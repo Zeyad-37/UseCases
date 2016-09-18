@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="gray_background">#f2f2f0</color>
+    <color name="gray_even_lighter">#DFDFDF</color>
+    <color name="lighter_gray_text_color">#b35c5c5c</color>
+    <color name="gray_recycler_view_header">#e3e3df</color>
+    <color name="gray_recycler_view_header_text">#82837f</color>
+    <color name="gray_text">#959592</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="lighter_black">#5c5c5c</color>
+</resources>
