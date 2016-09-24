@@ -20,7 +20,7 @@ public class DiskDataStore implements DataStore {
 
     private DataBaseManager mRealmManager;
     private EntityMapper mEntityDataMapper;
-    public final String TAG = DiskDataStore.class.getName();
+    public final String TAG = com.zeyad.genericusecase.data.repository.generalstore.DiskDataStore.class.getName();
 
     /**
      * Construct a {@link DataStore} based file system data store.

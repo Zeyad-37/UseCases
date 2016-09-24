@@ -34,6 +34,7 @@ android {
         targetSdkVersion 24
         versionCode 1
         versionName "1.0"
+        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -72,11 +73,14 @@ ext {
     supportLibraryVersion = '24.2.1'
     retrofitVersion = '2.1.0'
     okhttpVersion = '3.3.1'
-    googlePlayVersion = '9.4.0'
+    googlePlayVersion = '9.6.1'
+    androidSupportTest = '0.5'
+    espressoCore = '2.2.2'
 }
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:multidex:1.0.1'
     //google apis
     compile "com.google.android.gms:play-services-gcm:$googlePlayVersion"
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
@@ -93,12 +97,12 @@ dependencies {
     compile 'io.reactivex:rxjava:1.1.7'
 
     //test compile libraries
-    androidTestCompile 'com.android.support.test:runner:0.4'
-    androidTestCompile 'com.android.support.test:rules:0.4'
+    androidTestCompile "com.android.support.test:runner:$androidSupportTest"
+    androidTestCompile "com.android.support.test:rules:$androidSupportTest"
     androidTestCompile 'junit:junit:4.12'
     androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
     androidTestCompile "com.android.support:support-annotations:$supportLibraryVersion"
-    androidTestCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    androidTestCompile "com.android.support.test.espresso:espresso-core:$espressoCore"
     androidTestCompile 'org.mockito:mockito-core:1.10.17'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
@@ -106,7 +110,7 @@ dependencies {
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
     testCompile "com.android.support:support-annotations:$supportLibraryVersion"
-    testCompile 'com.android.support.test.espresso:espresso-core:2.2.1'
+    testCompile "com.android.support.test.espresso:espresso-core:$espressoCore"
     testCompile "org.mockito:mockito-core:2.0.57-beta"
 }
 

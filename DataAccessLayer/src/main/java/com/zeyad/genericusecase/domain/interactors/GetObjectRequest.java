@@ -11,7 +11,7 @@ public class GetObjectRequest {
 
     private String mUrl;
     private Subscriber mSubscriber;
-    private Class mDataClass, mPresentationClass, mDomainClass;
+    private Class mDataClass, mPresentationClass;
     private boolean mPersist;
     private String mIdColumnName;
     private int mItemId;
@@ -21,7 +21,6 @@ public class GetObjectRequest {
         mUrl = getObjectRequestBuilder.getUrl();
         mDataClass = getObjectRequestBuilder.getDataClass();
         mPresentationClass = getObjectRequestBuilder.getPresentationClass();
-        mDomainClass = getObjectRequestBuilder.getDomainClass();
         mPersist = getObjectRequestBuilder.isPersist();
         mSubscriber = getObjectRequestBuilder.getSubscriber();
         mIdColumnName = getObjectRequestBuilder.getIdColumnName();
@@ -30,14 +29,13 @@ public class GetObjectRequest {
     }
 
     public GetObjectRequest(@NonNull Subscriber subscriber, String url, String idColumnName,
-                            int itemId, @NonNull Class presentationClass, Class domainClass,
-                            Class dataClass, boolean persist, boolean shouldCache) {
+                            int itemId, @NonNull Class presentationClass, Class dataClass, boolean persist,
+                            boolean shouldCache) {
         mSubscriber = subscriber;
         mUrl = url;
         mIdColumnName = idColumnName;
         mItemId = itemId;
         mPresentationClass = presentationClass;
-        mDomainClass = domainClass;
         mDataClass = dataClass;
         mPersist = persist;
         mShouldCache = shouldCache;
@@ -57,10 +55,6 @@ public class GetObjectRequest {
 
     public Class getPresentationClass() {
         return mPresentationClass;
-    }
-
-    public Class getDomainClass() {
-        return mDomainClass;
     }
 
     public boolean isPersist() {
@@ -85,7 +79,7 @@ public class GetObjectRequest {
         private int mItemId;
         private String mUrl;
         private Subscriber mSubscriber;
-        private Class mDataClass, mPresentationClass, mDomainClass;
+        private Class mDataClass, mPresentationClass;
         private boolean mPersist;
 
         public GetObjectRequestBuilder(Class dataClass, boolean persist) {
@@ -102,12 +96,6 @@ public class GetObjectRequest {
         @NonNull
         public GetObjectRequestBuilder presentationClass(Class presentationClass) {
             mPresentationClass = presentationClass;
-            return this;
-        }
-
-        @NonNull
-        public GetObjectRequestBuilder domainClass(Class domainClass) {
-            mDomainClass = domainClass;
             return this;
         }
 
@@ -131,10 +119,6 @@ public class GetObjectRequest {
 
         public Class getPresentationClass() {
             return mPresentationClass;
-        }
-
-        public Class getDomainClass() {
-            return mDomainClass;
         }
 
         public boolean isPersist() {

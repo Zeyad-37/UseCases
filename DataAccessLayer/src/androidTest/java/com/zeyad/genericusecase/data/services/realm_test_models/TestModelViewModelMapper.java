@@ -38,12 +38,12 @@ public class TestModelViewModelMapper implements EntityMapper<Object, Object>, A
         if (tenderoRealmModel == null) {
             throw new IllegalArgumentException("object to convert is null");
         }
-        if (!(tenderoRealmModel instanceof TestModel)) {
+        if (!(tenderoRealmModel instanceof TestModel2)) {
             throw new IllegalArgumentException("only test realm models can be converted to domain, trying to convert:" + tenderoRealmModel);
         }
-        TestModel testModel = (TestModel) tenderoRealmModel;
+        TestModel2 testModel2 = (TestModel2) tenderoRealmModel;
         TestViewModel testViewModel = new TestViewModel();
-        testViewModel.setTestInfo(testModel.getId() + ":" + testModel.getValue());
+        testViewModel.setTestInfo(testModel2.getId() + ":" + testModel2.getValue());
         return testViewModel;
     }
 
@@ -58,7 +58,7 @@ public class TestModelViewModelMapper implements EntityMapper<Object, Object>, A
 
     @Override
     public Object transformToDomain(Object userRealmModel, @NonNull Class domainClass) {
-        if (userRealmModel instanceof TestModel) {
+        if (userRealmModel instanceof TestModel2) {
             return transformToDomain(userRealmModel);
         }
         if (domainClass.isInstance(userRealmModel)) {

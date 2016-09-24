@@ -12,7 +12,7 @@ public class FileIORequest {
     File mFile;
     String mUrl;
     boolean mOnWifi, mWhileCharging;
-    Class mDataClass, mPresentationClass, mDomainClass;
+    Class mDataClass, mPresentationClass;
 
     public FileIORequest() {
     }
@@ -24,14 +24,12 @@ public class FileIORequest {
         mFile = uploadRequestBuilder.getFile();
         mDataClass = uploadRequestBuilder.getDataClass();
         mPresentationClass = uploadRequestBuilder.getPresentationClass();
-        mDomainClass = uploadRequestBuilder.getDomainClass();
     }
 
-    public FileIORequest(String url, File file, boolean onWifi, boolean whileCharging, Class domainClass,
-                         Class presentationClass, Class dataClass) {
+    public FileIORequest(String url, File file, boolean onWifi, boolean whileCharging, Class presentationClass,
+                         Class dataClass) {
         mOnWifi = onWifi;
         mWhileCharging = whileCharging;
-        mDomainClass = domainClass;
         mPresentationClass = presentationClass;
         mDataClass = dataClass;
         mUrl = url;
@@ -58,10 +56,6 @@ public class FileIORequest {
         return mPresentationClass;
     }
 
-    public Class getDomainClass() {
-        return mDomainClass;
-    }
-
     public File getFile() {
         return mFile;
     }
@@ -71,7 +65,7 @@ public class FileIORequest {
         private File mFile;
         private String mUrl;
         private boolean mOnWifi, mWhileCharging;
-        private Class mDataClass, mPresentationClass, mDomainClass;
+        private Class mDataClass, mPresentationClass;
 
         public UploadRequestBuilder(String url, File file) {
             mUrl = url;
@@ -87,12 +81,6 @@ public class FileIORequest {
         @NonNull
         public UploadRequestBuilder presentationClass(Class presentationClass) {
             mPresentationClass = presentationClass;
-            return this;
-        }
-
-        @NonNull
-        public UploadRequestBuilder domainClass(Class domainClass) {
-            mDomainClass = domainClass;
             return this;
         }
 
@@ -141,10 +129,6 @@ public class FileIORequest {
 
         public Class getPresentationClass() {
             return mPresentationClass;
-        }
-
-        public Class getDomainClass() {
-            return mDomainClass;
         }
     }
 }

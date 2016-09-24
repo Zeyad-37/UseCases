@@ -3,14 +3,14 @@ package com.zeyad.genericusecase;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
+import java.io.File;
 
 public class Config {
 
     private static Config sInstance;
     private Context mContext;
     private String mPrefFileName;
+    private boolean mUseApiWithCache;
 
     private Config(@NonNull Context context) {
         mContext = context;
@@ -18,10 +18,16 @@ public class Config {
     }
 
     private void setupRealm(@NonNull Context context) {
-        Realm.setDefaultConfiguration(new RealmConfiguration.Builder(context)
-                .name("library.realm")
-//                .modules(new LibraryModule())
-                .build());
+//        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(context, context.getCacheDir())
+//                .name("library.realm")
+//                .modules(new TestLibraryModule())
+//                .build();
+    }
+
+    private File getFolder() {
+        final File someDir = new File("someDir");
+        someDir.mkdir();
+        return someDir;
     }
 
     public static Config getInstance() {
@@ -38,6 +44,14 @@ public class Config {
         if (mContext == null)
             throw new NullPointerException("set app context needs to be called first");
         return mContext;
+    }
+
+    public boolean isUseApiWithCache() {
+        return mUseApiWithCache;
+    }
+
+    public void setUseApiWithCache(boolean useApiWithCache) {
+        mUseApiWithCache = useApiWithCache;
     }
 
     public String getPrefFileName() {

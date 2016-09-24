@@ -35,7 +35,7 @@ public class Utils {
     }
 
     public static int getNextId(Class clazz, String column) {
-        return Utils.getMaxId(clazz, column) + 1;
+        return com.zeyad.genericusecase.data.utils.Utils.getMaxId(clazz, column) + 1;
     }
 
     // Simple logging to let us know what each source is returning
@@ -135,5 +135,9 @@ public class Utils {
 //        Intent intent = Config.getInstance().getContext().registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 //        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
 //        return plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB;
+    }
+
+    public static boolean isChargingReqCompatible(boolean isChargingCurrently, boolean doWhileCharging) {
+        return !doWhileCharging || isChargingCurrently;
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.google.android.gms.gcm.GcmNetworkManager;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
@@ -14,12 +15,22 @@ public class DataStoreFactory {
     @Nullable
     private DataBaseManager mRealmManager;
     private final Context mContext;
+    private final GcmNetworkManager mGCMNetworkManager;
 
     public DataStoreFactory(@Nullable DataBaseManager realmManager, Context context) {
         if (realmManager == null)
             throw new IllegalArgumentException("Constructor parameters cannot be null!");
         mContext = context;
         mRealmManager = realmManager;
+        mGCMNetworkManager = GcmNetworkManager.getInstance(mContext);
+    }
+
+    DataStoreFactory(@Nullable DataBaseManager realmManager, Context context, GcmNetworkManager gcmNetworkManager) {
+        if (realmManager == null)
+            throw new IllegalArgumentException("Constructor parameters cannot be null!");
+        mContext = context;
+        mRealmManager = realmManager;
+        mGCMNetworkManager = gcmNetworkManager;
     }
 
     /**
@@ -31,7 +42,7 @@ public class DataStoreFactory {
                 + dataClass.getSimpleName()) || !com.zeyad.genericusecase.data.utils.Utils.isNetworkAvailable(mContext)))
             return new DiskDataStore(mRealmManager, entityDataMapper);
         else if (!url.isEmpty())
-            return new CloudDataStore(new RestApiImpl(), mRealmManager, entityDataMapper);
+            return new CloudDataStore(new RestApiImpl(), mRealmManager, entityDataMapper, mGCMNetworkManager);
         else return new DiskDataStore(mRealmManager, entityDataMapper);
     }
 
@@ -44,7 +55,7 @@ public class DataStoreFactory {
         if (url.isEmpty() && (mRealmManager.isItemValid(id, idColumnName, dataClass) || !com.zeyad.genericusecase.data.utils.Utils.isNetworkAvailable(mContext)))
             return new DiskDataStore(mRealmManager, entityDataMapper);
         else if (!url.isEmpty())
-            return new CloudDataStore(new RestApiImpl(), mRealmManager, entityDataMapper);
+            return new CloudDataStore(new RestApiImpl(), mRealmManager, entityDataMapper, mGCMNetworkManager);
         else return new DiskDataStore(mRealmManager, entityDataMapper);
     }
 
@@ -61,6 +72,6 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore cloud(EntityMapper entityDataMapper) {
-        return new CloudDataStore(new RestApiImpl(), mRealmManager, entityDataMapper);
+        return new CloudDataStore(new RestApiImpl(), mRealmManager, entityDataMapper, mGCMNetworkManager);
     }
 }

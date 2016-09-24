@@ -60,4 +60,12 @@ public class ModelConverters {
         }
         return idList;
     }
+
+    @NonNull
+    public static <T> JSONArray convertToJsonArray(@NonNull List<T> hashMap) {
+        final JSONArray jsonArray = new JSONArray();
+        for (T object : hashMap)
+            jsonArray.put(object);
+        return jsonArray;
+    }
 }

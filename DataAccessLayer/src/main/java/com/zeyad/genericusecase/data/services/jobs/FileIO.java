@@ -30,6 +30,7 @@ import java.io.OutputStream;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import rx.Subscription;
+import rx.subscriptions.Subscriptions;
 
 import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
 import static android.app.job.JobInfo.NETWORK_TYPE_UNMETERED;
@@ -45,24 +46,22 @@ import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentSe
  * @author Zeyad on 6/05/16.
  */
 public class FileIO {
-    public static final String TAG = FileIO.class.getSimpleName();
+    public static final String TAG = com.zeyad.genericusecase.data.services.jobs.FileIO.class.getSimpleName();
     private final Context mContext;
     private final RestApi mRestApi;
     private int mTrailCount;
     private FileIORequest mFileIORequest;
     private boolean mIsDownload;
     private GcmNetworkManager mGcmNetworkManager;
-    private boolean mHasLollipop;
     private boolean mGooglePlayServicesAvailable;
 
-    public FileIO(@NonNull Intent intent, Context context, boolean isDownload) {
+    public FileIO(@NonNull Intent intent, @NonNull Context context, boolean isDownload) {
         mRestApi = new RestApiImpl();
         mContext = context;
         mTrailCount = intent.getIntExtra(TRIAL_COUNT, 0);
         mFileIORequest = new Gson().fromJson(intent.getStringExtra(PAYLOAD), FileIORequest.class);
         mIsDownload = isDownload;
         mGcmNetworkManager = GcmNetworkManager.getInstance(mContext);
-        mHasLollipop = Utils.hasLollipop();
         mGooglePlayServicesAvailable = Utils.isGooglePlayServicesAvailable(mContext);
     }
 
@@ -78,11 +77,9 @@ public class FileIO {
         mFileIORequest = fileIORequest;
         mIsDownload = isDownload;
         mGcmNetworkManager = gcmNetworkManager;
-        mHasLollipop = hasLollipop;
         mGooglePlayServicesAvailable = googlePlayServicesAvailable;
     }
 
-    @Nullable
     public Subscription execute() {
         if (mIsDownload) {
             if (!mFileIORequest.getFile().exists()) {
@@ -95,8 +92,8 @@ public class FileIO {
                             byte[] fileReader = new byte[4096];
                             long fileSize = responseBody.contentLength();
                             long fileSizeDownloaded = 0;
-                            inputStream = responseBody.byteStream();
                             outputStream = new FileOutputStream(mFileIORequest.getFile());
+                            inputStream = responseBody.byteStream();
                             while (true) {
                                 int read = inputStream.read(fileReader);
                                 if (read == -1)
@@ -122,7 +119,7 @@ public class FileIO {
                     throwable.printStackTrace();
                 });
             }
-            return null;
+            return Subscriptions.empty();
         } else
             return mRestApi.upload(mFileIORequest.getUrl(), RequestBody.create(MediaType
                     .parse(getMimeType(mFileIORequest.getFile()
@@ -132,7 +129,7 @@ public class FileIO {
     }
 
     @Nullable
-    public static String getMimeType(String uri) {
+    private static String getMimeType(String uri) {
         String type = null;
         String extension = MimeTypeMap.getFileExtensionFromUrl(uri);
         if (extension != null)
@@ -140,10 +137,11 @@ public class FileIO {
         return type;
     }
 
-    public void queueIOFile() {
+    void queueIOFile() {
         mTrailCount++;
         if (mTrailCount < 3) {
-            FileIORequest fileIORequest = new FileIORequest.UploadRequestBuilder(mFileIORequest.getUrl(), mFileIORequest.getFile())
+            FileIORequest fileIORequest = new FileIORequest.UploadRequestBuilder(mFileIORequest.getUrl(),
+                    mFileIORequest.getFile())
                     .onWifi(mFileIORequest.onWifi())
                     .whileCharging(mFileIORequest.isWhileCharging())
                     .build();
@@ -163,7 +161,7 @@ public class FileIO {
                         .build());
                 Log.d(TAG, "Requeue scheduled through GcmNetworkManager: " + true);
             } else {
-                if (mHasLollipop) {
+                if (Utils.hasLollipop()) {
                     PersistableBundle persistableBundle = new PersistableBundle();
                     persistableBundle.putString(JOB_TYPE, mIsDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
                     persistableBundle.putString(PAYLOAD, new Gson().toJson(fileIORequest));

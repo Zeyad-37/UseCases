@@ -59,12 +59,15 @@ import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentSe
 
 public class CloudDataStore implements DataStore {
 
-    static final String TAG = CloudDataStore.class.getName();
+    static final String TAG = com.zeyad.genericusecase.data.repository.generalstore.CloudDataStore.class.getName();
     @NonNull
     private final Observable<Object> mErrorObservablePersisted, mErrorObservableNotPersisted, mQueueFileIO;
     private final RestApi mRestApi;
+    private final boolean mIsCharging;
+    private final GcmNetworkManager mGcmNetworkManager;
     private GoogleApiAvailability mGoogleApiAvailability;
-    private boolean mHasLollipop = Utils.hasLollipop();
+    private boolean mIsOnWifi;
+    private boolean mHasLollipop;
     final EntityMapper mEntityDataMapper;
     final DataBaseManager mRealmManager;
     final Context mContext;
@@ -76,6 +79,17 @@ public class CloudDataStore implements DataStore {
      * @param realmManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
     public CloudDataStore(RestApi restApi, DataBaseManager realmManager, EntityMapper entityDataMapper) {
+        this(restApi, realmManager, entityDataMapper
+                , GcmNetworkManager.getInstance(realmManager.getContext().getApplicationContext()));
+    }
+
+    /**
+     * Construct a {@link DataStore} based on connections to the api (Cloud).
+     *
+     * @param restApi      The {@link RestApi} implementation to use.
+     * @param realmManager A {@link DataBaseManager} to cache data retrieved from the api.
+     */
+    CloudDataStore(RestApi restApi, DataBaseManager realmManager, EntityMapper entityDataMapper, GcmNetworkManager gcmNetworkManager) {
         mRestApi = restApi;
         mEntityDataMapper = entityDataMapper;
         mRealmManager = realmManager;
@@ -84,6 +98,32 @@ public class CloudDataStore implements DataStore {
         mErrorObservablePersisted = Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_PERSISTED));
         mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_NOT_PERSISTED));
         mQueueFileIO = Observable.empty();
+        mIsCharging = Utils.isCharging();
+        mGcmNetworkManager = gcmNetworkManager;
+    }
+
+    /**
+     * Construct a {@link DataStore} based on connections to the api (Cloud).
+     *
+     * @param restApi           The {@link RestApi} implementation to use.
+     * @param realmManager      A {@link DataBaseManager} to cache data retrieved from the api.
+     * @param isCharging
+     * @param isOnWifi
+     * @param gcmNetworkManager
+     */
+    CloudDataStore(RestApi restApi, DataBaseManager realmManager, EntityMapper entityDataMapper
+            , boolean isCharging, boolean isOnWifi, GcmNetworkManager gcmNetworkManager) {
+        mRestApi = restApi;
+        mEntityDataMapper = entityDataMapper;
+        mRealmManager = realmManager;
+        mContext = mRealmManager.getContext().getApplicationContext();
+        mGoogleApiAvailability = GoogleApiAvailability.getInstance();
+        mErrorObservablePersisted = Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_PERSISTED));
+        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_NOT_PERSISTED));
+        mQueueFileIO = Observable.empty();
+        mIsCharging = isCharging;
+        mIsOnWifi = isOnWifi;
+        mGcmNetworkManager = gcmNetworkManager;
     }
 
     @NonNull
@@ -187,7 +227,7 @@ public class CloudDataStore implements DataStore {
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
                 return mErrorObservableNotPersisted;
             return mRestApi.dynamicDeleteObject(url, RequestBody.create(MediaType.parse(Constants.APPLICATION_JSON),
-                   ModelConverters.convertToString(jsonArray)))
+                    ModelConverters.convertToString(jsonArray)))
                     //.compose(applyExponentialBackoff())
                     .doOnNext(object -> {
                         if (persist)
@@ -216,7 +256,7 @@ public class CloudDataStore implements DataStore {
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
                 return mErrorObservableNotPersisted;
             return mRestApi.dynamicPutObject(url, RequestBody.create(MediaType.parse(Constants.APPLICATION_JSON),
-                   ModelConverters.convertToString( keyValuePairs)))
+                    ModelConverters.convertToString(keyValuePairs)))
                     //.compose(applyExponentialBackoff())
                     .doOnNext(object -> {
                         if (persist)
@@ -234,16 +274,17 @@ public class CloudDataStore implements DataStore {
     public Observable<?> dynamicUploadFile(String url, @NonNull File file, boolean onWifi, boolean whileCharging,
                                            Class domainClass) {
         return Observable.defer(() -> {
-            if (isEligibleForPersistenceIfNetworkNotAvailable() && Utils.isOnWifi() == onWifi
-                    && Utils.isCharging() == whileCharging) {
-                queueIOFile(url, file, true, whileCharging, false);
+            mIsOnWifi = Utils.isOnWifi();
+            if (isEligibleForPersistenceIfNetworkNotAvailable() && mIsOnWifi == onWifi
+                    && Utils.isChargingReqCompatible(mIsCharging, whileCharging)) {
+                queueIOFile(url, file, true, whileCharging, false, mContext);
                 return mQueueFileIO;
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
                 return mErrorObservableNotPersisted;
             return mRestApi.upload(url, RequestBody.create(MediaType.parse(getMimeType(file.getPath())), file))
                     .doOnError(throwable -> {
                         throwable.printStackTrace();
-                        queueIOFile(url, file, true, whileCharging, false);
+                        queueIOFile(url, file, true, whileCharging, false, mContext);
                     })
                     .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel, domainClass));
         });
@@ -301,9 +342,10 @@ public class CloudDataStore implements DataStore {
     @Override
     public Observable<?> dynamicDownloadFile(String url, @NonNull File file, boolean onWifi, boolean whileCharging) {
         return Observable.defer(() -> {
-            if (isEligibleForPersistenceIfNetworkNotAvailable() && Utils.isOnWifi() == onWifi
-                    && Utils.isCharging() == whileCharging) {
-                queueIOFile(url, file, onWifi, whileCharging, true);
+            mIsOnWifi = Utils.isOnWifi();
+            if (isEligibleForPersistenceIfNetworkNotAvailable() && mIsOnWifi == onWifi
+                    && Utils.isChargingReqCompatible(mIsCharging, whileCharging)) {
+                queueIOFile(url, file, onWifi, whileCharging, true, mContext);
                 return mQueueFileIO;
             } else
                 return mRestApi.dynamicDownload(url)
@@ -357,7 +399,7 @@ public class CloudDataStore implements DataStore {
     }
 
     @Nullable
-    public static String getMimeType(String uri) {
+    private static String getMimeType(String uri) {
         String type = null;
         String extension = MimeTypeMap.getFileExtensionFromUrl(uri);
         if (extension != null)
@@ -396,7 +438,7 @@ public class CloudDataStore implements DataStore {
     private static class SimpleSubscriber extends Subscriber<Object> {
         private final Object mObject;
 
-        public SimpleSubscriber(Object object) {
+        SimpleSubscriber(Object object) {
             mObject = object;
         }
 
@@ -421,7 +463,7 @@ public class CloudDataStore implements DataStore {
         private Class mDataClass;
         private String mIdColumnName;
 
-        public SaveGenericToDBAction(Class dataClass, String idColumnName) {
+        SaveGenericToDBAction(Class dataClass, String idColumnName) {
             mDataClass = dataClass;
             mIdColumnName = idColumnName;
         }
@@ -478,7 +520,7 @@ public class CloudDataStore implements DataStore {
 
         private Class mDataClass;
 
-        public SaveAllGenericsToDBAction(Class dataClass) {
+        SaveAllGenericsToDBAction(Class dataClass) {
             mDataClass = dataClass;
         }
 
@@ -494,7 +536,7 @@ public class CloudDataStore implements DataStore {
 
         private Class mDataClass;
 
-        public DeleteCollectionGenericsFromDBAction(Class dataClass) {
+        DeleteCollectionGenericsFromDBAction(Class dataClass) {
             mDataClass = dataClass;
         }
 
@@ -544,7 +586,7 @@ public class CloudDataStore implements DataStore {
         return !Utils.isNetworkAvailable(mContext) && !(mHasLollipop || isGooglePlayServicesAvailable());
     }
 
-    public boolean queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload) {
+    private boolean queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload, Context context) {
         FileIORequest fileIORequest = new FileIORequest.UploadRequestBuilder(url, file)
                 .onWifi(onWifi)
                 .whileCharging(whileCharging)
@@ -553,22 +595,25 @@ public class CloudDataStore implements DataStore {
             Bundle extras = new Bundle();
             extras.putString(GenericNetworkQueueIntentService.JOB_TYPE, isDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
             extras.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(fileIORequest));
-            GcmNetworkManager.getInstance(mContext).schedule(new OneoffTask.Builder()
-                    .setService(GenericGCMService.class)
-                    .setRequiredNetwork(onWifi ? OneoffTask.NETWORK_STATE_UNMETERED : OneoffTask.NETWORK_STATE_CONNECTED)
-                    .setRequiresCharging(whileCharging)
-                    .setUpdateCurrent(false)
-                    .setPersisted(true)
-                    .setExtras(extras)
-                    .build());
+            mGcmNetworkManager
+                    .schedule(new OneoffTask.Builder()
+                            .setService(GenericGCMService.class)
+                            .setRequiredNetwork(onWifi ? OneoffTask.NETWORK_STATE_UNMETERED : OneoffTask.NETWORK_STATE_CONNECTED)
+                            .setRequiresCharging(whileCharging)
+                            .setUpdateCurrent(false)
+                            .setPersisted(true)
+                            .setExtras(extras)
+                            .setTag(Constants.FILE_IO_TAG)
+                            .setExecutionWindow(0, 30)
+                            .build());
             Log.d(TAG, "QueuePost scheduled through GcmNetworkManager: " + true);
             return true;
         } else if (Utils.hasLollipop()) {
             PersistableBundle persistableBundle = new PersistableBundle();
             persistableBundle.putString(GenericNetworkQueueIntentService.JOB_TYPE, isDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
             persistableBundle.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(fileIORequest));
-            boolean isScheduled = Utils.scheduleJob(mContext, new JobInfo.Builder(1,
-                    new ComponentName(mContext, GenericJobService.class))
+            boolean isScheduled = Utils.scheduleJob(context, new JobInfo.Builder(1,
+                    new ComponentName(context, GenericJobService.class))
                     .setRequiredNetworkType(onWifi ? JobInfo.NETWORK_TYPE_UNMETERED : JobInfo.NETWORK_TYPE_ANY)
                     .setRequiresCharging(whileCharging)
                     .setPersisted(true)
@@ -619,13 +664,15 @@ public class CloudDataStore implements DataStore {
             Bundle extras = new Bundle();
             extras.putString(GenericNetworkQueueIntentService.JOB_TYPE, GenericNetworkQueueIntentService.POST);
             extras.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(postRequest));
-            GcmNetworkManager.getInstance(mContext).schedule(new OneoffTask.Builder()
+            mGcmNetworkManager.schedule(new OneoffTask.Builder()
                     .setService(GenericGCMService.class)
                     .setRequiredNetwork(OneoffTask.NETWORK_STATE_CONNECTED)
                     .setRequiresCharging(false)
                     .setUpdateCurrent(false)
                     .setPersisted(true)
                     .setExtras(extras)
+                    .setTag(Constants.POST_TAG)
+                    .setExecutionWindow(0, 30)
                     .build());
             Log.d(TAG, "QueuePost scheduled through GcmNetworkManager: " + true);
             return true;

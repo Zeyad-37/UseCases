@@ -48,7 +48,7 @@ import rx.Observable;
  * Implements {@link Callable} so when executed asynchronously can
  * return a value.
  */
-public class ApiConnection implements IApiConnection {
+class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnection {
 
     private static ApiConnection sInstance;
     private final static String CACHE_CONTROL = "Cache-Control";
@@ -56,26 +56,21 @@ public class ApiConnection implements IApiConnection {
     private final RestApi mRestApiWithCache;
     private static final int TIME_OUT = 15;
 
-    private ApiConnection() {
-        Retrofit retrofitWithCache = createRetro2Client(provideOkHttpClient(true));
-        Retrofit retrofitWithoutCache = createRetro2Client(provideOkHttpClient(false));
-        mRestApiWithoutCache = retrofitWithoutCache.create(RestApi.class);
-        mRestApiWithCache = retrofitWithCache.create(RestApi.class);
-    }
-
     private ApiConnection(@Nullable OkHttpClient.Builder okhttpBuilder, @Nullable Cache cache) {
-        if (okhttpBuilder == null) {
+        if (okhttpBuilder == null)
             throw new NullPointerException("okhttp builder can not be null");
-        }
-        final Cache cacheToUse = cache == null ? provideCache() : cache;
-        Retrofit retrofitWithCache = createRetro2Client(provideOkHttpClient(okhttpBuilder, cacheToUse, true));
-        Retrofit retrofitWithoutCache = createRetro2Client(provideOkHttpClient(okhttpBuilder, cacheToUse, false));
-        mRestApiWithoutCache = retrofitWithoutCache.create(RestApi.class);
-        mRestApiWithCache = retrofitWithCache.create(RestApi.class);
+        mRestApiWithCache = createRetro2Client(provideOkHttpClient(okhttpBuilder, cache))
+                .create(RestApi.class);
+        mRestApiWithoutCache = createRetro2Client(provideOkHttpClient(okhttpBuilder, null))
+                .create(RestApi.class);
     }
 
-    private ApiConnection(OkHttpClient.Builder okhttpBuilder) {
-        this(okhttpBuilder, null);
+    private ApiConnection() {
+        Config.getInstance().setUseApiWithCache(true);
+        mRestApiWithCache = createRetro2Client(provideOkHttpClient(getBuilderForOkhttp()
+                , provideCache())).create(RestApi.class);
+        mRestApiWithoutCache = createRetro2Client(provideOkHttpClient(getBuilderForOkhttp()
+                , null)).create(RestApi.class);
     }
 
     /**
@@ -90,9 +85,8 @@ public class ApiConnection implements IApiConnection {
     }
 
     static IApiConnection getInstance() {
-        if (sInstance == null) {
+        if (sInstance == null)
             throw new NullPointerException("init should be called atleast once before calling getInstance");
-        }
         return sInstance;
     }
 
@@ -102,10 +96,6 @@ public class ApiConnection implements IApiConnection {
 
     static void init(OkHttpClient.Builder okhttpBuilder, Cache cache) {
         sInstance = new ApiConnection(okhttpBuilder, cache);
-    }
-
-    static void init(OkHttpClient.Builder okhttpBuilder) {
-        sInstance = new ApiConnection(okhttpBuilder);
     }
 
     /**
@@ -127,72 +117,83 @@ public class ApiConnection implements IApiConnection {
 
     @Override
     public Observable<ResponseBody> dynamicDownload(String url) {
-        return mRestApiWithoutCache.dynamicDownload(url);
+
+        return getRestApi().dynamicDownload(url);
+    }
+
+    private RestApi getRestApi() {
+        return Config.getInstance().isUseApiWithCache() ? mRestApiWithCache : mRestApiWithoutCache;
     }
 
     @Override
     public Observable<Object> dynamicGetObject(String url) {
-        return mRestApiWithoutCache.dynamicGetObject(url);
+        return getRestApi().dynamicGetObject(url);
     }
 
     @Override
     public Observable<Object> dynamicGetObject(String url, boolean shouldCache) {
-        return (shouldCache ? mRestApiWithCache : mRestApiWithoutCache).dynamicGetObject(url);
+        if (shouldCache && !Config.getInstance().isUseApiWithCache()) {
+            logNoCache();
+        }
+        return getRestApi().dynamicGetObject(url);
     }
 
     @Override
     public Observable<List> dynamicGetList(String url) {
-        return mRestApiWithoutCache.dynamicGetList(url);
+        return getRestApi().dynamicGetList(url);
     }
 
     @Override
     public Observable<List> dynamicGetList(String url, boolean shouldCache) {
-        return (shouldCache ? mRestApiWithCache : mRestApiWithoutCache).dynamicGetList(url);
+        if (shouldCache && !Config.getInstance().isUseApiWithCache()) {
+            logNoCache();
+        }
+        return getRestApi().dynamicGetList(url);
     }
 
     @Override
     public Observable<Object> dynamicPostObject(String url, RequestBody requestBody) {
-        return mRestApiWithoutCache.dynamicPostObject(url, requestBody);
+        return getRestApi().dynamicPostObject(url, requestBody);
     }
 
     @Override
     public Observable<List> dynamicPostList(String url, RequestBody requestBody) {
-        return mRestApiWithoutCache.dynamicPostList(url, requestBody);
+        return getRestApi().dynamicPostList(url, requestBody);
     }
 
     @Override
     public Observable<Object> dynamicPutObject(String url, RequestBody requestBody) {
-        return mRestApiWithoutCache.dynamicPutObject(url, requestBody);
+        return getRestApi().dynamicPutObject(url, requestBody);
     }
 
     @Override
     public Observable<List> dynamicPutList(String url, RequestBody requestBody) {
-        return mRestApiWithoutCache.dynamicPutList(url, requestBody);
+        return getRestApi().dynamicPutList(url, requestBody);
     }
 
     @Override
     public Observable<ResponseBody> upload(String url, MultipartBody.Part file, RequestBody description) {
-        return mRestApiWithoutCache.upload(url, file);
+        return getRestApi().upload(url, file);
     }
 
     @Override
     public Observable<Object> upload(String url, RequestBody requestBody) {
-        return mRestApiWithoutCache.upload(url, requestBody);
+        return getRestApi().upload(url, requestBody);
     }
 
     @Override
     public Observable<ResponseBody> upload(String url, MultipartBody.Part file) {
-        return mRestApiWithoutCache.upload(url, file);
+        return getRestApi().upload(url, file);
     }
 
     @Override
     public Observable<List> dynamicDeleteList(String url, RequestBody body) {
-        return mRestApiWithoutCache.dynamicDeleteList(url, body);
+        return getRestApi().dynamicDeleteList(url, body);
     }
 
     @Override
     public Observable<Object> dynamicDeleteObject(String url, RequestBody body) {
-        return mRestApiWithoutCache.dynamicDeleteObject(url, body);
+        return getRestApi().dynamicDeleteObject(url, body);
     }
 
     RestApi getRestApiWithoutCache() {
@@ -300,20 +301,26 @@ public class ApiConnection implements IApiConnection {
         };
     }
 
-    private OkHttpClient provideOkHttpClient(boolean shouldCache) {
-        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+    private OkHttpClient provideOkHttpClient() {
+        OkHttpClient.Builder builder = getBuilderForOkhttp();
+        return provideOkHttpClient(builder, provideCache());
+    }
+
+    @NonNull
+    private OkHttpClient.Builder getBuilderForOkhttp() {
+        return new OkHttpClient.Builder()
                 .addInterceptor(provideHttpLoggingInterceptor())
                 .addInterceptor(provideOfflineCacheInterceptor())
                 .addNetworkInterceptor(provideCacheInterceptor())
                 .connectTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .readTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .writeTimeout(TIME_OUT, TimeUnit.SECONDS);
-        return provideOkHttpClient(builder, provideCache(), shouldCache);
     }
 
-    private OkHttpClient provideOkHttpClient(@NonNull OkHttpClient.Builder okHttpBuilder, Cache cache, boolean shouldCache) {
-        if (shouldCache)
+    private OkHttpClient provideOkHttpClient(@NonNull OkHttpClient.Builder okHttpBuilder, Cache cache) {
+        if (cache != null) {
             okHttpBuilder.cache(cache);
+        }
         return okHttpBuilder.build();
     }
 
@@ -348,5 +355,9 @@ public class ApiConnection implements IApiConnection {
             e.printStackTrace();
         }
         return cache;
+    }
+
+    private void logNoCache() {
+        Log.e("ApiConnection", "there would be no caching. Since caching module is disabled.");
     }
 }

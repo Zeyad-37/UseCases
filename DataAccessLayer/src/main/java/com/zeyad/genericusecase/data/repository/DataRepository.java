@@ -20,6 +20,7 @@ public class DataRepository implements Repository {
 
     private final DataStoreFactory mDataStoreFactory;
     public static final String DEFAULT_ID_TO_BE_REPLACED = "id";
+    public static final boolean DEFAULT_TO_CACHE = false;
     private final IEntityMapperUtil mEntityMapperUtil;
 
     /**
@@ -84,7 +85,7 @@ public class DataRepository implements Repository {
     public Observable<?> deleteListDynamically(@NonNull String url, JSONArray jsonArray,
                                                Class domainClass, @NonNull Class dataClass, boolean persist) {
         return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass), dataClass)
-                .dynamicDeleteCollection(url, DataRepository.DEFAULT_ID_TO_BE_REPLACED, jsonArray,
+                .dynamicDeleteCollection(url, com.zeyad.genericusecase.data.repository.DataRepository.DEFAULT_ID_TO_BE_REPLACED, jsonArray,
                         dataClass, persist);
     }
 

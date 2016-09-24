@@ -2,7 +2,6 @@ package com.zeyad.genericusecase.data.services;
 
 import android.app.IntentService;
 import android.content.Intent;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.zeyad.genericusecase.data.services.jobs.FileIO;
@@ -13,19 +12,19 @@ import rx.subscriptions.CompositeSubscription;
 
 public class GenericNetworkQueueIntentService extends IntentService {
 
-    public static final String TAG = GenericNetworkQueueIntentService.class.getSimpleName(),
+    public static final String TAG = com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.class.getSimpleName(),
             DOWNLOAD_FILE = "DOWNLOAD_FILE", UPLOAD_FILE = "UPLOAD_FILE", JOB_TYPE = "JOB_TYPE",
             POST = "POST", LIST = "LIST", PAYLOAD = "payload", TRIAL_COUNT = "trialCount";
     @Nullable
     private CompositeSubscription mCompositeSubscription;
 
     public GenericNetworkQueueIntentService() {
-        super(GenericNetworkQueueIntentService.class.getName());
-        mCompositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(mCompositeSubscription);
+        super(com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.class.getName());
     }
 
     @Override
-    protected void onHandleIntent(@NonNull Intent intent) {
+    protected void onHandleIntent(Intent intent) {
+        mCompositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(mCompositeSubscription);
         switch (intent.getStringExtra(JOB_TYPE)) {
             case POST:
                 mCompositeSubscription.add(new Post(intent, getApplicationContext()).execute());

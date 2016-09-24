@@ -32,7 +32,7 @@ import rx.schedulers.Schedulers;
 public class GenericRealmManager implements DataBaseManager {
 
     private static DataBaseManager sInstance;
-    public final String TAG = GenericRealmManager.class.getName();
+    public final String TAG = com.zeyad.genericusecase.data.db.GenericRealmManager.class.getName();
     private Realm mRealm;
     private Context mContext;
 
@@ -288,6 +288,9 @@ public class GenericRealmManager implements DataBaseManager {
     void writeToPreferences(long value, String destination, String source) {
         SharedPreferences.Editor editor = mContext.getSharedPreferences(Config.getInstance().getPrefFileName(),
                 Context.MODE_PRIVATE).edit();
+        if (editor == null) {
+            return;
+        }
         editor.putLong(destination, value);
         editor.apply();
         Log.d(TAG, source + " writeToPreferencesTo " + destination + ": " + value);

@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
@@ -31,6 +30,7 @@ import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import rx.Subscription;
 import rx.functions.Action1;
+import rx.subscriptions.Subscriptions;
 
 import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
 import static com.google.android.gms.gcm.Task.NETWORK_STATE_CONNECTED;
@@ -42,41 +42,37 @@ import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentSe
  * @author Zeyad on 6/05/16.
  */
 public class Post {
-    public static final String TAG = Post.class.getSimpleName();
+    public static final String TAG = com.zeyad.genericusecase.data.services.jobs.Post.class.getSimpleName();
     private final Context mContext;
     private final PostRequest mPostRequest;
     private final RestApi mRestApi;
     private int mTrailCount;
-    private boolean mHasLollipop;
     private boolean mGooglePlayServicesAvailable;
     private boolean mNetworkAvailable;
     private GcmNetworkManager mGcmNetworkManager;
 
-    public Post(@NonNull Intent intent, Context context) {
+    public Post(@NonNull Intent intent, @NonNull Context context) {
         mRestApi = new RestApiImpl();
         mContext = context;
         mTrailCount = intent.getIntExtra(TRIAL_COUNT, 0);
         mPostRequest = new Gson().fromJson(intent.getStringExtra(PAYLOAD), PostRequest.class);
-        mHasLollipop = Utils.hasLollipop();
         mGooglePlayServicesAvailable = Utils.isGooglePlayServicesAvailable(mContext);
         mNetworkAvailable = Utils.isNetworkAvailable(mContext);
         mGcmNetworkManager = GcmNetworkManager.getInstance(mContext);
     }
 
-    Post(Context context, PostRequest postRequest, RestApi restApi, int trailCount, boolean hasLollipop,
+    Post(Context context, PostRequest postRequest, RestApi restApi, int trailCount,
          boolean googlePlayServicesAvailable, boolean networkAvailable, GcmNetworkManager gcmNetworkManager) {
         mContext = context;
         mPostRequest = postRequest;
         mRestApi = restApi;
         mTrailCount = trailCount;
-        mHasLollipop = hasLollipop;
         mGooglePlayServicesAvailable = googlePlayServicesAvailable;
         mNetworkAvailable = networkAvailable;
         mGcmNetworkManager = gcmNetworkManager;
 
     }
 
-    @Nullable
     public Subscription execute() {
         if (mNetworkAvailable) {
             String bundle = "";
@@ -119,7 +115,7 @@ public class Post {
             }
         } else
             reQueue();
-        return null;
+        return Subscriptions.empty();
     }
 
     @NonNull
@@ -153,7 +149,7 @@ public class Post {
                         .build());
                 Log.d(TAG, "Request reQueued through GcmNetworkManager: " + true);
             } else {
-                if (mHasLollipop) {
+                if (Utils.hasLollipop()) {
                     PersistableBundle persistableBundle = new PersistableBundle();
                     persistableBundle.putString(JOB_TYPE, GenericNetworkQueueIntentService.POST);
                     persistableBundle.putString(PAYLOAD, gson.toJson(mPostRequest));

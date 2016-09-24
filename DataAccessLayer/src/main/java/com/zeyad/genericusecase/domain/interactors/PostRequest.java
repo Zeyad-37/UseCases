@@ -17,7 +17,7 @@ public class PostRequest {
     public static final String POST = "post", DELETE = "delete", PUT = "put";
     public String mUrl, mIdColumnName, mMethod;
     public Subscriber mSubscriber;
-    public Class mDataClass, mPresentationClass, mDomainClass;
+    public Class mDataClass, mPresentationClass;
     public boolean mPersist;
     public JSONObject mJsonObject;
     public JSONArray mJsonArray;
@@ -27,7 +27,6 @@ public class PostRequest {
         mUrl = postRequestBuilder.getUrl();
         mDataClass = postRequestBuilder.getDataClass();
         mPresentationClass = postRequestBuilder.getPresentationClass();
-        mDomainClass = postRequestBuilder.getDomainClass();
         mPersist = postRequestBuilder.isPersist();
         mSubscriber = postRequestBuilder.getSubscriber();
         mKeyValuePairs = postRequestBuilder.getKeyValuePairs();
@@ -38,11 +37,10 @@ public class PostRequest {
     }
 
     public PostRequest(Subscriber subscriber, String idColumnName, String url, JSONObject keyValuePairs,
-                       Class presentationClass, Class domainClass, Class dataClass, boolean persist) {
+                       Class presentationClass, Class dataClass, boolean persist) {
         mIdColumnName = idColumnName;
         mJsonObject = keyValuePairs;
         mPersist = persist;
-        mDomainClass = domainClass;
         mPresentationClass = presentationClass;
         mDataClass = dataClass;
         mSubscriber = subscriber;
@@ -50,11 +48,10 @@ public class PostRequest {
     }
 
     public PostRequest(Subscriber subscriber, String idColumnName, String url, JSONArray keyValuePairs,
-                       Class presentationClass, Class domainClass, Class dataClass, boolean persist) {
+                       Class presentationClass, Class dataClass, boolean persist) {
         mIdColumnName = idColumnName;
         mJsonArray = keyValuePairs;
         mPersist = persist;
-        mDomainClass = domainClass;
         mPresentationClass = presentationClass;
         mDataClass = dataClass;
         mSubscriber = subscriber;
@@ -62,11 +59,10 @@ public class PostRequest {
     }
 
     public PostRequest(Subscriber subscriber, String idColumnName, String url, HashMap<String, Object> keyValuePairs,
-                       Class presentationClass, Class domainClass, Class dataClass, boolean persist) {
+                       Class presentationClass, Class dataClass, boolean persist) {
         mIdColumnName = idColumnName;
         mKeyValuePairs = keyValuePairs;
         mPersist = persist;
-        mDomainClass = domainClass;
         mPresentationClass = presentationClass;
         mDataClass = dataClass;
         mSubscriber = subscriber;
@@ -96,10 +92,6 @@ public class PostRequest {
 
     public Class getPresentationClass() {
         return mPresentationClass;
-    }
-
-    public Class getDomainClass() {
-        return mDomainClass;
     }
 
     public boolean isPersist() {
@@ -133,7 +125,7 @@ public class PostRequest {
         private HashMap<String, Object> mKeyValuePairs;
         private String mUrl, mIdColumnName, mMethod;
         private Subscriber mSubscriber;
-        private Class mDataClass, mPresentationClass, mDomainClass;
+        private Class mDataClass, mPresentationClass;
         private boolean mPersist;
 
         public PostRequestBuilder(Class dataClass, boolean persist) {
@@ -150,12 +142,6 @@ public class PostRequest {
         @NonNull
         public PostRequestBuilder presentationClass(Class presentationClass) {
             mPresentationClass = presentationClass;
-            return this;
-        }
-
-        @NonNull
-        public PostRequestBuilder domainClass(Class domainClass) {
-            mDomainClass = domainClass;
             return this;
         }
 
@@ -213,10 +199,6 @@ public class PostRequest {
 
         protected Class getPresentationClass() {
             return mPresentationClass;
-        }
-
-        protected Class getDomainClass() {
-            return mDomainClass;
         }
 
         protected boolean isPersist() {

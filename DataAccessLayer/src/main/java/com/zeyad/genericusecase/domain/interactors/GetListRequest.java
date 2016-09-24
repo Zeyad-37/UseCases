@@ -13,13 +13,12 @@ public class GetListRequest {
     private boolean mShouldCache, mPersist;
     private String mUrl;
     private Subscriber mSubscriber;
-    private Class mDataClass, mPresentationClass, mDomainClass;
+    private Class mDataClass, mPresentationClass;
 
     public GetListRequest(@NonNull GetListRequestBuilder genericUseCaseRequestBuilder) {
         mUrl = genericUseCaseRequestBuilder.getUrl();
         mDataClass = genericUseCaseRequestBuilder.getDataClass();
         mPresentationClass = genericUseCaseRequestBuilder.getPresentationClass();
-        mDomainClass = genericUseCaseRequestBuilder.getDomainClass();
         mPersist = genericUseCaseRequestBuilder.isPersist();
         mShouldCache = genericUseCaseRequestBuilder.isShouldCache();
         mSubscriber = genericUseCaseRequestBuilder.getSubscriber();
@@ -41,10 +40,6 @@ public class GetListRequest {
         return mPresentationClass;
     }
 
-    public Class getDomainClass() {
-        return mDomainClass;
-    }
-
     public boolean isPersist() {
         return mPersist;
     }
@@ -57,7 +52,7 @@ public class GetListRequest {
 
         private boolean mShouldCache;
         private String mUrl;
-        private Class mDataClass, mPresentationClass, mDomainClass;
+        private Class mDataClass, mPresentationClass;
         private boolean mPersist;
         private Subscriber mSubscriber;
 
@@ -79,12 +74,6 @@ public class GetListRequest {
         }
 
         @NonNull
-        public GetListRequestBuilder domainClass(Class domainClass) {
-            mDomainClass = domainClass;
-            return this;
-        }
-
-        @NonNull
         public GetListRequestBuilder subscriber(Subscriber subscriber) {
             mSubscriber = subscriber;
             return this;
@@ -102,17 +91,13 @@ public class GetListRequest {
             return mPresentationClass;
         }
 
-        public Class getDomainClass() {
-            return mDomainClass;
-        }
-
         public boolean isPersist() {
             return mPersist;
         }
 
         @Nullable
         public GetListRequest build() {
-            if (mUrl != null && mDataClass != null && mPresentationClass != null && mDomainClass != null)
+            if (mUrl != null && mDataClass != null && mPresentationClass != null)
                 return new GetListRequest(this);
             return null;
         }

@@ -11,7 +11,7 @@ import android.support.annotation.Nullable;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.zeyad.genericusecase.data.network.RestApi;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestModel2;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
 import com.zeyad.genericusecase.data.utils.Utils;
 import com.zeyad.genericusecase.domain.interactors.FileIORequest;
@@ -59,7 +59,7 @@ class FileIOTestRobot {
 
     @NonNull
     static Class getPresentationClass() {
-        return TestModel.class;
+        return TestModel2.class;
     }
 
     static String getValidColumnName() {
@@ -68,20 +68,12 @@ class FileIOTestRobot {
 
     @NonNull
     static Class getValidDataClass() {
-        return TestModel.class;
+        return TestModel2.class;
     }
 
     static FileIORequest createFileIoReq(boolean wifi, boolean isCharging, File file) {
-//        return new FileIORequest.UploadRequestBuilder(getValidUrl(), getValidFile())
-//                .dataClass(getValidDataClass())
-//                .domainClass(getValidDomainClass())
-//                .onWifi(wifi)
-//                .presentationClass(getPresentationClass())
-//                .whileCharging(isCharging)
-//                .build();
         final FileIORequest fileIORequest = Mockito.mock(FileIORequest.class);
         Mockito.when(fileIORequest.getDataClass()).thenReturn(getValidDataClass());
-        Mockito.when(fileIORequest.getDomainClass()).thenReturn(getValidDomainClass());
         Mockito.when(fileIORequest.getPresentationClass()).thenReturn(getPresentationClass());
         Mockito.when(fileIORequest.getUrl()).thenReturn(getValidUrl());
         Mockito.when(fileIORequest.getFile()).thenReturn(file);

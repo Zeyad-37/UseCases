@@ -67,40 +67,6 @@ public class FileIOTest {
     }
 
     @Test
-    public void testExecute_ifDataIsReadFromInputStreamOfFile_whenFileIsToBeDownloadedAndFileDoesNotExist() throws IOException, PackageManager.NameNotFoundException {
-        FileIORequest fileIOReq =
-                FileIOTestRobot.createFileIoReq(true, true, FileIOTestRobot.createFileWhichDoesNotExist());
-        final RestApiImpl restApi = FileIOTestRobot.createRestApi();
-        FileIO fileIO = FileIOTestRobot.createFileIO(FileIOTestRobot.createMockedContext()
-                , restApi
-                , 3
-                , fileIOReq
-                , true
-                , FileIOTestRobot.getGcmNetworkManager()
-                , true
-                , false);
-        fileIO.execute();
-        Mockito.verify(FileIOTestRobot.getInputSreamReader()).read(eq(new byte[4096]));
-    }
-
-    @Test
-    public void testExecute_ifInputStreamIsClosedCorrectly_whenFileIsToBeDownloadedAndFileDoesNotExist() throws IOException, PackageManager.NameNotFoundException {
-        FileIORequest fileIOReq =
-                FileIOTestRobot.createFileIoReq(true, true, FileIOTestRobot.createFileWhichDoesNotExist());
-        final RestApiImpl restApi = FileIOTestRobot.createRestApi();
-        FileIO fileIO = FileIOTestRobot.createFileIO(FileIOTestRobot.createMockedContext()
-                , restApi
-                , 3
-                , fileIOReq
-                , true
-                , FileIOTestRobot.getGcmNetworkManager()
-                , true
-                , false);
-        fileIO.execute();
-        Mockito.verify(FileIOTestRobot.getInputSreamReader()).close();
-    }
-
-    @Test
     public void testQueueIoFile_ifTrailCountIncrements_whenFileIsToBeDownloadedAndFileDoesNotExist() throws IOException, PackageManager.NameNotFoundException {
         FileIORequest fileIOReq =
                 FileIOTestRobot.createFileIoReq(true, true, FileIOTestRobot.createFileWhichDoesNotExist());
@@ -115,7 +81,6 @@ public class FileIOTest {
                 , false);
         fileIO.queueIOFile();
         assertThat(fileIO.getTrailCount(), is(equalTo(4)));
-        Mockito.verify(FileIOTestRobot.getInputSreamReader()).close();
     }
 
     @Test

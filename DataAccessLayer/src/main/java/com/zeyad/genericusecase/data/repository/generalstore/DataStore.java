@@ -15,35 +15,34 @@ import rx.Observable;
  * Interface that represents a data store from where data is retrieved.
  */
 public interface DataStore {
-    String IDS = "ids";
 
     @NonNull
     Observable<List> dynamicGetList(final String url, Class domainClass, Class dataClass, boolean persist,
                                     boolean shouldCache);
 
     /**
-     * Get an {@link rx.Observable} which will emit a ? by its id.
+     * Get an {@link Observable} which will emit a ? by its id.
      */
     @NonNull
     Observable<?> dynamicGetObject(final String url, final String idColumnName, final int itemId,
                                    Class domainClass, Class dataClass, boolean persist, boolean shouldCache);
 
     /**
-     * Post a JSONObject which returns an {@link rx.Observable} that will emit a ?.
+     * Post a JSONObject which returns an {@link Observable} that will emit a ?.
      */
     @NonNull
     Observable<?> dynamicPostObject(final String url, String idColumnName, final JSONObject keyValuePairs, Class domainClass,
                                     Class dataClass, boolean persist);
 
     /**
-     * Post a HashMap<String, Object> which returns an {@link rx.Observable} that will emit a list of ?.
+     * Post a HashMap<String, Object> which returns an {@link Observable} that will emit a list of ?.
      */
     @NonNull
     Observable<?> dynamicPostList(final String url, String idColumnName, final JSONArray jsonArray,
                                   Class domainClass, Class dataClass, boolean persist);
 
     /**
-     * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link rx.Observable}
+     * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Observable}
      * that will emit a ?.
      */
     @NonNull
@@ -54,34 +53,34 @@ public interface DataStore {
                                     Class domainClass);
 
     /**
-     * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link rx.Observable}
+     * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Observable}
      * that will emit a list of ?.
      */
     Observable<?> dynamicPutList(final String url, String idColumnName, final JSONArray jsonArray,
                                  Class domainClass, Class dataClass, boolean persist);
 
     /**
-     * Delete a HashMap<String, Object> from cloud which returns an {@link rx.Observable} that will emit a ?.
+     * Delete a HashMap<String, Object> from cloud which returns an {@link Observable} that will emit a ?.
      */
     @NonNull
     Observable<?> dynamicDeleteCollection(final String url, String idColumnName, final JSONArray jsonArray,
                                           Class dataClass, boolean persist);
 
     /**
-     * Delete all items of the same type from cloud or disk which returns an {@link rx.Observable}
+     * Delete all items of the same type from cloud or disk which returns an {@link Observable}
      * that will emit a list of ?.
      */
     @NonNull
     Observable<Boolean> dynamicDeleteAll(String url, Class dataClass, boolean persist);
 
     /**
-     * Search disk with a query which returns an {@link rx.Observable} that will emit a list of ?.
+     * Search disk with a query which returns an {@link Observable} that will emit a list of ?.
      */
     @NonNull
     Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass);
 
     /**
-     * Search disk with a RealmQuery which returns an {@link rx.Observable} that will emit a list of ?.
+     * Search disk with a RealmQuery which returns an {@link Observable} that will emit a list of ?.
      */
     @NonNull
     Observable<List> searchDisk(RealmQuery query, Class domainClass);

@@ -13,6 +13,7 @@ import android.util.Log;
 
 import java.util.LinkedList;
 
+import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.JOB_TYPE;
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.PAYLOAD;
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.POST;
@@ -23,15 +24,17 @@ import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentSe
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class GenericJobService extends JobService { // runs on the ui thread
 
-    private static final String TAG = GenericJobService.class.getName();
+    private static final String TAG = com.zeyad.genericusecase.data.services.GenericJobService.class.getName();
     private final LinkedList<JobParameters> jobParamsMap = new LinkedList<>();
+    private Context mContext;
+    private Context mApplicationContext;
 
     /**
      * Send job to the JobScheduler.
      */
     public void scheduleJob(JobInfo t) {
         Log.d(TAG, "Scheduling job");
-        JobScheduler tm = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
+        JobScheduler tm = (JobScheduler) mContext.getSystemService(Context.JOB_SCHEDULER_SERVICE);
         tm.schedule(t);
     }
 
@@ -54,6 +57,8 @@ public class GenericJobService extends JobService { // runs on the ui thread
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "Service created");
+        mContext = this;
+        mApplicationContext = getApplicationContext();
     }
 
     @Override
@@ -75,21 +80,21 @@ public class GenericJobService extends JobService { // runs on the ui thread
     public boolean onStartJob(@NonNull JobParameters params) { // return true if u r doing background thread work, else return false
         switch (params.getExtras().getString(JOB_TYPE, "")) {
             case GenericNetworkQueueIntentService.DOWNLOAD_FILE:
-                startService(new Intent(getApplicationContext(), GenericNetworkQueueIntentService.class)
-                        .putExtra(JOB_TYPE, UPLOAD_FILE)
+                mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
+                        .putExtra(JOB_TYPE, DOWNLOAD_FILE)
                         .putExtra(TRIAL_COUNT, 0)
                         .putExtra(PAYLOAD, params.getExtras().getString(PAYLOAD)));
                 Log.d(TAG, "FileIO Job started!");
                 break;
             case UPLOAD_FILE:
-                startService(new Intent(getApplicationContext(), GenericNetworkQueueIntentService.class)
+                mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
                         .putExtra(JOB_TYPE, UPLOAD_FILE)
                         .putExtra(TRIAL_COUNT, 0)
                         .putExtra(PAYLOAD, params.getExtras().getString(PAYLOAD)));
                 Log.d(TAG, "FileIO Job started!");
                 break;
             case POST:
-                startService(new Intent(this, GenericNetworkQueueIntentService.class)
+                mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
                         .putExtra(JOB_TYPE, POST)
                         .putExtra(TRIAL_COUNT, 0)
                         .putExtra(PAYLOAD, params.getExtras().getString(PAYLOAD)));
@@ -98,7 +103,12 @@ public class GenericJobService extends JobService { // runs on the ui thread
             default:
                 break;
         }
-        jobFinished(params, false);// true to reschedule, false to drop
+        try {
+            jobFinished(params, false);// true to reschedule, false to drop
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            //unable to finish job
+        }
         return true;
     }
 
@@ -109,5 +119,23 @@ public class GenericJobService extends JobService { // runs on the ui thread
         jobParamsMap.remove(params);
         Log.i(TAG, "on stop job: " + params.getJobId());
         return true;
+    }
+
+    /**
+     * This method is meant for testing purposes. To set a mocked context.
+     *
+     * @param context mocked context
+     */
+    void setContext(Context context) {
+        mContext = context;
+    }
+
+    /**
+     * This method is meant for testing purposes. To set a mocked context.
+     *
+     * @param applicationContext mocked context
+     */
+    void setApplicationContext(Context applicationContext) {
+        mApplicationContext = applicationContext;
     }
 }

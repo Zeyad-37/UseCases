@@ -1,5 +1,6 @@
 package com.zeyad.genericusecase.data.services;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -19,6 +20,15 @@ public class GenericGCMService extends GcmTaskService {
 
     public static final String TAG = GenericNetworkQueueIntentService.class.getSimpleName(),
             TAG_TASK_ONE_OFF_LOG = "one_off_task", TAG_TASK_PERIODIC_LOG = "periodic_task";
+    private Context mContext;
+    private Context mApplicationContext;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        mContext = this;
+        mApplicationContext = getApplicationContext();
+    }
 
     @Override
     public void onInitializeTasks() {
@@ -34,21 +44,21 @@ public class GenericGCMService extends GcmTaskService {
                 if (taskParams.getExtras().containsKey(JOB_TYPE))
                     switch (taskParams.getExtras().getString(JOB_TYPE)) {
                         case DOWNLOAD_FILE:
-                            startService(new Intent(getApplicationContext(), GenericNetworkQueueIntentService.class)
+                            mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
                                     .putExtra(JOB_TYPE, DOWNLOAD_FILE)
                                     .putExtra(TRIAL_COUNT, 0)
                                     .putExtra(PAYLOAD, taskParams.getExtras().getString(PAYLOAD)));
                             Log.d(TAG, "FileIO Job started!");
                             break;
                         case UPLOAD_FILE:
-                            startService(new Intent(getApplicationContext(), GenericNetworkQueueIntentService.class)
+                            mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
                                     .putExtra(JOB_TYPE, UPLOAD_FILE)
                                     .putExtra(TRIAL_COUNT, 0)
                                     .putExtra(PAYLOAD, taskParams.getExtras().getString(PAYLOAD)));
                             Log.d(TAG, "FileIO Job started!");
                             break;
                         case POST:
-                            startService(new Intent(this, GenericNetworkQueueIntentService.class)
+                            mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
                                     .putExtra(JOB_TYPE, POST)
                                     .putExtra(TRIAL_COUNT, 0)
                                     .putExtra(PAYLOAD, taskParams.getExtras().getString(PAYLOAD)));
@@ -65,5 +75,23 @@ public class GenericGCMService extends GcmTaskService {
             default:
                 return GcmNetworkManager.RESULT_FAILURE;
         }
+    }
+
+    /**
+     * This method is meant for testing purposes. To set a mocked context.
+     *
+     * @param context mocked context
+     */
+    void setContext(Context context) {
+        mContext = context;
+    }
+
+    /**
+     * This method is meant for testing purposes. To set a mocked context.
+     *
+     * @param applicationContext mocked context
+     */
+    void setApplicationContext(Context applicationContext) {
+        mApplicationContext = applicationContext;
     }
 }
