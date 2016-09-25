@@ -2,7 +2,7 @@ package com.zeyad.genericusecase.data.repository.generalstore;
 
 import android.support.annotation.NonNull;
 
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel2;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,10 +22,10 @@ public interface DiskDataStoreRobotInterface {
     void insertTestModels(int count);
 
     @NonNull
-    TestModel2 createTestModel();
+    TestModel createTestModel();
 
     @NonNull
-    TestModel2 createTestModel(int id);
+    TestModel createTestModel(int id);
 
     @NonNull
     String getValueForTestModel(int id);
@@ -40,7 +40,7 @@ public interface DiskDataStoreRobotInterface {
 
     Class getDomainClass();
 
-    void addTestModel(TestModel2 testModel2);
+    void addTestModel(TestModel testModel);
 
     int getPrimaryIdForAnyInsertedTestModel();
 

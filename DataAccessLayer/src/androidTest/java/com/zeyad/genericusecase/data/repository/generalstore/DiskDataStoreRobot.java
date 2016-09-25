@@ -6,7 +6,7 @@ import com.zeyad.genericusecase.data.TestUtility;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.repository.DataRepository;
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel2;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
 import com.zeyad.genericusecase.data.utils.ModelConverters;
 
@@ -41,7 +41,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
 
     @Override
     public void tearDown() {
-        mDBManager.evictAll(TestModel2.class)
+        mDBManager.evictAll(TestModel.class)
                 .subscribe(new TestSubscriber<>());
     }
 
@@ -53,22 +53,22 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
     @Override
     public void insertTestModels(int count) {
         for (int i = 0; i < count; i++) {
-            final TestModel2 model = createTestModel();
+            final TestModel model = createTestModel();
             addTestModel(model);
         }
     }
 
     @NonNull
     @Override
-    public TestModel2 createTestModel() {
+    public TestModel createTestModel() {
         final int randomInt = getRandomInt();
         return createTestModel(randomInt);
     }
 
     @NonNull
     @Override
-    public TestModel2 createTestModel(int id) {
-        return new TestModel2(id, getValueForTestModel(id));
+    public TestModel createTestModel(int id) {
+        return new TestModel(id, getValueForTestModel(id));
     }
 
     @NonNull
@@ -94,7 +94,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
     @Override
     @NonNull
     public Class getDataClass() {
-        return TestModel2.class;
+        return TestModel.class;
     }
 
     @Override
@@ -103,8 +103,8 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
     }
 
     @Override
-    public void addTestModel(TestModel2 model) {
-        mDBManager.put(model, TestModel2.class)
+    public void addTestModel(TestModel model) {
+        mDBManager.put(model, TestModel.class)
                 .subscribe(new TestSubscriber<>());
     }
 
@@ -112,8 +112,8 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
     public int getPrimaryIdForAnyInsertedTestModel() {
         final TestSubscriber<List> subscriber = new TestSubscriber<>();
         mDBManager.getAll(getDataClass()).subscribe(subscriber);
-        List<TestModel2> testModel2List = subscriber.getOnNextEvents().get(0);
-        return testModel2List.get(mRandom.nextInt(testModel2List.size())).getId();
+        List<TestModel> testModelList = subscriber.getOnNextEvents().get(0);
+        return testModelList.get(mRandom.nextInt(testModelList.size())).getId();
     }
 
     @Override
@@ -123,19 +123,19 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
 
     @Override
     public RealmQuery getRealmQueryForValue(String query) {
-        return Realm.getDefaultInstance().where(TestModel2.class)
+        return Realm.getDefaultInstance().where(TestModel.class)
                 .contains("value", query);
     }
 
     @Override
     public RealmQuery getRealmQueryForId(int query) {
-        return Realm.getDefaultInstance().where(TestModel2.class)
+        return Realm.getDefaultInstance().where(TestModel.class)
                 .equalTo("id", query);
     }
 
     @Override
     public RealmQuery getRealmQueryForAnyId() {
-        return Realm.getDefaultInstance().where(TestModel2.class)
+        return Realm.getDefaultInstance().where(TestModel.class)
                 .equalTo("id", getPrimaryIdForAnyInsertedTestModel());
     }
 
@@ -143,7 +143,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
     public List<Long> getListOfAllIds() {
         final TestSubscriber<List> subscriber = new TestSubscriber<>();
         mDBManager.getAll(getDataClass()).subscribe(subscriber);
-        final List<TestModel2> list = ((RealmResults) subscriber.getOnNextEvents().get(0));
+        final List<TestModel> list = ((RealmResults) subscriber.getOnNextEvents().get(0));
         int count = list.size();
         List<Long> listOfId = new ArrayList<>();
         for (int i = 0; i < count; i++) {
@@ -179,7 +179,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
     public TestSubscriber<Object> deleteAllAfterAddingSome(DataStore diskDataStore) {
         insertTestModels(10);
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        diskDataStore.dynamicDeleteAll(null, TestModel2.class, false)
+        diskDataStore.dynamicDeleteAll(null, TestModel.class, false)
                 .subscribe(subscriber);
         return subscriber;
     }

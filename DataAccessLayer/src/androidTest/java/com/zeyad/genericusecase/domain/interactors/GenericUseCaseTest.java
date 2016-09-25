@@ -6,7 +6,8 @@ import com.zeyad.genericusecase.UIThread;
 import com.zeyad.genericusecase.data.executor.JobExecutor;
 import com.zeyad.genericusecase.data.mockable.ObjectObservable;
 import com.zeyad.genericusecase.data.repository.DataRepository;
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel2;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
 import com.zeyad.genericusecase.domain.repository.Repository;
 
 import org.json.JSONArray;
@@ -25,6 +26,7 @@ import java.util.List;
 
 import io.realm.RealmQuery;
 import rx.Observable;
+import rx.Subscriber;
 import rx.observers.TestSubscriber;
 
 import static org.mockito.Matchers.eq;
@@ -56,7 +58,7 @@ public class GenericUseCaseTest {
                         eq(getUrl())
                         , eq(getIdColumnName())
                         , eq(getItemId())
-                        , eq(getPresentationClass())
+                        , eq(getDomainClass())
                         , eq(getDataClass())
                         , eq(mToPersist)
                         , eq(false));
@@ -70,7 +72,7 @@ public class GenericUseCaseTest {
                         eq(getUrl())
                         , eq(getIdColumnName())
                         , eq(getJSONObject())
-                        , eq(getPresentationClass())
+                        , eq(getDomainClass())
                         , eq(getDataClass())
                         , eq(mToPersist));
     }
@@ -83,7 +85,7 @@ public class GenericUseCaseTest {
                         eq(getUrl())
                         , eq(getIdColumnName())
                         , eq(getJSONObject())
-                        , eq(getPresentationClass())
+                        , eq(getDomainClass())
                         , eq(getDataClass())
                         , eq(mToPersist));
     }
@@ -96,7 +98,7 @@ public class GenericUseCaseTest {
                         eq(getUrl())
                         , eq(getIdColumnName())
                         , eq(getJSONObject())
-                        , eq(getPresentationClass())
+                        , eq(getDomainClass())
                         , eq(getDataClass())
                         , eq(mToPersist));
     }
@@ -109,7 +111,7 @@ public class GenericUseCaseTest {
                         eq(getUrl())
                         , eq(getIdColumnName())
                         , eq(getJsonArray())
-                        , eq(getPresentationClass())
+                        , eq(getDomainClass())
                         , eq(getDataClass())
                         , eq(mToPersist));
     }
@@ -118,7 +120,9 @@ public class GenericUseCaseTest {
     public void testExecuteSearch_ifDataRepoCorrectMethodIsCalled_whenRealmQueryIsPassed() {
         executeSearch_RealmQuery(mGenericUse);
         Mockito.verify(mDataRepository)
-                .searchDisk(eq(getRealmQuery()), eq(getPresentationClass()));
+                .searchDisk(
+                        eq(getRealmQuery())
+                        , eq(getDomainClass()));
     }
 
     @Test
@@ -128,7 +132,7 @@ public class GenericUseCaseTest {
                 .searchDisk(
                         eq(getStringQuery())
                         , eq(getColumnQueryValue())
-                        , eq(getPresentationClass())
+                        , eq(getDomainClass())
                         , eq(getDataClass()));
     }
 
@@ -139,7 +143,7 @@ public class GenericUseCaseTest {
                 .deleteListDynamically(
                         eq(getUrl())
                         , eq(getJsonArray())
-                        , eq(getPresentationClass())
+                        , eq(getDomainClass())
                         , eq(getDataClass())
                         , eq(mToPersist));
     }
@@ -152,7 +156,7 @@ public class GenericUseCaseTest {
                         eq(getUrl())
                         , eq(getIdColumnName())
                         , eq(getJSONObject())
-                        , eq(getPresentationClass())
+                        , eq(getDomainClass())
                         , eq(getDataClass())
                         , eq(mToPersist));
     }
@@ -165,7 +169,7 @@ public class GenericUseCaseTest {
                         eq(getUrl())
                         , eq(getIdColumnName())
                         , eq(getJSONObject())
-                        , eq(getPresentationClass())
+                        , eq(getDomainClass())
                         , eq(getDataClass())
                         , eq(mToPersist));
     }
@@ -189,7 +193,7 @@ public class GenericUseCaseTest {
                 eq(getUrl())
                 , eq(getIdColumnName())
                 , eq(getJsonArray())
-                , eq(getPresentationClass())
+                , eq(getDomainClass())
                 , eq(getDataClass())
                 , eq(mToPersist));
     }
@@ -201,7 +205,7 @@ public class GenericUseCaseTest {
                 eq(getUrl())
                 , eq(getIdColumnName())
                 , eq(getJsonArray())
-                , eq(getPresentationClass())
+                , eq(getDomainClass())
                 , eq(getDataClass())
                 , eq(mToPersist));
     }
@@ -222,17 +226,17 @@ public class GenericUseCaseTest {
         return GenericUseCase.getInstance();
     }
 
-    private static final TestModel2 TEST_MODEL = new TestModel2(1, "123");
+    private static final TestModel TEST_MODEL = new TestModel(1, "123");
     private static final JSONObject JSON_OBJECT = new JSONObject();
     private static final JSONArray JSON_ARRAY = new JSONArray();
     private static final HashMap<String, Object> HASH_MAP = new HashMap<>();
     private static final File MOCKED_FILE = Mockito.mock(File.class);
-    //    private static final RealmQuery<TestModel2> REALM_QUERY = Realm.getDefaultInstance().where(TestModel2.class);
-    private static final RealmQuery<TestModel2> REALM_QUERY = null;
+    //    private static final RealmQuery<TestModel> REALM_QUERY = Realm.getDefaultInstance().where(TestModel.class);
+    private static final RealmQuery<TestModel> REALM_QUERY = null;
     public static final boolean ON_WIFI = Mockito.anyBoolean();
     public static final boolean WHILE_CHARGING = Mockito.anyBoolean();
-    public static final Class DOMAIN_CLASS = TestModel2.class;
-    public static final Class DATA_CLASS = TestModel2.class;
+    public static final Class DOMAIN_CLASS = TestModel.class;
+    public static final Class DATA_CLASS = TestModel.class;
 
     /**
      * At 0th index => getObjectDynamicallyById observable
@@ -246,8 +250,9 @@ public class GenericUseCaseTest {
      */
     static TestSubscriber<Object> getObject(IGenericUseCase genericUseCase, boolean shouldPersist) {
         final TestSubscriber<Object> useCaseSubscriber = new TestSubscriber<>();
-        genericUseCase.getObject(new GetObjectRequest(useCaseSubscriber, getUrl(), getIdColumnName(),
-                getItemId(), getPresentationClass(), getDataClass(), shouldPersist, false))
+        genericUseCase.getObject(new GetObjectRequest(useCaseSubscriber, getUrl()
+                , getIdColumnName(), getItemId(), getPresentationClass()
+                , getDataClass(), shouldPersist, false))
                 .subscribe(useCaseSubscriber);
         return useCaseSubscriber;
     }
@@ -261,7 +266,11 @@ public class GenericUseCaseTest {
     }
 
     static Class getDataClass() {
-        return TestModel2.class;
+        return TestModel.class;
+    }
+
+    static Class getDomainClass() {
+        return TestViewModel.class;
     }
 
     static Class getPresentationClass() {
@@ -288,24 +297,19 @@ public class GenericUseCaseTest {
                 .deleteAllDynamically(Mockito.anyString(), Mockito.any(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .putListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class),
-                        Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .putListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .putListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class),
-                        Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .putListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
         Mockito.doReturn(getListObservable())
                 .when(dataRepository)
-                .uploadFileDynamically(Mockito.anyString(), Mockito.any(File.class), Mockito.anyBoolean(),
-                        Mockito.anyBoolean(), Mockito.any(), Mockito.any());
+                .uploadFileDynamically(Mockito.anyString(), Mockito.any(File.class), Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.any(), Mockito.any());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .putObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class),
-                        Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .putObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .deleteListDynamically(Mockito.anyString(), Mockito.any(JSONArray.class), Mockito.any(),
-                        Mockito.any(), Mockito.anyBoolean());
+                .deleteListDynamically(Mockito.anyString(), Mockito.any(JSONArray.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
                 .searchDisk(Mockito.any(RealmQuery.class), Mockito.any());
@@ -314,16 +318,13 @@ public class GenericUseCaseTest {
                 .searchDisk(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .postListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class),
-                        Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .postListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class),
-                        Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class),
-                        Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
         return dataRepository;
     }
 
@@ -337,19 +338,36 @@ public class GenericUseCaseTest {
 
     @NonNull
     private static Observable<List> getListObservable() {
-        return Observable.defer(() -> Observable.just(Collections.singletonList(createTestModel())));
+        return Observable.create(
+                new Observable.OnSubscribe<List>() {
+                    @Override
+                    public void call(Subscriber<? super List> subscriber) {
+                        subscriber.onNext(Collections.singletonList(createTestModel()));
+                    }
+                });
     }
 
     @NonNull
     private static Observable<Object> getObjectObservable() {
-        return Observable.defer(() -> Observable.just(createTestModel()));
+        //        final ObjectObservable mock1 = getMockedObjectObservable();
+        //        final ObjectObservable mock2 = getMockedObjectObservable();
+        //        final ObjectObservable mock3 = getMockedObjectObservable();
+        //        final ObjectObservable mock4 = getMockedObjectObservable();
+        //        Mockito.when(mock1.map(Mockito.any())).thenReturn(mock2);
+        //        Mockito.when(mock2.compose(Mockito.any())).thenReturn(mock3);
+        //        Mockito.when(mock3.compose(Mockito.any())).thenReturn(mock4);
+        //        return mock1;
+        return Observable.create(
+                subscriber -> {
+                    subscriber.onNext(createTestModel());
+                });
     }
 
     private static ObjectObservable getMockedObjectObservable() {
         return Mockito.mock(ObjectObservable.class);
     }
 
-    static TestModel2 createTestModel() {
+    static TestModel createTestModel() {
         return TEST_MODEL;
     }
 
@@ -427,6 +445,7 @@ public class GenericUseCaseTest {
     }
 
     static TestSubscriber<Object> postList(IGenericUseCase genericUse, boolean toPersist) {
+
         final PostRequest jsonArrayPostRequest = getJsonArrayPostRequest(toPersist);
         TestSubscriber<Object> testSubscriber = (TestSubscriber<Object>) jsonArrayPostRequest.getSubscriber();
         genericUse.postList(jsonArrayPostRequest)

@@ -7,7 +7,7 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
 import com.zeyad.genericusecase.data.db.GenericRealmManager;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel2;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModelViewModelMapper;
 
 import org.mockito.Mockito;
@@ -57,8 +57,8 @@ class DataStoreFactoryRobot {
     }
 
     @NonNull
-    static Class<TestModel2> getDataClass() {
-        return TestModel2.class;
+    static Class<TestModel> getDataClass() {
+        return TestModel.class;
     }
 
     @NonNull

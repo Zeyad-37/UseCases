@@ -10,7 +10,7 @@ import android.support.annotation.Nullable;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.zeyad.genericusecase.data.network.RestApi;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel2;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
 import com.zeyad.genericusecase.data.utils.Utils;
 import com.zeyad.genericusecase.domain.interactors.PostRequest;
@@ -43,7 +43,7 @@ public class PostTestRobot {
     private static final JobScheduler JOB_SCHEDULER;
     private static final ResponseBody RESPONSE_BODY = mock(ResponseBody.class);
     private static final InputStream INPUT_STREAM = mock(InputStream.class);
-    private static final TestModel2 TEST_MODEL = new TestModel2(1, "123");
+    private static final TestModel TEST_MODEL = new TestModel(1, "123");
 
     static {
         JOB_SCHEDULER = Utils.hasLollipop() ? mock(JobScheduler.class) : null;
@@ -77,7 +77,7 @@ public class PostTestRobot {
 
     @NonNull
     static Class getPresentationClass() {
-        return TestModel2.class;
+        return TestModel.class;
     }
 
     static String getValidColumnName() {
@@ -86,7 +86,7 @@ public class PostTestRobot {
 
     @NonNull
     static Class getValidDataClass() {
-        return TestModel2.class;
+        return TestModel.class;
     }
 
     static Context createMockedContext() throws PackageManager.NameNotFoundException {
@@ -97,7 +97,7 @@ public class PostTestRobot {
                 .thenReturn(mock(Context.class));
         when(context.getResources()).thenReturn(resources);
         when(context.getPackageManager()).thenReturn(packageManager);
-        when(context.getSystemService(anyString())).thenReturn(getMockedJobScheduler());
+        when(context.getSystemService(Context.STORAGE_SERVICE)).thenReturn(getMockedJobScheduler());
         return context;
     }
 
@@ -147,7 +147,7 @@ public class PostTestRobot {
                 });
     }
 
-    public static TestModel2 createTestModel() {
+    public static TestModel createTestModel() {
         return TEST_MODEL;
     }
 

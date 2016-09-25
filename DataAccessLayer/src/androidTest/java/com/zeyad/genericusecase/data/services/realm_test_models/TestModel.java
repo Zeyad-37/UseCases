@@ -1,4 +1,6 @@
-package com.zeyad.genericusecase.data.db.realm_test_models;
+package com.zeyad.genericusecase.data.services.realm_test_models;
+
+import android.support.annotation.NonNull;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -16,9 +18,8 @@ public class TestModel extends RealmObject {
     public TestModel(int id, String value) {
         this.id = id;
         this.value = value;
-        if (id <= 0) {
+        if (id <= 0)
             throw new IllegalArgumentException("id should be greater than 0");
-        }
     }
 
     public TestModel() {
@@ -40,9 +41,10 @@ public class TestModel extends RealmObject {
         this.value = value;
     }
 
+    @NonNull
     @Override
     public String toString() {
-        return "TestModel2{" +
+        return "TestModel{" +
                 "id=" + id +
                 ", value='" + value + '\'' +
                 '}';
@@ -53,8 +55,7 @@ public class TestModel extends RealmObject {
         if (this == o) return true;
         if (!(o instanceof TestModel)) return false;
         TestModel testModel = (TestModel) o;
-        if (getId() != testModel.getId()) return false;
-        return getValue().equals(testModel.getValue());
+        return getId() == testModel.getId() && getValue().equals(testModel.getValue());
     }
 
     @Override

@@ -4,7 +4,7 @@ import com.zeyad.genericusecase.data.repository.generalstore.CloudDataStore;
 import com.zeyad.genericusecase.data.repository.generalstore.DataStore;
 import com.zeyad.genericusecase.data.repository.generalstore.DataStoreFactory;
 import com.zeyad.genericusecase.data.repository.generalstore.DiskDataStore;
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel2;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
 
 import org.json.JSONArray;
@@ -69,7 +69,7 @@ class DataRepositoryRobot {
     }
 
     static Class getValidDataClass() {
-        return TestModel2.class;
+        return TestModel.class;
     }
 
     static String getColumnName() {

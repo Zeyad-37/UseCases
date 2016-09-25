@@ -6,7 +6,7 @@ import com.zeyad.genericusecase.data.db.DataBaseManager;
 import com.zeyad.genericusecase.data.exceptions.NetworkConnectionException;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.network.RestApi;
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel2;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -693,7 +693,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
         if (mCallRealMethodsOfEntityMapper) {
-            verify.put(Mockito.any(TestModel2.class), Mockito.eq(CloudDataStoreTestRobot.getValidDataClass()));
+            verify.put(Mockito.any(TestModel.class), Mockito.eq(CloudDataStoreTestRobot.getValidDataClass()));
         } else {
             verify.put(Mockito.any(JSONObject.class), Mockito.eq("id"), Mockito.eq(CloudDataStoreTestRobot.getValidDataClass()));
         }
@@ -722,7 +722,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
         if (mCallRealMethodsOfEntityMapper) {
-            verify.put(Mockito.any(TestModel2.class), Mockito.eq(CloudDataStoreTestRobot.getValidDataClass()));
+            verify.put(Mockito.any(TestModel.class), Mockito.eq(CloudDataStoreTestRobot.getValidDataClass()));
         } else {
             verify.put(Mockito.any(JSONObject.class), Mockito.eq("id"), Mockito.eq(CloudDataStoreTestRobot.getValidDataClass()));
         }
@@ -755,7 +755,7 @@ public class CloudDataStoreTest {
                     , Mockito.eq(CloudDataStoreTestRobot.getValidColumnName())
                     , Mockito.eq(CloudDataStoreTestRobot.getValidDataClass()));
         } else {
-            verify.put(Mockito.any(TestModel2.class)
+            verify.put(Mockito.any(TestModel.class)
                     , Mockito.eq(CloudDataStoreTestRobot.getValidDataClass()));
         }
     }

@@ -20,7 +20,7 @@ import com.zeyad.genericusecase.data.mappers.EntityDataMapper;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.services.GenericGCMService;
 import com.zeyad.genericusecase.data.services.GenericJobService;
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel2;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.utils.EntityMapperUtil;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
 import com.zeyad.genericusecase.data.utils.Utils;
@@ -68,8 +68,8 @@ public class TestUtility {
     public static final String EXCEPTION_PRINT_THROWABLE = "Exception While Executing Test Case.\nCause:";
 
     public static void printCurrentTestModels(@NonNull Realm realm) {
-        RealmResults<TestModel2> testModel2s = realm.where(TestModel2.class).findAll();
-        printObjects(testModel2s);
+        RealmResults<TestModel> testModels = realm.where(TestModel.class).findAll();
+        printObjects(testModels);
     }
 
     public static <T> void printObjects(@NonNull List<T> list) {
@@ -230,7 +230,6 @@ public class TestUtility {
                                                           boolean isGoogleServicesAvailable,
                                                           boolean hasLollipop,
                                                           JobScheduler jobScheduler) {
-
         if (isGoogleServicesAvailable) {
             ArgumentCaptor<OneoffTask> peopleCaptor = ArgumentCaptor.forClass(OneoffTask.class);
             Mockito.verify(gcmNetworkManager).schedule(peopleCaptor.capture());
@@ -261,7 +260,6 @@ public class TestUtility {
                                                        boolean isGoogleServicesAvailable,
                                                        boolean hasLollipop,
                                                        JobScheduler jobScheduler) {
-
         if (isGoogleServicesAvailable) {
             ArgumentCaptor<OneoffTask> peopleCaptor = ArgumentCaptor.forClass(OneoffTask.class);
             Mockito.verify(gcmNetworkManager).schedule(peopleCaptor.capture());

@@ -1,8 +1,7 @@
 package com.zeyad.genericusecase.domain.interactors;
 
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel2;
-
-import junit.framework.Test;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
 
 import rx.Subscriber;
 import rx.observers.TestSubscriber;
@@ -10,9 +9,9 @@ import rx.observers.TestSubscriber;
 class GetListRequestTestRobot {
 
 
-    static final Class DATA_CLASS = TestModel2.class;
+    static final Class DATA_CLASS = TestModel.class;
     static final boolean TO_PERSIST = false;
-    static final Class PRESENTATION_CLASS = Test.class;
+    static final Class PRESENTATION_CLASS = TestViewModel.class;
     static final Subscriber SUBSCRIBER = new TestSubscriber<>();
     static final String URL = "www.google.com";
     static final boolean SHOULD_CACHE = true;

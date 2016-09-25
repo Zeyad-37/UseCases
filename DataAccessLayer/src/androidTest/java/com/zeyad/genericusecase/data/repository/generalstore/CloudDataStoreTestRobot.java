@@ -19,7 +19,7 @@ import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.mockable.ResponseBodyObservable;
 import com.zeyad.genericusecase.data.network.RestApi;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel2;
+import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModelViewModelMapper;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
 
@@ -50,7 +50,7 @@ import static org.mockito.Matchers.eq;
 @SuppressWarnings("WrongConstant")
 class CloudDataStoreTestRobot {
 
-    private static final TestModel2 TEST_MODEL = new TestModel2(1, "123");
+    private static final TestModel TEST_MODEL = new TestModel(1, "123");
     private static final File MOCKED_FILE = Mockito.mock(File.class);
     private static final JobScheduler JOB_SCHEDULER = Mockito.mock(JobScheduler.class);
 
@@ -120,7 +120,7 @@ class CloudDataStoreTestRobot {
     }
 
     static Class getValidDataClass() {
-        return TestModel2.class;
+        return TestModel.class;
     }
 
     static GoogleApiAvailability createMockedGoogleApiAvailability() {
@@ -311,7 +311,7 @@ class CloudDataStoreTestRobot {
         return subscriber;
     }
 
-    public static TestModel2 createTestModel() {
+    public static TestModel createTestModel() {
         return TEST_MODEL;
     }
 
