@@ -12,7 +12,7 @@ import com.google.android.gms.gcm.Task;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
 import com.zeyad.genericusecase.data.services.GenericGCMService;
 import com.zeyad.genericusecase.data.services.GenericJobService;
-import com.zeyad.genericusecase.domain.interactors.PostRequest;
+import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 
 import org.junit.After;
 import org.junit.Before;

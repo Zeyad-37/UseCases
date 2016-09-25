@@ -8,6 +8,9 @@ import com.zeyad.genericusecase.data.mockable.ObjectObservable;
 import com.zeyad.genericusecase.data.repository.DataRepository;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
+import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
+import com.zeyad.genericusecase.domain.interactors.requests.GetObjectRequest;
+import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 import com.zeyad.genericusecase.domain.repository.Repository;
 
 import org.json.JSONArray;

@@ -20,7 +20,7 @@ import com.zeyad.genericusecase.data.services.GenericJobService;
 import com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService;
 import com.zeyad.genericusecase.data.utils.Constants;
 import com.zeyad.genericusecase.data.utils.Utils;
-import com.zeyad.genericusecase.domain.interactors.PostRequest;
+import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 
 import org.json.JSONObject;
 

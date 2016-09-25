@@ -15,6 +15,10 @@ import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
 import com.zeyad.genericusecase.data.utils.ModelConverters;
 import com.zeyad.genericusecase.domain.executors.PostExecutionThread;
 import com.zeyad.genericusecase.domain.executors.ThreadExecutor;
+import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
+import com.zeyad.genericusecase.domain.interactors.requests.GetListRequest;
+import com.zeyad.genericusecase.domain.interactors.requests.GetObjectRequest;
+import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 import com.zeyad.genericusecase.domain.repository.Repository;
 
 import org.json.JSONArray;

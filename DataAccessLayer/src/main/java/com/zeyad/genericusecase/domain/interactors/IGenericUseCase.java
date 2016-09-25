@@ -2,6 +2,11 @@ package com.zeyad.genericusecase.domain.interactors;
 
 import android.support.annotation.NonNull;
 
+import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
+import com.zeyad.genericusecase.domain.interactors.requests.GetListRequest;
+import com.zeyad.genericusecase.domain.interactors.requests.GetObjectRequest;
+import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
+
 import io.realm.RealmQuery;
 import rx.Observable;
 

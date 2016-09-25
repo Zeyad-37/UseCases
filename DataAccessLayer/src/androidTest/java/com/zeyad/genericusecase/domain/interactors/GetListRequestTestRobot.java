@@ -2,6 +2,7 @@ package com.zeyad.genericusecase.domain.interactors;
 
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
+import com.zeyad.genericusecase.domain.interactors.requests.GetListRequest;
 
 import rx.Subscriber;
 import rx.observers.TestSubscriber;

@@ -20,7 +20,7 @@ import com.zeyad.genericusecase.data.services.GenericGCMService;
 import com.zeyad.genericusecase.data.services.GenericJobService;
 import com.zeyad.genericusecase.data.utils.Constants;
 import com.zeyad.genericusecase.data.utils.Utils;
-import com.zeyad.genericusecase.domain.interactors.FileIORequest;
+import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

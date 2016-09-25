@@ -8,19 +8,12 @@ import com.workable.errorhandler.ErrorHandler;
 import com.zeyad.generic.usecase.dataaccesslayer.di.components.ApplicationComponent;
 import com.zeyad.generic.usecase.dataaccesslayer.di.components.DaggerApplicationComponent;
 import com.zeyad.generic.usecase.dataaccesslayer.di.modules.ApplicationModule;
-import com.zeyad.genericusecase.Config;
-import com.zeyad.genericusecase.data.mappers.EntityDataMapper;
-import com.zeyad.genericusecase.data.mappers.EntityMapper;
-import com.zeyad.genericusecase.data.network.ApiConnectionFactory;
-import com.zeyad.genericusecase.data.utils.EntityMapperUtil;
-import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
 import com.zeyad.genericusecase.domain.interactors.GenericUseCaseFactory;
 
 import java.io.File;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -39,9 +32,7 @@ import retrofit2.adapter.rxjava.HttpException;
 public class GenericApplication extends Application {
 
     private ApplicationComponent applicationComponent;
-    private AtomicInteger mAtomicInteger = new AtomicInteger();
     private static GenericApplication sInstance;
-    private static final int TIME_OUT = 15;
 
     public static GenericApplication getInstance() {
         return sInstance;
@@ -52,10 +43,8 @@ public class GenericApplication extends Application {
         super.onCreate();
         sInstance = this;
         initializeInjector();
-        setupDataLayerModule();
         initializeRealm();
-        GenericUseCaseFactory.init(getApplicationContext(), createEntityMapper());
-        ApiConnectionFactory.init();
+        GenericUseCaseFactory.init(getApplicationContext(), null);
         initErrorHandler();
     }
 
@@ -115,20 +104,6 @@ public class GenericApplication extends Application {
     private HttpLoggingInterceptor provideHttpLoggingInterceptor() {
         return new HttpLoggingInterceptor(message -> Log.d("NetworkInfo", message))
                 .setLevel(HttpLoggingInterceptor.Level.BODY);
-    }
-
-    private void setupDataLayerModule() {
-        Config.init(getApplicationContext());
-        Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
-    }
-
-    private IEntityMapperUtil createEntityMapper() {
-        return new EntityMapperUtil() {
-            @Override
-            public EntityMapper getDataMapper(Class dataClass) {
-                return new EntityDataMapper();
-            }
-        };
     }
 
     private void initializeRealm() {

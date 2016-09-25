@@ -27,8 +27,8 @@ import com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService;
 import com.zeyad.genericusecase.data.utils.Constants;
 import com.zeyad.genericusecase.data.utils.ModelConverters;
 import com.zeyad.genericusecase.data.utils.Utils;
-import com.zeyad.genericusecase.domain.interactors.FileIORequest;
-import com.zeyad.genericusecase.domain.interactors.PostRequest;
+import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
+import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

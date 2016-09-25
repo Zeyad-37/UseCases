@@ -14,7 +14,7 @@ import com.zeyad.genericusecase.data.network.RestApiImpl;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
 import com.zeyad.genericusecase.data.utils.Utils;
-import com.zeyad.genericusecase.domain.interactors.FileIORequest;
+import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
 
 import org.mockito.Mockito;
 

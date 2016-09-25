@@ -1,5 +1,7 @@
 package com.zeyad.genericusecase.domain.interactors;
 
+import com.zeyad.genericusecase.domain.interactors.requests.GetObjectRequest;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
