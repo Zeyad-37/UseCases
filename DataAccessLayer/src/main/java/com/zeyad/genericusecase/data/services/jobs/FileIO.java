@@ -46,7 +46,7 @@ import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentSe
  * @author Zeyad on 6/05/16.
  */
 public class FileIO {
-    public static final String TAG = com.zeyad.genericusecase.data.services.jobs.FileIO.class.getSimpleName();
+    private static final String TAG = com.zeyad.genericusecase.data.services.jobs.FileIO.class.getSimpleName();
     private final Context mContext;
     private final RestApi mRestApi;
     private int mTrailCount;
@@ -80,39 +80,51 @@ public class FileIO {
         mGooglePlayServicesAvailable = googlePlayServicesAvailable;
     }
 
+    @Nullable
+    private static String getMimeType(String uri) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(uri);
+        if (extension != null)
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        return type;
+    }
+
     public Subscription execute() {
         if (mIsDownload) {
             if (!mFileIORequest.getFile().exists()) {
-                Log.d(TAG, "Downloading " + mFileIORequest.getUrl() + " into " + mFileIORequest.getFile().getAbsolutePath());
                 return mRestApi.dynamicDownload(mFileIORequest.getUrl()).subscribe(responseBody -> {
+                    InputStream inputStream = null;
+                    OutputStream outputStream = null;
                     try {
-                        InputStream inputStream = null;
-                        OutputStream outputStream = null;
-                        try {
-                            byte[] fileReader = new byte[4096];
-                            long fileSize = responseBody.contentLength();
-                            long fileSizeDownloaded = 0;
-                            outputStream = new FileOutputStream(mFileIORequest.getFile());
-                            inputStream = responseBody.byteStream();
-                            while (true) {
-                                int read = inputStream.read(fileReader);
-                                if (read == -1)
-                                    break;
-                                outputStream.write(fileReader, 0, read);
-                                fileSizeDownloaded += read;
-                                Log.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
-                            }
-                            outputStream.flush();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } finally {
-                            if (inputStream != null)
-                                inputStream.close();
-                            if (outputStream != null)
-                                outputStream.close();
+                        byte[] fileReader = new byte[4096];
+                        long fileSize = responseBody.contentLength();
+                        long fileSizeDownloaded = 0;
+                        outputStream = new FileOutputStream(mFileIORequest.getFile());
+                        inputStream = responseBody.byteStream();
+                        while (true) {
+                            int read = inputStream.read(fileReader);
+                            if (read == -1)
+                                break;
+                            outputStream.write(fileReader, 0, read);
+                            fileSizeDownloaded += read;
+                            Log.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
                         }
+                        outputStream.flush();
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } finally {
+                        if (inputStream != null)
+                            try {
+                                inputStream.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        if (outputStream != null)
+                            try {
+                                outputStream.close();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                     }
                 }, throwable -> {
                     queueIOFile();
@@ -126,15 +138,6 @@ public class FileIO {
                             .getAbsolutePath())), mFileIORequest.getFile()))
                     .subscribe(o -> {
                     }, throwable -> queueIOFile());
-    }
-
-    @Nullable
-    private static String getMimeType(String uri) {
-        String type = null;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(uri);
-        if (extension != null)
-            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-        return type;
     }
 
     void queueIOFile() {

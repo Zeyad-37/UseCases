@@ -37,11 +37,11 @@ public class EntityDataMapper implements EntityMapper<Object, Object> {
 
     @NonNull
     @Override
-    public List transformAllToRealm(@NonNull List list, @NonNull Class dataClass) {
-        List<Object> objects = new ArrayList<>();
+    public List<Object> transformAllToRealm(@NonNull List list, @NonNull Class dataClass) {
+        List<Object> objects = new ArrayList<>(list.size());
         Object object;
-        for (Object item : list) {
-            object = transformToRealm(item, dataClass);
+        for (int i = 0, listSize = list.size(); i < listSize; i++) {
+            object = transformToRealm(list.get(i), dataClass);
             if (object != null)
                 objects.add(object);
         }
@@ -57,10 +57,10 @@ public class EntityDataMapper implements EntityMapper<Object, Object> {
     @Nullable
     @Override
     public List<Object> transformAllToDomain(@NonNull List<Object> objectList) {
-        List<Object> list = new ArrayList<>();
-        for (Object realmObject : objectList)
-            list.add(transformToDomain(realmObject));
-        for (int i = 0; i < list.size(); i++)
+        List<Object> list = new ArrayList<>(objectList.size());
+        for (int i = 0, objectListSize = objectList.size(); i < objectListSize; i++)
+            list.add(transformToDomain(objectList.get(i)));
+        for (int i = 0, size = list.size(); i < size; i++)
             if (list.get(i) == null)
                 list.remove(i);
         return list;
@@ -83,8 +83,8 @@ public class EntityDataMapper implements EntityMapper<Object, Object> {
     @NonNull
     @Override
     public List<Object> transformAllToDomain(@NonNull List list, @NonNull Class domainClass) {
-        List domainObjects = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++)
+        List<Object> domainObjects = new ArrayList<>(list.size());
+        for (int i = 0, size = list.size(); i < size; i++)
             domainObjects.add(transformToDomain(list.get(i), domainClass));
         return domainObjects;
     }

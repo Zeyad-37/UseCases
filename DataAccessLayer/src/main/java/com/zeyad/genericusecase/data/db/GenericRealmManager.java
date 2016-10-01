@@ -37,7 +37,7 @@ public class GenericRealmManager implements DataBaseManager {
     private Context mContext;
 
     private GenericRealmManager(Context context) {
-        if (!com.zeyad.genericusecase.data.utils.Utils.doesContextBelongsToApplication(mContext))
+        if (!Utils.doesContextBelongsToApplication(mContext))
             throw new IllegalArgumentException("Context should be application context only.");
         mRealm = Realm.getDefaultInstance();
         mContext = context;
@@ -231,7 +231,7 @@ public class GenericRealmManager implements DataBaseManager {
                                          @NonNull Class dataClass) {
         return Observable.defer(() -> {
             boolean isDeleted = true;
-            for (int i = 0; i < list.size(); i++)
+            for (int i = 0, size = list.size(); i < size; i++)
                 isDeleted = isDeleted && evictById(dataClass, idFieldName, list.get(i));
             return Observable.just(isDeleted);
         });
@@ -288,9 +288,8 @@ public class GenericRealmManager implements DataBaseManager {
     void writeToPreferences(long value, String destination, String source) {
         SharedPreferences.Editor editor = mContext.getSharedPreferences(Config.getInstance().getPrefFileName(),
                 Context.MODE_PRIVATE).edit();
-        if (editor == null) {
+        if (editor == null)
             return;
-        }
         editor.putLong(destination, value);
         editor.apply();
         Log.d(TAG, source + " writeToPreferencesTo " + destination + ": " + value);
@@ -310,6 +309,27 @@ public class GenericRealmManager implements DataBaseManager {
         return mRealm;
     }
 
+    @NonNull
+    private JSONArray updateJsonArrayWithIdValue(@NonNull JSONArray jsonArray, @Nullable String idColumnName, Class dataClass)
+            throws JSONException, IllegalArgumentException {
+        if (idColumnName == null || idColumnName.isEmpty())
+            throw new IllegalArgumentException("could not find id!");
+        for (int i = 0, length = jsonArray.length(); i < length; i++)
+            if (jsonArray.get(i) instanceof JSONObject)
+                updateJsonObjectWithIdValue(jsonArray.getJSONObject(i), idColumnName, dataClass);
+        return jsonArray;
+    }
+
+    @NonNull
+    private JSONObject updateJsonObjectWithIdValue(@NonNull JSONObject jsonObject, @Nullable String idColumnName, Class dataClass)
+            throws JSONException, IllegalArgumentException {
+        if (idColumnName == null || idColumnName.isEmpty())
+            throw new IllegalArgumentException("could not find id!");
+        if (jsonObject.getInt(idColumnName) == 0)
+            jsonObject.put(idColumnName, Utils.getNextId(dataClass, idColumnName));
+        return jsonObject;
+    }
+
     private interface Executor {
         void run();
     }
@@ -323,7 +343,7 @@ public class GenericRealmManager implements DataBaseManager {
 
         private final Class mClazz;
 
-        public EvictSubscriberClass(Class clazz) {
+        EvictSubscriberClass(Class clazz) {
             mClazz = clazz;
         }
 
@@ -347,7 +367,7 @@ public class GenericRealmManager implements DataBaseManager {
 
         private final List<RealmObject> mRealmModels;
 
-        public PutAllSubscriberClass(List<RealmObject> realmModels) {
+        PutAllSubscriberClass(List<RealmObject> realmModels) {
             mRealmModels = realmModels;
         }
 
@@ -364,26 +384,5 @@ public class GenericRealmManager implements DataBaseManager {
         public void onNext(Object o) {
             Log.d(TAG, "all " + mRealmModels.getClass().getName() + "s added!");
         }
-    }
-
-    @NonNull
-    private JSONArray updateJsonArrayWithIdValue(@NonNull JSONArray jsonArray, @Nullable String idColumnName, Class dataClass)
-            throws JSONException, IllegalArgumentException {
-        if (idColumnName == null || idColumnName.isEmpty())
-            throw new IllegalArgumentException("could not find id!");
-        for (int i = 0; i < jsonArray.length(); i++)
-            if (jsonArray.get(i) instanceof JSONObject)
-                updateJsonObjectWithIdValue(jsonArray.getJSONObject(i), idColumnName, dataClass);
-        return jsonArray;
-    }
-
-    @NonNull
-    private JSONObject updateJsonObjectWithIdValue(@NonNull JSONObject jsonObject, @Nullable String idColumnName, Class dataClass)
-            throws JSONException, IllegalArgumentException {
-        if (idColumnName == null || idColumnName.isEmpty())
-            throw new IllegalArgumentException("could not find id!");
-        if (jsonObject.getInt(idColumnName) == 0)
-            jsonObject.put(idColumnName, com.zeyad.genericusecase.data.utils.Utils.getNextId(dataClass, idColumnName));
-        return jsonObject;
     }
 }

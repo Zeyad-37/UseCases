@@ -45,10 +45,10 @@ import rx.schedulers.Schedulers;
  */
 public class GenericUseCase implements IGenericUseCase {
 
+    private static GenericUseCase sGenericUseCase;
     private final Repository mRepository;
     private final ThreadExecutor mThreadExecutor;
     private final PostExecutionThread mPostExecutionThread;
-    private static GenericUseCase sGenericUseCase;
 
     private GenericUseCase(Repository repository, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
         mThreadExecutor = threadExecutor;
@@ -215,8 +215,8 @@ public class GenericUseCase implements IGenericUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable executeSearch(String query, String column, @NonNull Class presentationClass,
-                                    Class dataClass) {
+    public Observable searchDisk(String query, String column, @NonNull Class presentationClass,
+                                 Class dataClass) {
         return mRepository.searchDisk(query, column, presentationClass, dataClass)
                 .compose(applySchedulers());
     }
@@ -226,7 +226,7 @@ public class GenericUseCase implements IGenericUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable executeSearch(RealmQuery realmQuery, @NonNull Class presentationClass) {
+    public Observable searchDisk(RealmQuery realmQuery, @NonNull Class presentationClass) {
         return mRepository.searchDisk(realmQuery, presentationClass)
                 .compose(applySchedulers());
     }
@@ -276,8 +276,8 @@ public class GenericUseCase implements IGenericUseCase {
     @Override
     public Observable<String> readFromFile(@NonNull String fullFilePath) {
         try {
-            FileInputStream fis = Config.getInstance().getContext().openFileInput(fullFilePath);
-            ObjectInputStream is = new ObjectInputStream(fis);
+            ObjectInputStream is = new ObjectInputStream(Config.getInstance().getContext()
+                    .openFileInput(fullFilePath));
             String data = (String) is.readObject();
             is.close();
             return Observable.just(data);

@@ -2,7 +2,6 @@ package com.zeyad.genericusecase.data.utils;
 
 public class Constants {
     public static final long EXPIRATION_TIME = 600000;
-    public static final String CONTENT_TYPE = "Content-Type";
     public static final String APPLICATION_JSON = "application/json";
     public static final int COUNTER_START = 1;
     public static final int ATTEMPTS = 3;
@@ -10,8 +9,6 @@ public class Constants {
     public static final String DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE = "detail_last_cache_update";
     public static final String POST_TAG = "postObject";
     public static final String FILE_IO_TAG = "fileIOObject";
-    public static String CACHE_DIR;
-    public static String ACCESS_TOKEN_VALUE;
 
     // Errors
     public static final String NETWORK_ERROR_PERSISTED = "No Notwork but post request persisted to queue!\\n Request\n" +

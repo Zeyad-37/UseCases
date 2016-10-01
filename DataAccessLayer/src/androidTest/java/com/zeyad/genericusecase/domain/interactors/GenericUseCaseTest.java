@@ -37,198 +37,10 @@ import static org.mockito.Matchers.eq;
 @RunWith(JUnit4.class)
 public class GenericUseCaseTest {
 
-    private IGenericUseCase mGenericUse;
-    private boolean mToPersist, mWhileCharging;
-    private final Repository mDataRepository = null;//GenericUseCaseTestRobot.getMockedDataRepo();
-    private final JobExecutor mJobExecutor = null;// GenericUseCaseTestRobot.getMockedJobExecuter();
-    private final UIThread mUIThread = null;//GenericUseCaseTestRobot.getMockedUiThread();
-
-    @Before
-    public void setUp() throws Exception {
-        mGenericUse = getGenericUseImplementation((DataRepository) mDataRepository, mJobExecutor, mUIThread);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-
-    }
-
-    @Test
-    public void testGetObject_ifDataRepositoryMethodGetObjectDynamicallyIsCalled_whenArgumentsArePassedAsExpected() {
-        getObject(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .getObjectDynamicallyById(
-                        eq(getUrl())
-                        , eq(getIdColumnName())
-                        , eq(getItemId())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist)
-                        , eq(false));
-    }
-
-    @Test
-    public void testExecuteDynamicPostObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestOfHasmapIsPassed() {
-        executeDynamicPostObject_PostRequestVersion_Hashmap(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .postObjectDynamically(
-                        eq(getUrl())
-                        , eq(getIdColumnName())
-                        , eq(getJSONObject())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist));
-    }
-
-    @Test
-    public void testPostObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestOfJsonObjectIsPassed() {
-        postObject_JsonObject(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .postObjectDynamically(
-                        eq(getUrl())
-                        , eq(getIdColumnName())
-                        , eq(getJSONObject())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist));
-    }
-
-    @Test
-    public void testPostObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestOfHashMapIsPassed() {
-        postObject_Hashmap(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .postObjectDynamically(
-                        eq(getUrl())
-                        , eq(getIdColumnName())
-                        , eq(getJSONObject())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist));
-    }
-
-    @Test
-    public void testPostList_ifDataRepoCorrectMethodIsCalled_whenPostRequestIsPassed() {
-        postList(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .postListDynamically(
-                        eq(getUrl())
-                        , eq(getIdColumnName())
-                        , eq(getJsonArray())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist));
-    }
-
-    @Test
-    public void testExecuteSearch_ifDataRepoCorrectMethodIsCalled_whenRealmQueryIsPassed() {
-        executeSearch_RealmQuery(mGenericUse);
-        Mockito.verify(mDataRepository)
-                .searchDisk(
-                        eq(getRealmQuery())
-                        , eq(getDomainClass()));
-    }
-
-    @Test
-    public void testExecuteSearch_ifDataRepoCorrectMethodIsCalled_whenRealmQueryIsNotPassed() {
-        executeSearch_NonRealmQuery(mGenericUse);
-        Mockito.verify(mDataRepository)
-                .searchDisk(
-                        eq(getStringQuery())
-                        , eq(getColumnQueryValue())
-                        , eq(getDomainClass())
-                        , eq(getDataClass()));
-    }
-
-    @Test
-    public void testDeleteCollection_ifDataRepoCorrectMethodIsCalled_whenPostRequestIsPassed() {
-        deleteCollection(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .deleteListDynamically(
-                        eq(getUrl())
-                        , eq(getJsonArray())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist));
-    }
-
-    @Test
-    public void testExecuteDynamicPutObject_ifDataRepoCorrectMethodIsCalled_whenNonPutRequestIsPassed() {
-        putObject(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .putObjectDynamically(
-                        eq(getUrl())
-                        , eq(getIdColumnName())
-                        , eq(getJSONObject())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist));
-    }
-
-    @Test
-    public void testPutObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestIsPassed() {
-        putObject(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .putObjectDynamically(
-                        eq(getUrl())
-                        , eq(getIdColumnName())
-                        , eq(getJSONObject())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist));
-    }
-
-    @Test
-    public void testUploadFile_ifDataRepoCorrectMethodIsCalled_whenPutRequestIsPassed() {
-        uploadFile(mGenericUse, mToPersist, mWhileCharging);
-        Mockito.verify(mDataRepository)
-                .uploadFileDynamically(eq(getUrl()),
-                        eq(getFile()),
-                        eq(ON_WIFI),
-                        eq(WHILE_CHARGING),
-                        eq(DOMAIN_CLASS),
-                        eq(DATA_CLASS));
-    }
-
-    @Test
-    public void testPutList_ifDataRepoCorrectMethodIsCalled_whenJsonArrayIsPassed() {
-        putList_JsonArray(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository).putListDynamically(
-                eq(getUrl())
-                , eq(getIdColumnName())
-                , eq(getJsonArray())
-                , eq(getDomainClass())
-                , eq(getDataClass())
-                , eq(mToPersist));
-    }
-
-    @Test
-    public void testPutList_ifDataRepoCorrectMethodIsCalled_whenHashmapIsPassed() {
-        putList_Hashmap(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository).putListDynamically(
-                eq(getUrl())
-                , eq(getIdColumnName())
-                , eq(getJsonArray())
-                , eq(getDomainClass())
-                , eq(getDataClass())
-                , eq(mToPersist));
-    }
-
-    @Test
-    public void testDeleteAll_ifDataRepositoryCorrectMethodIsCalled_whenPostRequestIsPassed() {
-        deleteAll(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository).deleteAllDynamically(
-                eq(getUrl())
-                , eq(getDataClass())
-                , eq(mToPersist));
-    }
-
-    public IGenericUseCase getGenericUseImplementation(DataRepository datarepo
-            , JobExecutor jobExecuter
-            , UIThread uithread) {
-        GenericUseCase.init(datarepo, jobExecuter, uithread);
-        return GenericUseCase.getInstance();
-    }
-
+    public static final boolean ON_WIFI = Mockito.anyBoolean();
+    public static final boolean WHILE_CHARGING = Mockito.anyBoolean();
+    public static final Class DOMAIN_CLASS = TestModel.class;
+    public static final Class DATA_CLASS = TestModel.class;
     private static final TestModel TEST_MODEL = new TestModel(1, "123");
     private static final JSONObject JSON_OBJECT = new JSONObject();
     private static final JSONArray JSON_ARRAY = new JSONArray();
@@ -236,10 +48,11 @@ public class GenericUseCaseTest {
     private static final File MOCKED_FILE = Mockito.mock(File.class);
     //    private static final RealmQuery<TestModel> REALM_QUERY = Realm.getDefaultInstance().where(TestModel.class);
     private static final RealmQuery<TestModel> REALM_QUERY = null;
-    public static final boolean ON_WIFI = Mockito.anyBoolean();
-    public static final boolean WHILE_CHARGING = Mockito.anyBoolean();
-    public static final Class DOMAIN_CLASS = TestModel.class;
-    public static final Class DATA_CLASS = TestModel.class;
+    private final Repository mDataRepository = null;//GenericUseCaseTestRobot.getMockedDataRepo();
+    private final JobExecutor mJobExecutor = null;// GenericUseCaseTestRobot.getMockedJobExecuter();
+    private final UIThread mUIThread = null;//GenericUseCaseTestRobot.getMockedUiThread();
+    private IGenericUseCase mGenericUse;
+    private boolean mToPersist, mWhileCharging;
 
     /**
      * At 0th index => getObjectDynamicallyById observable
@@ -437,13 +250,13 @@ public class GenericUseCaseTest {
 
     static TestSubscriber executeSearch_RealmQuery(IGenericUseCase genericUse) {
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        genericUse.executeSearch(getRealmQuery(), getPresentationClass()).subscribe(testSubscriber);
+        genericUse.searchDisk(getRealmQuery(), getPresentationClass()).subscribe(testSubscriber);
         return testSubscriber;
     }
 
     static TestSubscriber executeSearch_NonRealmQuery(IGenericUseCase genericUse) {
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        genericUse.executeSearch(getStringQuery(), getColumnQueryValue(), getPresentationClass(), getDataClass());
+        genericUse.searchDisk(getStringQuery(), getColumnQueryValue(), getPresentationClass(), getDataClass());
         return testSubscriber;
     }
 
@@ -513,5 +326,191 @@ public class GenericUseCaseTest {
 
     public static RealmQuery getRealmQuery() {
         return REALM_QUERY;
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        mGenericUse = getGenericUseImplementation((DataRepository) mDataRepository, mJobExecutor, mUIThread);
+    }
+
+    @After
+    public void tearDown() throws Exception {
+
+    }
+
+    @Test
+    public void testGetObject_ifDataRepositoryMethodGetObjectDynamicallyIsCalled_whenArgumentsArePassedAsExpected() {
+        getObject(mGenericUse, mToPersist);
+        Mockito.verify(mDataRepository)
+                .getObjectDynamicallyById(
+                        eq(getUrl())
+                        , eq(getIdColumnName())
+                        , eq(getItemId())
+                        , eq(getDomainClass())
+                        , eq(getDataClass())
+                        , eq(mToPersist)
+                        , eq(false));
+    }
+
+    @Test
+    public void testExecuteDynamicPostObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestOfHasmapIsPassed() {
+        executeDynamicPostObject_PostRequestVersion_Hashmap(mGenericUse, mToPersist);
+        Mockito.verify(mDataRepository)
+                .postObjectDynamically(
+                        eq(getUrl())
+                        , eq(getIdColumnName())
+                        , eq(getJSONObject())
+                        , eq(getDomainClass())
+                        , eq(getDataClass())
+                        , eq(mToPersist));
+    }
+
+    @Test
+    public void testPostObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestOfJsonObjectIsPassed() {
+        postObject_JsonObject(mGenericUse, mToPersist);
+        Mockito.verify(mDataRepository)
+                .postObjectDynamically(
+                        eq(getUrl())
+                        , eq(getIdColumnName())
+                        , eq(getJSONObject())
+                        , eq(getDomainClass())
+                        , eq(getDataClass())
+                        , eq(mToPersist));
+    }
+
+    @Test
+    public void testPostObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestOfHashMapIsPassed() {
+        postObject_Hashmap(mGenericUse, mToPersist);
+        Mockito.verify(mDataRepository)
+                .postObjectDynamically(
+                        eq(getUrl())
+                        , eq(getIdColumnName())
+                        , eq(getJSONObject())
+                        , eq(getDomainClass())
+                        , eq(getDataClass())
+                        , eq(mToPersist));
+    }
+
+    @Test
+    public void testPostList_ifDataRepoCorrectMethodIsCalled_whenPostRequestIsPassed() {
+        postList(mGenericUse, mToPersist);
+        Mockito.verify(mDataRepository)
+                .postListDynamically(
+                        eq(getUrl())
+                        , eq(getIdColumnName())
+                        , eq(getJsonArray())
+                        , eq(getDomainClass())
+                        , eq(getDataClass())
+                        , eq(mToPersist));
+    }
+
+    @Test
+    public void testExecuteSearch_ifDataRepoCorrectMethodIsCalled_whenRealmQueryIsPassed() {
+        executeSearch_RealmQuery(mGenericUse);
+        Mockito.verify(mDataRepository)
+                .searchDisk(
+                        eq(getRealmQuery())
+                        , eq(getDomainClass()));
+    }
+
+    @Test
+    public void testExecuteSearch_ifDataRepoCorrectMethodIsCalled_whenRealmQueryIsNotPassed() {
+        executeSearch_NonRealmQuery(mGenericUse);
+        Mockito.verify(mDataRepository)
+                .searchDisk(
+                        eq(getStringQuery())
+                        , eq(getColumnQueryValue())
+                        , eq(getDomainClass())
+                        , eq(getDataClass()));
+    }
+
+    @Test
+    public void testDeleteCollection_ifDataRepoCorrectMethodIsCalled_whenPostRequestIsPassed() {
+        deleteCollection(mGenericUse, mToPersist);
+        Mockito.verify(mDataRepository)
+                .deleteListDynamically(
+                        eq(getUrl())
+                        , eq(getJsonArray())
+                        , eq(getDomainClass())
+                        , eq(getDataClass())
+                        , eq(mToPersist));
+    }
+
+    @Test
+    public void testExecuteDynamicPutObject_ifDataRepoCorrectMethodIsCalled_whenNonPutRequestIsPassed() {
+        putObject(mGenericUse, mToPersist);
+        Mockito.verify(mDataRepository)
+                .putObjectDynamically(
+                        eq(getUrl())
+                        , eq(getIdColumnName())
+                        , eq(getJSONObject())
+                        , eq(getDomainClass())
+                        , eq(getDataClass())
+                        , eq(mToPersist));
+    }
+
+    @Test
+    public void testPutObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestIsPassed() {
+        putObject(mGenericUse, mToPersist);
+        Mockito.verify(mDataRepository)
+                .putObjectDynamically(
+                        eq(getUrl())
+                        , eq(getIdColumnName())
+                        , eq(getJSONObject())
+                        , eq(getDomainClass())
+                        , eq(getDataClass())
+                        , eq(mToPersist));
+    }
+
+    @Test
+    public void testUploadFile_ifDataRepoCorrectMethodIsCalled_whenPutRequestIsPassed() {
+        uploadFile(mGenericUse, mToPersist, mWhileCharging);
+        Mockito.verify(mDataRepository)
+                .uploadFileDynamically(eq(getUrl()),
+                        eq(getFile()),
+                        eq(ON_WIFI),
+                        eq(WHILE_CHARGING),
+                        eq(DOMAIN_CLASS),
+                        eq(DATA_CLASS));
+    }
+
+    @Test
+    public void testPutList_ifDataRepoCorrectMethodIsCalled_whenJsonArrayIsPassed() {
+        putList_JsonArray(mGenericUse, mToPersist);
+        Mockito.verify(mDataRepository).putListDynamically(
+                eq(getUrl())
+                , eq(getIdColumnName())
+                , eq(getJsonArray())
+                , eq(getDomainClass())
+                , eq(getDataClass())
+                , eq(mToPersist));
+    }
+
+    @Test
+    public void testPutList_ifDataRepoCorrectMethodIsCalled_whenHashmapIsPassed() {
+        putList_Hashmap(mGenericUse, mToPersist);
+        Mockito.verify(mDataRepository).putListDynamically(
+                eq(getUrl())
+                , eq(getIdColumnName())
+                , eq(getJsonArray())
+                , eq(getDomainClass())
+                , eq(getDataClass())
+                , eq(mToPersist));
+    }
+
+    @Test
+    public void testDeleteAll_ifDataRepositoryCorrectMethodIsCalled_whenPostRequestIsPassed() {
+        deleteAll(mGenericUse, mToPersist);
+        Mockito.verify(mDataRepository).deleteAllDynamically(
+                eq(getUrl())
+                , eq(getDataClass())
+                , eq(mToPersist));
+    }
+
+    public IGenericUseCase getGenericUseImplementation(DataRepository datarepo
+            , JobExecutor jobExecuter
+            , UIThread uithread) {
+        GenericUseCase.init(datarepo, jobExecuter, uithread);
+        return GenericUseCase.getInstance();
     }
 }

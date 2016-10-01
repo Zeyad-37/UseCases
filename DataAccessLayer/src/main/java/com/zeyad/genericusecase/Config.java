@@ -3,8 +3,6 @@ package com.zeyad.genericusecase;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import java.io.File;
-
 public class Config {
 
     private static Config sInstance;
@@ -17,19 +15,6 @@ public class Config {
         setupRealm(context);
     }
 
-    private void setupRealm(@NonNull Context context) {
-//        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(context, context.getCacheDir())
-//                .name("library.realm")
-//                .modules(new TestLibraryModule())
-//                .build();
-    }
-
-    private File getFolder() {
-        final File someDir = new File("someDir");
-        someDir.mkdir();
-        return someDir;
-    }
-
     public static Config getInstance() {
         if (sInstance == null)
             throw new NullPointerException("init must be called before");
@@ -38,6 +23,13 @@ public class Config {
 
     public static void init(@NonNull Context context) {
         sInstance = new Config(context);
+    }
+
+    private void setupRealm(@NonNull Context context) {
+//        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(context, context.getCacheDir())
+//                .name("library.realm")
+//                .modules(new TestLibraryModule())
+//                .build();
     }
 
     public Context getContext() {

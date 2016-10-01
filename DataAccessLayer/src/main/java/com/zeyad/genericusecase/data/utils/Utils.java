@@ -54,17 +54,14 @@ public class Utils {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (hasLollipop()) {
             Network[] networks = connectivityManager.getAllNetworks();
-            NetworkInfo networkInfo;
-            for (Network mNetwork : networks) {
-                networkInfo = connectivityManager.getNetworkInfo(mNetwork);
-                if (networkInfo.getState().equals(NetworkInfo.State.CONNECTED))
+            for (int i = 0, networksLength = networks.length; i < networksLength; i++)
+                if (connectivityManager.getNetworkInfo(networks[i]).getState().equals(NetworkInfo.State.CONNECTED))
                     return true;
-            }
         } else if (connectivityManager != null) {
             NetworkInfo[] info = connectivityManager.getAllNetworkInfo();
             if (info != null)
-                for (NetworkInfo anInfo : info)
-                    if (anInfo.getState() == NetworkInfo.State.CONNECTED)
+                for (int i = 0, infoLength = info.length; i < infoLength; i++)
+                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
                         return true;
         }
         return false;

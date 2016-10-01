@@ -41,6 +41,24 @@ public class GenericUseCaseFactory {
     }
 
     /**
+     * initializes the Generic Use Case with given context.
+     *
+     * @param context context of activity/application
+     */
+    public static void init(@NonNull Context context) {
+        Config.init(context);
+        Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
+        ApiConnectionFactory.init();
+        GenericUseCase.init(context, new EntityMapperUtil() {
+            @Override
+            public EntityMapper getDataMapper(Class dataClass) {
+                return new EntityDataMapper();
+            }
+        });
+        sGenericUseCase = GenericUseCase.getInstance();
+    }
+
+    /**
      * This method is meant for test purposes only. Use other versions of init for production code.
      *
      * @param genericUseCase mocked generic use(expected) or any IGenericUseCase implementation

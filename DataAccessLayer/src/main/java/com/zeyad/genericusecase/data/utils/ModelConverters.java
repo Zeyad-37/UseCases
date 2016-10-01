@@ -49,14 +49,13 @@ public class ModelConverters {
                 //json array can not be converted into array of id ints.
                 return null;
             }
-            idList = new ArrayList<>();
-            for (int i = 0; i < jsonArray.length(); i++) {
+            idList = new ArrayList<>(jsonArray.length());
+            for (int i = 0, length = jsonArray.length(); i < length; i++)
                 try {
                     idList.add(jsonArray.getLong(i));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-            }
         }
         return idList;
     }
@@ -64,8 +63,8 @@ public class ModelConverters {
     @NonNull
     public static <T> JSONArray convertToJsonArray(@NonNull List<T> hashMap) {
         final JSONArray jsonArray = new JSONArray();
-        for (T object : hashMap)
-            jsonArray.put(object);
+        for (int i = 0, hashMapSize = hashMap.size(); i < hashMapSize; i++)
+            jsonArray.put(hashMap.get(i));
         return jsonArray;
     }
 }

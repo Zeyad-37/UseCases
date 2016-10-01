@@ -14,7 +14,7 @@ public class GenericNetworkQueueIntentService extends IntentService {
 
     public static final String TAG = com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.class.getSimpleName(),
             DOWNLOAD_FILE = "DOWNLOAD_FILE", UPLOAD_FILE = "UPLOAD_FILE", JOB_TYPE = "JOB_TYPE",
-            POST = "POST", LIST = "LIST", PAYLOAD = "payload", TRIAL_COUNT = "trialCount";
+            POST = "POST", PAYLOAD = "payload", TRIAL_COUNT = "trialCount";
     @Nullable
     private CompositeSubscription mCompositeSubscription;
 

@@ -23,10 +23,10 @@ public interface IGenericUseCase {
     Observable postList(@NonNull PostRequest postRequest);
 
     @SuppressWarnings("unchecked")
-    Observable executeSearch(String query, String column, @NonNull Class presentationClass, Class dataClass);
+    Observable searchDisk(String query, String column, @NonNull Class presentationClass, Class dataClass);
 
     @SuppressWarnings("unchecked")
-    Observable executeSearch(RealmQuery realmQuery, @NonNull Class presentationClass);
+    Observable searchDisk(RealmQuery realmQuery, @NonNull Class presentationClass);
 
     Observable deleteCollection(@NonNull PostRequest deleteRequest);
 
