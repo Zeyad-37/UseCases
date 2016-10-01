@@ -1,5 +1,7 @@
 package com.zeyad.genericusecase.data.network;
 
+import android.support.annotation.NonNull;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -19,8 +21,11 @@ public abstract class RestApiTest {
 
     private RestApi mRestApi;
     private IApiConnection mMockedApiConnection;
+    @NonNull
     private String mValidUrl = "some strong";
+    @NonNull
     private RequestBody mRequestBody = MultipartBody.create(MediaType.parse("text/html"), new byte[0]);
+    @NonNull
     private MultipartBody.Part mMultipart = MultipartBody.Part.create(mRequestBody);
 
     @Before

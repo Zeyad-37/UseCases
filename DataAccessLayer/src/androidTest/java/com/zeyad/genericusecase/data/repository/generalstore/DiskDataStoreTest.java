@@ -1,5 +1,6 @@
 package com.zeyad.genericusecase.data.repository.generalstore;
 
+import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -35,13 +36,14 @@ import static org.hamcrest.Matchers.notNullValue;
 @RunWith(AndroidJUnit4.class)
 public class DiskDataStoreTest {
 
-    private DiskDataStoreRobotInterface mDiskDataStoreRobot;
-    private DataStore mDiskDataStore;
-
+    @NonNull
     @Rule
     public Timeout mTimeout = new Timeout(TestUtility.TIMEOUT_TIME_VALUE, TestUtility.TIMEOUT_TIME_UNIT);
+    @NonNull
     @Rule
     public ExpectedException mExpectedException = ExpectedException.none();
+    private DiskDataStoreRobotInterface mDiskDataStoreRobot;
+    private DataStore mDiskDataStore;
 
     @Before
     public void setUp() throws Exception {

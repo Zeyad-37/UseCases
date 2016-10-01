@@ -1,5 +1,7 @@
 package com.zeyad.genericusecase.domain.interactors;
 
+import android.support.annotation.Nullable;
+
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
 import com.zeyad.genericusecase.domain.interactors.requests.GetListRequest;
@@ -17,6 +19,7 @@ class GetListRequestTestRobot {
     static final String URL = "www.google.com";
     static final boolean SHOULD_CACHE = true;
 
+    @Nullable
     static GetListRequest createGetListRequest() {
         return new GetListRequest.GetListRequestBuilder(DATA_CLASS, TO_PERSIST)
                 .subscriber(SUBSCRIBER)

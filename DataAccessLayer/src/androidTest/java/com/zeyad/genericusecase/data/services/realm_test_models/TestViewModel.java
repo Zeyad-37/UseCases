@@ -7,11 +7,11 @@ public class TestViewModel {
     public TestViewModel() {
     }
 
-    public void setTestInfo(String testInfo) {
-        mTestInfo = testInfo;
-    }
-
     public String getTestInfo() {
         return mTestInfo;
+    }
+
+    public void setTestInfo(String testInfo) {
+        mTestInfo = testInfo;
     }
 }

@@ -18,9 +18,9 @@ import rx.Observable;
 
 public class DiskDataStore implements DataStore {
 
+    public final String TAG = com.zeyad.genericusecase.data.repository.generalstore.DiskDataStore.class.getName();
     private DataBaseManager mRealmManager;
     private EntityMapper mEntityDataMapper;
-    public final String TAG = com.zeyad.genericusecase.data.repository.generalstore.DiskDataStore.class.getName();
 
     /**
      * Construct a {@link DataStore} based file system data store.

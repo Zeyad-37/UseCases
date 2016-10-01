@@ -1,5 +1,6 @@
 package com.zeyad.genericusecase.data.repository;
 
+import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 
 import com.zeyad.genericusecase.data.TestUtility;
@@ -30,10 +31,16 @@ import static org.junit.Assume.assumeThat;
 public class DataRepositoryTest {
 
     private final boolean mIsDiskType;
-    private DataStore mDataStore;
     private final boolean mToCache;
+    private DataStore mDataStore;
     private DataRepository mDataRepository;
 
+    public DataRepositoryTest(boolean isDiskType, boolean toCache) {
+        mIsDiskType = isDiskType;
+        mToCache = toCache;
+    }
+
+    @NonNull
     @Parameterized.Parameters
     public static Collection<Object[]> data() {
         final ArrayList<Object[]> objects = new ArrayList<>(2);
@@ -43,11 +50,6 @@ public class DataRepositoryTest {
         objects.add(new Object[]{false, true});
         objects.add(new Object[]{false, false});
         return objects;
-    }
-
-    public DataRepositoryTest(boolean isDiskType, boolean toCache) {
-        mIsDiskType = isDiskType;
-        mToCache = toCache;
     }
 
     @Before

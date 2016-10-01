@@ -27,10 +27,10 @@ public abstract class IApiConnectionTest {
 
     private final String mValidUrl = ApiConnectionRobot.getValidUrl();
     private final RequestBody mMockedRequestBody = ApiConnectionRobot.getMockedRequestBody();
+    private final MultipartBody.Part mMultipartBodyPart = ApiConnectionRobot.getValidMultipartBodyPart();
     private IApiConnection mApiConnection;
     private RestApi mRestApiWithCache;
     private RestApi mRestApiWithoutCache;
-    private final MultipartBody.Part mMultipartBodyPart = ApiConnectionRobot.getValidMultipartBodyPart();
 
     @Before
     public void setUp() throws Exception {

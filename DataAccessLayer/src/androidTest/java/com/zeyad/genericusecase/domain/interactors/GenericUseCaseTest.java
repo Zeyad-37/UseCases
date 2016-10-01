@@ -1,6 +1,7 @@
 package com.zeyad.genericusecase.domain.interactors;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.zeyad.genericusecase.UIThread;
 import com.zeyad.genericusecase.data.executor.JobExecutor;
@@ -47,9 +48,13 @@ public class GenericUseCaseTest {
     private static final HashMap<String, Object> HASH_MAP = new HashMap<>();
     private static final File MOCKED_FILE = Mockito.mock(File.class);
     //    private static final RealmQuery<TestModel> REALM_QUERY = Realm.getDefaultInstance().where(TestModel.class);
+    @Nullable
     private static final RealmQuery<TestModel> REALM_QUERY = null;
+    @Nullable
     private final Repository mDataRepository = null;//GenericUseCaseTestRobot.getMockedDataRepo();
+    @Nullable
     private final JobExecutor mJobExecutor = null;// GenericUseCaseTestRobot.getMockedJobExecuter();
+    @Nullable
     private final UIThread mUIThread = null;//GenericUseCaseTestRobot.getMockedUiThread();
     private IGenericUseCase mGenericUse;
     private boolean mToPersist, mWhileCharging;
@@ -64,7 +69,8 @@ public class GenericUseCaseTest {
      * @param shouldPersist
      * @return
      */
-    static TestSubscriber<Object> getObject(IGenericUseCase genericUseCase, boolean shouldPersist) {
+    @NonNull
+    static TestSubscriber<Object> getObject(@NonNull IGenericUseCase genericUseCase, boolean shouldPersist) {
         final TestSubscriber<Object> useCaseSubscriber = new TestSubscriber<>();
         genericUseCase.getObject(new GetObjectRequest(useCaseSubscriber, getUrl()
                 , getIdColumnName(), getItemId(), getPresentationClass()
@@ -81,14 +87,17 @@ public class GenericUseCaseTest {
         return "id";
     }
 
+    @NonNull
     static Class getDataClass() {
         return TestModel.class;
     }
 
+    @NonNull
     static Class getDomainClass() {
         return TestViewModel.class;
     }
 
+    @NonNull
     static Class getPresentationClass() {
         return junit.framework.Test.class;
     }
@@ -157,7 +166,7 @@ public class GenericUseCaseTest {
         return Observable.create(
                 new Observable.OnSubscribe<List>() {
                     @Override
-                    public void call(Subscriber<? super List> subscriber) {
+                    public void call(@NonNull Subscriber<? super List> subscriber) {
                         subscriber.onNext(Collections.singletonList(createTestModel()));
                     }
                 });
@@ -183,18 +192,19 @@ public class GenericUseCaseTest {
         return Mockito.mock(ObjectObservable.class);
     }
 
+    @NonNull
     static TestModel createTestModel() {
         return TEST_MODEL;
     }
 
-    static void deleteAll(IGenericUseCase genericUse, boolean toPersist) {
+    static void deleteAll(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final PostRequest postRequest = new PostRequest
                 .PostRequestBuilder(getDataClass(), toPersist)
                 .url(getUrl()).build();
         genericUse.deleteAll(postRequest).subscribe(new TestSubscriber());
     }
 
-    static void putList_JsonArray(IGenericUseCase genericUseCase, boolean toPersist) {
+    static void putList_JsonArray(@NonNull IGenericUseCase genericUseCase, boolean toPersist) {
         final PostRequest postRequest
                 = new PostRequest(new TestSubscriber(), getIdColumnName()
                 , getUrl(), getJsonArray(), getPresentationClass()
@@ -202,7 +212,7 @@ public class GenericUseCaseTest {
         genericUseCase.putList(postRequest);
     }
 
-    static void putList_Hashmap(IGenericUseCase genericUseCase, boolean toPersist) {
+    static void putList_Hashmap(@NonNull IGenericUseCase genericUseCase, boolean toPersist) {
         final PostRequest postRequest
                 = getHashmapPostRequest(toPersist);
         genericUseCase.putList(postRequest);
@@ -213,15 +223,18 @@ public class GenericUseCaseTest {
         return JSON_OBJECT;
     }
 
+    @NonNull
     static JSONArray getJsonArray() {
         return JSON_ARRAY;
     }
 
+    @NonNull
     static HashMap<String, Object> getHashmap() {
         return HASH_MAP;
     }
 
-    static TestSubscriber uploadFile(IGenericUseCase genericUse, boolean onWifi, boolean whileCharging) {
+    @NonNull
+    static TestSubscriber uploadFile(@NonNull IGenericUseCase genericUse, boolean onWifi, boolean whileCharging) {
         final TestSubscriber subscriber = new TestSubscriber();
         final FileIORequest fileIORequest = getUploadRequest(onWifi, whileCharging);
         genericUse.uploadFile(fileIORequest)
@@ -233,14 +246,16 @@ public class GenericUseCaseTest {
         return MOCKED_FILE;
     }
 
-    static TestSubscriber putObject(IGenericUseCase genericUse, boolean toPersist) {
+    @NonNull
+    static TestSubscriber putObject(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final TestSubscriber subscriber = new TestSubscriber();
         genericUse.putObject(getHashmapPostRequest(toPersist))
                 .subscribe(subscriber);
         return subscriber;
     }
 
-    static TestSubscriber deleteCollection(IGenericUseCase genericUse, boolean toPersist) {
+    @NonNull
+    static TestSubscriber deleteCollection(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final PostRequest deleteRequest = getHashmapPostRequest(toPersist);
         final TestSubscriber subscriber = (TestSubscriber) deleteRequest.getSubscriber();
         genericUse.deleteCollection(deleteRequest)
@@ -248,19 +263,22 @@ public class GenericUseCaseTest {
         return subscriber;
     }
 
-    static TestSubscriber executeSearch_RealmQuery(IGenericUseCase genericUse) {
+    @NonNull
+    static TestSubscriber executeSearch_RealmQuery(@NonNull IGenericUseCase genericUse) {
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         genericUse.searchDisk(getRealmQuery(), getPresentationClass()).subscribe(testSubscriber);
         return testSubscriber;
     }
 
-    static TestSubscriber executeSearch_NonRealmQuery(IGenericUseCase genericUse) {
+    @NonNull
+    static TestSubscriber executeSearch_NonRealmQuery(@NonNull IGenericUseCase genericUse) {
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         genericUse.searchDisk(getStringQuery(), getColumnQueryValue(), getPresentationClass(), getDataClass());
         return testSubscriber;
     }
 
-    static TestSubscriber<Object> postList(IGenericUseCase genericUse, boolean toPersist) {
+    @NonNull
+    static TestSubscriber<Object> postList(@NonNull IGenericUseCase genericUse, boolean toPersist) {
 
         final PostRequest jsonArrayPostRequest = getJsonArrayPostRequest(toPersist);
         TestSubscriber<Object> testSubscriber = (TestSubscriber<Object>) jsonArrayPostRequest.getSubscriber();
@@ -269,21 +287,24 @@ public class GenericUseCaseTest {
         return testSubscriber;
     }
 
-    static TestSubscriber<Object> postObject_JsonObject(IGenericUseCase genericUse, boolean toPersist) {
+    @NonNull
+    static TestSubscriber<Object> postObject_JsonObject(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final PostRequest jsonObjectPostRequest = getJsonObjectPostRequest(toPersist);
         TestSubscriber<Object> subscriber = (TestSubscriber<Object>) jsonObjectPostRequest.getSubscriber();
         genericUse.postObject(jsonObjectPostRequest);
         return subscriber;
     }
 
-    static TestSubscriber<Object> postObject_Hashmap(IGenericUseCase genericUse, boolean toPersist) {
+    @NonNull
+    static TestSubscriber<Object> postObject_Hashmap(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final PostRequest jsonObjectPostRequest = getHashmapPostRequest(toPersist);
         TestSubscriber<Object> subscriber = (TestSubscriber<Object>) jsonObjectPostRequest.getSubscriber();
         genericUse.postObject(jsonObjectPostRequest);
         return subscriber;
     }
 
-    static TestSubscriber<Object> executeDynamicPostObject_PostRequestVersion_Hashmap(IGenericUseCase genericUse, boolean toPersist) {
+    @NonNull
+    static TestSubscriber<Object> executeDynamicPostObject_PostRequestVersion_Hashmap(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final PostRequest jsonObjectPostRequest = getHashmapPostRequest(toPersist);
         TestSubscriber<Object> subscriber = (TestSubscriber<Object>) jsonObjectPostRequest.getSubscriber();
         genericUse.postObject(jsonObjectPostRequest);
@@ -324,6 +345,7 @@ public class GenericUseCaseTest {
                 , getDataClass(), toPersist);
     }
 
+    @Nullable
     public static RealmQuery getRealmQuery() {
         return REALM_QUERY;
     }

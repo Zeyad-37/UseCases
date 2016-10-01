@@ -14,6 +14,10 @@ import io.realm.RealmQuery;
 import rx.Observable;
 
 public interface DataBaseManager {
+
+    String COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE = "collection_last_cache_update",
+            DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE = "detail_last_cache_update";
+
     /**
      * Gets an {@link Observable} which will emit an Object.
      *

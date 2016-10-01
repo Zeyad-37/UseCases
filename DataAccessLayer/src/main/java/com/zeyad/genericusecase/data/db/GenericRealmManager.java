@@ -7,7 +7,6 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.zeyad.genericusecase.Config;
-import com.zeyad.genericusecase.data.utils.Constants;
 import com.zeyad.genericusecase.data.utils.Utils;
 
 import org.json.JSONArray;
@@ -31,13 +30,14 @@ import rx.schedulers.Schedulers;
  */
 public class GenericRealmManager implements DataBaseManager {
 
+    private static final long EXPIRATION_TIME = 600000;
     private static DataBaseManager sInstance;
-    public final String TAG = com.zeyad.genericusecase.data.db.GenericRealmManager.class.getName();
+    private final String TAG = com.zeyad.genericusecase.data.db.GenericRealmManager.class.getName();
     private Realm mRealm;
     private Context mContext;
 
     private GenericRealmManager(Context context) {
-        if (!Utils.doesContextBelongsToApplication(mContext))
+        if (!Utils.doesContextBelongsToApplication(context))
             throw new IllegalArgumentException("Context should be application context only.");
         mRealm = Realm.getDefaultInstance();
         mContext = context;
@@ -105,7 +105,7 @@ public class GenericRealmManager implements DataBaseManager {
                 RealmObject result = executeWriteOperationInRealm(mRealm, () -> Realm.getDefaultInstance()
                         .copyToRealmOrUpdate(realmObject));
                 if (RealmObject.isValid(result)) {
-                    writeToPreferences(System.currentTimeMillis(), Constants.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
+                    writeToPreferences(System.currentTimeMillis(), DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
                             + dataClass.getSimpleName(), "putRealmObject");
                     return Observable.just(Boolean.TRUE);
                 } else
@@ -124,7 +124,7 @@ public class GenericRealmManager implements DataBaseManager {
                 RealmModel result = executeWriteOperationInRealm(mRealm, () -> Realm.getDefaultInstance()
                         .copyToRealmOrUpdate(realmModel));
                 if (RealmObject.isValid(result)) {
-                    writeToPreferences(System.currentTimeMillis(), Constants.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
+                    writeToPreferences(System.currentTimeMillis(), DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
                             + dataClass.getSimpleName(), "putRealmModel");
                     return Observable.just(Boolean.TRUE);
                 } else
@@ -149,7 +149,7 @@ public class GenericRealmManager implements DataBaseManager {
                         () -> Realm.getDefaultInstance().createOrUpdateObjectFromJson(dataClass, realmObject));
                 if (RealmObject.isValid(result)) {
                     writeToPreferences(System.currentTimeMillis(),
-                            Constants.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE + dataClass.getSimpleName(),
+                            DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE + dataClass.getSimpleName(),
                             "putJSON");
                     return Observable.just(true);
                 } else
@@ -170,7 +170,7 @@ public class GenericRealmManager implements DataBaseManager {
                 return Observable.error(e);
             }
             executeWriteOperationInRealm(mRealm, () -> Realm.getDefaultInstance().createOrUpdateAllFromJson(dataClass, jsonArray));
-            writeToPreferences(System.currentTimeMillis(), Constants.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE
+            writeToPreferences(System.currentTimeMillis(), DataBaseManager.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE
                     + dataClass.getSimpleName(), "putAll");
             return Observable.just(Boolean.TRUE);
         });
@@ -181,7 +181,7 @@ public class GenericRealmManager implements DataBaseManager {
         Observable.defer(() -> {
             mRealm = Realm.getDefaultInstance();
             executeWriteOperationInRealm(mRealm, () -> Realm.getDefaultInstance().copyToRealmOrUpdate(realmModels));
-            writeToPreferences(System.currentTimeMillis(), Constants.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE
+            writeToPreferences(System.currentTimeMillis(), DataBaseManager.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE
                     + dataClass.getSimpleName(), "putAll");
             return Observable.from(realmModels);
         }).subscribeOn(Schedulers.immediate())
@@ -194,7 +194,7 @@ public class GenericRealmManager implements DataBaseManager {
         return Observable.defer(() -> {
             mRealm = Realm.getDefaultInstance();
             executeWriteOperationInRealm(mRealm, () -> Realm.getDefaultInstance().delete(clazz));
-            writeToPreferences(System.currentTimeMillis(), Constants.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE
+            writeToPreferences(System.currentTimeMillis(), DataBaseManager.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE
                     + clazz.getSimpleName(), "evictAll");
             return Observable.just(Boolean.TRUE);
         });
@@ -206,7 +206,7 @@ public class GenericRealmManager implements DataBaseManager {
             mRealm = Realm.getDefaultInstance();
             executeWriteOperationInRealm(mRealm, (Executor) realmModel::deleteFromRealm);
             boolean isDeleted = !realmModel.isValid();
-            writeToPreferences(System.currentTimeMillis(), Constants.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
+            writeToPreferences(System.currentTimeMillis(), DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
                     + clazz.getSimpleName(), "evict");
             return Observable.just(isDeleted);
         }).subscribeOn(Schedulers.immediate())
@@ -219,7 +219,7 @@ public class GenericRealmManager implements DataBaseManager {
         if (toDelete != null) {
             executeWriteOperationInRealm(Realm.getDefaultInstance(), () -> RealmObject.deleteFromRealm(toDelete));
             boolean isDeleted = !RealmObject.isValid(toDelete);
-            writeToPreferences(System.currentTimeMillis(), Constants.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
+            writeToPreferences(System.currentTimeMillis(), DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
                     + clazz.getSimpleName(), "evictById");
             return isDeleted;
         } else return false;
@@ -252,13 +252,13 @@ public class GenericRealmManager implements DataBaseManager {
 
     @Override
     public boolean isItemValid(int itemId, @NonNull String columnId, @NonNull Class clazz) {
-        return isCached(itemId, columnId, clazz) && areItemsValid(Constants.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
+        return isCached(itemId, columnId, clazz) && areItemsValid(DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
                 + clazz.getSimpleName());
     }
 
     @Override
     public boolean areItemsValid(String destination) {
-        return (System.currentTimeMillis() - getFromPreferences(destination)) <= Constants.EXPIRATION_TIME;
+        return (System.currentTimeMillis() - getFromPreferences(destination)) <= EXPIRATION_TIME;
     }
 
     private void executeWriteOperationInRealm(@NonNull Realm realm, @NonNull Executor executor) {

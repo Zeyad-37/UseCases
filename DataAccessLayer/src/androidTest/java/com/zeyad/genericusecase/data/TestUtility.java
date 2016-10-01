@@ -171,12 +171,6 @@ public class TestUtility {
         return GoogleApiAvailability.getInstance() != null && GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
     }
 
-    public interface Executor {
-
-        void run();
-
-    }
-
     private static String getStackTrace(@NonNull Throwable throwable) {
 
         StringWriter errors = new StringWriter();
@@ -214,7 +208,7 @@ public class TestUtility {
         };
     }
 
-    public static void performInitialSetupOfDb(Context context) {
+    public static void performInitialSetupOfDb(@NonNull Context context) {
         Realm.setDefaultConfiguration(new RealmConfiguration.Builder(context)
                 .name("app.realm")
                 .modules(Realm.getDefaultModule(), new TestLibraryModule())
@@ -283,5 +277,11 @@ public class TestUtility {
             Mockito.verify(jobScheduler).schedule(Mockito.any(JobInfo.class));
             Mockito.verify(gcmNetworkManager).schedule(Mockito.any(OneoffTask.class));
         }
+    }
+
+    public interface Executor {
+
+        void run();
+
     }
 }

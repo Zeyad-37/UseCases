@@ -1,5 +1,7 @@
 package com.zeyad.genericusecase.domain.interactors;
 
+import android.support.annotation.Nullable;
+
 import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
 
 import org.junit.After;
@@ -12,6 +14,7 @@ import static org.hamcrest.Matchers.is;
 
 public class FileIORequestTest {
 
+    @Nullable
     private FileIORequest mFileIORequest;
 
     @Before

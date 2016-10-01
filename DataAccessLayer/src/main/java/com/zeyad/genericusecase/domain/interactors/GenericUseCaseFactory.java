@@ -31,6 +31,7 @@ public class GenericUseCaseFactory {
         ApiConnectionFactory.init();
         if (entityMapper == null)
             entityMapper = new EntityMapperUtil() {
+                @NonNull
                 @Override
                 public EntityMapper getDataMapper(Class dataClass) {
                     return new EntityDataMapper();
@@ -50,6 +51,7 @@ public class GenericUseCaseFactory {
         Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
         ApiConnectionFactory.init();
         GenericUseCase.init(context, new EntityMapperUtil() {
+            @NonNull
             @Override
             public EntityMapper getDataMapper(Class dataClass) {
                 return new EntityDataMapper();

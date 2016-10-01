@@ -49,6 +49,7 @@ public interface Repository {
     Observable<?> putObjectDynamically(String url, String idColumnName, JSONObject keyValuePairs,
                                        Class domainClass, Class dataClass, boolean persist);
 
+    @NonNull
     Observable<?> putListDynamically(String url, String idColumnName, JSONArray jsonArray,
                                      Class domainClass, Class dataClass, boolean persist);
 
@@ -61,9 +62,11 @@ public interface Repository {
     @NonNull
     Observable<List> searchDisk(RealmQuery query, Class domainClass);
 
+    @NonNull
     Observable<?> uploadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
                                         Class domainClass, Class dataClass);
 
+    @NonNull
     Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
                                           Class domainClass, Class dataClass);
 }

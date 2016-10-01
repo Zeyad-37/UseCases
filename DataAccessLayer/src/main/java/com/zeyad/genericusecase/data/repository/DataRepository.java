@@ -18,9 +18,9 @@ import rx.Observable;
 // TODO: 13/05/16 Document!
 public class DataRepository implements Repository {
 
-    private final DataStoreFactory mDataStoreFactory;
     public static final String DEFAULT_ID_TO_BE_REPLACED = "id";
     public static final boolean DEFAULT_TO_CACHE = false;
+    private final DataStoreFactory mDataStoreFactory;
     private final IEntityMapperUtil mEntityMapperUtil;
 
     /**
@@ -102,6 +102,7 @@ public class DataRepository implements Repository {
         return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(domainClass)).searchDisk(query, domainClass);
     }
 
+    @NonNull
     @Override
     public Observable<?> uploadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
                                                Class domainClass, Class dataClass) {
@@ -109,6 +110,7 @@ public class DataRepository implements Repository {
                 .dynamicUploadFile(url, file, onWifi, whileCharging, domainClass);
     }
 
+    @NonNull
     @Override
     public Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging, Class domainClass, Class dataClass) {
         return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
@@ -123,6 +125,7 @@ public class DataRepository implements Repository {
                 .dynamicPutObject(url, idColumnName, keyValuePairs, domainClass, dataClass, persist);
     }
 
+    @NonNull
     @Override
     public Observable<?> putListDynamically(@NonNull String url, String idColumnName, JSONArray jsonArray,
                                             Class domainClass, @NonNull Class dataClass, boolean persist) {

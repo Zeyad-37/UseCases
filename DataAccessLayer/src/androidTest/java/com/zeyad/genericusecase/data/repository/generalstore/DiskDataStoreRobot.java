@@ -25,6 +25,7 @@ import rx.observers.TestSubscriber;
 
 class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
 
+    @NonNull
     private final Random mRandom;
     private final DataBaseManager mDBManager;
     private final EntityMapper mEntityMapper;
@@ -35,6 +36,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
         mRandom = new Random();
     }
 
+    @NonNull
     public static DiskDataStoreRobotInterface newInstance(DataBaseManager dbManager, EntityMapper enitityMapper) {
         return new DiskDataStoreRobot(dbManager, enitityMapper);
     }
@@ -45,6 +47,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
                 .subscribe(new TestSubscriber<>());
     }
 
+    @NonNull
     @Override
     public DataStore createDiskDataStore() {
         return new DiskDataStore(mDBManager, mEntityMapper);
@@ -97,6 +100,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
         return TestModel.class;
     }
 
+    @NonNull
     @Override
     public Class getDomainClass() {
         return TestViewModel.class;
@@ -116,29 +120,34 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
         return testModelList.get(mRandom.nextInt(testModelList.size())).getId();
     }
 
+    @NonNull
     @Override
     public String getTestInfo(int testModelId) {
         return testModelId + ":" + getValueForTestModel(testModelId);
     }
 
+    @NonNull
     @Override
     public RealmQuery getRealmQueryForValue(String query) {
         return Realm.getDefaultInstance().where(TestModel.class)
                 .contains("value", query);
     }
 
+    @NonNull
     @Override
     public RealmQuery getRealmQueryForId(int query) {
         return Realm.getDefaultInstance().where(TestModel.class)
                 .equalTo("id", query);
     }
 
+    @NonNull
     @Override
     public RealmQuery getRealmQueryForAnyId() {
         return Realm.getDefaultInstance().where(TestModel.class)
                 .equalTo("id", getPrimaryIdForAnyInsertedTestModel());
     }
 
+    @NonNull
     @Override
     public List<Long> getListOfAllIds() {
         final TestSubscriber<List> subscriber = new TestSubscriber<>();
@@ -161,7 +170,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
 
     @Override
     @NonNull
-    public TestSubscriber<Object> deleteAllExceptOneAfterAddingSome(DataStore diskDataStore) {
+    public TestSubscriber<Object> deleteAllExceptOneAfterAddingSome(@NonNull DataStore diskDataStore) {
         insertTestModels(10);
         final List<Long> listOfAllIds = getListOfAllIds();
         listOfAllIds.remove(0);
@@ -176,7 +185,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
 
     @Override
     @NonNull
-    public TestSubscriber<Object> deleteAllAfterAddingSome(DataStore diskDataStore) {
+    public TestSubscriber<Object> deleteAllAfterAddingSome(@NonNull DataStore diskDataStore) {
         insertTestModels(10);
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         diskDataStore.dynamicDeleteAll(null, TestModel.class, false)
@@ -206,32 +215,36 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
 //        return keyValue;
 //    }
 
+    @NonNull
     @Override
-    public TestSubscriber<Object> postTestModelKeyValuePair(DataStore diskDataStore) throws JSONException {
+    public TestSubscriber<Object> postTestModelKeyValuePair(@NonNull DataStore diskDataStore) throws JSONException {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         diskDataStore.dynamicPostObject(null, "id", getTestModelJson(), getDomainClass(), getDataClass(), false)
                 .subscribe(subscriber);
         return subscriber;
     }
 
+    @NonNull
     @Override
-    public TestSubscriber<Object> putTestModelKeyValuePair(DataStore diskDataStore) throws JSONException {
+    public TestSubscriber<Object> putTestModelKeyValuePair(@NonNull DataStore diskDataStore) throws JSONException {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         diskDataStore.dynamicPutObject(null, "id", getTestModelJson(), getDomainClass(), getDataClass(), false)
                 .subscribe(subscriber);
         return subscriber;
     }
 
+    @NonNull
     @Override
-    public TestSubscriber<Object> postTestModelJsonObject(DataStore diskDataStore) {
+    public TestSubscriber<Object> postTestModelJsonObject(@NonNull DataStore diskDataStore) {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         diskDataStore.dynamicPostObject(null, "id", getTestModelJson(), getDomainClass(), getDataClass(), false)
                 .subscribe(subscriber);
         return subscriber;
     }
 
+    @NonNull
     @Override
-    public Observable<?> dynamicDownloadFile(DataStore diskDataStore) {
+    public Observable<?> dynamicDownloadFile(@NonNull DataStore diskDataStore) {
         return diskDataStore.dynamicDownloadFile(null, null, true, false);
     }
 }

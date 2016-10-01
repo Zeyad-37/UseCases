@@ -41,6 +41,7 @@ public class GenericJobServiceTestRobot {
         return bundle;
     }
 
+    @NonNull
     static String getTaskParamPayload() {
         return TASK_PARAM_PAYLOAD;
     }

@@ -35,7 +35,7 @@ public class Utils {
     }
 
     public static int getNextId(Class clazz, String column) {
-        return com.zeyad.genericusecase.data.utils.Utils.getMaxId(clazz, column) + 1;
+        return Utils.getMaxId(clazz, column) + 1;
     }
 
     // Simple logging to let us know what each source is returning
@@ -43,7 +43,7 @@ public class Utils {
         return observable -> observable.doOnNext(entities -> {
             if (entities == null)
                 System.out.println(source + " does not have any data.");
-            else if (!realmManager.areItemsValid(Constants.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE))
+            else if (!realmManager.areItemsValid(DataBaseManager.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE))
                 System.out.println(source + " has stale data.");
             else
                 System.out.println(source + " has the data you are looking for!");

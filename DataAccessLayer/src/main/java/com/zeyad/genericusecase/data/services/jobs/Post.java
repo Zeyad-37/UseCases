@@ -15,10 +15,10 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.zeyad.genericusecase.data.network.RestApi;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
+import com.zeyad.genericusecase.data.repository.generalstore.CloudDataStore;
 import com.zeyad.genericusecase.data.services.GenericGCMService;
 import com.zeyad.genericusecase.data.services.GenericJobService;
 import com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService;
-import com.zeyad.genericusecase.data.utils.Constants;
 import com.zeyad.genericusecase.data.utils.Utils;
 import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 
@@ -50,6 +50,13 @@ public class Post {
     private boolean mGooglePlayServicesAvailable;
     private boolean mNetworkAvailable;
     private GcmNetworkManager mGcmNetworkManager;
+    @NonNull
+    private Action1<Object> handleError = object -> {
+        if (object instanceof IOException) {
+            reQueue();
+            ((Exception) object).printStackTrace();
+        }
+    };
 
     public Post(@NonNull Intent intent, @NonNull Context context) {
         mRestApi = new RestApiImpl();
@@ -88,43 +95,35 @@ public class Post {
                 case PostRequest.POST:
                     if (isObject)
                         return mRestApi.dynamicPostObject(mPostRequest.getUrl(), RequestBody
-                                .create(MediaType.parse(Constants.APPLICATION_JSON), bundle))
+                                .create(MediaType.parse(CloudDataStore.APPLICATION_JSON), bundle))
                                 .subscribe(handleError);
                     else
                         return mRestApi.dynamicPostList(mPostRequest.getUrl(), RequestBody.create(MediaType
-                                .parse(Constants.APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
+                                .parse(CloudDataStore.APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
                                 .subscribe(handleError);
                 case PostRequest.PUT:
                     if (isObject)
                         return mRestApi.dynamicPutObject(mPostRequest.getUrl(), RequestBody
-                                .create(MediaType.parse(Constants.APPLICATION_JSON), bundle))
+                                .create(MediaType.parse(CloudDataStore.APPLICATION_JSON), bundle))
                                 .subscribe(handleError);
                     else
                         return mRestApi.dynamicPutList(mPostRequest.getUrl(), RequestBody.create(MediaType
-                                .parse(Constants.APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
+                                .parse(CloudDataStore.APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
                                 .subscribe(handleError);
                 case PostRequest.DELETE:
                     if (isObject)
                         return mRestApi.dynamicDeleteObject(mPostRequest.getUrl(), RequestBody
-                                .create(MediaType.parse(Constants.APPLICATION_JSON), bundle))
+                                .create(MediaType.parse(CloudDataStore.APPLICATION_JSON), bundle))
                                 .subscribe(handleError);
                     else
                         return mRestApi.dynamicDeleteList(mPostRequest.getUrl(), RequestBody.create(MediaType
-                                .parse(Constants.APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
+                                .parse(CloudDataStore.APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
                                 .subscribe(handleError);
             }
         } else
             reQueue();
         return Subscriptions.empty();
     }
-
-    @NonNull
-    private Action1<Object> handleError = object -> {
-        if (object instanceof IOException) {
-            reQueue();
-            ((Exception) object).printStackTrace();
-        }
-    };
 
     private void reQueue() {
         mTrailCount++;
@@ -144,7 +143,7 @@ public class Post {
                         .setUpdateCurrent(false)
                         .setPersisted(true)
                         .setExtras(extras)
-                        .setTag(Constants.POST_TAG)
+                        .setTag(CloudDataStore.POST_TAG)
                         .setExecutionWindow(0, 30)
                         .build());
                 Log.d(TAG, "Request reQueued through GcmNetworkManager: " + true);

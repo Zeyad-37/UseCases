@@ -49,6 +49,7 @@ public interface DataStore {
     Observable<?> dynamicPutObject(final String url, String idColumnName, final JSONObject keyValuePairs,
                                    Class domainClass, Class dataClass, boolean persist);
 
+    @NonNull
     Observable<?> dynamicUploadFile(final String url, final File file, boolean onWifi, boolean whileCharging,
                                     Class domainClass);
 
@@ -56,6 +57,7 @@ public interface DataStore {
      * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Observable}
      * that will emit a list of ?.
      */
+    @NonNull
     Observable<?> dynamicPutList(final String url, String idColumnName, final JSONArray jsonArray,
                                  Class domainClass, Class dataClass, boolean persist);
 
@@ -85,5 +87,6 @@ public interface DataStore {
     @NonNull
     Observable<List> searchDisk(RealmQuery query, Class domainClass);
 
+    @NonNull
     Observable<?> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging);
 }

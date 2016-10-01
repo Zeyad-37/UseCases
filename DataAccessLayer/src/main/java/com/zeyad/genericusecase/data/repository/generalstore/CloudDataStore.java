@@ -17,6 +17,8 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.gson.Gson;
+import com.zeyad.genericusecase.Config;
+import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
 import com.zeyad.genericusecase.data.exceptions.NetworkConnectionException;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
@@ -24,7 +26,6 @@ import com.zeyad.genericusecase.data.network.RestApi;
 import com.zeyad.genericusecase.data.services.GenericGCMService;
 import com.zeyad.genericusecase.data.services.GenericJobService;
 import com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService;
-import com.zeyad.genericusecase.data.utils.Constants;
 import com.zeyad.genericusecase.data.utils.ModelConverters;
 import com.zeyad.genericusecase.data.utils.Utils;
 import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
@@ -59,7 +60,12 @@ import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentSe
 
 public class CloudDataStore implements DataStore {
 
+    public static final String FILE_IO_TAG = "fileIOObject", POST_TAG = "postObject", APPLICATION_JSON = "application/json";
+    public static final int COUNTER_START = 1, ATTEMPTS = 3;
     static final String TAG = com.zeyad.genericusecase.data.repository.generalstore.CloudDataStore.class.getName();
+    final EntityMapper mEntityDataMapper;
+    final DataBaseManager mRealmManager;
+    final Context mContext;
     @NonNull
     private final Observable<Object> mErrorObservablePersisted, mErrorObservableNotPersisted, mQueueFileIO;
     private final RestApi mRestApi;
@@ -68,9 +74,6 @@ public class CloudDataStore implements DataStore {
     private GoogleApiAvailability mGoogleApiAvailability;
     private boolean mIsOnWifi;
     private boolean mHasLollipop;
-    final EntityMapper mEntityDataMapper;
-    final DataBaseManager mRealmManager;
-    final Context mContext;
 
     /**
      * Construct a {@link DataStore} based on connections to the api (Cloud).
@@ -78,7 +81,7 @@ public class CloudDataStore implements DataStore {
      * @param restApi      The {@link RestApi} implementation to use.
      * @param realmManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    public CloudDataStore(RestApi restApi, DataBaseManager realmManager, EntityMapper entityDataMapper) {
+    public CloudDataStore(RestApi restApi, @NonNull DataBaseManager realmManager, EntityMapper entityDataMapper) {
         this(restApi, realmManager, entityDataMapper
                 , GcmNetworkManager.getInstance(realmManager.getContext().getApplicationContext()));
     }
@@ -93,10 +96,10 @@ public class CloudDataStore implements DataStore {
         mRestApi = restApi;
         mEntityDataMapper = entityDataMapper;
         mRealmManager = realmManager;
-        mContext = mRealmManager.getContext().getApplicationContext();
+        mContext = Config.getInstance().getContext();
         mGoogleApiAvailability = GoogleApiAvailability.getInstance();
-        mErrorObservablePersisted = Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_PERSISTED));
-        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_NOT_PERSISTED));
+        mErrorObservablePersisted = Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_persisted)));
+        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_not_persisted)));
         mQueueFileIO = Observable.empty();
         mIsCharging = Utils.isCharging();
         mGcmNetworkManager = gcmNetworkManager;
@@ -116,14 +119,23 @@ public class CloudDataStore implements DataStore {
         mRestApi = restApi;
         mEntityDataMapper = entityDataMapper;
         mRealmManager = realmManager;
-        mContext = mRealmManager.getContext().getApplicationContext();
+        mContext = Config.getInstance().getContext();
         mGoogleApiAvailability = GoogleApiAvailability.getInstance();
-        mErrorObservablePersisted = Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_PERSISTED));
-        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_NOT_PERSISTED));
+        mErrorObservablePersisted = Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_persisted)));
+        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_not_persisted)));
         mQueueFileIO = Observable.empty();
         mIsCharging = isCharging;
         mIsOnWifi = isOnWifi;
         mGcmNetworkManager = gcmNetworkManager;
+    }
+
+    @Nullable
+    private static String getMimeType(String uri) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(uri);
+        if (extension != null)
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        return type;
     }
 
     @NonNull
@@ -168,7 +180,7 @@ public class CloudDataStore implements DataStore {
                 return mErrorObservablePersisted;
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
                 return mErrorObservableNotPersisted;
-            return mRestApi.dynamicPostObject(url, RequestBody.create(MediaType.parse(Constants.APPLICATION_JSON),
+            return mRestApi.dynamicPostObject(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     ModelConverters.convertToString(jsonObject)))
                     //.compose(applyExponentialBackoff())
                     .doOnNext(object -> {
@@ -190,13 +202,13 @@ public class CloudDataStore implements DataStore {
 //                queuePost.call(object);
                 if (persist)
                     new SaveGenericToDBAction(dataClass, idColumnName).call(jsonArray);
-                return Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_PERSISTED));
+                return Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_persisted)));
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
-                return Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_PERSISTED));
+                return Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_persisted)));
             else if (isEligibleForThrowErrorIfNetworkNotAvailable())
-                return Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_NOT_PERSISTED));
+                return Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_not_persisted)));
             return mRestApi.dynamicPostList(url,
-                    RequestBody.create(MediaType.parse(Constants.APPLICATION_JSON), jsonArray.toString()))
+                    RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
                     //.compose(applyExponentialBackoff())
 //                    .doOnError(Throwable::printStackTrace)
                     .doOnNext(list -> {
@@ -226,7 +238,7 @@ public class CloudDataStore implements DataStore {
                 return mErrorObservablePersisted;
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
                 return mErrorObservableNotPersisted;
-            return mRestApi.dynamicDeleteObject(url, RequestBody.create(MediaType.parse(Constants.APPLICATION_JSON),
+            return mRestApi.dynamicDeleteObject(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     ModelConverters.convertToString(jsonArray)))
                     //.compose(applyExponentialBackoff())
                     .doOnNext(object -> {
@@ -255,7 +267,7 @@ public class CloudDataStore implements DataStore {
                 return mErrorObservablePersisted;
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
                 return mErrorObservableNotPersisted;
-            return mRestApi.dynamicPutObject(url, RequestBody.create(MediaType.parse(Constants.APPLICATION_JSON),
+            return mRestApi.dynamicPutObject(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     ModelConverters.convertToString(keyValuePairs)))
                     //.compose(applyExponentialBackoff())
                     .doOnNext(object -> {
@@ -301,10 +313,10 @@ public class CloudDataStore implements DataStore {
 //                queuePut.call(object);
                 if (persist)
                     cacheAction.call(keyValuePairs);
-                return Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_PERSISTED));
+                return Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_persisted)));
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
-                return Observable.error(new NetworkConnectionException(Constants.NETWORK_ERROR_NOT_PERSISTED));
-            return mRestApi.dynamicPutList(url, RequestBody.create(MediaType.parse(Constants.APPLICATION_JSON),
+                return Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_not_persisted)));
+            return mRestApi.dynamicPutList(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     ModelConverters.convertToString(keyValuePairs)))
                     //.compose(applyExponentialBackoff())
                     .doOnNext(list -> {
@@ -388,23 +400,13 @@ public class CloudDataStore implements DataStore {
         return observable -> observable.retryWhen(attempts -> {
             ConnectionQuality cq = ConnectionClassManager.getInstance().getCurrentBandwidthQuality();
             if (cq.compareTo(ConnectionQuality.MODERATE) >= 0)
-                return attempts.zipWith(Observable.range(Constants.COUNTER_START,
-                        Constants.ATTEMPTS), (n, i) -> i)
+                return attempts.zipWith(Observable.range(COUNTER_START, ATTEMPTS), (n, i) -> i)
                         .flatMap(i -> {
                             Log.d(TAG, "delay retry by " + i + " second(s)");
                             return Observable.timer(i, TimeUnit.SECONDS);
                         });
             else return null;
         });
-    }
-
-    @Nullable
-    private static String getMimeType(String uri) {
-        String type = null;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(uri);
-        if (extension != null)
-            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-        return type;
     }
 
     boolean isGooglePlayServicesAvailable() {
@@ -419,20 +421,135 @@ public class CloudDataStore implements DataStore {
         return mGoogleApiAvailability;
     }
 
+    GoogleApiAvailability getGoogleApiAvailability() {
+        return mGoogleApiAvailability;
+    }
+
     void setGoogleApiAvailability(GoogleApiAvailability googleApiAvailability) {
         mGoogleApiAvailability = googleApiAvailability;
+    }
+
+    boolean isHasLollipop() {
+        return mHasLollipop;
     }
 
     void setHasLollipop(boolean hasLollipop) {
         mHasLollipop = hasLollipop;
     }
 
-    GoogleApiAvailability getGoogleApiAvailability() {
-        return mGoogleApiAvailability;
+    private boolean isEligibleForPersistenceIfNetworkNotAvailable() {
+        return !Utils.isNetworkAvailable(mContext) && (mHasLollipop || isGooglePlayServicesAvailable());
     }
 
-    boolean isHasLollipop() {
-        return mHasLollipop;
+    private boolean isEligibleForThrowErrorIfNetworkNotAvailable() {
+        return !Utils.isNetworkAvailable(mContext) && !(mHasLollipop || isGooglePlayServicesAvailable());
+    }
+
+    private boolean queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload, @NonNull Context context) {
+        FileIORequest fileIORequest = new FileIORequest.UploadRequestBuilder(url, file)
+                .onWifi(onWifi)
+                .whileCharging(whileCharging)
+                .build();
+        if (isGooglePlayServicesAvailable()) {
+            Bundle extras = new Bundle();
+            extras.putString(GenericNetworkQueueIntentService.JOB_TYPE, isDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
+            extras.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(fileIORequest));
+            mGcmNetworkManager
+                    .schedule(new OneoffTask.Builder()
+                            .setService(GenericGCMService.class)
+                            .setRequiredNetwork(onWifi ? OneoffTask.NETWORK_STATE_UNMETERED : OneoffTask.NETWORK_STATE_CONNECTED)
+                            .setRequiresCharging(whileCharging)
+                            .setUpdateCurrent(false)
+                            .setPersisted(true)
+                            .setExtras(extras)
+                            .setTag(FILE_IO_TAG)
+                            .setExecutionWindow(0, 30)
+                            .build());
+            Log.d(TAG, "QueuePost scheduled through GcmNetworkManager: " + true);
+            return true;
+        } else if (Utils.hasLollipop()) {
+            PersistableBundle persistableBundle = new PersistableBundle();
+            persistableBundle.putString(GenericNetworkQueueIntentService.JOB_TYPE, isDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
+            persistableBundle.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(fileIORequest));
+            boolean isScheduled = Utils.scheduleJob(context, new JobInfo.Builder(1,
+                    new ComponentName(context, GenericJobService.class))
+                    .setRequiredNetworkType(onWifi ? JobInfo.NETWORK_TYPE_UNMETERED : JobInfo.NETWORK_TYPE_ANY)
+                    .setRequiresCharging(whileCharging)
+                    .setPersisted(true)
+                    .setExtras(persistableBundle)
+                    .build());
+            Log.d(TAG, "QueuePost scheduled through JobScheduler: " + isScheduled);
+            return isScheduled;
+        }
+        return false;
+    }
+
+    public boolean queuePost(PostRequest postRequest) {
+        return queuePostCore(postRequest);
+    }
+
+    public boolean queuePost(String method, String url, String idColumnName, HashMap<String, Object> keyValuePairs,
+                             Class dataClass, boolean persist) {
+        return queuePostCore(new PostRequest.PostRequestBuilder(dataClass, persist)
+                .idColumnName(idColumnName)
+                .hashMap(keyValuePairs)
+                .url(url)
+                .method(method)
+                .build());
+    }
+
+    public boolean queuePost(String method, String url, String idColumnName, JSONArray jsonArray,
+                             Class dataClass, boolean persist) {
+        return queuePostCore(new PostRequest.PostRequestBuilder(dataClass, persist)
+                .idColumnName(idColumnName)
+                .jsonArray(jsonArray)
+                .url(url)
+                .method(method)
+                .build());
+    }
+
+    public boolean queuePost(String method, String url, String idColumnName, JSONObject jsonObject,
+                             Class dataClass, boolean persist) {
+        return queuePostCore(new PostRequest.PostRequestBuilder(dataClass, persist)
+                .idColumnName(idColumnName)
+                .jsonObject(jsonObject)
+                .url(url)
+                .method(method)
+                .build());
+    }
+
+    private boolean queuePostCore(PostRequest postRequest) {
+        if (isGooglePlayServicesAvailable()) {
+            Bundle extras = new Bundle();
+            extras.putString(GenericNetworkQueueIntentService.JOB_TYPE, GenericNetworkQueueIntentService.POST);
+            extras.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(postRequest));
+            mGcmNetworkManager.schedule(new OneoffTask.Builder()
+                    .setService(GenericGCMService.class)
+                    .setRequiredNetwork(OneoffTask.NETWORK_STATE_CONNECTED)
+                    .setRequiresCharging(false)
+                    .setUpdateCurrent(false)
+                    .setPersisted(true)
+                    .setExtras(extras)
+                    .setTag(POST_TAG)
+                    .setExecutionWindow(0, 30)
+                    .build());
+            Log.d(TAG, "QueuePost scheduled through GcmNetworkManager: " + true);
+            return true;
+        } else if (Utils.hasLollipop()) {
+            PersistableBundle persistableBundle = new PersistableBundle();
+            persistableBundle.putString(GenericNetworkQueueIntentService.JOB_TYPE, GenericNetworkQueueIntentService.POST);
+            persistableBundle.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(postRequest));
+            boolean isScheduled = Utils.scheduleJob(mContext, new JobInfo.Builder(1,
+                    new ComponentName(mContext, GenericJobService.class))
+                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
+                    .setRequiresCharging(false)
+                    .setPersisted(true)
+                    .setExtras(persistableBundle)
+                    .build());
+            Log.d(TAG, "QueuePost scheduled through JobScheduler: " + isScheduled);
+            return isScheduled;
+        }
+        return false;
     }
 
     private static class SimpleSubscriber extends Subscriber<Object> {
@@ -576,120 +693,5 @@ public class CloudDataStore implements DataStore {
                         }
                     });
         }
-    }
-
-    private boolean isEligibleForPersistenceIfNetworkNotAvailable() {
-        return !Utils.isNetworkAvailable(mContext) && (mHasLollipop || isGooglePlayServicesAvailable());
-    }
-
-    private boolean isEligibleForThrowErrorIfNetworkNotAvailable() {
-        return !Utils.isNetworkAvailable(mContext) && !(mHasLollipop || isGooglePlayServicesAvailable());
-    }
-
-    private boolean queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload, Context context) {
-        FileIORequest fileIORequest = new FileIORequest.UploadRequestBuilder(url, file)
-                .onWifi(onWifi)
-                .whileCharging(whileCharging)
-                .build();
-        if (isGooglePlayServicesAvailable()) {
-            Bundle extras = new Bundle();
-            extras.putString(GenericNetworkQueueIntentService.JOB_TYPE, isDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
-            extras.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(fileIORequest));
-            mGcmNetworkManager
-                    .schedule(new OneoffTask.Builder()
-                            .setService(GenericGCMService.class)
-                            .setRequiredNetwork(onWifi ? OneoffTask.NETWORK_STATE_UNMETERED : OneoffTask.NETWORK_STATE_CONNECTED)
-                            .setRequiresCharging(whileCharging)
-                            .setUpdateCurrent(false)
-                            .setPersisted(true)
-                            .setExtras(extras)
-                            .setTag(Constants.FILE_IO_TAG)
-                            .setExecutionWindow(0, 30)
-                            .build());
-            Log.d(TAG, "QueuePost scheduled through GcmNetworkManager: " + true);
-            return true;
-        } else if (Utils.hasLollipop()) {
-            PersistableBundle persistableBundle = new PersistableBundle();
-            persistableBundle.putString(GenericNetworkQueueIntentService.JOB_TYPE, isDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
-            persistableBundle.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(fileIORequest));
-            boolean isScheduled = Utils.scheduleJob(context, new JobInfo.Builder(1,
-                    new ComponentName(context, GenericJobService.class))
-                    .setRequiredNetworkType(onWifi ? JobInfo.NETWORK_TYPE_UNMETERED : JobInfo.NETWORK_TYPE_ANY)
-                    .setRequiresCharging(whileCharging)
-                    .setPersisted(true)
-                    .setExtras(persistableBundle)
-                    .build());
-            Log.d(TAG, "QueuePost scheduled through JobScheduler: " + isScheduled);
-            return isScheduled;
-        }
-        return false;
-    }
-
-    public boolean queuePost(PostRequest postRequest) {
-        return queuePostCore(postRequest);
-    }
-
-    public boolean queuePost(String method, String url, String idColumnName, HashMap<String, Object> keyValuePairs,
-                             Class dataClass, boolean persist) {
-        return queuePostCore(new PostRequest.PostRequestBuilder(dataClass, persist)
-                .idColumnName(idColumnName)
-                .hashMap(keyValuePairs)
-                .url(url)
-                .method(method)
-                .build());
-    }
-
-    public boolean queuePost(String method, String url, String idColumnName, JSONArray jsonArray,
-                             Class dataClass, boolean persist) {
-        return queuePostCore(new PostRequest.PostRequestBuilder(dataClass, persist)
-                .idColumnName(idColumnName)
-                .jsonArray(jsonArray)
-                .url(url)
-                .method(method)
-                .build());
-    }
-
-    public boolean queuePost(String method, String url, String idColumnName, JSONObject jsonObject,
-                             Class dataClass, boolean persist) {
-        return queuePostCore(new PostRequest.PostRequestBuilder(dataClass, persist)
-                .idColumnName(idColumnName)
-                .jsonObject(jsonObject)
-                .url(url)
-                .method(method)
-                .build());
-    }
-
-    private boolean queuePostCore(PostRequest postRequest) {
-        if (isGooglePlayServicesAvailable()) {
-            Bundle extras = new Bundle();
-            extras.putString(GenericNetworkQueueIntentService.JOB_TYPE, GenericNetworkQueueIntentService.POST);
-            extras.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(postRequest));
-            mGcmNetworkManager.schedule(new OneoffTask.Builder()
-                    .setService(GenericGCMService.class)
-                    .setRequiredNetwork(OneoffTask.NETWORK_STATE_CONNECTED)
-                    .setRequiresCharging(false)
-                    .setUpdateCurrent(false)
-                    .setPersisted(true)
-                    .setExtras(extras)
-                    .setTag(Constants.POST_TAG)
-                    .setExecutionWindow(0, 30)
-                    .build());
-            Log.d(TAG, "QueuePost scheduled through GcmNetworkManager: " + true);
-            return true;
-        } else if (Utils.hasLollipop()) {
-            PersistableBundle persistableBundle = new PersistableBundle();
-            persistableBundle.putString(GenericNetworkQueueIntentService.JOB_TYPE, GenericNetworkQueueIntentService.POST);
-            persistableBundle.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(postRequest));
-            boolean isScheduled = Utils.scheduleJob(mContext, new JobInfo.Builder(1,
-                    new ComponentName(mContext, GenericJobService.class))
-                    .setRequiredNetworkType(JobInfo.NETWORK_TYPE_ANY)
-                    .setRequiresCharging(false)
-                    .setPersisted(true)
-                    .setExtras(persistableBundle)
-                    .build());
-            Log.d(TAG, "QueuePost scheduled through JobScheduler: " + isScheduled);
-            return isScheduled;
-        }
-        return false;
     }
 }

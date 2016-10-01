@@ -58,15 +58,17 @@ public class GeneralRealmManagerImplTest {
 
     public static final String TEST_MODEL_PREFIX = "random value:";
 
+    @NonNull
     @Rule
     public Timeout globalTimeout = new Timeout(TestUtility.TIMEOUT_TIME_VALUE_LARGE, TestUtility.TIMEOUT_TIME_UNIT);
-
-    private GenericRealmManager mRealmManager;
+    @NonNull
     @Rule
     public UiThreadTestRule mUiThreadTestRule = new UiThreadTestRule();
+    @NonNull
     @Rule
     public ExpectedException exception
             = ExpectedException.none();
+    private GenericRealmManager mRealmManager;
     private Random mRandom;
 
     @Before
@@ -991,13 +993,15 @@ public class GeneralRealmManagerImplTest {
         subscriber.assertValue(Boolean.TRUE);
     }
 
-    private <T> T getItemForId(String idFieldName, long idFieldValue, Class<T> clazz) {
+    @NonNull
+    private <T> T getItemForId(@NonNull String idFieldName, long idFieldValue, Class<T> clazz) {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         mRealmManager.getById(idFieldName, (int) idFieldValue, clazz).subscribe(subscriber);
         return (T) subscriber.getOnNextEvents().get(0);
     }
 
-    private TestModel getManagedObject(TestModel testModel, GenericRealmManager realmManager) {
+    @NonNull
+    private TestModel getManagedObject(@NonNull TestModel testModel, @NonNull GenericRealmManager realmManager) {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         realmManager.getById("id", testModel.getId(), TestModel.class).subscribe(subscriber);
         return (TestModel) subscriber.getOnNextEvents().get(0);
@@ -1018,6 +1022,7 @@ public class GeneralRealmManagerImplTest {
         });
     }
 
+    @NonNull
     private <T extends RealmModel> RealmResults<T> assertGetAllForSize(Class<T> clazz
             , int sizeExpected) {
         final RealmResults<T> queryResult = getQueryList(clazz);
@@ -1048,7 +1053,8 @@ public class GeneralRealmManagerImplTest {
         System.out.println(str);
     }
 
-    private <T> T assertSubscriberGetSingleNextEventWithNoError(TestSubscriber subscriber, Class<T> clazz) {
+    @NonNull
+    private <T> T assertSubscriberGetSingleNextEventWithNoError(@NonNull TestSubscriber subscriber, Class<T> clazz) {
         subscriber.assertNoErrors();
         final List<List> onNextEvents = subscriber.getOnNextEvents();
         assertThat(onNextEvents, allOf(notNullValue(), iterableWithSize(1)));
@@ -1057,7 +1063,7 @@ public class GeneralRealmManagerImplTest {
     }
 
     @NonNull
-    private RealmQuery<TestModel> getExactTestModelRealmQuery(TestModel insertedTestModel) {
+    private RealmQuery<TestModel> getExactTestModelRealmQuery(@NonNull TestModel insertedTestModel) {
         return Realm.getDefaultInstance()
                 .where(TestModel.class)
                 .beginsWith("value", TEST_MODEL_PREFIX, Case.INSENSITIVE)
@@ -1080,7 +1086,7 @@ public class GeneralRealmManagerImplTest {
         InstrumentationRegistry.getInstrumentation().runOnMainSync(runnable);
     }
 
-    private void assertPutOperationObservable(Observable<?> observable) {
+    private void assertPutOperationObservable(@NonNull Observable<?> observable) {
         final TestSubscriber<Object> subscriber = TestSubscriber.create();
         observable.subscribe(subscriber);
         List<Object> onNextEvents = subscriber.getOnNextEvents();
@@ -1104,6 +1110,7 @@ public class GeneralRealmManagerImplTest {
         return InstrumentationRegistry.getContext();
     }
 
+    @NonNull
     private TestModel insertJsonObject() throws JSONException {
         TestModel testModel = createTestModelWithRandomId();
         String json = new Gson().toJson(testModel);
@@ -1115,11 +1122,11 @@ public class GeneralRealmManagerImplTest {
         return testModel;
     }
 
-    private TestModel putTestModel(DataBaseManager dataBaseManager) {
+    private TestModel putTestModel(@NonNull DataBaseManager dataBaseManager) {
         return putTestModel(dataBaseManager, createTestModelWithRandomId());
     }
 
-    private TestModel putTestModel(DataBaseManager dataBaseManager, TestModel realmModel) {
+    private TestModel putTestModel(@NonNull DataBaseManager dataBaseManager, TestModel realmModel) {
         Observable<?> observable
                 = dataBaseManager.put(realmModel, GeneralRealmManagerImplTest.class);
         TestSubscriber<Object> subscriber = TestSubscriber.create();
@@ -1156,7 +1163,7 @@ public class GeneralRealmManagerImplTest {
                 , equalTo(Looper.getMainLooper().getThread()));
     }
 
-    private <T> void assertThatTwoCollectionsContainSameElements(List<T> left, List<T> right) {
+    private <T> void assertThatTwoCollectionsContainSameElements(@NonNull List<T> left, @NonNull List<T> right) {
         assertThat(left, is(containsInAnyOrder(right.toArray())));
         assertThat(right, is(containsInAnyOrder(left.toArray())));
     }

@@ -17,6 +17,7 @@ public interface DiskDataStoreRobotInterface {
 
     void tearDown();
 
+    @NonNull
     DataStore createDiskDataStore();
 
     void insertTestModels(int count);
@@ -38,20 +39,26 @@ public interface DiskDataStoreRobotInterface {
     @NonNull
     Class getDataClass();
 
+    @NonNull
     Class getDomainClass();
 
     void addTestModel(TestModel testModel);
 
     int getPrimaryIdForAnyInsertedTestModel();
 
+    @NonNull
     String getTestInfo(int testModelId);
 
+    @NonNull
     RealmQuery getRealmQueryForValue(String query);
 
+    @NonNull
     RealmQuery getRealmQueryForId(int query);
 
+    @NonNull
     RealmQuery getRealmQueryForAnyId();
 
+    @NonNull
     List<Long> getListOfAllIds();
 
     int getItemCount();
@@ -64,11 +71,15 @@ public interface DiskDataStoreRobotInterface {
 
     JSONObject getTestModelJson();
 
+    @NonNull
     TestSubscriber<Object> postTestModelKeyValuePair(DataStore diskDataStore) throws JSONException;
 
+    @NonNull
     TestSubscriber<Object> putTestModelKeyValuePair(DataStore diskDataStore) throws JSONException;
 
+    @NonNull
     TestSubscriber<Object> postTestModelJsonObject(DataStore diskDataStore);
 
+    @NonNull
     Observable<?> dynamicDownloadFile(DataStore diskDataStore);
 }

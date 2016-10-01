@@ -1,5 +1,7 @@
 package com.zeyad.genericusecase.domain.interactors;
 
+import android.support.annotation.Nullable;
+
 import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 
 import org.junit.After;
@@ -15,6 +17,7 @@ import static org.hamcrest.Matchers.is;
 @RunWith(JUnit4.class)
 public class PostRequestTest {
 
+    @Nullable
     private PostRequest mPostRequest;
 
     @Before

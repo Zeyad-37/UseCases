@@ -1,5 +1,6 @@
 package com.zeyad.genericusecase.data.mappers;
 
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import java.util.List;
@@ -11,6 +12,7 @@ public interface EntityMapper<D, R> {
 
     R transformToRealm(D item, Class dataClass);
 
+    @NonNull
     List<R> transformAllToRealm(List<D> list, Class dataClass);
 
     @Nullable
@@ -22,5 +24,6 @@ public interface EntityMapper<D, R> {
     @Nullable
     D transformToDomain(R userRealmModel, Class domainClass);
 
+    @NonNull
     List<D> transformAllToDomain(List<R> tenderoRealmModels, Class domainClass);
 }

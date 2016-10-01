@@ -50,11 +50,11 @@ import rx.Observable;
  */
 class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnection {
 
-    private static ApiConnection sInstance;
     private final static String CACHE_CONTROL = "Cache-Control";
+    private static final int TIME_OUT = 15;
+    private static ApiConnection sInstance;
     private final RestApi mRestApiWithoutCache;
     private final RestApi mRestApiWithCache;
-    private static final int TIME_OUT = 15;
 
     private ApiConnection(@Nullable OkHttpClient.Builder okhttpBuilder, @Nullable Cache cache) {
         if (okhttpBuilder == null)
@@ -317,7 +317,7 @@ class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnect
                 .writeTimeout(TIME_OUT, TimeUnit.SECONDS);
     }
 
-    private OkHttpClient provideOkHttpClient(@NonNull OkHttpClient.Builder okHttpBuilder, Cache cache) {
+    private OkHttpClient provideOkHttpClient(@NonNull OkHttpClient.Builder okHttpBuilder, @Nullable Cache cache) {
         if (cache != null) {
             okHttpBuilder.cache(cache);
         }

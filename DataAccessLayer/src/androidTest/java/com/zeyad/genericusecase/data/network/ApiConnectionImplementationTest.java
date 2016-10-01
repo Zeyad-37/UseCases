@@ -1,5 +1,6 @@
 package com.zeyad.genericusecase.data.network;
 
+import android.support.annotation.NonNull;
 import android.support.test.runner.AndroidJUnit4;
 
 import org.junit.runner.RunWith;
@@ -8,12 +9,12 @@ import org.junit.runner.RunWith;
 public class ApiConnectionImplementationTest extends IApiConnectionTest {
 
     @Override
-    protected RestApi getCurrentSetRestApiWithoutCache(IApiConnection apiConnection) {
+    protected RestApi getCurrentSetRestApiWithoutCache(@NonNull IApiConnection apiConnection) {
         return ((ApiConnection) apiConnection).getRestApiWithoutCache();
     }
 
     @Override
-    protected RestApi getCurrentSetRestApiWithCache(IApiConnection apiConnection) {
+    protected RestApi getCurrentSetRestApiWithCache(@NonNull IApiConnection apiConnection) {
         return ((ApiConnection) apiConnection).getRestApiWithCache();
     }
 

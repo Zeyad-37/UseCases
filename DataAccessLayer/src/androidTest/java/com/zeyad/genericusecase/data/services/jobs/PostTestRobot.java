@@ -133,7 +133,7 @@ public class PostTestRobot {
         return Observable.create(
                 new Observable.OnSubscribe<List>() {
                     @Override
-                    public void call(Subscriber<? super List> subscriber) {
+                    public void call(@NonNull Subscriber<? super List> subscriber) {
                         subscriber.onNext(Collections.singletonList(createTestModel()));
                     }
                 });
@@ -147,6 +147,7 @@ public class PostTestRobot {
                 });
     }
 
+    @NonNull
     public static TestModel createTestModel() {
         return TEST_MODEL;
     }

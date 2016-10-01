@@ -1,5 +1,7 @@
 package com.zeyad.genericusecase.data.repository.generalstore;
 
+import android.support.annotation.NonNull;
+
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.zeyad.genericusecase.data.TestUtility;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
@@ -43,17 +45,24 @@ public class CloudDataStoreTest {
     private final boolean mToPersist;
     private final boolean mToCache;
     private final boolean mCallRealMethodsOfEntityMapper;
+    @NonNull
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+    @NonNull
+    @Rule
+    public Timeout mTimeout = new Timeout(TestUtility.TIMEOUT_TIME_VALUE, TestUtility.TIMEOUT_TIME_UNIT);
     private CloudDataStore mCloudDataStore;
     private RestApi mMockedRestApi;
     private DataBaseManager mMockedDBManager;
     private EntityMapper<Object, Object> mEntityMapper;
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-    @Rule
-    public Timeout mTimeout = new Timeout(TestUtility.TIMEOUT_TIME_VALUE, TestUtility.TIMEOUT_TIME_UNIT);
     private GoogleApiAvailability mMockedGoogleApiAvailability;
 
+
+    public CloudDataStoreTest(boolean callRealMethodsOfEntityMapper, boolean toPersist, boolean toCache) {
+        mCallRealMethodsOfEntityMapper = callRealMethodsOfEntityMapper;
+        mToPersist = toPersist;
+        mToCache = toCache;
+    }
 
     @Parameterized.Parameters
     public static Collection<Object[]> getParameters() {
@@ -67,12 +76,6 @@ public class CloudDataStoreTest {
                 , new Object[]{false, false, false}
                 , new Object[]{false, false, true}
         );
-    }
-
-    public CloudDataStoreTest(boolean callRealMethodsOfEntityMapper, boolean toPersist, boolean toCache) {
-        mCallRealMethodsOfEntityMapper = callRealMethodsOfEntityMapper;
-        mToPersist = toPersist;
-        mToCache = toCache;
     }
 
     @Before

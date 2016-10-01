@@ -2,6 +2,7 @@ package com.zeyad.genericusecase.data.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.zeyad.genericusecase.data.services.jobs.FileIO;
@@ -23,7 +24,7 @@ public class GenericNetworkQueueIntentService extends IntentService {
     }
 
     @Override
-    protected void onHandleIntent(Intent intent) {
+    protected void onHandleIntent(@NonNull Intent intent) {
         mCompositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(mCompositeSubscription);
         switch (intent.getStringExtra(JOB_TYPE)) {
             case POST:

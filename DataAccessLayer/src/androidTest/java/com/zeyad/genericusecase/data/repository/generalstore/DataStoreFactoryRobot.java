@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 class DataStoreFactoryRobot {
 
 
+    @NonNull
     static DataStoreFactory createDataStoreFactory(DataBaseManager dataBaseManager, Context mockedContext) {
         return new DataStoreFactory(dataBaseManager, mockedContext, Mockito.mock(GcmNetworkManager.class));
     }
@@ -26,23 +27,27 @@ class DataStoreFactoryRobot {
         return realmManager;
     }
 
-    static DataBaseManager setDataBaseManagerForValidItems(DataBaseManager mockedDbManager) {
+    @NonNull
+    static DataBaseManager setDataBaseManagerForValidItems(@NonNull DataBaseManager mockedDbManager) {
         Mockito.when(mockedDbManager.areItemsValid(Mockito.anyString())).thenReturn(Boolean.TRUE);
         return mockedDbManager;
     }
 
-    static DataBaseManager setDataBaseManagerForInvalidItems(DataBaseManager mockedDbManager) {
+    @NonNull
+    static DataBaseManager setDataBaseManagerForInvalidItems(@NonNull DataBaseManager mockedDbManager) {
         Mockito.when(mockedDbManager.areItemsValid(Mockito.any())).thenReturn(Boolean.FALSE);
         return mockedDbManager;
     }
 
-    static DataBaseManager setDataBaseManagerForValidItem(DataBaseManager mockedDbManager) {
+    @NonNull
+    static DataBaseManager setDataBaseManagerForValidItem(@NonNull DataBaseManager mockedDbManager) {
         Mockito.when(mockedDbManager.isItemValid(getValidColumnId(), getValidColumnName(), getDataClass()))
                 .thenReturn(Boolean.TRUE);
         return mockedDbManager;
     }
 
-    static DataBaseManager setDataBaseManagerForInvalidItem(DataBaseManager mockedDbManager) {
+    @NonNull
+    static DataBaseManager setDataBaseManagerForInvalidItem(@NonNull DataBaseManager mockedDbManager) {
         Mockito.when(mockedDbManager.isItemValid(getValidColumnId(), getValidColumnName(), getDataClass()))
                 .thenReturn(Boolean.FALSE);
         return mockedDbManager;

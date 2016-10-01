@@ -16,9 +16,9 @@ import com.google.android.gms.gcm.OneoffTask;
 import com.google.gson.Gson;
 import com.zeyad.genericusecase.data.network.RestApi;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
+import com.zeyad.genericusecase.data.repository.generalstore.CloudDataStore;
 import com.zeyad.genericusecase.data.services.GenericGCMService;
 import com.zeyad.genericusecase.data.services.GenericJobService;
-import com.zeyad.genericusecase.data.utils.Constants;
 import com.zeyad.genericusecase.data.utils.Utils;
 import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
 
@@ -159,7 +159,7 @@ public class FileIO {
                         .setUpdateCurrent(false)
                         .setPersisted(true)
                         .setExtras(extras)
-                        .setTag(Constants.FILE_IO_TAG)
+                        .setTag(CloudDataStore.FILE_IO_TAG)
                         .setExecutionWindow(0, 30)
                         .build());
                 Log.d(TAG, "Requeue scheduled through GcmNetworkManager: " + true);

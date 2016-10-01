@@ -1,2 +1,4 @@
 <resources>
+    <string name="exception_network_error_persisted">Could not reach server, but post request persisted to queue!\n Request will be posted as soon as internet is available.</string>
+    <string name="exception_network_error_not_persisted">Could not reach server and could not persist request to queue!\nGoogle play services not available and android version less than 5.0!</string>
 </resources>

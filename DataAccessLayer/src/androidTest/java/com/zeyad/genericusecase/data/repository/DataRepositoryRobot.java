@@ -1,5 +1,7 @@
 package com.zeyad.genericusecase.data.repository;
 
+import android.support.annotation.NonNull;
+
 import com.zeyad.genericusecase.data.repository.generalstore.CloudDataStore;
 import com.zeyad.genericusecase.data.repository.generalstore.DataStore;
 import com.zeyad.genericusecase.data.repository.generalstore.DataStoreFactory;
@@ -36,7 +38,7 @@ class DataRepositoryRobot {
         return dataStoreFactory;
     }
 
-    static void addMockForDiskStore(DataStoreFactory mockedDataStoreFactory, DataStore mockedDataStore) {
+    static void addMockForDiskStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedDataStore) {
         Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any(), Mockito.any()))
                 .thenReturn(mockedDataStore);
         Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.any(), Mockito.any()))
@@ -44,7 +46,7 @@ class DataRepositoryRobot {
         Mockito.when(mockedDataStoreFactory.disk(Mockito.any())).thenReturn(mockedDataStore);
     }
 
-    static void addMockForCloudStore(DataStoreFactory mockedDataStoreFactory, DataStore mockedCloudStore) {
+    static void addMockForCloudStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedCloudStore) {
         Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any(), Mockito.any()))
                 .thenReturn(mockedCloudStore);
         Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.any(), Mockito.any()))
@@ -64,10 +66,12 @@ class DataRepositoryRobot {
         return "http://www.google.com";
     }
 
+    @NonNull
     static Class getValidDomainClass() {
         return TestViewModel.class;
     }
 
+    @NonNull
     static Class getValidDataClass() {
         return TestModel.class;
     }
@@ -80,7 +84,7 @@ class DataRepositoryRobot {
         return 1;
     }
 
-    static void mockDataStore(boolean isDiskType, DataStore dataStore, DataStoreFactory dataStoreFactory) {
+    static void mockDataStore(boolean isDiskType, DataStore dataStore, @NonNull DataStoreFactory dataStoreFactory) {
         if (isDiskType) {
             DataRepositoryRobot.addMockForDiskStore(dataStoreFactory, dataStore);
         } else {
@@ -88,7 +92,7 @@ class DataRepositoryRobot {
         }
     }
 
-    static OngoingStubbing<Observable<List>> mockDataStoreForDynamicGetList(DataStore dataStore, boolean persist, boolean toCache) {
+    static OngoingStubbing<Observable<List>> mockDataStoreForDynamicGetList(@NonNull DataStore dataStore, boolean persist, boolean toCache) {
         return Mockito.when(dataStore.dynamicGetList(getValidUrl()
                 , getValidDomainClass()
                 , getValidDataClass()
@@ -100,10 +104,12 @@ class DataRepositoryRobot {
 //        return OBJECT_HASH_MAP;
 //    }
 
+    @NonNull
     public static JSONObject getValidJSONObject() {
         return JSON_OBJECT;
     }
 
+    @NonNull
     public static JSONArray getValidJSONArray() {
         return JSON_ARRAY;
     }
@@ -112,6 +118,7 @@ class DataRepositoryRobot {
         return "1";
     }
 
+    @NonNull
     public static RealmQuery getValidRealmQuery() {
         return REALM_QUERY;
 

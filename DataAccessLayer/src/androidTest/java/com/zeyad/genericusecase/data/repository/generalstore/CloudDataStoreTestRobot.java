@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -22,6 +23,7 @@ import com.zeyad.genericusecase.data.network.RestApiImpl;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModelViewModelMapper;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
+import com.zeyad.genericusecase.data.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -102,6 +104,7 @@ class CloudDataStoreTestRobot {
         return "http://www.google.com";
     }
 
+    @NonNull
     static Class getValidDomainClass() {
         return TestViewModel.class;
     }
@@ -110,6 +113,7 @@ class CloudDataStoreTestRobot {
         return 12;
     }
 
+    @NonNull
     static HashMap<String, Object> getValidHashmap() {
         return new HashMap<>();
     }
@@ -119,6 +123,7 @@ class CloudDataStoreTestRobot {
         return "id";
     }
 
+    @NonNull
     static Class getValidDataClass() {
         return TestModel.class;
     }
@@ -129,7 +134,7 @@ class CloudDataStoreTestRobot {
         return googleApiAvailaibility;
     }
 
-    static void changeStateOfGoogleApi(GoogleApiAvailability googleApiAvailaibility, boolean state) {
+    static void changeStateOfGoogleApi(@NonNull GoogleApiAvailability googleApiAvailaibility, boolean state) {
         Mockito.when(googleApiAvailaibility.isGooglePlayServicesAvailable(Mockito.any()))
                 .thenReturn(state ? ConnectionResult.SUCCESS : ConnectionResult.API_UNAVAILABLE);
     }
@@ -162,7 +167,7 @@ class CloudDataStoreTestRobot {
         return Observable.create(
                 new Observable.OnSubscribe<List<?>>() {
                     @Override
-                    public void call(Subscriber<? super List<?>> subscriber) {
+                    public void call(@NonNull Subscriber<? super List<?>> subscriber) {
                         subscriber.onNext(Collections.singletonList(createTestModel()));
                     }
                 });
@@ -181,7 +186,7 @@ class CloudDataStoreTestRobot {
         final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
         final Observable<Boolean> TRUE_OBSERVABLE = Observable.create(new Observable.OnSubscribe<Boolean>() {
             @Override
-            public void call(Subscriber<? super Boolean> subscriber) {
+            public void call(@NonNull Subscriber<? super Boolean> subscriber) {
                 subscriber.onNext(true);
             }
         });
@@ -230,7 +235,7 @@ class CloudDataStoreTestRobot {
         return JOB_SCHEDULER;
     }
 
-    private static void mockForString(Context appContext, Resources resources, int resId) {
+    private static void mockForString(@NonNull Context appContext, @NonNull Resources resources, int resId) {
         Mockito.when(appContext.getString(resId)).thenReturn("Hello");
         Mockito.when(resources.getString(resId)).thenReturn("Hello");
     }
@@ -240,7 +245,8 @@ class CloudDataStoreTestRobot {
         return "";
     }
 
-    static TestSubscriber<List> dynamicGetList(CloudDataStore cloudDataStore, boolean toPersist) {
+    @NonNull
+    static TestSubscriber<List> dynamicGetList(@NonNull CloudDataStore cloudDataStore, boolean toPersist) {
         final TestSubscriber<List> listTestSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicGetList(getValidUrl()
                 , getValidDomainClass()
@@ -250,7 +256,8 @@ class CloudDataStoreTestRobot {
         return listTestSubscriber;
     }
 
-    static TestSubscriber<List> dynamicGetList(CloudDataStore cloudDataStore, boolean toPersist, boolean toCahce) {
+    @NonNull
+    static TestSubscriber<List> dynamicGetList(@NonNull CloudDataStore cloudDataStore, boolean toPersist, boolean toCahce) {
         final TestSubscriber<List> listTestSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicGetList(getValidUrl()
                 , getValidDomainClass()
@@ -259,7 +266,8 @@ class CloudDataStoreTestRobot {
         return listTestSubscriber;
     }
 
-    static TestSubscriber<Object> dynamicGetObject(CloudDataStore cloudDataStore, boolean toPersist) {
+    @NonNull
+    static TestSubscriber<Object> dynamicGetObject(@NonNull CloudDataStore cloudDataStore, boolean toPersist) {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         cloudDataStore
                 .dynamicGetObject(getValidUrl()
@@ -273,7 +281,8 @@ class CloudDataStoreTestRobot {
         return subscriber;
     }
 
-    static TestSubscriber<Object> dynamicGetObject(CloudDataStore cloudDataStore, boolean toPersist, boolean toCache) {
+    @NonNull
+    static TestSubscriber<Object> dynamicGetObject(@NonNull CloudDataStore cloudDataStore, boolean toPersist, boolean toCache) {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         cloudDataStore
                 .dynamicGetObject(getValidUrl()
@@ -287,7 +296,8 @@ class CloudDataStoreTestRobot {
         return subscriber;
     }
 
-    static TestSubscriber<Object> dynamicPostJsonObject(CloudDataStore cloudDataStore, boolean toPersist) {
+    @NonNull
+    static TestSubscriber<Object> dynamicPostJsonObject(@NonNull CloudDataStore cloudDataStore, boolean toPersist) {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPostObject(getValidUrl()
                 , CloudDataStoreTestRobot.getValidColumnName()
@@ -299,7 +309,8 @@ class CloudDataStoreTestRobot {
         return subscriber;
     }
 
-    static TestSubscriber<Object> dynamicPutHashmapObject(CloudDataStore cloudDataStore, boolean toPersist) {
+    @NonNull
+    static TestSubscriber<Object> dynamicPutHashmapObject(@NonNull CloudDataStore cloudDataStore, boolean toPersist) {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPutObject(getValidUrl()
                 , getValidColumnName()
@@ -311,10 +322,12 @@ class CloudDataStoreTestRobot {
         return subscriber;
     }
 
+    @NonNull
     public static TestModel createTestModel() {
         return TEST_MODEL;
     }
 
+    @Nullable
     static JSONObject createTestModelJSON() {
         JSONObject jsonObject = null;
         try {
@@ -324,24 +337,24 @@ class CloudDataStoreTestRobot {
         return jsonObject;
     }
 
-    static Context changeNetworkState(DataBaseManager mockedDBManager, boolean toEnable) {
+    static Context changeNetworkState(@NonNull DataBaseManager mockedDBManager, boolean toEnable) {
         return TestUtility.changeStateOfNetwork(mockedDBManager.getContext().getApplicationContext(), toEnable);
     }
 
-    static void changeHasLollipop(CloudDataStore cloudDataStore, boolean state) {
+    static void changeHasLollipop(@NonNull CloudDataStore cloudDataStore, boolean state) {
         cloudDataStore.setHasLollipop(state);
     }
 
-    static boolean isNetworkEnabled(DataBaseManager mockedDBManager) {
-        return com.zeyad.genericusecase.data.utils.Utils.isNetworkAvailable(mockedDBManager.getContext().getApplicationContext());
+    static boolean isNetworkEnabled(@NonNull DataBaseManager mockedDBManager) {
+        return Utils.isNetworkAvailable(mockedDBManager.getContext().getApplicationContext());
     }
 
-    static boolean isGooglePlayerServicesEnabled(DataBaseManager mockedDBManager, CloudDataStore cloudDataStore) {
+    static boolean isGooglePlayerServicesEnabled(@NonNull DataBaseManager mockedDBManager, @NonNull CloudDataStore cloudDataStore) {
         return cloudDataStore.getGoogleApiAvailability().isGooglePlayServicesAvailable(mockedDBManager.getContext().getApplicationContext())
                 == CommonStatusCodes.SUCCESS;
     }
 
-    static boolean hasLollipop(CloudDataStore cloudDataStore) {
+    static boolean hasLollipop(@NonNull CloudDataStore cloudDataStore) {
         return cloudDataStore.isHasLollipop();
     }
 
@@ -349,7 +362,8 @@ class CloudDataStoreTestRobot {
         return argThat(ToStringArgumentMatcher.newInstance(arg));
     }
 
-    static TestSubscriber<List> dynamicPostList(CloudDataStore cloudDataStore, boolean toPersist) {
+    @NonNull
+    static TestSubscriber<List> dynamicPostList(@NonNull CloudDataStore cloudDataStore, boolean toPersist) {
         final TestSubscriber<List> subscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPostList(getValidUrl()
                 , getValidColumnName()
@@ -361,7 +375,8 @@ class CloudDataStoreTestRobot {
         return subscriber;
     }
 
-    static TestSubscriber dynamicPutList(CloudDataStore cloudDataStore, boolean toPersist) {
+    @NonNull
+    static TestSubscriber dynamicPutList(@NonNull CloudDataStore cloudDataStore, boolean toPersist) {
         final TestSubscriber subscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPutList(getValidUrl()
                 , getValidColumnName()
@@ -373,7 +388,8 @@ class CloudDataStoreTestRobot {
         return subscriber;
     }
 
-    static TestSubscriber<Object> dynamicUploadFile(CloudDataStore cloudDataStore, boolean onWifi) {
+    @NonNull
+    static TestSubscriber<Object> dynamicUploadFile(@NonNull CloudDataStore cloudDataStore, boolean onWifi) {
 
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         cloudDataStore.dynamicUploadFile(getValidUrl(), getValidFile(), onWifi, true, getValidDataClass())

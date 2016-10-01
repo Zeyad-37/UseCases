@@ -1,5 +1,7 @@
 package com.zeyad.genericusecase.data;
 
+import android.support.annotation.NonNull;
+
 import org.mockito.ArgumentMatcher;
 
 public class ToStringArgumentMatcher<T> extends ArgumentMatcher<T> {
@@ -10,12 +12,13 @@ public class ToStringArgumentMatcher<T> extends ArgumentMatcher<T> {
         mExpected = expected;
     }
 
+    @NonNull
     public static <T> ArgumentMatcher<T> newInstance(T expected) {
         return new ToStringArgumentMatcher<>(expected);
     }
 
     @Override
-    public boolean matches(Object actual) {
+    public boolean matches(@NonNull Object actual) {
         return mExpected.toString().equals(actual.toString());
     }
 }
