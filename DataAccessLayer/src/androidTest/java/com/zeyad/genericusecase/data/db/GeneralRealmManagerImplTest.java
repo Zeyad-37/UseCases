@@ -68,7 +68,7 @@ public class GeneralRealmManagerImplTest {
     @Rule
     public ExpectedException exception
             = ExpectedException.none();
-    private GenericRealmManager mRealmManager;
+    private RealmManager mRealmManager;
     private Random mRandom;
 
     @Before
@@ -99,7 +99,7 @@ public class GeneralRealmManagerImplTest {
     @Test
     public void testPutRealmObject_ifNoExceptionIsRaised_WhenInsertInMainThreadAndReadInWorkerThread()
             throws InterruptedException {
-        GenericRealmManager realmManager = getGeneralRealmManager();
+        RealmManager realmManager = getGeneralRealmManager();
         runOnMainThread(() -> {
             putTestModel(realmManager);
         });
@@ -164,7 +164,7 @@ public class GeneralRealmManagerImplTest {
         JSONObject jsonObject = new JSONObject(json);
         runOnMainThread(() -> {
             final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-            GenericRealmManager realmManager
+            RealmManager realmManager
                     = getGeneralRealmManager();
             realmManager.put(jsonObject, "id", TestModel.class)
                     .subscribe(subscriber);
@@ -180,7 +180,7 @@ public class GeneralRealmManagerImplTest {
         runOnMainThread(() -> TestUtility.getJsonObjectFrom(jsonObject
                 , createTestModelWithRandomId()));
         TestUtility.assertConvertedJsonArray(jsonObject);
-        GenericRealmManager realmManager
+        RealmManager realmManager
                 = getGeneralRealmManager();
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         realmManager.put(jsonObject[0], "id", TestModel.class)
@@ -190,7 +190,7 @@ public class GeneralRealmManagerImplTest {
 
     @Test
     public void testPutJsonObject_ifNoExceptionIsRaised_whenJsonObjectIsInserted() {
-        GenericRealmManager realmManager
+        RealmManager realmManager
                 = getGeneralRealmManager();
         JSONObject[] jsonObject = new JSONObject[1];
         TestUtility.getJsonObjectFrom(jsonObject
@@ -218,7 +218,7 @@ public class GeneralRealmManagerImplTest {
 
     @Test
     public void testPutJsonObject_IfNoExceptionIsRaised_whenOrderModelJsonCreateInUIAndWriteInWorker() {
-        GenericRealmManager realmManager
+        RealmManager realmManager
                 = getGeneralRealmManager();
         JSONObject[] jsonObject
                 = new JSONObject[1];
@@ -1001,7 +1001,7 @@ public class GeneralRealmManagerImplTest {
     }
 
     @NonNull
-    private TestModel getManagedObject(@NonNull TestModel testModel, @NonNull GenericRealmManager realmManager) {
+    private TestModel getManagedObject(@NonNull TestModel testModel, @NonNull RealmManager realmManager) {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         realmManager.getById("id", testModel.getId(), TestModel.class).subscribe(subscriber);
         return (TestModel) subscriber.getOnNextEvents().get(0);
@@ -1009,7 +1009,7 @@ public class GeneralRealmManagerImplTest {
 
     private void createJsonObjectInWorkerThreadAndInsertInUi() {
         assertCurrentThreadIsWorkerThread();
-        GenericRealmManager realmManager
+        RealmManager realmManager
                 = getGeneralRealmManager();
         JSONObject[] jsonObject
                 = new JSONObject[1];
@@ -1102,8 +1102,8 @@ public class GeneralRealmManagerImplTest {
 
 
     @NonNull
-    private GenericRealmManager getGeneralRealmManager() {
-        return (GenericRealmManager) DatabaseManagerFactory.getInstance(getContext());
+    private RealmManager getGeneralRealmManager() {
+        return (RealmManager) DatabaseManagerFactory.getInstance(getContext());
     }
 
     private Context getContext() {

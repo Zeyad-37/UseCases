@@ -1,5 +1,6 @@
 package com.zeyad.genericusecase.data.db;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
@@ -17,6 +18,7 @@ public interface DataBaseManager {
 
     String COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE = "collection_last_cache_update",
             DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE = "detail_last_cache_update";
+    long EXPIRATION_TIME = 600000;
 
     /**
      * Gets an {@link Observable} which will emit an Object.
@@ -46,12 +48,16 @@ public interface DataBaseManager {
     @NonNull
     Observable<?> put(JSONObject realmObject, String idColumnName, Class dataClass);
 
+    Observable<?> put(ContentValues contentValues, Class dataClass);
+
     /**
      * Puts and element into the cache.
      *
      * @param realmModels Element to insert in the cache.
      */
     void putAll(List<RealmObject> realmModels, Class dataClass);
+
+    void putAll(ContentValues[] contentValues, Class dataClass);
 
     /**
      * Puts and element into the cache.

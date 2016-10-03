@@ -7,7 +7,7 @@ import org.mockito.Mockito;
 public class GeneralRealmManagerImplUtils {
 
     public static DataBaseManager createDBManagerWithMockedContext(Context mockedContext) {
-        final GenericRealmManager generalRealmManager = Mockito.mock(GenericRealmManager.class);
+        final RealmManager generalRealmManager = Mockito.mock(RealmManager.class);
         Mockito.when(generalRealmManager.getContext()).thenReturn(mockedContext);
 //        final SharedPreferences sharedPreferences = Mockito.mock(SharedPreferences.class);
 //        Mockito.when(sharedPreferences.edit()).thenReturn(null);

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.Service;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -20,8 +21,12 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.zeyad.genericusecase.Config;
+import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
 
+import java.lang.reflect.Field;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 import io.realm.Realm;
@@ -136,5 +141,22 @@ public class Utils {
 
     public static boolean isChargingReqCompatible(boolean isChargingCurrently, boolean doWhileCharging) {
         return !doWhileCharging || isChargingCurrently;
+    }
+
+    public static ContentValues objectToContentValues(Object o) throws IllegalAccessException {
+        ContentValues cv = new ContentValues();
+        Field[] fields = o.getClass().getFields();
+        for (int i = 0, fieldsLength = fields.length; i < fieldsLength; i++) {
+            Field field = fields[i];
+            Object value = field.get(o);
+            //check if compatible with contentvalues
+            if (value instanceof Double || value instanceof Integer || value instanceof R.string || value instanceof Boolean
+                    || value instanceof Long || value instanceof Float || value instanceof Short) {
+                cv.put(field.getName(), value.toString());
+                Log.d("CVLOOP", field.getName() + ":" + value.toString());
+            } else if (value instanceof Date)
+                cv.put(field.getName(), new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format((Date) value));
+        }
+        return cv;
     }
 }

@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
-import com.zeyad.genericusecase.data.db.GenericRealmManager;
+import com.zeyad.genericusecase.data.db.RealmManager;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModelViewModelMapper;
@@ -21,7 +21,7 @@ class DataStoreFactoryRobot {
     }
 
     static DataBaseManager createMockedDataBaseManager() {
-        final GenericRealmManager realmManager = Mockito.mock(GenericRealmManager.class);
+        final RealmManager realmManager = Mockito.mock(RealmManager.class);
         final Context mockedContext = CloudDataStoreTestRobot.getMockedContext();
         Mockito.when(realmManager.getContext()).thenReturn(mockedContext);
         return realmManager;

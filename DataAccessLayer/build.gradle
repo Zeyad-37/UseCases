@@ -28,7 +28,7 @@ buildscript {
 
 android {
     compileSdkVersion 24
-    buildToolsVersion '24.0.1'
+    buildToolsVersion '24.0.2'
     defaultConfig {
         minSdkVersion 16
         targetSdkVersion 24
@@ -36,6 +36,16 @@ android {
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+            consumerProguardFiles 'proguard-project.txt'
+        }
+        release {
+            consumerProguardFiles 'proguard-project.txt'
+        }
     }
 
     lintOptions {
@@ -95,7 +105,8 @@ dependencies {
     // Rx
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.7'
-
+    // DB
+    compile 'com.squareup.sqlbrite:sqlbrite:0.7.0'
     //test compile libraries
     androidTestCompile "com.android.support.test:runner:$androidSupportTest"
     androidTestCompile "com.android.support.test:rules:$androidSupportTest"

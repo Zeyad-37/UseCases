@@ -1,5 +1,6 @@
 package com.zeyad.genericusecase.data.db;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
@@ -28,15 +29,15 @@ import rx.schedulers.Schedulers;
 /**
  * {@link DataBaseManager} implementation.
  */
-public class GenericRealmManager implements DataBaseManager {
+public class RealmManager implements DataBaseManager {
 
     private static final long EXPIRATION_TIME = 600000;
     private static DataBaseManager sInstance;
-    private final String TAG = com.zeyad.genericusecase.data.db.GenericRealmManager.class.getName();
+    private final String TAG = RealmManager.class.getName();
     private Realm mRealm;
     private Context mContext;
 
-    private GenericRealmManager(Context context) {
+    private RealmManager(Context context) {
         if (!Utils.doesContextBelongsToApplication(context))
             throw new IllegalArgumentException("Context should be application context only.");
         mRealm = Realm.getDefaultInstance();
@@ -50,7 +51,7 @@ public class GenericRealmManager implements DataBaseManager {
      * @param context Application Context
      */
     static void init(Context context) {
-        sInstance = new GenericRealmManager(context);
+        sInstance = new RealmManager(context);
     }
 
     static DataBaseManager getInstance(Context context) {
@@ -159,6 +160,11 @@ public class GenericRealmManager implements DataBaseManager {
             return Observable.defer(() -> Observable.error(new Exception("json cant be null")));
     }
 
+    @Override
+    public Observable<?> put(ContentValues contentValues, Class dataClass) {
+        return Observable.error(new IllegalStateException("This is not SQLBrite"));
+    }
+
     @NonNull
     @Override
     public Observable<?> putAll(@NonNull JSONArray jsonArray, String idColumnName, @NonNull Class dataClass) {
@@ -186,6 +192,11 @@ public class GenericRealmManager implements DataBaseManager {
             return Observable.from(realmModels);
         }).subscribeOn(Schedulers.immediate())
                 .subscribe(new PutAllSubscriberClass(realmModels));
+    }
+
+    @Override
+    public void putAll(ContentValues[] contentValues, Class dataClass) {
+        throw new IllegalStateException("This is not SQLBrite");
     }
 
     @NonNull

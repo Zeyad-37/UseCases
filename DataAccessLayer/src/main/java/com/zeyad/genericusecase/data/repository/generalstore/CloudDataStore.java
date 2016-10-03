@@ -64,7 +64,7 @@ public class CloudDataStore implements DataStore {
     public static final int COUNTER_START = 1, ATTEMPTS = 3;
     static final String TAG = com.zeyad.genericusecase.data.repository.generalstore.CloudDataStore.class.getName();
     final EntityMapper mEntityDataMapper;
-    final DataBaseManager mRealmManager;
+    final DataBaseManager mDataBaseManager;
     final Context mContext;
     @NonNull
     private final Observable<Object> mErrorObservablePersisted, mErrorObservableNotPersisted, mQueueFileIO;
@@ -83,7 +83,7 @@ public class CloudDataStore implements DataStore {
      */
     public CloudDataStore(RestApi restApi, @NonNull DataBaseManager realmManager, EntityMapper entityDataMapper) {
         this(restApi, realmManager, entityDataMapper
-                , GcmNetworkManager.getInstance(realmManager.getContext().getApplicationContext()));
+                , GcmNetworkManager.getInstance(Config.getInstance().getContext()));
     }
 
     /**
@@ -95,7 +95,7 @@ public class CloudDataStore implements DataStore {
     CloudDataStore(RestApi restApi, DataBaseManager realmManager, EntityMapper entityDataMapper, GcmNetworkManager gcmNetworkManager) {
         mRestApi = restApi;
         mEntityDataMapper = entityDataMapper;
-        mRealmManager = realmManager;
+        mDataBaseManager = realmManager;
         mContext = Config.getInstance().getContext();
         mGoogleApiAvailability = GoogleApiAvailability.getInstance();
         mErrorObservablePersisted = Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_persisted)));
@@ -118,7 +118,7 @@ public class CloudDataStore implements DataStore {
             , boolean isCharging, boolean isOnWifi, GcmNetworkManager gcmNetworkManager) {
         mRestApi = restApi;
         mEntityDataMapper = entityDataMapper;
-        mRealmManager = realmManager;
+        mDataBaseManager = realmManager;
         mContext = Config.getInstance().getContext();
         mGoogleApiAvailability = GoogleApiAvailability.getInstance();
         mErrorObservablePersisted = Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_persisted)));
@@ -602,15 +602,15 @@ public class CloudDataStore implements DataStore {
             }
             Observable<?> observable = null;
             if (mappedObject instanceof RealmObject)
-                observable = mRealmManager.put((RealmObject) mappedObject, mDataClass);
+                observable = mDataBaseManager.put((RealmObject) mappedObject, mDataClass);
             else if (mappedObject instanceof RealmModel)
-                observable = mRealmManager.put((RealmModel) mappedObject, mDataClass);
+                observable = mDataBaseManager.put((RealmModel) mappedObject, mDataClass);
             else
                 try {
                     if ((object instanceof JSONArray)) {
-                        observable = mRealmManager.putAll((JSONArray) object, mIdColumnName, mDataClass);
+                        observable = mDataBaseManager.putAll((JSONArray) object, mIdColumnName, mDataClass);
                     } else if (object instanceof List) {
-                        mRealmManager.putAll((List<RealmObject>) mEntityDataMapper.transformAllToRealm((List) object, mDataClass), mDataClass);
+                        mDataBaseManager.putAll((List<RealmObject>) mEntityDataMapper.transformAllToRealm((List) object, mDataClass), mDataClass);
                     } else {
                         JSONObject jsonObject;
                         if (object instanceof Map) {
@@ -621,7 +621,7 @@ public class CloudDataStore implements DataStore {
                             jsonObject = ((JSONObject) object);
                         } else
                             jsonObject = new JSONObject(new Gson().toJson(object, mDataClass));
-                        observable = mRealmManager.put(jsonObject, mIdColumnName, mDataClass);
+                        observable = mDataBaseManager.put(jsonObject, mIdColumnName, mDataClass);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -645,7 +645,7 @@ public class CloudDataStore implements DataStore {
         public void call(List collection) {
             List<RealmObject> realmObjectCollection = new ArrayList<>();
             realmObjectCollection.addAll(mEntityDataMapper.transformAllToRealm(collection, mDataClass));
-            mRealmManager.putAll(realmObjectCollection, mDataClass);
+            mDataBaseManager.putAll(realmObjectCollection, mDataClass);
         }
     }
 
@@ -662,7 +662,7 @@ public class CloudDataStore implements DataStore {
             List<RealmObject> realmObjectList = new ArrayList<>();
             realmObjectList.addAll(mEntityDataMapper.transformAllToRealm(collection, mDataClass));
             for (RealmObject realmObject : realmObjectList)
-                mRealmManager.evict(realmObject, mDataClass);
+                mDataBaseManager.evict(realmObject, mDataClass);
         }
     }
 
@@ -676,7 +676,7 @@ public class CloudDataStore implements DataStore {
 
         @Override
         public void call(@NonNull List collection) {
-            mRealmManager.evictAll(mDataClass)
+            mDataBaseManager.evictAll(mDataClass)
                     .subscribeOn(Schedulers.io())
                     .subscribe(new Subscriber<Boolean>() {
                         @Override
