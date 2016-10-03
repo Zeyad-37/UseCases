@@ -166,7 +166,6 @@ public class PostRequest {
             mPersist = persist;
         }
 
-
         @NonNull
         public PostRequestBuilder contentValue(ContentValues contentValues) {
             mContentValue = contentValues;
@@ -174,11 +173,10 @@ public class PostRequest {
         }
 
         @NonNull
-        public PostRequestBuilder contentValue(ContentValues[] contentValues) {
+        public PostRequestBuilder contentValues(ContentValues[] contentValues) {
             mContentValues = contentValues;
             return this;
         }
-
 
         @NonNull
         public PostRequestBuilder url(String url) {

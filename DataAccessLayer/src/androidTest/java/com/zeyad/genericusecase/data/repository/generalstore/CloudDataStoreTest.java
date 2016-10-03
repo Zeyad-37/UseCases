@@ -85,15 +85,10 @@ public class CloudDataStoreTest {
         mMockedDBManager = CloudDataStoreTestRobot.createDBManagerWithMockedContext();
         if (mCallRealMethodsOfEntityMapper) {
             mEntityMapper = CloudDataStoreTestRobot.createMockedEntityMapperWithActualMethodCalls();
-        } else {
+        } else
             mEntityMapper = CloudDataStoreTestRobot.createMockedEntityMapper();
-        }
-        mCloudDataStore = new CloudDataStore(mMockedRestApi
-                , mMockedDBManager
-                , mEntityMapper
-                , true
-                , true
-                , CloudDataStoreTestRobot.getGcmNetworkManager());
+        mCloudDataStore = new CloudDataStore(mMockedRestApi, mMockedDBManager, mEntityMapper,
+                CloudDataStoreTestRobot.getGcmNetworkManager());
         mMockedGoogleApiAvailability = CloudDataStoreTestRobot.createMockedGoogleApiAvailability();
         mCloudDataStore.setGoogleApiAvailability(mMockedGoogleApiAvailability);
     }
