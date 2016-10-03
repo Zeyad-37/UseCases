@@ -82,7 +82,7 @@ android {
 ext {
     supportLibraryVersion = '24.2.1'
     retrofitVersion = '2.1.0'
-    okhttpVersion = '3.3.1'
+    okhttpVersion = '3.4.1'
     googlePlayVersion = '9.6.1'
     androidSupportTest = '0.5'
     espressoCore = '2.2.2'
