@@ -20,6 +20,7 @@ import com.google.gson.Gson;
 import com.zeyad.genericusecase.Config;
 import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
+import com.zeyad.genericusecase.data.db.RealmManager;
 import com.zeyad.genericusecase.data.exceptions.NetworkConnectionException;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.network.RestApi;
@@ -78,24 +79,24 @@ public class CloudDataStore implements DataStore {
     /**
      * Construct a {@link DataStore} based on connections to the api (Cloud).
      *
-     * @param restApi      The {@link RestApi} implementation to use.
-     * @param realmManager A {@link DataBaseManager} to cache data retrieved from the api.
+     * @param restApi         The {@link RestApi} implementation to use.
+     * @param dataBaseManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    public CloudDataStore(RestApi restApi, @NonNull DataBaseManager realmManager, EntityMapper entityDataMapper) {
-        this(restApi, realmManager, entityDataMapper
+    public CloudDataStore(RestApi restApi, @NonNull DataBaseManager dataBaseManager, EntityMapper entityDataMapper) {
+        this(restApi, dataBaseManager, entityDataMapper
                 , GcmNetworkManager.getInstance(Config.getInstance().getContext()));
     }
 
     /**
      * Construct a {@link DataStore} based on connections to the api (Cloud).
      *
-     * @param restApi      The {@link RestApi} implementation to use.
-     * @param realmManager A {@link DataBaseManager} to cache data retrieved from the api.
+     * @param restApi         The {@link RestApi} implementation to use.
+     * @param dataBaseManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    CloudDataStore(RestApi restApi, DataBaseManager realmManager, EntityMapper entityDataMapper, GcmNetworkManager gcmNetworkManager) {
+    CloudDataStore(RestApi restApi, DataBaseManager dataBaseManager, EntityMapper entityDataMapper, GcmNetworkManager gcmNetworkManager) {
         mRestApi = restApi;
         mEntityDataMapper = entityDataMapper;
-        mDataBaseManager = realmManager;
+        mDataBaseManager = dataBaseManager;
         mContext = Config.getInstance().getContext();
         mGoogleApiAvailability = GoogleApiAvailability.getInstance();
         mErrorObservablePersisted = Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_persisted)));
@@ -109,16 +110,16 @@ public class CloudDataStore implements DataStore {
      * Construct a {@link DataStore} based on connections to the api (Cloud).
      *
      * @param restApi           The {@link RestApi} implementation to use.
-     * @param realmManager      A {@link DataBaseManager} to cache data retrieved from the api.
+     * @param dataBaseManager   A {@link DataBaseManager} to cache data retrieved from the api.
      * @param isCharging
      * @param isOnWifi
      * @param gcmNetworkManager
      */
-    CloudDataStore(RestApi restApi, DataBaseManager realmManager, EntityMapper entityDataMapper
+    CloudDataStore(RestApi restApi, DataBaseManager dataBaseManager, EntityMapper entityDataMapper
             , boolean isCharging, boolean isOnWifi, GcmNetworkManager gcmNetworkManager) {
         mRestApi = restApi;
         mEntityDataMapper = entityDataMapper;
-        mDataBaseManager = realmManager;
+        mDataBaseManager = dataBaseManager;
         mContext = Config.getInstance().getContext();
         mGoogleApiAvailability = GoogleApiAvailability.getInstance();
         mErrorObservablePersisted = Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_persisted)));
@@ -409,7 +410,7 @@ public class CloudDataStore implements DataStore {
         });
     }
 
-    boolean isGooglePlayServicesAvailable() {
+    private boolean isGooglePlayServicesAvailable() {
         return getGoogleApiInstance() != null && getGooglePlayServicesAvailable() == ConnectionResult.SUCCESS;
     }
 
@@ -591,41 +592,49 @@ public class CloudDataStore implements DataStore {
                 //since file object save is not supported by Realm.
                 return;
             Object mappedObject = null;
-            try {
-                //we need to check object is not instance of JsonArray,Map since
-                //if we pass on to this method, unexpected and unwanted results are produced.
-                //we need to skip if object is instance of JsonArray,Map
-                if (!(object instanceof JSONArray) && !(object instanceof Map))
-                    mappedObject = mEntityDataMapper.transformToRealm(object, mDataClass);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
             Observable<?> observable = null;
-            if (mappedObject instanceof RealmObject)
-                observable = mDataBaseManager.put((RealmObject) mappedObject, mDataClass);
-            else if (mappedObject instanceof RealmModel)
-                observable = mDataBaseManager.put((RealmModel) mappedObject, mDataClass);
-            else
+            if (mDataBaseManager instanceof RealmManager) {
                 try {
-                    if ((object instanceof JSONArray)) {
-                        observable = mDataBaseManager.putAll((JSONArray) object, mIdColumnName, mDataClass);
-                    } else if (object instanceof List) {
-                        mDataBaseManager.putAll((List<RealmObject>) mEntityDataMapper.transformAllToRealm((List) object, mDataClass), mDataClass);
-                    } else {
-                        JSONObject jsonObject;
-                        if (object instanceof Map) {
-                            jsonObject = new JSONObject(((Map) object));
-                        } else if (object instanceof String) {
-                            jsonObject = new JSONObject((String) object);
-                        } else if (object instanceof JSONObject) {
-                            jsonObject = ((JSONObject) object);
-                        } else
-                            jsonObject = new JSONObject(new Gson().toJson(object, mDataClass));
-                        observable = mDataBaseManager.put(jsonObject, mIdColumnName, mDataClass);
-                    }
+                    //we need to check object is not instance of JsonArray,Map since
+                    //if we pass on to this method, unexpected and unwanted results are produced.
+                    //we need to skip if object is instance of JsonArray,Map
+                    if (!(object instanceof JSONArray) && !(object instanceof Map))
+                        mappedObject = mEntityDataMapper.transformToRealm(object, mDataClass);
                 } catch (Exception e) {
                     e.printStackTrace();
-                    observable = Observable.error(e);
+                }
+                if (mappedObject instanceof RealmObject)
+                    observable = mDataBaseManager.put((RealmObject) mappedObject, mDataClass);
+                else if (mappedObject instanceof RealmModel)
+                    observable = mDataBaseManager.put((RealmModel) mappedObject, mDataClass);
+                else
+                    try {
+                        if ((object instanceof JSONArray)) {
+                            observable = mDataBaseManager.putAll((JSONArray) object, mIdColumnName, mDataClass);
+                        } else if (object instanceof List) {
+                            mDataBaseManager.putAll((List<RealmObject>) mEntityDataMapper.transformAllToRealm((List) object, mDataClass), mDataClass);
+                        } else {
+                            JSONObject jsonObject;
+                            if (object instanceof Map) {
+                                jsonObject = new JSONObject(((Map) object));
+                            } else if (object instanceof String) {
+                                jsonObject = new JSONObject((String) object);
+                            } else if (object instanceof JSONObject) {
+                                jsonObject = ((JSONObject) object);
+                            } else
+                                jsonObject = new JSONObject(new Gson().toJson(object, mDataClass));
+                            observable = mDataBaseManager.put(jsonObject, mIdColumnName, mDataClass);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        observable = Observable.error(e);
+                    }
+            } else
+                try {
+                    observable = mDataBaseManager.put(Utils.objectToContentValues(object), mDataClass);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                    Log.d(TAG, "Could not convert object to contentValues!");
                 }
             if (observable != null)
                 observable.subscribeOn(Schedulers.io())
@@ -643,9 +652,7 @@ public class CloudDataStore implements DataStore {
 
         @Override
         public void call(List collection) {
-            List<RealmObject> realmObjectCollection = new ArrayList<>();
-            realmObjectCollection.addAll(mEntityDataMapper.transformAllToRealm(collection, mDataClass));
-            mDataBaseManager.putAll(realmObjectCollection, mDataClass);
+            mDataBaseManager.putAll(mEntityDataMapper.transformAllToRealm(collection, mDataClass), mDataClass);
         }
     }
 
@@ -659,10 +666,17 @@ public class CloudDataStore implements DataStore {
 
         @Override
         public void call(List collection) {
-            List<RealmObject> realmObjectList = new ArrayList<>();
-            realmObjectList.addAll(mEntityDataMapper.transformAllToRealm(collection, mDataClass));
-            for (RealmObject realmObject : realmObjectList)
-                mDataBaseManager.evict(realmObject, mDataClass);
+            if (mDataBaseManager instanceof RealmModel) {
+                List<RealmObject> realmObjectList = new ArrayList<>();
+                realmObjectList.addAll(mEntityDataMapper.transformAllToRealm(collection, mDataClass));
+                for (int i = 0, realmObjectListSize = realmObjectList.size(); i < realmObjectListSize; i++) {
+                    RealmObject realmObject = realmObjectList.get(i);
+                    mDataBaseManager.evict(realmObject, mDataClass);
+                }
+            }
+            // TODO: 10/3/16 Add SQLBrite!
+//            else for (int i = 0, collectionSize = collection.size(); i < collectionSize; i++)
+//                mDataBaseManager.evictById(mDataClass, "", 0);
         }
     }
 

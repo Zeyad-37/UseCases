@@ -44,7 +44,7 @@ public class GenericApplication extends Application {
         sInstance = this;
         initializeInjector();
         initializeRealm();
-        GenericUseCaseFactory.init(getApplicationContext(), null);
+        GenericUseCaseFactory.initWithRealm(getApplicationContext(), null);
         initErrorHandler();
     }
 

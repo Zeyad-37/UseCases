@@ -21,7 +21,6 @@ import android.util.Log;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.zeyad.genericusecase.Config;
-import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
 
 import java.lang.reflect.Field;
@@ -150,8 +149,9 @@ public class Utils {
             Field field = fields[i];
             Object value = field.get(o);
             //check if compatible with contentvalues
-            if (value instanceof Double || value instanceof Integer || value instanceof R.string || value instanceof Boolean
-                    || value instanceof Long || value instanceof Float || value instanceof Short) {
+            if (value instanceof Double || value instanceof Integer || value instanceof String
+                    || value instanceof Boolean || value instanceof Long || value instanceof Float
+                    || value instanceof Short) {
                 cv.put(field.getName(), value.toString());
                 Log.d("CVLOOP", field.getName() + ":" + value.toString());
             } else if (value instanceof Date)

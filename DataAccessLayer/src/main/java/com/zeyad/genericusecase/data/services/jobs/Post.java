@@ -127,7 +127,7 @@ public class Post {
 
     private void reQueue() {
         mTrailCount++;
-        if (mTrailCount < 3) { // inject value at init!
+        if (mTrailCount < 3) { // inject value at initRealm!
             Gson gson = new GsonBuilder()
                     .registerTypeAdapter(Class.class, new ClassTypeAdapter())
                     .create();

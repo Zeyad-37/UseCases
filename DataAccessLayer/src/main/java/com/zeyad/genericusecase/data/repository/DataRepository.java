@@ -1,6 +1,7 @@
 package com.zeyad.genericusecase.data.repository;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.zeyad.genericusecase.data.repository.generalstore.DataStoreFactory;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
@@ -19,7 +20,6 @@ import rx.Observable;
 public class DataRepository implements Repository {
 
     public static final String DEFAULT_ID_TO_BE_REPLACED = "id";
-    public static final boolean DEFAULT_TO_CACHE = false;
     private final DataStoreFactory mDataStoreFactory;
     private final IEntityMapperUtil mEntityMapperUtil;
 
@@ -28,7 +28,7 @@ public class DataRepository implements Repository {
      *
      * @param dataStoreFactory A factory to construct different data source implementations.
      */
-    public DataRepository(DataStoreFactory dataStoreFactory, IEntityMapperUtil entityMapperUtil) {
+    public DataRepository(@Nullable DataStoreFactory dataStoreFactory, IEntityMapperUtil entityMapperUtil) {
         mDataStoreFactory = dataStoreFactory;
         mEntityMapperUtil = entityMapperUtil;
     }

@@ -16,21 +16,21 @@ public class DataStoreFactory {
     private final Context mContext;
     private final GcmNetworkManager mGCMNetworkManager;
     @Nullable
-    private DataBaseManager mRealmManager;
+    private DataBaseManager mDataBaseManager;
 
-    public DataStoreFactory(@Nullable DataBaseManager realmManager, Context context) {
-        if (realmManager == null)
+    public DataStoreFactory(@Nullable DataBaseManager dataBaseManager, Context context) {
+        if (dataBaseManager == null)
             throw new IllegalArgumentException("Constructor parameters cannot be null!");
         mContext = context;
-        mRealmManager = realmManager;
+        mDataBaseManager = dataBaseManager;
         mGCMNetworkManager = GcmNetworkManager.getInstance(mContext);
     }
 
-    DataStoreFactory(@Nullable DataBaseManager realmManager, Context context, GcmNetworkManager gcmNetworkManager) {
-        if (realmManager == null)
+    DataStoreFactory(@Nullable DataBaseManager dataBaseManager, Context context, GcmNetworkManager gcmNetworkManager) {
+        if (dataBaseManager == null)
             throw new IllegalArgumentException("Constructor parameters cannot be null!");
         mContext = context;
-        mRealmManager = realmManager;
+        mDataBaseManager = dataBaseManager;
         mGCMNetworkManager = gcmNetworkManager;
     }
 
@@ -39,12 +39,12 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore dynamically(@NonNull String url, EntityMapper entityDataMapper, @NonNull Class dataClass) {
-        if (url.isEmpty() && (mRealmManager.areItemsValid(DataBaseManager.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE
+        if (url.isEmpty() && (mDataBaseManager.areItemsValid(DataBaseManager.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE
                 + dataClass.getSimpleName()) || !Utils.isNetworkAvailable(mContext)))
-            return new DiskDataStore(mRealmManager, entityDataMapper);
+            return new DiskDataStore(mDataBaseManager, entityDataMapper);
         else if (!url.isEmpty())
-            return new CloudDataStore(new RestApiImpl(), mRealmManager, entityDataMapper, mGCMNetworkManager);
-        else return new DiskDataStore(mRealmManager, entityDataMapper);
+            return new CloudDataStore(new RestApiImpl(), mDataBaseManager, entityDataMapper, mGCMNetworkManager);
+        else return new DiskDataStore(mDataBaseManager, entityDataMapper);
     }
 
     /**
@@ -53,11 +53,11 @@ public class DataStoreFactory {
     @NonNull
     public DataStore dynamically(@NonNull String url, String idColumnName, int id, EntityMapper entityDataMapper,
                                  Class dataClass) {
-        if (url.isEmpty() && (mRealmManager.isItemValid(id, idColumnName, dataClass) || !Utils.isNetworkAvailable(mContext)))
-            return new DiskDataStore(mRealmManager, entityDataMapper);
+        if (url.isEmpty() && (mDataBaseManager.isItemValid(id, idColumnName, dataClass) || !Utils.isNetworkAvailable(mContext)))
+            return new DiskDataStore(mDataBaseManager, entityDataMapper);
         else if (!url.isEmpty())
-            return new CloudDataStore(new RestApiImpl(), mRealmManager, entityDataMapper, mGCMNetworkManager);
-        else return new DiskDataStore(mRealmManager, entityDataMapper);
+            return new CloudDataStore(new RestApiImpl(), mDataBaseManager, entityDataMapper, mGCMNetworkManager);
+        else return new DiskDataStore(mDataBaseManager, entityDataMapper);
     }
 
     /**
@@ -65,7 +65,7 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore disk(EntityMapper entityDataMapper) {
-        return new DiskDataStore(mRealmManager, entityDataMapper);
+        return new DiskDataStore(mDataBaseManager, entityDataMapper);
     }
 
     /**
@@ -73,6 +73,6 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore cloud(EntityMapper entityDataMapper) {
-        return new CloudDataStore(new RestApiImpl(), mRealmManager, entityDataMapper, mGCMNetworkManager);
+        return new CloudDataStore(new RestApiImpl(), mDataBaseManager, entityDataMapper, mGCMNetworkManager);
     }
 }

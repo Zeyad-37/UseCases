@@ -1103,7 +1103,8 @@ public class GeneralRealmManagerImplTest {
 
     @NonNull
     private RealmManager getGeneralRealmManager() {
-        return (RealmManager) DatabaseManagerFactory.getInstance(getContext());
+        DatabaseManagerFactory.initRealm(getContext());
+        return (RealmManager) DatabaseManagerFactory.getInstance();
     }
 
     private Context getContext() {

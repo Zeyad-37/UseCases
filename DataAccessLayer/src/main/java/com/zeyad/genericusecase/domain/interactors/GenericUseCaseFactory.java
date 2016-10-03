@@ -1,6 +1,7 @@
 package com.zeyad.genericusecase.domain.interactors;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -19,13 +20,50 @@ public class GenericUseCaseFactory {
         return sGenericUseCase;
     }
 
+//    /**
+//     * initializes the Generic Use Case with given context without a DB option.
+//     *
+//     * @param context context of activity/application
+//     */
+//    public static void initWithoutDB(@NonNull Context context) {
+//        Config.init(context);
+//        Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
+//        ApiConnectionFactory.init();
+//        GenericUseCase.initWithoutDB(new EntityMapperUtil() {
+//            @NonNull
+//            @Override
+//            public EntityMapper getDataMapper(Class dataClass) {
+//                return new EntityDataMapper();
+//            }
+//        });
+//        sGenericUseCase = GenericUseCase.getInstance();
+//    }
+
     /**
-     * initializes the Generic Use Case with given context.
+     * initializes the Generic Use Case with Realm given context.
      *
      * @param context      context of activity/application
      * @param entityMapper
      */
-    public static void init(@NonNull Context context, @Nullable IEntityMapperUtil entityMapper) {
+    public static void initWithRealm(@NonNull Context context, @Nullable IEntityMapperUtil entityMapper) {
+        initCore(context, null, entityMapper);
+        sGenericUseCase = GenericUseCase.getInstance();
+    }
+
+    /**
+     * initializes the Generic Use Case with SQLBrite given context.
+     *
+     * @param context      context of application
+     * @param entityMapper
+     */
+    public static void initWithSQLBrite(@NonNull Context context, @NonNull SQLiteOpenHelper sqLiteOpenHelper,
+                                        @Nullable IEntityMapperUtil entityMapper) {
+        initCore(context, sqLiteOpenHelper, entityMapper);
+        sGenericUseCase = GenericUseCase.getInstance();
+    }
+
+    static void initCore(@NonNull Context context, SQLiteOpenHelper sqLiteOpenHelper,
+                         @Nullable IEntityMapperUtil entityMapper) {
         Config.init(context);
         Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
         ApiConnectionFactory.init();
@@ -37,31 +75,14 @@ public class GenericUseCaseFactory {
                     return new EntityDataMapper();
                 }
             };
-        GenericUseCase.init(context, entityMapper);
-        sGenericUseCase = GenericUseCase.getInstance();
+        if (sqLiteOpenHelper == null)
+            GenericUseCase.initWithRealm(entityMapper);
+        else
+            GenericUseCase.initWithSQLBrite(sqLiteOpenHelper, entityMapper);
     }
 
     /**
-     * initializes the Generic Use Case with given context.
-     *
-     * @param context context of activity/application
-     */
-    public static void init(@NonNull Context context) {
-        Config.init(context);
-        Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
-        ApiConnectionFactory.init();
-        GenericUseCase.init(context, new EntityMapperUtil() {
-            @NonNull
-            @Override
-            public EntityMapper getDataMapper(Class dataClass) {
-                return new EntityDataMapper();
-            }
-        });
-        sGenericUseCase = GenericUseCase.getInstance();
-    }
-
-    /**
-     * This method is meant for test purposes only. Use other versions of init for production code.
+     * This method is meant for test purposes only. Use other versions of initRealm for production code.
      *
      * @param genericUseCase mocked generic use(expected) or any IGenericUseCase implementation
      */

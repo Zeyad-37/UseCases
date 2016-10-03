@@ -47,8 +47,7 @@ public class SQLBriteManager implements DataBaseManager {
 
     static DataBaseManager getInstance() {
         if (sInstance == null)
-            throw new NullPointerException("Instance have not been initialized yet. " +
-                    "Please call init first or getInstance with context as an argument");
+            throw new NullPointerException("Instance have not been initialized yet. Please call initRealm first or getInstance with context as an argument");
         return sInstance;
     }
 
@@ -63,6 +62,18 @@ public class SQLBriteManager implements DataBaseManager {
     @Override
     public Observable getAll(Class clazz) {
         return mBDb.createQuery(clazz.getSimpleName(), "Select * From " + clazz.getSimpleName());
+    }
+
+    @NonNull
+    @Override
+    public Observable getWhere(@NonNull Class clazz, @NonNull String query, @Nullable String filterKey) {
+        return mBDb.createQuery(clazz.getSimpleName(), query, filterKey);
+    }
+
+    @NonNull
+    @Override
+    public Observable<List<?>> getWhere(RealmQuery realmQuery) {
+        return Observable.error(new IllegalStateException("This is not Realm's realm"));
     }
 
     @NonNull
@@ -85,10 +96,11 @@ public class SQLBriteManager implements DataBaseManager {
 
     @Override
     public Observable<?> put(ContentValues contentValues, Class dataClass) {
-        writeToPreferences(System.currentTimeMillis(), DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
-                + dataClass.getSimpleName(), "putContentValues");
-        return Observable.defer(() -> Observable.just(mBDb.insert(dataClass.getSimpleName(),
-                new ContentValues())));
+        return Observable.defer(() -> {
+            writeToPreferences(System.currentTimeMillis(), DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
+                    + dataClass.getSimpleName(), "putContentValues");
+            return Observable.just(mBDb.insert(dataClass.getSimpleName(), contentValues));
+        });
     }
 
     @Override
@@ -99,8 +111,8 @@ public class SQLBriteManager implements DataBaseManager {
     @Override
     public void putAll(ContentValues[] contentValues, Class dataClass) {
         Observable result = Observable.empty();
-        for (int i = 0, contentValuesLength = contentValues.length; i < contentValuesLength; i++)
-            result.concatWith(put(contentValues[i], dataClass));
+        for (ContentValues contentValue : contentValues)
+            result.concatWith(put(contentValue, dataClass));
         result.subscribe(new Subscriber() {
             @Override
             public void onCompleted() {
@@ -143,9 +155,11 @@ public class SQLBriteManager implements DataBaseManager {
     @NonNull
     @Override
     public Observable evictAll(Class clazz) {
-        writeToPreferences(System.currentTimeMillis(), DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
-                + clazz.getSimpleName(), "evictAll");
-        return Observable.defer(() -> Observable.just(mBDb.delete(clazz.getSimpleName(), "")));
+        return Observable.defer(() -> {
+            writeToPreferences(System.currentTimeMillis(), DataBaseManager.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE
+                    + clazz.getSimpleName(), "evictAll");
+            return Observable.just(mBDb.delete(clazz.getSimpleName(), ""));
+        });
     }
 
     @Override
@@ -155,10 +169,12 @@ public class SQLBriteManager implements DataBaseManager {
 
     @Override
     public boolean evictById(Class clazz, String idFieldName, long idFieldValue) {
-        writeToPreferences(System.currentTimeMillis(), DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
-                + clazz.getSimpleName(), "evictById");
-        return Observable.defer(() -> Observable.just(mBDb.delete(clazz.getSimpleName(), "")))
-                .toBlocking().first() > 0;
+        return Observable.defer(() -> {
+            writeToPreferences(System.currentTimeMillis(), DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
+                    + clazz.getSimpleName(), "evictById");
+            return Observable.just(mBDb.delete(clazz.getSimpleName(), "Where " + idFieldName + " = ?",
+                    String.valueOf(idFieldValue)));
+        }).toBlocking().first() > 0;
     }
 
     @NonNull
@@ -175,24 +191,12 @@ public class SQLBriteManager implements DataBaseManager {
         return Config.getInstance().getContext();
     }
 
-    @NonNull
-    @Override
-    public Observable getWhere(@NonNull Class clazz, @NonNull String query, @Nullable String filterKey) {
-        return mBDb.createQuery(clazz.getSimpleName(), query);
-    }
-
-    @NonNull
-    @Override
-    public Observable<List<?>> getWhere(RealmQuery realmQuery) {
-        return Observable.error(new IllegalStateException("This is not Realm's realm"));
-    }
-
     /**
      * Get a value from a user preferences file.
      *
      * @return A long representing the value retrieved from the preferences file.
      */
-    long getFromPreferences(String destination) {
+    private long getFromPreferences(String destination) {
         return Config.getInstance().getContext().getSharedPreferences(Config.getInstance().getPrefFileName(),
                 Context.MODE_PRIVATE).getLong(destination, 0);
     }
@@ -203,7 +207,7 @@ public class SQLBriteManager implements DataBaseManager {
      * @param value  A long representing the value to be inserted.
      * @param source which method is making this call
      */
-    void writeToPreferences(long value, String destination, String source) {
+    private void writeToPreferences(long value, String destination, String source) {
         SharedPreferences.Editor editor = getContext().getSharedPreferences(Config.getInstance().getPrefFileName(),
                 Context.MODE_PRIVATE).edit();
         if (editor == null)

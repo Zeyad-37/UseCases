@@ -19,7 +19,7 @@ import rx.Observable;
 public class DiskDataStore implements DataStore {
 
     public final String TAG = com.zeyad.genericusecase.data.repository.generalstore.DiskDataStore.class.getName();
-    private DataBaseManager mRealmManager;
+    private DataBaseManager mDataBaseManager;
     private EntityMapper mEntityDataMapper;
 
     /**
@@ -28,7 +28,7 @@ public class DiskDataStore implements DataStore {
      * @param realmManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
     public DiskDataStore(DataBaseManager realmManager, EntityMapper entityDataMapper) {
-        mRealmManager = realmManager;
+        mDataBaseManager = realmManager;
         mEntityDataMapper = entityDataMapper;
     }
 
@@ -36,30 +36,30 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<List> dynamicGetList(String url, Class domainClass, Class dataClass, boolean persist,
                                            boolean shouldCache) {
-        return mRealmManager.getAll(dataClass)
+        return mDataBaseManager.getAll(dataClass)
                 .map(realmModels -> mEntityDataMapper.transformAllToDomain(realmModels))
-                .compose(Utils.logSources(TAG, mRealmManager));
+                .compose(Utils.logSources(TAG, mDataBaseManager));
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicGetObject(String url, String idColumnName, int itemId, Class domainClass,
                                           Class dataClass, boolean persist, boolean shouldCache) {
-        return mRealmManager.getById(idColumnName, itemId, dataClass)
+        return mDataBaseManager.getById(idColumnName, itemId, dataClass)
                 .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel));
     }
 
     @NonNull
     @Override
     public Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass) {
-        return mRealmManager.getWhere(dataClass, query, column)
+        return mDataBaseManager.getWhere(dataClass, query, column)
                 .map(realmModel -> mEntityDataMapper.transformAllToDomain(realmModel));
     }
 
     @NonNull
     @Override
     public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
-        return mRealmManager.getWhere(query)
+        return mDataBaseManager.getWhere(query)
                 .map(realmModel -> mEntityDataMapper.transformAllToDomain(realmModel));
     }
 
@@ -73,28 +73,28 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<?> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
                                                  Class dataClass, boolean persist) {
-        return Observable.defer(() -> mRealmManager.evictCollection(idColumnName,
+        return Observable.defer(() -> mDataBaseManager.evictCollection(idColumnName,
                 ModelConverters.convertToListOfId(jsonArray), dataClass));
     }
 
     @NonNull
     @Override
     public Observable<Boolean> dynamicDeleteAll(String url, Class dataClass, boolean persist) {
-        return mRealmManager.evictAll(dataClass);
+        return mDataBaseManager.evictAll(dataClass);
     }
 
     @NonNull
     @Override
-    public Observable<?> dynamicPostObject(String url, String idColumnName, JSONObject keyValuePairs,
+    public Observable<?> dynamicPostObject(String url, String idColumnName, JSONObject jsonObject,
                                            Class domainClass, Class dataClass, boolean persist) {
-        return Observable.defer(() -> mRealmManager.put(keyValuePairs, idColumnName, dataClass));
+        return Observable.defer(() -> mDataBaseManager.put(jsonObject, idColumnName, dataClass));
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicPutObject(String url, String idColumnName, JSONObject jsonObject,
                                           Class domainClass, Class dataClass, boolean persist) {
-        return Observable.defer(() -> mRealmManager.put(jsonObject, idColumnName, dataClass));
+        return Observable.defer(() -> mDataBaseManager.put(jsonObject, idColumnName, dataClass));
     }
 
     @NonNull
@@ -108,13 +108,13 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<?> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
                                          Class domainClass, Class dataClass, boolean persist) {
-        return Observable.defer(() -> mRealmManager.putAll(jsonArray, idColumnName, dataClass));
+        return Observable.defer(() -> mDataBaseManager.putAll(jsonArray, idColumnName, dataClass));
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
                                         Class domainClass, Class dataClass, boolean persist) {
-        return Observable.defer(() -> mRealmManager.putAll(jsonArray, idColumnName, dataClass));
+        return Observable.defer(() -> mDataBaseManager.putAll(jsonArray, idColumnName, dataClass));
     }
 }

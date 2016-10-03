@@ -86,7 +86,7 @@ class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnect
 
     static IApiConnection getInstance() {
         if (sInstance == null)
-            throw new NullPointerException("init should be called atleast once before calling getInstance");
+            throw new NullPointerException("init should be called at least once before calling getInstance");
         return sInstance;
     }
 

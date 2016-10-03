@@ -1,12 +1,12 @@
 package com.zeyad.genericusecase.domain.interactors;
 
 import android.content.Context;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.zeyad.genericusecase.Config;
 import com.zeyad.genericusecase.UIThread;
-import com.zeyad.genericusecase.data.db.DataBaseManager;
 import com.zeyad.genericusecase.data.db.DatabaseManagerFactory;
 import com.zeyad.genericusecase.data.executor.JobExecutor;
 import com.zeyad.genericusecase.data.repository.DataRepository;
@@ -61,20 +61,43 @@ public class GenericUseCase implements IGenericUseCase {
      * This function should not be called multiple times, but only when required.
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
-     *
-     * @param context context of application or instrumentation(testing only)
      */
-    public static void init(Context context, IEntityMapperUtil entityMapper) {
-        DatabaseManagerFactory.init(context);
-        final DataBaseManager dataBaseManager = DatabaseManagerFactory.getInstance();
-        final DataStoreFactory dataStoreFactory = new DataStoreFactory(dataBaseManager, context);
-        final DataRepository repository = new DataRepository(dataStoreFactory, entityMapper);
-        final JobExecutor threadExecutor = new JobExecutor();
-        final UIThread postExecutionThread = new UIThread();
-        sGenericUseCase = new GenericUseCase(repository, threadExecutor, postExecutionThread);
+    public static void initWithoutDB(IEntityMapperUtil entityMapper) {
+        Context context = Config.getInstance().getContext();
+        sGenericUseCase = new GenericUseCase(new DataRepository(new DataStoreFactory(null, context),
+                entityMapper), new JobExecutor(), new UIThread());
     }
 
     /**
+     * This function should be called at-least once before calling getInstance() method
+     * This function should not be called multiple times, but only when required.
+     * Ideally this function should be called once when application  is started or created.
+     * This function may be called n number of times if required, during mocking and testing.
+     */
+    public static void initWithRealm(IEntityMapperUtil entityMapper) {
+        Context context = Config.getInstance().getContext();
+        DatabaseManagerFactory.initRealm(context);
+        sGenericUseCase = new GenericUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
+                .getInstance(), context), entityMapper), new JobExecutor(), new UIThread());
+    }
+
+    /**
+     * This function should be called at-least once before calling getInstance() method
+     * This function should not be called multiple times, but only when required.
+     * Ideally this function should be called once when application  is started or created.
+     * This function may be called n number of times if required, during mocking and testing.
+     *
+     * @param sqLiteOpenHelper
+     */
+    public static void initWithSQLBrite(SQLiteOpenHelper sqLiteOpenHelper, IEntityMapperUtil entityMapper) {
+        DatabaseManagerFactory.initSQLBrite(sqLiteOpenHelper);
+        sGenericUseCase = new GenericUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
+                .getInstance(), Config.getInstance().getContext()), entityMapper), new JobExecutor(),
+                new UIThread());
+    }
+
+    /**
+     * Testing only!
      * This function should be called at-least once before calling getInstance() method
      * This function should not be called multiple times, but only when required.
      * Ideally this function should be called once when application  is started or created.
@@ -90,7 +113,7 @@ public class GenericUseCase implements IGenericUseCase {
 
     public static GenericUseCase getInstance() {
         if (sGenericUseCase == null)
-            throw new NullPointerException("GenericUseCase#init must be called before calling getInstance()");
+            throw new NullPointerException("GenericUseCase#initRealm must be called before calling getInstance()");
         return sGenericUseCase;
     }
 

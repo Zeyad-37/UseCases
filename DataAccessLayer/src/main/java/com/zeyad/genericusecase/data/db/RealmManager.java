@@ -54,15 +54,9 @@ public class RealmManager implements DataBaseManager {
         sInstance = new RealmManager(context);
     }
 
-    static DataBaseManager getInstance(Context context) {
-        if (sInstance == null)
-            init(context);
-        return sInstance;
-    }
-
     static DataBaseManager getInstance() {
         if (sInstance == null)
-            throw new NullPointerException("Instance have not been initialized yet.Please call init first or getInstance with context as an argument");
+            throw new NullPointerException("Instance have not been initialized yet.Please call initRealm first or getInstance with context as an argument");
         return sInstance;
     }
 

@@ -5,10 +5,12 @@ import android.support.annotation.NonNull;
 
 public class Config {
 
+    public static final int REALM = 0, SQLBRITE = 1;
     private static Config sInstance;
     private Context mContext;
     private String mPrefFileName;
     private boolean mUseApiWithCache;
+    private int mDBType;
 
     private Config(@NonNull Context context) {
         mContext = context;
@@ -17,7 +19,7 @@ public class Config {
 
     public static Config getInstance() {
         if (sInstance == null)
-            throw new NullPointerException("init must be called before");
+            throw new NullPointerException("initRealm must be called before");
         return sInstance;
     }
 
@@ -52,5 +54,13 @@ public class Config {
 
     public void setPrefFileName(String prefFileName) {
         mPrefFileName = prefFileName;
+    }
+
+    public int getDBType() {
+        return mDBType;
+    }
+
+    public void setDBType(int dBType) {
+        mDBType = dBType;
     }
 }

@@ -2,7 +2,6 @@ package com.zeyad.generic.usecase.dataaccesslayer.components;
 
 import android.content.Context;
 
-import com.zeyad.genericusecase.data.exceptions.DataNotFoundException;
 import com.zeyad.genericusecase.data.exceptions.NetworkConnectionException;
 
 import org.json.JSONException;
@@ -36,8 +35,6 @@ public class ErrorMessageFactory {
         if (exception instanceof NetworkConnectionException)
             message = "";
         else if (exception instanceof UnknownHostException)
-            message = "";
-        else if (exception instanceof DataNotFoundException)
             message = "";
         else if (exception instanceof HttpException) {
             try {

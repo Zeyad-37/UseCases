@@ -49,10 +49,9 @@ public class DiskDataStoreTest {
     public void setUp() throws Exception {
         Config.init(InstrumentationRegistry.getTargetContext());
         TestUtility.performInitialSetupOfDb(InstrumentationRegistry.getTargetContext());
-        final DataBaseManager dbManager
-                = DatabaseManagerFactory.getInstance(InstrumentationRegistry.getContext());
-        final TestModelViewModelMapper enitityMapper
-                = new TestModelViewModelMapper();
+        DatabaseManagerFactory.initRealm(InstrumentationRegistry.getContext());
+        final DataBaseManager dbManager = DatabaseManagerFactory.getInstance();
+        final TestModelViewModelMapper enitityMapper = new TestModelViewModelMapper();
         mDiskDataStoreRobot = DiskDataStoreRobot.newInstance(dbManager, enitityMapper);
         mDiskDataStore = mDiskDataStoreRobot.createDiskDataStore();
     }
