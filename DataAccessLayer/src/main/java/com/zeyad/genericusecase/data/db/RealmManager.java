@@ -189,8 +189,8 @@ public class RealmManager implements DataBaseManager {
     }
 
     @Override
-    public void putAll(ContentValues[] contentValues, Class dataClass) {
-        throw new IllegalStateException("This is not SQLBrite");
+    public Observable putAll(ContentValues[] contentValues, Class dataClass) {
+        return Observable.error(new IllegalStateException("This is not SQLBrite"));
     }
 
     @NonNull

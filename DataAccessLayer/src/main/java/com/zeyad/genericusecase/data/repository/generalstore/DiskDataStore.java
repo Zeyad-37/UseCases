@@ -1,5 +1,6 @@
 package com.zeyad.genericusecase.data.repository.generalstore;
 
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
 import com.zeyad.genericusecase.data.db.DataBaseManager;
@@ -79,7 +80,7 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Boolean> dynamicDeleteAll(String url, Class dataClass, boolean persist) {
+    public Observable<?> dynamicDeleteAll(String url, Class dataClass, boolean persist) {
         return mDataBaseManager.evictAll(dataClass);
     }
 
@@ -92,9 +93,23 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
+    public Observable<?> dynamicPostObject(String url, String idColumnName, ContentValues contentValues,
+                                           Class domainClass, Class dataClass, boolean persist) {
+        return Observable.defer(() -> mDataBaseManager.put(contentValues, dataClass));
+    }
+
+    @NonNull
+    @Override
     public Observable<?> dynamicPutObject(String url, String idColumnName, JSONObject jsonObject,
                                           Class domainClass, Class dataClass, boolean persist) {
         return Observable.defer(() -> mDataBaseManager.put(jsonObject, idColumnName, dataClass));
+    }
+
+    @NonNull
+    @Override
+    public Observable<?> dynamicPutObject(String url, String idColumnName, ContentValues contentValues,
+                                          Class domainClass, Class dataClass, boolean persist) {
+        return Observable.defer(() -> mDataBaseManager.put(contentValues, dataClass));
     }
 
     @NonNull
@@ -113,8 +128,22 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
+    public Observable<?> dynamicPostList(String url, String idColumnName, ContentValues[] contentValues,
+                                         Class domainClass, Class dataClass, boolean persist) {
+        return Observable.defer(() -> mDataBaseManager.putAll(contentValues, dataClass));
+    }
+
+    @NonNull
+    @Override
     public Observable<?> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
                                         Class domainClass, Class dataClass, boolean persist) {
         return Observable.defer(() -> mDataBaseManager.putAll(jsonArray, idColumnName, dataClass));
+    }
+
+    @NonNull
+    @Override
+    public Observable<?> dynamicPutList(String url, String idColumnName, ContentValues[] contentValues,
+                                        Class domainClass, Class dataClass, boolean persist) {
+        return Observable.defer(() -> mDataBaseManager.putAll(contentValues, dataClass));
     }
 }

@@ -1,5 +1,6 @@
 package com.zeyad.genericusecase.data.repository;
 
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -74,10 +75,26 @@ public class DataRepository implements Repository {
 
     @NonNull
     @Override
+    public Observable<?> postObjectDynamically(@NonNull String url, String idColumnName, ContentValues contentValues,
+                                               Class domainClass, @NonNull Class dataClass, boolean persist) {
+        return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass), dataClass)
+                .dynamicPostObject(url, idColumnName, contentValues, domainClass, dataClass, persist);
+    }
+
+    @NonNull
+    @Override
     public Observable<?> postListDynamically(@NonNull String url, String idColumnName, JSONArray jsonArray,
                                              Class domainClass, @NonNull Class dataClass, boolean persist) {
         return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass), dataClass)
                 .dynamicPostList(url, idColumnName, jsonArray, domainClass, dataClass, persist);
+    }
+
+    @NonNull
+    @Override
+    public Observable<?> postListDynamically(@NonNull String url, String idColumnName, ContentValues[] contentValues,
+                                             Class domainClass, @NonNull Class dataClass, boolean persist) {
+        return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass), dataClass)
+                .dynamicPostList(url, idColumnName, contentValues, domainClass, dataClass, persist);
     }
 
     @NonNull
@@ -127,6 +144,14 @@ public class DataRepository implements Repository {
 
     @NonNull
     @Override
+    public Observable<?> putObjectDynamically(@NonNull String url, String idColumnName, ContentValues contentValues,
+                                              Class domainClass, @NonNull Class dataClass, boolean persist) {
+        return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass), dataClass)
+                .dynamicPutObject(url, idColumnName, contentValues, domainClass, dataClass, persist);
+    }
+
+    @NonNull
+    @Override
     public Observable<?> putListDynamically(@NonNull String url, String idColumnName, JSONArray jsonArray,
                                             Class domainClass, @NonNull Class dataClass, boolean persist) {
         return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass), dataClass)
@@ -135,7 +160,15 @@ public class DataRepository implements Repository {
 
     @NonNull
     @Override
-    public Observable<Boolean> deleteAllDynamically(@NonNull String url, @NonNull Class dataClass, boolean persist) {
+    public Observable<?> putListDynamically(@NonNull String url, String idColumnName, ContentValues[] contentValues,
+                                            Class domainClass, @NonNull Class dataClass, boolean persist) {
+        return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass), dataClass)
+                .dynamicPutList(url, idColumnName, contentValues, domainClass, dataClass, persist);
+    }
+
+    @NonNull
+    @Override
+    public Observable<?> deleteAllDynamically(@NonNull String url, @NonNull Class dataClass, boolean persist) {
         return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass), dataClass)
                 .dynamicDeleteAll(url, dataClass, persist);
     }

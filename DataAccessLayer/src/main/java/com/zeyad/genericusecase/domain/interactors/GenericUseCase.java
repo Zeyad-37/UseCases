@@ -22,7 +22,6 @@ import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 import com.zeyad.genericusecase.domain.repository.Repository;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -146,24 +145,34 @@ public class GenericUseCase implements IGenericUseCase {
 
     @Override
     public Observable postObject(@NonNull PostRequest postRequest) {
-        JSONObject jsonObject = null;
-        if (postRequest.getKeyValuePairs() != null) {
-            jsonObject = ModelConverters.convertToJsonObject(postRequest.getKeyValuePairs());
-        } else if (postRequest.getJsonObject() != null)
-            jsonObject = postRequest.getJsonObject();
-        if (jsonObject != null)
-            return mRepository.postObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(), jsonObject,
-                    postRequest.getPresentationClass(), postRequest.getDataClass(), postRequest.isPersist())
-                    .compose(applySchedulers());
+        if (postRequest.getObjectBundle() != null)
+            return mRepository.postObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
+                    postRequest.getObjectBundle(), postRequest.getPresentationClass(), postRequest.getDataClass(),
+                    postRequest.isPersist()).compose(applySchedulers());
+        else if (postRequest.getContentValue() != null)
+            return mRepository.postObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
+                    postRequest.getContentValue(), postRequest.getPresentationClass(), postRequest.getDataClass(),
+                    postRequest.isPersist()).compose(applySchedulers());
         else
-            return Observable.defer(() -> Observable.error(new Exception("payload is null!")));
+            return Observable.defer(() -> Observable.error(new IllegalArgumentException("Payload is null!")));
     }
 
     @Override
     public Observable postList(@NonNull PostRequest postRequest) {
-        return mRepository.postListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                postRequest.getJsonArray(), postRequest.getPresentationClass(), postRequest.getDataClass(),
-                postRequest.isPersist()).compose(applySchedulers());
+        JSONArray jsonArray = null;
+        if (postRequest.getKeyValuePairs() != null)
+            jsonArray = ModelConverters.convertToJsonArray(postRequest.getKeyValuePairs());
+        else if (postRequest.getJsonArray() != null)
+            jsonArray = postRequest.getJsonArray();
+        if (jsonArray != null)
+            return mRepository.postListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
+                    jsonArray, postRequest.getPresentationClass(), postRequest.getDataClass(),
+                    postRequest.isPersist()).compose(applySchedulers());
+        else if (postRequest.getContentValues() != null)
+            return mRepository.postListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
+                    postRequest.getContentValues(), postRequest.getPresentationClass(), postRequest.getDataClass(),
+                    postRequest.isPersist()).compose(applySchedulers());
+        else return Observable.error(new IllegalArgumentException("Payload is null"));
     }
 
     /**
@@ -173,10 +182,15 @@ public class GenericUseCase implements IGenericUseCase {
      */
     @Override
     public Observable putObject(@NonNull PostRequest postRequest) {
-        return mRepository.putObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                ModelConverters.convertToJsonObject(postRequest.getKeyValuePairs()),
-                postRequest.getPresentationClass(), postRequest.getDataClass(), postRequest.isPersist())
-                .compose(applySchedulers());
+        if (postRequest.getObjectBundle() != null)
+            return mRepository.putObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
+                    postRequest.getObjectBundle(), postRequest.getPresentationClass(),
+                    postRequest.getDataClass(), postRequest.isPersist()).compose(applySchedulers());
+        else if (postRequest.getContentValue() != null)
+            return mRepository.putObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
+                    postRequest.getContentValue(), postRequest.getPresentationClass(), postRequest.getDataClass(),
+                    postRequest.isPersist()).compose(applySchedulers());
+        else return Observable.error(new IllegalArgumentException("Payload is null"));
     }
 
     /**
@@ -192,10 +206,13 @@ public class GenericUseCase implements IGenericUseCase {
         if (jsonArray != null)
             return mRepository.putListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
                     jsonArray, postRequest.getPresentationClass(), postRequest.getDataClass(),
-                    postRequest.isPersist())
-                    .compose(applySchedulers());
+                    postRequest.isPersist()).compose(applySchedulers());
+        else if (postRequest.getContentValues() != null)
+            return mRepository.putListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
+                    postRequest.getContentValues(), postRequest.getPresentationClass(),
+                    postRequest.getDataClass(), postRequest.isPersist()).compose(applySchedulers());
         else
-            return Observable.error(new Exception("Missing Payload!"));
+            return Observable.error(new IllegalArgumentException("Missing Payload!"));
     }
 
     @Override
@@ -212,7 +229,7 @@ public class GenericUseCase implements IGenericUseCase {
      * @param postRequest The guy who will be listen to the observable build with .
      */
     @Override
-    public Observable<Boolean> deleteAll(@NonNull PostRequest postRequest) {
+    public Observable<?> deleteAll(@NonNull PostRequest postRequest) {
         return mRepository.deleteAllDynamically(postRequest.getUrl(), postRequest.getDataClass(), postRequest.isPersist())
                 .compose(applySchedulers());
     }

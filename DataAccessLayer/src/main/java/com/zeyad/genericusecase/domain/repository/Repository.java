@@ -1,5 +1,6 @@
 package com.zeyad.genericusecase.domain.repository;
 
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
 import org.json.JSONArray;
@@ -38,8 +39,16 @@ public interface Repository {
                                         Class domainClass, Class dataClass, boolean persist);
 
     @NonNull
+    Observable<?> postObjectDynamically(@NonNull String url, String idColumnName, ContentValues contentValues,
+                                        Class domainClass, @NonNull Class dataClass, boolean persist);
+
+    @NonNull
     Observable<?> postListDynamically(String url, String idColumnName, JSONArray jsonArray,
                                       Class domainClass, Class dataClass, boolean persist);
+
+    @NonNull
+    Observable<?> postListDynamically(@NonNull String url, String idColumnName, ContentValues[] contentValues,
+                                      Class domainClass, @NonNull Class dataClass, boolean persist);
 
     @NonNull
     Observable<?> deleteListDynamically(String url, JSONArray jsonArray, Class domainClass,
@@ -50,11 +59,19 @@ public interface Repository {
                                        Class domainClass, Class dataClass, boolean persist);
 
     @NonNull
+    Observable<?> putObjectDynamically(@NonNull String url, String idColumnName, ContentValues contentValues,
+                                       Class domainClass, @NonNull Class dataClass, boolean persist);
+
+    @NonNull
     Observable<?> putListDynamically(String url, String idColumnName, JSONArray jsonArray,
                                      Class domainClass, Class dataClass, boolean persist);
 
     @NonNull
-    Observable<Boolean> deleteAllDynamically(String url, Class dataClass, boolean persist);
+    Observable<?> putListDynamically(@NonNull String url, String idColumnName, ContentValues[] contentValues,
+                                     Class domainClass, @NonNull Class dataClass, boolean persist);
+
+    @NonNull
+    Observable<?> deleteAllDynamically(String url, Class dataClass, boolean persist);
 
     @NonNull
     Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass);

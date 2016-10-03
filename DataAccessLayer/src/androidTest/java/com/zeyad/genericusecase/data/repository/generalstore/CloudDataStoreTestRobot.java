@@ -45,6 +45,7 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.observers.TestSubscriber;
 
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 
@@ -184,12 +185,7 @@ class CloudDataStoreTestRobot {
     static DataBaseManager createDBManagerWithMockedContext() {
         final Observable<List<?>> LIST_OBSERVABLE = getListObservable();
         final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
-        final Observable<Boolean> TRUE_OBSERVABLE = Observable.create(new Observable.OnSubscribe<Boolean>() {
-            @Override
-            public void call(@NonNull Subscriber<? super Boolean> subscriber) {
-                subscriber.onNext(true);
-            }
-        });
+        final Observable<Object> TRUE_OBSERVABLE = Observable.create(subscriber -> subscriber.onNext(true));
         final DataBaseManager dbManagerWithMockedContext
                 = GeneralRealmManagerImplUtils.createDBManagerWithMockedContext(getMockedContext());
         Mockito.when(dbManagerWithMockedContext.getAll(Mockito.any())).thenReturn(LIST_OBSERVABLE);
@@ -203,8 +199,7 @@ class CloudDataStoreTestRobot {
         Mockito.when(dbManagerWithMockedContext.isCached(Mockito.anyInt(), Mockito.anyString(), Mockito.any())).thenReturn(true);
         Mockito.when(dbManagerWithMockedContext.isItemValid(Mockito.anyInt(), Mockito.anyString(), Mockito.any())).thenReturn(true);
         Mockito.when(dbManagerWithMockedContext.areItemsValid(Mockito.anyString())).thenReturn(true);
-        Mockito.when(dbManagerWithMockedContext.evictAll(Mockito.any()))
-                .thenReturn(TRUE_OBSERVABLE);
+        Mockito.when(dbManagerWithMockedContext.evictAll(Mockito.any())).thenReturn(any()); // was TRUE_OBSERVABLE
         Mockito.doNothing()
                 .when(dbManagerWithMockedContext).evict(Mockito.any(), Mockito.any());
         Mockito.when(dbManagerWithMockedContext.evictById(Mockito.any(), Mockito.anyString(), Mockito.anyLong()))

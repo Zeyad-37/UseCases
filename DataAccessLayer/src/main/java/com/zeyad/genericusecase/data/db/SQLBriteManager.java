@@ -21,13 +21,12 @@ import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import rx.Observable;
-import rx.Subscriber;
 import rx.schedulers.Schedulers;
 
 /**
  * @author by ZIaDo on 10/2/16.
  */
-public class SQLBriteManager implements DataBaseManager {
+class SQLBriteManager implements DataBaseManager {
 
     private static DataBaseManager sInstance;
     private final String TAG = SQLBriteManager.class.getName();
@@ -108,26 +107,13 @@ public class SQLBriteManager implements DataBaseManager {
         throw new IllegalStateException("This is not Realm's realm");
     }
 
+    @NonNull
     @Override
-    public void putAll(ContentValues[] contentValues, Class dataClass) {
+    public Observable putAll(ContentValues[] contentValues, Class dataClass) {
         Observable result = Observable.empty();
         for (ContentValues contentValue : contentValues)
             result.concatWith(put(contentValue, dataClass));
-        result.subscribe(new Subscriber() {
-            @Override
-            public void onCompleted() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onNext(Object o) {
-
-            }
-        });
+        return result;
     }
 
     @NonNull

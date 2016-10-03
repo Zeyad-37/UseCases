@@ -13,34 +13,34 @@ import rx.Observable;
 public interface IGenericUseCase {
 
     @SuppressWarnings("unchecked")
-    Observable getList(@NonNull GetListRequest genericUseCaseRequest);
+    Observable<?> getList(@NonNull GetListRequest genericUseCaseRequest);
 
     @SuppressWarnings("unchecked")
-    Observable getObject(@NonNull GetObjectRequest getObjectRequest);
+    Observable<?> getObject(@NonNull GetObjectRequest getObjectRequest);
 
-    Observable postObject(@NonNull PostRequest postRequest);
+    Observable<?> postObject(@NonNull PostRequest postRequest);
 
-    Observable postList(@NonNull PostRequest postRequest);
-
-    @SuppressWarnings("unchecked")
-    Observable searchDisk(String query, String column, @NonNull Class presentationClass, Class dataClass);
+    Observable<?> postList(@NonNull PostRequest postRequest);
 
     @SuppressWarnings("unchecked")
-    Observable searchDisk(RealmQuery realmQuery, @NonNull Class presentationClass);
+    Observable<?> searchDisk(String query, String column, @NonNull Class presentationClass, Class dataClass);
 
-    Observable deleteCollection(@NonNull PostRequest deleteRequest);
+    @SuppressWarnings("unchecked")
+    Observable<?> searchDisk(RealmQuery realmQuery, @NonNull Class presentationClass);
 
-    Observable putObject(@NonNull PostRequest postRequest);
+    Observable<?> deleteCollection(@NonNull PostRequest deleteRequest);
 
-    Observable uploadFile(@NonNull FileIORequest fileIORequest);
+    Observable<?> putObject(@NonNull PostRequest postRequest);
 
-    Observable downloadFile(@NonNull FileIORequest fileIORequest);
+    Observable<?> uploadFile(@NonNull FileIORequest fileIORequest);
 
-    Observable putList(@NonNull PostRequest postRequest);
+    Observable<?> downloadFile(@NonNull FileIORequest fileIORequest);
 
-    Observable<Boolean> deleteAll(@NonNull PostRequest postRequest);
+    Observable<?> putList(@NonNull PostRequest postRequest);
 
-    Observable readFromResource(String filePath);
+    Observable<?> deleteAll(@NonNull PostRequest postRequest);
+
+    Observable<?> readFromResource(String filePath);
 
     @NonNull
     Observable<String> readFromFile(String fullFilePath);

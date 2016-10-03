@@ -57,7 +57,8 @@ public interface DataBaseManager {
      */
     void putAll(List<RealmObject> realmModels, Class dataClass);
 
-    void putAll(ContentValues[] contentValues, Class dataClass);
+    @NonNull
+    Observable<?> putAll(ContentValues[] contentValues, Class dataClass);
 
     /**
      * Puts and element into the cache.
@@ -89,7 +90,7 @@ public interface DataBaseManager {
      * Evict all elements of the cache.
      */
     @NonNull
-    Observable<Boolean> evictAll(Class clazz);
+    Observable<?> evictAll(Class clazz);
 
     void evict(final RealmObject realmModel, Class clazz);
 

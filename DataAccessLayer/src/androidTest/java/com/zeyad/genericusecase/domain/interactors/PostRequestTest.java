@@ -56,11 +56,6 @@ public class PostRequestTest {
     }
 
     @Test
-    public void testGetJsonObject() throws Exception {
-        assertThat(mPostRequest.getJsonObject(), is(equalTo(PostRequestTestRobot.JSON_OBJECT)));
-    }
-
-    @Test
     public void testGetJsonArray() throws Exception {
         assertThat(mPostRequest.getJsonArray(), is(equalTo(PostRequestTestRobot.JSON_ARRAY)));
     }

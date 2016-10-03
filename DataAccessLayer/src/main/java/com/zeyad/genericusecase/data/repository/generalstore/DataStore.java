@@ -1,5 +1,6 @@
 package com.zeyad.genericusecase.data.repository.generalstore;
 
+import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
 import org.json.JSONArray;
@@ -31,14 +32,20 @@ public interface DataStore {
      * Post a JSONObject which returns an {@link Observable} that will emit a ?.
      */
     @NonNull
-    Observable<?> dynamicPostObject(final String url, String idColumnName, final JSONObject keyValuePairs, Class domainClass,
-                                    Class dataClass, boolean persist);
+    Observable<?> dynamicPostObject(final String url, String idColumnName, final JSONObject keyValuePairs,
+                                    Class domainClass, Class dataClass, boolean persist);
+
+    Observable<?> dynamicPostObject(String url, String idColumnName, ContentValues contentValues,
+                                    Class domainClass, Class dataClass, boolean persist);
 
     /**
      * Post a HashMap<String, Object> which returns an {@link Observable} that will emit a list of ?.
      */
     @NonNull
     Observable<?> dynamicPostList(final String url, String idColumnName, final JSONArray jsonArray,
+                                  Class domainClass, Class dataClass, boolean persist);
+
+    Observable<?> dynamicPostList(String url, String idColumnName, ContentValues[] contentValues,
                                   Class domainClass, Class dataClass, boolean persist);
 
     /**
@@ -49,9 +56,8 @@ public interface DataStore {
     Observable<?> dynamicPutObject(final String url, String idColumnName, final JSONObject keyValuePairs,
                                    Class domainClass, Class dataClass, boolean persist);
 
-    @NonNull
-    Observable<?> dynamicUploadFile(final String url, final File file, boolean onWifi, boolean whileCharging,
-                                    Class domainClass);
+    Observable<?> dynamicPutObject(String url, String idColumnName, ContentValues contentValues,
+                                   Class domainClass, Class dataClass, boolean persist);
 
     /**
      * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Observable}
@@ -59,6 +65,9 @@ public interface DataStore {
      */
     @NonNull
     Observable<?> dynamicPutList(final String url, String idColumnName, final JSONArray jsonArray,
+                                 Class domainClass, Class dataClass, boolean persist);
+
+    Observable<?> dynamicPutList(String url, String idColumnName, ContentValues[] contentValues,
                                  Class domainClass, Class dataClass, boolean persist);
 
     /**
@@ -73,7 +82,7 @@ public interface DataStore {
      * that will emit a list of ?.
      */
     @NonNull
-    Observable<Boolean> dynamicDeleteAll(String url, Class dataClass, boolean persist);
+    Observable<?> dynamicDeleteAll(String url, Class dataClass, boolean persist);
 
     /**
      * Search disk with a query which returns an {@link Observable} that will emit a list of ?.
@@ -89,4 +98,8 @@ public interface DataStore {
 
     @NonNull
     Observable<?> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging);
+
+    @NonNull
+    Observable<?> dynamicUploadFile(final String url, final File file, boolean onWifi, boolean whileCharging,
+                                    Class domainClass);
 }
