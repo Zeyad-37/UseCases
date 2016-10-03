@@ -60,9 +60,9 @@ public class DataRepository implements Repository {
     public Observable<?> getObjectDynamicallyById(@NonNull String url, String idColumnName, int itemId,
                                                   Class domainClass, Class dataClass, boolean persist,
                                                   boolean shouldCache) {
-        return mDataStoreFactory.dynamically(url, idColumnName, itemId, mEntityMapperUtil.getDataMapper(dataClass), dataClass)
-                .dynamicGetObject(url, idColumnName, itemId, domainClass, dataClass, persist,
-                        shouldCache);
+        return mDataStoreFactory.dynamically(url, idColumnName, itemId, mEntityMapperUtil.getDataMapper(dataClass),
+                dataClass).dynamicGetObject(url, idColumnName, itemId, domainClass, dataClass, persist,
+                shouldCache);
     }
 
     @NonNull
@@ -102,7 +102,7 @@ public class DataRepository implements Repository {
     public Observable<?> deleteListDynamically(@NonNull String url, JSONArray jsonArray,
                                                Class domainClass, @NonNull Class dataClass, boolean persist) {
         return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass), dataClass)
-                .dynamicDeleteCollection(url, com.zeyad.genericusecase.data.repository.DataRepository.DEFAULT_ID_TO_BE_REPLACED, jsonArray,
+                .dynamicDeleteCollection(url, DataRepository.DEFAULT_ID_TO_BE_REPLACED, jsonArray,
                         dataClass, persist);
     }
 
@@ -129,7 +129,8 @@ public class DataRepository implements Repository {
 
     @NonNull
     @Override
-    public Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging, Class domainClass, Class dataClass) {
+    public Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
+                                                 Class domainClass, Class dataClass) {
         return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
                 .dynamicDownloadFile(url, file, onWifi, whileCharging);
     }

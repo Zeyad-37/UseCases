@@ -9,6 +9,7 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.GsonBuilder;
 import com.zeyad.genericusecase.BuildConfig;
 import com.zeyad.genericusecase.Config;
+import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.executor.JobExecutor;
 import com.zeyad.genericusecase.data.utils.Utils;
 
@@ -58,7 +59,7 @@ class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnect
 
     private ApiConnection(@Nullable OkHttpClient.Builder okhttpBuilder, @Nullable Cache cache) {
         if (okhttpBuilder == null)
-            throw new NullPointerException("okhttp builder can not be null");
+            throw new NullPointerException(Config.getInstance().getContext().getString(R.string.builder_null));
         mRestApiWithCache = createRetro2Client(provideOkHttpClient(okhttpBuilder, cache))
                 .create(RestApi.class);
         mRestApiWithoutCache = createRetro2Client(provideOkHttpClient(okhttpBuilder, null))
@@ -86,7 +87,7 @@ class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnect
 
     static IApiConnection getInstance() {
         if (sInstance == null)
-            throw new NullPointerException("init should be called at least once before calling getInstance");
+            throw new NullPointerException(Config.getInstance().getContext().getString(R.string.api_connection_uninitialized));
         return sInstance;
     }
 
@@ -358,6 +359,6 @@ class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnect
     }
 
     private void logNoCache() {
-        Log.e("ApiConnection", "there would be no caching. Since caching module is disabled.");
+        Log.e(getClass().getSimpleName(), Config.getInstance().getContext().getString(R.string.caching_disabled));
     }
 }

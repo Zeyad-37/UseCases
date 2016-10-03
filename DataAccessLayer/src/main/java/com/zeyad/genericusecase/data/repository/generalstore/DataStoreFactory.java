@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
+import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
@@ -20,7 +21,7 @@ public class DataStoreFactory {
 
     public DataStoreFactory(@Nullable DataBaseManager dataBaseManager, Context context) {
         if (dataBaseManager == null)
-            throw new IllegalArgumentException("Constructor parameters cannot be null!");
+            throw new IllegalArgumentException(context.getString(R.string.dbmanager_null_error));
         mContext = context;
         mDataBaseManager = dataBaseManager;
         mGCMNetworkManager = GcmNetworkManager.getInstance(mContext);
@@ -28,7 +29,7 @@ public class DataStoreFactory {
 
     DataStoreFactory(@Nullable DataBaseManager dataBaseManager, Context context, GcmNetworkManager gcmNetworkManager) {
         if (dataBaseManager == null)
-            throw new IllegalArgumentException("Constructor parameters cannot be null!");
+            throw new IllegalArgumentException(context.getString(R.string.dbmanager_null_error));
         mContext = context;
         mDataBaseManager = dataBaseManager;
         mGCMNetworkManager = gcmNetworkManager;

@@ -8,6 +8,7 @@ import android.util.Log;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.GcmTaskService;
 import com.google.android.gms.gcm.TaskParams;
+import com.zeyad.genericusecase.R;
 
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.JOB_TYPE;
@@ -48,21 +49,21 @@ public class GenericGCMService extends GcmTaskService {
                                     .putExtra(JOB_TYPE, DOWNLOAD_FILE)
                                     .putExtra(TRIAL_COUNT, 0)
                                     .putExtra(PAYLOAD, taskParams.getExtras().getString(PAYLOAD)));
-                            Log.d(TAG, "FileIO Job started!");
+                            Log.d(TAG, getString(R.string.job_started, DOWNLOAD_FILE));
                             break;
                         case UPLOAD_FILE:
                             mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
                                     .putExtra(JOB_TYPE, UPLOAD_FILE)
                                     .putExtra(TRIAL_COUNT, 0)
                                     .putExtra(PAYLOAD, taskParams.getExtras().getString(PAYLOAD)));
-                            Log.d(TAG, "FileIO Job started!");
+                            Log.d(TAG, getString(R.string.job_started, UPLOAD_FILE));
                             break;
                         case POST:
                             mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
                                     .putExtra(JOB_TYPE, POST)
                                     .putExtra(TRIAL_COUNT, 0)
                                     .putExtra(PAYLOAD, taskParams.getExtras().getString(PAYLOAD)));
-                            Log.d(TAG, "Post Object Job Started!");
+                            Log.d(TAG, getString(R.string.job_started, POST));
                             break;
                         default:
                             break;

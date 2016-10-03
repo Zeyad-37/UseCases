@@ -15,7 +15,6 @@ import android.os.BatteryManager;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -54,14 +53,14 @@ public class Utils {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (hasLollipop()) {
             Network[] networks = connectivityManager.getAllNetworks();
-            for (int i = 0, networksLength = networks.length; i < networksLength; i++)
-                if (connectivityManager.getNetworkInfo(networks[i]).getState().equals(NetworkInfo.State.CONNECTED))
+            for (Network network : networks)
+                if (connectivityManager.getNetworkInfo(network).getState().equals(NetworkInfo.State.CONNECTED))
                     return true;
         } else if (connectivityManager != null) {
             NetworkInfo[] info = connectivityManager.getAllNetworkInfo();
             if (info != null)
-                for (int i = 0, infoLength = info.length; i < infoLength; i++)
-                    if (info[i].getState() == NetworkInfo.State.CONNECTED)
+                for (NetworkInfo anInfo : info)
+                    if (anInfo.getState() == NetworkInfo.State.CONNECTED)
                         return true;
         }
         return false;
@@ -70,13 +69,7 @@ public class Utils {
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public static boolean scheduleJob(@NonNull Context context, JobInfo jobInfo) {
         JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        if (scheduler.schedule(jobInfo) == 1) {
-            Log.d("JobScheduler", "Job scheduled successfully!");
-            return true;
-        } else {
-            Log.d("JobScheduler", "Failed to scheduled Job!");
-            return false;
-        }
+        return scheduler.schedule(jobInfo) == 1;
     }
 
     public static boolean hasLollipop() {
@@ -107,9 +100,8 @@ public class Utils {
     }
 
     public static boolean isOnWifi() {
-        ConnectivityManager connManager = (ConnectivityManager) Config.getInstance().getContext().
-                getSystemService(Context.CONNECTIVITY_SERVICE);
-        return connManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected();
+        return ((ConnectivityManager) Config.getInstance().getContext().getSystemService(Context.CONNECTIVITY_SERVICE))
+                .getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI;
     }
 
     public static boolean isCharging() {
@@ -128,7 +120,6 @@ public class Utils {
         if (acCharge) charging = true;
 
         return charging;
-
 //        Intent intent = Config.getInstance().getContext().registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 //        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
 //        return plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB;

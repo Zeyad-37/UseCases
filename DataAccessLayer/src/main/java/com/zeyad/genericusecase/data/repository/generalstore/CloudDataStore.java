@@ -41,7 +41,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -291,7 +290,7 @@ public class CloudDataStore implements DataStore {
             if (isEligibleForPersistenceIfNetworkNotAvailable()) {
 //                queueDeleteCollection.call(list);
                 if (persist)
-                    new DeleteCollectionGenericsFromDBAction(dataClass).call(ids);
+                    new DeleteCollectionGenericsFromDBAction(dataClass, idColumnName).call(ids);
                 return mErrorObservablePersisted;
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
                 return mErrorObservableNotPersisted;
@@ -300,12 +299,12 @@ public class CloudDataStore implements DataStore {
                     //.compose(applyExponentialBackoff())
                     .doOnNext(object -> {
                         if (persist)
-                            new DeleteCollectionGenericsFromDBAction(dataClass).call(ids);
+                            new DeleteCollectionGenericsFromDBAction(dataClass, idColumnName).call(ids);
                     })
                     .doOnError(throwable -> {
 //                        queueDeleteCollection.call(list);
                         if (persist)
-                            new DeleteCollectionGenericsFromDBAction(dataClass).call(ids);
+                            new DeleteCollectionGenericsFromDBAction(dataClass, idColumnName).call(ids);
                     });
         });
     }
@@ -371,14 +370,14 @@ public class CloudDataStore implements DataStore {
             mIsOnWifi = Utils.isOnWifi();
             if (isEligibleForPersistenceIfNetworkNotAvailable() && mIsOnWifi == onWifi
                     && Utils.isChargingReqCompatible(mIsCharging, whileCharging)) {
-                queueIOFile(url, file, true, whileCharging, false, mContext);
+                queueIOFile(url, file, true, whileCharging, false);
                 return mQueueFileIO;
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
                 return mErrorObservableNotPersisted;
             return mRestApi.upload(url, RequestBody.create(MediaType.parse(getMimeType(file.getPath())), file))
                     .doOnError(throwable -> {
                         throwable.printStackTrace();
-                        queueIOFile(url, file, true, whileCharging, false, mContext);
+                        queueIOFile(url, file, true, whileCharging, false);
                     })
                     .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel, domainClass));
         });
@@ -444,19 +443,19 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public Observable<Boolean> dynamicDeleteAll(String url, Class dataClass, boolean persist) {
-        return Observable.error(new Exception("cant delete all from cloud data store"));
+        return Observable.error(new Exception(mContext.getString(R.string.delete_all_error_cloud)));
     }
 
     @NonNull
     @Override
     public Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass) {
-        return Observable.error(new Exception("cant search disk in cloud data store"));
+        return Observable.error(new Exception(mContext.getString(R.string.search_disk_error_cloud)));
     }
 
     @NonNull
     @Override
     public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
-        return Observable.error(new Exception("cant search disk in cloud data store"));
+        return Observable.error(new Exception(mContext.getString(R.string.search_disk_error_cloud)));
     }
 
     @NonNull
@@ -466,7 +465,7 @@ public class CloudDataStore implements DataStore {
             mIsOnWifi = Utils.isOnWifi();
             if (isEligibleForPersistenceIfNetworkNotAvailable() && mIsOnWifi == onWifi
                     && Utils.isChargingReqCompatible(mIsCharging, whileCharging)) {
-                queueIOFile(url, file, onWifi, whileCharging, true, mContext);
+                queueIOFile(url, file, onWifi, whileCharging, true);
                 return mQueueFileIO;
             } else
                 return mRestApi.dynamicDownload(url)
@@ -554,7 +553,7 @@ public class CloudDataStore implements DataStore {
         return !Utils.isNetworkAvailable(mContext) && !(mHasLollipop || isGooglePlayServicesAvailable());
     }
 
-    private boolean queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload, @NonNull Context context) {
+    private boolean queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload) {
         FileIORequest fileIORequest = new FileIORequest.UploadRequestBuilder(url, file)
                 .onWifi(onWifi)
                 .whileCharging(whileCharging)
@@ -563,31 +562,30 @@ public class CloudDataStore implements DataStore {
             Bundle extras = new Bundle();
             extras.putString(GenericNetworkQueueIntentService.JOB_TYPE, isDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
             extras.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(fileIORequest));
-            mGcmNetworkManager
-                    .schedule(new OneoffTask.Builder()
-                            .setService(GenericGCMService.class)
-                            .setRequiredNetwork(onWifi ? OneoffTask.NETWORK_STATE_UNMETERED : OneoffTask.NETWORK_STATE_CONNECTED)
-                            .setRequiresCharging(whileCharging)
-                            .setUpdateCurrent(false)
-                            .setPersisted(true)
-                            .setExtras(extras)
-                            .setTag(FILE_IO_TAG)
-                            .setExecutionWindow(0, 30)
-                            .build());
-            Log.d(TAG, "QueuePost scheduled through GcmNetworkManager: " + true);
+            mGcmNetworkManager.schedule(new OneoffTask.Builder()
+                    .setService(GenericGCMService.class)
+                    .setRequiredNetwork(onWifi ? OneoffTask.NETWORK_STATE_UNMETERED : OneoffTask.NETWORK_STATE_CONNECTED)
+                    .setRequiresCharging(whileCharging)
+                    .setUpdateCurrent(false)
+                    .setPersisted(true)
+                    .setExtras(extras)
+                    .setTag(FILE_IO_TAG)
+                    .setExecutionWindow(0, 30)
+                    .build());
+            Log.d(TAG, mContext.getString(R.string.queued, "GCM Network Manager", String.valueOf(true)));
             return true;
         } else if (Utils.hasLollipop()) {
             PersistableBundle persistableBundle = new PersistableBundle();
             persistableBundle.putString(GenericNetworkQueueIntentService.JOB_TYPE, isDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
             persistableBundle.putString(GenericNetworkQueueIntentService.PAYLOAD, new Gson().toJson(fileIORequest));
-            boolean isScheduled = Utils.scheduleJob(context, new JobInfo.Builder(1,
-                    new ComponentName(context, GenericJobService.class))
+            boolean isScheduled = Utils.scheduleJob(mContext, new JobInfo.Builder(1,
+                    new ComponentName(mContext, GenericJobService.class))
                     .setRequiredNetworkType(onWifi ? JobInfo.NETWORK_TYPE_UNMETERED : JobInfo.NETWORK_TYPE_ANY)
                     .setRequiresCharging(whileCharging)
                     .setPersisted(true)
                     .setExtras(persistableBundle)
                     .build());
-            Log.d(TAG, "QueuePost scheduled through JobScheduler: " + isScheduled);
+            Log.d(TAG, mContext.getString(R.string.queued, "JobScheduler", String.valueOf(isScheduled)));
             return isScheduled;
         }
         return false;
@@ -642,7 +640,7 @@ public class CloudDataStore implements DataStore {
                     .setTag(POST_TAG)
                     .setExecutionWindow(0, 30)
                     .build());
-            Log.d(TAG, "QueuePost scheduled through GcmNetworkManager: " + true);
+            Log.d(TAG, mContext.getString(R.string.queued, "GCM Network Manager", String.valueOf(true)));
             return true;
         } else if (Utils.hasLollipop()) {
             PersistableBundle persistableBundle = new PersistableBundle();
@@ -655,7 +653,7 @@ public class CloudDataStore implements DataStore {
                     .setPersisted(true)
                     .setExtras(persistableBundle)
                     .build());
-            Log.d(TAG, "QueuePost scheduled through JobScheduler: " + isScheduled);
+            Log.d(TAG, mContext.getString(R.string.queued, "JobScheduler", String.valueOf(isScheduled)));
             return isScheduled;
         }
         return false;
@@ -764,24 +762,17 @@ public class CloudDataStore implements DataStore {
     private final class DeleteCollectionGenericsFromDBAction implements Action1<List> {
 
         private Class mDataClass;
+        private String mIdFieldName;
 
-        DeleteCollectionGenericsFromDBAction(Class dataClass) {
+        DeleteCollectionGenericsFromDBAction(Class dataClass, String idFieldName) {
             mDataClass = dataClass;
+            mIdFieldName = idFieldName;
         }
 
         @Override
         public void call(List collection) {
-            if (mDataBaseManager instanceof RealmModel) {
-                List<RealmObject> realmObjectList = new ArrayList<>();
-                realmObjectList.addAll(mEntityDataMapper.transformAllToRealm(collection, mDataClass));
-                for (int i = 0, realmObjectListSize = realmObjectList.size(); i < realmObjectListSize; i++) {
-                    RealmObject realmObject = realmObjectList.get(i);
-                    mDataBaseManager.evict(realmObject, mDataClass);
-                }
-            }
-            // TODO: 10/3/16 Add SQLBrite!
-//            else for (int i = 0, collectionSize = collection.size(); i < collectionSize; i++)
-//                mDataBaseManager.evictById(mDataClass, "", 0);
+            for (int i = 0, collectionSize = collection.size(); i < collectionSize; i++)
+                mDataBaseManager.evictById(mDataClass, mIdFieldName, (long) collection.get(i));
         }
     }
 

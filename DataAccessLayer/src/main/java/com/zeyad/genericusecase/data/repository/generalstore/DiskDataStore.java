@@ -3,6 +3,8 @@ package com.zeyad.genericusecase.data.repository.generalstore;
 import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
+import com.zeyad.genericusecase.Config;
+import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.utils.ModelConverters;
@@ -67,7 +69,7 @@ public class DiskDataStore implements DataStore {
     @NonNull
     @Override
     public Observable<?> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging) {
-        return Observable.error(new IllegalStateException("Can't download file to local DB!"));
+        return Observable.error(new IllegalStateException(Config.getInstance().getContext().getString(R.string.io_to_db_error)));
     }
 
     @NonNull
@@ -116,7 +118,7 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<?> dynamicUploadFile(String url, File file, boolean onWifi, boolean whileCharging,
                                            Class domainClass) {
-        return Observable.error(new IllegalStateException("Can't upload file to local DB!"));
+        return Observable.error(new IllegalStateException(Config.getInstance().getContext().getString(R.string.io_to_db_error)));
     }
 
     @NonNull

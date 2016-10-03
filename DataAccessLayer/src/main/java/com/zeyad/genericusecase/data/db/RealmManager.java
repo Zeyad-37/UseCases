@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.zeyad.genericusecase.Config;
+import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.utils.Utils;
 
 import org.json.JSONArray;
@@ -38,8 +39,6 @@ public class RealmManager implements DataBaseManager {
     private Context mContext;
 
     private RealmManager(Context context) {
-        if (!Utils.doesContextBelongsToApplication(context))
-            throw new IllegalArgumentException("Context should be application context only.");
         mRealm = Realm.getDefaultInstance();
         mContext = context;
     }
@@ -56,7 +55,7 @@ public class RealmManager implements DataBaseManager {
 
     static DataBaseManager getInstance() {
         if (sInstance == null)
-            throw new NullPointerException("Instance have not been initialized yet.Please call initRealm first or getInstance with context as an argument");
+            throw new NullPointerException(Config.getInstance().getContext().getString(R.string.realm_uninitialized));
         return sInstance;
     }
 
@@ -104,10 +103,10 @@ public class RealmManager implements DataBaseManager {
                             + dataClass.getSimpleName(), "putRealmObject");
                     return Observable.just(Boolean.TRUE);
                 } else
-                    return Observable.error(new Exception("RealmObject is invalid"));
+                    return Observable.error(new IllegalArgumentException(mContext.getString(R.string.realm_object_invalid)));
             });
         }
-        return Observable.error(new Exception("realmObject cant be null"));
+        return Observable.error(new IllegalArgumentException(mContext.getString(R.string.realm_object_invalid)));
     }
 
     @NonNull
@@ -123,10 +122,10 @@ public class RealmManager implements DataBaseManager {
                             + dataClass.getSimpleName(), "putRealmModel");
                     return Observable.just(Boolean.TRUE);
                 } else
-                    return Observable.error(new Exception("RealmModel is invalid"));
+                    return Observable.error(new IllegalArgumentException(mContext.getString(R.string.realm_model_invalid)));
             });
         }
-        return Observable.error(new Exception("realmModel cant be null"));
+        return Observable.error(new IllegalArgumentException(mContext.getString(R.string.realm_model_invalid)));
     }
 
     @NonNull
@@ -148,15 +147,17 @@ public class RealmManager implements DataBaseManager {
                             "putJSON");
                     return Observable.just(true);
                 } else
-                    return Observable.error(new Exception("RealmModel is invalid"));
+                    return Observable.error(new IllegalArgumentException(mContext
+                            .getString(R.string.realm_model_invalid)));
             });
         } else
-            return Observable.defer(() -> Observable.error(new Exception("json cant be null")));
+            return Observable.defer(() -> Observable.error(new IllegalArgumentException(mContext
+                    .getString(R.string.json_object_invalid))));
     }
 
     @Override
     public Observable<?> put(ContentValues contentValues, Class dataClass) {
-        return Observable.error(new IllegalStateException("This is not SQLBrite"));
+        return Observable.error(new IllegalStateException(mContext.getString(R.string.not_sqlbrite)));
     }
 
     @NonNull
@@ -190,7 +191,7 @@ public class RealmManager implements DataBaseManager {
 
     @Override
     public Observable putAll(ContentValues[] contentValues, Class dataClass) {
-        return Observable.error(new IllegalStateException("This is not SQLBrite"));
+        return Observable.error(new IllegalStateException(mContext.getString(R.string.not_sqlbrite)));
     }
 
     @NonNull
@@ -318,7 +319,7 @@ public class RealmManager implements DataBaseManager {
     private JSONArray updateJsonArrayWithIdValue(@NonNull JSONArray jsonArray, @Nullable String idColumnName, Class dataClass)
             throws JSONException, IllegalArgumentException {
         if (idColumnName == null || idColumnName.isEmpty())
-            throw new IllegalArgumentException("could not find id!");
+            throw new IllegalArgumentException(mContext.getString(R.string.no_id));
         for (int i = 0, length = jsonArray.length(); i < length; i++)
             if (jsonArray.get(i) instanceof JSONObject)
                 updateJsonObjectWithIdValue(jsonArray.getJSONObject(i), idColumnName, dataClass);
@@ -329,7 +330,7 @@ public class RealmManager implements DataBaseManager {
     private JSONObject updateJsonObjectWithIdValue(@NonNull JSONObject jsonObject, @Nullable String idColumnName, Class dataClass)
             throws JSONException, IllegalArgumentException {
         if (idColumnName == null || idColumnName.isEmpty())
-            throw new IllegalArgumentException("could not find id!");
+            throw new IllegalArgumentException(mContext.getString(R.string.no_id));
         if (jsonObject.getInt(idColumnName) == 0)
             jsonObject.put(idColumnName, Utils.getNextId(dataClass, idColumnName));
         return jsonObject;

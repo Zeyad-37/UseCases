@@ -11,6 +11,7 @@ import android.util.Log;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 import com.zeyad.genericusecase.Config;
+import com.zeyad.genericusecase.R;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -46,21 +47,22 @@ class SQLBriteManager implements DataBaseManager {
 
     static DataBaseManager getInstance() {
         if (sInstance == null)
-            throw new NullPointerException("Instance have not been initialized yet. Please call initRealm first or getInstance with context as an argument");
+            throw new NullPointerException(Config.getInstance().getContext().getString(R.string.sqlbrite_uninitialized));
         return sInstance;
     }
 
     @NonNull
     @Override
     public Observable<?> getById(String idColumnName, int id, Class clazz) {
-        return mBDb.createQuery(clazz.getSimpleName(), "Select * From " + clazz.getSimpleName()
-                + "Where " + idColumnName + " = ?", String.valueOf(id));
+        return mBDb.createQuery(clazz.getSimpleName(), getContext().getString(R.string.select_from_where,
+                clazz.getSimpleName(), idColumnName), String.valueOf(id));
     }
 
     @NonNull
     @Override
     public Observable getAll(Class clazz) {
-        return mBDb.createQuery(clazz.getSimpleName(), "Select * From " + clazz.getSimpleName());
+        return mBDb.createQuery(clazz.getSimpleName(), getContext().getString(R.string.select_from,
+                clazz.getSimpleName()));
     }
 
     @NonNull
@@ -72,25 +74,25 @@ class SQLBriteManager implements DataBaseManager {
     @NonNull
     @Override
     public Observable<List<?>> getWhere(RealmQuery realmQuery) {
-        return Observable.error(new IllegalStateException("This is not Realm's realm"));
+        return Observable.error(new IllegalStateException(getContext().getString(R.string.not_realm)));
     }
 
     @NonNull
     @Override
     public Observable<?> put(RealmObject realmModel, Class dataClass) {
-        return Observable.error(new IllegalStateException("This is not Realm's realm"));
+        return Observable.error(new IllegalStateException(getContext().getString(R.string.not_realm)));
     }
 
     @NonNull
     @Override
     public Observable<?> put(RealmModel realmModel, Class dataClass) {
-        return Observable.error(new IllegalStateException("This is not Realm's realm"));
+        return Observable.error(new IllegalStateException(getContext().getString(R.string.not_realm)));
     }
 
     @NonNull
     @Override
     public Observable<?> put(JSONObject jsonObject, String idColumnName, Class dataClass) {
-        return Observable.error(new IllegalStateException("This is not Realm's realm"));
+        return Observable.error(new IllegalStateException(getContext().getString(R.string.not_realm)));
     }
 
     @Override
@@ -104,7 +106,7 @@ class SQLBriteManager implements DataBaseManager {
 
     @Override
     public void putAll(List<RealmObject> realmModels, Class dataClass) {
-        throw new IllegalStateException("This is not Realm's realm");
+        throw new IllegalStateException(getContext().getString(R.string.not_realm));
     }
 
     @NonNull
@@ -119,7 +121,7 @@ class SQLBriteManager implements DataBaseManager {
     @NonNull
     @Override
     public Observable<?> putAll(JSONArray jsonArray, String idColumnName, Class dataClass) {
-        return Observable.error(new IllegalStateException("This is not Realm's realm"));
+        return Observable.error(new IllegalStateException(getContext().getString(R.string.not_realm)));
     }
 
     @Override
@@ -150,7 +152,7 @@ class SQLBriteManager implements DataBaseManager {
 
     @Override
     public void evict(RealmObject realmModel, Class clazz) {
-        throw new IllegalStateException("This is not Realm's realm");
+        throw new IllegalStateException(getContext().getString(R.string.not_realm));
     }
 
     @Override
@@ -158,8 +160,8 @@ class SQLBriteManager implements DataBaseManager {
         return Observable.defer(() -> {
             writeToPreferences(System.currentTimeMillis(), DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE
                     + clazz.getSimpleName(), "evictById");
-            return Observable.just(mBDb.delete(clazz.getSimpleName(), "Where " + idFieldName + " = ?",
-                    String.valueOf(idFieldValue)));
+            return Observable.just(mBDb.delete(clazz.getSimpleName(), getContext().getString(R.string.where,
+                    idFieldName), String.valueOf(idFieldValue)));
         }).toBlocking().first() > 0;
     }
 

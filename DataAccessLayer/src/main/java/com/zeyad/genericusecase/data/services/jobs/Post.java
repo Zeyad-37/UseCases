@@ -13,6 +13,7 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.network.RestApi;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
 import com.zeyad.genericusecase.data.repository.generalstore.CloudDataStore;
@@ -42,7 +43,7 @@ import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentSe
  * @author Zeyad on 6/05/16.
  */
 public class Post {
-    public static final String TAG = com.zeyad.genericusecase.data.services.jobs.Post.class.getSimpleName();
+    private static final String TAG = com.zeyad.genericusecase.data.services.jobs.Post.class.getSimpleName();
     private final Context mContext;
     private final PostRequest mPostRequest;
     private final RestApi mRestApi;
@@ -146,7 +147,7 @@ public class Post {
                         .setTag(CloudDataStore.POST_TAG)
                         .setExecutionWindow(0, 30)
                         .build());
-                Log.d(TAG, "Request reQueued through GcmNetworkManager: " + true);
+                Log.d(TAG, mContext.getString(R.string.requeued, "GcmNetworkManager", "true"));
             } else {
                 if (Utils.hasLollipop()) {
                     PersistableBundle persistableBundle = new PersistableBundle();
@@ -160,7 +161,7 @@ public class Post {
                             .setPersisted(true)
                             .setExtras(persistableBundle)
                             .build());
-                    Log.d(TAG, "Request reQueued through JobScheduler: " + isScheduled);
+                    Log.d(TAG, mContext.getString(R.string.requeued, "JobScheduler", String.valueOf(isScheduled)));
                 }
             }
         }

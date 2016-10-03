@@ -11,6 +11,7 @@ import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.network.ApiConnectionFactory;
 import com.zeyad.genericusecase.data.utils.EntityMapperUtil;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
+import com.zeyad.genericusecase.data.utils.Utils;
 
 public class GenericUseCaseFactory {
 
@@ -64,6 +65,8 @@ public class GenericUseCaseFactory {
 
     static void initCore(@NonNull Context context, SQLiteOpenHelper sqLiteOpenHelper,
                          @Nullable IEntityMapperUtil entityMapper) {
+        if (!Utils.doesContextBelongsToApplication(context))
+            throw new IllegalArgumentException("Context should be application context only.");
         Config.init(context);
         Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
         ApiConnectionFactory.init();

@@ -11,6 +11,8 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
+import com.zeyad.genericusecase.R;
+
 import java.util.LinkedList;
 
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
@@ -79,26 +81,26 @@ public class GenericJobService extends JobService { // runs on the ui thread
     @Override
     public boolean onStartJob(@NonNull JobParameters params) { // return true if u r doing background thread work, else return false
         switch (params.getExtras().getString(JOB_TYPE, "")) {
-            case GenericNetworkQueueIntentService.DOWNLOAD_FILE:
+            case DOWNLOAD_FILE:
                 mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
                         .putExtra(JOB_TYPE, DOWNLOAD_FILE)
                         .putExtra(TRIAL_COUNT, 0)
                         .putExtra(PAYLOAD, params.getExtras().getString(PAYLOAD)));
-                Log.d(TAG, "FileIO Job started!");
+                Log.d(TAG, getString(R.string.job_started, DOWNLOAD_FILE));
                 break;
             case UPLOAD_FILE:
                 mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
                         .putExtra(JOB_TYPE, UPLOAD_FILE)
                         .putExtra(TRIAL_COUNT, 0)
                         .putExtra(PAYLOAD, params.getExtras().getString(PAYLOAD)));
-                Log.d(TAG, "FileIO Job started!");
+                Log.d(TAG, getString(R.string.job_started, UPLOAD_FILE));
                 break;
             case POST:
                 mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
                         .putExtra(JOB_TYPE, POST)
                         .putExtra(TRIAL_COUNT, 0)
                         .putExtra(PAYLOAD, params.getExtras().getString(PAYLOAD)));
-                Log.d(TAG, "Post Object Job Started!");
+                Log.d(TAG, getString(R.string.job_started, POST));
                 break;
             default:
                 break;

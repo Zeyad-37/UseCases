@@ -19,7 +19,7 @@ public class Config {
 
     public static Config getInstance() {
         if (sInstance == null)
-            throw new NullPointerException("initRealm must be called before");
+            throw new NullPointerException("Config.init(context) must be called before");
         return sInstance;
     }
 
@@ -35,8 +35,6 @@ public class Config {
     }
 
     public Context getContext() {
-        if (mContext == null)
-            throw new NullPointerException("set app context needs to be called first");
         return mContext;
     }
 

@@ -14,6 +14,7 @@ import android.webkit.MimeTypeMap;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.gson.Gson;
+import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.network.RestApi;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
 import com.zeyad.genericusecase.data.repository.generalstore.CloudDataStore;
@@ -68,9 +69,8 @@ public class FileIO {
     /**
      * This constructor meant to be used in testing and restricted environments only. Use public constructors instead.
      */
-    FileIO(Context context, RestApi restApi, int trailCount
-            , FileIORequest fileIORequest
-            , boolean isDownload, GcmNetworkManager gcmNetworkManager, boolean googlePlayServicesAvailable, boolean hasLollipop) {
+    FileIO(Context context, RestApi restApi, int trailCount, FileIORequest fileIORequest, boolean isDownload,
+           GcmNetworkManager gcmNetworkManager, boolean googlePlayServicesAvailable, boolean hasLollipop) {
         mContext = context;
         mRestApi = restApi;
         mTrailCount = trailCount;
@@ -162,7 +162,7 @@ public class FileIO {
                         .setTag(CloudDataStore.FILE_IO_TAG)
                         .setExecutionWindow(0, 30)
                         .build());
-                Log.d(TAG, "Requeue scheduled through GcmNetworkManager: " + true);
+                Log.d(TAG, mContext.getString(R.string.requeued, "GcmNetworkManager", "true"));
             } else {
                 if (Utils.hasLollipop()) {
                     PersistableBundle persistableBundle = new PersistableBundle();
@@ -175,7 +175,7 @@ public class FileIO {
                             .setPersisted(true)
                             .setExtras(persistableBundle)
                             .build());
-                    Log.d(TAG, "Requeue scheduled through JobScheduler: " + isScheduled);
+                    Log.d(TAG, mContext.getString(R.string.requeued, "JobScheduler", String.valueOf(isScheduled)));
                 }
             }
         }
