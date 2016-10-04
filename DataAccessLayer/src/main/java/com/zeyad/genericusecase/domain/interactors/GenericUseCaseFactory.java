@@ -21,24 +21,24 @@ public class GenericUseCaseFactory {
         return sGenericUseCase;
     }
 
-//    /**
-//     * initializes the Generic Use Case with given context without a DB option.
-//     *
-//     * @param context context of activity/application
-//     */
-//    public static void initWithoutDB(@NonNull Context context) {
-//        Config.init(context);
-//        Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
-//        ApiConnectionFactory.init();
-//        GenericUseCase.initWithoutDB(new EntityMapperUtil() {
-//            @NonNull
-//            @Override
-//            public EntityMapper getDataMapper(Class dataClass) {
-//                return new EntityDataMapper();
-//            }
-//        });
-//        sGenericUseCase = GenericUseCase.getInstance();
-//    }
+    /**
+     * initializes the Generic Use Case with given context without a DB option.
+     *
+     * @param context context of activity/application
+     */
+    public static void initWithoutDB(@NonNull Context context) {
+        Config.init(context);
+        Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
+        ApiConnectionFactory.init();
+        GenericUseCase.initWithoutDB(new EntityMapperUtil() {
+            @NonNull
+            @Override
+            public EntityMapper getDataMapper(Class dataClass) {
+                return new EntityDataMapper();
+            }
+        });
+        sGenericUseCase = GenericUseCase.getInstance();
+    }
 
     /**
      * initializes the Generic Use Case with Realm given context.

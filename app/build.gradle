@@ -69,8 +69,6 @@ dependencies {
     apt "com.google.dagger:dagger-compiler:$daggerVersion"
     compile 'com.jakewharton:butterknife:7.0.1'
     compile 'javax.annotation:jsr250-api:1.0'
-    // Utilities
-    compile 'com.workable:error-handler:0.9.1'
     // Testing
     testCompile 'junit:junit:4.12'
     testCompile 'org.hamcrest:hamcrest-library:1.3'

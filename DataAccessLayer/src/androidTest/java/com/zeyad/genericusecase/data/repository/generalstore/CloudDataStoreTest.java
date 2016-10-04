@@ -87,8 +87,7 @@ public class CloudDataStoreTest {
             mEntityMapper = CloudDataStoreTestRobot.createMockedEntityMapperWithActualMethodCalls();
         } else
             mEntityMapper = CloudDataStoreTestRobot.createMockedEntityMapper();
-        mCloudDataStore = new CloudDataStore(mMockedRestApi, mMockedDBManager, mEntityMapper,
-                CloudDataStoreTestRobot.getGcmNetworkManager());
+        mCloudDataStore = new CloudDataStore(mMockedRestApi, mMockedDBManager, mEntityMapper);
         mMockedGoogleApiAvailability = CloudDataStoreTestRobot.createMockedGoogleApiAvailability();
         mCloudDataStore.setGoogleApiAvailability(mMockedGoogleApiAvailability);
     }

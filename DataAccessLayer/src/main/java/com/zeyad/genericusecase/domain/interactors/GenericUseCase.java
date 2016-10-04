@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.zeyad.genericusecase.Config;
+import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.UIThread;
 import com.zeyad.genericusecase.data.db.DatabaseManagerFactory;
 import com.zeyad.genericusecase.data.executor.JobExecutor;
@@ -61,10 +62,9 @@ public class GenericUseCase implements IGenericUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    public static void initWithoutDB(IEntityMapperUtil entityMapper) {
-        Context context = Config.getInstance().getContext();
-        sGenericUseCase = new GenericUseCase(new DataRepository(new DataStoreFactory(null, context),
-                entityMapper), new JobExecutor(), new UIThread());
+    static void initWithoutDB(IEntityMapperUtil entityMapper) {
+        sGenericUseCase = new GenericUseCase(new DataRepository(new DataStoreFactory(Config.getInstance()
+                .getContext()), entityMapper), new JobExecutor(), new UIThread());
     }
 
     /**
@@ -73,7 +73,7 @@ public class GenericUseCase implements IGenericUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    public static void initWithRealm(IEntityMapperUtil entityMapper) {
+    static void initWithRealm(IEntityMapperUtil entityMapper) {
         Context context = Config.getInstance().getContext();
         DatabaseManagerFactory.initRealm(context);
         sGenericUseCase = new GenericUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
@@ -88,7 +88,7 @@ public class GenericUseCase implements IGenericUseCase {
      *
      * @param sqLiteOpenHelper
      */
-    public static void initWithSQLBrite(SQLiteOpenHelper sqLiteOpenHelper, IEntityMapperUtil entityMapper) {
+    static void initWithSQLBrite(SQLiteOpenHelper sqLiteOpenHelper, IEntityMapperUtil entityMapper) {
         DatabaseManagerFactory.initSQLBrite(sqLiteOpenHelper);
         sGenericUseCase = new GenericUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
                 .getInstance(), Config.getInstance().getContext()), entityMapper), new JobExecutor(),
@@ -124,9 +124,9 @@ public class GenericUseCase implements IGenericUseCase {
     @Override
     @SuppressWarnings("unchecked")
     public Observable getList(@NonNull GetListRequest genericUseCaseRequest) {
-        return mRepository.getListDynamically(genericUseCaseRequest.getUrl(), genericUseCaseRequest.getPresentationClass(),
-                genericUseCaseRequest.getDataClass(), genericUseCaseRequest.isPersist(), genericUseCaseRequest.isShouldCache())
-                .compose(applySchedulers());
+        return mRepository.getListDynamically(genericUseCaseRequest.getUrl(), genericUseCaseRequest
+                .getPresentationClass(), genericUseCaseRequest.getDataClass(), genericUseCaseRequest
+                .isPersist(), genericUseCaseRequest.isShouldCache()).compose(applySchedulers());
     }
 
     /**
@@ -137,9 +137,9 @@ public class GenericUseCase implements IGenericUseCase {
     @Override
     @SuppressWarnings("unchecked")
     public Observable getObject(@NonNull GetObjectRequest getObjectRequest) {
-        return mRepository.getObjectDynamicallyById(getObjectRequest.getUrl(), getObjectRequest.getIdColumnName(),
-                getObjectRequest.getItemId(), getObjectRequest.getPresentationClass(), getObjectRequest.getDataClass(),
-                getObjectRequest.isPersist(), getObjectRequest.isShouldCache())
+        return mRepository.getObjectDynamicallyById(getObjectRequest.getUrl(), getObjectRequest
+                        .getIdColumnName(), getObjectRequest.getItemId(), getObjectRequest.getPresentationClass(),
+                getObjectRequest.getDataClass(), getObjectRequest.isPersist(), getObjectRequest.isShouldCache())
                 .compose(applySchedulers());
     }
 
@@ -147,14 +147,15 @@ public class GenericUseCase implements IGenericUseCase {
     public Observable postObject(@NonNull PostRequest postRequest) {
         if (postRequest.getObjectBundle() != null)
             return mRepository.postObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                    postRequest.getObjectBundle(), postRequest.getPresentationClass(), postRequest.getDataClass(),
-                    postRequest.isPersist()).compose(applySchedulers());
+                    postRequest.getObjectBundle(), postRequest.getPresentationClass(), postRequest
+                            .getDataClass(), postRequest.isPersist()).compose(applySchedulers());
         else if (postRequest.getContentValue() != null)
             return mRepository.postObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                    postRequest.getContentValue(), postRequest.getPresentationClass(), postRequest.getDataClass(),
-                    postRequest.isPersist()).compose(applySchedulers());
+                    postRequest.getContentValue(), postRequest.getPresentationClass(), postRequest
+                            .getDataClass(), postRequest.isPersist()).compose(applySchedulers());
         else
-            return Observable.defer(() -> Observable.error(new IllegalArgumentException("Payload is null!")));
+            return Observable.defer(() -> Observable.error(new IllegalArgumentException(Config.getInstance()
+                    .getContext().getString(R.string.null_payload))));
     }
 
     @Override
@@ -170,9 +171,10 @@ public class GenericUseCase implements IGenericUseCase {
                     postRequest.isPersist()).compose(applySchedulers());
         else if (postRequest.getContentValues() != null)
             return mRepository.postListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                    postRequest.getContentValues(), postRequest.getPresentationClass(), postRequest.getDataClass(),
-                    postRequest.isPersist()).compose(applySchedulers());
-        else return Observable.error(new IllegalArgumentException("Payload is null"));
+                    postRequest.getContentValues(), postRequest.getPresentationClass(), postRequest
+                            .getDataClass(), postRequest.isPersist()).compose(applySchedulers());
+        else return Observable.error(new IllegalArgumentException(Config.getInstance().getContext()
+                    .getString(R.string.null_payload)));
     }
 
     /**
@@ -188,9 +190,10 @@ public class GenericUseCase implements IGenericUseCase {
                     postRequest.getDataClass(), postRequest.isPersist()).compose(applySchedulers());
         else if (postRequest.getContentValue() != null)
             return mRepository.putObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                    postRequest.getContentValue(), postRequest.getPresentationClass(), postRequest.getDataClass(),
-                    postRequest.isPersist()).compose(applySchedulers());
-        else return Observable.error(new IllegalArgumentException("Payload is null"));
+                    postRequest.getContentValue(), postRequest.getPresentationClass(), postRequest
+                            .getDataClass(), postRequest.isPersist()).compose(applySchedulers());
+        else return Observable.error(new IllegalArgumentException(Config.getInstance().getContext()
+                    .getString(R.string.null_payload)));
     }
 
     /**
@@ -212,15 +215,16 @@ public class GenericUseCase implements IGenericUseCase {
                     postRequest.getContentValues(), postRequest.getPresentationClass(),
                     postRequest.getDataClass(), postRequest.isPersist()).compose(applySchedulers());
         else
-            return Observable.error(new IllegalArgumentException("Missing Payload!"));
+            return Observable.error(new IllegalArgumentException(Config.getInstance().getContext()
+                    .getString(R.string.null_payload)));
     }
 
     @Override
     public Observable deleteCollection(@NonNull PostRequest deleteRequest) {
         return mRepository.deleteListDynamically(deleteRequest.getUrl(),
                 ModelConverters.convertToJsonArray(deleteRequest.getKeyValuePairs()),
-                deleteRequest.getPresentationClass(), deleteRequest.getDataClass(), deleteRequest.isPersist())
-                .compose(applySchedulers());
+                deleteRequest.getPresentationClass(), deleteRequest.getDataClass(), deleteRequest
+                        .isPersist()).compose(applySchedulers());
     }
 
     /**
@@ -230,8 +234,8 @@ public class GenericUseCase implements IGenericUseCase {
      */
     @Override
     public Observable<?> deleteAll(@NonNull PostRequest postRequest) {
-        return mRepository.deleteAllDynamically(postRequest.getUrl(), postRequest.getDataClass(), postRequest.isPersist())
-                .compose(applySchedulers());
+        return mRepository.deleteAllDynamically(postRequest.getUrl(), postRequest.getDataClass(),
+                postRequest.isPersist()).compose(applySchedulers());
     }
 
     @Override
@@ -324,7 +328,8 @@ public class GenericUseCase implements IGenericUseCase {
         } catch (@NonNull ClassNotFoundException | IOException e) {
             e.printStackTrace();
             try {
-                return Observable.just(new Gson().fromJson(new InputStreamReader(new FileInputStream(new File(fullFilePath))), String.class));
+                return Observable.just(new Gson().fromJson(new InputStreamReader(new FileInputStream
+                        (new File(fullFilePath))), String.class));
             } catch (FileNotFoundException e1) {
                 e1.printStackTrace();
                 return Observable.error(e1);

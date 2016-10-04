@@ -9,6 +9,7 @@
     <string name="exception_network_error_not_persisted">Could not reach server and could not persist request to queue!\nGoogle play services not available and android version less than 5.0!</string>
     <string name="not_realm">This is not Realm\'s realm</string>
     <string name="not_sqlbrite">This is not SQLBrite</string>
+    <string name="no_db">Database not enabled!</string>
     <string name="sqlbrite_uninitialized">Instance have not been initialized yet. Please call initSQLBrite() first</string>
     <string name="realm_uninitialized">Instance have not been initialized yet. Please call initRealm() first</string>
     <string name="api_connection_uninitialized">Instance have not been initialized yet. Please call ApiConnection.init() first</string>
@@ -25,6 +26,7 @@
     <string name="dbmanager_null_error">DataBaseManager cannot be null!</string>
     <string name="io_to_db_error">Can\'t IO file to local DB!</string>
     <string name="job_started">%1$s Job started!</string>
+    <string name="null_payload">Payload is null, can not put/post nulls</string>
     <string name="unknown_error">Unknown error</string>
 
 </resources>
