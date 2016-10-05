@@ -57,8 +57,10 @@ import rx.Subscriber;
 import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
+import static com.zeyad.genericusecase.Config.NONE;
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.UPLOAD_FILE;
+import static com.zeyad.genericusecase.domain.interactors.requests.PostRequest.POST;
 
 public class CloudDataStore implements DataStore {
 
@@ -72,8 +74,8 @@ public class CloudDataStore implements DataStore {
     private final Observable<Object> mErrorObservablePersisted, mErrorObservableNotPersisted, mQueueFileIO;
     private final RestApi mRestApi;
     private final GcmNetworkManager mGcmNetworkManager;
-    private GoogleApiAvailability mGoogleApiAvailability;
     private final boolean mCanPersist;
+    private GoogleApiAvailability mGoogleApiAvailability;
     private boolean mHasLollipop;
 
     /**
@@ -93,7 +95,16 @@ public class CloudDataStore implements DataStore {
         mQueueFileIO = Observable.empty();
         mGcmNetworkManager = GcmNetworkManager.getInstance(mContext);
         mHasLollipop = Utils.hasLollipop();
-        mCanPersist = Config.getInstance().getDBType() > 0;
+        mCanPersist = Config.getInstance().getDBType() > NONE;
+    }
+
+    @Nullable
+    private static String getMimeType(String uri) {
+        String type = null;
+        String extension = MimeTypeMap.getFileExtensionFromUrl(uri);
+        if (extension != null)
+            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        return type;
     }
 
     @NonNull
@@ -129,7 +140,7 @@ public class CloudDataStore implements DataStore {
         return Observable.defer(() -> {
             final SaveGenericToDBAction cacheAction = new SaveGenericToDBAction(dataClass, idColumnName);
             if (isEligibleForPersistenceIfNetworkNotAvailable()) {
-                queuePost(PostRequest.POST, url, idColumnName, jsonObject, dataClass, persist);
+                queuePost(POST, url, idColumnName, jsonObject, dataClass, persist);
                 if (willPersist(persist))
                     cacheAction.call(jsonObject);
                 return mErrorObservablePersisted;
@@ -144,7 +155,7 @@ public class CloudDataStore implements DataStore {
                     })
                     .doOnError(throwable -> {
                         if (throwable instanceof UnknownHostException || throwable instanceof ConnectException)
-                            queuePost(PostRequest.POST, url, idColumnName, jsonObject, dataClass, persist);
+                            queuePost(POST, url, idColumnName, jsonObject, dataClass, persist);
                     })
                     .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel, domainClass));
         });
@@ -156,7 +167,7 @@ public class CloudDataStore implements DataStore {
         return Observable.defer(() -> {
             final SaveGenericToDBAction cacheAction = new SaveGenericToDBAction(dataClass, idColumnName);
             if (isEligibleForPersistenceIfNetworkNotAvailable()) {
-                queuePost(PostRequest.POST, url, idColumnName, ModelConverters.contentValueToJSONObject(contentValues),
+                queuePost(POST, url, idColumnName, ModelConverters.contentValueToJSONObject(contentValues),
                         dataClass, persist);
                 if (willPersist(persist))
                     cacheAction.call(contentValues);
@@ -175,7 +186,7 @@ public class CloudDataStore implements DataStore {
                         if (willPersist(persist))
                             new SaveGenericToDBAction(dataClass, idColumnName).call(jsonObject);
                         if (isNetworkFailure(throwable))
-                            queuePost(PostRequest.POST, url, idColumnName, jsonObject, dataClass, persist);
+                            queuePost(POST, url, idColumnName, jsonObject, dataClass, persist);
                     })
                     .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel, domainClass));
         });
@@ -187,7 +198,7 @@ public class CloudDataStore implements DataStore {
                                             Class domainClass, Class dataClass, boolean persist) {
         return Observable.defer(() -> {
             if (isEligibleForPersistenceIfNetworkNotAvailable()) {
-                queuePost(PostRequest.POST, url, idColumnName, jsonArray, dataClass, persist);
+                queuePost(POST, url, idColumnName, jsonArray, dataClass, persist);
                 if (willPersist(persist))
                     new SaveGenericToDBAction(dataClass, idColumnName).call(jsonArray);
                 return Observable.error(new NetworkConnectionException(mContext.getString(R.string.exception_network_error_persisted)));
@@ -206,7 +217,7 @@ public class CloudDataStore implements DataStore {
                         if (willPersist(persist))
                             new SaveGenericToDBAction(dataClass, idColumnName).call(jsonArray);
                         if (isNetworkFailure(throwable))
-                            queuePost(PostRequest.POST, url, idColumnName, jsonArray, dataClass, persist);
+                            queuePost(POST, url, idColumnName, jsonArray, dataClass, persist);
                     })
                     .map(realmModel -> mEntityDataMapper.transformAllToDomain(realmModel, domainClass));
         });
@@ -217,7 +228,7 @@ public class CloudDataStore implements DataStore {
                                          Class domainClass, Class dataClass, boolean persist) {
         return Observable.defer(() -> {
             if (isEligibleForPersistenceIfNetworkNotAvailable()) {
-                queuePost(PostRequest.POST, url, idColumnName, ModelConverters.contentValuesToJSONArray(contentValues),
+                queuePost(POST, url, idColumnName, ModelConverters.contentValuesToJSONArray(contentValues),
                         dataClass, persist);
                 if (willPersist(persist))
                     new SaveGenericToDBAction(dataClass, idColumnName).call(contentValues);
@@ -239,7 +250,7 @@ public class CloudDataStore implements DataStore {
                         if (willPersist(persist))
                             new SaveGenericToDBAction(dataClass, idColumnName).call(jsonArray);
                         if (isNetworkFailure(throwable))
-                            queuePost(PostRequest.POST, url, idColumnName, jsonArray, dataClass, persist);
+                            queuePost(POST, url, idColumnName, jsonArray, dataClass, persist);
                     })
                     .map(realmModel -> mEntityDataMapper.transformAllToDomain(realmModel, domainClass));
         });
@@ -491,15 +502,6 @@ public class CloudDataStore implements DataStore {
                         });
             else return null;
         });
-    }
-
-    @Nullable
-    private static String getMimeType(String uri) {
-        String type = null;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(uri);
-        if (extension != null)
-            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-        return type;
     }
 
     private boolean willPersist(boolean persist) {
