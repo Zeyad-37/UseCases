@@ -75,7 +75,7 @@ public class EntityDataMapper implements EntityMapper<Object, Object> {
     }
 
     /**
-     * Transform a {Entity} into an {Model}.
+     * Transform a {Entity}ies into an {Model}s.
      *
      * @param list Objects to be transformed.
      * @return {Model} if valid {Entity} otherwise null.

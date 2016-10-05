@@ -378,9 +378,8 @@ public class GenericUseCase implements IGenericUseCase {
      * @param <T> the current observable
      * @return the transformed observable
      */
-    @Override
     @NonNull
-    public <T> Observable.Transformer<T, T> applySchedulers() {
+    private <T> Observable.Transformer<T, T> applySchedulers() {
         return observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor))
                 .observeOn(mPostExecutionThread.getScheduler())
                 .unsubscribeOn(Schedulers.from(mThreadExecutor));

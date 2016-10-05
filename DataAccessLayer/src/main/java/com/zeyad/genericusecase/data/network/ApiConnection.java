@@ -302,11 +302,6 @@ class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnect
         };
     }
 
-    private OkHttpClient provideOkHttpClient() {
-        OkHttpClient.Builder builder = getBuilderForOkhttp();
-        return provideOkHttpClient(builder, provideCache());
-    }
-
     @NonNull
     private OkHttpClient.Builder getBuilderForOkhttp() {
         return new OkHttpClient.Builder()

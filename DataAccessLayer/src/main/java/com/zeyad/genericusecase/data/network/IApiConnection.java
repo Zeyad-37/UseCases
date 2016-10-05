@@ -10,7 +10,7 @@ import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import rx.Observable;
 
-public interface IApiConnection {
+interface IApiConnection {
 
     @NonNull
     HttpLoggingInterceptor provideHttpLoggingInterceptor();

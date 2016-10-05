@@ -9,21 +9,60 @@ import java.util.List;
  * @author Zeyad on 11/05/16.
  */
 public interface EntityMapper<D, R> {
-
+    /**
+     * Transform item to its realm counter part.
+     *
+     * @param item      item to be converted.
+     * @param dataClass Realm Class to be converted to.
+     * @return
+     */
     R transformToRealm(D item, Class dataClass);
 
+    /**
+     * Transform a list items to its realm counter part.
+     *
+     * @param list      list of items to be converted.
+     * @param dataClass Realm Class to be converted to.
+     * @return
+     */
     @NonNull
     List<R> transformAllToRealm(List<D> list, Class dataClass);
 
+    /**
+     * Transforms entity to its domain counter part.
+     *
+     * @param entity entity to be converted.
+     * @return
+     */
     @Nullable
-    D transformToDomain(R tenderoRealmModel);
+    D transformToDomain(R entity);
 
+    /**
+     * Transforms entities to its domain counter part.
+     *
+     * @param entities entities to be converted.
+     * @return
+     */
     @Nullable
-    List<D> transformAllToDomain(List<R> tenderoRealmModels);
+    List<D> transformAllToDomain(List<R> entities);
 
+    /**
+     * Transforms realmInstance to its domain counter part.
+     *
+     * @param realmInstance object to be converted.
+     * @param domainClass   Domain class to be converted to.
+     * @return
+     */
     @Nullable
-    D transformToDomain(R userRealmModel, Class domainClass);
+    D transformToDomain(R realmInstance, Class domainClass);
 
+    /**
+     * Transforms realmInstances to its domain counter part.
+     *
+     * @param realmInstances objects to be converted.
+     * @param domainClass    Domain class to be converted to.
+     * @return
+     */
     @NonNull
-    List<D> transformAllToDomain(List<R> tenderoRealmModels, Class domainClass);
+    List<D> transformAllToDomain(List<R> realmInstances, Class domainClass);
 }

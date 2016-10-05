@@ -53,12 +53,22 @@ public class RealmManager implements DataBaseManager {
         sInstance = new RealmManager(context);
     }
 
+    /**
+     * @return RealmManager the implemented instance of the DatabaseManager.
+     */
     static DataBaseManager getInstance() {
         if (sInstance == null)
             throw new NullPointerException(Config.getInstance().getContext().getString(R.string.realm_uninitialized));
         return sInstance;
     }
 
+    /**
+     * Gets an {@link Observable} which will emit an Object.
+     *
+     * @param dataClass    Class type of the items to get.
+     * @param idColumnName Name of the id field.
+     * @param itemId       The user id to retrieve data.
+     */
     @NonNull
     @Override
     public Observable<?> getById(@NonNull final String idColumnName, final int itemId, Class dataClass) {
@@ -71,12 +81,24 @@ public class RealmManager implements DataBaseManager {
         });
     }
 
+    /**
+     * Gets an {@link Observable} which will emit a List of Objects.
+     *
+     * @param clazz Class type of the items to get.
+     */
     @NonNull
     @Override
     public Observable<List<?>> getAll(Class clazz) {
         return Observable.defer(() -> Observable.just(Realm.getDefaultInstance().where(clazz).findAll()));
     }
 
+    /**
+     * Get list of items according to the query passed.
+     *
+     * @param filterKey The key used to look for inside the DB.
+     * @param query     The query used to look for inside the DB.
+     * @param clazz     Class type of the items to be deleted.
+     */
     @NonNull
     @Override
     public Observable<List<?>> getWhere(Class clazz, String query, @NonNull String filterKey) {
@@ -84,12 +106,23 @@ public class RealmManager implements DataBaseManager {
                 .where(clazz).beginsWith(filterKey, query, Case.INSENSITIVE).findAll()));
     }
 
+    /**
+     * Get list of items according to the query passed.
+     *
+     * @param realmQuery The query used to look for inside the DB.
+     */
     @NonNull
     @Override
     public Observable<List<?>> getWhere(@NonNull RealmQuery realmQuery) {
         return Observable.defer(() -> Observable.just(realmQuery.findAll()));
     }
 
+    /**
+     * Puts and element into the DB.
+     *
+     * @param realmObject Element to insert in the DB.
+     * @param dataClass   Class type of the items to be put.
+     */
     @NonNull
     @Override
     public Observable<?> put(@Nullable RealmObject realmObject, @NonNull Class dataClass) {
@@ -109,6 +142,12 @@ public class RealmManager implements DataBaseManager {
         return Observable.error(new IllegalArgumentException(mContext.getString(R.string.realm_object_invalid)));
     }
 
+    /**
+     * Puts and element into the DB.
+     *
+     * @param realmModel Element to insert in the DB.
+     * @param dataClass  Class type of the items to be put.
+     */
     @NonNull
     @Override
     public Observable<?> put(@Nullable RealmModel realmModel, @NonNull Class dataClass) {
@@ -128,19 +167,25 @@ public class RealmManager implements DataBaseManager {
         return Observable.error(new IllegalArgumentException(mContext.getString(R.string.realm_model_invalid)));
     }
 
+    /**
+     * Puts and element into the DB.
+     *
+     * @param jsonObject Element to insert in the DB.
+     * @param dataClass  Class type of the items to be put.
+     */
     @NonNull
     @Override
-    public Observable<?> put(@Nullable JSONObject realmObject, @Nullable String idColumnName, @NonNull Class dataClass) {
-        if (realmObject != null) {
+    public Observable<?> put(@Nullable JSONObject jsonObject, @Nullable String idColumnName, @NonNull Class dataClass) {
+        if (jsonObject != null) {
             return Observable.defer(() -> {
                 try {
-                    updateJsonObjectWithIdValue(realmObject, idColumnName, dataClass);
+                    updateJsonObjectWithIdValue(jsonObject, idColumnName, dataClass);
                 } catch (@NonNull JSONException | IllegalArgumentException e) {
                     return Observable.error(e);
                 }
                 mRealm = Realm.getDefaultInstance();
                 RealmModel result = executeWriteOperationInRealm(mRealm,
-                        () -> Realm.getDefaultInstance().createOrUpdateObjectFromJson(dataClass, realmObject));
+                        () -> Realm.getDefaultInstance().createOrUpdateObjectFromJson(dataClass, jsonObject));
                 if (RealmObject.isValid(result)) {
                     writeToPreferences(System.currentTimeMillis(),
                             DataBaseManager.DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE + dataClass.getSimpleName(),
@@ -155,11 +200,24 @@ public class RealmManager implements DataBaseManager {
                     .getString(R.string.json_object_invalid))));
     }
 
+    /**
+     * Puts and element into the DB.
+     *
+     * @param contentValues Element to insert in the DB.
+     * @param dataClass     Class type of the items to be put.
+     */
     @Override
     public Observable<?> put(ContentValues contentValues, Class dataClass) {
         return Observable.error(new IllegalStateException(mContext.getString(R.string.not_sqlbrite)));
     }
 
+    /**
+     * Puts and element into the DB.
+     *
+     * @param jsonArray    Element to insert in the DB.
+     * @param idColumnName Name of the id field.
+     * @param dataClass    Class type of the items to be put.
+     */
     @NonNull
     @Override
     public Observable<?> putAll(@NonNull JSONArray jsonArray, String idColumnName, @NonNull Class dataClass) {
@@ -177,6 +235,12 @@ public class RealmManager implements DataBaseManager {
         });
     }
 
+    /**
+     * Puts and element into the DB.
+     *
+     * @param realmModels Element to insert in the DB.
+     * @param dataClass   Class type of the items to be put.
+     */
     @Override
     public void putAll(@NonNull List<RealmObject> realmModels, @NonNull Class dataClass) {
         Observable.defer(() -> {
@@ -189,11 +253,22 @@ public class RealmManager implements DataBaseManager {
                 .subscribe(new PutAllSubscriberClass(realmModels));
     }
 
+    /**
+     * Puts and element into the DB.
+     *
+     * @param contentValues Element to insert in the DB.
+     * @param dataClass     Class type of the items to be put.
+     */
     @Override
     public Observable putAll(ContentValues[] contentValues, Class dataClass) {
         return Observable.error(new IllegalStateException(mContext.getString(R.string.not_sqlbrite)));
     }
 
+    /**
+     * Evict all elements of the DB.
+     *
+     * @param clazz Class type of the items to be deleted.
+     */
     @NonNull
     @Override
     public Observable<Boolean> evictAll(@NonNull Class clazz) {
@@ -206,6 +281,12 @@ public class RealmManager implements DataBaseManager {
         });
     }
 
+    /**
+     * Evict element of the DB.
+     *
+     * @param realmModel Element to deleted from the DB.
+     * @param clazz      Class type of the items to be deleted.
+     */
     @Override
     public void evict(@NonNull final RealmObject realmModel, @NonNull Class clazz) {
         Observable.defer(() -> {
@@ -219,6 +300,13 @@ public class RealmManager implements DataBaseManager {
                 .subscribe(new EvictSubscriberClass(clazz));
     }
 
+    /**
+     * Evict element by id of the DB.
+     *
+     * @param clazz        Class type of the items to be deleted.
+     * @param idFieldName  The id used to look for inside the DB.
+     * @param idFieldValue Name of the id field.
+     */
     @Override
     public boolean evictById(@NonNull Class clazz, @NonNull String idFieldName, final long idFieldValue) {
         RealmModel toDelete = Realm.getDefaultInstance().where(clazz).equalTo(idFieldName, idFieldValue).findFirst();
@@ -231,6 +319,13 @@ public class RealmManager implements DataBaseManager {
         } else return false;
     }
 
+    /**
+     * Evict a collection elements of the DB.
+     *
+     * @param idFieldName The id used to look for inside the DB.
+     * @param list        List of ids to be deleted.
+     * @param dataClass   Class type of the items to be deleted.
+     */
     @NonNull
     @Override
     public Observable<?> evictCollection(@NonNull String idFieldName, @NonNull List<Long> list,
