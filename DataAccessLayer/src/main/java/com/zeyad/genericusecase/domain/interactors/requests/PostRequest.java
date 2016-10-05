@@ -129,6 +129,10 @@ public class PostRequest {
         return mJsonArray;
     }
 
+    public JSONObject getJsonObject() {
+        return mJsonObject;
+    }
+
     public HashMap<String, Object> getKeyValuePairs() {
         return mKeyValuePairs;
     }

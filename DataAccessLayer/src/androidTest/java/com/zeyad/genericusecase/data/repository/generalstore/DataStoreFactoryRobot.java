@@ -3,7 +3,6 @@ package com.zeyad.genericusecase.data.repository.generalstore;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.google.android.gms.gcm.GcmNetworkManager;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
 import com.zeyad.genericusecase.data.db.RealmManager;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
@@ -17,7 +16,7 @@ class DataStoreFactoryRobot {
 
     @NonNull
     static DataStoreFactory createDataStoreFactory(DataBaseManager dataBaseManager, Context mockedContext) {
-        return new DataStoreFactory(dataBaseManager, mockedContext, Mockito.mock(GcmNetworkManager.class));
+        return new DataStoreFactory(dataBaseManager, mockedContext);
     }
 
     static DataBaseManager createMockedDataBaseManager() {
@@ -71,11 +70,11 @@ class DataStoreFactoryRobot {
         return "";
     }
 
-    public static String getValidColumnName() {
+    static String getValidColumnName() {
         return "";
     }
 
-    public static int getValidColumnId() {
+    static int getValidColumnId() {
         return 1;
     }
 }
