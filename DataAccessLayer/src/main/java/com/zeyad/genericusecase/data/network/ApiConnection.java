@@ -2,6 +2,7 @@ package com.zeyad.genericusecase.data.network;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
 import com.google.gson.ExclusionStrategy;
@@ -80,7 +81,8 @@ class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnect
      * @param restApiWithoutCache
      * @param restApiWithCache
      */
-    ApiConnection(RestApi restApiWithoutCache, RestApi restApiWithCache) {
+    @VisibleForTesting
+    private ApiConnection(RestApi restApiWithoutCache, RestApi restApiWithCache) {
         mRestApiWithoutCache = restApiWithoutCache;
         mRestApiWithCache = restApiWithCache;
     }

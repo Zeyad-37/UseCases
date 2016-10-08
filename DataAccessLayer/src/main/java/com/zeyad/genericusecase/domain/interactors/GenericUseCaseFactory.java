@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.VisibleForTesting;
 
 import com.zeyad.genericusecase.Config;
 import com.zeyad.genericusecase.data.mappers.EntityDataMapper;
@@ -89,7 +90,8 @@ public class GenericUseCaseFactory {
      *
      * @param genericUseCase mocked generic use(expected) or any IGenericUseCase implementation
      */
-    public static void init(IGenericUseCase genericUseCase) {
+    @VisibleForTesting
+    private static void init(IGenericUseCase genericUseCase) {
         sGenericUseCase = genericUseCase;
     }
 }

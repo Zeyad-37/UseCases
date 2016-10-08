@@ -21,7 +21,7 @@ import rx.Observable;
 
 public class DiskDataStore implements DataStore {
 
-    public final String TAG = com.zeyad.genericusecase.data.repository.generalstore.DiskDataStore.class.getName();
+    private final String TAG = com.zeyad.genericusecase.data.repository.generalstore.DiskDataStore.class.getName();
     private DataBaseManager mDataBaseManager;
     private EntityMapper mEntityDataMapper;
 
@@ -30,7 +30,7 @@ public class DiskDataStore implements DataStore {
      *
      * @param realmManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    public DiskDataStore(DataBaseManager realmManager, EntityMapper entityDataMapper) {
+    DiskDataStore(DataBaseManager realmManager, EntityMapper entityDataMapper) {
         mDataBaseManager = realmManager;
         mEntityDataMapper = entityDataMapper;
     }

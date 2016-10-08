@@ -174,7 +174,7 @@ class SQLBriteManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public Observable putAll(ContentValues[] contentValues, Class dataClass) {
+    public Observable<?> putAll(ContentValues[] contentValues, Class dataClass) {
         Observable result = Observable.empty();
         for (ContentValues contentValue : contentValues)
             result.concatWith(put(contentValue, dataClass));

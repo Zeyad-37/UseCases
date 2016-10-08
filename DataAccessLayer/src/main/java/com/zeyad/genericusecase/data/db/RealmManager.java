@@ -259,6 +259,7 @@ public class RealmManager implements DataBaseManager {
      * @param contentValues Element to insert in the DB.
      * @param dataClass     Class type of the items to be put.
      */
+    @NonNull
     @Override
     public Observable putAll(ContentValues[] contentValues, Class dataClass) {
         return Observable.error(new IllegalStateException(mContext.getString(R.string.not_sqlbrite)));

@@ -15,7 +15,6 @@ import rx.Observable;
 /**
  * Interface that represents a Repository for getting Objects from the data layer.
  */
-// TODO: 13/05/16 Document!
 public interface Repository {
 
     /**

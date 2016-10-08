@@ -3,6 +3,7 @@ package com.zeyad.genericusecase.domain.interactors;
 import android.content.Context;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
+import android.support.annotation.VisibleForTesting;
 
 import com.google.gson.Gson;
 import com.zeyad.genericusecase.Config;
@@ -106,6 +107,7 @@ public class GenericUseCase implements IGenericUseCase {
      * @param jobExecutor    job executor
      * @param uiThread       ui thread implementation
      */
+    @VisibleForTesting
     public static void init(DataRepository dataRepository, JobExecutor jobExecutor, UIThread uiThread) {
         sGenericUseCase = new GenericUseCase(dataRepository, jobExecutor, uiThread);
     }

@@ -81,7 +81,7 @@ public class TLSSocketFactory extends SSLSocketFactory {
     }
 
     @NonNull
-    public X509TrustManager systemDefaultTrustManager() {
+    private X509TrustManager systemDefaultTrustManager() {
         try {
             TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory
                     .getDefaultAlgorithm());

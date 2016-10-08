@@ -17,7 +17,6 @@ import java.util.List;
 import io.realm.RealmQuery;
 import rx.Observable;
 
-// TODO: 13/05/16 Document!
 public class DataRepository implements Repository {
 
     public static final String DEFAULT_ID_TO_BE_REPLACED = "id";
