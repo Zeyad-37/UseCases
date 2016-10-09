@@ -56,11 +56,9 @@ public class GenericUseCaseFactory {
      * initializes the Generic Use Case with SQLBrite given context.
      *
      * @param context      context of application
-     * @param entityMapper
      */
-    public static void initWithSQLBrite(@NonNull Context context, @NonNull SQLiteOpenHelper sqLiteOpenHelper,
-                                        @Nullable IEntityMapperUtil entityMapper) {
-        initCore(context, sqLiteOpenHelper, entityMapper);
+    public static void initWithSQLBrite(@NonNull Context context, @NonNull SQLiteOpenHelper sqLiteOpenHelper) {
+        initCore(context, sqLiteOpenHelper, null);
         sGenericUseCase = GenericUseCase.getInstance();
     }
 
