@@ -1,7 +1,6 @@
 package com.zeyad.genericusecase.domain.interactors;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.annotation.VisibleForTesting;
 
@@ -79,21 +78,6 @@ public class GenericUseCase implements IGenericUseCase {
         DatabaseManagerFactory.initRealm(context);
         sGenericUseCase = new GenericUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
                 .getInstance(), context), entityMapper), new JobExecutor(), new UIThread());
-    }
-
-    /**
-     * This function should be called at-least once before calling getInstance() method
-     * This function should not be called multiple times, but only when required.
-     * Ideally this function should be called once when application  is started or created.
-     * This function may be called n number of times if required, during mocking and testing.
-     *
-     * @param sqLiteOpenHelper
-     */
-    static void initWithSQLBrite(SQLiteOpenHelper sqLiteOpenHelper, IEntityMapperUtil entityMapper) {
-        DatabaseManagerFactory.initSQLBrite(sqLiteOpenHelper);
-        sGenericUseCase = new GenericUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
-                .getInstance(), Config.getInstance().getContext()), entityMapper), new JobExecutor(),
-                new UIThread());
     }
 
     /**
