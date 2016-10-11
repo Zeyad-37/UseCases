@@ -89,7 +89,7 @@ public class RealmManager implements DataBaseManager {
     @NonNull
     @Override
     public Observable<List<?>> getAll(Class clazz) {
-        return Observable.defer(() -> Observable.just(Realm.getDefaultInstance().where(clazz).findAll()));
+        return Observable.defer(() -> Realm.getDefaultInstance().where(clazz).findAll().asObservable());
     }
 
     /**
@@ -102,8 +102,8 @@ public class RealmManager implements DataBaseManager {
     @NonNull
     @Override
     public Observable<List<?>> getWhere(Class clazz, String query, @NonNull String filterKey) {
-        return Observable.defer(() -> Observable.just(Realm.getDefaultInstance()
-                .where(clazz).beginsWith(filterKey, query, Case.INSENSITIVE).findAll()));
+        return Observable.defer(() -> Realm.getDefaultInstance().where(clazz).beginsWith(filterKey,
+                query, Case.INSENSITIVE).findAll().asObservable());
     }
 
     /**
@@ -114,7 +114,7 @@ public class RealmManager implements DataBaseManager {
     @NonNull
     @Override
     public Observable<List<?>> getWhere(@NonNull RealmQuery realmQuery) {
-        return Observable.defer(() -> Observable.just(realmQuery.findAll()));
+        return Observable.defer(() -> realmQuery.findAll().asObservable());
     }
 
     /**
