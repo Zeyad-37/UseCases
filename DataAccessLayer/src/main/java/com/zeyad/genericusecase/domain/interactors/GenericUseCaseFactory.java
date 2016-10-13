@@ -1,7 +1,6 @@
 package com.zeyad.genericusecase.domain.interactors;
 
 import android.content.Context;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
@@ -48,12 +47,11 @@ public class GenericUseCaseFactory {
      * @param entityMapper
      */
     public static void initWithRealm(@NonNull Context context, @Nullable IEntityMapperUtil entityMapper) {
-        initCore(context, null, entityMapper);
+        initCore(context, entityMapper);
         sGenericUseCase = GenericUseCase.getInstance();
     }
 
-    static void initCore(@NonNull Context context, SQLiteOpenHelper sqLiteOpenHelper,
-                         @Nullable IEntityMapperUtil entityMapper) {
+    static void initCore(@NonNull Context context, @Nullable IEntityMapperUtil entityMapper) {
         if (!Utils.doesContextBelongsToApplication(context))
             throw new IllegalArgumentException("Context should be application context only.");
         Config.init(context);
