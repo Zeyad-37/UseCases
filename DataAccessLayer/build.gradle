@@ -36,15 +36,16 @@ android {
         versionName "1.0"
         multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
     }
 
     buildTypes {
         debug {
             debuggable true
-            consumerProguardFiles 'proguard-project.txt'
+//            consumerProguardFiles 'proguard-project.txt'
         }
         release {
-            consumerProguardFiles 'proguard-project.txt'
+//            consumerProguardFiles 'proguard-project.txt'
         }
     }
 
@@ -53,24 +54,17 @@ android {
     }
 
     testOptions {
+        unitTests.returnDefaultValues = true
         unitTests.all {
             // All the usual Gradle options.
             jvmArgs '-XX:MaxPermSize=256m'
         }
     }
 
-    testOptions {
-        unitTests.returnDefaultValues = true
-    }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
         incremental false
-    }
-
-    defaultConfig {
-        vectorDrawables.useSupportLibrary = true
     }
 
     packagingOptions {
@@ -107,8 +101,6 @@ dependencies {
     // Rx
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.1.7'
-    // DB
-    compile 'com.squareup.sqlbrite:sqlbrite:0.7.0'
     //test compile libraries
     androidTestCompile "com.android.support.test:runner:$androidSupportTest"
     androidTestCompile "com.android.support.test:rules:$androidSupportTest"

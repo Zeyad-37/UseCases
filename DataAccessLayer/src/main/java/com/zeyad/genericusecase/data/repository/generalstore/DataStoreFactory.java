@@ -38,31 +38,13 @@ public class DataStoreFactory {
      * Create {@link DataStore} .
      */
     @NonNull
-    public DataStore dynamically(@NonNull String url, EntityMapper entityDataMapper,
-                                 @NonNull Class dataClass) throws IllegalAccessException {
-        if (!url.isEmpty())
+    public DataStore dynamically(@NonNull String url, EntityMapper entityDataMapper) throws IllegalAccessException {
+        if (!url.isEmpty() && Utils.isNetworkAvailable(mContext))
             return new CloudDataStore(new RestApiImpl(), mDataBaseManager, entityDataMapper);
-        else if (mDataBaseManager != null && url.isEmpty() && (mDataBaseManager
-                .areItemsValid(DataBaseManager.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE
-                        + dataClass.getSimpleName()) || !Utils.isNetworkAvailable(mContext)))
-            return new DiskDataStore(mDataBaseManager, entityDataMapper);
-        else
+        else if (mDataBaseManager == null)
             throw new IllegalAccessException(getInstance().getContext().getString(R.string.no_db));
-    }
-
-    /**
-     * Create {@link DataStore} from an id.
-     */
-    @NonNull
-    public DataStore dynamically(@NonNull String url, String idColumnName, int id,
-                                 EntityMapper entityDataMapper, Class dataClass) throws IllegalAccessException {
-        if (!url.isEmpty())
-            return new CloudDataStore(new RestApiImpl(), mDataBaseManager, entityDataMapper);
-        else if (mDataBaseManager != null && url.isEmpty() && (mDataBaseManager.isItemValid(id,
-                idColumnName, dataClass) || !Utils.isNetworkAvailable(mContext)))
-            return new DiskDataStore(mDataBaseManager, entityDataMapper);
         else
-            throw new IllegalAccessException(getInstance().getContext().getString(R.string.no_db));
+            return new DiskDataStore(mDataBaseManager, entityDataMapper);
     }
 
     /**

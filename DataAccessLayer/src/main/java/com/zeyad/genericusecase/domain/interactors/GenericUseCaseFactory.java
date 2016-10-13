@@ -52,16 +52,6 @@ public class GenericUseCaseFactory {
         sGenericUseCase = GenericUseCase.getInstance();
     }
 
-    /**
-     * initializes the Generic Use Case with SQLBrite given context.
-     *
-     * @param context      context of application
-     */
-    public static void initWithSQLBrite(@NonNull Context context, @NonNull SQLiteOpenHelper sqLiteOpenHelper) {
-        initCore(context, sqLiteOpenHelper, null);
-        sGenericUseCase = GenericUseCase.getInstance();
-    }
-
     static void initCore(@NonNull Context context, SQLiteOpenHelper sqLiteOpenHelper,
                          @Nullable IEntityMapperUtil entityMapper) {
         if (!Utils.doesContextBelongsToApplication(context))
@@ -77,10 +67,7 @@ public class GenericUseCaseFactory {
                     return new EntityDataMapper();
                 }
             };
-        if (sqLiteOpenHelper == null)
-            GenericUseCase.initWithRealm(entityMapper);
-        else
-            GenericUseCase.initWithSQLBrite(sqLiteOpenHelper, entityMapper);
+        GenericUseCase.initWithRealm(entityMapper);
     }
 
     /**
