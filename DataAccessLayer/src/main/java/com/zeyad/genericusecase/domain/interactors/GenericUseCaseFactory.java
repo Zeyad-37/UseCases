@@ -92,7 +92,7 @@ public class GenericUseCaseFactory {
     }
 
     static void initCore(@NonNull Context context, @Nullable IEntityMapperUtil entityMapper,
-                         @Nullable OkHttpClient.Builder okhttpBuilder, @Nullable Cache cache) {
+                         OkHttpClient.Builder okhttpBuilder, Cache cache) {
         if (!Utils.doesContextBelongsToApplication(context))
             throw new IllegalArgumentException("Context should be application context only.");
         Config.init(context);

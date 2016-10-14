@@ -2,7 +2,6 @@ package com.zeyad.genericusecase.data.repository;
 
 import android.content.ContentValues;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
@@ -28,7 +27,7 @@ public class DataRepository implements Repository {
      *
      * @param dataStoreFactory A factory to construct different data source implementations.
      */
-    public DataRepository(@Nullable DataStoreFactory dataStoreFactory, IEntityMapperUtil entityMapperUtil) {
+    public DataRepository(DataStoreFactory dataStoreFactory, IEntityMapperUtil entityMapperUtil) {
         mDataStoreFactory = dataStoreFactory;
         mEntityMapperUtil = entityMapperUtil;
     }
