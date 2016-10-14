@@ -9,10 +9,10 @@ import java.io.File;
  */
 public class FileIORequest {
 
-    File mFile;
-    String mUrl;
-    boolean mOnWifi, mWhileCharging;
-    Class mDataClass, mPresentationClass;
+    private File mFile;
+    private String mUrl;
+    private boolean mOnWifi, mWhileCharging;
+    private Class mDataClass, mPresentationClass;
 
     public FileIORequest() {
     }

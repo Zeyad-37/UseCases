@@ -5,8 +5,8 @@ import android.support.test.InstrumentationRegistry;
 
 import com.zeyad.genericusecase.data.TestUtility;
 import com.zeyad.genericusecase.data.mockable.ListObservable;
-import com.zeyad.genericusecase.data.repository.generalstore.DataStore;
-import com.zeyad.genericusecase.data.repository.generalstore.DataStoreFactory;
+import com.zeyad.genericusecase.data.repository.stores.DataStore;
+import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
 
 import org.hamcrest.Matchers;
 import org.junit.After;

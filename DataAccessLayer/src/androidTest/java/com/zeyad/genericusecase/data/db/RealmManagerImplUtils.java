@@ -4,7 +4,7 @@ import android.content.Context;
 
 import org.mockito.Mockito;
 
-public class GeneralRealmManagerImplUtils {
+public class RealmManagerImplUtils {
 
     public static DataBaseManager createDBManagerWithMockedContext(Context mockedContext) {
         final RealmManager generalRealmManager = Mockito.mock(RealmManager.class);

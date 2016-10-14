@@ -3,8 +3,7 @@ package com.zeyad.genericusecase.domain.interactors;
 import android.support.annotation.NonNull;
 
 import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
-import com.zeyad.genericusecase.domain.interactors.requests.GetListRequest;
-import com.zeyad.genericusecase.domain.interactors.requests.GetObjectRequest;
+import com.zeyad.genericusecase.domain.interactors.requests.GetRequest;
 import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 
 import io.realm.RealmQuery;
@@ -17,15 +16,15 @@ public interface IGenericUseCase {
      * @param getListRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable getList(@NonNull GetListRequest getListRequest);
+    Observable getList(@NonNull GetRequest getListRequest);
 
     /**
      * Gets object from full url.
      *
-     * @param getObjectRequest contains the attributes of the request.
+     * @param getRequest contains the attributes of the request.
      * @return Observable with the Object.
      */
-    Observable getObject(@NonNull GetObjectRequest getObjectRequest);
+    Observable getObject(@NonNull GetRequest getRequest);
 
     /**
      * Post Object to full url.

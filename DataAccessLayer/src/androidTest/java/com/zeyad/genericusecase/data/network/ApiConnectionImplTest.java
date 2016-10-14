@@ -6,7 +6,7 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
-public class ApiConnectionImplementationTest extends IApiConnectionTest {
+public class ApiConnectionImplTest extends IApiConnectionTest {
 
     @Override
     protected RestApi getCurrentSetRestApiWithoutCache(@NonNull IApiConnection apiConnection) {

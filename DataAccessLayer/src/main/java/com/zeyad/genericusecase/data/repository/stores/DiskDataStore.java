@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.data.repository.generalstore;
+package com.zeyad.genericusecase.data.repository.stores;
 
 import android.content.ContentValues;
 import android.support.annotation.NonNull;
@@ -21,7 +21,7 @@ import rx.Observable;
 
 public class DiskDataStore implements DataStore {
 
-    private final String TAG = com.zeyad.genericusecase.data.repository.generalstore.DiskDataStore.class.getName();
+    private final String TAG = com.zeyad.genericusecase.data.repository.stores.DiskDataStore.class.getName();
     private DataBaseManager mDataBaseManager;
     private EntityMapper mEntityDataMapper;
 

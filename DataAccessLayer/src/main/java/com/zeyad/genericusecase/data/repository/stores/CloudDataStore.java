@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.data.repository.generalstore;
+package com.zeyad.genericusecase.data.repository.stores;
 
 import android.app.job.JobInfo;
 import android.content.ComponentName;
@@ -66,7 +66,7 @@ public class CloudDataStore implements DataStore {
 
     public static final String FILE_IO_TAG = "fileIOObject", POST_TAG = "postObject", APPLICATION_JSON = "application/json";
     private static final int COUNTER_START = 1, ATTEMPTS = 3;
-    private static final String TAG = com.zeyad.genericusecase.data.repository.generalstore.CloudDataStore.class.getName();
+    private static final String TAG = com.zeyad.genericusecase.data.repository.stores.CloudDataStore.class.getName();
     private final EntityMapper mEntityDataMapper;
     private final DataBaseManager mDataBaseManager;
     private final Context mContext;

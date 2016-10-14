@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.data.repository.generalstore;
+package com.zeyad.genericusecase.data.repository.stores;
 
 import android.app.job.JobScheduler;
 import android.content.Context;
@@ -15,7 +15,7 @@ import com.google.gson.Gson;
 import com.zeyad.genericusecase.data.TestUtility;
 import com.zeyad.genericusecase.data.ToStringArgumentMatcher;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
-import com.zeyad.genericusecase.data.db.GeneralRealmManagerImplUtils;
+import com.zeyad.genericusecase.data.db.RealmManagerImplUtils;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.mockable.ResponseBodyObservable;
 import com.zeyad.genericusecase.data.network.RestApi;
@@ -187,7 +187,7 @@ class CloudDataStoreTestRobot {
         final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
         final Observable<Object> TRUE_OBSERVABLE = Observable.create(subscriber -> subscriber.onNext(true));
         final DataBaseManager dbManagerWithMockedContext
-                = GeneralRealmManagerImplUtils.createDBManagerWithMockedContext(getMockedContext());
+                = RealmManagerImplUtils.createDBManagerWithMockedContext(getMockedContext());
         Mockito.when(dbManagerWithMockedContext.getAll(Mockito.any())).thenReturn(LIST_OBSERVABLE);
         Mockito.doReturn(OBJECT_OBSERVABLE).when(dbManagerWithMockedContext).put(Mockito.any(RealmObject.class), Mockito.any());
         Mockito.doReturn(OBJECT_OBSERVABLE).when(dbManagerWithMockedContext).put(Mockito.any(RealmModel.class), Mockito.any());

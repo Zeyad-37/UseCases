@@ -11,14 +11,13 @@ import com.zeyad.genericusecase.UIThread;
 import com.zeyad.genericusecase.data.db.DatabaseManagerFactory;
 import com.zeyad.genericusecase.data.executor.JobExecutor;
 import com.zeyad.genericusecase.data.repository.DataRepository;
-import com.zeyad.genericusecase.data.repository.generalstore.DataStoreFactory;
+import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
 import com.zeyad.genericusecase.data.utils.ModelConverters;
 import com.zeyad.genericusecase.domain.executors.PostExecutionThread;
 import com.zeyad.genericusecase.domain.executors.ThreadExecutor;
 import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
-import com.zeyad.genericusecase.domain.interactors.requests.GetListRequest;
-import com.zeyad.genericusecase.domain.interactors.requests.GetObjectRequest;
+import com.zeyad.genericusecase.domain.interactors.requests.GetRequest;
 import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 import com.zeyad.genericusecase.domain.repository.Repository;
 
@@ -109,7 +108,7 @@ public class GenericUseCase implements IGenericUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable getList(@NonNull GetListRequest genericUseCaseRequest) {
+    public Observable getList(@NonNull GetRequest genericUseCaseRequest) {
         return mRepository.getListDynamically(genericUseCaseRequest.getUrl(), genericUseCaseRequest
                 .getPresentationClass(), genericUseCaseRequest.getDataClass(), genericUseCaseRequest
                 .isPersist(), genericUseCaseRequest.isShouldCache()).compose(applySchedulers());
@@ -118,14 +117,14 @@ public class GenericUseCase implements IGenericUseCase {
     /**
      * Executes the current use case.
      *
-     * @param getObjectRequest The guy who will be listen to the observable build with .
+     * @param getRequest The guy who will be listen to the observable build with .
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable getObject(@NonNull GetObjectRequest getObjectRequest) {
-        return mRepository.getObjectDynamicallyById(getObjectRequest.getUrl(), getObjectRequest
-                        .getIdColumnName(), getObjectRequest.getItemId(), getObjectRequest.getPresentationClass(),
-                getObjectRequest.getDataClass(), getObjectRequest.isPersist(), getObjectRequest.isShouldCache())
+    public Observable getObject(@NonNull GetRequest getRequest) {
+        return mRepository.getObjectDynamicallyById(getRequest.getUrl(), getRequest
+                        .getIdColumnName(), getRequest.getItemId(), getRequest.getPresentationClass(),
+                getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
                 .compose(applySchedulers());
     }
 

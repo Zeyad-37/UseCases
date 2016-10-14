@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.data.repository.generalstore;
+package com.zeyad.genericusecase.data.repository.stores;
 
 import android.content.ContentValues;
 import android.support.annotation.NonNull;

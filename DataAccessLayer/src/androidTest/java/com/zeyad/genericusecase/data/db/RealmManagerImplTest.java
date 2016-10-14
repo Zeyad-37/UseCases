@@ -54,7 +54,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 @RunWith(AndroidJUnit4.class)
-public class GeneralRealmManagerImplTest {
+public class RealmManagerImplTest {
 
     public static final String TEST_MODEL_PREFIX = "random value:";
 
@@ -150,7 +150,7 @@ public class GeneralRealmManagerImplTest {
     @Test
     public void testPutRealmObject_ifTrueIsReturnedInSubscriber_whenOperationIsPerformed() throws Throwable {
         Observable<?> observable
-                = mRealmManager.put(createTestModelWithRandomId(), GeneralRealmManagerImplTest.class);
+                = mRealmManager.put(createTestModelWithRandomId(), RealmManagerImplTest.class);
         TestSubscriber<Object> subscriber = TestSubscriber.create();
         observable.subscribe(subscriber);
         subscriber.assertValue(Boolean.TRUE);
@@ -1129,7 +1129,7 @@ public class GeneralRealmManagerImplTest {
 
     private TestModel putTestModel(@NonNull DataBaseManager dataBaseManager, TestModel realmModel) {
         Observable<?> observable
-                = dataBaseManager.put(realmModel, GeneralRealmManagerImplTest.class);
+                = dataBaseManager.put(realmModel, RealmManagerImplTest.class);
         TestSubscriber<Object> subscriber = TestSubscriber.create();
         observable.subscribe(subscriber);
         TestUtility.printThrowables(subscriber.getOnErrorEvents());

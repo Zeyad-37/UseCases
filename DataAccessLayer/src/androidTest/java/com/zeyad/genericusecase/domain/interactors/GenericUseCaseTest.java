@@ -8,9 +8,8 @@ import com.zeyad.genericusecase.data.executor.JobExecutor;
 import com.zeyad.genericusecase.data.mockable.ObjectObservable;
 import com.zeyad.genericusecase.data.repository.DataRepository;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
-import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
 import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
-import com.zeyad.genericusecase.domain.interactors.requests.GetObjectRequest;
+import com.zeyad.genericusecase.domain.interactors.requests.GetRequest;
 import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 import com.zeyad.genericusecase.domain.repository.Repository;
 
@@ -38,76 +37,61 @@ import static org.mockito.Matchers.eq;
 @RunWith(JUnit4.class)
 public class GenericUseCaseTest {
 
-    public static final boolean ON_WIFI = Mockito.anyBoolean();
-    public static final boolean WHILE_CHARGING = Mockito.anyBoolean();
-    public static final Class DOMAIN_CLASS = TestModel.class;
-    public static final Class DATA_CLASS = TestModel.class;
-    private static final TestModel TEST_MODEL = new TestModel(1, "123");
-    private static final JSONObject JSON_OBJECT = new JSONObject();
-    private static final JSONArray JSON_ARRAY = new JSONArray();
-    private static final HashMap<String, Object> HASH_MAP = new HashMap<>();
-    private static final File MOCKED_FILE = Mockito.mock(File.class);
-    //    private static final RealmQuery<TestModel> REALM_QUERY = Realm.getDefaultInstance().where(TestModel.class);
+    boolean ON_WIFI = true;
+    boolean WHILE_CHARGING = true;
+    Class DOMAIN_CLASS = TestModel.class;
+    Class DATA_CLASS = TestModel.class;
+    TestModel TEST_MODEL = new TestModel(1, "123");
+    JSONObject JSON_OBJECT = new JSONObject();
+    JSONArray JSON_ARRAY = new JSONArray();
+    HashMap<String, Object> HASH_MAP = new HashMap<>();
+    File MOCKED_FILE = Mockito.mock(File.class);
+    //    private  final RealmQuery<TestModel> REALM_QUERY = Realm.getDefaultInstance().where(TestModel.class);
     @Nullable
-    private static final RealmQuery<TestModel> REALM_QUERY = null;
+    RealmQuery<TestModel> REALM_QUERY = null;
     @Nullable
-    private final Repository mDataRepository = null;//GenericUseCaseTestRobot.getMockedDataRepo();
+    Repository mDataRepository = getMockedDataRepo();
     @Nullable
-    private final JobExecutor mJobExecutor = null;// GenericUseCaseTestRobot.getMockedJobExecuter();
+    JobExecutor mJobExecutor = getMockedJobExecuter();
     @Nullable
-    private final UIThread mUIThread = null;//GenericUseCaseTestRobot.getMockedUiThread();
-    private IGenericUseCase mGenericUse;
-    private boolean mToPersist, mWhileCharging;
+    UIThread mUIThread = getMockedUiThread();
+    IGenericUseCase mGenericUse;
+    boolean mToPersist, mWhileCharging;
 
-    /**
-     * At 0th index => getObjectDynamicallyById observable
-     * At 1st index => map() observable
-     * At 2nd index => compose() observable
-     * At 3rd index => compose() on compose() observable
-     *
-     * @param genericUseCase
-     * @param shouldPersist
-     * @return
-     */
     @NonNull
-    static TestSubscriber<Object> getObject(@NonNull IGenericUseCase genericUseCase, boolean shouldPersist) {
+    private TestSubscriber<Object> getObject(@NonNull IGenericUseCase genericUseCase, boolean shouldPersist) {
         final TestSubscriber<Object> useCaseSubscriber = new TestSubscriber<>();
-        genericUseCase.getObject(new GetObjectRequest(useCaseSubscriber, getUrl()
+        genericUseCase.getObject(new GetRequest(useCaseSubscriber, getUrl()
                 , getIdColumnName(), getItemId(), getPresentationClass()
                 , getDataClass(), shouldPersist, false))
                 .subscribe(useCaseSubscriber);
         return useCaseSubscriber;
     }
 
-    static int getItemId() {
+    private int getItemId() {
         return 1;
     }
 
-    static String getIdColumnName() {
+    private String getIdColumnName() {
         return "id";
     }
 
     @NonNull
-    static Class getDataClass() {
+    private Class getDataClass() {
         return TestModel.class;
     }
 
     @NonNull
-    static Class getDomainClass() {
-        return TestViewModel.class;
-    }
-
-    @NonNull
-    static Class getPresentationClass() {
+    private Class getPresentationClass() {
         return junit.framework.Test.class;
     }
 
-    static String getUrl() {
+    String getUrl() {
         return "www.google.com";
     }
 
-    static Repository getMockedDataRepo() {
-        final Repository dataRepository = Mockito.mock(Repository.class);
+    Repository getMockedDataRepo() {
+        final DataRepository dataRepository = Mockito.mock(DataRepository.class);
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
                 .getObjectDynamicallyById(Mockito.anyString(), Mockito.anyString()
@@ -153,16 +137,16 @@ public class GenericUseCaseTest {
         return dataRepository;
     }
 
-    static JobExecutor getMockedJobExecuter() {
+    JobExecutor getMockedJobExecuter() {
         return Mockito.mock(JobExecutor.class);
     }
 
-    static UIThread getMockedUiThread() {
+    UIThread getMockedUiThread() {
         return Mockito.mock(UIThread.class);
     }
 
     @NonNull
-    private static Observable<List> getListObservable() {
+    private Observable<List> getListObservable() {
         return Observable.create(
                 new Observable.OnSubscribe<List>() {
                     @Override
@@ -173,7 +157,7 @@ public class GenericUseCaseTest {
     }
 
     @NonNull
-    private static Observable<Object> getObjectObservable() {
+    private Observable<Object> getObjectObservable() {
         //        final ObjectObservable mock1 = getMockedObjectObservable();
         //        final ObjectObservable mock2 = getMockedObjectObservable();
         //        final ObjectObservable mock3 = getMockedObjectObservable();
@@ -182,29 +166,26 @@ public class GenericUseCaseTest {
         //        Mockito.when(mock2.compose(Mockito.any())).thenReturn(mock3);
         //        Mockito.when(mock3.compose(Mockito.any())).thenReturn(mock4);
         //        return mock1;
-        return Observable.create(
-                subscriber -> {
-                    subscriber.onNext(createTestModel());
-                });
+        return Observable.just(createTestModel());
     }
 
-    private static ObjectObservable getMockedObjectObservable() {
+    private ObjectObservable getMockedObjectObservable() {
         return Mockito.mock(ObjectObservable.class);
     }
 
     @NonNull
-    static TestModel createTestModel() {
+    private TestModel createTestModel() {
         return TEST_MODEL;
     }
 
-    static void deleteAll(@NonNull IGenericUseCase genericUse, boolean toPersist) {
+    private void deleteAll(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final PostRequest postRequest = new PostRequest
                 .PostRequestBuilder(getDataClass(), toPersist)
                 .url(getUrl()).build();
         genericUse.deleteAll(postRequest).subscribe(new TestSubscriber());
     }
 
-    static void putList_JsonArray(@NonNull IGenericUseCase genericUseCase, boolean toPersist) {
+    private void putList_JsonArray(@NonNull IGenericUseCase genericUseCase, boolean toPersist) {
         final PostRequest postRequest
                 = new PostRequest(new TestSubscriber(), getIdColumnName()
                 , getUrl(), getJsonArray(), getPresentationClass()
@@ -212,29 +193,29 @@ public class GenericUseCaseTest {
         genericUseCase.putList(postRequest);
     }
 
-    static void putList_Hashmap(@NonNull IGenericUseCase genericUseCase, boolean toPersist) {
+    private void putList_Hashmap(@NonNull IGenericUseCase genericUseCase, boolean toPersist) {
         final PostRequest postRequest
                 = getHashmapPostRequest(toPersist);
         genericUseCase.putList(postRequest);
     }
 
     @NonNull
-    static JSONObject getJSONObject() {
+    JSONObject getJSONObject() {
         return JSON_OBJECT;
     }
 
     @NonNull
-    static JSONArray getJsonArray() {
+    private JSONArray getJsonArray() {
         return JSON_ARRAY;
     }
 
     @NonNull
-    static HashMap<String, Object> getHashmap() {
+    HashMap<String, Object> getHashmap() {
         return HASH_MAP;
     }
 
     @NonNull
-    static TestSubscriber uploadFile(@NonNull IGenericUseCase genericUse, boolean onWifi, boolean whileCharging) {
+    private TestSubscriber uploadFile(@NonNull IGenericUseCase genericUse, boolean onWifi, boolean whileCharging) {
         final TestSubscriber subscriber = new TestSubscriber();
         final FileIORequest fileIORequest = getUploadRequest(onWifi, whileCharging);
         genericUse.uploadFile(fileIORequest)
@@ -242,12 +223,12 @@ public class GenericUseCaseTest {
         return subscriber;
     }
 
-    static File getFile() {
+    File getFile() {
         return MOCKED_FILE;
     }
 
     @NonNull
-    static TestSubscriber putObject(@NonNull IGenericUseCase genericUse, boolean toPersist) {
+    private TestSubscriber putObject(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final TestSubscriber subscriber = new TestSubscriber();
         genericUse.putObject(getHashmapPostRequest(toPersist))
                 .subscribe(subscriber);
@@ -255,7 +236,7 @@ public class GenericUseCaseTest {
     }
 
     @NonNull
-    static TestSubscriber deleteCollection(@NonNull IGenericUseCase genericUse, boolean toPersist) {
+    private TestSubscriber deleteCollection(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final PostRequest deleteRequest = getHashmapPostRequest(toPersist);
         final TestSubscriber subscriber = (TestSubscriber) deleteRequest.getSubscriber();
         genericUse.deleteCollection(deleteRequest)
@@ -264,21 +245,21 @@ public class GenericUseCaseTest {
     }
 
     @NonNull
-    static TestSubscriber executeSearch_RealmQuery(@NonNull IGenericUseCase genericUse) {
+    private TestSubscriber executeSearch_RealmQuery(@NonNull IGenericUseCase genericUse) {
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         genericUse.searchDisk(getRealmQuery(), getPresentationClass()).subscribe(testSubscriber);
         return testSubscriber;
     }
 
     @NonNull
-    static TestSubscriber executeSearch_NonRealmQuery(@NonNull IGenericUseCase genericUse) {
+    private TestSubscriber executeSearch_NonRealmQuery(@NonNull IGenericUseCase genericUse) {
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         genericUse.searchDisk(getStringQuery(), getColumnQueryValue(), getPresentationClass(), getDataClass());
         return testSubscriber;
     }
 
     @NonNull
-    static TestSubscriber<Object> postList(@NonNull IGenericUseCase genericUse, boolean toPersist) {
+    private TestSubscriber<Object> postList(@NonNull IGenericUseCase genericUse, boolean toPersist) {
 
         final PostRequest jsonArrayPostRequest = getJsonArrayPostRequest(toPersist);
         TestSubscriber<Object> testSubscriber = (TestSubscriber<Object>) jsonArrayPostRequest.getSubscriber();
@@ -288,7 +269,7 @@ public class GenericUseCaseTest {
     }
 
     @NonNull
-    static TestSubscriber<Object> postObject_JsonObject(@NonNull IGenericUseCase genericUse, boolean toPersist) {
+    private TestSubscriber<Object> postObject_JsonObject(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final PostRequest jsonObjectPostRequest = getJsonObjectPostRequest(toPersist);
         TestSubscriber<Object> subscriber = (TestSubscriber<Object>) jsonObjectPostRequest.getSubscriber();
         genericUse.postObject(jsonObjectPostRequest);
@@ -296,7 +277,7 @@ public class GenericUseCaseTest {
     }
 
     @NonNull
-    static TestSubscriber<Object> postObject_Hashmap(@NonNull IGenericUseCase genericUse, boolean toPersist) {
+    private TestSubscriber<Object> postObject_Hashmap(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final PostRequest jsonObjectPostRequest = getHashmapPostRequest(toPersist);
         TestSubscriber<Object> subscriber = (TestSubscriber<Object>) jsonObjectPostRequest.getSubscriber();
         genericUse.postObject(jsonObjectPostRequest);
@@ -304,49 +285,49 @@ public class GenericUseCaseTest {
     }
 
     @NonNull
-    static TestSubscriber<Object> executeDynamicPostObject_PostRequestVersion_Hashmap(@NonNull IGenericUseCase genericUse, boolean toPersist) {
+    private TestSubscriber<Object> executeDynamicPostObject_PostRequestVersion_Hashmap(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final PostRequest jsonObjectPostRequest = getHashmapPostRequest(toPersist);
         TestSubscriber<Object> subscriber = (TestSubscriber<Object>) jsonObjectPostRequest.getSubscriber();
         genericUse.postObject(jsonObjectPostRequest);
         return subscriber;
     }
 
-    static String getColumnQueryValue() {
+    String getColumnQueryValue() {
         return "1";
     }
 
-    static String getStringQuery() {
+    private String getStringQuery() {
         return "some query";
     }
 
     @NonNull
-    private static FileIORequest getUploadRequest(boolean onWifi, boolean whileCharging) {
+    private FileIORequest getUploadRequest(boolean onWifi, boolean whileCharging) {
         return new FileIORequest(getUrl(), getFile(), onWifi, whileCharging, getPresentationClass(), getDataClass());
     }
 
     @NonNull
-    private static PostRequest getHashmapPostRequest(boolean toPersist) {
+    private PostRequest getHashmapPostRequest(boolean toPersist) {
         return new PostRequest(new TestSubscriber(), getIdColumnName()
                 , getUrl(), getHashmap(), getPresentationClass()
                 , getDataClass(), toPersist);
     }
 
     @NonNull
-    private static PostRequest getJsonArrayPostRequest(boolean toPersist) {
+    private PostRequest getJsonArrayPostRequest(boolean toPersist) {
         return new PostRequest(new TestSubscriber(), getIdColumnName()
                 , getUrl(), getJsonArray(), getPresentationClass()
                 , getDataClass(), toPersist);
     }
 
     @NonNull
-    private static PostRequest getJsonObjectPostRequest(boolean toPersist) {
+    private PostRequest getJsonObjectPostRequest(boolean toPersist) {
         return new PostRequest(new TestSubscriber(), getIdColumnName()
                 , getUrl(), getJSONObject(), getPresentationClass()
                 , getDataClass(), toPersist);
     }
 
     @Nullable
-    public static RealmQuery getRealmQuery() {
+    public RealmQuery getRealmQuery() {
         return REALM_QUERY;
     }
 
@@ -363,28 +344,26 @@ public class GenericUseCaseTest {
     @Test
     public void testGetObject_ifDataRepositoryMethodGetObjectDynamicallyIsCalled_whenArgumentsArePassedAsExpected() {
         getObject(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .getObjectDynamicallyById(
-                        eq(getUrl())
-                        , eq(getIdColumnName())
-                        , eq(getItemId())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist)
-                        , eq(false));
+        Mockito.verify(getMockedDataRepo()).getObjectDynamicallyById(
+                eq(getUrl())
+                , eq(getIdColumnName())
+                , eq(getItemId())
+                , eq(getPresentationClass())
+                , eq(getDataClass())
+                , eq(mToPersist)
+                , eq(false));
     }
 
     @Test
     public void testExecuteDynamicPostObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestOfHasmapIsPassed() {
         executeDynamicPostObject_PostRequestVersion_Hashmap(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .postObjectDynamically(
-                        eq(getUrl())
-                        , eq(getIdColumnName())
-                        , eq(getJSONObject())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist));
+        Mockito.verify(mDataRepository).postObjectDynamically(
+                eq(getUrl())
+                , eq(getIdColumnName())
+                , eq(getJSONObject())
+                , eq(getPresentationClass())
+                , eq(getDataClass())
+                , eq(mToPersist));
     }
 
     @Test
@@ -395,7 +374,7 @@ public class GenericUseCaseTest {
                         eq(getUrl())
                         , eq(getIdColumnName())
                         , eq(getJSONObject())
-                        , eq(getDomainClass())
+                        , eq(getPresentationClass())
                         , eq(getDataClass())
                         , eq(mToPersist));
     }
@@ -403,14 +382,13 @@ public class GenericUseCaseTest {
     @Test
     public void testPostObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestOfHashMapIsPassed() {
         postObject_Hashmap(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .postObjectDynamically(
-                        eq(getUrl())
-                        , eq(getIdColumnName())
-                        , eq(getJSONObject())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist));
+        Mockito.verify(mDataRepository).postObjectDynamically(
+                eq(getUrl())
+                , eq(getIdColumnName())
+                , eq(getJSONObject())
+                , eq(getPresentationClass())
+                , eq(getDataClass())
+                , eq(mToPersist));
     }
 
     @Test
@@ -421,7 +399,7 @@ public class GenericUseCaseTest {
                         eq(getUrl())
                         , eq(getIdColumnName())
                         , eq(getJsonArray())
-                        , eq(getDomainClass())
+                        , eq(getPresentationClass())
                         , eq(getDataClass())
                         , eq(mToPersist));
     }
@@ -432,7 +410,7 @@ public class GenericUseCaseTest {
         Mockito.verify(mDataRepository)
                 .searchDisk(
                         eq(getRealmQuery())
-                        , eq(getDomainClass()));
+                        , eq(getPresentationClass()));
     }
 
     @Test
@@ -442,7 +420,7 @@ public class GenericUseCaseTest {
                 .searchDisk(
                         eq(getStringQuery())
                         , eq(getColumnQueryValue())
-                        , eq(getDomainClass())
+                        , eq(getPresentationClass())
                         , eq(getDataClass()));
     }
 
@@ -453,7 +431,7 @@ public class GenericUseCaseTest {
                 .deleteListDynamically(
                         eq(getUrl())
                         , eq(getJsonArray())
-                        , eq(getDomainClass())
+                        , eq(getPresentationClass())
                         , eq(getDataClass())
                         , eq(mToPersist));
     }
@@ -461,39 +439,36 @@ public class GenericUseCaseTest {
     @Test
     public void testExecuteDynamicPutObject_ifDataRepoCorrectMethodIsCalled_whenNonPutRequestIsPassed() {
         putObject(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .putObjectDynamically(
-                        eq(getUrl())
-                        , eq(getIdColumnName())
-                        , eq(getJSONObject())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist));
+        Mockito.verify(mDataRepository).putObjectDynamically(
+                eq(getUrl())
+                , eq(getIdColumnName())
+                , eq(getJSONObject())
+                , eq(getPresentationClass())
+                , eq(getDataClass())
+                , eq(mToPersist));
     }
 
     @Test
     public void testPutObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestIsPassed() {
         putObject(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository)
-                .putObjectDynamically(
-                        eq(getUrl())
-                        , eq(getIdColumnName())
-                        , eq(getJSONObject())
-                        , eq(getDomainClass())
-                        , eq(getDataClass())
-                        , eq(mToPersist));
+        Mockito.verify(mDataRepository).putObjectDynamically(
+                eq(getUrl()),
+                eq(getIdColumnName()),
+                eq(getJSONObject()),
+                eq(getPresentationClass()),
+                eq(getDataClass()),
+                eq(mToPersist));
     }
 
     @Test
     public void testUploadFile_ifDataRepoCorrectMethodIsCalled_whenPutRequestIsPassed() {
         uploadFile(mGenericUse, mToPersist, mWhileCharging);
-        Mockito.verify(mDataRepository)
-                .uploadFileDynamically(eq(getUrl()),
-                        eq(getFile()),
-                        eq(ON_WIFI),
-                        eq(WHILE_CHARGING),
-                        eq(DOMAIN_CLASS),
-                        eq(DATA_CLASS));
+        Mockito.verify(mDataRepository).uploadFileDynamically(eq(getUrl()),
+                eq(getFile()),
+                eq(ON_WIFI),
+                eq(WHILE_CHARGING),
+                eq(DOMAIN_CLASS),
+                eq(DATA_CLASS));
     }
 
     @Test
@@ -503,7 +478,7 @@ public class GenericUseCaseTest {
                 eq(getUrl())
                 , eq(getIdColumnName())
                 , eq(getJsonArray())
-                , eq(getDomainClass())
+                , eq(getPresentationClass())
                 , eq(getDataClass())
                 , eq(mToPersist));
     }
@@ -515,7 +490,7 @@ public class GenericUseCaseTest {
                 eq(getUrl())
                 , eq(getIdColumnName())
                 , eq(getJsonArray())
-                , eq(getDomainClass())
+                , eq(getPresentationClass())
                 , eq(getDataClass())
                 , eq(mToPersist));
     }
@@ -529,8 +504,7 @@ public class GenericUseCaseTest {
                 , eq(mToPersist));
     }
 
-    public IGenericUseCase getGenericUseImplementation(DataRepository datarepo
-            , JobExecutor jobExecuter
+    public IGenericUseCase getGenericUseImplementation(DataRepository datarepo, JobExecutor jobExecuter
             , UIThread uithread) {
         GenericUseCase.init(datarepo, jobExecuter, uithread);
         return GenericUseCase.getInstance();

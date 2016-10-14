@@ -7,7 +7,7 @@ import rx.Subscriber;
 /**
  * @author zeyad on 7/29/16.
  */
-public class GetObjectRequest {
+public class GetRequest {
 
     private String mUrl;
     private Subscriber mSubscriber;
@@ -17,7 +17,7 @@ public class GetObjectRequest {
     private int mItemId;
     private boolean mShouldCache;
 
-    public GetObjectRequest(@NonNull GetObjectRequestBuilder getObjectRequestBuilder) {
+    public GetRequest(@NonNull GetObjectRequestBuilder getObjectRequestBuilder) {
         mUrl = getObjectRequestBuilder.getUrl();
         mDataClass = getObjectRequestBuilder.getDataClass();
         mPresentationClass = getObjectRequestBuilder.getPresentationClass();
@@ -28,9 +28,9 @@ public class GetObjectRequest {
         mShouldCache = getObjectRequestBuilder.isShouldCache();
     }
 
-    public GetObjectRequest(@NonNull Subscriber subscriber, String url, String idColumnName,
-                            int itemId, @NonNull Class presentationClass, Class dataClass, boolean persist,
-                            boolean shouldCache) {
+    public GetRequest(@NonNull Subscriber subscriber, String url, String idColumnName,
+                      int itemId, @NonNull Class presentationClass, Class dataClass, boolean persist,
+                      boolean shouldCache) {
         mSubscriber = subscriber;
         mUrl = url;
         mIdColumnName = idColumnName;
@@ -126,8 +126,8 @@ public class GetObjectRequest {
         }
 
         @NonNull
-        public GetObjectRequest build() {
-            return new GetObjectRequest(this);
+        public GetRequest build() {
+            return new GetRequest(this);
         }
 
         public boolean isShouldCache() {

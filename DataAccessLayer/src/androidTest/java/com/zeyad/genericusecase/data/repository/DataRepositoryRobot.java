@@ -2,10 +2,10 @@ package com.zeyad.genericusecase.data.repository;
 
 import android.support.annotation.NonNull;
 
-import com.zeyad.genericusecase.data.repository.generalstore.CloudDataStore;
-import com.zeyad.genericusecase.data.repository.generalstore.DataStore;
-import com.zeyad.genericusecase.data.repository.generalstore.DataStoreFactory;
-import com.zeyad.genericusecase.data.repository.generalstore.DiskDataStore;
+import com.zeyad.genericusecase.data.repository.stores.CloudDataStore;
+import com.zeyad.genericusecase.data.repository.stores.DataStore;
+import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
+import com.zeyad.genericusecase.data.repository.stores.DiskDataStore;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
 
@@ -39,17 +39,17 @@ class DataRepositoryRobot {
     }
 
     static void addMockForDiskStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedDataStore) throws IllegalAccessException {
-        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any(), Mockito.any()))
+        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any()))
                 .thenReturn(mockedDataStore);
-        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.any(), Mockito.any()))
+        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any()))
                 .thenReturn(mockedDataStore);
         Mockito.when(mockedDataStoreFactory.disk(Mockito.any())).thenReturn(mockedDataStore);
     }
 
     static void addMockForCloudStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedCloudStore) throws IllegalAccessException {
-        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any(), Mockito.any()))
+        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any()))
                 .thenReturn(mockedCloudStore);
-        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyString(), Mockito.anyInt(), Mockito.any(), Mockito.any()))
+        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any()))
                 .thenReturn(mockedCloudStore);
         Mockito.when(mockedDataStoreFactory.cloud(Mockito.any())).thenReturn(mockedCloudStore);
     }

@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.zeyad.genericusecase.data.repository.generalstore.DataStoreFactory;
+import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
 import com.zeyad.genericusecase.domain.repository.Repository;
 

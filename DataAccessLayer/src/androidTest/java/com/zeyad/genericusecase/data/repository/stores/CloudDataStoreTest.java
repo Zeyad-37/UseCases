@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.data.repository.generalstore;
+package com.zeyad.genericusecase.data.repository.stores;
 
 import android.support.annotation.NonNull;
 
@@ -31,7 +31,7 @@ import io.realm.RealmObject;
 import okhttp3.RequestBody;
 import rx.observers.TestSubscriber;
 
-import static com.zeyad.genericusecase.data.repository.generalstore.CloudDataStoreTestRobot.argThis;
+import static com.zeyad.genericusecase.data.repository.stores.CloudDataStoreTestRobot.argThis;
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Matchers.eq;
