@@ -56,7 +56,7 @@ public class GenericUseCaseTest {
     @Nullable
     UIThread mUIThread = getMockedUiThread();
     IGenericUseCase mGenericUse;
-    boolean mToPersist, mWhileCharging;
+    boolean mToPersist, mWhileCharging, mQueuable;
 
     @NonNull
     private TestSubscriber<Object> getObject(@NonNull IGenericUseCase genericUseCase, boolean shouldPersist) {
@@ -106,19 +106,24 @@ public class GenericUseCaseTest {
                 .deleteAllDynamically(Mockito.anyString(), Mockito.any(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .putListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .putListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class),
+                        Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .putListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .putListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class),
+                        Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(getListObservable())
                 .when(dataRepository)
-                .uploadFileDynamically(Mockito.anyString(), Mockito.any(File.class), Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.any(), Mockito.any());
+                .uploadFileDynamically(Mockito.anyString(), Mockito.any(File.class), Mockito.anyBoolean(),
+                        Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.any(), Mockito.any());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .putObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .putObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class),
+                        Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .deleteListDynamically(Mockito.anyString(), Mockito.any(JSONArray.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .deleteListDynamically(Mockito.anyString(), Mockito.any(JSONArray.class), Mockito.any(),
+                        Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
                 .searchDisk(Mockito.any(RealmQuery.class), Mockito.any());
@@ -127,13 +132,16 @@ public class GenericUseCaseTest {
                 .searchDisk(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .postListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .postListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class),
+                        Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class),
+                        Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class), Mockito.any(), Mockito.any(), Mockito.anyBoolean());
+                .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class),
+                        Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         return dataRepository;
     }
 
@@ -363,7 +371,8 @@ public class GenericUseCaseTest {
                 , eq(getJSONObject())
                 , eq(getPresentationClass())
                 , eq(getDataClass())
-                , eq(mToPersist));
+                , eq(mToPersist)
+                , eq(mQueuable));
     }
 
     @Test
@@ -376,7 +385,8 @@ public class GenericUseCaseTest {
                         , eq(getJSONObject())
                         , eq(getPresentationClass())
                         , eq(getDataClass())
-                        , eq(mToPersist));
+                        , eq(mToPersist)
+                        , eq(mQueuable));
     }
 
     @Test
@@ -388,7 +398,8 @@ public class GenericUseCaseTest {
                 , eq(getJSONObject())
                 , eq(getPresentationClass())
                 , eq(getDataClass())
-                , eq(mToPersist));
+                , eq(mToPersist)
+                , eq(mQueuable));
     }
 
     @Test
@@ -401,7 +412,8 @@ public class GenericUseCaseTest {
                         , eq(getJsonArray())
                         , eq(getPresentationClass())
                         , eq(getDataClass())
-                        , eq(mToPersist));
+                        , eq(mToPersist)
+                        , eq(mQueuable));
     }
 
     @Test
@@ -433,7 +445,8 @@ public class GenericUseCaseTest {
                         , eq(getJsonArray())
                         , eq(getPresentationClass())
                         , eq(getDataClass())
-                        , eq(mToPersist));
+                        , eq(mToPersist)
+                        , eq(mQueuable));
     }
 
     @Test
@@ -445,7 +458,8 @@ public class GenericUseCaseTest {
                 , eq(getJSONObject())
                 , eq(getPresentationClass())
                 , eq(getDataClass())
-                , eq(mToPersist));
+                , eq(mToPersist)
+                , eq(mQueuable));
     }
 
     @Test
@@ -456,8 +470,9 @@ public class GenericUseCaseTest {
                 eq(getIdColumnName()),
                 eq(getJSONObject()),
                 eq(getPresentationClass()),
-                eq(getDataClass()),
-                eq(mToPersist));
+                eq(getDataClass())
+                , eq(mToPersist)
+                , eq(mQueuable));
     }
 
     @Test
@@ -467,6 +482,7 @@ public class GenericUseCaseTest {
                 eq(getFile()),
                 eq(ON_WIFI),
                 eq(WHILE_CHARGING),
+                eq(mQueuable),
                 eq(DOMAIN_CLASS),
                 eq(DATA_CLASS));
     }
@@ -480,7 +496,8 @@ public class GenericUseCaseTest {
                 , eq(getJsonArray())
                 , eq(getPresentationClass())
                 , eq(getDataClass())
-                , eq(mToPersist));
+                , eq(mToPersist)
+                , eq(mQueuable));
     }
 
     @Test
@@ -492,7 +509,8 @@ public class GenericUseCaseTest {
                 , eq(getJsonArray())
                 , eq(getPresentationClass())
                 , eq(getDataClass())
-                , eq(mToPersist));
+                , eq(mToPersist)
+                , eq(mQueuable));
     }
 
     @Test

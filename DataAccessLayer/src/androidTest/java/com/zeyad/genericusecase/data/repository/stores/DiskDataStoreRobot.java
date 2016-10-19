@@ -175,10 +175,9 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
         final List<Long> listOfAllIds = getListOfAllIds();
         listOfAllIds.remove(0);
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        diskDataStore
-                .dynamicDeleteCollection(null, DataRepository.DEFAULT_ID_TO_BE_REPLACED
+        diskDataStore.dynamicDeleteCollection(null, DataRepository.DEFAULT_ID_TO_BE_REPLACED
                         , ModelConverters.convertToJsonArray(listOfAllIds)
-                        , getDataClass(), false)
+                , getDataClass(), false, false)
                 .subscribe(subscriber);
         return subscriber;
     }
@@ -219,7 +218,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
     @Override
     public TestSubscriber<Object> postTestModelKeyValuePair(@NonNull DataStore diskDataStore) throws JSONException {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        diskDataStore.dynamicPostObject(null, "id", getTestModelJson(), getDomainClass(), getDataClass(), false)
+        diskDataStore.dynamicPostObject(null, "id", getTestModelJson(), getDomainClass(), getDataClass(), false, false)
                 .subscribe(subscriber);
         return subscriber;
     }
@@ -228,7 +227,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
     @Override
     public TestSubscriber<Object> putTestModelKeyValuePair(@NonNull DataStore diskDataStore) throws JSONException {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        diskDataStore.dynamicPutObject(null, "id", getTestModelJson(), getDomainClass(), getDataClass(), false)
+        diskDataStore.dynamicPutObject(null, "id", getTestModelJson(), getDomainClass(), getDataClass(), false, false)
                 .subscribe(subscriber);
         return subscriber;
     }
@@ -237,7 +236,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
     @Override
     public TestSubscriber<Object> postTestModelJsonObject(@NonNull DataStore diskDataStore) {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        diskDataStore.dynamicPostObject(null, "id", getTestModelJson(), getDomainClass(), getDataClass(), false)
+        diskDataStore.dynamicPostObject(null, "id", getTestModelJson(), getDomainClass(), getDataClass(), false, false)
                 .subscribe(subscriber);
         return subscriber;
     }
@@ -245,6 +244,6 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
     @NonNull
     @Override
     public Observable<?> dynamicDownloadFile(@NonNull DataStore diskDataStore) {
-        return diskDataStore.dynamicDownloadFile(null, null, true, false);
+        return diskDataStore.dynamicDownloadFile(null, null, true, false, false);
     }
 }

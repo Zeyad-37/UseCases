@@ -53,8 +53,7 @@ public class PostTestRobot {
     static Post createPost(Context context, PostRequest postRequest, RestApi restApi, int trailCount,
                            boolean hasLollipop, boolean isPlayServicesAvailable, boolean networkAvailable,
                            GcmNetworkManager gcmNetworkManager) {
-        return new Post(context, postRequest, restApi
-                , trailCount, isPlayServicesAvailable, networkAvailable, gcmNetworkManager);
+        return new Post(context, postRequest, restApi, trailCount, isPlayServicesAvailable);
     }
 
     static String getValidUrl() {

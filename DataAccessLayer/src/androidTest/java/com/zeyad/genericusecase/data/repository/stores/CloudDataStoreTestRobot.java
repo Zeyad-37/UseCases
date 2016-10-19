@@ -299,6 +299,7 @@ class CloudDataStoreTestRobot {
                 , createTestModelJSON()
                 , getValidDomainClass()
                 , getValidDataClass()
+                , false
                 , toPersist)
                 .subscribe(subscriber);
         return subscriber;
@@ -312,6 +313,7 @@ class CloudDataStoreTestRobot {
                 , createTestModelJSON()
                 , getValidDomainClass()
                 , getValidDataClass()
+                , false
                 , toPersist)
                 .subscribe(subscriber);
         return subscriber;
@@ -359,12 +361,13 @@ class CloudDataStoreTestRobot {
 
     @NonNull
     static TestSubscriber<List> dynamicPostList(@NonNull CloudDataStore cloudDataStore, boolean toPersist) {
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
+        final TestSubscriber subscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPostList(getValidUrl()
                 , getValidColumnName()
                 , getValidJsonArray()
                 , getValidDomainClass()
                 , getValidDataClass()
+                , false
                 , toPersist)
                 .subscribe(subscriber);
         return subscriber;
@@ -378,6 +381,7 @@ class CloudDataStoreTestRobot {
                 , getValidJsonArray()
                 , getValidDomainClass()
                 , getValidDataClass()
+                , false
                 , toPersist)
                 .subscribe(subscriber);
         return subscriber;
@@ -387,7 +391,7 @@ class CloudDataStoreTestRobot {
     static TestSubscriber<Object> dynamicUploadFile(@NonNull CloudDataStore cloudDataStore, boolean onWifi) {
 
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        cloudDataStore.dynamicUploadFile(getValidUrl(), getValidFile(), onWifi, true, getValidDataClass())
+        cloudDataStore.dynamicUploadFile(getValidUrl(), getValidFile(), onWifi, true, false, getValidDataClass())
                 .subscribe(subscriber);
         return subscriber;
     }

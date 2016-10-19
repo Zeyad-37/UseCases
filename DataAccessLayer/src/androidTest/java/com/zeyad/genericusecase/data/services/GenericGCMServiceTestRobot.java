@@ -48,7 +48,6 @@ class GenericGCMServiceTestRobot {
     static int runForDownloadFile() {
         final GenericGCMService genericGCMService = new GenericGCMService();
         genericGCMService.setContext(GenericGCMServiceTestRobot.getMockedContext());
-        genericGCMService.setApplicationContext(Mockito.mock(Context.class));
         return genericGCMService.onRunTask(GenericGCMServiceTestRobot
                 .createTaskParam(GenericGCMService.TAG_TASK_ONE_OFF_LOG, DOWNLOAD_FILE));
     }
@@ -56,7 +55,6 @@ class GenericGCMServiceTestRobot {
     static int runForUploadFile() {
         final GenericGCMService genericGCMService = new GenericGCMService();
         genericGCMService.setContext(GenericGCMServiceTestRobot.getMockedContext());
-        genericGCMService.setApplicationContext(Mockito.mock(Context.class));
         return genericGCMService.onRunTask(GenericGCMServiceTestRobot
                 .createTaskParam(GenericGCMService.TAG_TASK_ONE_OFF_LOG, UPLOAD_FILE));
     }
@@ -64,7 +62,6 @@ class GenericGCMServiceTestRobot {
     static int runForPost() {
         final GenericGCMService genericGCMService = new GenericGCMService();
         genericGCMService.setContext(GenericGCMServiceTestRobot.getMockedContext());
-        genericGCMService.setApplicationContext(Mockito.mock(Context.class));
         return genericGCMService.onRunTask(GenericGCMServiceTestRobot
                 .createTaskParam(GenericGCMService.TAG_TASK_ONE_OFF_LOG, POST));
     }
@@ -72,7 +69,6 @@ class GenericGCMServiceTestRobot {
     static int runForPeriodicLog() {
         final GenericGCMService genericGCMService = new GenericGCMService();
         genericGCMService.setContext(GenericGCMServiceTestRobot.getMockedContext());
-        genericGCMService.setApplicationContext(Mockito.mock(Context.class));
         return genericGCMService.onRunTask(GenericGCMServiceTestRobot
                 .createTaskParam(GenericGCMService.TAG_TASK_PERIODIC_LOG, null));
     }
@@ -80,7 +76,6 @@ class GenericGCMServiceTestRobot {
     static int runForDefaultTag() {
         final GenericGCMService genericGCMService = new GenericGCMService();
         genericGCMService.setContext(GenericGCMServiceTestRobot.getMockedContext());
-        genericGCMService.setApplicationContext(Mockito.mock(Context.class));
         return genericGCMService.onRunTask(GenericGCMServiceTestRobot
                 .createTaskParam("-1", null));
     }

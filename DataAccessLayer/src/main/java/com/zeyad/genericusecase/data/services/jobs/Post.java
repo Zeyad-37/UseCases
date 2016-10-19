@@ -69,14 +69,13 @@ public class Post {
     }
 
     Post(Context context, PostRequest postRequest, RestApi restApi, int trailCount,
-         boolean googlePlayServicesAvailable, GcmNetworkManager gcmNetworkManager) {
+         boolean isPlayServicesAvailable) {
         mContext = context;
         mPostRequest = postRequest;
         mRestApi = restApi;
         mTrailCount = trailCount;
-        mGooglePlayServicesAvailable = googlePlayServicesAvailable;
-        mGcmNetworkManager = gcmNetworkManager;
-
+        mGooglePlayServicesAvailable = isPlayServicesAvailable;
+        mGcmNetworkManager = GcmNetworkManager.getInstance(mContext);
     }
 
     public Subscription execute() {

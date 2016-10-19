@@ -30,6 +30,7 @@ class DataRepositoryRobot {
     public static final File MOCKED_FILE = Mockito.mock(File.class);
     public static final boolean ON_WIFI = true;
     public static final boolean WHILE_CHARGING = true;
+    public static final boolean QUEUABLE = true;
 
 
     static DataStoreFactory createMockedDataStoreFactory(DataStore dataStore) {
@@ -39,17 +40,17 @@ class DataRepositoryRobot {
     }
 
     static void addMockForDiskStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedDataStore) throws IllegalAccessException {
-        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any()))
+        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
                 .thenReturn(mockedDataStore);
-        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any()))
+        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
                 .thenReturn(mockedDataStore);
         Mockito.when(mockedDataStoreFactory.disk(Mockito.any())).thenReturn(mockedDataStore);
     }
 
     static void addMockForCloudStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedCloudStore) throws IllegalAccessException {
-        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any()))
+        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
                 .thenReturn(mockedCloudStore);
-        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any()))
+        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
                 .thenReturn(mockedCloudStore);
         Mockito.when(mockedDataStoreFactory.cloud(Mockito.any())).thenReturn(mockedCloudStore);
     }

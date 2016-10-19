@@ -124,13 +124,13 @@ public class DataRepositoryTest {
                 , DataRepositoryRobot.getValidJSONObject()
                 , DataRepositoryRobot.getValidDomainClass()
                 , DataRepositoryRobot.getValidDataClass()
-                , true);
+                , true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicPostObject(DataRepositoryRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_TO_BE_REPLACED, DataRepositoryRobot.getValidJSONObject()
                         , DataRepositoryRobot.getValidDomainClass()
                         , DataRepositoryRobot.getValidDataClass()
-                        , true);
+                        , true, true);
     }
 
     @Test
@@ -139,13 +139,13 @@ public class DataRepositoryTest {
                 , DataRepository.DEFAULT_ID_TO_BE_REPLACED, DataRepositoryRobot.getValidJSONArray()
                 , DataRepositoryRobot.getValidDomainClass()
                 , DataRepositoryRobot.getValidDataClass()
-                , true);
+                , true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicPostList(DataRepositoryRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_TO_BE_REPLACED, DataRepositoryRobot.getValidJSONArray()
                         , DataRepositoryRobot.getValidDomainClass()
                         , DataRepositoryRobot.getValidDataClass()
-                        , true);
+                        , true, true);
     }
 
     @Test
@@ -154,13 +154,13 @@ public class DataRepositoryTest {
                 , DataRepositoryRobot.getValidJSONArray()
                 , DataRepositoryRobot.getValidDomainClass()
                 , DataRepositoryRobot.getValidDataClass()
-                , true);
+                , true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicDeleteCollection(DataRepositoryRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_TO_BE_REPLACED
                         , DataRepositoryRobot.getValidJSONArray()
                         , DataRepositoryRobot.getValidDataClass()
-                        , true);
+                        , true, true);
     }
 
     @Test
@@ -192,10 +192,12 @@ public class DataRepositoryTest {
         assumeThat(mIsDiskType, Matchers.is(false));
         mDataRepository.uploadFileDynamically(DataRepositoryRobot.getValidUrl()
                 , DataRepositoryRobot.getValidFile(), DataRepositoryRobot.ON_WIFI,
-                DataRepositoryRobot.WHILE_CHARGING, DataRepositoryRobot.getValidDomainClass(), DataRepositoryRobot.getValidDataClass());
+                DataRepositoryRobot.WHILE_CHARGING, DataRepositoryRobot.QUEUABLE,
+                DataRepositoryRobot.getValidDomainClass(), DataRepositoryRobot.getValidDataClass());
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicUploadFile(DataRepositoryRobot.getValidUrl(), DataRepositoryRobot.getValidFile(),
-                        DataRepositoryRobot.ON_WIFI, DataRepositoryRobot.WHILE_CHARGING, DataRepositoryRobot.getValidDomainClass());
+                        DataRepositoryRobot.ON_WIFI, DataRepositoryRobot.WHILE_CHARGING, DataRepositoryRobot.QUEUABLE,
+                        DataRepositoryRobot.getValidDomainClass());
     }
 
     @Test
@@ -204,13 +206,13 @@ public class DataRepositoryTest {
                 , DataRepository.DEFAULT_ID_TO_BE_REPLACED
                 , DataRepositoryRobot.getValidJSONObject()
                 , DataRepositoryRobot.getValidDomainClass()
-                , DataRepositoryRobot.getValidDataClass(), true);
+                , DataRepositoryRobot.getValidDataClass(), true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicPutObject(DataRepositoryRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_TO_BE_REPLACED
                         , DataRepositoryRobot.getValidJSONObject()
                         , DataRepositoryRobot.getValidDomainClass()
-                        , DataRepositoryRobot.getValidDataClass(), true);
+                        , DataRepositoryRobot.getValidDataClass(), true, true);
     }
 
     @Test
@@ -219,13 +221,13 @@ public class DataRepositoryTest {
                 , DataRepository.DEFAULT_ID_TO_BE_REPLACED
                 , DataRepositoryRobot.getValidJSONArray()
                 , DataRepositoryRobot.getValidDomainClass()
-                , DataRepositoryRobot.getValidDataClass(), true);
+                , DataRepositoryRobot.getValidDataClass(), true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicPutList(DataRepositoryRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_TO_BE_REPLACED
                         , DataRepositoryRobot.getValidJSONArray()
                         , DataRepositoryRobot.getValidDomainClass()
-                        , DataRepositoryRobot.getValidDataClass(), true);
+                        , DataRepositoryRobot.getValidDataClass(), true, true);
     }
 
     @Test
