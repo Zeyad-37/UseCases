@@ -16,7 +16,6 @@ import com.google.gson.GsonBuilder;
 import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.network.RestApi;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
-import com.zeyad.genericusecase.data.repository.stores.CloudDataStore;
 import com.zeyad.genericusecase.data.services.GenericGCMService;
 import com.zeyad.genericusecase.data.services.GenericJobService;
 import com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService;
@@ -35,6 +34,8 @@ import rx.subscriptions.Subscriptions;
 
 import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
 import static com.google.android.gms.gcm.Task.NETWORK_STATE_CONNECTED;
+import static com.zeyad.genericusecase.data.repository.stores.CloudDataStore.APPLICATION_JSON;
+import static com.zeyad.genericusecase.data.repository.stores.CloudDataStore.POST_TAG;
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.JOB_TYPE;
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.PAYLOAD;
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.TRIAL_COUNT;
@@ -43,13 +44,12 @@ import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentSe
  * @author Zeyad on 6/05/16.
  */
 public class Post {
-    private static final String TAG = com.zeyad.genericusecase.data.services.jobs.Post.class.getSimpleName();
+    private static final String TAG = Post.class.getSimpleName();
     private final Context mContext;
     private final PostRequest mPostRequest;
     private final RestApi mRestApi;
     private int mTrailCount;
     private boolean mGooglePlayServicesAvailable;
-    private boolean mNetworkAvailable;
     private GcmNetworkManager mGcmNetworkManager;
     @NonNull
     private Action1<Object> handleError = object -> {
@@ -65,24 +65,22 @@ public class Post {
         mTrailCount = intent.getIntExtra(TRIAL_COUNT, 0);
         mPostRequest = new Gson().fromJson(intent.getStringExtra(PAYLOAD), PostRequest.class);
         mGooglePlayServicesAvailable = Utils.isGooglePlayServicesAvailable(mContext);
-        mNetworkAvailable = Utils.isNetworkAvailable(mContext);
         mGcmNetworkManager = GcmNetworkManager.getInstance(mContext);
     }
 
     Post(Context context, PostRequest postRequest, RestApi restApi, int trailCount,
-         boolean googlePlayServicesAvailable, boolean networkAvailable, GcmNetworkManager gcmNetworkManager) {
+         boolean googlePlayServicesAvailable, GcmNetworkManager gcmNetworkManager) {
         mContext = context;
         mPostRequest = postRequest;
         mRestApi = restApi;
         mTrailCount = trailCount;
         mGooglePlayServicesAvailable = googlePlayServicesAvailable;
-        mNetworkAvailable = networkAvailable;
         mGcmNetworkManager = gcmNetworkManager;
 
     }
 
     public Subscription execute() {
-        if (mNetworkAvailable) {
+        if (Utils.isNetworkAvailable(mContext)) {
             String bundle = "";
             boolean isObject = false;
             if (mPostRequest.getJsonArray() == null) {
@@ -96,29 +94,29 @@ public class Post {
                 case PostRequest.POST:
                     if (isObject)
                         return mRestApi.dynamicPostObject(mPostRequest.getUrl(), RequestBody
-                                .create(MediaType.parse(CloudDataStore.APPLICATION_JSON), bundle))
+                                .create(MediaType.parse(APPLICATION_JSON), bundle))
                                 .subscribe(handleError);
                     else
                         return mRestApi.dynamicPostList(mPostRequest.getUrl(), RequestBody.create(MediaType
-                                .parse(CloudDataStore.APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
+                                .parse(APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
                                 .subscribe(handleError);
                 case PostRequest.PUT:
                     if (isObject)
                         return mRestApi.dynamicPutObject(mPostRequest.getUrl(), RequestBody
-                                .create(MediaType.parse(CloudDataStore.APPLICATION_JSON), bundle))
+                                .create(MediaType.parse(APPLICATION_JSON), bundle))
                                 .subscribe(handleError);
                     else
                         return mRestApi.dynamicPutList(mPostRequest.getUrl(), RequestBody.create(MediaType
-                                .parse(CloudDataStore.APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
+                                .parse(APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
                                 .subscribe(handleError);
                 case PostRequest.DELETE:
                     if (isObject)
                         return mRestApi.dynamicDeleteObject(mPostRequest.getUrl(), RequestBody
-                                .create(MediaType.parse(CloudDataStore.APPLICATION_JSON), bundle))
+                                .create(MediaType.parse(APPLICATION_JSON), bundle))
                                 .subscribe(handleError);
                     else
                         return mRestApi.dynamicDeleteList(mPostRequest.getUrl(), RequestBody.create(MediaType
-                                .parse(CloudDataStore.APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
+                                .parse(APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
                                 .subscribe(handleError);
             }
         } else
@@ -144,7 +142,7 @@ public class Post {
                         .setUpdateCurrent(false)
                         .setPersisted(true)
                         .setExtras(extras)
-                        .setTag(CloudDataStore.POST_TAG)
+                        .setTag(POST_TAG)
                         .setExecutionWindow(0, 30)
                         .build());
                 Log.d(TAG, mContext.getString(R.string.requeued, "GcmNetworkManager", "true"));

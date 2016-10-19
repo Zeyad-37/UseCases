@@ -19,16 +19,14 @@ import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentSe
 
 public class GenericGCMService extends GcmTaskService {
 
-    public static final String TAG = GenericNetworkQueueIntentService.class.getSimpleName(),
+    public static final String TAG = GenericGCMService.class.getSimpleName(),
             TAG_TASK_ONE_OFF_LOG = "one_off_task", TAG_TASK_PERIODIC_LOG = "periodic_task";
     private Context mContext;
-    private Context mApplicationContext;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        mContext = this;
-        mApplicationContext = getApplicationContext();
+        mContext = getApplicationContext();
     }
 
     @Override
@@ -45,21 +43,21 @@ public class GenericGCMService extends GcmTaskService {
                 if (taskParams.getExtras().containsKey(JOB_TYPE))
                     switch (taskParams.getExtras().getString(JOB_TYPE)) {
                         case DOWNLOAD_FILE:
-                            mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
+                            mContext.startService(new Intent(mContext, GenericNetworkQueueIntentService.class)
                                     .putExtra(JOB_TYPE, DOWNLOAD_FILE)
                                     .putExtra(TRIAL_COUNT, 0)
                                     .putExtra(PAYLOAD, taskParams.getExtras().getString(PAYLOAD)));
                             Log.d(TAG, getString(R.string.job_started, DOWNLOAD_FILE));
                             break;
                         case UPLOAD_FILE:
-                            mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
+                            mContext.startService(new Intent(mContext, GenericNetworkQueueIntentService.class)
                                     .putExtra(JOB_TYPE, UPLOAD_FILE)
                                     .putExtra(TRIAL_COUNT, 0)
                                     .putExtra(PAYLOAD, taskParams.getExtras().getString(PAYLOAD)));
                             Log.d(TAG, getString(R.string.job_started, UPLOAD_FILE));
                             break;
                         case POST:
-                            mContext.startService(new Intent(mApplicationContext, GenericNetworkQueueIntentService.class)
+                            mContext.startService(new Intent(mContext, GenericNetworkQueueIntentService.class)
                                     .putExtra(JOB_TYPE, POST)
                                     .putExtra(TRIAL_COUNT, 0)
                                     .putExtra(PAYLOAD, taskParams.getExtras().getString(PAYLOAD)));
@@ -85,14 +83,5 @@ public class GenericGCMService extends GcmTaskService {
      */
     void setContext(Context context) {
         mContext = context;
-    }
-
-    /**
-     * This method is meant for testing purposes. To set a mocked context.
-     *
-     * @param applicationContext mocked context
-     */
-    void setApplicationContext(Context applicationContext) {
-        mApplicationContext = applicationContext;
     }
 }

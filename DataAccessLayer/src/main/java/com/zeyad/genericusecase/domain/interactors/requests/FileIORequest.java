@@ -9,10 +9,10 @@ import java.io.File;
  */
 public class FileIORequest {
 
-    private File mFile;
-    private String mUrl;
-    private boolean mOnWifi, mWhileCharging;
-    private Class mDataClass, mPresentationClass;
+    File mFile;
+    String mUrl;
+    boolean mOnWifi, mWhileCharging, mQueuable;
+    Class mDataClass, mPresentationClass;
 
     public FileIORequest() {
     }
@@ -21,6 +21,7 @@ public class FileIORequest {
         mUrl = uploadRequestBuilder.getUrl();
         mOnWifi = uploadRequestBuilder.isOnWifi();
         mWhileCharging = uploadRequestBuilder.isWhileCharging();
+        mQueuable = uploadRequestBuilder.isQueuable();
         mFile = uploadRequestBuilder.getFile();
         mDataClass = uploadRequestBuilder.getDataClass();
         mPresentationClass = uploadRequestBuilder.getPresentationClass();
@@ -48,6 +49,10 @@ public class FileIORequest {
         return mWhileCharging;
     }
 
+    public boolean isQueuable() {
+        return mQueuable;
+    }
+
     public Class getDataClass() {
         return mDataClass;
     }
@@ -64,7 +69,7 @@ public class FileIORequest {
 
         private File mFile;
         private String mUrl;
-        private boolean mOnWifi, mWhileCharging;
+        private boolean mOnWifi, mWhileCharging, mQueuable;
         private Class mDataClass, mPresentationClass;
 
         public UploadRequestBuilder(String url, File file) {
@@ -97,6 +102,12 @@ public class FileIORequest {
         }
 
         @NonNull
+        public UploadRequestBuilder queuable(boolean queuable) {
+            mQueuable = queuable;
+            return this;
+        }
+
+        @NonNull
         public UploadRequestBuilder whileCharging(boolean whileCharging) {
             mWhileCharging = whileCharging;
             return this;
@@ -117,6 +128,10 @@ public class FileIORequest {
 
         public boolean isOnWifi() {
             return mOnWifi;
+        }
+
+        public boolean isQueuable() {
+            return mQueuable;
         }
 
         public boolean isWhileCharging() {

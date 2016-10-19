@@ -8,6 +8,7 @@ import java.util.List;
 /**
  * @author Zeyad on 11/05/16.
  */
+// TODO: 10/18/16 convert to abstract!
 public interface EntityMapper<D, R> {
     /**
      * Transform item to its realm counter part.
@@ -26,7 +27,7 @@ public interface EntityMapper<D, R> {
      * @return
      */
     @NonNull
-    List<R> transformAllToRealm(List<D> list, Class dataClass);
+    List transformAllToRealm(List<D> list, Class dataClass);
 
     /**
      * Transforms entity to its domain counter part.
@@ -44,7 +45,7 @@ public interface EntityMapper<D, R> {
      * @return
      */
     @Nullable
-    List<D> transformAllToDomain(List<R> entities);
+    List transformAllToDomain(List<R> entities);
 
     /**
      * Transforms realmInstance to its domain counter part.
@@ -64,5 +65,5 @@ public interface EntityMapper<D, R> {
      * @return
      */
     @NonNull
-    List<D> transformAllToDomain(List<R> realmInstances, Class domainClass);
+    List transformAllToDomain(List<R> realmInstances, Class domainClass);
 }

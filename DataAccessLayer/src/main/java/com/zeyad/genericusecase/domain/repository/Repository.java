@@ -1,6 +1,5 @@
 package com.zeyad.genericusecase.domain.repository;
 
-import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
 import org.json.JSONArray;
@@ -35,39 +34,23 @@ public interface Repository {
 
     @NonNull
     Observable<?> postObjectDynamically(String url, String idColumnName, JSONObject keyValuePairs,
-                                        Class domainClass, Class dataClass, boolean persist);
-
-    @NonNull
-    Observable<?> postObjectDynamically(@NonNull String url, String idColumnName, ContentValues contentValues,
-                                        Class domainClass, @NonNull Class dataClass, boolean persist);
+                                        Class domainClass, Class dataClass, boolean persist, boolean queuable);
 
     @NonNull
     Observable<?> postListDynamically(String url, String idColumnName, JSONArray jsonArray,
-                                      Class domainClass, Class dataClass, boolean persist);
-
-    @NonNull
-    Observable<?> postListDynamically(@NonNull String url, String idColumnName, ContentValues[] contentValues,
-                                      Class domainClass, @NonNull Class dataClass, boolean persist);
+                                      Class domainClass, Class dataClass, boolean persist, boolean queuable);
 
     @NonNull
     Observable<?> deleteListDynamically(String url, JSONArray jsonArray, Class domainClass,
-                                        Class dataClass, boolean persist);
+                                        Class dataClass, boolean persist, boolean queuable);
 
     @NonNull
     Observable<?> putObjectDynamically(String url, String idColumnName, JSONObject keyValuePairs,
-                                       Class domainClass, Class dataClass, boolean persist);
-
-    @NonNull
-    Observable<?> putObjectDynamically(@NonNull String url, String idColumnName, ContentValues contentValues,
-                                       Class domainClass, @NonNull Class dataClass, boolean persist);
+                                       Class domainClass, Class dataClass, boolean persist, boolean queuable);
 
     @NonNull
     Observable<?> putListDynamically(String url, String idColumnName, JSONArray jsonArray,
-                                     Class domainClass, Class dataClass, boolean persist);
-
-    @NonNull
-    Observable<?> putListDynamically(@NonNull String url, String idColumnName, ContentValues[] contentValues,
-                                     Class domainClass, @NonNull Class dataClass, boolean persist);
+                                     Class domainClass, Class dataClass, boolean persist, boolean queuable);
 
     @NonNull
     Observable<?> deleteAllDynamically(String url, Class dataClass, boolean persist);
@@ -80,9 +63,9 @@ public interface Repository {
 
     @NonNull
     Observable<?> uploadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
-                                        Class domainClass, Class dataClass);
+                                        boolean queuable, Class domainClass, Class dataClass);
 
     @NonNull
     Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
-                                          Class domainClass, Class dataClass);
+                                          boolean queuable, Class domainClass, Class dataClass);
 }

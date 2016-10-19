@@ -89,7 +89,7 @@ public class RealmManager implements DataBaseManager {
     @NonNull
     @Override
     public Observable<List<?>> getAll(Class clazz) {
-        return Observable.defer(() -> Realm.getDefaultInstance().where(clazz).findAll().asObservable());
+        return Observable.defer(() -> Observable.just(Realm.getDefaultInstance().where(clazz).findAll()));
     }
 
     /**
@@ -412,7 +412,8 @@ public class RealmManager implements DataBaseManager {
     }
 
     @NonNull
-    private JSONArray updateJsonArrayWithIdValue(@NonNull JSONArray jsonArray, @Nullable String idColumnName, Class dataClass)
+    private JSONArray updateJsonArrayWithIdValue(@NonNull JSONArray jsonArray, @Nullable String idColumnName,
+                                                 Class dataClass)
             throws JSONException, IllegalArgumentException {
         if (idColumnName == null || idColumnName.isEmpty())
             throw new IllegalArgumentException(mContext.getString(R.string.no_id));
@@ -423,7 +424,8 @@ public class RealmManager implements DataBaseManager {
     }
 
     @NonNull
-    private JSONObject updateJsonObjectWithIdValue(@NonNull JSONObject jsonObject, @Nullable String idColumnName, Class dataClass)
+    private JSONObject updateJsonObjectWithIdValue(@NonNull JSONObject jsonObject, @Nullable String idColumnName,
+                                                   Class dataClass)
             throws JSONException, IllegalArgumentException {
         if (idColumnName == null || idColumnName.isEmpty())
             throw new IllegalArgumentException(mContext.getString(R.string.no_id));

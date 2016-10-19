@@ -1,6 +1,5 @@
 package com.zeyad.genericusecase.domain.interactors.requests;
 
-import android.content.ContentValues;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
@@ -19,48 +18,23 @@ public class PostRequest {
     private String mUrl, mIdColumnName, mMethod;
     private Subscriber mSubscriber;
     private Class mDataClass, mPresentationClass;
-    private boolean mPersist;
+    private boolean mPersist, mQueuable;
     private JSONObject mJsonObject;
     private JSONArray mJsonArray;
     private HashMap<String, Object> mKeyValuePairs;
-    private ContentValues mContentValue;
-    private ContentValues[] mContentValues;
 
     public PostRequest(@NonNull PostRequestBuilder postRequestBuilder) {
         mUrl = postRequestBuilder.mUrl;
         mDataClass = postRequestBuilder.mDataClass;
         mPresentationClass = postRequestBuilder.mPresentationClass;
         mPersist = postRequestBuilder.mPersist;
+        mQueuable = postRequestBuilder.mQueuable;
         mSubscriber = postRequestBuilder.mSubscriber;
         mKeyValuePairs = postRequestBuilder.mKeyValuePairs;
         mJsonObject = postRequestBuilder.mJsonObject;
         mJsonArray = postRequestBuilder.mJsonArray;
         mIdColumnName = postRequestBuilder.mIdColumnName;
         mMethod = postRequestBuilder.mMethod;
-        mContentValue = postRequestBuilder.mContentValue;
-        mContentValues = postRequestBuilder.mContentValues;
-    }
-
-    public PostRequest(Subscriber subscriber, String idColumnName, String url, ContentValues[] contentValues,
-                       Class presentationClass, Class dataClass, boolean persist) {
-        mIdColumnName = idColumnName;
-        mContentValues = contentValues;
-        mPersist = persist;
-        mPresentationClass = presentationClass;
-        mDataClass = dataClass;
-        mSubscriber = subscriber;
-        mUrl = url;
-    }
-
-    public PostRequest(Subscriber subscriber, String idColumnName, String url, ContentValues contentValue,
-                       Class presentationClass, Class dataClass, boolean persist) {
-        mIdColumnName = idColumnName;
-        mContentValue = contentValue;
-        mPersist = persist;
-        mPresentationClass = presentationClass;
-        mDataClass = dataClass;
-        mSubscriber = subscriber;
-        mUrl = url;
     }
 
     public PostRequest(Subscriber subscriber, String idColumnName, String url, JSONObject keyValuePairs,
@@ -74,6 +48,7 @@ public class PostRequest {
         mUrl = url;
     }
 
+    // for test
     public PostRequest(Subscriber subscriber, String idColumnName, String url, JSONArray keyValuePairs,
                        Class presentationClass, Class dataClass, boolean persist) {
         mIdColumnName = idColumnName;
@@ -125,6 +100,10 @@ public class PostRequest {
         return mPersist;
     }
 
+    public boolean isQueuable() {
+        return mQueuable;
+    }
+
     public JSONArray getJsonArray() {
         return mJsonArray;
     }
@@ -145,25 +124,14 @@ public class PostRequest {
         return mMethod;
     }
 
-    public ContentValues[] getContentValues() {
-        return mContentValues;
-    }
-
-    public ContentValues getContentValue() {
-        return mContentValue;
-    }
-
     public static class PostRequestBuilder {
-
-        ContentValues mContentValue;
-        ContentValues[] mContentValues;
         JSONArray mJsonArray;
         JSONObject mJsonObject;
         HashMap<String, Object> mKeyValuePairs;
         String mUrl, mIdColumnName, mMethod;
         Subscriber mSubscriber;
         Class mDataClass, mPresentationClass;
-        boolean mPersist;
+        boolean mPersist, mQueuable;
 
         public PostRequestBuilder(Class dataClass, boolean persist) {
             mDataClass = dataClass;
@@ -171,20 +139,14 @@ public class PostRequest {
         }
 
         @NonNull
-        public PostRequestBuilder contentValue(ContentValues contentValues) {
-            mContentValue = contentValues;
-            return this;
-        }
-
-        @NonNull
-        public PostRequestBuilder contentValues(ContentValues[] contentValues) {
-            mContentValues = contentValues;
-            return this;
-        }
-
-        @NonNull
         public PostRequestBuilder url(String url) {
             mUrl = url;
+            return this;
+        }
+
+        @NonNull
+        public PostRequestBuilder queuable(boolean queuable) {
+            mQueuable = queuable;
             return this;
         }
 

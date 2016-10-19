@@ -38,8 +38,8 @@ public class DataStoreFactory {
      * Create {@link DataStore} .
      */
     @NonNull
-    public DataStore dynamically(@NonNull String url, EntityMapper entityDataMapper) throws IllegalAccessException {
-        if (!url.isEmpty() && Utils.isNetworkAvailable(mContext))
+    public DataStore dynamically(@NonNull String url, boolean isGet, EntityMapper entityDataMapper) throws IllegalAccessException {
+        if (!url.isEmpty() && (isGet && Utils.isNetworkAvailable(mContext)) || !isGet)
             return new CloudDataStore(new RestApiImpl(), mDataBaseManager, entityDataMapper);
         else if (mDataBaseManager == null)
             throw new IllegalAccessException(getInstance().getContext().getString(R.string.no_db));

@@ -1,6 +1,5 @@
 package com.zeyad.genericusecase.data.repository;
 
-import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
 import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
@@ -50,7 +49,7 @@ public class DataRepository implements Repository {
     public Observable<List> getListDynamically(@NonNull String url, Class domainClass, @NonNull Class dataClass,
                                                boolean persist, boolean shouldCache) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
+            return mDataStoreFactory.dynamically(url, true, mEntityMapperUtil.getDataMapper(dataClass))
                     .dynamicGetList(url, domainClass, dataClass, persist, shouldCache);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
@@ -64,7 +63,7 @@ public class DataRepository implements Repository {
                                                   Class domainClass, Class dataClass, boolean persist,
                                                   boolean shouldCache) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
+            return mDataStoreFactory.dynamically(url, true, mEntityMapperUtil.getDataMapper(dataClass))
                     .dynamicGetObject(url, idColumnName, itemId, domainClass, dataClass, persist,
                             shouldCache);
         } catch (IllegalAccessException e) {
@@ -76,23 +75,11 @@ public class DataRepository implements Repository {
     @NonNull
     @Override
     public Observable<?> postObjectDynamically(@NonNull String url, String idColumnName, JSONObject keyValuePairs,
-                                               Class domainClass, @NonNull Class dataClass, boolean persist) {
+                                               Class domainClass, @NonNull Class dataClass, boolean persist,
+                                               boolean queuable) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPostObject(url, idColumnName, keyValuePairs, domainClass, dataClass, persist);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return Observable.error(e);
-        }
-    }
-
-    @NonNull
-    @Override
-    public Observable<?> postObjectDynamically(@NonNull String url, String idColumnName, ContentValues contentValues,
-                                               Class domainClass, @NonNull Class dataClass, boolean persist) {
-        try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPostObject(url, idColumnName, contentValues, domainClass, dataClass, persist);
+            return mDataStoreFactory.dynamically(url, false, mEntityMapperUtil.getDataMapper(dataClass))
+                    .dynamicPostObject(url, idColumnName, keyValuePairs, domainClass, dataClass, persist, queuable);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return Observable.error(e);
@@ -102,10 +89,10 @@ public class DataRepository implements Repository {
     @NonNull
     @Override
     public Observable<?> postListDynamically(@NonNull String url, String idColumnName, JSONArray jsonArray,
-                                             Class domainClass, @NonNull Class dataClass, boolean persist) {
+                                             Class domainClass, @NonNull Class dataClass, boolean persist, boolean queuable) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPostList(url, idColumnName, jsonArray, domainClass, dataClass, persist);
+            return mDataStoreFactory.dynamically(url, false, mEntityMapperUtil.getDataMapper(dataClass))
+                    .dynamicPostList(url, idColumnName, jsonArray, domainClass, dataClass, persist, queuable);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return Observable.error(e);
@@ -114,25 +101,12 @@ public class DataRepository implements Repository {
 
     @NonNull
     @Override
-    public Observable<?> postListDynamically(@NonNull String url, String idColumnName, ContentValues[] contentValues,
-                                             Class domainClass, @NonNull Class dataClass, boolean persist) {
+    public Observable<?> deleteListDynamically(@NonNull String url, JSONArray jsonArray, Class domainClass,
+                                               @NonNull Class dataClass, boolean persist, boolean queuable) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPostList(url, idColumnName, contentValues, domainClass, dataClass, persist);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return Observable.error(e);
-        }
-    }
-
-    @NonNull
-    @Override
-    public Observable<?> deleteListDynamically(@NonNull String url, JSONArray jsonArray,
-                                               Class domainClass, @NonNull Class dataClass, boolean persist) {
-        try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
+            return mDataStoreFactory.dynamically(url, false, mEntityMapperUtil.getDataMapper(dataClass))
                     .dynamicDeleteCollection(url, DataRepository.DEFAULT_ID_TO_BE_REPLACED, jsonArray,
-                            dataClass, persist);
+                            dataClass, persist, queuable);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return Observable.error(e);
@@ -155,7 +129,8 @@ public class DataRepository implements Repository {
     @Override
     public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
         try {
-            return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(domainClass)).searchDisk(query, domainClass);
+            return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(domainClass)).searchDisk(query
+                    , domainClass);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return Observable.error(e);
@@ -165,39 +140,28 @@ public class DataRepository implements Repository {
     @NonNull
     @Override
     public Observable<?> uploadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
-                                               Class domainClass, Class dataClass) {
+                                               boolean queuable, Class domainClass, Class dataClass) {
         return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
-                .dynamicUploadFile(url, file, onWifi, whileCharging, domainClass);
+                .dynamicUploadFile(url, file, onWifi, queuable, whileCharging, domainClass);
     }
 
     @NonNull
     @Override
     public Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
-                                                 Class domainClass, Class dataClass) {
+                                                 boolean queuable, Class domainClass, Class dataClass) {
         return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
-                .dynamicDownloadFile(url, file, onWifi, whileCharging);
+                .dynamicDownloadFile(url, file, onWifi, whileCharging, queuable);
     }
 
     @NonNull
     @Override
     public Observable<?> putObjectDynamically(@NonNull String url, String idColumnName, JSONObject keyValuePairs,
-                                              Class domainClass, @NonNull Class dataClass, boolean persist) {
+                                              Class domainClass, @NonNull Class dataClass, boolean persist,
+                                              boolean queuable) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPutObject(url, idColumnName, keyValuePairs, domainClass, dataClass, persist);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return Observable.error(e);
-        }
-    }
-
-    @NonNull
-    @Override
-    public Observable<?> putObjectDynamically(@NonNull String url, String idColumnName, ContentValues contentValues,
-                                              Class domainClass, @NonNull Class dataClass, boolean persist) {
-        try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPutObject(url, idColumnName, contentValues, domainClass, dataClass, persist);
+            return mDataStoreFactory.dynamically(url, false, mEntityMapperUtil.getDataMapper(dataClass))
+                    .dynamicPutObject(url, idColumnName, keyValuePairs, domainClass, dataClass, persist,
+                            queuable);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return Observable.error(e);
@@ -207,23 +171,11 @@ public class DataRepository implements Repository {
     @NonNull
     @Override
     public Observable<?> putListDynamically(@NonNull String url, String idColumnName, JSONArray jsonArray,
-                                            Class domainClass, @NonNull Class dataClass, boolean persist) {
+                                            Class domainClass, @NonNull Class dataClass, boolean persist,
+                                            boolean queuable) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPutList(url, idColumnName, jsonArray, domainClass, dataClass, persist);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-            return Observable.error(e);
-        }
-    }
-
-    @NonNull
-    @Override
-    public Observable<?> putListDynamically(@NonNull String url, String idColumnName, ContentValues[] contentValues,
-                                            Class domainClass, @NonNull Class dataClass, boolean persist) {
-        try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPutList(url, idColumnName, contentValues, domainClass, dataClass, persist);
+            return mDataStoreFactory.dynamically(url, false, mEntityMapperUtil.getDataMapper(dataClass))
+                    .dynamicPutList(url, idColumnName, jsonArray, domainClass, dataClass, persist, queuable);
         } catch (IllegalAccessException e) {
             e.printStackTrace();
             return Observable.error(e);
@@ -234,7 +186,7 @@ public class DataRepository implements Repository {
     @Override
     public Observable<?> deleteAllDynamically(@NonNull String url, @NonNull Class dataClass, boolean persist) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
+            return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(dataClass))
                     .dynamicDeleteAll(url, dataClass, persist);
         } catch (IllegalAccessException e) {
             e.printStackTrace();

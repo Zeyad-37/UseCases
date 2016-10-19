@@ -133,11 +133,7 @@ public class GenericUseCase implements IGenericUseCase {
         if (postRequest.getObjectBundle() != null)
             return mRepository.postObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
                     postRequest.getObjectBundle(), postRequest.getPresentationClass(), postRequest
-                            .getDataClass(), postRequest.isPersist()).compose(applySchedulers());
-        else if (postRequest.getContentValue() != null)
-            return mRepository.postObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                    postRequest.getContentValue(), postRequest.getPresentationClass(), postRequest
-                            .getDataClass(), postRequest.isPersist()).compose(applySchedulers());
+                            .getDataClass(), postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
         else
             return Observable.defer(() -> Observable.error(new IllegalArgumentException(Config.getInstance()
                     .getContext().getString(R.string.null_payload))));
@@ -153,13 +149,9 @@ public class GenericUseCase implements IGenericUseCase {
         if (jsonArray != null)
             return mRepository.postListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
                     jsonArray, postRequest.getPresentationClass(), postRequest.getDataClass(),
-                    postRequest.isPersist()).compose(applySchedulers());
-        else if (postRequest.getContentValues() != null)
-            return mRepository.postListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                    postRequest.getContentValues(), postRequest.getPresentationClass(), postRequest
-                            .getDataClass(), postRequest.isPersist()).compose(applySchedulers());
+                    postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
         else return Observable.error(new IllegalArgumentException(Config.getInstance().getContext()
-                    .getString(R.string.null_payload)));
+                .getString(R.string.null_payload)));
     }
 
     /**
@@ -172,13 +164,10 @@ public class GenericUseCase implements IGenericUseCase {
         if (postRequest.getObjectBundle() != null)
             return mRepository.putObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
                     postRequest.getObjectBundle(), postRequest.getPresentationClass(),
-                    postRequest.getDataClass(), postRequest.isPersist()).compose(applySchedulers());
-        else if (postRequest.getContentValue() != null)
-            return mRepository.putObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                    postRequest.getContentValue(), postRequest.getPresentationClass(), postRequest
-                            .getDataClass(), postRequest.isPersist()).compose(applySchedulers());
+                    postRequest.getDataClass(), postRequest.isPersist(), postRequest.isQueuable())
+                    .compose(applySchedulers());
         else return Observable.error(new IllegalArgumentException(Config.getInstance().getContext()
-                    .getString(R.string.null_payload)));
+                .getString(R.string.null_payload)));
     }
 
     /**
@@ -194,11 +183,7 @@ public class GenericUseCase implements IGenericUseCase {
         if (jsonArray != null)
             return mRepository.putListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
                     jsonArray, postRequest.getPresentationClass(), postRequest.getDataClass(),
-                    postRequest.isPersist()).compose(applySchedulers());
-        else if (postRequest.getContentValues() != null)
-            return mRepository.putListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                    postRequest.getContentValues(), postRequest.getPresentationClass(),
-                    postRequest.getDataClass(), postRequest.isPersist()).compose(applySchedulers());
+                    postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
         else
             return Observable.error(new IllegalArgumentException(Config.getInstance().getContext()
                     .getString(R.string.null_payload)));
@@ -206,10 +191,15 @@ public class GenericUseCase implements IGenericUseCase {
 
     @Override
     public Observable deleteCollection(@NonNull PostRequest deleteRequest) {
-        return mRepository.deleteListDynamically(deleteRequest.getUrl(),
-                ModelConverters.convertToJsonArray(deleteRequest.getKeyValuePairs()),
-                deleteRequest.getPresentationClass(), deleteRequest.getDataClass(), deleteRequest
-                        .isPersist()).compose(applySchedulers());
+        JSONArray jsonArray = null;
+        if (deleteRequest.getKeyValuePairs() != null)
+            jsonArray = ModelConverters.convertToJsonArray(deleteRequest.getKeyValuePairs());
+        else if (deleteRequest.getJsonArray() != null)
+            jsonArray = deleteRequest.getJsonArray();
+        return mRepository.deleteListDynamically(deleteRequest.getUrl(), jsonArray,
+                deleteRequest.getPresentationClass(), deleteRequest.getDataClass(), deleteRequest.isPersist(),
+                deleteRequest.isQueuable())
+                .compose(applySchedulers());
     }
 
     /**
@@ -226,17 +216,16 @@ public class GenericUseCase implements IGenericUseCase {
     @Override
     public Observable uploadFile(@NonNull FileIORequest fileIORequest) {
         return mRepository.uploadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
-                fileIORequest.onWifi(), fileIORequest.isWhileCharging(), fileIORequest.getPresentationClass(),
-                fileIORequest.getDataClass())
+                fileIORequest.onWifi(), fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
+                fileIORequest.getPresentationClass(), fileIORequest.getDataClass())
                 .compose(applySchedulers());
     }
 
     @Override
     public Observable downloadFile(@NonNull FileIORequest fileIORequest) {
         return mRepository.downloadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
-                fileIORequest.onWifi(), fileIORequest.isWhileCharging(), fileIORequest.getPresentationClass(),
-                fileIORequest.getDataClass())
-                .compose(applySchedulers());
+                fileIORequest.onWifi(), fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
+                fileIORequest.getPresentationClass(), fileIORequest.getDataClass()).compose(applySchedulers());
     }
 
     /**
