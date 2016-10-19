@@ -8,7 +8,6 @@ import java.util.List;
 /**
  * @author Zeyad on 11/05/16.
  */
-// TODO: 10/18/16 convert to abstract!
 public interface EntityMapper<D, R> {
     /**
      * Transform item to its realm counter part.
