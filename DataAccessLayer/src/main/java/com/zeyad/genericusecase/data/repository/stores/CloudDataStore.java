@@ -71,10 +71,10 @@ import static com.zeyad.genericusecase.domain.interactors.requests.PostRequest.P
 public class CloudDataStore implements DataStore {
 
     public static final String FILE_IO_TAG = "fileIOObject", POST_TAG = "postObject", APPLICATION_JSON = "application/json";
-    private static final int COUNTER_START = 1, ATTEMPTS = 3;
     static final String TAG = CloudDataStore.class.getName();
-    private final EntityMapper mEntityDataMapper;
+    private static final int COUNTER_START = 1, ATTEMPTS = 3;
     final DataBaseManager mDataBaseManager;
+    private final EntityMapper mEntityDataMapper;
     private final Context mContext;
     @NonNull
     private final Observable<Object> mErrorObservableNotPersisted, mQueueFileIO;
@@ -431,7 +431,7 @@ public class CloudDataStore implements DataStore {
     }
 
     private boolean queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload) {
-        FileIORequest fileIORequest = new FileIORequest.UploadRequestBuilder(url, file)
+        FileIORequest fileIORequest = new FileIORequest.FileIORequestBuilder(url, file)
                 .onWifi(onWifi)
                 .whileCharging(whileCharging)
                 .build();

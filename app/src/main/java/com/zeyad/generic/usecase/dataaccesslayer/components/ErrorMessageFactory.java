@@ -2,6 +2,7 @@ package com.zeyad.generic.usecase.dataaccesslayer.components;
 
 import android.content.Context;
 
+import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.genericusecase.data.exceptions.NetworkConnectionException;
 
 import org.json.JSONException;
@@ -9,8 +10,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.List;
 
 import retrofit2.adapter.rxjava.HttpException;
 
@@ -20,7 +19,6 @@ import retrofit2.adapter.rxjava.HttpException;
 public class ErrorMessageFactory {
 
     private ErrorMessageFactory() {
-        //empty
     }
 
     /**
@@ -31,36 +29,16 @@ public class ErrorMessageFactory {
      * @return {@link String} an error message.
      */
     public static String create(Context context, Exception exception) {
-        String message = "";
-        if (exception instanceof NetworkConnectionException)
-            message = "";
-        else if (exception instanceof UnknownHostException)
-            message = "";
-        else if (exception instanceof HttpException) {
+        if (exception instanceof NetworkConnectionException || exception instanceof UnknownHostException)
+            return context.getString(R.string.exception_message_no_connection);
+        else if (exception instanceof HttpException)
             try {
-                message = new JSONObject(((HttpException) exception).response().errorBody().string())
-                        .getString("error_description");
-            } catch (IOException | JSONException e1) {
-                try {
-                    String fieldName = "";
-                    JSONObject json = new JSONObject(((HttpException) exception).response().errorBody().string());
-                    List<String> fieldNames = new ArrayList<>();
-                    for (int i = 0; i < json.names().length(); i++) {
-                        fieldName = json.names().optString(i);
-                        if (fieldName.toLowerCase().contains("error"))
-                            fieldNames.add(fieldName);
-                    }
-                    for (String string : fieldNames)
-                        if (string.equalsIgnoreCase("error"))
-                            fieldName = string;
-                    if (!fieldName.equalsIgnoreCase("error"))
-                        fieldName = fieldNames.get(0);
-                    message = new JSONObject(((HttpException) exception).response().errorBody().string()).getString(fieldName);
-                } catch (JSONException | IOException e) {
-                    message = "Error de red";
-                }
+                return new JSONObject(((HttpException) exception).response().errorBody().string())
+                        .getJSONObject("error").getString("message");
+            } catch (IOException | JSONException e) {
+                e.printStackTrace();
+                return exception.getMessage();
             }
-        }
-        return message;
+        return exception.getMessage();
     }
 }

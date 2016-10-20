@@ -143,7 +143,7 @@ public class FileIO {
     void queueIOFile() {
         mTrailCount++;
         if (mTrailCount < 3) {
-            FileIORequest fileIORequest = new FileIORequest.UploadRequestBuilder(mFileIORequest.getUrl(),
+            FileIORequest fileIORequest = new FileIORequest.FileIORequestBuilder(mFileIORequest.getUrl(),
                     mFileIORequest.getFile())
                     .onWifi(mFileIORequest.onWifi())
                     .whileCharging(mFileIORequest.isWhileCharging())

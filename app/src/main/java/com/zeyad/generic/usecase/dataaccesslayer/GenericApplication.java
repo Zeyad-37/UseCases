@@ -25,8 +25,8 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 public class GenericApplication extends Application {
 
-    private ApplicationComponent applicationComponent;
     private static GenericApplication sInstance;
+    private ApplicationComponent applicationComponent;
 
     public static GenericApplication getInstance() {
         return sInstance;
@@ -38,7 +38,7 @@ public class GenericApplication extends Application {
         sInstance = this;
         initializeInjector();
         initializeRealm();
-        GenericUseCaseFactory.initWithRealm(getApplicationContext(), null);
+        GenericUseCaseFactory.initWithoutDB(getApplicationContext());
     }
 
     private Cache provideCache() {
