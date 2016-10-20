@@ -1,17 +1,18 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.Toast;
 
 import com.zeyad.generic.usecase.dataaccesslayer.GenericApplication;
+import com.zeyad.generic.usecase.dataaccesslayer.Utils;
 import com.zeyad.generic.usecase.dataaccesslayer.components.SnackBarFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.IRxEventBus;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.INavigator;
 import com.zeyad.generic.usecase.dataaccesslayer.di.HasComponent;
 import com.zeyad.generic.usecase.dataaccesslayer.di.components.ApplicationComponent;
-import com.zeyad.genericusecase.data.utils.Utils;
 
 import javax.inject.Inject;
 
@@ -70,6 +71,10 @@ public abstract class BaseFragment extends Fragment {
     protected void showSnackBarMessage(@SnackBarFactory.SnackBarType String typeSnackBar, View view, int messageId, int duration) {
         SnackBarFactory.getSnackBar(typeSnackBar, view, getString(messageId), duration)
                 .show();
+    }
+
+    public void showErrorSnackBar(String message, View view) {
+        showSnackBarMessage(SnackBarFactory.TYPE_ERROR, view, message, Snackbar.LENGTH_LONG);
     }
 
     /**

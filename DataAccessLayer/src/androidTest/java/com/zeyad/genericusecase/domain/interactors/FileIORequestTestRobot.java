@@ -16,7 +16,7 @@ public class FileIORequestTestRobot {
     static final File FILE = Mockito.mock(File.class);
 
     static FileIORequest createUploadRequest() {
-        return new FileIORequest.UploadRequestBuilder(URL, FILE)
+        return new FileIORequest.FileIORequestBuilder(URL, FILE)
                 .onWifi(ON_WIFI)
                 .whileCharging(WHILE_CHARGING)
                 .dataClass(DATA_CLASS)

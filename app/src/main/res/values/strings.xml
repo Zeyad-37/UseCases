@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">DataAccessLayer</string>
+    <string name="exception_message_no_connection">Please check your internet connection</string>
 </resources>

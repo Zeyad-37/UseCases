@@ -3,6 +3,7 @@ package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 import android.app.Activity;
 import android.content.ComponentCallbacks2;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +13,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.zeyad.generic.usecase.dataaccesslayer.GenericApplication;
+import com.zeyad.generic.usecase.dataaccesslayer.Utils;
 import com.zeyad.generic.usecase.dataaccesslayer.components.SnackBarFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.IRxEventBus;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.INavigator;
@@ -20,7 +22,6 @@ import com.zeyad.generic.usecase.dataaccesslayer.di.components.ApplicationCompon
 import com.zeyad.generic.usecase.dataaccesslayer.di.components.DaggerUserComponent;
 import com.zeyad.generic.usecase.dataaccesslayer.di.components.UserComponent;
 import com.zeyad.generic.usecase.dataaccesslayer.di.modules.ActivityModule;
-import com.zeyad.genericusecase.data.utils.Utils;
 
 import java.util.List;
 
@@ -145,6 +146,10 @@ public abstract class BaseActivity extends AppCompatActivity implements HasCompo
                                        int messageId, int duration) {
         SnackBarFactory.getSnackBar(typeSnackBar, view, getString(messageId), duration)
                 .show();
+    }
+
+    public void showErrorSnackBar(String message, View view) {
+        showSnackBarMessage(SnackBarFactory.TYPE_ERROR, view, message, Snackbar.LENGTH_LONG);
     }
 
     @Override

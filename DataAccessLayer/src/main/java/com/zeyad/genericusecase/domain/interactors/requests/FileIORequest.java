@@ -9,22 +9,22 @@ import java.io.File;
  */
 public class FileIORequest {
 
-    File mFile;
-    String mUrl;
-    boolean mOnWifi, mWhileCharging, mQueuable;
-    Class mDataClass, mPresentationClass;
+    private File mFile;
+    private String mUrl;
+    private boolean mOnWifi, mWhileCharging, mQueuable;
+    private Class mDataClass, mPresentationClass;
 
     public FileIORequest() {
     }
 
-    public FileIORequest(@NonNull UploadRequestBuilder uploadRequestBuilder) {
-        mUrl = uploadRequestBuilder.getUrl();
-        mOnWifi = uploadRequestBuilder.isOnWifi();
-        mWhileCharging = uploadRequestBuilder.isWhileCharging();
-        mQueuable = uploadRequestBuilder.isQueuable();
-        mFile = uploadRequestBuilder.getFile();
-        mDataClass = uploadRequestBuilder.getDataClass();
-        mPresentationClass = uploadRequestBuilder.getPresentationClass();
+    public FileIORequest(@NonNull FileIORequestBuilder fileIORequestBuilder) {
+        mUrl = fileIORequestBuilder.getUrl();
+        mOnWifi = fileIORequestBuilder.isOnWifi();
+        mWhileCharging = fileIORequestBuilder.isWhileCharging();
+        mQueuable = fileIORequestBuilder.isQueuable();
+        mFile = fileIORequestBuilder.getFile();
+        mDataClass = fileIORequestBuilder.getDataClass();
+        mPresentationClass = fileIORequestBuilder.getPresentationClass();
     }
 
     public FileIORequest(String url, File file, boolean onWifi, boolean whileCharging, Class presentationClass,
@@ -65,50 +65,50 @@ public class FileIORequest {
         return mFile;
     }
 
-    public static class UploadRequestBuilder {
+    public static class FileIORequestBuilder {
 
         private File mFile;
         private String mUrl;
         private boolean mOnWifi, mWhileCharging, mQueuable;
         private Class mDataClass, mPresentationClass;
 
-        public UploadRequestBuilder(String url, File file) {
+        public FileIORequestBuilder(String url, File file) {
             mUrl = url;
             mFile = file;
         }
 
         @NonNull
-        public UploadRequestBuilder url(String url) {
+        public FileIORequestBuilder url(String url) {
             mUrl = url;
             return this;
         }
 
         @NonNull
-        public UploadRequestBuilder presentationClass(Class presentationClass) {
+        public FileIORequestBuilder presentationClass(Class presentationClass) {
             mPresentationClass = presentationClass;
             return this;
         }
 
         @NonNull
-        public UploadRequestBuilder dataClass(Class dataClass) {
+        public FileIORequestBuilder dataClass(Class dataClass) {
             mDataClass = dataClass;
             return this;
         }
 
         @NonNull
-        public UploadRequestBuilder onWifi(boolean onWifi) {
+        public FileIORequestBuilder onWifi(boolean onWifi) {
             mOnWifi = onWifi;
             return this;
         }
 
         @NonNull
-        public UploadRequestBuilder queuable(boolean queuable) {
+        public FileIORequestBuilder queuable(boolean queuable) {
             mQueuable = queuable;
             return this;
         }
 
         @NonNull
-        public UploadRequestBuilder whileCharging(boolean whileCharging) {
+        public FileIORequestBuilder whileCharging(boolean whileCharging) {
             mWhileCharging = whileCharging;
             return this;
         }
