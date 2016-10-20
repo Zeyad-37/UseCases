@@ -14,7 +14,6 @@ import com.zeyad.genericusecase.data.utils.Utils;
 import static com.zeyad.genericusecase.Config.NONE;
 import static com.zeyad.genericusecase.Config.getInstance;
 
-
 public class DataStoreFactory {
 
     private final Context mContext;
@@ -39,7 +38,7 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore dynamically(@NonNull String url, boolean isGet, EntityMapper entityDataMapper) throws IllegalAccessException {
-        if (!url.isEmpty() && (isGet && Utils.isNetworkAvailable(mContext)) || !isGet)
+        if (!url.isEmpty() && (!isGet || Utils.isNetworkAvailable(mContext)))
             return new CloudDataStore(new RestApiImpl(), mDataBaseManager, entityDataMapper);
         else if (mDataBaseManager == null)
             throw new IllegalAccessException(getInstance().getContext().getString(R.string.no_db));
