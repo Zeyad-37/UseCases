@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/DataAccessLayer.iml" filepath="$PROJECT_DIR$/DataAccessLayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/DataAccessLayer/DataAccessLayer.iml" filepath="$PROJECT_DIR$/DataAccessLayer/DataAccessLayer.iml" />
+      <module fileurl="file://$PROJECT_DIR$/DataAccessLayer.iml" filepath="$PROJECT_DIR$/DataAccessLayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/DataAccessLayer/DataAccessLayer-DataAccessLayer.iml" filepath="$PROJECT_DIR$/DataAccessLayer/DataAccessLayer-DataAccessLayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/GenericUseCase.iml" filepath="$PROJECT_DIR$/GenericUseCase.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
