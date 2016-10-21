@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 
 public class Config {
 
-    public static final int NONE = 0, REALM = 1, SQLBRITE = 2;
+    public static final int NONE = 0, REALM = 1;
     private static Config sInstance;
     private Context mContext;
     private String mPrefFileName;
