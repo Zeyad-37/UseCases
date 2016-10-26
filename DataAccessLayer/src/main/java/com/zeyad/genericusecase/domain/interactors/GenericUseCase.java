@@ -12,13 +12,13 @@ import com.zeyad.genericusecase.data.db.DatabaseManagerFactory;
 import com.zeyad.genericusecase.data.executor.JobExecutor;
 import com.zeyad.genericusecase.data.repository.DataRepository;
 import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
+import com.zeyad.genericusecase.data.requests.FileIORequest;
+import com.zeyad.genericusecase.data.requests.GetRequest;
+import com.zeyad.genericusecase.data.requests.PostRequest;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
 import com.zeyad.genericusecase.data.utils.ModelConverters;
 import com.zeyad.genericusecase.domain.executors.PostExecutionThread;
 import com.zeyad.genericusecase.domain.executors.ThreadExecutor;
-import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
-import com.zeyad.genericusecase.domain.interactors.requests.GetRequest;
-import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 import com.zeyad.genericusecase.domain.repository.Repository;
 
 import org.json.JSONArray;

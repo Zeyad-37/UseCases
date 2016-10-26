@@ -2,7 +2,7 @@ package com.zeyad.genericusecase.domain.interactors;
 
 import android.support.annotation.Nullable;
 
-import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
+import com.zeyad.genericusecase.data.requests.PostRequest;
 
 import org.junit.After;
 import org.junit.Before;

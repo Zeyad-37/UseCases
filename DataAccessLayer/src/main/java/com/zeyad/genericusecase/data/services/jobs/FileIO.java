@@ -18,10 +18,10 @@ import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.network.RestApi;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
 import com.zeyad.genericusecase.data.repository.stores.CloudDataStore;
+import com.zeyad.genericusecase.data.requests.FileIORequest;
 import com.zeyad.genericusecase.data.services.GenericGCMService;
 import com.zeyad.genericusecase.data.services.GenericJobService;
 import com.zeyad.genericusecase.data.utils.Utils;
-import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
 
 import java.io.FileOutputStream;
 import java.io.IOException;

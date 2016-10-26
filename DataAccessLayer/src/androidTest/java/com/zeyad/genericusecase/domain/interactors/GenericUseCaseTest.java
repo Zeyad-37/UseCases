@@ -7,10 +7,10 @@ import com.zeyad.genericusecase.UIThread;
 import com.zeyad.genericusecase.data.executor.JobExecutor;
 import com.zeyad.genericusecase.data.mockable.ObjectObservable;
 import com.zeyad.genericusecase.data.repository.DataRepository;
+import com.zeyad.genericusecase.data.requests.FileIORequest;
+import com.zeyad.genericusecase.data.requests.GetRequest;
+import com.zeyad.genericusecase.data.requests.PostRequest;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
-import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
-import com.zeyad.genericusecase.domain.interactors.requests.GetRequest;
-import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 import com.zeyad.genericusecase.domain.repository.Repository;
 
 import org.json.JSONArray;

@@ -10,10 +10,10 @@ import android.support.annotation.Nullable;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.zeyad.genericusecase.data.network.RestApi;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
+import com.zeyad.genericusecase.data.requests.PostRequest;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
 import com.zeyad.genericusecase.data.utils.Utils;
-import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

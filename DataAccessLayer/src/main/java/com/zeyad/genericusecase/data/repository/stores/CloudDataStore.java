@@ -28,13 +28,13 @@ import com.zeyad.genericusecase.data.db.RealmManager;
 import com.zeyad.genericusecase.data.exceptions.NetworkConnectionException;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.network.RestApi;
+import com.zeyad.genericusecase.data.requests.FileIORequest;
+import com.zeyad.genericusecase.data.requests.PostRequest;
 import com.zeyad.genericusecase.data.services.GenericGCMService;
 import com.zeyad.genericusecase.data.services.GenericJobService;
 import com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService;
 import com.zeyad.genericusecase.data.utils.ModelConverters;
 import com.zeyad.genericusecase.data.utils.Utils;
-import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
-import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -62,11 +62,11 @@ import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 
 import static com.zeyad.genericusecase.Config.NONE;
+import static com.zeyad.genericusecase.data.requests.PostRequest.DELETE;
+import static com.zeyad.genericusecase.data.requests.PostRequest.POST;
 import static com.zeyad.genericusecase.data.services.GenericGCMService.TAG_TASK_ONE_OFF_LOG;
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
 import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService.UPLOAD_FILE;
-import static com.zeyad.genericusecase.domain.interactors.requests.PostRequest.DELETE;
-import static com.zeyad.genericusecase.domain.interactors.requests.PostRequest.POST;
 
 public class CloudDataStore implements DataStore {
 

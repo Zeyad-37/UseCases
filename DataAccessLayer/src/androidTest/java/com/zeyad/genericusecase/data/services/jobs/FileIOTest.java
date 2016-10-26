@@ -9,9 +9,9 @@ import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.android.gms.gcm.Task;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
+import com.zeyad.genericusecase.data.requests.FileIORequest;
 import com.zeyad.genericusecase.data.services.GenericGCMService;
 import com.zeyad.genericusecase.data.services.GenericJobService;
-import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
 
 import org.junit.After;
 import org.junit.Before;

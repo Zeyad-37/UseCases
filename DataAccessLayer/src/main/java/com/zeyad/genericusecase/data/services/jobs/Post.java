@@ -16,11 +16,11 @@ import com.google.gson.GsonBuilder;
 import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.network.RestApi;
 import com.zeyad.genericusecase.data.network.RestApiImpl;
+import com.zeyad.genericusecase.data.requests.PostRequest;
 import com.zeyad.genericusecase.data.services.GenericGCMService;
 import com.zeyad.genericusecase.data.services.GenericJobService;
 import com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService;
 import com.zeyad.genericusecase.data.utils.Utils;
-import com.zeyad.genericusecase.domain.interactors.requests.PostRequest;
 
 import org.json.JSONObject;
 

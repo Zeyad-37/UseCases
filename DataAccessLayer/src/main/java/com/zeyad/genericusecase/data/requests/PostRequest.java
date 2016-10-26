@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.domain.interactors.requests;
+package com.zeyad.genericusecase.data.requests;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;

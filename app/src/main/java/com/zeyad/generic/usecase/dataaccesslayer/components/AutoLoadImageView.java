@@ -11,8 +11,8 @@ import android.widget.ImageView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.gson.Gson;
+import com.zeyad.genericusecase.data.requests.FileIORequest;
 import com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentService;
-import com.zeyad.genericusecase.domain.interactors.requests.FileIORequest;
 
 import java.io.File;
 
