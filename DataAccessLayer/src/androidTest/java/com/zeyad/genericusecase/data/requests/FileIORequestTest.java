@@ -1,8 +1,6 @@
-package com.zeyad.genericusecase.domain.interactors;
+package com.zeyad.genericusecase.data.requests;
 
 import android.support.annotation.Nullable;
-
-import com.zeyad.genericusecase.data.requests.FileIORequest;
 
 import org.junit.After;
 import org.junit.Before;
