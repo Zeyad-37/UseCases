@@ -120,14 +120,14 @@ public class DataRepositoryTest {
     @Test
     public void testPostObjectDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenJsonObjectIsPassed() {
         mDataRepository.postObjectDynamically(DataRepositoryRobot.getValidUrl()
-                , DataRepository.DEFAULT_ID_TO_BE_REPLACED
+                , DataRepository.DEFAULT_ID_KEY
                 , DataRepositoryRobot.getValidJSONObject()
                 , DataRepositoryRobot.getValidDomainClass()
                 , DataRepositoryRobot.getValidDataClass()
                 , true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicPostObject(DataRepositoryRobot.getValidUrl()
-                        , DataRepository.DEFAULT_ID_TO_BE_REPLACED, DataRepositoryRobot.getValidJSONObject()
+                        , DataRepository.DEFAULT_ID_KEY, DataRepositoryRobot.getValidJSONObject()
                         , DataRepositoryRobot.getValidDomainClass()
                         , DataRepositoryRobot.getValidDataClass()
                         , true, true);
@@ -136,13 +136,13 @@ public class DataRepositoryTest {
     @Test
     public void testPostListDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.postListDynamically(DataRepositoryRobot.getValidUrl()
-                , DataRepository.DEFAULT_ID_TO_BE_REPLACED, DataRepositoryRobot.getValidJSONArray()
+                , DataRepository.DEFAULT_ID_KEY, DataRepositoryRobot.getValidJSONArray()
                 , DataRepositoryRobot.getValidDomainClass()
                 , DataRepositoryRobot.getValidDataClass()
                 , true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicPostList(DataRepositoryRobot.getValidUrl()
-                        , DataRepository.DEFAULT_ID_TO_BE_REPLACED, DataRepositoryRobot.getValidJSONArray()
+                        , DataRepository.DEFAULT_ID_KEY, DataRepositoryRobot.getValidJSONArray()
                         , DataRepositoryRobot.getValidDomainClass()
                         , DataRepositoryRobot.getValidDataClass()
                         , true, true);
@@ -157,7 +157,7 @@ public class DataRepositoryTest {
                 , true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicDeleteCollection(DataRepositoryRobot.getValidUrl()
-                        , DataRepository.DEFAULT_ID_TO_BE_REPLACED
+                        , DataRepository.DEFAULT_ID_KEY
                         , DataRepositoryRobot.getValidJSONArray()
                         , DataRepositoryRobot.getValidDataClass()
                         , true, true);
@@ -203,13 +203,13 @@ public class DataRepositoryTest {
     @Test
     public void testPutObjectDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.putObjectDynamically(DataRepositoryRobot.getValidUrl()
-                , DataRepository.DEFAULT_ID_TO_BE_REPLACED
+                , DataRepository.DEFAULT_ID_KEY
                 , DataRepositoryRobot.getValidJSONObject()
                 , DataRepositoryRobot.getValidDomainClass()
                 , DataRepositoryRobot.getValidDataClass(), true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicPutObject(DataRepositoryRobot.getValidUrl()
-                        , DataRepository.DEFAULT_ID_TO_BE_REPLACED
+                        , DataRepository.DEFAULT_ID_KEY
                         , DataRepositoryRobot.getValidJSONObject()
                         , DataRepositoryRobot.getValidDomainClass()
                         , DataRepositoryRobot.getValidDataClass(), true, true);
@@ -218,13 +218,13 @@ public class DataRepositoryTest {
     @Test
     public void testPutListDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.putListDynamically(DataRepositoryRobot.getValidUrl()
-                , DataRepository.DEFAULT_ID_TO_BE_REPLACED
+                , DataRepository.DEFAULT_ID_KEY
                 , DataRepositoryRobot.getValidJSONArray()
                 , DataRepositoryRobot.getValidDomainClass()
                 , DataRepositoryRobot.getValidDataClass(), true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicPutList(DataRepositoryRobot.getValidUrl()
-                        , DataRepository.DEFAULT_ID_TO_BE_REPLACED
+                        , DataRepository.DEFAULT_ID_KEY
                         , DataRepositoryRobot.getValidJSONArray()
                         , DataRepositoryRobot.getValidDomainClass()
                         , DataRepositoryRobot.getValidDataClass(), true, true);

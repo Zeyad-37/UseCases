@@ -1,19 +1,11 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 
 import android.support.annotation.NonNull;
-import android.text.TextUtils;
 
 import com.zeyad.generic.usecase.dataaccesslayer.components.ErrorMessageFactory;
-import com.zeyad.genericusecase.domain.exceptions.DefaultErrorBundle;
-import com.zeyad.genericusecase.domain.exceptions.ErrorBundle;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.HashMap;
 
-import retrofit2.adapter.rxjava.HttpException;
 import rx.Subscriber;
 
 /**
@@ -46,9 +38,9 @@ public abstract class GenericPostPresenter<M> extends BasePresenter {
         mGenericPostView.hideLoading();
     }
 
-    public void showErrorMessage(ErrorBundle errorBundle) {
+    public void showErrorMessage(Throwable throwable) {
         mGenericPostView.showError(ErrorMessageFactory.create(mGenericPostView.getApplicationContext(),
-                errorBundle.getException()));
+                (Exception) throwable));
     }
 
     /**
@@ -75,11 +67,7 @@ public abstract class GenericPostPresenter<M> extends BasePresenter {
         @Override
         public void onError(Throwable e) {
             hideViewLoading();
-            String message = getErrorMessage(e);
-            if (TextUtils.isEmpty(message)) {
-                showErrorMessage(new DefaultErrorBundle((Exception) e));
-            } else
-                mGenericPostView.showError(message);
+            showErrorMessage(e);
             e.printStackTrace();
         }
 
@@ -87,16 +75,5 @@ public abstract class GenericPostPresenter<M> extends BasePresenter {
         public void onNext(M model) {
             postSuccess(model);
         }
-    }
-
-    private String getErrorMessage(Throwable e) {
-        String message = "";
-        try {
-            JSONObject json = new JSONObject(((HttpException) e).response().errorBody().string());
-            message = (String) json.getJSONObject("error").get("message");
-        } catch (JSONException | IOException e1) {
-            e1.printStackTrace();
-        }
-        return message;
     }
 }

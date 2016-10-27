@@ -209,9 +209,9 @@ public class TestUtility {
     }
 
     public static void performInitialSetupOfDb(@NonNull Context context) {
-        Realm.setDefaultConfiguration(new RealmConfiguration.Builder(context)
+        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
                 .name("app.realm")
-                .modules(Realm.getDefaultModule(), new TestLibraryModule())
+                .modules(Realm.getDefaultModule(), new LibraryModule())
                 .rxFactory(new RealmObservableFactory())
                 .deleteRealmIfMigrationNeeded()
                 .build());

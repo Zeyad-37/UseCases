@@ -14,20 +14,47 @@ apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 25
     buildToolsVersion "24.0.2"
 
     defaultConfig {
         applicationId "com.zeyad.generic.usecase.dataaccesslayer"
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
     }
+
+    signingConfigs {
+        releaseConfig {
+            storeFile file(project.jksDir)
+            storePassword "generic123"
+            keyAlias "Zeyad"
+            keyPassword "generic123"
+        }
+
+        debugConfig {
+            storeFile file(project.jksDir)
+            storePassword "generic123"
+            keyAlias "Zeyad"
+            keyPassword "generic123"
+        }
+    }
+
     buildTypes {
-        release {
-            minifyEnabled false
+        debug {
+            minifyEnabled true
+            shrinkResources true
+            debuggable true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debugConfig
+        }
+
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.releaseConfig
         }
     }
 
@@ -38,10 +65,10 @@ android {
 }
 
 ext {
-    supportLibraryVersion = '24.2.1'
+    supportLibraryVersion = '25.0.0'
     retrofitVersion = '2.1.0'
     okhttpVersion = '3.3.1'
-    googlePlayVersion = '9.4.0'
+    googlePlayVersion = '9.8.0'
     rxbindingVersion = '0.4.0'
     daggerVersion = '2.5'
     parcelerVersion = '1.1.1'

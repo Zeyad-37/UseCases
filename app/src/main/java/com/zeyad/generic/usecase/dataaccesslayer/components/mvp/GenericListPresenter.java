@@ -4,8 +4,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
 import com.zeyad.generic.usecase.dataaccesslayer.components.ErrorMessageFactory;
-import com.zeyad.genericusecase.domain.exceptions.DefaultErrorBundle;
-import com.zeyad.genericusecase.domain.exceptions.ErrorBundle;
 
 import java.util.List;
 
@@ -69,9 +67,9 @@ public abstract class GenericListPresenter<M, H extends RecyclerView.ViewHolder>
         mGenericListView.hideRetry();
     }
 
-    public void showErrorMessage(ErrorBundle errorBundle) {
+    public void showErrorMessage(Throwable exception) {
         mGenericListView.showError(ErrorMessageFactory.create(mGenericListView.getApplicationContext(),
-                errorBundle.getException()));
+                (Exception) exception));
     }
 
     public void showItemsListInView(List<M> userViewModels) {
@@ -93,7 +91,7 @@ public abstract class GenericListPresenter<M, H extends RecyclerView.ViewHolder>
         @Override
         public void onError(Throwable e) {
             hideViewLoading();
-            showErrorMessage(new DefaultErrorBundle((Exception) e));
+            showErrorMessage(e);
             showViewRetry();
             e.printStackTrace();
         }

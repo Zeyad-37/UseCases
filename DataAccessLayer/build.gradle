@@ -27,11 +27,11 @@ buildscript {
 //}
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 25
     buildToolsVersion '24.0.2'
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
@@ -74,10 +74,10 @@ android {
 }
 
 ext {
-    supportLibraryVersion = '24.2.1'
+    supportLibraryVersion = '25.0.0'
     retrofitVersion = '2.1.0'
     okhttpVersion = '3.4.1'
-    googlePlayVersion = '9.6.1'
+    googlePlayVersion = '9.8.0'
     androidSupportTest = '0.5'
     espressoCore = '2.2.2'
     hamcrest = '1.3'

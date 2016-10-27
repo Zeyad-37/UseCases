@@ -2,8 +2,6 @@ package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 
 import android.support.annotation.NonNull;
 
-import com.zeyad.genericusecase.domain.exceptions.DefaultErrorBundle;
-
 import rx.Subscriber;
 
 /**
@@ -42,7 +40,7 @@ public abstract class GenericExtendedDetailPresenter<M> extends GenericDetailPre
         @Override
         public void onError(Throwable e) {
             hideViewLoading();
-            showErrorMessage(new DefaultErrorBundle((Exception) e));
+            showErrorMessage(e);
             showViewRetry();
             e.printStackTrace();
         }

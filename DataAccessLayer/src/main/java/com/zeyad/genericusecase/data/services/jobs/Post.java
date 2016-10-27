@@ -24,12 +24,10 @@ import com.zeyad.genericusecase.data.utils.Utils;
 
 import org.json.JSONObject;
 
-import java.io.IOException;
-
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
+import rx.Subscriber;
 import rx.Subscription;
-import rx.functions.Action1;
 import rx.subscriptions.Subscriptions;
 
 import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
@@ -52,10 +50,21 @@ public class Post {
     private boolean mGooglePlayServicesAvailable;
     private GcmNetworkManager mGcmNetworkManager;
     @NonNull
-    private Action1<Object> handleError = object -> {
-        if (object instanceof IOException) {
+    private Subscriber<Object> handleError = new Subscriber<Object>() {
+        @Override
+        public void onCompleted() {
+
+        }
+
+        @Override
+        public void onError(Throwable e) {
             reQueue();
-            ((Exception) object).printStackTrace();
+            e.printStackTrace();
+        }
+
+        @Override
+        public void onNext(Object o) {
+
         }
     };
 

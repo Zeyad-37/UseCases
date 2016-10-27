@@ -17,7 +17,7 @@ import rx.Observable;
 
 public class DataRepository implements Repository {
 
-    public static final String DEFAULT_ID_TO_BE_REPLACED = "id";
+    public static final String DEFAULT_ID_KEY = "id";
     private final DataStoreFactory mDataStoreFactory;
     private final IEntityMapperUtil mEntityMapperUtil;
 
@@ -105,7 +105,7 @@ public class DataRepository implements Repository {
                                                @NonNull Class dataClass, boolean persist, boolean queuable) {
         try {
             return mDataStoreFactory.dynamically(url, false, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicDeleteCollection(url, DataRepository.DEFAULT_ID_TO_BE_REPLACED, jsonArray,
+                    .dynamicDeleteCollection(url, DataRepository.DEFAULT_ID_KEY, jsonArray,
                             dataClass, persist, queuable);
         } catch (IllegalAccessException e) {
             e.printStackTrace();

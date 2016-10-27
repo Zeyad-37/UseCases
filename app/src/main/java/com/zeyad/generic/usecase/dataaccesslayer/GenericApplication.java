@@ -38,7 +38,7 @@ public class GenericApplication extends Application {
         sInstance = this;
         initializeInjector();
         initializeRealm();
-        GenericUseCaseFactory.initWithoutDB(getApplicationContext());
+        GenericUseCaseFactory.initWithRealm(getApplicationContext(), null);
     }
 
     private Cache provideCache() {
@@ -69,7 +69,7 @@ public class GenericApplication extends Application {
     }
 
     private void initializeRealm() {
-        Realm.setDefaultConfiguration(new RealmConfiguration.Builder(this)
+        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
                 .name("app.realm")
                 .modules(Realm.getDefaultModule(), new LibraryModule())
                 .rxFactory(new RealmObservableFactory())

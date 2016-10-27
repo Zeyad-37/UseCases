@@ -3,8 +3,6 @@ package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 
-import com.zeyad.genericusecase.domain.exceptions.DefaultErrorBundle;
-
 import java.util.List;
 
 import rx.Subscriber;
@@ -38,7 +36,7 @@ public abstract class GenericListExtendedPresenter<M, H extends RecyclerView.Vie
         @Override
         public void onError(Throwable e) {
             hideViewLoading();
-            showErrorMessage(new DefaultErrorBundle((Exception) e));
+            showErrorMessage(e);
             showViewRetry();
             e.printStackTrace();
         }
@@ -59,7 +57,7 @@ public abstract class GenericListExtendedPresenter<M, H extends RecyclerView.Vie
         @Override
         public void onError(Throwable e) {
             hideViewLoading();
-            showErrorMessage(new DefaultErrorBundle((Exception) e));
+            showErrorMessage(e);
             showViewRetry();
             e.printStackTrace();
         }
@@ -78,7 +76,7 @@ public abstract class GenericListExtendedPresenter<M, H extends RecyclerView.Vie
         @Override
         public void onError(Throwable e) {
             hideViewLoading();
-            showErrorMessage(new DefaultErrorBundle((Exception) e));
+            showErrorMessage(e);
             showViewRetry();
             e.printStackTrace();
         }

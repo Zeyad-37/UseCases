@@ -175,7 +175,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
         final List<Long> listOfAllIds = getListOfAllIds();
         listOfAllIds.remove(0);
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        diskDataStore.dynamicDeleteCollection(null, DataRepository.DEFAULT_ID_TO_BE_REPLACED
+        diskDataStore.dynamicDeleteCollection(null, DataRepository.DEFAULT_ID_KEY
                         , ModelConverters.convertToJsonArray(listOfAllIds)
                 , getDataClass(), false, false)
                 .subscribe(subscriber);

@@ -3,8 +3,6 @@ package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 import android.support.annotation.NonNull;
 
 import com.zeyad.generic.usecase.dataaccesslayer.components.ErrorMessageFactory;
-import com.zeyad.genericusecase.domain.exceptions.DefaultErrorBundle;
-import com.zeyad.genericusecase.domain.exceptions.ErrorBundle;
 
 import rx.Subscriber;
 
@@ -67,9 +65,9 @@ public abstract class GenericDetailPresenter<M> extends BasePresenter {
         mGenericDetailView.hideRetry();
     }
 
-    public void showErrorMessage(ErrorBundle errorBundle) {
+    public void showErrorMessage(Throwable throwable) {
         mGenericDetailView.showError(ErrorMessageFactory.create(mGenericDetailView.getApplicationContext(),
-                errorBundle.getException()));
+                (Exception) throwable));
     }
 
     void showUserDetailsInView(M m) {
@@ -103,7 +101,7 @@ public abstract class GenericDetailPresenter<M> extends BasePresenter {
         @Override
         public void onError(Throwable e) {
             hideViewLoading();
-            showErrorMessage(new DefaultErrorBundle((Exception) e));
+            showErrorMessage(e);
             showViewRetry();
             e.printStackTrace();
         }

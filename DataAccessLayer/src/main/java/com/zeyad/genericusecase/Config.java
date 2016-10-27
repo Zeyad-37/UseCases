@@ -14,7 +14,7 @@ public class Config {
 
     private Config(@NonNull Context context) {
         mContext = context;
-        setupRealm(context);
+        setupRealm();
     }
 
     public static Config getInstance() {
@@ -27,10 +27,10 @@ public class Config {
         sInstance = new Config(context);
     }
 
-    private void setupRealm(@NonNull Context context) {
-//        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder(context, context.getCacheDir())
+    private void setupRealm() {
+//        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
 //                .name("library.realm")
-//                .modules(new TestLibraryModule())
+//                .modules(new LibraryModule())
 //                .build();
     }
 
