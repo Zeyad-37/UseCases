@@ -3,11 +3,29 @@
 
 Is a library that is a generic implementation of the Domain and Data layers in a clean architecture. 
 
-## Requirements
+# Motivation
+
+As developers, we always need to deliver high quality software on time,
+ which is not an easy task.
+In most tasks, we need to make either a IO operation, whether from the server,
+ db or file, which is a lot of boiler plate. And getting it write every time
+ is a bit challenging due to the many things that you need to take care of. 
+ Like separation of concerns, error handling and writing robust code that 
+ would not crash on you.
+ I have noticed that this code repeats almost with every user story, and 
+ i was basically re-writing the same code, but for different models. So i 
+ thought what if i could pass the class with the request and not repeat this
+ code over and over. Hence, please welcome the GenericUseCase lib.
+
+# Requirements
 
 Generic Use Case Library can be included in any Android application. 
 
 Generic Use Case Library supports Android 2.3 (Gingerbread) and later. 
+
+# Installation
+
+Provide code examples and explanations of how to get the project.
 
 # Code Example
 
@@ -161,24 +179,6 @@ getGenericUseCase().deleteCollection(new PostRequest // putList
         .url(FULL_URL)
         .build())
 ```
-# Motivation
-
-As developers, we always need to deliver high quality software on time,
- which is not an easy task.
-In most tasks, we need to make either a IO operation, whether from the server,
- db or file, which is a lot of boiler plate. And getting it write every time
- is a bit challenging due to the many things that you need to take care of. 
- Like separation of concerns, error handling and writing robust code that 
- would not crash on you.
- I have noticed that this code repeats almost with every user story, and 
- i was basically re-writing the same code, but for different models. So i 
- thought what if i could pass the class with the request and not repeat this
- code over and over. Hence, please welcome the GenericUseCase lib.
-
-# Installation
-
-Provide code examples and explanations of how to get the project.
-
 # Contributors
 
 Just make pull request. You are in!
