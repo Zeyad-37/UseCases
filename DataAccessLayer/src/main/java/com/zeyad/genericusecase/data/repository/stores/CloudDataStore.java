@@ -2,7 +2,6 @@ package com.zeyad.genericusecase.data.repository.stores;
 
 import android.app.job.JobInfo;
 import android.content.ComponentName;
-import android.content.ContentValues;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.PersistableBundle;
@@ -611,10 +610,7 @@ public class CloudDataStore implements DataStore {
                         e.printStackTrace();
                         observable = Observable.error(e);
                     }
-            } else if (object instanceof ContentValues)
-                observable = mDataBaseManager.put((ContentValues) object, mDataClass);
-            else if (object instanceof ContentValues[])
-                observable = mDataBaseManager.putAll((ContentValues[]) object, mDataClass);
+            }
             if (observable != null)
                 observable.subscribeOn(Schedulers.io())
                         .subscribe(new SimpleSubscriber(object));

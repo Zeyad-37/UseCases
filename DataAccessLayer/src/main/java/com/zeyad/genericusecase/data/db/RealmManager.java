@@ -1,6 +1,5 @@
 package com.zeyad.genericusecase.data.db;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
@@ -25,7 +24,6 @@ import io.realm.RealmQuery;
 import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
-
 
 /**
  * {@link DataBaseManager} implementation.
@@ -203,17 +201,6 @@ public class RealmManager implements DataBaseManager {
     /**
      * Puts and element into the DB.
      *
-     * @param contentValues Element to insert in the DB.
-     * @param dataClass     Class type of the items to be put.
-     */
-    @Override
-    public Observable<?> put(ContentValues contentValues, Class dataClass) {
-        return Observable.error(new IllegalStateException(mContext.getString(R.string.not_sqlbrite)));
-    }
-
-    /**
-     * Puts and element into the DB.
-     *
      * @param jsonArray    Element to insert in the DB.
      * @param idColumnName Name of the id field.
      * @param dataClass    Class type of the items to be put.
@@ -251,18 +238,6 @@ public class RealmManager implements DataBaseManager {
             return Observable.from(realmModels);
         }).subscribeOn(Schedulers.immediate())
                 .subscribe(new PutAllSubscriberClass(realmModels));
-    }
-
-    /**
-     * Puts and element into the DB.
-     *
-     * @param contentValues Element to insert in the DB.
-     * @param dataClass     Class type of the items to be put.
-     */
-    @NonNull
-    @Override
-    public Observable putAll(ContentValues[] contentValues, Class dataClass) {
-        return Observable.error(new IllegalStateException(mContext.getString(R.string.not_sqlbrite)));
     }
 
     /**
