@@ -15,12 +15,9 @@ import com.zeyad.genericusecase.data.requests.FileIORequest;
 import com.zeyad.genericusecase.data.requests.GetRequest;
 import com.zeyad.genericusecase.data.requests.PostRequest;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
-import com.zeyad.genericusecase.data.utils.ModelConverters;
 import com.zeyad.genericusecase.domain.executors.PostExecutionThread;
 import com.zeyad.genericusecase.domain.executors.ThreadExecutor;
 import com.zeyad.genericusecase.domain.repository.Repository;
-
-import org.json.JSONArray;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -166,12 +163,7 @@ public class GenericUseCase implements IGenericUseCase {
 
     @Override
     public Observable deleteCollection(@NonNull PostRequest deleteRequest) {
-        JSONArray jsonArray = null;
-        if (deleteRequest.getKeyValuePairs() != null)
-            jsonArray = ModelConverters.convertToJsonArray(deleteRequest.getKeyValuePairs());
-        else if (deleteRequest.getJsonArray() != null)
-            jsonArray = deleteRequest.getJsonArray();
-        return mRepository.deleteListDynamically(deleteRequest.getUrl(), jsonArray,
+        return mRepository.deleteListDynamically(deleteRequest.getUrl(), deleteRequest.getArrayBundle(),
                 deleteRequest.getPresentationClass(), deleteRequest.getDataClass(), deleteRequest.isPersist(),
                 deleteRequest.isQueuable())
                 .compose(applySchedulers());

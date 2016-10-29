@@ -26,7 +26,6 @@
     <string name="dbmanager_null_error">DataBaseManager cannot be null!</string>
     <string name="io_to_db_error">Can\'t IO file to local DB!</string>
     <string name="job_started">%1$s Job started!</string>
-    <string name="null_payload">Payload is null, can not put/post nulls</string>
     <string name="unknown_error">Unknown error</string>
 
 </resources>
