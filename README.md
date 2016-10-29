@@ -4,8 +4,154 @@ Is a library that is a generic implementation of the Domain and Data layers in a
 
 # Code Example
 
-Show what the library does as concisely as possible, developers should be able to figure out how your project solves their problem by looking at the code example. Make sure the API you are showing off is obvious, and that your code is short and concise.
+Get Object From Server:
+```
+mGenericUseCase.getObject(new GetRequest
+        .GetRequestBuilder(OrdersRealmModel.class, true) // true to save result to db, false otherwise.
+        .presentationClass(OrderViewModel.class)
+        .url(FULL_URL)
+        .idColumnName(OrderViewModel.ID)
+        .id(mItemId)
+        .build())
+        .subscribe(new Subscriber<OrderViewModel>() {
+            @Override
+            public void onCompleted() {
+            }
 
+            @Override
+            public void onError(Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onNext(OrderViewModel orderViewModel) {
+            }
+        });
+        ```
+Get Object From DB:
+```
+mGenericUseCase.getObject(new GetRequest
+        .GetRequestBuilder(OrdersRealmModel.class, true)
+        .presentationClass(OrderViewModel.class)
+        .url("") // empty !!
+        .idColumnName(OrderViewModel.ID)
+        .id(mItemId)
+        .build());
+        ```
+Get List From Server:
+```
+mGenericUseCase.getList(new GetRequest
+        .GetRequestBuilder(OrdersRealmModel.class, false)
+        .presentationClass(OrderViewModel.class)
+        .url(FULL_URL)
+        .build())
+        .subscribe(new Subscriber<List<OrderViewModel>>() {
+            @Override
+            public void onCompleted() {
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                e.printStackTrace();
+            }
+
+            @Override
+            public void onNext(List<OrderViewModel> orderViewModel){
+            }
+        });
+        ```
+Get List From DB:
+```
+mGenericUseCase.getList(new GetRequest
+        .GetRequestBuilder(OrdersRealmModel.class, false)
+        .presentationClass(OrderViewModel.class)
+        .url("")
+        .build());
+        ```
+Post/Put Object to Server:
+```
+mGenericUseCase.postObject(new PostRequest // putObject
+        .PostRequestBuilder(OrdersRealmModel.class, true)
+        .idColumnName(OrderViewModel.ID)
+        .presentationClass(OrderViewModel.class)
+        .url(FULL_URL)
+        .payLoad(OrderViewModel.toJSONObject()) // or HashMap 
+        .build());
+Post/Put Object to DB:
+```
+mGenericUseCase.postObject(new PostRequest // putObject
+        .PostRequestBuilder(OrdersRealmModel.class, true)
+        .idColumnName(OrderViewModel.ID)
+        .presentationClass(OrderViewModel.class)
+        .url("")
+        .payLoad(OrderViewModel.toJSONObject()) // or HashMap 
+        .build());
+Post/Put List to Server:
+```
+mGenericUseCase.postList(new PostRequest // putList
+        .PostRequestBuilder(OrdersRealmModel.class, true)
+        .presentationClass(OrdersViewModel.class)
+        .payLoad(OrdersViewModel.toJSONArray())
+        .idColumnName(OrdersRealmModel.ID)
+        .url(FULL_URL)
+        .build())
+```
+Post/Put List to DB:
+```
+mGenericUseCase.postList(new PostRequest // putList
+        .PostRequestBuilder(OrdersRealmModel.class, true)
+        .presentationClass(OrdersViewModel.class)
+        .payLoad(OrdersViewModel.toJSONArray())
+        .idColumnName(OrdersRealmModel.ID)
+        .url("")
+        .build())
+        ```
+Delete All from DB:
+```
+getGenericUseCase().deleteAll(new PostRequest
+        .PostRequestBuilder(OrdersRealmModel.class, true)
+        .idColumnName(OrdersRealmModel.ID)
+        .url("")
+        .build())
+        ```
+Upload File
+```
+mGenericUseCase.uploadFile(new FileIORequest
+        .FileIORequestBuilder(FULL_URL, new File())
+        .onWifi(true)
+        .whileCharging(false)
+        .dataClass(OrdersRealmModel.class)
+        .presentationClass(OrdersViewModel.class)
+        .build())
+        ```
+Download File
+```
+mGenericUseCase.downloadFile(new FileIORequest
+        .FileIORequestBuilder(FULL_URL, new File())
+        .onWifi(true)
+        .whileCharging(false)
+        .dataClass(OrdersRealmModel.class)
+        .presentationClass(OrdersViewModel.class)
+        .build())
+        ```
+Read from File
+```
+mGenericUseCase.readFile(String fullFilePath);
+```
+Write to File
+```
+mGenericUseCase.writeToFile(String fullFilePath, String data);
+mGenericUseCase.writeToFile(String fullFilePath, byte[] data);
+```
+Delete Collection from Server
+```
+getGenericUseCase().deleteCollection(new PostRequest // putList
+        .PostRequestBuilder(OrdersRealmModel.class, true)
+        .presentationClass(OrdersViewModel.class)
+        .payLoad(OrdersViewModel.toJSONArrayOfId())
+        .url(FULL_URL)
+        .build())
+        ```
 # Motivation
 
 As developers, we always need to deliver high quality software on time,
