@@ -77,6 +77,7 @@ mGenericUseCase.postObject(new PostRequest // putObject
         .url(FULL_URL)
         .payLoad(OrderViewModel.toJSONObject()) // or HashMap 
         .build());
+```
 Post/Put Object to DB:
 ```
 mGenericUseCase.postObject(new PostRequest // putObject
@@ -86,6 +87,7 @@ mGenericUseCase.postObject(new PostRequest // putObject
         .url("")
         .payLoad(OrderViewModel.toJSONObject()) // or HashMap 
         .build());
+```
 Post/Put List to Server:
 ```
 mGenericUseCase.postList(new PostRequest // putList
@@ -105,7 +107,7 @@ mGenericUseCase.postList(new PostRequest // putList
         .idColumnName(OrdersRealmModel.ID)
         .url("")
         .build())
-        ```
+```
 Delete All from DB:
 ```
 getGenericUseCase().deleteAll(new PostRequest
@@ -123,7 +125,7 @@ mGenericUseCase.uploadFile(new FileIORequest
         .dataClass(OrdersRealmModel.class)
         .presentationClass(OrdersViewModel.class)
         .build())
-        ```
+```
 Download File
 ```
 mGenericUseCase.downloadFile(new FileIORequest
@@ -133,7 +135,7 @@ mGenericUseCase.downloadFile(new FileIORequest
         .dataClass(OrdersRealmModel.class)
         .presentationClass(OrdersViewModel.class)
         .build())
-        ```
+```
 Read from File
 ```
 mGenericUseCase.readFile(String fullFilePath);
@@ -151,7 +153,7 @@ getGenericUseCase().deleteCollection(new PostRequest // putList
         .payLoad(OrdersViewModel.toJSONArrayOfId())
         .url(FULL_URL)
         .build())
-        ```
+```
 # Motivation
 
 As developers, we always need to deliver high quality software on time,
