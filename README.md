@@ -37,7 +37,7 @@ mGenericUseCase.getObject(new GetRequest
         .idColumnName(OrderViewModel.ID)
         .id(mItemId)
         .build());
-        ```
+```
 Get List From Server:
 ```
 mGenericUseCase.getList(new GetRequest
@@ -59,7 +59,7 @@ mGenericUseCase.getList(new GetRequest
             public void onNext(List<OrderViewModel> orderViewModel){
             }
         });
-        ```
+```
 Get List From DB:
 ```
 mGenericUseCase.getList(new GetRequest
@@ -67,7 +67,7 @@ mGenericUseCase.getList(new GetRequest
         .presentationClass(OrderViewModel.class)
         .url("")
         .build());
-        ```
+```
 Post/Put Object to Server:
 ```
 mGenericUseCase.postObject(new PostRequest // putObject
