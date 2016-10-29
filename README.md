@@ -27,7 +27,7 @@ mGenericUseCase.getObject(new GetRequest
             public void onNext(OrderViewModel orderViewModel) {
             }
         });
-        ```
+```
 Get Object From DB:
 ```
 mGenericUseCase.getObject(new GetRequest
