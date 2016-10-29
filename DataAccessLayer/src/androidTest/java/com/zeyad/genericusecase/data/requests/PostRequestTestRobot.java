@@ -26,10 +26,10 @@ class PostRequestTestRobot {
 
     public static PostRequest buildPostRequest() {
         return new PostRequest.PostRequestBuilder(DATA_CLASS, TO_PERSIST)
-                .hashMap(HASH_MAP)
+                .payLoad(HASH_MAP)
                 .idColumnName(ID_COLUMN_NAME)
-                .jsonArray(JSON_ARRAY)
-                .jsonObject(JSON_OBJECT)
+                .payLoad(JSON_ARRAY)
+                .payLoad(JSON_OBJECT)
                 .presentationClass(PRESENTATION_CLASS)
                 .subscriber(SUBSCRIBER)
                 .url(URL)

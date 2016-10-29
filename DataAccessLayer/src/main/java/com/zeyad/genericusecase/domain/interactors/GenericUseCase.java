@@ -6,7 +6,6 @@ import android.support.annotation.VisibleForTesting;
 
 import com.google.gson.Gson;
 import com.zeyad.genericusecase.Config;
-import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.UIThread;
 import com.zeyad.genericusecase.data.db.DatabaseManagerFactory;
 import com.zeyad.genericusecase.data.executor.JobExecutor;
@@ -130,28 +129,16 @@ public class GenericUseCase implements IGenericUseCase {
 
     @Override
     public Observable postObject(@NonNull PostRequest postRequest) {
-        if (postRequest.getObjectBundle() != null)
-            return mRepository.postObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                    postRequest.getObjectBundle(), postRequest.getPresentationClass(), postRequest
-                            .getDataClass(), postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
-        else
-            return Observable.defer(() -> Observable.error(new IllegalArgumentException(Config.getInstance()
-                    .getContext().getString(R.string.null_payload))));
+        return mRepository.postObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
+                postRequest.getObjectBundle(), postRequest.getPresentationClass(), postRequest
+                        .getDataClass(), postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
     }
 
     @Override
     public Observable postList(@NonNull PostRequest postRequest) {
-        JSONArray jsonArray = null;
-        if (postRequest.getKeyValuePairs() != null)
-            jsonArray = ModelConverters.convertToJsonArray(postRequest.getKeyValuePairs());
-        else if (postRequest.getJsonArray() != null)
-            jsonArray = postRequest.getJsonArray();
-        if (jsonArray != null)
-            return mRepository.postListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                    jsonArray, postRequest.getPresentationClass(), postRequest.getDataClass(),
-                    postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
-        else return Observable.error(new IllegalArgumentException(Config.getInstance().getContext()
-                .getString(R.string.null_payload)));
+        return mRepository.postListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
+                postRequest.getArrayBundle(), postRequest.getPresentationClass(), postRequest.getDataClass(),
+                postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
     }
 
     /**
@@ -161,13 +148,10 @@ public class GenericUseCase implements IGenericUseCase {
      */
     @Override
     public Observable putObject(@NonNull PostRequest postRequest) {
-        if (postRequest.getObjectBundle() != null)
-            return mRepository.putObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                    postRequest.getObjectBundle(), postRequest.getPresentationClass(),
-                    postRequest.getDataClass(), postRequest.isPersist(), postRequest.isQueuable())
-                    .compose(applySchedulers());
-        else return Observable.error(new IllegalArgumentException(Config.getInstance().getContext()
-                .getString(R.string.null_payload)));
+        return mRepository.putObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
+                postRequest.getObjectBundle(), postRequest.getPresentationClass(),
+                postRequest.getDataClass(), postRequest.isPersist(), postRequest.isQueuable())
+                .compose(applySchedulers());
     }
 
     /**
@@ -175,18 +159,9 @@ public class GenericUseCase implements IGenericUseCase {
      */
     @Override
     public Observable putList(@NonNull PostRequest postRequest) {
-        JSONArray jsonArray = null;
-        if (postRequest.getKeyValuePairs() != null)
-            jsonArray = ModelConverters.convertToJsonArray(postRequest.getKeyValuePairs());
-        else if (postRequest.getJsonArray() != null)
-            jsonArray = postRequest.getJsonArray();
-        if (jsonArray != null)
-            return mRepository.putListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
-                    jsonArray, postRequest.getPresentationClass(), postRequest.getDataClass(),
-                    postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
-        else
-            return Observable.error(new IllegalArgumentException(Config.getInstance().getContext()
-                    .getString(R.string.null_payload)));
+        return mRepository.putListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
+                postRequest.getArrayBundle(), postRequest.getPresentationClass(), postRequest.getDataClass(),
+                postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
     }
 
     @Override

@@ -154,7 +154,7 @@ public class PostTestRobot {
 
     public static PostRequest createPostRequestForHashmap(Subscriber subscriber, String method) {
         return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
-                .hashMap(new HashMap<>())
+                .payLoad(new HashMap<>())
                 .idColumnName(getValidColumnName())
                 .presentationClass(getPresentationClass())
                 .subscriber(subscriber)
@@ -165,7 +165,7 @@ public class PostTestRobot {
 
     public static PostRequest createPostRequestForJsonObject(Subscriber subscriber, String method) {
         return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
-                .jsonObject(new JSONObject())
+                .payLoad(new JSONObject())
                 .idColumnName(getValidColumnName())
                 .presentationClass(getPresentationClass())
                 .subscriber(subscriber)
@@ -176,7 +176,7 @@ public class PostTestRobot {
 
     public static PostRequest createPostRequestForJsonArray(Subscriber subscriber, String method) {
         return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
-                .jsonArray(new JSONArray())
+                .payLoad(new JSONArray())
                 .idColumnName(getValidColumnName())
                 .presentationClass(getPresentationClass())
                 .subscriber(subscriber)

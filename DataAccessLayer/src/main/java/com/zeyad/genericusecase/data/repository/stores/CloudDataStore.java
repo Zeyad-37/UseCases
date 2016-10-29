@@ -471,7 +471,7 @@ public class CloudDataStore implements DataStore {
                               boolean persist) {
         return queuePostCore(new PostRequest.PostRequestBuilder(null, persist)
                 .idColumnName(idColumnName)
-                .jsonArray(jsonArray)
+                .payLoad(jsonArray)
                 .url(url)
                 .method(method)
                 .build());
@@ -481,7 +481,7 @@ public class CloudDataStore implements DataStore {
                               boolean persist) {
         return queuePostCore(new PostRequest.PostRequestBuilder(null, persist)
                 .idColumnName(idColumnName)
-                .jsonObject(jsonObject)
+                .payLoad(jsonObject)
                 .url(url)
                 .method(method)
                 .build());

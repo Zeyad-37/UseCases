@@ -1,7 +1,8 @@
 package com.zeyad.genericusecase.data.requests;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+
+import com.zeyad.genericusecase.data.utils.ModelConverters;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -71,13 +72,20 @@ public class PostRequest {
         mUrl = url;
     }
 
-    @Nullable
     public JSONObject getObjectBundle() {
         if (mJsonObject != null)
             return mJsonObject;
         else if (mKeyValuePairs != null)
             return new JSONObject(mKeyValuePairs);
-        else return null;
+        else return new JSONObject();
+    }
+
+    public JSONArray getArrayBundle() {
+        if (mJsonArray != null)
+            return mJsonArray;
+        else if (mKeyValuePairs != null)
+            return ModelConverters.convertToJsonArray(mKeyValuePairs);
+        else return new JSONArray();
     }
 
     public String getUrl() {
@@ -169,26 +177,26 @@ public class PostRequest {
         }
 
         @NonNull
-        public PostRequestBuilder jsonObject(JSONObject jsonObject) {
-            mJsonObject = jsonObject;
-            return this;
-        }
-
-        @NonNull
         public PostRequestBuilder method(String method) {
             mMethod = method;
             return this;
         }
 
         @NonNull
-        public PostRequestBuilder jsonArray(JSONArray jsonArray) {
+        public PostRequestBuilder payLoad(JSONObject jsonObject) {
+            mJsonObject = jsonObject;
+            return this;
+        }
+
+        @NonNull
+        public PostRequestBuilder payLoad(JSONArray jsonArray) {
             mJsonArray = jsonArray;
             return this;
         }
 
         @NonNull
-        public PostRequestBuilder hashMap(HashMap<String, Object> bundle) {
-            mKeyValuePairs = bundle;
+        public PostRequestBuilder payLoad(HashMap hashMap) {
+            mKeyValuePairs = hashMap;
             return this;
         }
 
