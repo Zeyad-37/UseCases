@@ -3,6 +3,12 @@
 
 Is a library that is a generic implementation of the Domain and Data layers in a clean architecture. 
 
+## Requirements
+
+Generic Use Case Library can be included in any Android application. 
+
+Generic Use Case Library supports Android 2.3 (Gingerbread) and later. 
+
 # Code Example
 
 Get Object From Server:
@@ -172,14 +178,6 @@ In most tasks, we need to make either a IO operation, whether from the server,
 # Installation
 
 Provide code examples and explanations of how to get the project.
-
-# API Reference
-
-Depending on the size of the project, if it is small and simple enough the reference docs can be added to the README. For medium size to larger projects it is important to at least provide a link to where the API reference docs live.
-
-# Tests
-
-Describe and show how to run the tests with code examples.
 
 # Contributors
 
