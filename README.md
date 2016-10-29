@@ -1,3 +1,4 @@
+[![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/Zeyad-37/GenericUseCase/blob/master/LICENSE)
 # GenericUseCase
 
 Is a library that is a generic implementation of the Domain and Data layers in a clean architecture. 
@@ -182,7 +183,7 @@ Describe and show how to run the tests with code examples.
 
 # Contributors
 
-Let people know how they can dive into the project, include important links to things like issue trackers, irc, twitter accounts if applicable.
+Just make pull request. You are in!
 
 # License
 
