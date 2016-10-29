@@ -115,7 +115,7 @@ getGenericUseCase().deleteAll(new PostRequest
         .idColumnName(OrdersRealmModel.ID)
         .url("")
         .build())
-        ```
+```
 Upload File
 ```
 mGenericUseCase.uploadFile(new FileIORequest
