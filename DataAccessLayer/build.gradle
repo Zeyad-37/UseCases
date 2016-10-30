@@ -17,15 +17,6 @@ buildscript {
     }
 }
 
-//def gitVersion() {
-//    if (!System.getenv('CI_BUILD')) {
-//        // don't care
-//        return 1
-//    }
-//    def cmd = 'git rev-list HEAD --first-parent --count'
-//    cmd.execute().text.trim().toInteger()
-//}
-
 android {
     compileSdkVersion 25
     buildToolsVersion '24.0.2'
