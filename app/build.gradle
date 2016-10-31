@@ -69,6 +69,7 @@ ext {
     retrofitVersion = '2.1.0'
     okhttpVersion = '3.3.1'
     googlePlayVersion = '9.8.0'
+    butterKnifeVersion = '8.4.0'
     rxbindingVersion = '0.4.0'
     daggerVersion = '2.5'
     parcelerVersion = '1.1.1'
@@ -94,22 +95,18 @@ dependencies {
     // Injection
     compile "com.google.dagger:dagger:$daggerVersion"
     apt "com.google.dagger:dagger-compiler:$daggerVersion"
-    compile 'com.jakewharton:butterknife:7.0.1'
-    compile 'javax.annotation:jsr250-api:1.0'
+    compile "com.jakewharton:butterknife:$butterKnifeVersion"
+    apt "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
     // Testing
-    testCompile 'junit:junit:4.12'
-    testCompile 'org.hamcrest:hamcrest-library:1.3'
-    testCompile "com.android.support:support-annotations:$supportLibraryVersion"
-    testCompile "com.android.support.test.espresso:espresso-core:$espressoCore"
-    testCompile "org.mockito:mockito-core:2.0.57-beta"
-
-    //test compile libraries
     androidTestCompile "com.android.support.test:runner:$androidSupportTest"
     androidTestCompile "com.android.support.test:rules:$androidSupportTest"
-    androidTestCompile 'junit:junit:4.12'
-    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
     androidTestCompile "com.android.support:support-annotations:$supportLibraryVersion"
     androidTestCompile "com.android.support.test.espresso:espresso-core:$espressoCore"
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'org.mockito:mockito-core:2.0.57-beta'
+    androidTestCompile 'junit:junit:4.12'
+    androidTestCompile 'org.hamcrest:hamcrest-library:1.3'
     androidTestCompile 'org.mockito:mockito-core:1.10.17'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'

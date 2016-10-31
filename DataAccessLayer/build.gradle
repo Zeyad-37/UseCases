@@ -80,8 +80,6 @@ dependencies {
     compile 'com.android.support:multidex:1.0.1'
     //google apis
     compile "com.google.android.gms:play-services-gcm:$googlePlayVersion"
-    compile "com.android.support:appcompat-v7:$supportLibraryVersion"
-    compile "com.android.support:support-v4:$supportLibraryVersion"
     // Network
     compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
     compile "com.squareup.retrofit2:converter-gson:$retrofitVersion"

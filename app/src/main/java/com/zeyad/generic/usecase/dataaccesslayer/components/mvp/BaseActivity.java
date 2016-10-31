@@ -27,7 +27,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -117,7 +116,6 @@ public abstract class BaseActivity extends AppCompatActivity implements HasCompo
         Glide.get(getApplicationContext()).clearMemory();
         Glide.get(getApplicationContext()).trimMemory(ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
 //        RappiApplication.getRefWatcher(getApplicationContext()).watch(this);
-        ButterKnife.unbind(this);
         super.onDestroy();
     }
 

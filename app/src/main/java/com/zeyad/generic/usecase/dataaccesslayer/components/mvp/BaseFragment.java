@@ -1,5 +1,6 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -16,7 +17,6 @@ import com.zeyad.generic.usecase.dataaccesslayer.di.components.ApplicationCompon
 
 import javax.inject.Inject;
 
-import butterknife.ButterKnife;
 import rx.subscriptions.CompositeSubscription;
 
 /**
@@ -85,9 +85,12 @@ public abstract class BaseFragment extends Fragment {
         return componentType.cast(((HasComponent<C>) getActivity()).getComponent());
     }
 
+    public Context getApplicationContext() {
+        return getContext().getApplicationContext();
+    }
+
     @Override
     public void onDestroyView() {
-        ButterKnife.unbind(this);
         Utils.unsubscribeIfNotNull(mCompositeSubscription);
         super.onDestroyView();
     }

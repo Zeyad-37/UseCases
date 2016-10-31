@@ -15,6 +15,25 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".presentation.RepoListActivity"
+            android:label="@string/title_repo_list"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name=".presentation.RepoDetailActivity"
+            android:label="@string/title_repo_detail"
+            android:parentActivityName=".presentation.RepoListActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.zeyad.generic.usecase.dataaccesslayer.presentation.RepoListActivity" />
+        </activity>
     </application>
 
 </manifest>
