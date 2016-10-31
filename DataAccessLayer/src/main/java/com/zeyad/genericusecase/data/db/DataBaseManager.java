@@ -37,7 +37,7 @@ public interface DataBaseManager {
      * @param clazz Class type of the items to get.
      */
     @NonNull
-    Observable<List<?>> getAll(Class clazz);
+    Observable<List> getAll(Class clazz);
 
     /**
      * Puts and element into the DB.
@@ -155,7 +155,7 @@ public interface DataBaseManager {
      * @param clazz     Class type of the items to be deleted.
      */
     @NonNull
-    Observable<List<?>> getWhere(Class clazz, String query, String filterKey);
+    Observable<List> getWhere(Class clazz, String query, String filterKey);
 
     /**
      * Get list of items according to the query passed.
@@ -163,10 +163,12 @@ public interface DataBaseManager {
      * @param realmQuery The query used to look for inside the DB.
      */
     @NonNull
-    Observable<List<?>> getWhere(RealmQuery realmQuery);
+    Observable<List> getWhere(RealmQuery realmQuery);
 
     /**
      * @return application Context.
      */
     Context getContext();
+
+    void closeRealm();
 }
