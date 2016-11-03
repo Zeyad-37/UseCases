@@ -1,6 +1,5 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.adapter;
 
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -23,7 +22,7 @@ public class HeadFootViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     }
 
     @Override
-    public void bindData(Object data, SparseBooleanArray selectedItems, int position, boolean isEnabled) {
+    public void bindData(Object data, boolean itemSelected, int position, boolean isEnabled) {
         itemView.setEnabled(isEnabled);
         if (data instanceof String)
             tvHeader.setText((String) data);

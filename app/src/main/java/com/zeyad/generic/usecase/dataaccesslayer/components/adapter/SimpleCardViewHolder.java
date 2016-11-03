@@ -1,7 +1,6 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.adapter;
 
 import android.support.v4.util.Pair;
-import android.util.SparseBooleanArray;
 import android.view.View;
 import android.widget.TextView;
 
@@ -27,7 +26,7 @@ public class SimpleCardViewHolder extends GenericRecyclerViewAdapter.ViewHolder 
     }
 
     @Override
-    public void bindData(Object data, SparseBooleanArray selectedItems, int position, boolean isEnabled) {
+    public void bindData(Object data, boolean itemSelected, int position, boolean isEnabled) {
         itemView.setEnabled(isEnabled);
 //        vSplitter.setVisibility(View.VISIBLE);
         tvSimpleTextValue.setVisibility(View.VISIBLE);

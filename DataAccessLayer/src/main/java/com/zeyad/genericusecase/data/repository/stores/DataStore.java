@@ -69,7 +69,7 @@ public interface DataStore {
      * that will emit a list of ?.
      */
     @NonNull
-    Observable<?> dynamicDeleteAll(String url, Class dataClass, boolean persist);
+    Observable<Boolean> dynamicDeleteAll(String url, Class dataClass, boolean persist);
 
     /**
      * Search disk with a query which returns an {@link Observable} that will emit a list of ?.

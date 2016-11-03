@@ -1032,7 +1032,7 @@ public class RealmManagerImplTest {
 
     @NonNull
     private <T extends RealmModel> RealmResults<T> getQueryList(Class<T> clazz) {
-        Observable<List<?>> queryObservable = mRealmManager.getAll(clazz);
+        Observable<List> queryObservable = mRealmManager.getAll(clazz);
         assertThat(queryObservable, notNullValue());
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
         queryObservable.subscribe(querySubscriber);

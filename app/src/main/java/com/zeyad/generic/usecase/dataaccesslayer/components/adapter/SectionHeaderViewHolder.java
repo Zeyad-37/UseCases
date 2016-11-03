@@ -1,7 +1,6 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.adapter;
 
 import android.support.v4.content.ContextCompat;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import android.widget.TextView;
@@ -24,7 +23,7 @@ public class SectionHeaderViewHolder extends GenericRecyclerViewAdapter.ViewHold
     }
 
     @Override
-    public void bindData(Object data, SparseBooleanArray selectedItems, int position, boolean isEnabled) {
+    public void bindData(Object data, boolean itemSelected, int position, boolean isEnabled) {
         itemView.setEnabled(isEnabled);
         itemView.setBackgroundColor(ContextCompat.getColor(itemView.getContext().getApplicationContext(),
                 R.color.gray_background));

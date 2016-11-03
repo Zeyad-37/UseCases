@@ -82,7 +82,7 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicDeleteAll(String url, Class dataClass, boolean persist) {
+    public Observable<Boolean> dynamicDeleteAll(String url, Class dataClass, boolean persist) {
         return mDataBaseManager.evictAll(dataClass);
     }
 

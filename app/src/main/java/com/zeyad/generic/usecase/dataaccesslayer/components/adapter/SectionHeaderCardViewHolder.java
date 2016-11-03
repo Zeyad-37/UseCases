@@ -1,7 +1,6 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.adapter;
 
 import android.support.annotation.Nullable;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +32,7 @@ public class SectionHeaderCardViewHolder extends GenericRecyclerViewAdapter.View
     }
 
     @Override
-    public void bindData(Object data, SparseBooleanArray selectedItems, int position, boolean isEnabled) {
+    public void bindData(Object data, boolean itemSelected, int position, boolean isEnabled) {
         itemView.setEnabled(isEnabled);
         if (data instanceof String) {
             if (tvSectionHeader != null) {

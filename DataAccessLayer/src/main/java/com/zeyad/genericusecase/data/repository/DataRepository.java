@@ -184,7 +184,7 @@ public class DataRepository implements Repository {
 
     @NonNull
     @Override
-    public Observable<?> deleteAllDynamically(@NonNull String url, @NonNull Class dataClass, boolean persist) {
+    public Observable<Boolean> deleteAllDynamically(@NonNull String url, @NonNull Class dataClass, boolean persist) {
         try {
             return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(dataClass))
                     .dynamicDeleteAll(url, dataClass, persist);

@@ -8,16 +8,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.jakewharton.rxbinding.view.RxView;
-import com.zeyad.genericusecase.data.utils.Utils;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-
-import rx.subscriptions.CompositeSubscription;
 
 /**
  * @author by zeyad on 19/05/16.
@@ -27,18 +22,17 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
     public final LayoutInflater mLayoutInflater;
     private List<ItemInfo> mDataList;
     private OnItemClickListener mOnItemClickListener;
+    private OnItemLongClickListener mOnItemLongClickListener;
     private SparseBooleanArray mSelectedItems;
     private boolean mIsLoadingFooterAdded = false;
     private boolean mHasHeader = false, mHasFooter = false, allowSelection = false, areItemsClickable = true, areItemsExpandable = false;
     private int expandedPosition = -1;
-    private CompositeSubscription mCompositeSubscription;
 
     public GenericRecyclerViewAdapter(Context context, List<ItemInfo> list) {
         validateList(list);
         mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         mDataList = list;
         mSelectedItems = new SparseBooleanArray();
-        mCompositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(mCompositeSubscription);
     }
 
     @Override
@@ -47,18 +41,15 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         ItemInfo itemInfo = mDataList.get(position);
-        holder.bindData(itemInfo.getData(), mSelectedItems, position, itemInfo.isEnabled());
+        holder.bindData(itemInfo.getData(), mSelectedItems.get(position, false), position, itemInfo.isEnabled());
         if (areItemsClickable && !(hasHeader() && position == 0 || hasFooter() && position == mDataList.size() - 1)) {
-            mCompositeSubscription.add(RxView.clicks(holder.itemView).subscribe(aVoid -> {
-                if (mOnItemClickListener != null)
-                    mOnItemClickListener.onItemClicked(holder.getAdapterPosition(), itemInfo, holder);
-            }));
-            mCompositeSubscription.add(RxView.longClicks(holder.itemView).subscribe(aVoid -> {
-                if (mOnItemClickListener != null)
-                    mOnItemClickListener.onItemLongClicked(holder.getAdapterPosition(), itemInfo, holder);
-            }));
+            if (mOnItemClickListener != null)
+                holder.itemView.setOnClickListener(view -> mOnItemClickListener.onItemClicked(holder
+                        .getAdapterPosition(), itemInfo, holder));
+            if (mOnItemLongClickListener != null)
+                holder.itemView.setOnLongClickListener(view -> mOnItemLongClickListener
+                        .onItemLongClicked(holder.getAdapterPosition(), itemInfo, holder));
         }
-
         if (areItemsExpandable) {
             final boolean isExpanded = position == expandedPosition;
             holder.expand(isExpanded);
@@ -116,6 +107,10 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         mOnItemClickListener = onItemClickListener;
     }
 
+    public void setOnItemLongClickListener(OnItemLongClickListener onItemLongClickListener) {
+        mOnItemLongClickListener = onItemLongClickListener;
+    }
+
     public boolean hasItemById(long itemId) {
         for (ItemInfo itemInfo : mDataList)
             if (itemInfo.getId() == itemId)
@@ -152,11 +147,8 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
 
     public void setHasHeader(boolean hasHeader, String label) {
         if (!mHasHeader && hasHeader) {
-            mHasHeader = hasHeader;
-            if (mHasHeader)
-                mDataList.add(0, new ItemInfo<>(label, ItemInfo.HEADER).setId(ItemInfo.HEADER));
-            else if (mDataList.size() > 0)
-                if (mDataList.get(0).getId() == ItemInfo.HEADER) mDataList.remove(0);
+            mHasHeader = true;
+            mDataList.add(0, new ItemInfo<>(label, ItemInfo.HEADER).setId(ItemInfo.HEADER));
             notifyDataSetChanged();
         }
     }
@@ -167,19 +159,11 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
 
     public void setHasFooter(boolean hasFooter, String label) {
         if (!mHasFooter && hasFooter) {
-            mHasFooter = hasFooter;
+            mHasFooter = true;
             int position;
-            if (mHasFooter) {
-                position = mDataList.size();
-                mDataList.add(position, new ItemInfo<>(label, ItemInfo.FOOTER).setId(ItemInfo.FOOTER));
-                notifyItemInserted(position);
-            } else if (!mDataList.isEmpty()) {
-                position = mDataList.size() - 1;
-                if (mDataList.get(position).getId() == ItemInfo.FOOTER) {
-                    mDataList.remove(position);
-                    notifyItemRemoved(position);
-                }
-            }
+            position = mDataList.size();
+            mDataList.add(position, new ItemInfo<>(label, ItemInfo.FOOTER).setId(ItemInfo.FOOTER));
+            notifyItemInserted(position);
         }
     }
 
@@ -354,10 +338,6 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         validateList(dataSet);
         mDataList = dataSet;
         notifyDataSetChanged();
-    }
-
-    public CompositeSubscription getCompositeSubscription() {
-        return mCompositeSubscription;
     }
 
     /**
@@ -547,7 +527,9 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
 
     public interface OnItemClickListener {
         void onItemClicked(int position, ItemInfo userViewModel, ViewHolder holder);
+    }
 
+    public interface OnItemLongClickListener {
         boolean onItemLongClicked(int position, ItemInfo userViewModel, GenericRecyclerViewAdapter.ViewHolder holder);
     }
 
@@ -557,9 +539,8 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
             super(itemView);
         }
 
-        // TODO: 21/07/16 change array for boolean value!
         @Override
-        public void bindData(Object data, SparseBooleanArray selectedItems, int position, boolean isEnabled) {
+        public void bindData(Object data, boolean itemSelected, int position, boolean isEnabled) {
         }
 
         public void expand(boolean expand) {

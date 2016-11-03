@@ -10,6 +10,7 @@ import android.view.MenuItem;
 
 import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.BaseActivity;
+import com.zeyad.generic.usecase.dataaccesslayer.di.components.UserComponent;
 
 import butterknife.BindView;
 
@@ -25,58 +26,43 @@ public class RepoDetailActivity extends BaseActivity {
     Toolbar mToolbar;
     @BindView(R.id.fab)
     FloatingActionButton mFab;
+    Bundle mSavedInstanceState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mSavedInstanceState = savedInstanceState;
         super.onCreate(savedInstanceState);
+    }
+
+    @Override
+    public void initialize() {
+        getComponent(UserComponent.class).inject(this);
+    }
+
+    @Override
+    public void setupUI() {
         setContentView(R.layout.activity_repo_detail);
         setSupportActionBar(mToolbar);
         mFab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own detail action",
                 Snackbar.LENGTH_LONG).setAction("Action", null).show());
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
+        if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-        // savedInstanceState is non-null when there is fragment state
-        // saved from previous configurations of this activity
-        // (e.g. when rotating the screen from portrait to landscape).
-        // In this case, the fragment will automatically be re-added
-        // to its container so we don't need to manually add it.
-        // For more information, see the Fragments API guide at:
-        // http://developer.android.com/guide/components/fragments.html
-        if (savedInstanceState == null) {
-            // Create the detail fragment and add it to the activity
-            // using a fragment transaction.
+        if (mSavedInstanceState == null) {
             Bundle arguments = new Bundle();
             arguments.putString(RepoDetailFragment.ARG_ITEM_ID,
                     getIntent().getStringExtra(RepoDetailFragment.ARG_ITEM_ID));
             RepoDetailFragment fragment = new RepoDetailFragment();
             fragment.setArguments(arguments);
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.repo_detail_container, fragment)
-                    .commit();
+            addFragment(R.id.repo_detail_container, fragment, null);
         }
-    }
-
-    @Override
-    public void initialize() {
-
-    }
-
-    @Override
-    public void setupUI() {
-
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            // This ID represents the Home or Up button. In the case of this
-            // activity, the Up button is shown. For
-            // more details, see the Navigation pattern on Android Design:
-            // http://developer.android.com/design/patterns/navigation.html#up-vs-back
             navigateUpTo(new Intent(this, RepoListActivity.class));
             return true;
         }

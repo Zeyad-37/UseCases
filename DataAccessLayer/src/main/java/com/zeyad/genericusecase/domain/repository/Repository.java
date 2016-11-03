@@ -53,7 +53,7 @@ public interface Repository {
                                      Class domainClass, Class dataClass, boolean persist, boolean queuable);
 
     @NonNull
-    Observable<?> deleteAllDynamically(String url, Class dataClass, boolean persist);
+    Observable<Boolean> deleteAllDynamically(String url, Class dataClass, boolean persist);
 
     @NonNull
     Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass);

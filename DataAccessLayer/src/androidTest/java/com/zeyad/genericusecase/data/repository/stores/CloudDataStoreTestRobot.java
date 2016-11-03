@@ -141,7 +141,7 @@ class CloudDataStoreTestRobot {
     }
 
     static RestApi createMockedRestApi(boolean toCache) {
-        final Observable<List<?>> LIST_OBSERVABLE = getListObservable();
+        final Observable<List> LIST_OBSERVABLE = getListObservable();
         final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
         final ResponseBodyObservable RESPONSE_BODY_OBSERVABLE = Mockito.mock(ResponseBodyObservable.class);
         final RestApiImpl mock = Mockito.mock(RestApiImpl.class);
@@ -164,11 +164,11 @@ class CloudDataStoreTestRobot {
     }
 
     @NonNull
-    private static Observable<List<?>> getListObservable() {
+    private static Observable<List> getListObservable() {
         return Observable.create(
-                new Observable.OnSubscribe<List<?>>() {
+                new Observable.OnSubscribe<List>() {
                     @Override
-                    public void call(@NonNull Subscriber<? super List<?>> subscriber) {
+                    public void call(@NonNull Subscriber<? super List> subscriber) {
                         subscriber.onNext(Collections.singletonList(createTestModel()));
                     }
                 });
@@ -183,7 +183,7 @@ class CloudDataStoreTestRobot {
     }
 
     static DataBaseManager createDBManagerWithMockedContext() {
-        final Observable<List<?>> LIST_OBSERVABLE = getListObservable();
+        final Observable<List> LIST_OBSERVABLE = getListObservable();
         final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
         final Observable<Object> TRUE_OBSERVABLE = Observable.create(subscriber -> subscriber.onNext(true));
         final DataBaseManager dbManagerWithMockedContext

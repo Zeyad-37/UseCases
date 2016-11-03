@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.List;
 
 import io.realm.RealmQuery;
 import rx.Observable;
@@ -104,7 +105,7 @@ public class GenericUseCase implements IGenericUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable getList(@NonNull GetRequest genericUseCaseRequest) {
+    public Observable<List> getList(@NonNull GetRequest genericUseCaseRequest) {
         return mRepository.getListDynamically(genericUseCaseRequest.getUrl(), genericUseCaseRequest
                 .getPresentationClass(), genericUseCaseRequest.getDataClass(), genericUseCaseRequest
                 .isPersist(), genericUseCaseRequest.isShouldCache()).compose(applySchedulers());
@@ -175,7 +176,7 @@ public class GenericUseCase implements IGenericUseCase {
      * @param postRequest The guy who will be listen to the observable build with .
      */
     @Override
-    public Observable<?> deleteAll(@NonNull PostRequest postRequest) {
+    public Observable<Boolean> deleteAll(@NonNull PostRequest postRequest) {
         return mRepository.deleteAllDynamically(postRequest.getUrl(), postRequest.getDataClass(),
                 postRequest.isPersist()).compose(applySchedulers());
     }

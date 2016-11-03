@@ -10,10 +10,16 @@ import android.view.ViewGroup;
 import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.generic.usecase.dataaccesslayer.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.BaseActivity;
+import com.zeyad.generic.usecase.dataaccesslayer.di.components.UserComponent;
 
 import java.util.ArrayList;
+import java.util.List;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
+import rx.Subscriber;
 
 /**
  * An activity representing a list of Repos. This activity
@@ -24,13 +30,15 @@ import butterknife.BindView;
  * item details side-by-side using two vertical panes.
  */
 public class RepoListActivity extends BaseActivity {
-
+    @Inject
+    RepoListPresenter mRepoListPresenter;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.repo_list)
     RecyclerView mRepoRecycler;
     @BindView(R.id.fab)
     FloatingActionButton mFab;
+    GenericRecyclerViewAdapter mReposAdapter;
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -40,37 +48,62 @@ public class RepoListActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_repo_list);
     }
 
     @Override
     public void initialize() {
-
+        getComponent(UserComponent.class).inject(this);
     }
 
     @Override
     public void setupUI() {
+        setContentView(R.layout.activity_repo_list);
         setSupportActionBar(mToolbar);
-//        ButterKnife.
+        ButterKnife.bind(this);
         mToolbar.setTitle(getTitle());
         mFab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action",
                 Snackbar.LENGTH_LONG)
                 .setAction("Action", null).show());
         setupRecyclerView();
-        if (findViewById(R.id.repo_detail_container) != null) {
-            // The detail container view will be present only in the
-            // large-screen layouts (res/values-w900dp).
-            // If this view is present, then the
-            // activity should be in two-pane mode.
+        if (findViewById(R.id.repo_detail_container) != null)
             mTwoPane = true;
-        }
     }
 
     private void setupRecyclerView() {
-        mRepoRecycler.setAdapter(new GenericRecyclerViewAdapter(getApplicationContext(), new ArrayList<>()) {
+        mReposAdapter = new GenericRecyclerViewAdapter(getApplicationContext(), new ArrayList<>()) {
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 return null;
+            }
+        };
+        mReposAdapter.setAreItemsClickable(true);
+        mReposAdapter.setOnItemClickListener((position, userViewModel, holder) -> {
+
+        });
+        mRepoRecycler.setAdapter(mReposAdapter);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadRepos();
+    }
+
+    private void loadRepos() {
+        mRepoListPresenter.getRepoList().subscribe(new Subscriber<List>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(List list) {
+
             }
         });
     }

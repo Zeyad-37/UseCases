@@ -40,7 +40,7 @@ public interface IGenericUseCase {
      * @param postRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable postList(@NonNull PostRequest postRequest);
+    Observable<?> postList(@NonNull PostRequest postRequest);
 
     /**
      * Put Object to full url.
@@ -72,7 +72,7 @@ public interface IGenericUseCase {
      * @param deleteRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable deleteAll(@NonNull PostRequest deleteRequest);
+    Observable<Boolean> deleteAll(@NonNull PostRequest deleteRequest);
 
     /**
      * Get list of items according to the query passed.
@@ -116,7 +116,7 @@ public interface IGenericUseCase {
      * @param filePath path of the file to read.
      * @return Observable with the String.
      */
-    Observable readFromResource(String filePath);
+    Observable<String> readFromResource(String filePath);
 
     /**
      * Returns a string of contents of the file.

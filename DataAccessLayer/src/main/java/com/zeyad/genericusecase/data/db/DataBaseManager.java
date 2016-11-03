@@ -118,7 +118,7 @@ public interface DataBaseManager {
      * @param clazz Class type of the items to be deleted.
      */
     @NonNull
-    Observable<?> evictAll(Class clazz);
+    Observable<Boolean> evictAll(Class clazz);
 
     /**
      * Evict element of the DB.
