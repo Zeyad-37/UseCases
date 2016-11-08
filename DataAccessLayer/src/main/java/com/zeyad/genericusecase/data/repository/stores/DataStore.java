@@ -88,6 +88,6 @@ public interface DataStore {
                                       boolean queuable);
 
     @NonNull
-    Observable<?> dynamicUploadFile(final String url, final File file, boolean onWifi, boolean whileCharging,
-                                    boolean queuable, Class domainClass);
+    Observable<?> dynamicUploadFile(String url, File file, String key, boolean onWifi,
+                                    boolean whileCharging, boolean queuable, Class domainClass);
 }

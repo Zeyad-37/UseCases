@@ -9,31 +9,33 @@ import java.io.File;
  */
 public class FileIORequest {
 
-    private File mFile;
-    private String mUrl;
-    private boolean mOnWifi, mWhileCharging, mQueuable;
-    private Class mDataClass, mPresentationClass;
+    File mFile;
+    String mUrl, mKey;
+    boolean mOnWifi, mWhileCharging, mQueuable;
+    Class mDataClass, mPresentationClass;
 
     public FileIORequest() {
     }
 
-    public FileIORequest(@NonNull FileIORequestBuilder fileIORequestBuilder) {
-        mUrl = fileIORequestBuilder.getUrl();
-        mOnWifi = fileIORequestBuilder.isOnWifi();
-        mWhileCharging = fileIORequestBuilder.isWhileCharging();
-        mQueuable = fileIORequestBuilder.isQueuable();
-        mFile = fileIORequestBuilder.getFile();
-        mDataClass = fileIORequestBuilder.getDataClass();
-        mPresentationClass = fileIORequestBuilder.getPresentationClass();
+    public FileIORequest(@NonNull FileIORequestBuilder uploadRequestBuilder) {
+        mUrl = uploadRequestBuilder.getUrl();
+        mOnWifi = uploadRequestBuilder.isOnWifi();
+        mWhileCharging = uploadRequestBuilder.isWhileCharging();
+        mQueuable = uploadRequestBuilder.isQueuable();
+        mFile = uploadRequestBuilder.getFile();
+        mKey = uploadRequestBuilder.getKey();
+        mDataClass = uploadRequestBuilder.getDataClass();
+        mPresentationClass = uploadRequestBuilder.getPresentationClass();
     }
 
-    public FileIORequest(String url, File file, boolean onWifi, boolean whileCharging, Class presentationClass,
+    public FileIORequest(String url, File file, String key, boolean onWifi, boolean whileCharging, Class presentationClass,
                          Class dataClass) {
         mOnWifi = onWifi;
         mWhileCharging = whileCharging;
         mPresentationClass = presentationClass;
         mDataClass = dataClass;
         mUrl = url;
+        mKey = key;
         mFile = file;
     }
 
@@ -65,10 +67,14 @@ public class FileIORequest {
         return mFile;
     }
 
+    public String getKey() {
+        return mKey;
+    }
+
     public static class FileIORequestBuilder {
 
         private File mFile;
-        private String mUrl;
+        private String mUrl, mKey;
         private boolean mOnWifi, mWhileCharging, mQueuable;
         private Class mDataClass, mPresentationClass;
 
@@ -98,6 +104,12 @@ public class FileIORequest {
         @NonNull
         public FileIORequestBuilder onWifi(boolean onWifi) {
             mOnWifi = onWifi;
+            return this;
+        }
+
+        @NonNull
+        public FileIORequestBuilder key(String key) {
+            mKey = key;
             return this;
         }
 
@@ -144,6 +156,10 @@ public class FileIORequest {
 
         public Class getPresentationClass() {
             return mPresentationClass;
+        }
+
+        public String getKey() {
+            return mKey;
         }
     }
 }

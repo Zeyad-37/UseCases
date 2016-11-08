@@ -71,7 +71,7 @@ public class GenericUseCase implements IGenericUseCase {
      */
     static void initWithRealm(IEntityMapperUtil entityMapper) {
         Context context = Config.getInstance().getContext();
-        DatabaseManagerFactory.initRealm(context);
+        DatabaseManagerFactory.initRealm();
         sGenericUseCase = new GenericUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
                 .getInstance(), context), entityMapper), new JobExecutor(), new UIThread());
     }
@@ -184,7 +184,7 @@ public class GenericUseCase implements IGenericUseCase {
     @Override
     public Observable uploadFile(@NonNull FileIORequest fileIORequest) {
         return mRepository.uploadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
-                fileIORequest.onWifi(), fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
+                fileIORequest.getKey(), fileIORequest.onWifi(), fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
                 fileIORequest.getPresentationClass(), fileIORequest.getDataClass())
                 .compose(applySchedulers());
     }
@@ -218,7 +218,7 @@ public class GenericUseCase implements IGenericUseCase {
     }
 
     @Override
-    public Observable readFromResource(String filePath) {
+    public Observable<String> readFromResource(String filePath) {
         return Observable.defer(() -> {
             StringBuilder returnString = new StringBuilder();
             InputStream fIn = null;

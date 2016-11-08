@@ -1,6 +1,5 @@
 package com.zeyad.genericusecase.data.db;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import org.json.JSONArray;
@@ -164,11 +163,4 @@ public interface DataBaseManager {
      */
     @NonNull
     Observable<List> getWhere(RealmQuery realmQuery);
-
-    /**
-     * @return application Context.
-     */
-    Context getContext();
-
-    void closeRealm();
 }

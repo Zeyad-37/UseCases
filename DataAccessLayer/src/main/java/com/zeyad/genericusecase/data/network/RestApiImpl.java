@@ -47,21 +47,8 @@ public class RestApiImpl implements RestApi {
      * @return Observable with the Object response.
      */
     @Override
-    public Observable<Object> upload(@Url String url,
-                                     @Part(value = "image", encoding = "binary") RequestBody requestBody) {
-        return mApiConnection.upload(url, requestBody);
-    }
-
-    /**
-     * Uploads a file to a url.
-     *
-     * @param url  destination address.
-     * @param file MultiBody.Part contains the file to be uploaded.
-     * @return Observable with the ResponseBody
-     */
-    @Override
-    public Observable<ResponseBody> upload(@Url String url, @Part MultipartBody.Part file) {
-        return mApiConnection.upload(url, file);
+    public Observable<Object> upload(@Url String url, @Part(value = "image") RequestBody requestBody, @Part MultipartBody.Part file) {
+        return mApiConnection.upload(url, requestBody, file);
     }
 
     /**

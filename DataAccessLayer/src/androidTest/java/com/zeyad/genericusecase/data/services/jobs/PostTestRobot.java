@@ -121,9 +121,7 @@ public class PostTestRobot {
         when(mock.dynamicPutList(any(), any())).thenReturn(LIST_OBSERVABLE);
         when(mock.dynamicDeleteObject(any(), any())).thenReturn(OBJECT_OBSERVABLE);
         when(mock.dynamicDeleteList(any(), any())).thenReturn(LIST_OBSERVABLE);
-        when(mock.upload(any(), any(RequestBody.class))).thenReturn(OBJECT_OBSERVABLE);
-        when(mock.upload(any(), any(MultipartBody.Part.class))).thenReturn(getResponseBodyObservable());
-        when(mock.upload(any(), any(MultipartBody.Part.class))).thenReturn(getResponseBodyObservable());
+        when(mock.upload(any(), any(RequestBody.class), any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
         return mock;
     }
 

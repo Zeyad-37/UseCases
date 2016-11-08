@@ -7,6 +7,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.app.AppCompatDelegate;
 import android.util.Pair;
 import android.view.View;
 import android.widget.Toast;
@@ -44,6 +45,7 @@ public abstract class BaseActivity extends AppCompatActivity implements HasCompo
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getApplicationComponent().inject(this);
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         mCompositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(mCompositeSubscription);
         initializeInjector();
         initialize();

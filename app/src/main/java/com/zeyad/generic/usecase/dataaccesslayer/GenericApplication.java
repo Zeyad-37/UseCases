@@ -65,7 +65,7 @@ public class GenericApplication extends Application {
 
     private HttpLoggingInterceptor provideHttpLoggingInterceptor() {
         return new HttpLoggingInterceptor(message -> Log.d("NetworkInfo", message))
-                .setLevel(HttpLoggingInterceptor.Level.BODY);
+                .setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
     }
 
     private void initializeRealm() {

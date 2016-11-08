@@ -81,6 +81,10 @@ class DataRepositoryRobot {
         return "id";
     }
 
+    static String getKey() {
+        return "image";
+    }
+
     static int getColumnId() {
         return 1;
     }

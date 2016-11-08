@@ -49,14 +49,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 
-
 @SuppressWarnings("WrongConstant")
 class CloudDataStoreTestRobot {
 
     private static final TestModel TEST_MODEL = new TestModel(1, "123");
     private static final File MOCKED_FILE = Mockito.mock(File.class);
     private static final JobScheduler JOB_SCHEDULER = Mockito.mock(JobScheduler.class);
-
 
     static EntityMapper<Object, Object> createMockedEntityMapper() {
         final TestModelViewModelMapper viewModelMapper
@@ -124,6 +122,11 @@ class CloudDataStoreTestRobot {
         return "id";
     }
 
+    static String getKey() {
+        return "image";
+    }
+
+
     @NonNull
     static Class getValidDataClass() {
         return TestModel.class;
@@ -157,9 +160,7 @@ class CloudDataStoreTestRobot {
         Mockito.when(mock.dynamicDeleteObject(Mockito.any(), Mockito.any())).thenReturn(OBJECT_OBSERVABLE);
         Mockito.doReturn(LIST_OBSERVABLE).when(mock).dynamicDeleteList(Mockito.any(), Mockito.any());
         Mockito.when(mock.dynamicDownload(getFileUrl())).thenReturn(RESPONSE_BODY_OBSERVABLE);
-        Mockito.when(mock.upload(Mockito.any(), Mockito.any(RequestBody.class))).thenReturn(OBJECT_OBSERVABLE);
-        Mockito.when(mock.upload(Mockito.any(), Mockito.any(MultipartBody.Part.class))).thenReturn(RESPONSE_BODY_OBSERVABLE);
-        Mockito.when(mock.upload(Mockito.any(), Mockito.any(MultipartBody.Part.class))).thenReturn(RESPONSE_BODY_OBSERVABLE);
+        Mockito.when(mock.upload(Mockito.any(), Mockito.any(RequestBody.class), Mockito.any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
         return mock;
     }
 
@@ -187,7 +188,7 @@ class CloudDataStoreTestRobot {
         final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
         final Observable<Object> TRUE_OBSERVABLE = Observable.create(subscriber -> subscriber.onNext(true));
         final DataBaseManager dbManagerWithMockedContext
-                = RealmManagerImplUtils.createDBManagerWithMockedContext(getMockedContext());
+                = RealmManagerImplUtils.createDBManagerWithMockedContext();
         Mockito.when(dbManagerWithMockedContext.getAll(Mockito.any())).thenReturn(LIST_OBSERVABLE);
         Mockito.doReturn(OBJECT_OBSERVABLE).when(dbManagerWithMockedContext).put(Mockito.any(RealmObject.class), Mockito.any());
         Mockito.doReturn(OBJECT_OBSERVABLE).when(dbManagerWithMockedContext).put(Mockito.any(RealmModel.class), Mockito.any());
@@ -334,20 +335,20 @@ class CloudDataStoreTestRobot {
         return jsonObject;
     }
 
-    static Context changeNetworkState(@NonNull DataBaseManager mockedDBManager, boolean toEnable) {
-        return TestUtility.changeStateOfNetwork(mockedDBManager.getContext().getApplicationContext(), toEnable);
+    static Context changeNetworkState(boolean toEnable) {
+        return TestUtility.changeStateOfNetwork(getMockedContext(), toEnable);
     }
 
     static void changeHasLollipop(@NonNull CloudDataStore cloudDataStore, boolean state) {
         cloudDataStore.setHasLollipop(state);
     }
 
-    static boolean isNetworkEnabled(@NonNull DataBaseManager mockedDBManager) {
-        return Utils.isNetworkAvailable(mockedDBManager.getContext().getApplicationContext());
+    static boolean isNetworkEnabled() {
+        return Utils.isNetworkAvailable(getMockedContext());
     }
 
-    static boolean isGooglePlayerServicesEnabled(@NonNull DataBaseManager mockedDBManager, @NonNull CloudDataStore cloudDataStore) {
-        return cloudDataStore.getGoogleApiAvailability().isGooglePlayServicesAvailable(mockedDBManager.getContext().getApplicationContext())
+    static boolean isGooglePlayerServicesEnabled(@NonNull CloudDataStore cloudDataStore) {
+        return cloudDataStore.getGoogleApiAvailability().isGooglePlayServicesAvailable(getMockedContext())
                 == CommonStatusCodes.SUCCESS;
     }
 
@@ -391,7 +392,7 @@ class CloudDataStoreTestRobot {
     static TestSubscriber<Object> dynamicUploadFile(@NonNull CloudDataStore cloudDataStore, boolean onWifi) {
 
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        cloudDataStore.dynamicUploadFile(getValidUrl(), getValidFile(), onWifi, true, false, getValidDataClass())
+        cloudDataStore.dynamicUploadFile(getValidUrl(), getValidFile(), getKey(), onWifi, true, false, getValidDataClass())
                 .subscribe(subscriber);
         return subscriber;
     }

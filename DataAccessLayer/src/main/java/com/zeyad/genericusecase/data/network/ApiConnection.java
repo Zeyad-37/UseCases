@@ -50,7 +50,7 @@ import rx.Observable;
  * Implements {@link Callable} so when executed asynchronously can
  * return a value.
  */
-class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnection {
+class ApiConnection implements IApiConnection {
 
     private final static String CACHE_CONTROL = "Cache-Control";
     private static final int TIME_OUT = 15;
@@ -175,18 +175,8 @@ class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnect
     }
 
     @Override
-    public Observable<ResponseBody> upload(String url, MultipartBody.Part file, RequestBody description) {
-        return getRestApi().upload(url, file);
-    }
-
-    @Override
-    public Observable<Object> upload(String url, RequestBody requestBody) {
-        return getRestApi().upload(url, requestBody);
-    }
-
-    @Override
-    public Observable<ResponseBody> upload(String url, MultipartBody.Part file) {
-        return getRestApi().upload(url, file);
+    public Observable<Object> upload(String url, RequestBody requestBody, MultipartBody.Part file) {
+        return getRestApi().upload(url, requestBody, file);
     }
 
     @Override

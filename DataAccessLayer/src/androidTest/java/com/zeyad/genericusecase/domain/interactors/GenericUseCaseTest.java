@@ -114,8 +114,9 @@ public class GenericUseCaseTest {
                         Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(getListObservable())
                 .when(dataRepository)
-                .uploadFileDynamically(Mockito.anyString(), Mockito.any(File.class), Mockito.anyBoolean(),
-                        Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.any(), Mockito.any());
+                .uploadFileDynamically(Mockito.anyString(), Mockito.any(File.class), Mockito.anyString(),
+                        Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.any(),
+                        Mockito.any());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
                 .putObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class),
@@ -235,6 +236,10 @@ public class GenericUseCaseTest {
         return MOCKED_FILE;
     }
 
+    String getKey() {
+        return "image";
+    }
+
     @NonNull
     private TestSubscriber putObject(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final TestSubscriber subscriber = new TestSubscriber();
@@ -310,7 +315,7 @@ public class GenericUseCaseTest {
 
     @NonNull
     private FileIORequest getUploadRequest(boolean onWifi, boolean whileCharging) {
-        return new FileIORequest(getUrl(), getFile(), onWifi, whileCharging, getPresentationClass(), getDataClass());
+        return new FileIORequest(getUrl(), getFile(), getKey(), onWifi, whileCharging, getPresentationClass(), getDataClass());
     }
 
     @NonNull
@@ -480,6 +485,7 @@ public class GenericUseCaseTest {
         uploadFile(mGenericUse, mToPersist, mWhileCharging);
         Mockito.verify(mDataRepository).uploadFileDynamically(eq(getUrl()),
                 eq(getFile()),
+                eq(getKey()),
                 eq(ON_WIFI),
                 eq(WHILE_CHARGING),
                 eq(mQueuable),
@@ -490,8 +496,7 @@ public class GenericUseCaseTest {
     @Test
     public void testPutList_ifDataRepoCorrectMethodIsCalled_whenJsonArrayIsPassed() {
         putList_JsonArray(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository).putListDynamically(
-                eq(getUrl())
+        Mockito.verify(mDataRepository).putListDynamically(eq(getUrl())
                 , eq(getIdColumnName())
                 , eq(getJsonArray())
                 , eq(getPresentationClass())
@@ -503,8 +508,7 @@ public class GenericUseCaseTest {
     @Test
     public void testPutList_ifDataRepoCorrectMethodIsCalled_whenHashmapIsPassed() {
         putList_Hashmap(mGenericUse, mToPersist);
-        Mockito.verify(mDataRepository).putListDynamically(
-                eq(getUrl())
+        Mockito.verify(mDataRepository).putListDynamically(eq(getUrl())
                 , eq(getIdColumnName())
                 , eq(getJsonArray())
                 , eq(getPresentationClass())

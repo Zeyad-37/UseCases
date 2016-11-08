@@ -33,11 +33,7 @@ interface IApiConnection {
 
     Observable<List> dynamicPutList(String url, RequestBody requestBody);
 
-    Observable<ResponseBody> upload(String url, MultipartBody.Part file, RequestBody description);
-
-    Observable<Object> upload(String url, RequestBody requestBody);
-
-    Observable<ResponseBody> upload(String url, MultipartBody.Part file);
+    Observable<Object> upload(String url, RequestBody requestBody, MultipartBody.Part file);
 
     Observable<List> dynamicDeleteList(String url, RequestBody body);
 

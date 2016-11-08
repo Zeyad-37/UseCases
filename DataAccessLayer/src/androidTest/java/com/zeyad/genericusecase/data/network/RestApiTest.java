@@ -106,17 +106,8 @@ public abstract class RestApiTest {
 
     @Test
     public void testUpload() throws Exception {
-        assertThat(mRestApi.dynamicDownload(mValidUrl), is(equalTo(mMockedApiConnection.dynamicDownload(mValidUrl))));
-    }
-
-    @Test
-    public void testUploadRequestBody() throws Exception {
-        assertThat(mRestApi.upload(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.upload(mValidUrl, mRequestBody))));
-    }
-
-    @Test
-    public void testUploadMultipart() throws Exception {
-        assertThat(mRestApi.upload(mValidUrl, mMultipart), is(equalTo(mMockedApiConnection.upload(mValidUrl, mMultipart))));
+        assertThat(mRestApi.upload(mValidUrl, mRequestBody, mMultipart),
+                is(equalTo(mMockedApiConnection.upload(mValidUrl, mRequestBody, mMultipart))));
     }
 
     public abstract RestApi getRestApiImplementation(IApiConnection mockedApiConnection);

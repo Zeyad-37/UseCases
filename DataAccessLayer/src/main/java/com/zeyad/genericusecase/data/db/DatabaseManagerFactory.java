@@ -1,6 +1,5 @@
 package com.zeyad.genericusecase.data.db;
 
-import android.content.Context;
 import android.support.annotation.Nullable;
 
 import com.zeyad.genericusecase.Config;
@@ -23,11 +22,9 @@ public class DatabaseManagerFactory {
 
     /**
      * Creates a RealmManager instance
-     *
-     * @param context Application context to initialize the RealmManager;
      */
-    public static void initRealm(Context context) {
-        RealmManager.init(context);
+    public static void initRealm() {
+        RealmManager.init();
         Config.getInstance().setDBType(REALM);
     }
 }

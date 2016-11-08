@@ -76,8 +76,8 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<?> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
                                                  Class dataClass, boolean persist, boolean queuable) {
-        return Observable.defer(() -> mDataBaseManager.evictCollection(idColumnName,
-                ModelConverters.convertToListOfId(jsonArray), dataClass));
+        return mDataBaseManager.evictCollection(idColumnName,
+                ModelConverters.convertToListOfId(jsonArray), dataClass);
     }
 
     @NonNull
@@ -90,20 +90,20 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<?> dynamicPostObject(String url, String idColumnName, JSONObject jsonObject,
                                            Class domainClass, Class dataClass, boolean persist, boolean queuable) {
-        return Observable.defer(() -> mDataBaseManager.put(jsonObject, idColumnName, dataClass));
+        return mDataBaseManager.put(jsonObject, idColumnName, dataClass);
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicPutObject(String url, String idColumnName, JSONObject jsonObject,
                                           Class domainClass, Class dataClass, boolean persist, boolean queuable) {
-        return Observable.defer(() -> mDataBaseManager.put(jsonObject, idColumnName, dataClass));
+        return mDataBaseManager.put(jsonObject, idColumnName, dataClass);
     }
 
     @NonNull
     @Override
-    public Observable<?> dynamicUploadFile(String url, File file, boolean onWifi, boolean whileCharging,
-                                           boolean queuable, Class domainClass) {
+    public Observable<?> dynamicUploadFile(String url, File file, String key, boolean onWifi,
+                                           boolean whileCharging, boolean queuable, Class domainClass) {
         return Observable.error(new IllegalStateException(Config.getInstance().getContext().getString(R.string.io_to_db_error)));
     }
 
@@ -111,13 +111,13 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<?> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
                                          Class domainClass, Class dataClass, boolean persist, boolean queuable) {
-        return Observable.defer(() -> mDataBaseManager.putAll(jsonArray, idColumnName, dataClass));
+        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass);
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
                                         Class domainClass, Class dataClass, boolean persist, boolean queuable) {
-        return Observable.defer(() -> mDataBaseManager.putAll(jsonArray, idColumnName, dataClass));
+        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass);
     }
 }

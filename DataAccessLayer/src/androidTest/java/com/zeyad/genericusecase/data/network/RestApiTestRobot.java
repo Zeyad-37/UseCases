@@ -35,12 +35,9 @@ class RestApiTestRobot {
                 .thenReturn(getObjectObservable());
         Mockito.when(apiConnection.dynamicPutList(Mockito.anyString(), Mockito.any()))
                 .thenReturn(getListObservable());
-        Mockito.when(apiConnection.upload(Mockito.anyString(), Mockito.any(MultipartBody.Part.class)))
-                .thenReturn(getResponseBodyObservable());
-        Mockito.when(apiConnection.upload(Mockito.anyString(), Mockito.any(MultipartBody.Part.class), Mockito.any(RequestBody.class)))
-                .thenReturn(getResponseBodyObservable());
-        Mockito.when(apiConnection.upload(Mockito.anyString(), Mockito.any(RequestBody.class)))
-                .thenReturn(getObjectObservable());
+        Mockito.when(apiConnection.upload(Mockito.anyString(), Mockito.any(RequestBody.class),
+                Mockito.any(MultipartBody.Part.class)))
+                .thenReturn(Mockito.any());
         Mockito.when(apiConnection.dynamicDeleteList(Mockito.anyString(), Mockito.any()))
                 .thenReturn(getListObservable());
         Mockito.when(apiConnection.dynamicDeleteObject(Mockito.anyString(), Mockito.any(RequestBody.class)))

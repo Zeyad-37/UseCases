@@ -29,6 +29,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Subscription;
 import rx.subscriptions.Subscriptions;
@@ -132,12 +133,16 @@ public class FileIO {
                 });
             }
             return Subscriptions.empty();
-        } else
-            return mRestApi.upload(mFileIORequest.getUrl(), RequestBody.create(MediaType
+        } else {
+            RequestBody requestFile = RequestBody.create(MediaType
                     .parse(getMimeType(mFileIORequest.getFile()
-                            .getAbsolutePath())), mFileIORequest.getFile()))
+                            .getAbsolutePath())), mFileIORequest.getFile());
+            return mRestApi.upload(mFileIORequest.getUrl(), requestFile,
+                    MultipartBody.Part.createFormData(mFileIORequest.getKey(), mFileIORequest
+                            .getFile().getName(), requestFile))
                     .subscribe(o -> {
                     }, throwable -> queueIOFile());
+        }
     }
 
     void queueIOFile() {

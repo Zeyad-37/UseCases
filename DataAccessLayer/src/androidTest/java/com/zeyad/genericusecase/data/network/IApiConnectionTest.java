@@ -130,22 +130,9 @@ public abstract class IApiConnectionTest {
     }
 
     @Test
-    public void testUploadPart() throws Exception {
-        MultipartBody.Part multipartBodyPart = ApiConnectionRobot.getValidMultipartBodyPart();
-        mApiConnection.upload(mValidUrl, multipartBodyPart);
-        Mockito.verify(mRestApiWithoutCache).upload(eq(mValidUrl), eq(multipartBodyPart));
-    }
-
-    @Test
     public void testUploadPartAndRequestBody() throws Exception {
-        mApiConnection.upload(mValidUrl, mMultipartBodyPart, mMockedRequestBody);
-        Mockito.verify(mRestApiWithoutCache).upload(eq(mValidUrl), eq(mMultipartBodyPart));
-    }
-
-    @Test
-    public void testUploadRequestBody() throws Exception {
-        mApiConnection.upload(mValidUrl, mMockedRequestBody);
-        Mockito.verify(mRestApiWithoutCache).upload(eq(mValidUrl), eq(mMockedRequestBody));
+        mApiConnection.upload(mValidUrl, mMockedRequestBody, mMultipartBodyPart);
+        Mockito.verify(mRestApiWithoutCache).upload(eq(mValidUrl), eq(mMockedRequestBody), eq(mMultipartBodyPart));
     }
 
     @Test

@@ -62,7 +62,7 @@ public interface Repository {
     Observable<List> searchDisk(RealmQuery query, Class domainClass);
 
     @NonNull
-    Observable<?> uploadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
+    Observable<?> uploadFileDynamically(String url, File file, String key, boolean onWifi, boolean whileCharging,
                                         boolean queuable, Class domainClass, Class dataClass);
 
     @NonNull

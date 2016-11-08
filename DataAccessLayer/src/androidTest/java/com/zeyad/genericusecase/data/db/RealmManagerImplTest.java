@@ -1,6 +1,5 @@
 package com.zeyad.genericusecase.data.db;
 
-import android.content.Context;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
@@ -1103,12 +1102,8 @@ public class RealmManagerImplTest {
 
     @NonNull
     private RealmManager getGeneralRealmManager() {
-        DatabaseManagerFactory.initRealm(getContext());
+        DatabaseManagerFactory.initRealm();
         return (RealmManager) DatabaseManagerFactory.getInstance();
-    }
-
-    private Context getContext() {
-        return InstrumentationRegistry.getContext();
     }
 
     @NonNull

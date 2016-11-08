@@ -54,6 +54,7 @@ import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Subscriber;
@@ -259,8 +260,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicUploadFile(String url, @NonNull File file, boolean onWifi, boolean whileCharging,
-                                           boolean queuable, Class domainClass) {
+    public Observable<?> dynamicUploadFile(String url, File file, String key, boolean onWifi,
+                                           boolean whileCharging, boolean queuable, Class domainClass) {
         return Observable.defer(() -> {
             if (isEligibleForPersistenceIfNetworkNotAvailable(queuable) && Utils.isOnWifi() == onWifi
                     && Utils.isChargingReqCompatible(Utils.isCharging(), whileCharging)) {
@@ -268,7 +269,9 @@ public class CloudDataStore implements DataStore {
                 return mQueueFileIO;
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
                 return mErrorObservableNotPersisted;
-            return mRestApi.upload(url, RequestBody.create(MediaType.parse(getMimeType(file.getPath())), file))
+            RequestBody requestFile =
+                    RequestBody.create(MediaType.parse("multipart/form-data"), file);
+            return mRestApi.upload(url, requestFile, MultipartBody.Part.createFormData(key, file.getName(), requestFile))
                     .doOnError(throwable -> {
                         throwable.printStackTrace();
                         queueIOFile(url, file, true, whileCharging, false);

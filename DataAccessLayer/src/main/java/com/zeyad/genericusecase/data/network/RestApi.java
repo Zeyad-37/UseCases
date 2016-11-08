@@ -57,10 +57,6 @@ public interface RestApi {
 
     @Multipart
     @POST
-    Observable<Object> upload(@Url String url, @Part(value = "file\";filename=\"somename.jpg\"",
-            encoding = "binary") RequestBody description);
-
-    @Multipart
-    @POST
-    Observable<ResponseBody> upload(@Url String url, @Part MultipartBody.Part file);
+    Observable<Object> upload(@Url String url, @Part(value = "image") RequestBody description,
+                              @Part MultipartBody.Part file);
 }

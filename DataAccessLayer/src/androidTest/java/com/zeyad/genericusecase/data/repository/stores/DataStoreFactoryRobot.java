@@ -20,10 +20,7 @@ class DataStoreFactoryRobot {
     }
 
     static DataBaseManager createMockedDataBaseManager() {
-        final RealmManager realmManager = Mockito.mock(RealmManager.class);
-        final Context mockedContext = CloudDataStoreTestRobot.getMockedContext();
-        Mockito.when(realmManager.getContext()).thenReturn(mockedContext);
-        return realmManager;
+        return Mockito.mock(RealmManager.class);
     }
 
     @NonNull

@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.List;
 
 import io.realm.RealmObject;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.observers.TestSubscriber;
 
@@ -35,8 +36,6 @@ import static com.zeyad.genericusecase.data.repository.stores.CloudDataStoreTest
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.times;
 
 @RunWith(Parameterized.class)
@@ -116,8 +115,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.dynamicGetList(mCloudDataStore, mToPersist);
         InOrder inorder = Mockito.inOrder(mEntityMapper, mEntityMapper);
         inorder.verify(mEntityMapper, times(mToPersist ? 1 : 0))
-                .transformAllToRealm(Mockito.anyList()
-                        , Mockito.any());
+                .transformAllToRealm(Mockito.anyList(), Mockito.any());
         inorder.verify(mEntityMapper, times(1))
                 .transformAllToDomain(Mockito.any()
                         , Mockito.any());
@@ -263,11 +261,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -275,11 +273,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifDataIsNotPersistedIrrespectiveOfPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedDBManager, times(0))
@@ -289,11 +287,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -301,11 +299,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifDataIsPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
@@ -318,11 +316,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifEntityMapperIsInvokedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(mToPersist ? 1 : 0))
@@ -331,11 +329,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -343,11 +341,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifDataIsPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
@@ -360,11 +358,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifEntityMapperIsInvokedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(mToPersist ? 1 : 0))
@@ -373,11 +371,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -385,11 +383,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifDataIsPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
@@ -402,11 +400,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifEntityMapperIsInvokedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(mToPersist ? 1 : 0))
@@ -415,7 +413,7 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifErrorObservableIsNotReturned_whenNetworkIsAvailableAndSDKHasLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
+        CloudDataStoreTestRobot.changeNetworkState(true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
@@ -425,16 +423,16 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifErrorObservableIsNotReturned_whenNetworkIsAvailable() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         testSubscriber.assertNoErrors();
     }
 
     @Test
     public void testDynamicPostJsonObject_ifCorrectPutMethodOfRealmManagerIsCalled_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedRestApi, times(1))
                 .dynamicPostObject(Mockito.anyString(), Mockito.any(RequestBody.class));
@@ -442,8 +440,8 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifCorrectEntityMapperMethodIsCalled_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(1))
                 .transformToDomain(Mockito.anyString(), Mockito.any());
@@ -451,19 +449,19 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonObject_ifNoErrorIsThrown_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist)
                 .assertNoErrors();
     }
 
     @Test
     public void testDynamicPostJsonArray_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<List> testSubscriber = CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -471,25 +469,24 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifDataIsNotPersistedIrrespectiveOfPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
-        Mockito.verify(mMockedDBManager, times(0))
-                .put(Mockito.any(), Mockito.any(), Mockito.any());
+        Mockito.verify(mMockedDBManager, times(0)).put(Mockito.any(), Mockito.any(), Mockito.any());
 
     }
 
     @Test
     public void testDynamicPostJsonArray_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<List> testSubscriber = CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -497,11 +494,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifDataIsPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
@@ -510,11 +507,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifEntityMapperIsNotInvokedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(0))
@@ -523,11 +520,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<List> testSubscriber = CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -535,11 +532,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifDataIsPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
@@ -548,11 +545,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifEntityMapperIsNotInvokedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(0))
@@ -561,11 +558,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<List> testSubscriber = CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -573,11 +570,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifDataIsPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
@@ -586,11 +583,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifEntityMapperIsNotInvokedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(0))
@@ -599,7 +596,7 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifErrorObservableIsNotReturned_whenNetworkIsAvailableAndSDKHasLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
+        CloudDataStoreTestRobot.changeNetworkState(true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
@@ -609,16 +606,16 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifErrorObservableIsNotReturned_whenNetworkIsAvailable() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         TestSubscriber<List> testSubscriber = CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         TestUtility.assertNoErrors(testSubscriber);
     }
 
     @Test
     public void testDynamicPostJsonArray_ifCorrectPutMethodOfRealmManagerIsCalled_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedRestApi, times(1))
                 .dynamicPostList(eq(CloudDataStoreTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
@@ -626,8 +623,8 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifCorrectEntityMapperMethodIsCalled_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(1))
                 .transformAllToDomain(Mockito.any(), eq(CloudDataStoreTestRobot.getValidDomainClass()));
@@ -635,19 +632,19 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPostJsonArray_ifNoErrorIsThrown_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         TestUtility.assertNoErrors(CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist));
     }
 
     //
     @Test
     public void testDynamicPutHashMap_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -655,11 +652,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutHashMap_ifDataIsNotPersistedIrrespectiveOfPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedDBManager, times(0))
@@ -669,11 +666,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutHashMap_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -681,11 +678,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutHashMap_ifDataIsPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
@@ -698,11 +695,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutHashMap_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -710,11 +707,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutHashMap_ifDataIsPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
@@ -727,11 +724,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutHashMap_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -739,11 +736,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutHashMap_ifDataIsPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
@@ -759,7 +756,7 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutHashMap_ifErrorObservableIsNotReturned_whenNetworkIsAvailableAndSDKHasLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
+        CloudDataStoreTestRobot.changeNetworkState(true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
@@ -769,16 +766,16 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutHashMap_ifErrorObservableIsNotReturned_whenNetworkIsAvailable() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         testSubscriber.assertNoErrors();
     }
 
     @Test
     public void testDynamicPutHashMap_ifCorrectPutMethodOfRealmManagerIsCalled_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedRestApi, times(1))
                 .dynamicPutObject(eq(CloudDataStoreTestRobot.getValidUrl()),
@@ -787,8 +784,8 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutHashMap_ifCorrectEntityMapperMethodIsCalled_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(1))
                 .transformToDomain(Mockito.anyString(), Mockito.any());
@@ -796,8 +793,8 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutHashMap_ifNoErrorIsThrown_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist)
                 .assertNoErrors();
     }
@@ -805,11 +802,11 @@ public class CloudDataStoreTest {
     //
     @Test
     public void testDynamicPutList_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<List> testSubscriber = CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -817,11 +814,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifDataIsNotPersistedIrrespectiveOfPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedDBManager, times(0))
@@ -831,11 +828,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<List> testSubscriber = CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -843,11 +840,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifDataIsPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
@@ -856,11 +853,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifEntityMapperIsNotInvokedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(0))
@@ -869,11 +866,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<List> testSubscriber = CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -881,11 +878,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifDataIsPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
@@ -894,11 +891,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifEntityMapperIsNotInvokedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(0))
@@ -907,11 +904,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<List> testSubscriber = CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -919,11 +916,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifDataIsPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
@@ -932,11 +929,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifEntityMapperIsNotInvokedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(0))
@@ -945,7 +942,7 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifErrorObservableIsNotReturned_whenNetworkIsAvailableAndSDKHasLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
+        CloudDataStoreTestRobot.changeNetworkState(true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
@@ -955,16 +952,16 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifErrorObservableIsNotReturned_whenNetworkIsAvailable() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         TestSubscriber<List> testSubscriber = CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         TestUtility.assertNoErrors(testSubscriber);
     }
 
     @Test
     public void testDynamicPutList_ifCorrectPutMethodOfRealmManagerIsCalled_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedRestApi, times(1))
                 .dynamicPutList(eq(CloudDataStoreTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
@@ -972,8 +969,8 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifCorrectEntityMapperMethodIsCalled_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(1))
                 .transformAllToDomain(Mockito.any(), eq(CloudDataStoreTestRobot.getValidDomainClass()));
@@ -981,19 +978,19 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicPutList_ifNoErrorIsThrown_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         TestUtility.assertNoErrors(CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist));
     }
 
     //upload file
     @Test
     public void testDynamicUploadFile_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
         testSubscriber.assertError(NetworkConnectionException.class);
@@ -1001,11 +998,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicUploadFile_ifDataIsNotPersistedIrrespectiveOfPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedDBManager, times(0))
@@ -1015,11 +1012,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicUploadFile_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesNotHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, false);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeFalse(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
         testSubscriber.assertNoErrors();
@@ -1027,11 +1024,11 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicUploadFile_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
         testSubscriber.assertNoErrors();
@@ -1039,24 +1036,23 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicUploadFile_ifDataIsNotPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, false);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeFalse(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
-        Mockito.verify(mMockedDBManager, atLeastOnce()).getContext();
         Mockito.verifyNoMoreInteractions(mMockedDBManager);
     }
 
     @Test
     public void testDynamicUploadFile_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
         testSubscriber.assertNoErrors();
@@ -1064,20 +1060,19 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicUploadFile_ifDataIsNotPersistedAccordingToPersistStatus_whenNetworkIsNotAvailableAndPlayServicesAreEnabledAndDeviceDoesHaveLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, false);
+        CloudDataStoreTestRobot.changeNetworkState(false);
         CloudDataStoreTestRobot.changeStateOfGoogleApi(mMockedGoogleApiAvailability, true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
-        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
-        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mMockedDBManager, mCloudDataStore));
+        assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
+        assumeTrue(CloudDataStoreTestRobot.isGooglePlayerServicesEnabled(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
-        Mockito.verify(mMockedDBManager, atLeast(1)).getContext();
         Mockito.verifyNoMoreInteractions(mMockedDBManager);
     }
 
     @Test
     public void testDynamicUploadFile_ifErrorObservableIsNotReturned_whenNetworkIsAvailableAndSDKHasLollipop() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
+        CloudDataStoreTestRobot.changeNetworkState(true);
         CloudDataStoreTestRobot.changeHasLollipop(mCloudDataStore, true);
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
         assumeTrue(CloudDataStoreTestRobot.hasLollipop(mCloudDataStore));
@@ -1087,25 +1082,25 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicUploadFile_ifErrorObservableIsNotReturned_whenNetworkIsAvailable() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         TestSubscriber<Object> testSubscriber = CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
         testSubscriber.assertNoErrors();
     }
 
     @Test
     public void testDynamicUploadFile_ifCorrectPutMethodOfRealmManagerIsCalled_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedRestApi, times(1))
-                .upload(Mockito.anyString(), Mockito.any(RequestBody.class));
+                .upload(Mockito.anyString(), Mockito.any(RequestBody.class), Mockito.any(MultipartBody.Part.class));
     }
 
     @Test
     public void testDynamicUploadFile_ifCorrectEntityMapperMethodIsCalled_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
         Mockito.verify(mEntityMapper, times(1))
                 .transformToDomain(Mockito.anyString(), Mockito.any());
@@ -1113,8 +1108,8 @@ public class CloudDataStoreTest {
 
     @Test
     public void testDynamicUploadFile_ifNoErrorIsThrown_whenRequiredThingsAreMet() {
-        CloudDataStoreTestRobot.changeNetworkState(mMockedDBManager, true);
-        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled(mMockedDBManager));
+        CloudDataStoreTestRobot.changeNetworkState(true);
+        assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist)
                 .assertNoErrors();
     }
