@@ -25,7 +25,7 @@ Generic Use Case Library supports Android 2.3 (Gingerbread) and later.
 
 # Installation
 
-Provide code examples and explanations of how to get the project.
+coming soon
 
 # Code Example
 
