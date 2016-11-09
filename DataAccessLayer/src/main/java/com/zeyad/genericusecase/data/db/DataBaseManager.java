@@ -17,9 +17,6 @@ import rx.Observable;
  */
 public interface DataBaseManager {
 
-    String COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE = "collection_last_cache_update",
-            DETAIL_SETTINGS_KEY_LAST_CACHE_UPDATE = "detail_last_cache_update";
-
     /**
      * Gets an {@link Observable} which will emit an Object.
      *
@@ -84,34 +81,6 @@ public interface DataBaseManager {
     Observable<?> putAll(JSONArray jsonArray, String idColumnName, Class dataClass);
 
     /**
-     * Checks if an element (User) exists in the DB.
-     *
-     * @param itemId   The id used to look for inside the DB.
-     * @param columnId Name of the id field.
-     * @param clazz    Class type of the items to check.
-     * @return true if the element is cached, otherwise false.
-     */
-    boolean isCached(final int itemId, String columnId, Class clazz);
-
-    /**
-     * Checks if the DB is expired.
-     *
-     * @param itemId   The id used to look for inside the DB.
-     * @param columnId Name of the id field.
-     * @param clazz    Class type of the items to check.
-     * @return true, the DB is expired, otherwise false.
-     */
-    boolean isItemValid(final int itemId, String columnId, Class clazz);
-
-    /**
-     * Checks if the DB is expired.
-     *
-     * @param destination Name DB destination.
-     * @return true, the DB is expired, otherwise false.
-     */
-    boolean areItemsValid(String destination);
-
-    /**
      * Evict all elements of the DB.
      *
      * @param clazz Class type of the items to be deleted.
@@ -154,7 +123,7 @@ public interface DataBaseManager {
      * @param clazz     Class type of the items to be deleted.
      */
     @NonNull
-    Observable<List> getWhere(Class clazz, String query, String filterKey);
+    Observable<?> getWhere(Class clazz, String query, String filterKey);
 
     /**
      * Get list of items according to the query passed.
@@ -162,5 +131,5 @@ public interface DataBaseManager {
      * @param realmQuery The query used to look for inside the DB.
      */
     @NonNull
-    Observable<List> getWhere(RealmQuery realmQuery);
+    Observable<?> getWhere(RealmQuery realmQuery);
 }
