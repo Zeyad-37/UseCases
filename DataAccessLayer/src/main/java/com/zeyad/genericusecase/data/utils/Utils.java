@@ -19,9 +19,6 @@ import android.support.annotation.Nullable;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.zeyad.genericusecase.Config;
-import com.zeyad.genericusecase.data.db.DataBaseManager;
-
-import java.util.List;
 
 import io.realm.Realm;
 import rx.Observable;
@@ -38,12 +35,10 @@ public class Utils {
     }
 
     // Simple logging to let us know what each source is returning
-    public static Observable.Transformer<List, List> logSources(final String source, @NonNull DataBaseManager realmManager) {
+    public static Observable.Transformer<?, ?> logSources(final String source) {
         return observable -> observable.doOnNext(entities -> {
             if (entities == null)
                 System.out.println(source + " does not have any data.");
-            else if (!realmManager.areItemsValid(DataBaseManager.COLLECTION_SETTINGS_KEY_LAST_CACHE_UPDATE))
-                System.out.println(source + " has stale data.");
             else
                 System.out.println(source + " has the data you are looking for!");
         });

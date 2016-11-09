@@ -184,7 +184,7 @@ class CloudDataStoreTestRobot {
     }
 
     static DataBaseManager createDBManagerWithMockedContext() {
-        final Observable<List> LIST_OBSERVABLE = getListObservable();
+        final Observable LIST_OBSERVABLE = getListObservable();
         final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
         final Observable<Object> TRUE_OBSERVABLE = Observable.create(subscriber -> subscriber.onNext(true));
         final DataBaseManager dbManagerWithMockedContext
@@ -197,9 +197,6 @@ class CloudDataStoreTestRobot {
                 .putAll(Mockito.anyListOf(RealmObject.class), Mockito.any());
         Mockito.doReturn(OBJECT_OBSERVABLE).when(dbManagerWithMockedContext)
                 .putAll(Mockito.any(JSONArray.class), eq(CloudDataStoreTestRobot.getValidColumnName()), Mockito.any());
-        Mockito.when(dbManagerWithMockedContext.isCached(Mockito.anyInt(), Mockito.anyString(), Mockito.any())).thenReturn(true);
-        Mockito.when(dbManagerWithMockedContext.isItemValid(Mockito.anyInt(), Mockito.anyString(), Mockito.any())).thenReturn(true);
-        Mockito.when(dbManagerWithMockedContext.areItemsValid(Mockito.anyString())).thenReturn(true);
         Mockito.when(dbManagerWithMockedContext.evictAll(Mockito.any())).thenReturn(any()); // was TRUE_OBSERVABLE
         Mockito.doNothing()
                 .when(dbManagerWithMockedContext).evict(Mockito.any(), Mockito.any());

@@ -7,7 +7,6 @@ import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.utils.ModelConverters;
-import com.zeyad.genericusecase.data.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -20,7 +19,6 @@ import rx.Observable;
 
 public class DiskDataStore implements DataStore {
 
-    private final String TAG = DiskDataStore.class.getName();
     private DataBaseManager mDataBaseManager;
     private EntityMapper mEntityDataMapper;
 
@@ -39,8 +37,7 @@ public class DiskDataStore implements DataStore {
     public Observable<List> dynamicGetList(String url, Class domainClass, Class dataClass, boolean persist,
                                            boolean shouldCache) {
         return mDataBaseManager.getAll(dataClass)
-                .map(realmModels -> mEntityDataMapper.transformAllToDomain(realmModels))
-                .compose(Utils.logSources(TAG, mDataBaseManager));
+                .map(realmModels -> mEntityDataMapper.transformAllToDomain(realmModels));
     }
 
     @NonNull
@@ -53,16 +50,16 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass) {
+    public Observable<?> searchDisk(String query, String column, Class domainClass, Class dataClass) {
         return mDataBaseManager.getWhere(dataClass, query, column)
-                .map(realmModel -> mEntityDataMapper.transformAllToDomain(realmModel));
+                .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel));
     }
 
     @NonNull
     @Override
-    public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
+    public Observable<?> searchDisk(RealmQuery query, Class domainClass) {
         return mDataBaseManager.getWhere(query)
-                .map(realmModel -> mEntityDataMapper.transformAllToDomain(realmModel));
+                .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel));
     }
 
     @NonNull

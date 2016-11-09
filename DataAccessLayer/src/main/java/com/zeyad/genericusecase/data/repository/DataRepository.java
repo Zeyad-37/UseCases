@@ -109,7 +109,7 @@ public class DataRepository implements Repository {
 
     @NonNull
     @Override
-    public Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass) {
+    public Observable<?> searchDisk(String query, String column, Class domainClass, Class dataClass) {
         try {
             return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(dataClass)).searchDisk(query, column,
                     domainClass, dataClass);
@@ -120,7 +120,7 @@ public class DataRepository implements Repository {
 
     @NonNull
     @Override
-    public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
+    public Observable<?> searchDisk(RealmQuery query, Class domainClass) {
         try {
             return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(domainClass)).searchDisk(query
                     , domainClass);

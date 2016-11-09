@@ -75,13 +75,13 @@ public interface DataStore {
      * Search disk with a query which returns an {@link Observable} that will emit a list of ?.
      */
     @NonNull
-    Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass);
+    Observable<?> searchDisk(String query, String column, Class domainClass, Class dataClass);
 
     /**
      * Search disk with a RealmQuery which returns an {@link Observable} that will emit a list of ?.
      */
     @NonNull
-    Observable<List> searchDisk(RealmQuery query, Class domainClass);
+    Observable<?> searchDisk(RealmQuery query, Class domainClass);
 
     @NonNull
     Observable<?> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,

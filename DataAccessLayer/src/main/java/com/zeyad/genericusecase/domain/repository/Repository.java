@@ -56,10 +56,10 @@ public interface Repository {
     Observable<Boolean> deleteAllDynamically(String url, Class dataClass, boolean persist);
 
     @NonNull
-    Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass);
+    Observable<?> searchDisk(String query, String column, Class domainClass, Class dataClass);
 
     @NonNull
-    Observable<List> searchDisk(RealmQuery query, Class domainClass);
+    Observable<?> searchDisk(RealmQuery query, Class domainClass);
 
     @NonNull
     Observable<?> uploadFileDynamically(String url, File file, String key, boolean onWifi, boolean whileCharging,

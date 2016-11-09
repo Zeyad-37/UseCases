@@ -193,7 +193,7 @@ public class DiskDataStoreTest {
     public void testSearchDisk_ifNoErrorIsThrown_whenDiskIsSearchedUsingId() {
         mDiskDataStoreRobot.insertTestModels(10);
         int idToLookFor = mDiskDataStoreRobot.getPrimaryIdForAnyInsertedTestModel();
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
+        final TestSubscriber subscriber = new TestSubscriber<>();
         mDiskDataStore.searchDisk(String.valueOf(idToLookFor), "id", null, mDiskDataStoreRobot.getDataClass())
                 .subscribe(subscriber);
         TestUtility.assertNoErrors(subscriber);
@@ -202,7 +202,7 @@ public class DiskDataStoreTest {
     @Test
     public void testSearchDisk_ifNoErrorIsThrown_whenDiskIsSearchedUsingValue() {
         mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
+        final TestSubscriber subscriber = new TestSubscriber<>();
         mDiskDataStore.searchDisk(mDiskDataStoreRobot.getPrefixForTestModel(), "value", null, mDiskDataStoreRobot.getDataClass())
                 .subscribe(subscriber);
         TestUtility.assertNoErrors(subscriber);
@@ -211,7 +211,7 @@ public class DiskDataStoreTest {
     @Test
     public void testSearchDisk_ifCorrectNumberOfItemsAreReturned_whenDiskIsSearchedUsingValue() {
         mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
+        final TestSubscriber subscriber = new TestSubscriber<>();
         mDiskDataStore.searchDisk(mDiskDataStoreRobot.getPrefixForTestModel(), "value", null, mDiskDataStoreRobot.getDataClass())
                 .subscribe(subscriber);
         assertThat(((List<Object>) subscriber.getOnNextEvents().get(0)), is(iterableWithSize(10)));
@@ -220,7 +220,7 @@ public class DiskDataStoreTest {
     @Test
     public void testSearchDisk_ifCorrectItemsTypeIsReturned_whenDiskIsSearchedUsingValue() {
         mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
+        final TestSubscriber subscriber = new TestSubscriber<>();
         mDiskDataStore.searchDisk(mDiskDataStoreRobot.getPrefixForTestModel(), "value", null, mDiskDataStoreRobot.getDataClass())
                 .subscribe(subscriber);
         assertThat(((List<Object>) subscriber.getOnNextEvents().get(0)).get(0), is(instanceOf(mDiskDataStoreRobot.getDomainClass())));
@@ -229,7 +229,7 @@ public class DiskDataStoreTest {
     @Test
     public void testSearchDiskRealmQuery_ifNoErrorIsThrown_whenDiskIsSearchedUsingValue() {
         mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
+        final TestSubscriber subscriber = new TestSubscriber<>();
         RealmQuery realmQuery
                 = mDiskDataStoreRobot
                 .getRealmQueryForValue(mDiskDataStoreRobot.getPrefixForTestModel());
@@ -241,7 +241,7 @@ public class DiskDataStoreTest {
     @Test
     public void testSearchDiskRealmQuery_ifCorrectNumberOfItemsAreReturned_whenDiskIsSearchedUsingValue() {
         mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
+        final TestSubscriber subscriber = new TestSubscriber<>();
         RealmQuery realmQuery
                 = mDiskDataStoreRobot
                 .getRealmQueryForValue(mDiskDataStoreRobot.getPrefixForTestModel());
@@ -253,7 +253,7 @@ public class DiskDataStoreTest {
     @Test
     public void testSearchDiskRealmQuery_ifCorrectItemsTypeIsReturned_whenDiskIsSearchedUsingValue() {
         mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
+        final TestSubscriber subscriber = new TestSubscriber<>();
         RealmQuery realmQuery
                 = mDiskDataStoreRobot
                 .getRealmQueryForValue(mDiskDataStoreRobot.getPrefixForTestModel());
@@ -265,7 +265,7 @@ public class DiskDataStoreTest {
     @Test
     public void testSearchDiskRealmQuery_ifNoErrorIsThrown_whenDiskIsSearchedUsingId() {
         mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
+        final TestSubscriber subscriber = new TestSubscriber<>();
         RealmQuery realmQuery
                 = mDiskDataStoreRobot
                 .getRealmQueryForAnyId();
@@ -277,7 +277,7 @@ public class DiskDataStoreTest {
     @Test
     public void testSearchDiskRealmQuery_ifCorrectNumberOfItemsAreReturned_whenDiskIsSearchedUsingId() {
         mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
+        final TestSubscriber subscriber = new TestSubscriber<>();
         RealmQuery realmQuery
                 = mDiskDataStoreRobot
                 .getRealmQueryForAnyId();
@@ -289,7 +289,7 @@ public class DiskDataStoreTest {
     @Test
     public void testSearchDiskRealmQuery_ifCorrectItemsTypeIsReturned_whenDiskIsSearchedUsingId() {
         mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
+        final TestSubscriber subscriber = new TestSubscriber<>();
         RealmQuery realmQuery
                 = mDiskDataStoreRobot
                 .getRealmQueryForAnyId();
