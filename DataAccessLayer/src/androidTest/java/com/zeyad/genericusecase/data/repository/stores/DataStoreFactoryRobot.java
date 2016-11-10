@@ -13,7 +13,6 @@ import org.mockito.Mockito;
 
 class DataStoreFactoryRobot {
 
-
     @NonNull
     static DataStoreFactory createDataStoreFactory(DataBaseManager dataBaseManager, Context mockedContext) {
         return new DataStoreFactory(dataBaseManager, mockedContext);

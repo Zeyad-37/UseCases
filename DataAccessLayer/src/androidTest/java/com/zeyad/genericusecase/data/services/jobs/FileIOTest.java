@@ -17,9 +17,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.robolectric.RobolectricTestRunner;
 
 import java.io.IOException;
 
@@ -36,7 +36,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 
-@RunWith(JUnit4.class)
+@RunWith(RobolectricTestRunner.class)
+//@Config(constants = BuildConfig.class)
 public class FileIOTest {
     // TODO: 9/25/16 Mock Job Scheduler
     @Before

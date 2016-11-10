@@ -4,7 +4,6 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.UiThreadTestRule;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.google.gson.Gson;
 import com.zeyad.genericusecase.Config;
@@ -25,6 +24,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,7 +52,8 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(RobolectricTestRunner.class)
+//@Config(constants = BuildConfig.class)
 public class RealmManagerImplTest {
 
     public static final String TEST_MODEL_PREFIX = "random value:";
@@ -99,9 +100,7 @@ public class RealmManagerImplTest {
     public void testPutRealmObject_ifNoExceptionIsRaised_WhenInsertInMainThreadAndReadInWorkerThread()
             throws InterruptedException {
         RealmManager realmManager = getGeneralRealmManager();
-        runOnMainThread(() -> {
-            putTestModel(realmManager);
-        });
+        runOnMainThread(() -> putTestModel(realmManager));
         realmManager.getAll(TestModel.class);
     }
 
@@ -148,8 +147,7 @@ public class RealmManagerImplTest {
 
     @Test
     public void testPutRealmObject_ifTrueIsReturnedInSubscriber_whenOperationIsPerformed() throws Throwable {
-        Observable<?> observable
-                = mRealmManager.put(createTestModelWithRandomId(), RealmManagerImplTest.class);
+        Observable<?> observable = mRealmManager.put(createTestModelWithRandomId(), RealmManagerImplTest.class);
         TestSubscriber<Object> subscriber = TestSubscriber.create();
         observable.subscribe(subscriber);
         subscriber.assertValue(Boolean.TRUE);
@@ -169,7 +167,6 @@ public class RealmManagerImplTest {
                     .subscribe(subscriber);
             subscriber.assertNoErrors();
         });
-
     }
 
     @Test

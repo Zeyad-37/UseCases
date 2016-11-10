@@ -2,7 +2,6 @@ package com.zeyad.genericusecase.data.repository.stores;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.zeyad.genericusecase.Config;
 import com.zeyad.genericusecase.data.TestUtility;
@@ -16,13 +15,15 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.robolectric.RobolectricTestRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(RobolectricTestRunner.class)
+//@Config(constants = BuildConfig.class))
 public class DataStoreFactoryTest {
 
     private DataBaseManager mDataBaseManager;

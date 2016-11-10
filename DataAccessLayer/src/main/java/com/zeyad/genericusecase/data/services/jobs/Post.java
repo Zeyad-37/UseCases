@@ -53,7 +53,7 @@ public class Post {
     private Subscriber<Object> handleError = new Subscriber<Object>() {
         @Override
         public void onCompleted() {
-
+            Log.d(TAG, "Completed");
         }
 
         @Override
@@ -64,7 +64,7 @@ public class Post {
 
         @Override
         public void onNext(Object o) {
-
+            Log.d(TAG, "Succeeded");
         }
     };
 
@@ -91,13 +91,13 @@ public class Post {
         if (Utils.isNetworkAvailable(mContext)) {
             String bundle = "";
             boolean isObject = false;
-            if (mPostRequest.getJsonArray() == null) {
+            if (mPostRequest.getArrayBundle().length() == 0) {
                 JSONObject jsonObject = mPostRequest.getObjectBundle();
                 if (jsonObject != null) {
                     bundle = jsonObject.toString();
                     isObject = true;
                 }
-            } else bundle = mPostRequest.getJsonArray().toString();
+            } else bundle = mPostRequest.getArrayBundle().toString();
             switch (mPostRequest.getMethod()) {
                 case PostRequest.POST:
                     if (isObject)
@@ -106,7 +106,7 @@ public class Post {
                                 .subscribe(handleError);
                     else
                         return mRestApi.dynamicPostList(mPostRequest.getUrl(), RequestBody.create(MediaType
-                                .parse(APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
+                                .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString()))
                                 .subscribe(handleError);
                 case PostRequest.PUT:
                     if (isObject)
@@ -115,7 +115,7 @@ public class Post {
                                 .subscribe(handleError);
                     else
                         return mRestApi.dynamicPutList(mPostRequest.getUrl(), RequestBody.create(MediaType
-                                .parse(APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
+                                .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString()))
                                 .subscribe(handleError);
                 case PostRequest.DELETE:
                     if (isObject)
@@ -124,7 +124,7 @@ public class Post {
                                 .subscribe(handleError);
                     else
                         return mRestApi.dynamicDeleteList(mPostRequest.getUrl(), RequestBody.create(MediaType
-                                .parse(APPLICATION_JSON), mPostRequest.getJsonArray().toString()))
+                                .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString()))
                                 .subscribe(handleError);
             }
         } else

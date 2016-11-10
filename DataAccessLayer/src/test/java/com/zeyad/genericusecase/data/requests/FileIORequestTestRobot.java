@@ -1,6 +1,6 @@
 package com.zeyad.genericusecase.data.requests;
 
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
+import com.zeyad.genericusecase.domain.interactor.TestModel;
 
 import org.mockito.Mockito;
 

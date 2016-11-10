@@ -16,7 +16,6 @@ import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentSe
 
 class GenericGCMServiceTestRobot {
 
-
     private static final String TASK_PARAM_PAYLOAD = "some_payload";
     private static final Context MOCKED_CONTEXT = Mockito.mock(Context.class);
 

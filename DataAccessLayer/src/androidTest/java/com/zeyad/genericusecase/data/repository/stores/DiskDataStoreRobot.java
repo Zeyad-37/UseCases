@@ -176,7 +176,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
         listOfAllIds.remove(0);
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         diskDataStore.dynamicDeleteCollection(null, DataRepository.DEFAULT_ID_KEY
-                        , ModelConverters.convertToJsonArray(listOfAllIds)
+                , ModelConverters.convertToJsonArray(listOfAllIds)
                 , getDataClass(), false, false)
                 .subscribe(subscriber);
         return subscriber;
@@ -202,7 +202,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
 //    @Override
 //    public HashMap<String, Object> getTestModelJsonKeyValuePair() throws JSONException {
 //        final JSONObject[] jsonObjects = new JSONObject[1];
-//        TestUtility.getJsonObjectFrom(jsonObjects, createTestModel());
+//        TestUtility2.getJsonObjectFrom(jsonObjects, createTestModel());
 //        final JSONObject jsonObject = jsonObjects[0];
 //        final Iterator<String> keys = jsonObject.keys();
 //        HashMap<String, Object> keyValue = new HashMap<>();

@@ -54,16 +54,6 @@ public class PostRequestTest {
     }
 
     @Test
-    public void testGetJsonArray() throws Exception {
-        assertThat(mPostRequest.getJsonArray(), is(equalTo(PostRequestTestRobot.JSON_ARRAY)));
-    }
-
-    @Test
-    public void testGetKeyValuePairs() throws Exception {
-        assertThat(mPostRequest.getKeyValuePairs(), is(equalTo(PostRequestTestRobot.HASH_MAP)));
-    }
-
-    @Test
     public void testGetIdColumnName() throws Exception {
         assertThat(mPostRequest.getIdColumnName(), is(equalTo(PostRequestTestRobot.ID_COLUMN_NAME)));
     }

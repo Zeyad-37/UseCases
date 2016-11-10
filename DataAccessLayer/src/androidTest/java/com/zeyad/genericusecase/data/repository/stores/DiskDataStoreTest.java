@@ -2,7 +2,6 @@ package com.zeyad.genericusecase.data.repository.stores;
 
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.zeyad.genericusecase.Config;
 import com.zeyad.genericusecase.data.TestUtility;
@@ -19,6 +18,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
 
 import java.util.List;
 
@@ -33,7 +33,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(RobolectricTestRunner.class)
+//@Config(constants = BuildConfig.class)
 public class DiskDataStoreTest {
 
     @NonNull

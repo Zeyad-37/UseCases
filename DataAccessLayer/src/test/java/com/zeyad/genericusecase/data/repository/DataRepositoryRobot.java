@@ -6,8 +6,8 @@ import com.zeyad.genericusecase.data.repository.stores.CloudDataStore;
 import com.zeyad.genericusecase.data.repository.stores.DataStore;
 import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
 import com.zeyad.genericusecase.data.repository.stores.DiskDataStore;
-import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
-import com.zeyad.genericusecase.data.services.realm_test_models.TestViewModel;
+import com.zeyad.genericusecase.domain.interactor.TestModel;
+import com.zeyad.genericusecase.domain.interactor.TestViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -29,7 +29,6 @@ import rx.Subscriber;
 
 class FileIOTestRobot {
 
-
     private static final ResponseBody RESPONSE_BODY = Mockito.mock(ResponseBody.class);
     private static final InputStream INPUT_STREAM = Mockito.mock(InputStream.class);
     @Nullable

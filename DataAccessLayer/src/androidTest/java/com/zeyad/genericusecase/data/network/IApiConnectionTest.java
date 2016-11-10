@@ -1,7 +1,6 @@
 package com.zeyad.genericusecase.data.network;
 
 import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
 
 import com.zeyad.genericusecase.BuildConfig;
 import com.zeyad.genericusecase.Config;
@@ -11,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.robolectric.RobolectricTestRunner;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -22,7 +22,8 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.eq;
 
-@RunWith(AndroidJUnit4.class)
+@RunWith(RobolectricTestRunner.class)
+//@Config(constants = BuildConfig.class)
 public abstract class IApiConnectionTest {
 
     private final String mValidUrl = ApiConnectionRobot.getValidUrl();

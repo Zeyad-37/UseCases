@@ -28,6 +28,7 @@ import com.zeyad.genericusecase.data.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mockito.Matchers;
 import org.mockito.Mockito;
 
 import java.io.File;
@@ -46,7 +47,6 @@ import rx.Subscriber;
 import rx.observers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 
 @SuppressWarnings("WrongConstant")
@@ -354,7 +354,7 @@ class CloudDataStoreTestRobot {
     }
 
     static <T> T argThis(T arg) {
-        return argThat(ToStringArgumentMatcher.newInstance(arg));
+        return Matchers.argThat(ToStringArgumentMatcher.newInstance(arg));
     }
 
     @NonNull

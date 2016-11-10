@@ -3,8 +3,8 @@ package com.zeyad.genericusecase.data.repository;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 
-import com.zeyad.genericusecase.data.TestUtility;
-import com.zeyad.genericusecase.data.mockable.ListObservable;
+import com.zeyad.genericusecase.data.ListObservable;
+import com.zeyad.genericusecase.data.TestUtility2;
 import com.zeyad.genericusecase.data.repository.stores.DataStore;
 import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
 
@@ -54,12 +54,12 @@ public class DataRepositoryTest {
 
     @Before
     public void setUp() throws Exception {
-        TestUtility.performInitialSetupOfDb(InstrumentationRegistry.getContext());
+        TestUtility2.performInitialSetupOfDb(InstrumentationRegistry.getContext());
         mDataStore = mIsDiskType
                 ? DataRepositoryRobot.createMockedDiskStore()
                 : DataRepositoryRobot.createMockedCloudStore();
         DataStoreFactory dataStoreFactory = DataRepositoryRobot.createMockedDataStoreFactory(mDataStore);
-        mDataRepository = new DataRepository(dataStoreFactory, TestUtility.createEntityMapper());
+        mDataRepository = new DataRepository(dataStoreFactory, TestUtility2.createEntityMapper());
         DataRepositoryRobot.mockDataStore(mIsDiskType, mDataStore, dataStoreFactory);
     }
 

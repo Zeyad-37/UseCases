@@ -2,6 +2,7 @@ package com.zeyad.genericusecase.data.requests;
 
 import android.support.annotation.NonNull;
 
+import com.zeyad.genericusecase.data.repository.DataRepository;
 import com.zeyad.genericusecase.data.utils.ModelConverters;
 
 import org.json.JSONArray;
@@ -88,6 +89,11 @@ public class PostRequest {
         else return new JSONArray();
     }
 
+    public String getIdColumnName() {
+        if (mIdColumnName == null || mIdColumnName.isEmpty()) return DataRepository.DEFAULT_ID_KEY;
+        return mIdColumnName;
+    }
+
     public String getUrl() {
         return mUrl;
     }
@@ -110,22 +116,6 @@ public class PostRequest {
 
     public boolean isQueuable() {
         return mQueuable;
-    }
-
-    public JSONArray getJsonArray() {
-        return mJsonArray;
-    }
-
-    public JSONObject getJsonObject() {
-        return mJsonObject;
-    }
-
-    public HashMap<String, Object> getKeyValuePairs() {
-        return mKeyValuePairs;
-    }
-
-    public String getIdColumnName() {
-        return mIdColumnName;
     }
 
     public String getMethod() {
