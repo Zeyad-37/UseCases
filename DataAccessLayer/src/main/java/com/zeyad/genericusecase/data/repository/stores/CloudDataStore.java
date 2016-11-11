@@ -45,6 +45,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -70,7 +71,8 @@ import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentSe
 
 public class CloudDataStore implements DataStore {
 
-    public static final String FILE_IO_TAG = "fileIOObject", POST_TAG = "postObject", APPLICATION_JSON = "application/json";
+    public static final String FILE_IO_TAG = "fileIOObject", POST_TAG = "postObject", APPLICATION_JSON = "application/json",
+            MULTIPART_FORMDATA = "multipart/form-data", RECEIVER_ID = "receiver_id";
     static final String TAG = CloudDataStore.class.getName();
     private static final int COUNTER_START = 1, ATTEMPTS = 3;
     final DataBaseManager mDataBaseManager;
@@ -260,8 +262,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicUploadFile(String url, File file, String key, boolean onWifi,
-                                           boolean whileCharging, boolean queuable, Class domainClass) {
+    public Observable<?> dynamicUploadFile(String url, @NonNull File file, String key, HashMap<String, Object> parameters, boolean onWifi, boolean whileCharging,
+                                           boolean queuable, Class domainClass) {
         return Observable.defer(() -> {
             if (isEligibleForPersistenceIfNetworkNotAvailable(queuable) && Utils.isOnWifi() == onWifi
                     && Utils.isChargingReqCompatible(Utils.isCharging(), whileCharging)) {
@@ -270,8 +272,17 @@ public class CloudDataStore implements DataStore {
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
                 return mErrorObservableNotPersisted;
             RequestBody requestFile =
-                    RequestBody.create(MediaType.parse("multipart/form-data"), file);
-            return mRestApi.upload(url, requestFile, MultipartBody.Part.createFormData(key, file.getName(), requestFile))
+                    RequestBody.create(MediaType.parse(MULTIPART_FORMDATA), file);
+            HashMap<String, RequestBody> map = new HashMap<>();
+            map.put(key, requestFile);
+            if (parameters != null && !parameters.isEmpty()) {
+                for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                    RequestBody data = Utils.createPartFromString(entry.getValue());
+                    map.put(entry.getKey(), data);
+                }
+            }
+
+            return mRestApi.upload(url, map, MultipartBody.Part.createFormData(key, file.getName(), requestFile))
                     .doOnError(throwable -> {
                         throwable.printStackTrace();
                         queueIOFile(url, file, true, whileCharging, false);

@@ -3,6 +3,7 @@ package com.zeyad.genericusecase.data.network;
 import android.support.annotation.NonNull;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -33,7 +34,7 @@ interface IApiConnection {
 
     Observable<List> dynamicPutList(String url, RequestBody requestBody);
 
-    Observable<Object> upload(String url, RequestBody requestBody, MultipartBody.Part file);
+    Observable<Object> upload(String url, Map<String, RequestBody> partMap, MultipartBody.Part file);
 
     Observable<List> dynamicDeleteList(String url, RequestBody body);
 

@@ -27,6 +27,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -137,9 +139,13 @@ public class FileIO {
             RequestBody requestFile = RequestBody.create(MediaType
                     .parse(getMimeType(mFileIORequest.getFile()
                             .getAbsolutePath())), mFileIORequest.getFile());
-            return mRestApi.upload(mFileIORequest.getUrl(), requestFile,
-                    MultipartBody.Part.createFormData(mFileIORequest.getKey(), mFileIORequest
-                            .getFile().getName(), requestFile))
+            HashMap<String, RequestBody> map = new HashMap<>();
+            map.put(mFileIORequest.getKey(), requestFile);
+            if (mFileIORequest.getParameters() != null && !mFileIORequest.getParameters().isEmpty())
+                for (Map.Entry<String, Object> entry : mFileIORequest.getParameters().entrySet())
+                    map.put(entry.getKey(), Utils.createPartFromString(entry.getValue()));
+            return mRestApi.upload(mFileIORequest.getUrl(), map, MultipartBody.Part
+                    .createFormData(mFileIORequest.getKey(), mFileIORequest.getFile().getName(), requestFile))
                     .subscribe(o -> {
                     }, throwable -> queueIOFile());
         }

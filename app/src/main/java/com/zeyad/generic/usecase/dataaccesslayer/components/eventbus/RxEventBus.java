@@ -18,9 +18,8 @@ class RxEventBus implements IRxEventBus {
     private final SerializedSubject<Object, Object> rxBus;
 
     static IRxEventBus getInstance() {
-        if (mInstance == null) {
+        if (mInstance == null)
             mInstance = new RxEventBus();
-        }
         return mInstance;
     }
 

@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 import io.realm.RealmQuery;
@@ -62,8 +63,9 @@ public interface Repository {
     Observable<?> searchDisk(RealmQuery query, Class domainClass);
 
     @NonNull
-    Observable<?> uploadFileDynamically(String url, File file, String key, boolean onWifi, boolean whileCharging,
-                                        boolean queuable, Class domainClass, Class dataClass);
+    Observable<?> uploadFileDynamically(String url, File file, String key, HashMap<String, Object> parameters,
+                                        boolean onWifi, boolean whileCharging, boolean queuable,
+                                        Class domainClass, Class dataClass);
 
     @NonNull
     Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,

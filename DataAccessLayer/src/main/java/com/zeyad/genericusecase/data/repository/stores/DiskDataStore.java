@@ -12,6 +12,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 import io.realm.RealmQuery;
@@ -99,8 +100,8 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicUploadFile(String url, File file, String key, boolean onWifi,
-                                           boolean whileCharging, boolean queuable, Class domainClass) {
+    public Observable<?> dynamicUploadFile(String url, File file, String key, HashMap<String, Object> parameters,
+                                           boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass) {
         return Observable.error(new IllegalStateException(Config.getInstance().getContext().getString(R.string.io_to_db_error)));
     }
 

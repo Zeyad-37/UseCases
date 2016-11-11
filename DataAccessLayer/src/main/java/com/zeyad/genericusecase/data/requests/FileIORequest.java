@@ -3,6 +3,7 @@ package com.zeyad.genericusecase.data.requests;
 import android.support.annotation.NonNull;
 
 import java.io.File;
+import java.util.HashMap;
 
 /**
  * @author zeyad on 7/29/16.
@@ -13,6 +14,7 @@ public class FileIORequest {
     String mUrl, mKey;
     boolean mOnWifi, mWhileCharging, mQueuable;
     Class mDataClass, mPresentationClass;
+    HashMap<String, Object> mParameters;
 
     public FileIORequest() {
     }
@@ -24,11 +26,12 @@ public class FileIORequest {
         mQueuable = uploadRequestBuilder.isQueuable();
         mFile = uploadRequestBuilder.getFile();
         mKey = uploadRequestBuilder.getKey();
+        mParameters = uploadRequestBuilder.getParameters();
         mDataClass = uploadRequestBuilder.getDataClass();
         mPresentationClass = uploadRequestBuilder.getPresentationClass();
     }
 
-    public FileIORequest(String url, File file, String key, boolean onWifi, boolean whileCharging, Class presentationClass,
+    public FileIORequest(String url, File file, String key, HashMap<String, Object> parameters, boolean onWifi, boolean whileCharging, Class presentationClass,
                          Class dataClass) {
         mOnWifi = onWifi;
         mWhileCharging = whileCharging;
@@ -36,6 +39,7 @@ public class FileIORequest {
         mDataClass = dataClass;
         mUrl = url;
         mKey = key;
+        mParameters = parameters;
         mFile = file;
     }
 
@@ -71,12 +75,17 @@ public class FileIORequest {
         return mKey;
     }
 
+    public HashMap<String, Object> getParameters() {
+        return mParameters;
+    }
+
     public static class FileIORequestBuilder {
 
         private File mFile;
         private String mUrl, mKey;
         private boolean mOnWifi, mWhileCharging, mQueuable;
         private Class mDataClass, mPresentationClass;
+        private HashMap<String, Object> mParameters;
 
         public FileIORequestBuilder(String url, File file) {
             mUrl = url;
@@ -110,6 +119,12 @@ public class FileIORequest {
         @NonNull
         public FileIORequestBuilder key(String key) {
             mKey = key;
+            return this;
+        }
+
+        @NonNull
+        public FileIORequestBuilder payLoad(HashMap<String, Object> parameters) {
+            mParameters = parameters;
             return this;
         }
 
@@ -160,6 +175,10 @@ public class FileIORequest {
 
         public String getKey() {
             return mKey;
+        }
+
+        public HashMap<String, Object> getParameters() {
+            return mParameters;
         }
     }
 }

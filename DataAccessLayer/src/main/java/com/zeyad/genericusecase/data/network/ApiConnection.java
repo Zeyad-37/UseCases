@@ -18,6 +18,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
@@ -50,7 +51,7 @@ import rx.Observable;
  * Implements {@link Callable} so when executed asynchronously can
  * return a value.
  */
-class ApiConnection implements IApiConnection {
+class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnection {
 
     private final static String CACHE_CONTROL = "Cache-Control";
     private static final int TIME_OUT = 15;
@@ -175,8 +176,8 @@ class ApiConnection implements IApiConnection {
     }
 
     @Override
-    public Observable<Object> upload(String url, RequestBody requestBody, MultipartBody.Part file) {
-        return getRestApi().upload(url, requestBody, file);
+    public Observable<Object> upload(String url, Map<String, RequestBody> partMap, MultipartBody.Part file) {
+        return getRestApi().upload(url, partMap, file);
     }
 
     @Override

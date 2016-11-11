@@ -1,12 +1,14 @@
 package com.zeyad.genericusecase.data.network;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import retrofit2.http.Body;
 import retrofit2.http.Part;
+import retrofit2.http.PartMap;
 import retrofit2.http.Url;
 import rx.Observable;
 
@@ -43,12 +45,12 @@ public class RestApiImpl implements RestApi {
      * Uploads a file to a url.
      *
      * @param url         destination address.
-     * @param requestBody request body contains the file to be uploaded.
+     * @param partMap request body contains the file to be uploaded.
      * @return Observable with the Object response.
      */
     @Override
-    public Observable<Object> upload(@Url String url, @Part(value = "image") RequestBody requestBody, @Part MultipartBody.Part file) {
-        return mApiConnection.upload(url, requestBody, file);
+    public Observable<Object> upload(@Url String url, @PartMap Map<String, RequestBody> partMap, @Part MultipartBody.Part file) {
+        return mApiConnection.upload(url, partMap, file);
     }
 
     /**

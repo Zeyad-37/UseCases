@@ -6,6 +6,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 import io.realm.RealmQuery;
@@ -88,6 +89,6 @@ public interface DataStore {
                                       boolean queuable);
 
     @NonNull
-    Observable<?> dynamicUploadFile(String url, File file, String key, boolean onWifi,
-                                    boolean whileCharging, boolean queuable, Class domainClass);
+    Observable<?> dynamicUploadFile(final String url, final File file, String key, HashMap<String, Object> parameter,
+                                    boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass);
 }

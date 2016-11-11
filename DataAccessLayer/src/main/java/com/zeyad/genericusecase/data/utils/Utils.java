@@ -21,6 +21,8 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.zeyad.genericusecase.Config;
 
 import io.realm.Realm;
+import okhttp3.MediaType;
+import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -122,5 +124,11 @@ public class Utils {
 
     public static boolean isChargingReqCompatible(boolean isChargingCurrently, boolean doWhileCharging) {
         return !doWhileCharging || isChargingCurrently;
+    }
+
+    public static final String MULTIPART_FORM_DATA = "multipart/form-data";
+
+    public static RequestBody createPartFromString(Object descriptionString) {
+        return RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), String.valueOf(descriptionString));
     }
 }

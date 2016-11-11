@@ -1,6 +1,7 @@
 package com.zeyad.genericusecase.data.network;
 
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -12,6 +13,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Part;
+import retrofit2.http.PartMap;
 import retrofit2.http.Streaming;
 import retrofit2.http.Url;
 import rx.Observable;
@@ -57,6 +59,5 @@ public interface RestApi {
 
     @Multipart
     @POST
-    Observable<Object> upload(@Url String url, @Part(value = "image") RequestBody description,
-                              @Part MultipartBody.Part file);
+    Observable<Object> upload(@Url String url, @PartMap() Map<String, RequestBody> partMap, @Part MultipartBody.Part file);
 }

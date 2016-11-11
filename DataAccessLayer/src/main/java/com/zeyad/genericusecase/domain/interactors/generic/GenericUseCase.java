@@ -166,7 +166,8 @@ public class GenericUseCase implements IGenericUseCase {
     @Override
     public Observable uploadFile(FileIORequest fileIORequest) {
         return mRepository.uploadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
-                fileIORequest.getKey(), fileIORequest.onWifi(), fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
+                fileIORequest.getKey(), fileIORequest.getParameters(), fileIORequest.onWifi(),
+                fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
                 fileIORequest.getPresentationClass(), fileIORequest.getDataClass())
                 .compose(applySchedulers());
     }

@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 import io.realm.RealmQuery;
@@ -131,11 +132,12 @@ public class DataRepository implements Repository {
 
     @NonNull
     @Override
-    public Observable<?> uploadFileDynamically(String url, File file, String key, boolean onWifi, boolean whileCharging,
+    public Observable<?> uploadFileDynamically(String url, File file, String key, HashMap<String, Object> parameters, boolean onWifi, boolean whileCharging,
                                                boolean queuable, Class domainClass, Class dataClass) {
         return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
-                .dynamicUploadFile(url, file, key, onWifi, queuable, whileCharging, domainClass);
+                .dynamicUploadFile(url, file, key, parameters, onWifi, queuable, whileCharging, domainClass);
     }
+
 
     @NonNull
     @Override
