@@ -9,8 +9,8 @@ import com.zeyad.genericusecase.data.repository.DataRepository;
 import com.zeyad.genericusecase.data.requests.FileIORequest;
 import com.zeyad.genericusecase.data.requests.GetRequest;
 import com.zeyad.genericusecase.data.requests.PostRequest;
-import com.zeyad.genericusecase.domain.interactors.GenericUseCase;
-import com.zeyad.genericusecase.domain.interactors.IGenericUseCase;
+import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCase;
+import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
 import com.zeyad.genericusecase.domain.repository.Repository;
 
 import org.json.JSONArray;

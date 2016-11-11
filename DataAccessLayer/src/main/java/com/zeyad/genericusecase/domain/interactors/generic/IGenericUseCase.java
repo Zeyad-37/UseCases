@@ -1,6 +1,4 @@
-package com.zeyad.genericusecase.domain.interactors;
-
-import android.support.annotation.NonNull;
+package com.zeyad.genericusecase.domain.interactors.generic;
 
 import com.zeyad.genericusecase.data.requests.FileIORequest;
 import com.zeyad.genericusecase.data.requests.GetRequest;
@@ -16,7 +14,7 @@ public interface IGenericUseCase {
      * @param getListRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable getList(@NonNull GetRequest getListRequest);
+    Observable getList(GetRequest getListRequest);
 
     /**
      * Gets object from full url.
@@ -24,7 +22,7 @@ public interface IGenericUseCase {
      * @param getRequest contains the attributes of the request.
      * @return Observable with the Object.
      */
-    Observable getObject(@NonNull GetRequest getRequest);
+    Observable getObject(GetRequest getRequest);
 
     /**
      * Post Object to full url.
@@ -32,7 +30,7 @@ public interface IGenericUseCase {
      * @param postRequest contains the attributes of the request.
      * @return Observable with the Object.
      */
-    Observable postObject(@NonNull PostRequest postRequest);
+    Observable postObject(PostRequest postRequest);
 
     /**
      * Post list to full url.
@@ -40,7 +38,7 @@ public interface IGenericUseCase {
      * @param postRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable<?> postList(@NonNull PostRequest postRequest);
+    Observable<?> postList(PostRequest postRequest);
 
     /**
      * Put Object to full url.
@@ -48,7 +46,7 @@ public interface IGenericUseCase {
      * @param postRequest contains the attributes of the request.
      * @return Observable with the Object.
      */
-    Observable putObject(@NonNull PostRequest postRequest);
+    Observable putObject(PostRequest postRequest);
 
     /**
      * Put list to full url.
@@ -56,7 +54,7 @@ public interface IGenericUseCase {
      * @param postRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable putList(@NonNull PostRequest postRequest);
+    Observable putList(PostRequest postRequest);
 
     /**
      * Deletes list from full url.
@@ -64,7 +62,7 @@ public interface IGenericUseCase {
      * @param deleteRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable deleteCollection(@NonNull PostRequest deleteRequest);
+    Observable deleteCollection(PostRequest deleteRequest);
 
     /**
      * Deletes All.
@@ -72,7 +70,7 @@ public interface IGenericUseCase {
      * @param deleteRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable<Boolean> deleteAll(@NonNull PostRequest deleteRequest);
+    Observable<Boolean> deleteAll(PostRequest deleteRequest);
 
     /**
      * Get list of items according to the query passed.
@@ -83,7 +81,7 @@ public interface IGenericUseCase {
      * @param presentationClass Class type of the items to be returned.
      * @return
      */
-    Observable searchDisk(String query, String column, @NonNull Class presentationClass, Class dataClass);
+    Observable searchDisk(String query, String column, Class presentationClass, Class dataClass);
 
     /**
      * Get list of items according to the query passed.
@@ -92,7 +90,7 @@ public interface IGenericUseCase {
      * @param presentationClass Class type of the items to be returned.
      * @return
      */
-    Observable searchDisk(RealmQuery realmQuery, @NonNull Class presentationClass);
+    Observable searchDisk(RealmQuery realmQuery, Class presentationClass);
 
     /**
      * Uploads a file to a url.
@@ -100,7 +98,7 @@ public interface IGenericUseCase {
      * @param fileIORequest contains the attributes of the request,
      * @return Observable with the Object response.
      */
-    Observable uploadFile(@NonNull FileIORequest fileIORequest);
+    Observable uploadFile(FileIORequest fileIORequest);
 
     /**
      * Downloads file from the give url.
@@ -108,38 +106,5 @@ public interface IGenericUseCase {
      * @param fileIORequest contains the attributes of the request,
      * @return Observable with the ResponseBody
      */
-    Observable downloadFile(@NonNull FileIORequest fileIORequest);
-
-    /**
-     * Returns a string of contents of the file.
-     *
-     * @param filePath path of the file to read.
-     * @return Observable with the String.
-     */
-    Observable<String> readFromResource(String filePath);
-
-    /**
-     * Returns a string of contents of the file.
-     *
-     * @param fullFilePath path of the file to read.
-     * @return Observable with the String.
-     */
-    @NonNull
-    Observable<String> readFromFile(String fullFilePath);
-
-    /**
-     * Saves a string of data to a file.
-     *
-     * @param fullFilePath path of the file to read.
-     * @return Observable with the boolean of success.
-     */
-    Observable<Boolean> saveToFile(String fullFilePath, String data);
-
-    /**
-     * Saves a byte array of data to a file.
-     *
-     * @param fullFilePath path of the file to read.
-     * @return Observable with the boolean of success.
-     */
-    Observable<Boolean> saveToFile(String fullFilePath, byte[] data);
+    Observable downloadFile(FileIORequest fileIORequest);
 }

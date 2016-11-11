@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.domain.interactors;
+package com.zeyad.genericusecase.domain.interactors.generic;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -12,6 +12,8 @@ import com.zeyad.genericusecase.data.network.ApiConnectionFactory;
 import com.zeyad.genericusecase.data.utils.EntityMapperUtil;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
 import com.zeyad.genericusecase.data.utils.Utils;
+import com.zeyad.genericusecase.domain.interactors.files.FilesUseCaseFactory;
+import com.zeyad.genericusecase.domain.interactors.prefs.PrefsUseCaseFactory;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
@@ -40,6 +42,8 @@ public class GenericUseCaseFactory {
                 return new EntityDataMapper();
             }
         });
+        PrefsUseCaseFactory.init();
+        FilesUseCaseFactory.init();
         sGenericUseCase = GenericUseCase.getInstance();
     }
 
@@ -63,6 +67,8 @@ public class GenericUseCaseFactory {
                 return new EntityDataMapper();
             }
         });
+        PrefsUseCaseFactory.init();
+        FilesUseCaseFactory.init();
         sGenericUseCase = GenericUseCase.getInstance();
     }
 
@@ -108,6 +114,8 @@ public class GenericUseCaseFactory {
                     return new EntityDataMapper();
                 }
             };
+        PrefsUseCaseFactory.init();
+        FilesUseCaseFactory.init();
         GenericUseCase.initWithRealm(entityMapper);
     }
 

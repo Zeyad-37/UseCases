@@ -5,8 +5,8 @@ import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.IRxEventBus
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.RxEventBusFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.INavigator;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.NavigatorFactory;
-import com.zeyad.genericusecase.domain.interactors.GenericUseCaseFactory;
-import com.zeyad.genericusecase.domain.interactors.IGenericUseCase;
+import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
+import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
 
 import javax.inject.Singleton;
 

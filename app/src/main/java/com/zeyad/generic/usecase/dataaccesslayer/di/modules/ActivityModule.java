@@ -5,8 +5,8 @@ import android.support.v7.app.AppCompatActivity;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.INavigator;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.NavigatorFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.di.PerActivity;
-import com.zeyad.genericusecase.domain.interactors.GenericUseCaseFactory;
-import com.zeyad.genericusecase.domain.interactors.IGenericUseCase;
+import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
+import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
 
 import dagger.Module;
 import dagger.Provides;

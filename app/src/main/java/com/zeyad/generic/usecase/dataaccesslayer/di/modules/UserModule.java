@@ -1,8 +1,8 @@
 package com.zeyad.generic.usecase.dataaccesslayer.di.modules;
 
 import com.zeyad.generic.usecase.dataaccesslayer.di.PerActivity;
-import com.zeyad.genericusecase.domain.interactors.GenericUseCaseFactory;
-import com.zeyad.genericusecase.domain.interactors.IGenericUseCase;
+import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
+import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
 
 import javax.inject.Named;
 

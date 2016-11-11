@@ -1,10 +1,5 @@
-package com.zeyad.genericusecase.domain.interactors;
+package com.zeyad.genericusecase.domain.interactors.generic;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.VisibleForTesting;
-
-import com.google.gson.Gson;
 import com.zeyad.genericusecase.Config;
 import com.zeyad.genericusecase.UIThread;
 import com.zeyad.genericusecase.data.db.DatabaseManagerFactory;
@@ -19,22 +14,11 @@ import com.zeyad.genericusecase.domain.executors.PostExecutionThread;
 import com.zeyad.genericusecase.domain.executors.ThreadExecutor;
 import com.zeyad.genericusecase.domain.repository.Repository;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.List;
 
 import io.realm.RealmQuery;
 import rx.Observable;
 import rx.schedulers.Schedulers;
-
 
 /**
  * This class is a general implementation that represents a use case for retrieving data.
@@ -70,10 +54,9 @@ public class GenericUseCase implements IGenericUseCase {
      * This function may be called n number of times if required, during mocking and testing.
      */
     static void initWithRealm(IEntityMapperUtil entityMapper) {
-        Context context = Config.getInstance().getContext();
         DatabaseManagerFactory.initRealm();
         sGenericUseCase = new GenericUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
-                .getInstance(), context), entityMapper), new JobExecutor(), new UIThread());
+                .getInstance(), Config.getInstance().getContext()), entityMapper), new JobExecutor(), new UIThread());
     }
 
     /**
@@ -87,7 +70,6 @@ public class GenericUseCase implements IGenericUseCase {
      * @param jobExecutor    job executor
      * @param uiThread       ui thread implementation
      */
-    @VisibleForTesting
     public static void init(DataRepository dataRepository, JobExecutor jobExecutor, UIThread uiThread) {
         sGenericUseCase = new GenericUseCase(dataRepository, jobExecutor, uiThread);
     }
@@ -105,7 +87,7 @@ public class GenericUseCase implements IGenericUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable<List> getList(@NonNull GetRequest genericUseCaseRequest) {
+    public Observable<List> getList(GetRequest genericUseCaseRequest) {
         return mRepository.getListDynamically(genericUseCaseRequest.getUrl(), genericUseCaseRequest
                 .getPresentationClass(), genericUseCaseRequest.getDataClass(), genericUseCaseRequest
                 .isPersist(), genericUseCaseRequest.isShouldCache()).compose(applySchedulers());
@@ -118,7 +100,7 @@ public class GenericUseCase implements IGenericUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable getObject(@NonNull GetRequest getRequest) {
+    public Observable getObject(GetRequest getRequest) {
         return mRepository.getObjectDynamicallyById(getRequest.getUrl(), getRequest
                         .getIdColumnName(), getRequest.getItemId(), getRequest.getPresentationClass(),
                 getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
@@ -126,14 +108,14 @@ public class GenericUseCase implements IGenericUseCase {
     }
 
     @Override
-    public Observable postObject(@NonNull PostRequest postRequest) {
+    public Observable postObject(PostRequest postRequest) {
         return mRepository.postObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
                 postRequest.getObjectBundle(), postRequest.getPresentationClass(), postRequest
                         .getDataClass(), postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
     }
 
     @Override
-    public Observable postList(@NonNull PostRequest postRequest) {
+    public Observable postList(PostRequest postRequest) {
         return mRepository.postListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
                 postRequest.getArrayBundle(), postRequest.getPresentationClass(), postRequest.getDataClass(),
                 postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
@@ -145,7 +127,7 @@ public class GenericUseCase implements IGenericUseCase {
      * @param postRequest The guy who will be listen to the observable build with .
      */
     @Override
-    public Observable putObject(@NonNull PostRequest postRequest) {
+    public Observable putObject(PostRequest postRequest) {
         return mRepository.putObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
                 postRequest.getObjectBundle(), postRequest.getPresentationClass(),
                 postRequest.getDataClass(), postRequest.isPersist(), postRequest.isQueuable())
@@ -156,14 +138,14 @@ public class GenericUseCase implements IGenericUseCase {
      * Executes the current use case.
      */
     @Override
-    public Observable putList(@NonNull PostRequest postRequest) {
+    public Observable putList(PostRequest postRequest) {
         return mRepository.putListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
                 postRequest.getArrayBundle(), postRequest.getPresentationClass(), postRequest.getDataClass(),
                 postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
     }
 
     @Override
-    public Observable deleteCollection(@NonNull PostRequest deleteRequest) {
+    public Observable deleteCollection(PostRequest deleteRequest) {
         return mRepository.deleteListDynamically(deleteRequest.getUrl(), deleteRequest.getArrayBundle(),
                 deleteRequest.getPresentationClass(), deleteRequest.getDataClass(), deleteRequest.isPersist(),
                 deleteRequest.isQueuable())
@@ -176,13 +158,13 @@ public class GenericUseCase implements IGenericUseCase {
      * @param postRequest The guy who will be listen to the observable build with .
      */
     @Override
-    public Observable<Boolean> deleteAll(@NonNull PostRequest postRequest) {
+    public Observable<Boolean> deleteAll(PostRequest postRequest) {
         return mRepository.deleteAllDynamically(postRequest.getUrl(), postRequest.getDataClass(),
                 postRequest.isPersist()).compose(applySchedulers());
     }
 
     @Override
-    public Observable uploadFile(@NonNull FileIORequest fileIORequest) {
+    public Observable uploadFile(FileIORequest fileIORequest) {
         return mRepository.uploadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
                 fileIORequest.getKey(), fileIORequest.onWifi(), fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
                 fileIORequest.getPresentationClass(), fileIORequest.getDataClass())
@@ -190,7 +172,7 @@ public class GenericUseCase implements IGenericUseCase {
     }
 
     @Override
-    public Observable downloadFile(@NonNull FileIORequest fileIORequest) {
+    public Observable downloadFile(FileIORequest fileIORequest) {
         return mRepository.downloadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
                 fileIORequest.onWifi(), fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
                 fileIORequest.getPresentationClass(), fileIORequest.getDataClass()).compose(applySchedulers());
@@ -201,7 +183,7 @@ public class GenericUseCase implements IGenericUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable searchDisk(String query, String column, @NonNull Class presentationClass,
+    public Observable searchDisk(String query, String column, Class presentationClass,
                                  Class dataClass) {
         return mRepository.searchDisk(query, column, presentationClass, dataClass)
                 .compose(applySchedulers());
@@ -212,106 +194,9 @@ public class GenericUseCase implements IGenericUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable searchDisk(RealmQuery realmQuery, @NonNull Class presentationClass) {
+    public Observable searchDisk(RealmQuery realmQuery, Class presentationClass) {
         return mRepository.searchDisk(realmQuery, presentationClass)
                 .compose(applySchedulers());
-    }
-
-    @Override
-    public Observable<String> readFromResource(String filePath) {
-        return Observable.defer(() -> {
-            StringBuilder returnString = new StringBuilder();
-            InputStream fIn = null;
-            InputStreamReader isr = null;
-            BufferedReader input = null;
-            try {
-                fIn = Config.getInstance().getContext().getResources().getAssets().open(filePath);
-                isr = new InputStreamReader(fIn);
-                input = new BufferedReader(isr);
-                String line;
-                while ((line = input.readLine()) != null)
-                    returnString.append(line);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return Observable.error(e);
-            } finally {
-                if (isr != null)
-                    try {
-                        isr.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                if (fIn != null)
-                    try {
-                        fIn.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                if (input != null)
-                    try {
-                        input.close();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-            }
-            return Observable.just(returnString.toString());
-        }).compose(applySchedulers());
-    }
-
-    @NonNull
-    @Override
-    public Observable<String> readFromFile(@NonNull String fullFilePath) {
-        try {
-            ObjectInputStream is = new ObjectInputStream(Config.getInstance().getContext()
-                    .openFileInput(fullFilePath));
-            String data = (String) is.readObject();
-            is.close();
-            return Observable.just(data);
-        } catch (@NonNull ClassNotFoundException | IOException e) {
-            e.printStackTrace();
-            try {
-                return Observable.just(new Gson().fromJson(new InputStreamReader(new FileInputStream
-                        (new File(fullFilePath))), String.class));
-            } catch (FileNotFoundException e1) {
-                e1.printStackTrace();
-                return Observable.error(e1);
-            }
-        }
-    }
-
-    @Override
-    public Observable<Boolean> saveToFile(String fullFilePath, String data) {
-        return Observable.defer(() -> {
-            FileOutputStream fos = null;
-            try {
-                fos = Config.getInstance().getContext().openFileOutput(fullFilePath, Context.MODE_PRIVATE);
-                ObjectOutputStream os = new ObjectOutputStream(fos);
-                os.writeObject(data);
-                os.flush();
-                os.close();
-                return Observable.just(true);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return Observable.error(e);
-            }
-        }).compose(applySchedulers());
-    }
-
-    @Override
-    public Observable<Boolean> saveToFile(@NonNull String fullFilePath, @NonNull byte[] data) {
-        return Observable.defer(() -> {
-            try {
-                File outFile = new File(fullFilePath);
-                FileOutputStream outStream = new FileOutputStream(outFile);
-                outStream.write(data);
-                outStream.flush();
-                outStream.close();
-                return Observable.just(true);
-            } catch (IOException e) {
-                e.printStackTrace();
-                return Observable.error(e);
-            }
-        }).compose(applySchedulers());
     }
 
     /**
@@ -320,7 +205,6 @@ public class GenericUseCase implements IGenericUseCase {
      * @param <T> the current observable
      * @return the transformed observable
      */
-    @NonNull
     private <T> Observable.Transformer<T, T> applySchedulers() {
         return observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor))
                 .observeOn(mPostExecutionThread.getScheduler())

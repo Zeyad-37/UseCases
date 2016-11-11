@@ -6,7 +6,7 @@ import android.util.Log;
 import com.zeyad.generic.usecase.dataaccesslayer.di.components.ApplicationComponent;
 import com.zeyad.generic.usecase.dataaccesslayer.di.components.DaggerApplicationComponent;
 import com.zeyad.generic.usecase.dataaccesslayer.di.modules.ApplicationModule;
-import com.zeyad.genericusecase.domain.interactors.GenericUseCaseFactory;
+import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
