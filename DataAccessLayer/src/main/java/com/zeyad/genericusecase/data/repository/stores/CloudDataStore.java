@@ -6,9 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
-import android.webkit.MimeTypeMap;
 
 import com.facebook.network.connectionclass.ConnectionClassManager;
 import com.facebook.network.connectionclass.ConnectionQuality;
@@ -72,7 +70,7 @@ import static com.zeyad.genericusecase.data.services.GenericNetworkQueueIntentSe
 public class CloudDataStore implements DataStore {
 
     public static final String FILE_IO_TAG = "fileIOObject", POST_TAG = "postObject", APPLICATION_JSON = "application/json",
-            MULTIPART_FORMDATA = "multipart/form-data", RECEIVER_ID = "receiver_id";
+            MULTIPART_FORMDATA = "multipart/form-data";
     static final String TAG = CloudDataStore.class.getName();
     private static final int COUNTER_START = 1, ATTEMPTS = 3;
     final DataBaseManager mDataBaseManager;
@@ -106,13 +104,17 @@ public class CloudDataStore implements DataStore {
         mCanPersist = Config.getInstance().getDBType() > NONE;
     }
 
-    @Nullable
-    private static String getMimeType(String uri) {
-        String type = null;
-        String extension = MimeTypeMap.getFileExtensionFromUrl(uri);
-        if (extension != null)
-            type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
-        return type;
+    @NonNull
+    @Override
+    public Observable<?> dynamicGetObject(String url, String idColumnName, int itemId, Class domainClass,
+                                          Class dataClass, boolean persist, boolean shouldCache) {
+        return mRestApi.dynamicGetObject(url, shouldCache)
+                //.compose(applyExponentialBackoff())
+                .doOnNext(object -> {
+                    if (willPersist(persist))
+                        new SaveGenericToDBAction(dataClass, idColumnName).call(object);
+                })
+                .map(entity -> mEntityDataMapper.transformToDomain(entity, domainClass));
     }
 
     @NonNull
@@ -130,27 +132,13 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicGetObject(String url, String idColumnName, int itemId, Class domainClass,
-                                          Class dataClass, boolean persist, boolean shouldCache) {
-        return mRestApi.dynamicGetObject(url, shouldCache)
-                //.compose(applyExponentialBackoff())
-                .doOnNext(object -> {
-                    if (willPersist(persist))
-                        new SaveGenericToDBAction(dataClass, idColumnName).call(object);
-                })
-                .map(entity -> mEntityDataMapper.transformToDomain(entity, domainClass));
-    }
-
-    @NonNull
-    @Override
     public Observable<?> dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
                                            Class domainClass, Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             final SaveGenericToDBAction cacheAction = new SaveGenericToDBAction(dataClass, idColumnName);
-            if (willPersist(persist))
-                cacheAction.call(jsonObject);
             if (isEligibleForPersistenceIfNetworkNotAvailable(queuable)) {
                 queuePost(POST, url, idColumnName, jsonObject, persist);
+                cacheAction.call(jsonObject);
                 return Observable.empty();
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
                 return mErrorObservableNotPersisted;
@@ -176,9 +164,9 @@ public class CloudDataStore implements DataStore {
     public Observable<?> dynamicPostList(String url, String idColumnName, @NonNull JSONArray jsonArray,
                                          Class domainClass, Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
-            if (willPersist(persist))
-                new SaveGenericToDBAction(dataClass, idColumnName).call(jsonArray);
+            final SaveGenericToDBAction cacheAction = new SaveGenericToDBAction(dataClass, idColumnName);
             if (isEligibleForPersistenceIfNetworkNotAvailable(queuable)) {
+                cacheAction.call(jsonArray);
                 queuePost(POST, url, idColumnName, jsonArray, persist);
                 return Observable.empty();
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
@@ -188,11 +176,11 @@ public class CloudDataStore implements DataStore {
                     //.compose(applyExponentialBackoff())
                     .doOnNext(list -> {
                         if (persist)
-                            new SaveGenericToDBAction(dataClass, idColumnName).call(list);
+                            cacheAction.call(list);
                     })
                     .doOnError(throwable -> {
                         if (persist)
-                            new SaveGenericToDBAction(dataClass, idColumnName).call(jsonArray);
+                            cacheAction.call(jsonArray);
                         if (isNetworkFailure(throwable))
                             queuePost(POST, url, idColumnName, jsonArray, persist);
                     })
@@ -202,43 +190,12 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicDeleteCollection(final String url, String idColumnName,
-                                                 @NonNull final JSONArray jsonArray,
-                                                 Class dataClass, boolean persist, boolean queuable) {
-        return Observable.defer(() -> {
-            List<Long> ids = ModelConverters.convertToListOfId(jsonArray);
-            if (willPersist(persist))
-                new DeleteCollectionGenericsFromDBAction(dataClass, idColumnName).call(ids);
-            if (isEligibleForPersistenceIfNetworkNotAvailable(queuable)) {
-                queuePost(DELETE, url, idColumnName, jsonArray, persist);
-                return Observable.empty();
-            } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
-                return mErrorObservableNotPersisted;
-            return mRestApi.dynamicDeleteObject(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
-                    ModelConverters.convertToString(jsonArray)))
-                    //.compose(applyExponentialBackoff())
-                    .doOnNext(object -> {
-                        if (willPersist(persist))
-                            new DeleteCollectionGenericsFromDBAction(dataClass, idColumnName).call(ids);
-                    })
-                    .doOnError(throwable -> {
-                        if (willPersist(persist))
-                            new DeleteCollectionGenericsFromDBAction(dataClass, idColumnName).call(ids);
-                        if (isNetworkFailure(throwable))
-                            queuePost(PostRequest.DELETE, url, idColumnName, jsonArray, persist);
-                    });
-        });
-    }
-
-    @NonNull
-    @Override
     public Observable<?> dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
                                           Class domainClass, Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             final SaveGenericToDBAction cacheAction = new SaveGenericToDBAction(dataClass, idColumnName);
-            if (willPersist(persist))
-                cacheAction.call(jsonObject);
             if (isEligibleForPersistenceIfNetworkNotAvailable(queuable)) {
+                cacheAction.call(jsonObject);
                 queuePost(PostRequest.PUT, url, idColumnName, jsonObject, persist);
                 return Observable.empty();
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
@@ -255,37 +212,6 @@ public class CloudDataStore implements DataStore {
                             new SaveGenericToDBAction(dataClass, idColumnName).call(jsonObject);
                         if (isNetworkFailure(throwable))
                             queuePost(PostRequest.PUT, url, idColumnName, jsonObject, persist);
-                    })
-                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel, domainClass));
-        });
-    }
-
-    @NonNull
-    @Override
-    public Observable<?> dynamicUploadFile(String url, @NonNull File file, String key, HashMap<String, Object> parameters, boolean onWifi, boolean whileCharging,
-                                           boolean queuable, Class domainClass) {
-        return Observable.defer(() -> {
-            if (isEligibleForPersistenceIfNetworkNotAvailable(queuable) && Utils.isOnWifi() == onWifi
-                    && Utils.isChargingReqCompatible(Utils.isCharging(), whileCharging)) {
-                queueIOFile(url, file, true, whileCharging, false);
-                return mQueueFileIO;
-            } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
-                return mErrorObservableNotPersisted;
-            RequestBody requestFile =
-                    RequestBody.create(MediaType.parse(MULTIPART_FORMDATA), file);
-            HashMap<String, RequestBody> map = new HashMap<>();
-            map.put(key, requestFile);
-            if (parameters != null && !parameters.isEmpty()) {
-                for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-                    RequestBody data = Utils.createPartFromString(entry.getValue());
-                    map.put(entry.getKey(), data);
-                }
-            }
-
-            return mRestApi.upload(url, map, MultipartBody.Part.createFormData(key, file.getName(), requestFile))
-                    .doOnError(throwable -> {
-                        throwable.printStackTrace();
-                        queueIOFile(url, file, true, whileCharging, false);
                     })
                     .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel, domainClass));
         });
@@ -323,20 +249,69 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
+    public Observable<?> dynamicDeleteCollection(final String url, String idColumnName,
+                                                 @NonNull final JSONArray jsonArray,
+                                                 Class dataClass, boolean persist, boolean queuable) {
+        return Observable.defer(() -> {
+            List<Long> ids = ModelConverters.convertToListOfId(jsonArray);
+            if (willPersist(persist))
+                new DeleteCollectionGenericsFromDBAction(dataClass, idColumnName).call(ids);
+            if (isEligibleForPersistenceIfNetworkNotAvailable(queuable)) {
+                queuePost(DELETE, url, idColumnName, jsonArray, persist);
+                return Observable.empty();
+            } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
+                return mErrorObservableNotPersisted;
+            return mRestApi.dynamicDeleteObject(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+                    ModelConverters.convertToString(jsonArray)))
+                    //.compose(applyExponentialBackoff())
+                    .doOnNext(object -> {
+                        if (willPersist(persist))
+                            new DeleteCollectionGenericsFromDBAction(dataClass, idColumnName).call(ids);
+                    })
+                    .doOnError(throwable -> {
+                        if (willPersist(persist))
+                            new DeleteCollectionGenericsFromDBAction(dataClass, idColumnName).call(ids);
+                        if (isNetworkFailure(throwable))
+                            queuePost(PostRequest.DELETE, url, idColumnName, jsonArray, persist);
+                    });
+        });
+    }
+
+    @NonNull
+    @Override
     public Observable<Boolean> dynamicDeleteAll(String url, Class dataClass, boolean persist) {
         return Observable.error(new Exception(mContext.getString(R.string.delete_all_error_cloud)));
     }
 
     @NonNull
     @Override
-    public Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass) {
-        return Observable.error(new Exception(mContext.getString(R.string.search_disk_error_cloud)));
-    }
+    public Observable<?> dynamicUploadFile(String url, @NonNull File file, String key, HashMap<String, Object> parameters, boolean onWifi, boolean whileCharging,
+                                           boolean queuable, Class domainClass) {
+        return Observable.defer(() -> {
+            if (isEligibleForPersistenceIfNetworkNotAvailable(queuable) && Utils.isOnWifi() == onWifi
+                    && Utils.isChargingReqCompatible(Utils.isCharging(), whileCharging)) {
+                queueIOFile(url, file, true, whileCharging, false);
+                return mQueueFileIO;
+            } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
+                return mErrorObservableNotPersisted;
+            RequestBody requestFile =
+                    RequestBody.create(MediaType.parse(MULTIPART_FORMDATA), file);
+            HashMap<String, RequestBody> map = new HashMap<>();
+            map.put(key, requestFile);
+            if (parameters != null && !parameters.isEmpty()) {
+                for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                    RequestBody data = Utils.createPartFromString(entry.getValue());
+                    map.put(entry.getKey(), data);
+                }
+            }
 
-    @NonNull
-    @Override
-    public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
-        return Observable.error(new Exception(mContext.getString(R.string.search_disk_error_cloud)));
+            return mRestApi.upload(url, map, MultipartBody.Part.createFormData(key, file.getName(), requestFile))
+                    .doOnError(throwable -> {
+                        throwable.printStackTrace();
+                        queueIOFile(url, file, true, whileCharging, false);
+                    })
+                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel, domainClass));
+        });
     }
 
     @NonNull
@@ -384,6 +359,18 @@ public class CloudDataStore implements DataStore {
                             return file;
                         });
         });
+    }
+
+    @NonNull
+    @Override
+    public Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass) {
+        return Observable.error(new Exception(mContext.getString(R.string.search_disk_error_cloud)));
+    }
+
+    @NonNull
+    @Override
+    public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
+        return Observable.error(new Exception(mContext.getString(R.string.search_disk_error_cloud)));
     }
 
     private <T> Observable.Transformer<T, T> applyExponentialBackoff() {
@@ -584,15 +571,11 @@ public class CloudDataStore implements DataStore {
         @Override
         public void call(Object object) {
             if (object instanceof File)
-                //since file object save is not supported by Realm.
                 return;
             Object mappedObject = null;
             Observable<?> observable = null;
             if (mDataBaseManager instanceof RealmManager) {
                 try {
-                    //we need to check object is not instance of JsonArray,Map since
-                    //if we pass on to this method, unexpected and unwanted results are produced.
-                    //we need to skip if object is instance of JsonArray,Map
                     if (!(object instanceof JSONArray) && !(object instanceof Map))
                         mappedObject = mEntityDataMapper.transformToRealm(object, mDataClass);
                 } catch (Exception e) {
@@ -603,7 +586,7 @@ public class CloudDataStore implements DataStore {
                 else if (mappedObject instanceof RealmModel)
                     observable = mDataBaseManager.put((RealmModel) mappedObject, mDataClass);
                 else try {
-                        if ((object instanceof JSONArray)) {
+                        if (object instanceof JSONArray) {
                             observable = mDataBaseManager.putAll((JSONArray) object, mIdColumnName, mDataClass);
                         } else if (object instanceof List) {
                             mDataBaseManager.putAll((List<RealmObject>) mEntityDataMapper
