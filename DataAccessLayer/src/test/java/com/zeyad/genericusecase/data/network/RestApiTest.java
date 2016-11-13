@@ -7,6 +7,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+import org.mockito.Mockito;
+
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -19,6 +22,7 @@ import static org.hamcrest.Matchers.is;
 @RunWith(JUnit4.class)
 public abstract class RestApiTest {
 
+    private final Map mMultipartBodyPart = Mockito.mock(Map.class);
     private RestApi mRestApi;
     private IApiConnection mMockedApiConnection;
     @NonNull
@@ -106,8 +110,8 @@ public abstract class RestApiTest {
 
     @Test
     public void testUpload() throws Exception {
-        assertThat(mRestApi.upload(mValidUrl, mRequestBody, mMultipart),
-                is(equalTo(mMockedApiConnection.upload(mValidUrl, mRequestBody, mMultipart))));
+        assertThat(mRestApi.upload(mValidUrl, mMultipartBodyPart, mMultipart),
+                is(equalTo(mMockedApiConnection.upload(mValidUrl, mMultipartBodyPart, mMultipart))));
     }
 
     public abstract RestApi getRestApiImplementation(IApiConnection mockedApiConnection);

@@ -36,12 +36,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Subscriber;
 import rx.observers.TestSubscriber;
@@ -117,7 +117,6 @@ class CloudDataStoreTestRobot {
         return new HashMap<>();
     }
 
-
     static String getValidColumnName() {
         return "id";
     }
@@ -125,7 +124,6 @@ class CloudDataStoreTestRobot {
     static String getKey() {
         return "image";
     }
-
 
     @NonNull
     static Class getValidDataClass() {
@@ -160,7 +158,7 @@ class CloudDataStoreTestRobot {
         Mockito.when(mock.dynamicDeleteObject(Mockito.any(), Mockito.any())).thenReturn(OBJECT_OBSERVABLE);
         Mockito.doReturn(LIST_OBSERVABLE).when(mock).dynamicDeleteList(Mockito.any(), Mockito.any());
         Mockito.when(mock.dynamicDownload(getFileUrl())).thenReturn(RESPONSE_BODY_OBSERVABLE);
-        Mockito.when(mock.upload(Mockito.any(), Mockito.any(RequestBody.class), Mockito.any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
+        Mockito.when(mock.upload(Mockito.any(), Mockito.any(Map.class), Mockito.any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
         return mock;
     }
 
@@ -389,7 +387,8 @@ class CloudDataStoreTestRobot {
     static TestSubscriber<Object> dynamicUploadFile(@NonNull CloudDataStore cloudDataStore, boolean onWifi) {
 
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        cloudDataStore.dynamicUploadFile(getValidUrl(), getValidFile(), getKey(), onWifi, true, false, getValidDataClass())
+        cloudDataStore.dynamicUploadFile(getValidUrl(), getValidFile(), getKey(), getValidHashmap(), onWifi,
+                true, false, getValidDataClass())
                 .subscribe(subscriber);
         return subscriber;
     }

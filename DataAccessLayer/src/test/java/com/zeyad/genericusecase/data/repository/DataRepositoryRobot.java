@@ -15,6 +15,7 @@ import org.mockito.Mockito;
 import org.mockito.stubbing.OngoingStubbing;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 import io.realm.Realm;
@@ -28,6 +29,7 @@ class DataRepositoryRobot {
     public static final JSONObject JSON_OBJECT = new JSONObject();
     public static final JSONArray JSON_ARRAY = new JSONArray();
     public static final File MOCKED_FILE = Mockito.mock(File.class);
+    public static final HashMap MOCKED_MAP = Mockito.mock(HashMap.class);
     public static final boolean ON_WIFI = true;
     public static final boolean WHILE_CHARGING = true;
     public static final boolean QUEUABLE = true;
@@ -131,5 +133,9 @@ class DataRepositoryRobot {
 
     public static File getValidFile() {
         return MOCKED_FILE;
+    }
+
+    public static HashMap getValidMap() {
+        return MOCKED_MAP;
     }
 }

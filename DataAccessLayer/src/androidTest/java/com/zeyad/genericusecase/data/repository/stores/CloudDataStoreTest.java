@@ -26,6 +26,7 @@ import org.mockito.Mockito;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
 import io.realm.RealmObject;
 import okhttp3.MultipartBody;
@@ -1094,7 +1095,7 @@ public class CloudDataStoreTest {
         assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedRestApi, times(1))
-                .upload(Mockito.anyString(), Mockito.any(RequestBody.class), Mockito.any(MultipartBody.Part.class));
+                .upload(Mockito.anyString(), Mockito.any(Map.class), Mockito.any(MultipartBody.Part.class));
     }
 
     @Test

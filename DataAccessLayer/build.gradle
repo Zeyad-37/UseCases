@@ -4,7 +4,7 @@ apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'android-apt'
 apply plugin: 'maven'
 apply plugin: 'realm-android'
-
+apply from: '../config/quality/quality.gradle'
 
 buildscript {
     repositories {

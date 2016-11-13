@@ -191,13 +191,15 @@ public class DataRepositoryTest {
     public void testUploadFile_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         assumeThat(mIsDiskType, Matchers.is(false));
         mDataRepository.uploadFileDynamically(DataRepositoryRobot.getValidUrl()
-                , DataRepositoryRobot.getValidFile(), DataRepositoryRobot.getKey(), DataRepositoryRobot.ON_WIFI,
+                , DataRepositoryRobot.getValidFile(), DataRepositoryRobot.getKey(),
+                DataRepositoryRobot.getValidMap(), DataRepositoryRobot.ON_WIFI,
                 DataRepositoryRobot.WHILE_CHARGING, DataRepositoryRobot.QUEUABLE,
                 DataRepositoryRobot.getValidDomainClass(), DataRepositoryRobot.getValidDataClass());
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicUploadFile(DataRepositoryRobot.getValidUrl(), DataRepositoryRobot.getValidFile(),
-                        DataRepositoryRobot.getKey(), DataRepositoryRobot.ON_WIFI, DataRepositoryRobot.WHILE_CHARGING, DataRepositoryRobot.QUEUABLE,
-                        DataRepositoryRobot.getValidDomainClass());
+                        DataRepositoryRobot.getKey(), DataRepositoryRobot.getValidMap(),
+                        DataRepositoryRobot.ON_WIFI, DataRepositoryRobot.WHILE_CHARGING,
+                        DataRepositoryRobot.QUEUABLE, DataRepositoryRobot.getValidDomainClass());
     }
 
     @Test

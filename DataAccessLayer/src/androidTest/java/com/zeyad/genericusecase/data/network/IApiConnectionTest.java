@@ -12,6 +12,8 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.robolectric.RobolectricTestRunner;
 
+import java.util.Map;
+
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -28,6 +30,7 @@ public abstract class IApiConnectionTest {
 
     private final String mValidUrl = ApiConnectionRobot.getValidUrl();
     private final RequestBody mMockedRequestBody = ApiConnectionRobot.getMockedRequestBody();
+    private final Map<String, RequestBody> mPartMap = ApiConnectionRobot.getPartMap();
     private final MultipartBody.Part mMultipartBodyPart = ApiConnectionRobot.getValidMultipartBodyPart();
     private IApiConnection mApiConnection;
     private RestApi mRestApiWithCache;
@@ -132,8 +135,8 @@ public abstract class IApiConnectionTest {
 
     @Test
     public void testUploadPartAndRequestBody() throws Exception {
-        mApiConnection.upload(mValidUrl, mMockedRequestBody, mMultipartBodyPart);
-        Mockito.verify(mRestApiWithoutCache).upload(eq(mValidUrl), eq(mMockedRequestBody), eq(mMultipartBodyPart));
+        mApiConnection.upload(mValidUrl, mPartMap, mMultipartBodyPart);
+        Mockito.verify(mRestApiWithoutCache).upload(eq(mValidUrl), eq(mPartMap), eq(mMultipartBodyPart));
     }
 
     @Test

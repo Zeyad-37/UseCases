@@ -3,6 +3,7 @@ package com.zeyad.genericusecase.data.network;
 import org.mockito.Mockito;
 
 import java.io.File;
+import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
@@ -20,6 +21,10 @@ class ApiConnectionRobot {
 
     static RequestBody getMockedRequestBody() {
         return Mockito.mock(RequestBody.class);
+    }
+
+    static Map getPartMap() {
+        return Mockito.mock(Map.class);
     }
 
     static MultipartBody.Part getValidMultipartBodyPart() {

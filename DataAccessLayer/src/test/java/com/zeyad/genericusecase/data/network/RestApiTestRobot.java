@@ -6,6 +6,7 @@ import org.mockito.Mockito;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -35,7 +36,7 @@ class RestApiTestRobot {
                 .thenReturn(getObjectObservable());
         Mockito.when(apiConnection.dynamicPutList(Mockito.anyString(), Mockito.any()))
                 .thenReturn(getListObservable());
-        Mockito.when(apiConnection.upload(Mockito.anyString(), Mockito.any(RequestBody.class),
+        Mockito.when(apiConnection.upload(Mockito.anyString(), Mockito.any(Map.class),
                 Mockito.any(MultipartBody.Part.class)))
                 .thenReturn(Mockito.any());
         Mockito.when(apiConnection.dynamicDeleteList(Mockito.anyString(), Mockito.any()))
@@ -71,6 +72,4 @@ class RestApiTestRobot {
                     subscriber.onNext(Mockito.mock(ResponseBody.class));
                 });
     }
-
-
 }

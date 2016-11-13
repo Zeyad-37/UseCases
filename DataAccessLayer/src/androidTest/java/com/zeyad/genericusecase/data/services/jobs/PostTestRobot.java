@@ -23,9 +23,9 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Subscriber;
@@ -121,7 +121,7 @@ public class PostTestRobot {
         when(mock.dynamicPutList(any(), any())).thenReturn(LIST_OBSERVABLE);
         when(mock.dynamicDeleteObject(any(), any())).thenReturn(OBJECT_OBSERVABLE);
         when(mock.dynamicDeleteList(any(), any())).thenReturn(LIST_OBSERVABLE);
-        when(mock.upload(any(), any(RequestBody.class), any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
+        when(mock.upload(any(), any(Map.class), any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
         return mock;
     }
 

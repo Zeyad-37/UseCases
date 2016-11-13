@@ -7,5 +7,5 @@ import io.realm.RealmObject;
  */
 public class SampleModel extends RealmObject {
 
-    String name;
+    boolean value;
 }

@@ -115,8 +115,8 @@ public class GenericUseCaseTest {
         Mockito.doReturn(getListObservable())
                 .when(dataRepository)
                 .uploadFileDynamically(Mockito.anyString(), Mockito.any(File.class), Mockito.anyString(),
-                        Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.anyBoolean(), Mockito.any(),
-                        Mockito.any());
+                        Mockito.mock(HashMap.class), Mockito.anyBoolean(), Mockito.anyBoolean(),
+                        Mockito.anyBoolean(), Mockito.any(), Mockito.any());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
                 .putObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class),
@@ -240,6 +240,10 @@ public class GenericUseCaseTest {
         return "image";
     }
 
+    HashMap getMap() {
+        return new HashMap();
+    }
+
     @NonNull
     private TestSubscriber putObject(@NonNull IGenericUseCase genericUse, boolean toPersist) {
         final TestSubscriber subscriber = new TestSubscriber();
@@ -315,7 +319,7 @@ public class GenericUseCaseTest {
 
     @NonNull
     private FileIORequest getUploadRequest(boolean onWifi, boolean whileCharging) {
-        return new FileIORequest(getUrl(), getFile(), getKey(), onWifi, whileCharging, getPresentationClass(), getDataClass());
+        return new FileIORequest(getUrl(), getFile(), getKey(), getHashmap(), onWifi, whileCharging, getPresentationClass(), getDataClass());
     }
 
     @NonNull
@@ -486,6 +490,7 @@ public class GenericUseCaseTest {
         Mockito.verify(mDataRepository).uploadFileDynamically(eq(getUrl()),
                 eq(getFile()),
                 eq(getKey()),
+                eq(getMap()),
                 eq(ON_WIFI),
                 eq(WHILE_CHARGING),
                 eq(mQueuable),
