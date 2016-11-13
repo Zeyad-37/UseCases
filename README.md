@@ -19,9 +19,7 @@ In most tasks, we need to make either a IO operation, whether from the server,
 
 # Requirements
 
-Generic Use Case Library can be included in any Android application. 
-
-Generic Use Case Library supports Android 2.3 (Gingerbread) and later. 
+Generic Use Case Library can be included in any Android application that supports Android 2.3 (Gingerbread) and later. 
 
 # Installation
 
