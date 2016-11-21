@@ -1,7 +1,7 @@
 package com.zeyad.genericusecase.domain.interactors.prefs;
 
 import com.zeyad.genericusecase.data.repository.PrefsRepository;
-import com.zeyad.genericusecase.domain.repository.Prefs;
+import com.zeyad.genericusecase.domain.repositories.Prefs;
 
 import rx.Observable;
 

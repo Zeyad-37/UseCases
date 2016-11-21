@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.domain.repository;
+package com.zeyad.genericusecase.domain.repositories;
 
 import rx.Observable;
 

@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
-import com.zeyad.genericusecase.domain.repository.Repository;
+import com.zeyad.genericusecase.domain.repositories.Repository;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

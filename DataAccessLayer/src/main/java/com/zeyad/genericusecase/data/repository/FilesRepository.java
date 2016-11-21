@@ -2,7 +2,7 @@ package com.zeyad.genericusecase.data.repository;
 
 import com.google.gson.Gson;
 import com.zeyad.genericusecase.Config;
-import com.zeyad.genericusecase.domain.repository.Files;
+import com.zeyad.genericusecase.domain.repositories.Files;
 
 import java.io.BufferedReader;
 import java.io.File;

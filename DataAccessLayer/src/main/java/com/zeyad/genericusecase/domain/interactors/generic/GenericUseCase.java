@@ -12,7 +12,7 @@ import com.zeyad.genericusecase.data.requests.PostRequest;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
 import com.zeyad.genericusecase.domain.executors.PostExecutionThread;
 import com.zeyad.genericusecase.domain.executors.ThreadExecutor;
-import com.zeyad.genericusecase.domain.repository.Repository;
+import com.zeyad.genericusecase.domain.repositories.Repository;
 
 import java.util.List;
 

@@ -11,7 +11,7 @@ import com.zeyad.genericusecase.data.requests.GetRequest;
 import com.zeyad.genericusecase.data.requests.PostRequest;
 import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCase;
 import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
-import com.zeyad.genericusecase.domain.repository.Repository;
+import com.zeyad.genericusecase.domain.repositories.Repository;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

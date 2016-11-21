@@ -31,7 +31,7 @@ import rx.Subscriber;
  */
 public class RepoListActivity extends BaseActivity {
     @Inject
-    RepoListPresenter mRepoListPresenter;
+    RepoListVM mRepoListVM;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.repo_list)
@@ -90,7 +90,7 @@ public class RepoListActivity extends BaseActivity {
     }
 
     private void loadRepos() {
-        mRepoListPresenter.getRepoList().subscribe(new Subscriber<List>() {
+        mRepoListVM.getRepoList().subscribe(new Subscriber<List>() {
             @Override
             public void onCompleted() {
 

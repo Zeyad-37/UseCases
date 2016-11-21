@@ -5,7 +5,7 @@ import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
 import com.zeyad.genericusecase.Config;
-import com.zeyad.genericusecase.domain.repository.Prefs;
+import com.zeyad.genericusecase.domain.repositories.Prefs;
 
 import rx.Observable;
 import rx.Scheduler;

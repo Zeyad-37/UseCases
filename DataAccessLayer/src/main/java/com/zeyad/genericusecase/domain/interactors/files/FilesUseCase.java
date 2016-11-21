@@ -5,7 +5,7 @@ import com.zeyad.genericusecase.data.executor.JobExecutor;
 import com.zeyad.genericusecase.data.repository.FilesRepository;
 import com.zeyad.genericusecase.domain.executors.PostExecutionThread;
 import com.zeyad.genericusecase.domain.executors.ThreadExecutor;
-import com.zeyad.genericusecase.domain.repository.Files;
+import com.zeyad.genericusecase.domain.repositories.Files;
 
 import rx.Observable;
 import rx.schedulers.Schedulers;
