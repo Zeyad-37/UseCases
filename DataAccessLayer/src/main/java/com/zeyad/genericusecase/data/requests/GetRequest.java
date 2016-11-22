@@ -17,15 +17,15 @@ public class GetRequest {
     private int mItemId;
     private boolean mShouldCache;
 
-    public GetRequest(@NonNull GetObjectRequestBuilder getObjectRequestBuilder) {
-        mUrl = getObjectRequestBuilder.getUrl();
-        mDataClass = getObjectRequestBuilder.getDataClass();
-        mPresentationClass = getObjectRequestBuilder.getPresentationClass();
-        mPersist = getObjectRequestBuilder.isPersist();
-        mSubscriber = getObjectRequestBuilder.getSubscriber();
-        mIdColumnName = getObjectRequestBuilder.getIdColumnName();
-        mItemId = getObjectRequestBuilder.getItemId();
-        mShouldCache = getObjectRequestBuilder.isShouldCache();
+    public GetRequest(@NonNull GetRequestBuilder getRequestBuilder) {
+        mUrl = getRequestBuilder.getUrl();
+        mDataClass = getRequestBuilder.getDataClass();
+        mPresentationClass = getRequestBuilder.getPresentationClass();
+        mPersist = getRequestBuilder.isPersist();
+        mSubscriber = getRequestBuilder.getSubscriber();
+        mIdColumnName = getRequestBuilder.getIdColumnName();
+        mItemId = getRequestBuilder.getItemId();
+        mShouldCache = getRequestBuilder.isShouldCache();
     }
 
     public GetRequest(@NonNull Subscriber subscriber, String url, String idColumnName,
@@ -73,7 +73,7 @@ public class GetRequest {
         return mItemId;
     }
 
-    public static class GetObjectRequestBuilder {
+    public static class GetRequestBuilder {
         private boolean mShouldCache;
         private String mIdColumnName;
         private int mItemId;
@@ -82,25 +82,25 @@ public class GetRequest {
         private Class mDataClass, mPresentationClass;
         private boolean mPersist;
 
-        public GetObjectRequestBuilder(Class dataClass, boolean persist) {
+        public GetRequestBuilder(Class dataClass, boolean persist) {
             mDataClass = dataClass;
             mPersist = persist;
         }
 
         @NonNull
-        public GetObjectRequestBuilder url(String url) {
+        public GetRequestBuilder url(String url) {
             mUrl = url;
             return this;
         }
 
         @NonNull
-        public GetObjectRequestBuilder presentationClass(Class presentationClass) {
+        public GetRequestBuilder presentationClass(Class presentationClass) {
             mPresentationClass = presentationClass;
             return this;
         }
 
         @NonNull
-        public GetObjectRequestBuilder subscriber(Subscriber subscriber) {
+        public GetRequestBuilder subscriber(Subscriber subscriber) {
             mSubscriber = subscriber;
             return this;
         }
@@ -143,19 +143,19 @@ public class GetRequest {
         }
 
         @NonNull
-        public GetObjectRequestBuilder shouldCache(boolean shouldCache) {
+        public GetRequestBuilder shouldCache(boolean shouldCache) {
             mShouldCache = shouldCache;
             return this;
         }
 
         @NonNull
-        public GetObjectRequestBuilder idColumnName(String idColumnName) {
+        public GetRequestBuilder idColumnName(String idColumnName) {
             mIdColumnName = idColumnName;
             return this;
         }
 
         @NonNull
-        public GetObjectRequestBuilder id(int id) {
+        public GetRequestBuilder id(int id) {
             mItemId = id;
             return this;
         }

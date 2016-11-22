@@ -18,7 +18,7 @@ class GetRequestTestRobot {
     static final Integer ID_COLUMN_ID = 1;
 
     static GetRequest createGetObjectRequest() {
-        return new GetRequest.GetObjectRequestBuilder(DATA_CLASS, TO_PERSIST)
+        return new GetRequest.GetRequestBuilder(DATA_CLASS, TO_PERSIST)
                 .url(URL)
                 .shouldCache(SHOULD_CACHE)
                 .presentationClass(PRESENTATION_CLASS)

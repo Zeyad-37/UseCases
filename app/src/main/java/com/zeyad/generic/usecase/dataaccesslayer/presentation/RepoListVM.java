@@ -32,8 +32,7 @@ public class RepoListVM extends BasePresenter implements RepoListView {
 
     @Override
     public Observable getRepoList() {
-        return getGenericUseCase().getList(new GetRequest
-                .GetObjectRequestBuilder(Object.class, true)
+        return getGenericUseCase().getList(new GetRequest.GetRequestBuilder(Object.class, true)
                 .presentationClass(Object.class)
                 .url(ENDPOINT + "r/aww/new/.json")
                 .build())
