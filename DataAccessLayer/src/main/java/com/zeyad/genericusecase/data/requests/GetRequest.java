@@ -2,6 +2,8 @@ package com.zeyad.genericusecase.data.requests;
 
 import android.support.annotation.NonNull;
 
+import com.zeyad.genericusecase.data.repository.DataRepository;
+
 import rx.Subscriber;
 
 /**
@@ -42,6 +44,9 @@ public class GetRequest {
     }
 
     public String getUrl() {
+        if (mUrl == null) {
+            return "";
+        }
         return mUrl;
     }
 
@@ -54,6 +59,8 @@ public class GetRequest {
     }
 
     public Class getPresentationClass() {
+        if (mPresentationClass == null)
+            return mDataClass;
         return mPresentationClass;
     }
 
@@ -66,6 +73,8 @@ public class GetRequest {
     }
 
     public String getIdColumnName() {
+        if (mIdColumnName == null)
+            return DataRepository.DEFAULT_ID_KEY;
         return mIdColumnName;
     }
 
