@@ -10,73 +10,82 @@ import java.util.HashMap;
  */
 public class FileIORequest {
 
-    File mFile;
-    String mUrl, mKey;
-    boolean mOnWifi, mWhileCharging, mQueuable;
-    Class mDataClass, mPresentationClass;
-    HashMap<String, Object> mParameters;
+    File file;
+    String url, key;
+    boolean onWifi, whileCharging, queuable;
+    Class dataClass, presentationClass;
+    HashMap<String, Object> parameters;
 
     public FileIORequest() {
     }
 
     public FileIORequest(@NonNull FileIORequestBuilder uploadRequestBuilder) {
-        mUrl = uploadRequestBuilder.getUrl();
-        mOnWifi = uploadRequestBuilder.isOnWifi();
-        mWhileCharging = uploadRequestBuilder.isWhileCharging();
-        mQueuable = uploadRequestBuilder.isQueuable();
-        mFile = uploadRequestBuilder.getFile();
-        mKey = uploadRequestBuilder.getKey();
-        mParameters = uploadRequestBuilder.getParameters();
-        mDataClass = uploadRequestBuilder.getDataClass();
-        mPresentationClass = uploadRequestBuilder.getPresentationClass();
+        url = uploadRequestBuilder.getUrl();
+        onWifi = uploadRequestBuilder.isOnWifi();
+        whileCharging = uploadRequestBuilder.isWhileCharging();
+        queuable = uploadRequestBuilder.isQueuable();
+        file = uploadRequestBuilder.getFile();
+        key = uploadRequestBuilder.getKey();
+        parameters = uploadRequestBuilder.getParameters();
+        dataClass = uploadRequestBuilder.getDataClass();
+        presentationClass = uploadRequestBuilder.getPresentationClass();
     }
 
     public FileIORequest(String url, File file, String key, HashMap<String, Object> parameters, boolean onWifi, boolean whileCharging, Class presentationClass,
                          Class dataClass) {
-        mOnWifi = onWifi;
-        mWhileCharging = whileCharging;
-        mPresentationClass = presentationClass;
-        mDataClass = dataClass;
-        mUrl = url;
-        mKey = key;
-        mParameters = parameters;
-        mFile = file;
+        this.onWifi = onWifi;
+        this.whileCharging = whileCharging;
+        this.presentationClass = presentationClass;
+        this.dataClass = dataClass;
+        this.url = url;
+        this.key = key;
+        this.parameters = parameters;
+        this.file = file;
     }
 
     public String getUrl() {
-        return mUrl;
+        return url;
     }
 
     public boolean onWifi() {
-        return mOnWifi;
+        return onWifi;
     }
 
     public boolean isWhileCharging() {
-        return mWhileCharging;
+        return whileCharging;
     }
 
     public boolean isQueuable() {
-        return mQueuable;
+        return queuable;
     }
 
     public Class getDataClass() {
-        return mDataClass;
+        return dataClass;
     }
 
     public Class getPresentationClass() {
-        return mPresentationClass;
+        if (presentationClass == null) {
+            return dataClass;
+        }
+        return presentationClass;
     }
 
     public File getFile() {
-        return mFile;
+        return file;
     }
 
     public String getKey() {
-        return mKey;
+        if (key == null) {
+            return "";
+        }
+        return key;
     }
 
     public HashMap<String, Object> getParameters() {
-        return mParameters;
+        if (parameters == null) {
+            return new HashMap<>();
+        }
+        return parameters;
     }
 
     public static class FileIORequestBuilder {

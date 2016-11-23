@@ -17,109 +17,129 @@ import rx.Subscriber;
  */
 public class PostRequest {
     public static final String POST = "post", DELETE = "delete", PUT = "put";
-    private String mUrl, mIdColumnName, mMethod;
-    private Subscriber mSubscriber;
-    private Class mDataClass, mPresentationClass;
-    private boolean mPersist, mQueuable;
-    private JSONObject mJsonObject;
-    private JSONArray mJsonArray;
-    private HashMap<String, Object> mKeyValuePairs;
+    private String url, idColumnName, method;
+    private Subscriber subscriber;
+    private Class dataClass, presentationClass;
+    private boolean persist, queuable;
+    private JSONObject jsonObject;
+    private JSONArray jsonArray;
+    private HashMap<String, Object> keyValuePairs;
 
     public PostRequest(@NonNull PostRequestBuilder postRequestBuilder) {
-        mUrl = postRequestBuilder.mUrl;
-        mDataClass = postRequestBuilder.mDataClass;
-        mPresentationClass = postRequestBuilder.mPresentationClass;
-        mPersist = postRequestBuilder.mPersist;
-        mQueuable = postRequestBuilder.mQueuable;
-        mSubscriber = postRequestBuilder.mSubscriber;
-        mKeyValuePairs = postRequestBuilder.mKeyValuePairs;
-        mJsonObject = postRequestBuilder.mJsonObject;
-        mJsonArray = postRequestBuilder.mJsonArray;
-        mIdColumnName = postRequestBuilder.mIdColumnName;
-        mMethod = postRequestBuilder.mMethod;
+        url = postRequestBuilder.mUrl;
+        dataClass = postRequestBuilder.mDataClass;
+        presentationClass = postRequestBuilder.mPresentationClass;
+        persist = postRequestBuilder.mPersist;
+        queuable = postRequestBuilder.mQueuable;
+        subscriber = postRequestBuilder.mSubscriber;
+        keyValuePairs = postRequestBuilder.mKeyValuePairs;
+        jsonObject = postRequestBuilder.mJsonObject;
+        jsonArray = postRequestBuilder.mJsonArray;
+        idColumnName = postRequestBuilder.mIdColumnName;
+        method = postRequestBuilder.mMethod;
     }
 
     public PostRequest(Subscriber subscriber, String idColumnName, String url, JSONObject keyValuePairs,
                        Class presentationClass, Class dataClass, boolean persist) {
-        mIdColumnName = idColumnName;
-        mJsonObject = keyValuePairs;
-        mPersist = persist;
-        mPresentationClass = presentationClass;
-        mDataClass = dataClass;
-        mSubscriber = subscriber;
-        mUrl = url;
+        this.idColumnName = idColumnName;
+        jsonObject = keyValuePairs;
+        this.persist = persist;
+        this.presentationClass = presentationClass;
+        this.dataClass = dataClass;
+        this.subscriber = subscriber;
+        this.url = url;
     }
 
     // for test
     public PostRequest(Subscriber subscriber, String idColumnName, String url, JSONArray keyValuePairs,
                        Class presentationClass, Class dataClass, boolean persist) {
-        mIdColumnName = idColumnName;
-        mJsonArray = keyValuePairs;
-        mPersist = persist;
-        mPresentationClass = presentationClass;
-        mDataClass = dataClass;
-        mSubscriber = subscriber;
-        mUrl = url;
+        this.idColumnName = idColumnName;
+        jsonArray = keyValuePairs;
+        this.persist = persist;
+        this.presentationClass = presentationClass;
+        this.dataClass = dataClass;
+        this.subscriber = subscriber;
+        this.url = url;
     }
 
     public PostRequest(Subscriber subscriber, String idColumnName, String url, HashMap<String, Object> keyValuePairs,
                        Class presentationClass, Class dataClass, boolean persist) {
-        mIdColumnName = idColumnName;
-        mKeyValuePairs = keyValuePairs;
-        mPersist = persist;
-        mPresentationClass = presentationClass;
-        mDataClass = dataClass;
-        mSubscriber = subscriber;
-        mUrl = url;
+        this.idColumnName = idColumnName;
+        this.keyValuePairs = keyValuePairs;
+        this.persist = persist;
+        this.presentationClass = presentationClass;
+        this.dataClass = dataClass;
+        this.subscriber = subscriber;
+        this.url = url;
     }
 
     public JSONObject getObjectBundle() {
-        if (mJsonObject != null)
-            return mJsonObject;
-        else if (mKeyValuePairs != null)
-            return new JSONObject(mKeyValuePairs);
+        if (jsonObject != null)
+            return jsonObject;
+        else if (keyValuePairs != null)
+            return new JSONObject(keyValuePairs);
         else return new JSONObject();
     }
 
     public JSONArray getArrayBundle() {
-        if (mJsonArray != null)
-            return mJsonArray;
-        else if (mKeyValuePairs != null)
-            return ModelConverters.convertToJsonArray(mKeyValuePairs);
+        if (jsonArray != null)
+            return jsonArray;
+        else if (keyValuePairs != null)
+            return ModelConverters.convertToJsonArray(keyValuePairs);
         else return new JSONArray();
     }
 
-    public String getIdColumnName() {
-        if (mIdColumnName == null || mIdColumnName.isEmpty()) return DataRepository.DEFAULT_ID_KEY;
-        return mIdColumnName;
-    }
-
     public String getUrl() {
-        return mUrl;
+        if (url == null) {
+            return "";
+        }
+        return url;
     }
 
     public Subscriber getSubscriber() {
-        return mSubscriber;
+        return subscriber;
     }
 
     public Class getDataClass() {
-        return mDataClass;
+        return dataClass;
     }
 
     public Class getPresentationClass() {
-        return mPresentationClass;
+        if (presentationClass == null) {
+            return dataClass;
+        }
+        return presentationClass;
     }
 
     public boolean isPersist() {
-        return mPersist;
+        return persist;
     }
 
     public boolean isQueuable() {
-        return mQueuable;
+        return queuable;
+    }
+
+    public JSONArray getJsonArray() {
+        return jsonArray;
+    }
+
+    public JSONObject getJsonObject() {
+        return jsonObject;
+    }
+
+    public HashMap<String, Object> getKeyValuePairs() {
+        return keyValuePairs;
+    }
+
+    public String getIdColumnName() {
+        if (idColumnName == null) {
+            return DataRepository.DEFAULT_ID_KEY;
+        }
+        return idColumnName;
     }
 
     public String getMethod() {
-        return mMethod;
+        return method;
     }
 
     public static class PostRequestBuilder {
@@ -167,12 +187,6 @@ public class PostRequest {
         }
 
         @NonNull
-        public PostRequestBuilder method(String method) {
-            mMethod = method;
-            return this;
-        }
-
-        @NonNull
         public PostRequestBuilder payLoad(JSONObject jsonObject) {
             mJsonObject = jsonObject;
             return this;
@@ -187,6 +201,12 @@ public class PostRequest {
         @NonNull
         public PostRequestBuilder payLoad(HashMap hashMap) {
             mKeyValuePairs = hashMap;
+            return this;
+        }
+
+        @NonNull
+        public PostRequestBuilder method(String method) {
+            mMethod = method;
             return this;
         }
 
