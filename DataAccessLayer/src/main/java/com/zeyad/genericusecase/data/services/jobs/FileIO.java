@@ -154,15 +154,10 @@ public class FileIO {
     void queueIOFile() {
         mTrailCount++;
         if (mTrailCount < 3) {
-            FileIORequest fileIORequest = new FileIORequest.FileIORequestBuilder(mFileIORequest.getUrl(),
-                    mFileIORequest.getFile())
-                    .onWifi(mFileIORequest.onWifi())
-                    .whileCharging(mFileIORequest.isWhileCharging())
-                    .build();
             if (mGooglePlayServicesAvailable) {
                 Bundle extras = new Bundle();
                 extras.putString(JOB_TYPE, mIsDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
-                extras.putString(PAYLOAD, new Gson().toJson(fileIORequest));
+                extras.putString(PAYLOAD, new Gson().toJson(mFileIORequest));
                 mGcmNetworkManager.schedule(new OneoffTask.Builder()
                         .setService(GenericGCMService.class)
                         .setRequiredNetwork(mFileIORequest.onWifi() ? NETWORK_STATE_UNMETERED : NETWORK_STATE_CONNECTED)
@@ -178,7 +173,7 @@ public class FileIO {
                 if (Utils.hasLollipop()) {
                     PersistableBundle persistableBundle = new PersistableBundle();
                     persistableBundle.putString(JOB_TYPE, mIsDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
-                    persistableBundle.putString(PAYLOAD, new Gson().toJson(fileIORequest));
+                    persistableBundle.putString(PAYLOAD, new Gson().toJson(mFileIORequest));
                     boolean isScheduled = Utils.scheduleJob(mContext, new JobInfo.Builder(1,
                             new ComponentName(mContext, GenericJobService.class))
                             .setRequiredNetworkType(mFileIORequest.onWifi() ? NETWORK_TYPE_UNMETERED : NETWORK_TYPE_ANY)

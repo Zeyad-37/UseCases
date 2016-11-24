@@ -11,75 +11,68 @@ import rx.Subscriber;
  */
 public class GetRequest {
 
-    private String mUrl;
-    private Subscriber mSubscriber;
-    private Class mDataClass, mPresentationClass;
-    private boolean mPersist;
-    private String mIdColumnName;
-    private int mItemId;
-    private boolean mShouldCache;
+    private String url;
+    private Subscriber subscriber;
+    private Class dataClass, presentationClass;
+    private boolean persist;
+    private String idColumnName;
+    private int itemId;
+    private boolean shouldCache;
 
     public GetRequest(@NonNull GetRequestBuilder getRequestBuilder) {
-        mUrl = getRequestBuilder.getUrl();
-        mDataClass = getRequestBuilder.getDataClass();
-        mPresentationClass = getRequestBuilder.getPresentationClass();
-        mPersist = getRequestBuilder.isPersist();
-        mSubscriber = getRequestBuilder.getSubscriber();
-        mIdColumnName = getRequestBuilder.getIdColumnName();
-        mItemId = getRequestBuilder.getItemId();
-        mShouldCache = getRequestBuilder.isShouldCache();
+        url = getRequestBuilder.getUrl();
+        dataClass = getRequestBuilder.getDataClass();
+        presentationClass = getRequestBuilder.getPresentationClass();
+        persist = getRequestBuilder.isPersist();
+        subscriber = getRequestBuilder.getSubscriber();
+        idColumnName = getRequestBuilder.getIdColumnName();
+        itemId = getRequestBuilder.getItemId();
+        shouldCache = getRequestBuilder.isShouldCache();
     }
 
     public GetRequest(@NonNull Subscriber subscriber, String url, String idColumnName,
                       int itemId, @NonNull Class presentationClass, Class dataClass, boolean persist,
                       boolean shouldCache) {
-        mSubscriber = subscriber;
-        mUrl = url;
-        mIdColumnName = idColumnName;
-        mItemId = itemId;
-        mPresentationClass = presentationClass;
-        mDataClass = dataClass;
-        mPersist = persist;
-        mShouldCache = shouldCache;
+        this.subscriber = subscriber;
+        this.url = url;
+        this.idColumnName = idColumnName;
+        this.itemId = itemId;
+        this.presentationClass = presentationClass;
+        this.dataClass = dataClass;
+        this.persist = persist;
+        this.shouldCache = shouldCache;
     }
 
     public String getUrl() {
-        if (mUrl == null) {
-            return "";
-        }
-        return mUrl;
+        return url != null ? url : "";
     }
 
     public Subscriber getSubscriber() {
-        return mSubscriber;
+        return subscriber;
     }
 
     public Class getDataClass() {
-        return mDataClass;
+        return dataClass;
     }
 
     public Class getPresentationClass() {
-        if (mPresentationClass == null)
-            return mDataClass;
-        return mPresentationClass;
+        return presentationClass != null ? presentationClass : dataClass;
     }
 
     public boolean isPersist() {
-        return mPersist;
+        return persist;
     }
 
     public boolean isShouldCache() {
-        return mShouldCache;
+        return shouldCache;
     }
 
     public String getIdColumnName() {
-        if (mIdColumnName == null)
-            return DataRepository.DEFAULT_ID_KEY;
-        return mIdColumnName;
+        return idColumnName != null ? idColumnName : DataRepository.DEFAULT_ID_KEY;
     }
 
     public int getItemId() {
-        return mItemId;
+        return itemId;
     }
 
     public static class GetRequestBuilder {

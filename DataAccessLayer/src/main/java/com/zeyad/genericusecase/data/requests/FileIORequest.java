@@ -31,7 +31,8 @@ public class FileIORequest {
         presentationClass = uploadRequestBuilder.getPresentationClass();
     }
 
-    public FileIORequest(String url, File file, String key, HashMap<String, Object> parameters, boolean onWifi, boolean whileCharging, Class presentationClass,
+    public FileIORequest(String url, File file, String key, HashMap<String, Object> parameters,
+                         boolean onWifi, boolean whileCharging, Class presentationClass,
                          Class dataClass) {
         this.onWifi = onWifi;
         this.whileCharging = whileCharging;
@@ -64,10 +65,7 @@ public class FileIORequest {
     }
 
     public Class getPresentationClass() {
-        if (presentationClass == null) {
-            return dataClass;
-        }
-        return presentationClass;
+        return presentationClass != null ? presentationClass : dataClass;
     }
 
     public File getFile() {
@@ -75,77 +73,71 @@ public class FileIORequest {
     }
 
     public String getKey() {
-        if (key == null) {
-            return "";
-        }
-        return key;
+        return key != null ? key : "";
     }
 
     public HashMap<String, Object> getParameters() {
-        if (parameters == null) {
-            return new HashMap<>();
-        }
-        return parameters;
+        return parameters != null ? parameters : new HashMap<>();
     }
 
     public static class FileIORequestBuilder {
 
-        private File mFile;
-        private String mUrl, mKey;
-        private boolean mOnWifi, mWhileCharging, mQueuable;
-        private Class mDataClass, mPresentationClass;
-        private HashMap<String, Object> mParameters;
+        private File file;
+        private String url, key;
+        private boolean onWifi, whileCharging, queuable;
+        private Class dataClass, presentationClass;
+        private HashMap<String, Object> parameters;
 
         public FileIORequestBuilder(String url, File file) {
-            mUrl = url;
-            mFile = file;
+            this.url = url;
+            this.file = file;
         }
 
         @NonNull
         public FileIORequestBuilder url(String url) {
-            mUrl = url;
+            this.url = url;
             return this;
         }
 
         @NonNull
         public FileIORequestBuilder presentationClass(Class presentationClass) {
-            mPresentationClass = presentationClass;
+            this.presentationClass = presentationClass;
             return this;
         }
 
         @NonNull
         public FileIORequestBuilder dataClass(Class dataClass) {
-            mDataClass = dataClass;
+            this.dataClass = dataClass;
             return this;
         }
 
         @NonNull
         public FileIORequestBuilder onWifi(boolean onWifi) {
-            mOnWifi = onWifi;
+            this.onWifi = onWifi;
             return this;
         }
 
         @NonNull
         public FileIORequestBuilder key(String key) {
-            mKey = key;
+            this.key = key;
             return this;
         }
 
         @NonNull
         public FileIORequestBuilder payLoad(HashMap<String, Object> parameters) {
-            mParameters = parameters;
+            this.parameters = parameters;
             return this;
         }
 
         @NonNull
         public FileIORequestBuilder queuable(boolean queuable) {
-            mQueuable = queuable;
+            this.queuable = queuable;
             return this;
         }
 
         @NonNull
         public FileIORequestBuilder whileCharging(boolean whileCharging) {
-            mWhileCharging = whileCharging;
+            this.whileCharging = whileCharging;
             return this;
         }
 
@@ -155,39 +147,39 @@ public class FileIORequest {
         }
 
         public File getFile() {
-            return mFile;
+            return file;
         }
 
         public String getUrl() {
-            return mUrl;
+            return url;
         }
 
         public boolean isOnWifi() {
-            return mOnWifi;
+            return onWifi;
         }
 
         public boolean isQueuable() {
-            return mQueuable;
+            return queuable;
         }
 
         public boolean isWhileCharging() {
-            return mWhileCharging;
+            return whileCharging;
         }
 
         public Class getDataClass() {
-            return mDataClass;
+            return dataClass;
         }
 
         public Class getPresentationClass() {
-            return mPresentationClass;
+            return presentationClass;
         }
 
         public String getKey() {
-            return mKey;
+            return key;
         }
 
         public HashMap<String, Object> getParameters() {
-            return mParameters;
+            return parameters;
         }
     }
 }
