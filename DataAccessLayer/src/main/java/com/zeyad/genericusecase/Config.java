@@ -35,12 +35,12 @@ public class Config {
         sInstance = new Config();
     }
 
-    private void setupRealm() {
+//    private void setupRealm() {
 //        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
 //                .name("library.realm")
 //                .modules(new LibraryModule())
 //                .build();
-    }
+//    }
 
     @Nullable
     public Context getContext() {

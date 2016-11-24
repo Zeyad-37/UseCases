@@ -35,7 +35,7 @@ import static org.mockito.Matchers.eq;
 @RunWith(JUnit4.class)
 public class GenericUseCaseTest {
 
-    private Class DOMAIN_CLASS = TestModel.class;
+    private Class PRESENTATION_CLASS = TestModel.class;
     private Class DATA_CLASS = TestModel.class;
     private TestModel TEST_MODEL = new TestModel(1, "123");
     private JSONObject JSON_OBJECT = new JSONObject();
@@ -111,11 +111,11 @@ public class GenericUseCaseTest {
                 .when(dataRepository)
                 .putListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class),
                         Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-        Mockito.doReturn(getObjectObservable())
-                .when(dataRepository)
-                .uploadFileDynamically(Mockito.anyString(), Mockito.any(File.class), Mockito.anyString(),
-                        Mockito.mock(HashMap.class), Mockito.anyBoolean(), Mockito.anyBoolean(),
-                        Mockito.anyBoolean(), Mockito.any(), Mockito.any());
+//        Mockito.doReturn(getObjectObservable())
+//                .when(dataRepository)
+//                .uploadFileDynamically(Mockito.anyString(), Mockito.any(File.class), Mockito.anyString(),
+//                        Mockito.mock(HashMap.class), Mockito.anyBoolean(), Mockito.anyBoolean(),
+//                        Mockito.anyBoolean(), Mockito.any(), Mockito.any());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
                 .putObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class),
@@ -459,7 +459,7 @@ public class GenericUseCaseTest {
                 eq(true),
                 eq(true),
                 eq(mQueuable),
-                eq(DOMAIN_CLASS),
+                eq(PRESENTATION_CLASS),
                 eq(DATA_CLASS));
     }
 
