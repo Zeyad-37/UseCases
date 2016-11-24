@@ -1,7 +1,7 @@
 package com.zeyad.genericusecase.data.requests;
 
-import com.zeyad.genericusecase.domain.interactor.TestModel;
-import com.zeyad.genericusecase.domain.interactor.TestViewModel;
+import com.zeyad.genericusecase.realm_test_models.TestModel;
+import com.zeyad.genericusecase.realm_test_models.TestViewModel;
 
 import rx.Subscriber;
 import rx.observers.TestSubscriber;

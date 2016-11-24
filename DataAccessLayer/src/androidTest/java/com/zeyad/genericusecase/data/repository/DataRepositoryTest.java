@@ -1,10 +1,8 @@
 package com.zeyad.genericusecase.data.repository;
 
 import android.support.annotation.NonNull;
-import android.support.test.InstrumentationRegistry;
 
-import com.zeyad.genericusecase.data.ListObservable;
-import com.zeyad.genericusecase.data.TestUtility2;
+import com.zeyad.genericusecase.data.TestUtility;
 import com.zeyad.genericusecase.data.repository.stores.DataStore;
 import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
 
@@ -54,12 +52,11 @@ public class DataRepositoryTest {
 
     @Before
     public void setUp() throws Exception {
-        TestUtility2.performInitialSetupOfDb(InstrumentationRegistry.getContext());
-        mDataStore = mIsDiskType
-                ? DataRepositoryRobot.createMockedDiskStore()
+//        TestUtility.performInitialSetupOfDb();
+        mDataStore = mIsDiskType ? DataRepositoryRobot.createMockedDiskStore()
                 : DataRepositoryRobot.createMockedCloudStore();
         DataStoreFactory dataStoreFactory = DataRepositoryRobot.createMockedDataStoreFactory(mDataStore);
-        mDataRepository = new DataRepository(dataStoreFactory, TestUtility2.createEntityMapper());
+        mDataRepository = new DataRepository(dataStoreFactory, TestUtility.createEntityMapper());
         DataRepositoryRobot.mockDataStore(mIsDiskType, mDataStore, dataStoreFactory);
     }
 
@@ -69,12 +66,11 @@ public class DataRepositoryTest {
 
     @Test
     public void testGetListDynamicallyCacheVersion_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
-        mDataRepository
-                .getListDynamically(DataRepositoryRobot.getValidUrl()
-                        , DataRepositoryRobot.getValidDomainClass()
-                        , DataRepositoryRobot.getValidDataClass()
-                        , false
-                        , mToCache);
+        mDataRepository.getListDynamically(DataRepositoryRobot.getValidUrl()
+                , DataRepositoryRobot.getValidDomainClass()
+                , DataRepositoryRobot.getValidDataClass()
+                , false
+                , mToCache);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicGetList(DataRepositoryRobot.getValidUrl()
                         , DataRepositoryRobot.getValidDomainClass()
@@ -85,7 +81,7 @@ public class DataRepositoryTest {
 
     @Test
     public void testGetListDynamicallyCacheVersion_ifExpectedObservableIsReturned_whenArgumentsArePassed() {
-        final ListObservable mockedObservable = Mockito.mock(ListObservable.class);
+        final Observable<List> mockedObservable = Mockito.mock(Observable.class);
         DataRepositoryRobot.mockDataStoreForDynamicGetList(mDataStore, false, mToCache)
                 .thenReturn(mockedObservable);
         Observable<List> observable = mDataRepository

@@ -5,6 +5,7 @@ import android.app.job.JobInfo;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
@@ -20,7 +21,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.robolectric.RobolectricTestRunner;
 
 import java.io.IOException;
 
@@ -38,7 +38,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(AndroidJUnit4.class)
 //@Config(constants = BuildConfig.class)
 public class PostTest {
 

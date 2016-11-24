@@ -4,6 +4,7 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.UiThreadTestRule;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.google.gson.Gson;
 import com.zeyad.genericusecase.Config;
@@ -13,6 +14,7 @@ import com.zeyad.genericusecase.data.services.realm_test_models.RealmModelClass;
 import com.zeyad.genericusecase.data.services.realm_test_models.TestModel;
 import com.zeyad.genericusecase.data.utils.Utils;
 
+import org.hamcrest.MatcherAssert;
 import org.hamcrest.Matchers;
 import org.hamcrest.core.IsCollectionContaining;
 import org.json.JSONException;
@@ -24,7 +26,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -52,7 +53,7 @@ import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(AndroidJUnit4.class)
 //@Config(constants = BuildConfig.class)
 public class RealmManagerImplTest {
 
@@ -73,8 +74,8 @@ public class RealmManagerImplTest {
 
     @Before
     public void before() {
-        Config.init(InstrumentationRegistry.getTargetContext());
-        TestUtility.performInitialSetupOfDb(InstrumentationRegistry.getTargetContext());
+        Config.init();
+        TestUtility.performInitialSetupOfDb();
         mRandom = new Random();
         mRealmManager = getGeneralRealmManager();
         mRealmManager.evictAll(TestModel.class).subscribe(new TestSubscriber<>());
@@ -321,7 +322,7 @@ public class RealmManagerImplTest {
     public void testGetManagedObject_ifReturnedObjectIsValid_whenNonManagedObjectIsProvided() {
         TestModel testModel = putTestModel(mRealmManager);
         TestModel managedTestModel = getManagedObject(testModel, mRealmManager);
-        assertThat("managed test model should be valid", managedTestModel.isValid());
+        MatcherAssert.assertThat("managed test model should be valid", managedTestModel.isValid());
     }
 
     @Test
@@ -368,7 +369,7 @@ public class RealmManagerImplTest {
         TestModel currentModel
                 = assertSubscriberGetSingleNextEventWithNoError(getItemByIdSubscriber
                 , TestModel.class);
-        assertThat("two instances are not same", currentModel.equals(testModelInstance));
+        MatcherAssert.assertThat("two instances are not same", currentModel.equals(testModelInstance));
     }
 
     /**
@@ -445,7 +446,7 @@ public class RealmManagerImplTest {
                 , "value")
                 .subscribe(querySubscriber);
         RealmResults<TestModel> queryResults = (RealmResults<TestModel>) querySubscriber.getOnNextEvents().get(0);
-        assertThat(queryResults, is(iterableWithSize(1)));
+        MatcherAssert.assertThat(queryResults, is(iterableWithSize(1)));
     }
 
     /**
@@ -663,7 +664,7 @@ public class RealmManagerImplTest {
         mRealmManager.getWhere(realmQuery)
                 .subscribe(querySubscriber);
         RealmResults<TestModel> queryResults = (RealmResults<TestModel>) querySubscriber.getOnNextEvents().get(0);
-        assertThat(queryResults, is(iterableWithSize(1)));
+        MatcherAssert.assertThat(queryResults, is(iterableWithSize(1)));
     }
 
     /**
@@ -834,7 +835,7 @@ public class RealmManagerImplTest {
         RealmModelClass currentModel
                 = assertSubscriberGetSingleNextEventWithNoError(getItemByIdSubscriber
                 , RealmModelClass.class);
-        assertThat("two instances are not same", currentModel.equals(testModelInstance));
+        MatcherAssert.assertThat("two instances are not same", currentModel.equals(testModelInstance));
     }
 
     @Test
@@ -855,7 +856,7 @@ public class RealmManagerImplTest {
         final RealmModelClass realmModelClass = createRealmModelInstanceWithRandomId();
         mRealmManager.put(realmModelClass, RealmModelClass.class)
                 .subscribe(new TestSubscriber<>());
-        assertThat(realmModelClass, is(equalTo(getItemForId("id", realmModelClass.getId(), RealmModelClass.class))));
+        assertThat(realmModelClass, Matchers.is(equalTo(getItemForId("id", realmModelClass.getId(), RealmModelClass.class))));
     }
 
     @Test
@@ -966,13 +967,13 @@ public class RealmManagerImplTest {
         //all ids before INVALID_ITEM_ID should be deleted
         int i = 0;
         while (listOfIdToDelete.get(i) != TestUtility.INVALID_ITEM_ID) {
-            assertThat(getItemForId("id", listOfIdToDelete.get(i), TestModel.class), is(nullValue()));
+            MatcherAssert.assertThat(getItemForId("id", listOfIdToDelete.get(i), TestModel.class), is(nullValue()));
             i++;
         }
         i++;
         //all ids before INVALID_ITEM_ID should not be deleted
         while (i < listOfIdToDelete.size()) {
-            assertThat(getItemForId("id", listOfIdToDelete.get(i), TestModel.class), is(notNullValue()));
+            MatcherAssert.assertThat(getItemForId("id", listOfIdToDelete.get(i), TestModel.class), is(notNullValue()));
             i++;
         }
     }
@@ -1067,13 +1068,6 @@ public class RealmManagerImplTest {
                 .equalTo("value", insertedTestModel.getValue(), Case.INSENSITIVE);
     }
 
-//    @NonNull
-//    private OrdersRealmModel getOrdersRealmModel() {
-//        OrdersRealmModel orm = new OrdersRealmModel();
-//        orm.setId(getRandomInt());
-//        return orm;
-//    }
-
     private int getRandomInt() {
         return Math.abs(mRandom.nextInt()) + 1;
     }
@@ -1160,5 +1154,4 @@ public class RealmManagerImplTest {
         assertThat(left, is(containsInAnyOrder(right.toArray())));
         assertThat(right, is(containsInAnyOrder(left.toArray())));
     }
-
 }

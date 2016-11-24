@@ -2,8 +2,6 @@ package com.zeyad.genericusecase.data.repository.stores;
 
 import android.support.annotation.NonNull;
 
-import com.zeyad.genericusecase.Config;
-import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.db.DataBaseManager;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.utils.ModelConverters;
@@ -19,7 +17,7 @@ import io.realm.RealmQuery;
 import rx.Observable;
 
 public class DiskDataStore implements DataStore {
-
+    private static final String IO_DB_ERROR = "Can not IO file to local DB";
     private DataBaseManager mDataBaseManager;
     private EntityMapper mEntityDataMapper;
 
@@ -133,13 +131,13 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<?> dynamicUploadFile(String url, File file, String key, HashMap<String, Object> parameters,
                                            boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass) {
-        return Observable.error(new IllegalStateException(Config.getInstance().getContext().getString(R.string.io_to_db_error)));
+        return Observable.error(new IllegalStateException(IO_DB_ERROR));
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,
                                              boolean queuable) {
-        return Observable.error(new IllegalStateException(Config.getInstance().getContext().getString(R.string.io_to_db_error)));
+        return Observable.error(new IllegalStateException(IO_DB_ERROR));
     }
 }

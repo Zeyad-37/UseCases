@@ -10,7 +10,6 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.GsonBuilder;
 import com.zeyad.genericusecase.BuildConfig;
 import com.zeyad.genericusecase.Config;
-import com.zeyad.genericusecase.R;
 import com.zeyad.genericusecase.data.executor.JobExecutor;
 import com.zeyad.genericusecase.data.utils.Utils;
 
@@ -52,8 +51,8 @@ import rx.Observable;
  * return a value.
  */
 class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnection {
-
-    private final static String CACHE_CONTROL = "Cache-Control";
+    private static final String CACHING_DISABLED = "There would be no caching. Since caching module is disabled.",
+            BUILDER_NULL = "OkHttp builder can not be null", CACHE_CONTROL = "Cache-Control";
     private static final int TIME_OUT = 15;
     private static ApiConnection sInstance;
     private final RestApi mRestApiWithoutCache;
@@ -61,7 +60,7 @@ class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnect
 
     private ApiConnection(@Nullable OkHttpClient.Builder okhttpBuilder, @Nullable Cache cache) {
         if (okhttpBuilder == null)
-            throw new NullPointerException(Config.getInstance().getContext().getString(R.string.builder_null));
+            throw new NullPointerException(BUILDER_NULL);
         mRestApiWithCache = createRetro2Client(provideOkHttpClient(okhttpBuilder, cache))
                 .create(RestApi.class);
         mRestApiWithoutCache = createRetro2Client(provideOkHttpClient(okhttpBuilder, null))
@@ -90,7 +89,7 @@ class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnect
 
     static IApiConnection getInstance() {
         if (sInstance == null)
-            throw new NullPointerException(Config.getInstance().getContext().getString(R.string.api_connection_uninitialized));
+            init();
         return sInstance;
     }
 
@@ -347,6 +346,6 @@ class ApiConnection implements com.zeyad.genericusecase.data.network.IApiConnect
     }
 
     private void logNoCache() {
-        Log.e(getClass().getSimpleName(), Config.getInstance().getContext().getString(R.string.caching_disabled));
+        Log.e(getClass().getSimpleName(), CACHING_DISABLED);
     }
 }

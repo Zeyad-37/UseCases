@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
 @RunWith(JUnit4.class)
-public abstract class RestApiTest {
+public class RestApiTest {
 
     private final Map mMultipartBodyPart = Mockito.mock(Map.class);
     private RestApi mRestApi;
@@ -114,5 +114,8 @@ public abstract class RestApiTest {
                 is(equalTo(mMockedApiConnection.upload(mValidUrl, mMultipartBodyPart, mMultipart))));
     }
 
-    public abstract RestApi getRestApiImplementation(IApiConnection mockedApiConnection);
+    @NonNull
+    public RestApi getRestApiImplementation(IApiConnection mockedApiConnection) {
+        return new RestApiImpl(mockedApiConnection);
+    }
 }

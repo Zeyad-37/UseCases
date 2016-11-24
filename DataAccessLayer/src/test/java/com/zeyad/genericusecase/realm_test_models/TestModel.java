@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.domain.interactor;
+package com.zeyad.genericusecase.realm_test_models;
 
 import android.support.annotation.NonNull;
 

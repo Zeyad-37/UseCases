@@ -2,9 +2,11 @@ package com.zeyad.genericusecase;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 public class Config {
 
+    private static final String NO_CONTEXT_ERROR = "Config.init(context) must be called before or Config.setContext(context)";
     public static final int NONE = 0, REALM = 1;
     private static Config sInstance;
     private Context mContext;
@@ -14,17 +16,23 @@ public class Config {
 
     private Config(@NonNull Context context) {
         mContext = context;
-        setupRealm();
+    }
+
+    private Config() {
     }
 
     public static Config getInstance() {
         if (sInstance == null)
-            throw new NullPointerException("Config.init(context) must be called before");
+            init();
         return sInstance;
     }
 
     public static void init(@NonNull Context context) {
         sInstance = new Config(context);
+    }
+
+    public static void init() {
+        sInstance = new Config();
     }
 
     private void setupRealm() {
@@ -34,8 +42,15 @@ public class Config {
 //                .build();
     }
 
+    @Nullable
     public Context getContext() {
+        if (mContext == null)
+            throw new NullPointerException(NO_CONTEXT_ERROR);
         return mContext;
+    }
+
+    public void setContext(Context context) {
+        mContext = context;
     }
 
     public boolean isUseApiWithCache() {

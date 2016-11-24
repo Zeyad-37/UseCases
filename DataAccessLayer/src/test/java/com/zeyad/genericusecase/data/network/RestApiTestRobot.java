@@ -38,7 +38,7 @@ class RestApiTestRobot {
                 .thenReturn(getListObservable());
         Mockito.when(apiConnection.upload(Mockito.anyString(), Mockito.any(Map.class),
                 Mockito.any(MultipartBody.Part.class)))
-                .thenReturn(Mockito.any());
+                .thenReturn(getObjectObservable());
         Mockito.when(apiConnection.dynamicDeleteList(Mockito.anyString(), Mockito.any()))
                 .thenReturn(getListObservable());
         Mockito.when(apiConnection.dynamicDeleteObject(Mockito.anyString(), Mockito.any(RequestBody.class)))

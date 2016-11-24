@@ -49,7 +49,7 @@ public class DiskDataStoreTest {
     @Before
     public void setUp() throws Exception {
         Config.init(InstrumentationRegistry.getTargetContext());
-        TestUtility.performInitialSetupOfDb(InstrumentationRegistry.getTargetContext());
+        TestUtility.performInitialSetupOfDb();
         DatabaseManagerFactory.initRealm();
         final DataBaseManager dbManager = DatabaseManagerFactory.getInstance();
         final TestModelViewModelMapper enitityMapper = new TestModelViewModelMapper();

@@ -11,20 +11,12 @@
     <string name="not_sqlbrite">This is not SQLBrite</string>
     <string name="no_db">Database not enabled!</string>
     <string name="sqlbrite_uninitialized">Instance have not been initialized yet. Please call initSQLBrite() first</string>
-    <string name="realm_uninitialized">Instance have not been initialized yet. Please call initRealm() first</string>
-    <string name="api_connection_uninitialized">Instance have not been initialized yet. Please call ApiConnection.init() first</string>
-    <string name="realm_object_invalid">RealmObject is invalid</string>
-    <string name="realm_model_invalid">RealmModel is invalid</string>
-    <string name="json_object_invalid">JSONObject is invalid</string>
-    <string name="no_id">could not find id!</string>
-    <string name="builder_null">OkHttp builder can not be null</string>
-    <string name="caching_disabled">There would be no caching. Since caching module is disabled.</string>
+
     <string name="delete_all_error_cloud">Can not delete all from cloud data store</string>
     <string name="search_disk_error_cloud">Can not search disk in cloud data store</string>
     <string name="queued">QueuePost scheduled through %1$s: %2$s</string>
     <string name="requeued">RequeuePost scheduled through %1$s: %2$s</string>
     <string name="dbmanager_null_error">DataBaseManager cannot be null!</string>
-    <string name="io_to_db_error">Can\'t IO file to local DB!</string>
     <string name="job_started">%1$s Job started!</string>
     <string name="unknown_error">Unknown error</string>
 

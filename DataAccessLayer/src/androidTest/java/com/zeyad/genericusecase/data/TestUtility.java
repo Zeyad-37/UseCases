@@ -208,7 +208,7 @@ public class TestUtility {
         };
     }
 
-    public static void performInitialSetupOfDb(@NonNull Context context) {
+    public static void performInitialSetupOfDb() {
         Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
                 .name("app.realm")
                 .modules(Realm.getDefaultModule(), new LibraryModule())

@@ -1,12 +1,10 @@
-package com.zeyad.genericusecase.data;
+package com.zeyad.genericusecase.realm_test_models;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
-import com.zeyad.genericusecase.realm_test_models.TestModel;
-import com.zeyad.genericusecase.realm_test_models.TestViewModel;
 
 import org.mockito.internal.invocation.AbstractAwareMethod;
 

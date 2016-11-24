@@ -1,6 +1,6 @@
 package com.zeyad.genericusecase.data.network;
 
-import android.support.test.InstrumentationRegistry;
+import android.support.annotation.NonNull;
 
 import com.zeyad.genericusecase.BuildConfig;
 import com.zeyad.genericusecase.Config;
@@ -9,8 +9,8 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
-import org.robolectric.RobolectricTestRunner;
 
 import java.util.Map;
 
@@ -24,9 +24,9 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.eq;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(JUnit4.class)
 //@Config(constants = BuildConfig.class)
-public abstract class IApiConnectionTest {
+public class IApiConnectionTest {
 
     private final String mValidUrl = ApiConnectionRobot.getValidUrl();
     private final RequestBody mMockedRequestBody = ApiConnectionRobot.getMockedRequestBody();
@@ -38,7 +38,7 @@ public abstract class IApiConnectionTest {
 
     @Before
     public void setUp() throws Exception {
-        Config.init(InstrumentationRegistry.getTargetContext());
+//        Config.init(InstrumentationRegistry.getTargetContext());
         Config.getInstance().setUseApiWithCache(false);
         mRestApiWithCache = ApiConnectionRobot.createMockedRestApi();
         mRestApiWithoutCache = ApiConnectionRobot.createMockedRestApi();
@@ -151,9 +151,16 @@ public abstract class IApiConnectionTest {
         Mockito.verify(mRestApiWithoutCache).dynamicDeleteObject(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
-    protected abstract IApiConnection getApiImplementation(RestApi restApiWithoutCache, RestApi restApiWithCache);
+    private RestApi getCurrentSetRestApiWithoutCache(@NonNull IApiConnection apiConnection) {
+        return ((ApiConnection) apiConnection).getRestApiWithoutCache();
+    }
 
-    protected abstract RestApi getCurrentSetRestApiWithoutCache(IApiConnection apiConnection);
+    private RestApi getCurrentSetRestApiWithCache(@NonNull IApiConnection apiConnection) {
+        return ((ApiConnection) apiConnection).getRestApiWithCache();
+    }
 
-    protected abstract RestApi getCurrentSetRestApiWithCache(IApiConnection apiConnection);
+    private IApiConnection getApiImplementation(RestApi restApiWithoutCache, RestApi restApiWithCache) {
+        ApiConnection.init(restApiWithoutCache, restApiWithCache);
+        return ApiConnection.getInstance();
+    }
 }
