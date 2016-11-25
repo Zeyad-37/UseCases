@@ -30,7 +30,7 @@ coming soon
 Get Object From Server:
 ```
 mGenericUseCase.getObject(new GetRequest
-        .GetRequestBuilder(OrdersRealmModel.class, true) // true to save result to db, false otherwise.
+        .GetRequestBuilder(OrderRealmModel.class, true) // true to save result to db, false otherwise.
         .presentationClass(OrderViewModel.class)
         .url(FULL_URL)
         .idColumnName(OrderViewModel.ID)
@@ -54,9 +54,8 @@ mGenericUseCase.getObject(new GetRequest
 Get Object From DB:
 ```
 mGenericUseCase.getObject(new GetRequest
-        .GetRequestBuilder(OrdersRealmModel.class, true)
+        .GetRequestBuilder(OrderRealmModel.class, true)
         .presentationClass(OrderViewModel.class)
-        .url("") // empty !!
         .idColumnName(OrderViewModel.ID)
         .id(mItemId)
         .build());
@@ -88,7 +87,6 @@ Get List From DB:
 mGenericUseCase.getList(new GetRequest
         .GetRequestBuilder(OrdersRealmModel.class, false)
         .presentationClass(OrderViewModel.class)
-        .url("")
         .build());
 ```
 Post/Put Object to Server:
@@ -107,7 +105,6 @@ mGenericUseCase.postObject(new PostRequest // putObject
         .PostRequestBuilder(OrdersRealmModel.class, true)
         .idColumnName(OrderViewModel.ID)
         .presentationClass(OrderViewModel.class)
-        .url("")
         .payLoad(OrderViewModel.toJSONObject()) // or HashMap 
         .build());
 ```
@@ -128,7 +125,6 @@ mGenericUseCase.postList(new PostRequest // putList
         .presentationClass(OrdersViewModel.class)
         .payLoad(OrdersViewModel.toJSONArray())
         .idColumnName(OrdersRealmModel.ID)
-        .url("")
         .build())
 ```
 Delete All from DB:
@@ -136,7 +132,6 @@ Delete All from DB:
 getGenericUseCase().deleteAll(new PostRequest
         .PostRequestBuilder(OrdersRealmModel.class, true)
         .idColumnName(OrdersRealmModel.ID)
-        .url("")
         .build())
 ```
 Upload File
