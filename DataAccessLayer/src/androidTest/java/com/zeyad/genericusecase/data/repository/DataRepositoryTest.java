@@ -52,7 +52,7 @@ public class DataRepositoryTest {
 
     @Before
     public void setUp() throws Exception {
-//        TestUtility.performInitialSetupOfDb();
+        TestUtility.performInitialSetupOfDb();
         mDataStore = mIsDiskType ? DataRepositoryRobot.createMockedDiskStore()
                 : DataRepositoryRobot.createMockedCloudStore();
         DataStoreFactory dataStoreFactory = DataRepositoryRobot.createMockedDataStoreFactory(mDataStore);
@@ -67,13 +67,13 @@ public class DataRepositoryTest {
     @Test
     public void testGetListDynamicallyCacheVersion_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.getListDynamically(DataRepositoryRobot.getValidUrl()
-                , DataRepositoryRobot.getValidDomainClass()
+                , DataRepositoryRobot.getValidPresentationClass()
                 , DataRepositoryRobot.getValidDataClass()
                 , false
                 , mToCache);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicGetList(DataRepositoryRobot.getValidUrl()
-                        , DataRepositoryRobot.getValidDomainClass()
+                        , DataRepositoryRobot.getValidPresentationClass()
                         , DataRepositoryRobot.getValidDataClass()
                         , false
                         , mToCache);
@@ -86,7 +86,7 @@ public class DataRepositoryTest {
                 .thenReturn(mockedObservable);
         Observable<List> observable = mDataRepository
                 .getListDynamically(DataRepositoryRobot.getValidUrl()
-                        , DataRepositoryRobot.getValidDomainClass()
+                        , DataRepositoryRobot.getValidPresentationClass()
                         , DataRepositoryRobot.getValidDataClass()
                         , false
                         , mToCache);
@@ -99,7 +99,7 @@ public class DataRepositoryTest {
                 .getObjectDynamicallyById(DataRepositoryRobot.getValidUrl()
                         , DataRepositoryRobot.getColumnName()
                         , DataRepositoryRobot.getColumnId()
-                        , DataRepositoryRobot.getValidDomainClass()
+                        , DataRepositoryRobot.getValidPresentationClass()
                         , DataRepositoryRobot.getValidDataClass()
                         , false
                         , mToCache);
@@ -107,7 +107,7 @@ public class DataRepositoryTest {
                 .dynamicGetObject(DataRepositoryRobot.getValidUrl()
                         , DataRepositoryRobot.getColumnName()
                         , DataRepositoryRobot.getColumnId()
-                        , DataRepositoryRobot.getValidDomainClass()
+                        , DataRepositoryRobot.getValidPresentationClass()
                         , DataRepositoryRobot.getValidDataClass()
                         , false
                         , mToCache);
@@ -118,13 +118,13 @@ public class DataRepositoryTest {
         mDataRepository.postObjectDynamically(DataRepositoryRobot.getValidUrl()
                 , DataRepository.DEFAULT_ID_KEY
                 , DataRepositoryRobot.getValidJSONObject()
-                , DataRepositoryRobot.getValidDomainClass()
+                , DataRepositoryRobot.getValidPresentationClass()
                 , DataRepositoryRobot.getValidDataClass()
                 , true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicPostObject(DataRepositoryRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_KEY, DataRepositoryRobot.getValidJSONObject()
-                        , DataRepositoryRobot.getValidDomainClass()
+                        , DataRepositoryRobot.getValidPresentationClass()
                         , DataRepositoryRobot.getValidDataClass()
                         , true, true);
     }
@@ -133,13 +133,13 @@ public class DataRepositoryTest {
     public void testPostListDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.postListDynamically(DataRepositoryRobot.getValidUrl()
                 , DataRepository.DEFAULT_ID_KEY, DataRepositoryRobot.getValidJSONArray()
-                , DataRepositoryRobot.getValidDomainClass()
+                , DataRepositoryRobot.getValidPresentationClass()
                 , DataRepositoryRobot.getValidDataClass()
                 , true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicPostList(DataRepositoryRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_KEY, DataRepositoryRobot.getValidJSONArray()
-                        , DataRepositoryRobot.getValidDomainClass()
+                        , DataRepositoryRobot.getValidPresentationClass()
                         , DataRepositoryRobot.getValidDataClass()
                         , true, true);
     }
@@ -148,7 +148,7 @@ public class DataRepositoryTest {
     public void testDeleteListDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.deleteListDynamically(DataRepositoryRobot.getValidUrl()
                 , DataRepositoryRobot.getValidJSONArray()
-                , DataRepositoryRobot.getValidDomainClass()
+                , DataRepositoryRobot.getValidPresentationClass()
                 , DataRepositoryRobot.getValidDataClass()
                 , true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
@@ -164,12 +164,12 @@ public class DataRepositoryTest {
         assumeThat(mIsDiskType, Matchers.is(true));
         mDataRepository.searchDisk(DataRepositoryRobot.getValidQuery()
                 , DataRepositoryRobot.getColumnName()
-                , DataRepositoryRobot.getValidDomainClass()
+                , DataRepositoryRobot.getValidPresentationClass()
                 , DataRepositoryRobot.getValidDataClass());
         Mockito.verify(mDataStore, Mockito.times(1))
                 .searchDisk(DataRepositoryRobot.getValidQuery()
                         , DataRepositoryRobot.getColumnName()
-                        , DataRepositoryRobot.getValidDomainClass()
+                        , DataRepositoryRobot.getValidPresentationClass()
                         , DataRepositoryRobot.getValidDataClass());
     }
 
@@ -177,10 +177,10 @@ public class DataRepositoryTest {
     public void testSearchDisk_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenRealmQueryIsPassed() {
         assumeThat(mIsDiskType, Matchers.is(true));
         mDataRepository.searchDisk(DataRepositoryRobot.getValidRealmQuery()
-                , DataRepositoryRobot.getValidDomainClass());
+                , DataRepositoryRobot.getValidPresentationClass());
         Mockito.verify(mDataStore, Mockito.times(1))
                 .searchDisk(DataRepositoryRobot.getValidRealmQuery()
-                        , DataRepositoryRobot.getValidDomainClass());
+                        , DataRepositoryRobot.getValidPresentationClass());
     }
 
     @Test
@@ -190,12 +190,12 @@ public class DataRepositoryTest {
                 , DataRepositoryRobot.getValidFile(), DataRepositoryRobot.getKey(),
                 DataRepositoryRobot.getValidMap(), DataRepositoryRobot.ON_WIFI,
                 DataRepositoryRobot.WHILE_CHARGING, DataRepositoryRobot.QUEUABLE,
-                DataRepositoryRobot.getValidDomainClass(), DataRepositoryRobot.getValidDataClass());
+                DataRepositoryRobot.getValidPresentationClass(), DataRepositoryRobot.getValidDataClass());
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicUploadFile(DataRepositoryRobot.getValidUrl(), DataRepositoryRobot.getValidFile(),
                         DataRepositoryRobot.getKey(), DataRepositoryRobot.getValidMap(),
                         DataRepositoryRobot.ON_WIFI, DataRepositoryRobot.WHILE_CHARGING,
-                        DataRepositoryRobot.QUEUABLE, DataRepositoryRobot.getValidDomainClass());
+                        DataRepositoryRobot.QUEUABLE, DataRepositoryRobot.getValidPresentationClass());
     }
 
     @Test
@@ -203,13 +203,13 @@ public class DataRepositoryTest {
         mDataRepository.putObjectDynamically(DataRepositoryRobot.getValidUrl()
                 , DataRepository.DEFAULT_ID_KEY
                 , DataRepositoryRobot.getValidJSONObject()
-                , DataRepositoryRobot.getValidDomainClass()
+                , DataRepositoryRobot.getValidPresentationClass()
                 , DataRepositoryRobot.getValidDataClass(), true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicPutObject(DataRepositoryRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_KEY
                         , DataRepositoryRobot.getValidJSONObject()
-                        , DataRepositoryRobot.getValidDomainClass()
+                        , DataRepositoryRobot.getValidPresentationClass()
                         , DataRepositoryRobot.getValidDataClass(), true, true);
     }
 
@@ -218,13 +218,13 @@ public class DataRepositoryTest {
         mDataRepository.putListDynamically(DataRepositoryRobot.getValidUrl()
                 , DataRepository.DEFAULT_ID_KEY
                 , DataRepositoryRobot.getValidJSONArray()
-                , DataRepositoryRobot.getValidDomainClass()
+                , DataRepositoryRobot.getValidPresentationClass()
                 , DataRepositoryRobot.getValidDataClass(), true, true);
         Mockito.verify(mDataStore, Mockito.times(1))
                 .dynamicPutList(DataRepositoryRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_KEY
                         , DataRepositoryRobot.getValidJSONArray()
-                        , DataRepositoryRobot.getValidDomainClass()
+                        , DataRepositoryRobot.getValidPresentationClass()
                         , DataRepositoryRobot.getValidDataClass(), true, true);
     }
 

@@ -1,7 +1,7 @@
 package com.zeyad.genericusecase.domain.interactor;
 
-import com.zeyad.genericusecase.domain.interactors.files.FilesUseCase;
-import com.zeyad.genericusecase.domain.interactors.files.IFilesUseCase;
+import com.zeyad.genericusecase.domain.interactors.files.FileUseCase;
+import com.zeyad.genericusecase.domain.interactors.files.IFileUseCase;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,16 +25,16 @@ import static org.hamcrest.Matchers.is;
 @RunWith(JUnit4.class)
 public class FileUseCaseTest {
 
-    private IFilesUseCase mFilesUseCase;
+    private IFileUseCase mFilesUseCase;
 
     @Before
     public void setUp() throws Exception {
-        FilesUseCase.init();
-        mFilesUseCase = FilesUseCase.getInstance();
+        FileUseCase.init();
+        mFilesUseCase = FileUseCase.getInstance();
     }
 
-    public static IFilesUseCase createMockedfilesUseCase() {
-        final IFilesUseCase filesUseCase = Mockito.mock(IFilesUseCase.class);
+    public static IFileUseCase createMockedfilesUseCase() {
+        final IFileUseCase filesUseCase = Mockito.mock(IFileUseCase.class);
 
         Mockito.when(filesUseCase.readFromResource(Mockito.anyString()))
                 .thenReturn(readResponse());

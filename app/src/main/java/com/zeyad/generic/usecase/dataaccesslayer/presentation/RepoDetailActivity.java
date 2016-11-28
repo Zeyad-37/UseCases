@@ -10,7 +10,6 @@ import android.view.MenuItem;
 
 import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.BaseActivity;
-import com.zeyad.generic.usecase.dataaccesslayer.di.components.UserComponent;
 
 import butterknife.BindView;
 
@@ -36,7 +35,6 @@ public class RepoDetailActivity extends BaseActivity {
 
     @Override
     public void initialize() {
-        getComponent(UserComponent.class).inject(this);
     }
 
     @Override

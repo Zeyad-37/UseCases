@@ -3,9 +3,6 @@ package com.zeyad.generic.usecase.dataaccesslayer;
 import android.app.Application;
 import android.util.Log;
 
-import com.zeyad.generic.usecase.dataaccesslayer.di.components.ApplicationComponent;
-import com.zeyad.generic.usecase.dataaccesslayer.di.components.DaggerApplicationComponent;
-import com.zeyad.generic.usecase.dataaccesslayer.di.modules.ApplicationModule;
 import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
 
 import java.io.File;
@@ -26,7 +23,6 @@ import okhttp3.logging.HttpLoggingInterceptor;
 public class GenericApplication extends Application {
 
     private static GenericApplication sInstance;
-    private ApplicationComponent applicationComponent;
 
     public static GenericApplication getInstance() {
         return sInstance;
@@ -36,7 +32,6 @@ public class GenericApplication extends Application {
     public void onCreate() {
         super.onCreate();
         sInstance = this;
-        initializeInjector();
         initializeRealm();
         GenericUseCaseFactory.initWithRealm(getApplicationContext(), null);
     }
@@ -75,15 +70,5 @@ public class GenericApplication extends Application {
                 .rxFactory(new RealmObservableFactory())
                 .deleteRealmIfMigrationNeeded()
                 .build());
-    }
-
-    private void initializeInjector() {
-        applicationComponent = DaggerApplicationComponent.builder()
-                .applicationModule(new ApplicationModule(this))
-                .build();
-    }
-
-    public ApplicationComponent getApplicationComponent() {
-        return applicationComponent;
     }
 }

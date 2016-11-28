@@ -6,7 +6,7 @@ import rx.Observable;
  * @author zeyad on 11/11/16.
  */
 
-public interface IFilesUseCase {
+public interface IFileUseCase {
 
     /**
      * Returns a string of contents of the file.

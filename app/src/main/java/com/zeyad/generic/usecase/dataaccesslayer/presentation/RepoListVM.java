@@ -1,9 +1,12 @@
 package com.zeyad.generic.usecase.dataaccesslayer.presentation;
 
-import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.BasePresenter;
-import com.zeyad.genericusecase.data.requests.GetRequest;
+import android.os.Bundle;
 
-import javax.inject.Inject;
+import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseViewModel;
+import com.zeyad.genericusecase.data.requests.GetRequest;
+import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
+
+import java.util.List;
 
 import rx.Observable;
 import rx.functions.Func1;
@@ -12,27 +15,18 @@ import rx.functions.Func1;
  * @author zeyad on 11/1/16.
  */
 
-public class RepoListVM extends BasePresenter implements RepoListView {
+public class RepoListVM extends BaseViewModel implements RepoListView {
 
+    final IGenericUseCase genericUseCase;
     String ENDPOINT = "https://api.ribot.io/";
 
-    @Inject
-    RepoListVM() {
+    RepoListVM(IGenericUseCase genericUseCase) {
+        this.genericUseCase = genericUseCase;
     }
 
     @Override
-    public void resume() {
-
-    }
-
-    @Override
-    public void pause() {
-
-    }
-
-    @Override
-    public Observable getRepoList() {
-        return getGenericUseCase().getList(new GetRequest.GetRequestBuilder(Object.class, true)
+    public Observable<List> getRepoList() {
+        return genericUseCase.getList(new GetRequest.GetRequestBuilder(Object.class, true)
                 .presentationClass(Object.class)
                 .url(ENDPOINT + "r/aww/new/.json")
                 .build())
@@ -51,5 +45,16 @@ public class RepoListVM extends BasePresenter implements RepoListView {
 //        snackbar.show();
 //        return observable;
         return Observable.empty();
+    }
+
+    @Override
+    public Bundle getState() {
+        Bundle bundle = new Bundle();
+        return null;
+    }
+
+    @Override
+    public void restoreState(Bundle state) {
+
     }
 }

@@ -1,8 +1,5 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components;
 
-import android.content.Context;
-
-import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.genericusecase.data.exceptions.NetworkConnectionException;
 
 import org.json.JSONException;
@@ -17,6 +14,8 @@ import retrofit2.adapter.rxjava.HttpException;
  * Factory used to create error messages from an Exception as a condition.
  */
 public class ErrorMessageFactory {
+    private static final String NO_INTERNET = "Please check your internet connection",
+            UNKNOWN_ERROR = "Unknown error";
 
     private ErrorMessageFactory() {
     }
@@ -24,18 +23,17 @@ public class ErrorMessageFactory {
     /**
      * Creates a String representing an error message.
      *
-     * @param context   Context needed to retrieve string resources.
      * @param exception An exception used as a condition to retrieve the correct error message.
      * @return {@link String} an error message.
      */
-    public static String create(Context context, Exception exception) {
+    public static String create(Exception exception) {
         if (exception instanceof NetworkConnectionException) {
             NetworkConnectionException networkConnectionException = (NetworkConnectionException) exception;
             if (networkConnectionException.getMessage().isEmpty())
-                return context.getString(R.string.exception_message_no_connection);
+                return NO_INTERNET;
             else return networkConnectionException.getMessage();
         } else if (exception instanceof UnknownHostException)
-            return context.getString(R.string.exception_message_no_connection);
+            return NO_INTERNET;
         else if (exception instanceof HttpException) {
             JSONObject jsonObject = new JSONObject();
             try {
@@ -62,6 +60,6 @@ public class ErrorMessageFactory {
                 return exception.getMessage();
             }
         }
-        return context.getString(R.string.unknown_error);
+        return UNKNOWN_ERROR;
     }
 }

@@ -12,7 +12,7 @@ import com.zeyad.genericusecase.data.network.ApiConnectionFactory;
 import com.zeyad.genericusecase.data.utils.EntityMapperUtil;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
 import com.zeyad.genericusecase.data.utils.Utils;
-import com.zeyad.genericusecase.domain.interactors.files.FilesUseCaseFactory;
+import com.zeyad.genericusecase.domain.interactors.files.FileUseCaseFactory;
 import com.zeyad.genericusecase.domain.interactors.prefs.PrefsUseCaseFactory;
 
 import okhttp3.Cache;
@@ -43,7 +43,7 @@ public class GenericUseCaseFactory {
             }
         });
         PrefsUseCaseFactory.init();
-        FilesUseCaseFactory.init();
+        FileUseCaseFactory.init();
         sGenericUseCase = GenericUseCase.getInstance();
     }
 
@@ -68,7 +68,7 @@ public class GenericUseCaseFactory {
             }
         });
         PrefsUseCaseFactory.init();
-        FilesUseCaseFactory.init();
+        FileUseCaseFactory.init();
         sGenericUseCase = GenericUseCase.getInstance();
     }
 
@@ -115,7 +115,7 @@ public class GenericUseCaseFactory {
                 }
             };
         PrefsUseCaseFactory.init();
-        FilesUseCaseFactory.init();
+        FileUseCaseFactory.init();
         GenericUseCase.initWithRealm(entityMapper);
     }
 

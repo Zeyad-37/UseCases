@@ -1,4 +1,4 @@
-package com.zeyad.generic.usecase.dataaccesslayer.components;
+package com.zeyad.generic.usecase.dataaccesslayer.components.snackbar;
 
 import android.support.annotation.ColorInt;
 import android.support.design.widget.Snackbar;

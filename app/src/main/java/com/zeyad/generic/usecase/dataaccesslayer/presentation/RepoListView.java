@@ -1,5 +1,7 @@
 package com.zeyad.generic.usecase.dataaccesslayer.presentation;
 
+import java.util.List;
+
 import rx.Observable;
 
 /**
@@ -8,5 +10,5 @@ import rx.Observable;
 
 public interface RepoListView {
 
-    Observable getRepoList();
+    Observable<List> getRepoList();
 }

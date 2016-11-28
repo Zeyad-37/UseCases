@@ -18,13 +18,12 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-import io.realm.Realm;
 import io.realm.RealmQuery;
 import rx.Observable;
 
-class DataRepositoryRobot {
+public class DataRepositoryRobot {
 
-    public static final RealmQuery REALM_QUERY = Realm.getDefaultInstance().where(getValidDataClass());
+    //    public static final RealmQuery REALM_QUERY = Realm.getDefaultInstance().where(getValidDataClass());
     //    public static final HashMap<String, Object> OBJECT_HASH_MAP = new HashMap<>();
     public static final JSONObject JSON_OBJECT = new JSONObject();
     public static final JSONArray JSON_ARRAY = new JSONArray();
@@ -70,7 +69,7 @@ class DataRepositoryRobot {
     }
 
     @NonNull
-    static Class getValidDomainClass() {
+    static Class getValidPresentationClass() {
         return TestViewModel.class;
     }
 
@@ -101,7 +100,7 @@ class DataRepositoryRobot {
 
     static OngoingStubbing<Observable<List>> mockDataStoreForDynamicGetList(@NonNull DataStore dataStore, boolean persist, boolean toCache) {
         return Mockito.when(dataStore.dynamicGetList(getValidUrl()
-                , getValidDomainClass()
+                , getValidPresentationClass()
                 , getValidDataClass()
                 , persist
                 , toCache));
@@ -127,8 +126,8 @@ class DataRepositoryRobot {
 
     @NonNull
     public static RealmQuery getValidRealmQuery() {
-        return REALM_QUERY;
-
+//        return REALM_QUERY;
+        return null;
     }
 
     public static File getValidFile() {

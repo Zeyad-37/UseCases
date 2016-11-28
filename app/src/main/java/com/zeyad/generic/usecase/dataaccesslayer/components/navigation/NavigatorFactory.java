@@ -2,7 +2,7 @@ package com.zeyad.generic.usecase.dataaccesslayer.components.navigation;
 
 public class NavigatorFactory {
 
-    public static INavigator getNavigator() {
+    public static INavigator getInstance() {
         return Navigator.getInstance();
     }
 }

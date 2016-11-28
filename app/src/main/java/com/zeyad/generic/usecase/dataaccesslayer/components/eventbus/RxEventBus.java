@@ -17,14 +17,14 @@ class RxEventBus implements IRxEventBus {
     private static IRxEventBus mInstance;
     private final SerializedSubject<Object, Object> rxBus;
 
+    private RxEventBus() {
+        rxBus = new SerializedSubject<>(PublishSubject.create());
+    }
+
     static IRxEventBus getInstance() {
         if (mInstance == null)
             mInstance = new RxEventBus();
         return mInstance;
-    }
-
-    private RxEventBus() {
-        rxBus = new SerializedSubject<>(PublishSubject.create());
     }
 
     @Override

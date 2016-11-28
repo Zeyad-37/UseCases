@@ -39,8 +39,7 @@ public abstract class GenericPostPresenter<M> extends BasePresenter {
     }
 
     public void showErrorMessage(Throwable throwable) {
-        mGenericPostView.showError(ErrorMessageFactory.create(mGenericPostView.getApplicationContext(),
-                (Exception) throwable));
+        mGenericPostView.showError(ErrorMessageFactory.create((Exception) throwable));
     }
 
     /**

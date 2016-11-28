@@ -5,21 +5,24 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.generic.usecase.dataaccesslayer.components.adapter.GenericRecyclerViewAdapter;
-import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.BaseActivity;
-import com.zeyad.generic.usecase.dataaccesslayer.di.components.UserComponent;
+import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseActivity;
+import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseSubscriber;
+import com.zeyad.generic.usecase.dataaccesslayer.components.snackbar.SnackBarFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Subscriber;
+import rx.Subscription;
+
+import static com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 
 /**
  * An activity representing a list of Repos. This activity
@@ -30,10 +33,13 @@ import rx.Subscriber;
  * item details side-by-side using two vertical panes.
  */
 public class RepoListActivity extends BaseActivity {
-    @Inject
+
+
     RepoListVM mRepoListVM;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
+    @BindView(R.id.linear_layout_loader)
+    LinearLayout loaderLayout;
     @BindView(R.id.repo_list)
     RecyclerView mRepoRecycler;
     @BindView(R.id.fab)
@@ -43,7 +49,7 @@ public class RepoListActivity extends BaseActivity {
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
-    private boolean mTwoPane;
+    private boolean twoPane;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,12 +57,11 @@ public class RepoListActivity extends BaseActivity {
     }
 
     @Override
-    public void initialize() {
-        getComponent(UserComponent.class).inject(this);
+    public void initialize(Bundle savedInstanceState) {
     }
 
     @Override
-    public void setupUI() {
+    public void setupUI(Bundle savedInstanceState) {
         setContentView(R.layout.activity_repo_list);
         setSupportActionBar(mToolbar);
         ButterKnife.bind(this);
@@ -66,7 +71,19 @@ public class RepoListActivity extends BaseActivity {
                 .setAction("Action", null).show());
         setupRecyclerView();
         if (findViewById(R.id.repo_detail_container) != null)
-            mTwoPane = true;
+            twoPane = true;
+    }
+
+    @Override
+    public Subscription loadData() {
+        return mRepoListVM.getRepoList()
+                .doOnSubscribe(this::showLoading)
+                .subscribe(new BaseSubscriber<RepoListActivity, List>(this, ERROR_WITH_RETRY) {
+                    @Override
+                    public void onNext(List list) {
+                        // render data
+                    }
+                });
     }
 
     private void setupRecyclerView() {
@@ -84,27 +101,22 @@ public class RepoListActivity extends BaseActivity {
     }
 
     @Override
-    protected void onResume() {
-        super.onResume();
-        loadRepos();
+    public void showLoading() {
+        runOnUiThread(() -> loaderLayout.setVisibility(View.VISIBLE));
     }
 
-    private void loadRepos() {
-        mRepoListVM.getRepoList().subscribe(new Subscriber<List>() {
-            @Override
-            public void onCompleted() {
+    @Override
+    public void hideLoading() {
+        runOnUiThread(() -> loaderLayout.setVisibility(View.GONE));
+    }
 
-            }
+    @Override
+    public void showErrorWithRetry(String message) {
+        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, mRepoRecycler, message, "RETRY", view -> onResume());
+    }
 
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(List list) {
-
-            }
-        });
+    @Override
+    public void showError(String message) {
+        showErrorSnackBar(message, mRepoRecycler, Snackbar.LENGTH_LONG);
     }
 }

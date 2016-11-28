@@ -1,4 +1,4 @@
-package com.zeyad.generic.usecase.dataaccesslayer.components;
+package com.zeyad.generic.usecase.dataaccesslayer.components.snackbar;
 
 import android.graphics.Color;
 import android.support.annotation.NonNull;
@@ -9,17 +9,12 @@ import android.view.View;
 
 import java.lang.annotation.Retention;
 
+import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 public class SnackBarFactory {
 
-    @Retention(SOURCE)
-    @StringDef({TYPE_INFO, TYPE_ERROR})
-    public @interface SnackBarType {
-    }
-
     public static final String TYPE_INFO = "type_info";
-
     public static final String TYPE_ERROR = "type_error";
 
     public static Snackbar getSnackBar(@SnackBarType String snackBarType, @NonNull View view,
@@ -32,6 +27,13 @@ public class SnackBarFactory {
         return createSnackBar(snackBarType, Snackbar.make(view, text, duration));
     }
 
+    public static Snackbar getSnackBarWithAction(@SnackBarType String snackBarType, @NonNull View view,
+                                                 @NonNull CharSequence text, String actionText,
+                                                 View.OnClickListener onClickListener) {
+        return createSnackBar(snackBarType, Snackbar.make(view, text, LENGTH_INDEFINITE)
+                .setAction(actionText, onClickListener));
+    }
+
     private static Snackbar createSnackBar(@SnackBarType String snackBarType, Snackbar snackbar) {
         switch (snackBarType) {
             case TYPE_INFO:
@@ -41,5 +43,10 @@ public class SnackBarFactory {
             default:
                 return snackbar;
         }
+    }
+
+    @Retention(SOURCE)
+    @StringDef({TYPE_INFO, TYPE_ERROR})
+    public @interface SnackBarType {
     }
 }

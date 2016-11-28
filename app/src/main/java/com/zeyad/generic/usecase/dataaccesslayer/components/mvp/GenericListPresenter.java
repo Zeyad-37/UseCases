@@ -46,7 +46,6 @@ public abstract class GenericListPresenter<M, H extends RecyclerView.ViewHolder>
      * Loads all users.
      */
     private void loadItemList() {
-        hideViewRetry();
         showViewLoading();
         getItemList();
     }
@@ -60,16 +59,11 @@ public abstract class GenericListPresenter<M, H extends RecyclerView.ViewHolder>
     }
 
     public void showViewRetry() {
-        mGenericListView.showRetry();
-    }
-
-    public void hideViewRetry() {
-        mGenericListView.hideRetry();
+        mGenericListView.showErrorWithRetry("");
     }
 
     public void showErrorMessage(Throwable exception) {
-        mGenericListView.showError(ErrorMessageFactory.create(mGenericListView.getApplicationContext(),
-                (Exception) exception));
+        mGenericListView.showError(ErrorMessageFactory.create((Exception) exception));
     }
 
     public void showItemsListInView(List<M> userViewModels) {

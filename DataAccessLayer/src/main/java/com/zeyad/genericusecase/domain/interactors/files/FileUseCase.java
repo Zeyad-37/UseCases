@@ -14,26 +14,26 @@ import rx.schedulers.Schedulers;
  * @author zeyad on 11/11/16.
  */
 
-public class FilesUseCase implements IFilesUseCase {
+public class FileUseCase implements IFileUseCase {
 
-    private static FilesUseCase sFilesUseCase;
+    private static FileUseCase sFilesUseCase;
     private final Files mFiles;
     private final ThreadExecutor mThreadExecutor;
     private final PostExecutionThread mPostExecutionThread;
 
-    private FilesUseCase(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+    private FileUseCase(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
         mThreadExecutor = threadExecutor;
         mPostExecutionThread = postExecutionThread;
         mFiles = FilesRepository.getInstance();
     }
 
     public static void init() {
-        sFilesUseCase = new FilesUseCase(new JobExecutor(), new UIThread());
+        sFilesUseCase = new FileUseCase(new JobExecutor(), new UIThread());
     }
 
-    public static FilesUseCase getInstance() {
+    public static FileUseCase getInstance() {
         if (sFilesUseCase == null)
-            sFilesUseCase = new FilesUseCase(new JobExecutor(), new UIThread());
+            sFilesUseCase = new FileUseCase(new JobExecutor(), new UIThread());
         return sFilesUseCase;
     }
 

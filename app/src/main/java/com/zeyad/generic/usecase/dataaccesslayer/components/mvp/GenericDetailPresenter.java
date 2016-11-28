@@ -44,7 +44,6 @@ public abstract class GenericDetailPresenter<M> extends BasePresenter {
      * Loads item details.
      */
     private void loadItemDetails() {
-        hideViewRetry();
         showViewLoading();
         getItemDetails();
     }
@@ -58,16 +57,11 @@ public abstract class GenericDetailPresenter<M> extends BasePresenter {
     }
 
     public void showViewRetry() {
-        mGenericDetailView.showRetry();
-    }
-
-    public void hideViewRetry() {
-        mGenericDetailView.hideRetry();
+        mGenericDetailView.showErrorWithRetry("");
     }
 
     public void showErrorMessage(Throwable throwable) {
-        mGenericDetailView.showError(ErrorMessageFactory.create(mGenericDetailView.getApplicationContext(),
-                (Exception) throwable));
+        mGenericDetailView.showError(ErrorMessageFactory.create((Exception) throwable));
     }
 
     void showUserDetailsInView(M m) {
@@ -80,12 +74,12 @@ public abstract class GenericDetailPresenter<M> extends BasePresenter {
         return mItemId;
     }
 
-    public GenericDetailView<M> getGenericDetailView() {
-        return mGenericDetailView;
-    }
-
     public void setItemId(int mItemId) {
         this.mItemId = mItemId;
+    }
+
+    public GenericDetailView<M> getGenericDetailView() {
+        return mGenericDetailView;
     }
 
     public void setViewDetailsView(GenericDetailView<M> mViewDetailsView) {
