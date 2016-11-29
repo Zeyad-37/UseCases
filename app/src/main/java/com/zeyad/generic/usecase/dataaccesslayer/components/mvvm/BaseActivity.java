@@ -8,17 +8,18 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Pair;
 import android.view.View;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.zeyad.generic.usecase.dataaccesslayer.Utils;
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.IRxEventBus;
-import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.RxEventBusFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.LoadDataView;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.INavigator;
-import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.NavigatorFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.snackbar.SnackBarFactory;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -27,7 +28,9 @@ import rx.subscriptions.CompositeSubscription;
  * @author zeyad on 11/28/16.
  */
 public abstract class BaseActivity extends AppCompatActivity implements LoadDataView {
+    @Inject
     public INavigator navigator;
+    @Inject
     public IRxEventBus rxEventBus;
     public IBaseViewModel viewModel;
     public CompositeSubscription mCompositeSubscription;
@@ -36,8 +39,6 @@ public abstract class BaseActivity extends AppCompatActivity implements LoadData
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        rxEventBus = RxEventBusFactory.getInstance();
-        navigator = NavigatorFactory.getInstance();
         isNewActivity = (savedInstanceState == null);
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         mCompositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(mCompositeSubscription);
@@ -126,12 +127,20 @@ public abstract class BaseActivity extends AppCompatActivity implements LoadData
         super.onDestroy();
     }
 
+    public void showToastMessage(String message) {
+        showToastMessage(message, Toast.LENGTH_LONG);
+    }
+
+    public void showToastMessage(String message, int duration) {
+        Toast.makeText(this, message, duration).show();
+    }
+
     /**
      * Shows a {@link android.support.design.widget.Snackbar} message.
      *
      * @param message An string representing a message to be shown.
      */
-    protected void showSnackBarMessage(View view, String message, int duration) {
+    public void showSnackBarMessage(View view, String message, int duration) {
         runOnUiThread(() -> {
             if (view != null)
                 SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_INFO, view, message, duration).show();

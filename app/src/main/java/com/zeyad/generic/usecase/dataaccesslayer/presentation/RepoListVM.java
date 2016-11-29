@@ -3,6 +3,7 @@ package com.zeyad.generic.usecase.dataaccesslayer.presentation;
 import android.os.Bundle;
 
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseViewModel;
+import com.zeyad.generic.usecase.dataaccesslayer.di.PerActivity;
 import com.zeyad.genericusecase.data.requests.GetRequest;
 import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
 
@@ -14,7 +15,7 @@ import rx.functions.Func1;
 /**
  * @author zeyad on 11/1/16.
  */
-
+@PerActivity
 public class RepoListVM extends BaseViewModel implements RepoListView {
 
     final IGenericUseCase genericUseCase;

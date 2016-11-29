@@ -4,14 +4,15 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.View;
+import android.widget.Toast;
 
 import com.zeyad.generic.usecase.dataaccesslayer.Utils;
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.IRxEventBus;
-import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.RxEventBusFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.LoadDataView;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.INavigator;
-import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.NavigatorFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.snackbar.SnackBarFactory;
+
+import javax.inject.Inject;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -22,9 +23,11 @@ import rx.subscriptions.CompositeSubscription;
 
 public abstract class BaseFragment extends Fragment implements LoadDataView {
 
+    @Inject
     public INavigator navigator;
+    @Inject
     public IRxEventBus rxEventBus;
-    public CompositeSubscription mCompositeSubscription;
+    public CompositeSubscription compositeSubscription;
     boolean isNewActivity;
     IBaseViewModel viewModel;
 
@@ -35,10 +38,8 @@ public abstract class BaseFragment extends Fragment implements LoadDataView {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
-        rxEventBus = RxEventBusFactory.getInstance();
-        navigator = NavigatorFactory.getInstance();
         isNewActivity = savedInstanceState == null;
-        mCompositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(mCompositeSubscription);
+        compositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(compositeSubscription);
     }
 
     @Override
@@ -64,12 +65,20 @@ public abstract class BaseFragment extends Fragment implements LoadDataView {
 
     public abstract Subscription loadData();
 
+    public void showToastMessage(String message) {
+        showToastMessage(message, Toast.LENGTH_LONG);
+    }
+
+    public void showToastMessage(String message, int duration) {
+        Toast.makeText(getContext(), message, duration).show();
+    }
+
     /**
      * Shows a {@link android.support.design.widget.Snackbar} message.
      *
      * @param message An string representing a message to be shown.
      */
-    protected void showSnackBarMessage(View view, String message, int duration) {
+    public void showSnackBarMessage(View view, String message, int duration) {
         if (getActivity() != null)
             getActivity().runOnUiThread(() -> {
                 if (view != null)
@@ -118,18 +127,18 @@ public abstract class BaseFragment extends Fragment implements LoadDataView {
     @Override
     public void onResume() {
         super.onResume();
-        mCompositeSubscription.add(loadData());
+        compositeSubscription.add(loadData());
     }
 
     @Override
     public void onPause() {
         super.onPause();
-        Utils.unsubscribeIfNotNull(mCompositeSubscription);
+        Utils.unsubscribeIfNotNull(compositeSubscription);
     }
 
     @Override
     public void onDestroyView() {
-        Utils.unsubscribeIfNotNull(mCompositeSubscription);
+        Utils.unsubscribeIfNotNull(compositeSubscription);
         if (viewModel != null)
             viewModel.onViewDetached();
         super.onDestroyView();
