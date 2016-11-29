@@ -120,6 +120,10 @@ public class GenericUseCaseFactory {
         GenericUseCase.initWithRealm(entityMapper);
     }
 
+    public static void destoryInstance() {
+        sGenericUseCase = null;
+    }
+
     public static String getBaseURL() {
         if (mBaseURL == null)
             throw new NullPointerException("Base Url is null");

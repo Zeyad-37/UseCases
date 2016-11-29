@@ -1,4 +1,4 @@
-package com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.models.repo.data;
+package com.zeyad.generic.usecase.dataaccesslayer.models.data;
 
 import com.google.gson.annotations.SerializedName;
 

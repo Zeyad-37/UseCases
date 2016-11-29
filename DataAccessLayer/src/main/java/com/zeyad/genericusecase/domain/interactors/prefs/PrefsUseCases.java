@@ -22,7 +22,7 @@ public class PrefsUseCases implements IPrefsUseCase {
         sPrefsUseCases = new PrefsUseCases();
     }
 
-    public static PrefsUseCases getInstance() {
+    protected static PrefsUseCases getInstance() {
         if (sPrefsUseCases == null)
             sPrefsUseCases = new PrefsUseCases();
         return sPrefsUseCases;

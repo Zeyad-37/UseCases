@@ -1,4 +1,4 @@
-package com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.models.repo.mapper;
+package com.zeyad.generic.usecase.dataaccesslayer.mapper;
 
 import android.support.annotation.NonNull;
 

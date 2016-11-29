@@ -1,4 +1,4 @@
-package com.zeyad.generic.usecase.dataaccesslayer.presentation;
+package com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_detail;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -6,10 +6,14 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 
 import com.zeyad.generic.usecase.dataaccesslayer.R;
-import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.BaseFragment;
+import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseFragment;
 import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.RepoListActivity;
+
+import butterknife.BindView;
+import rx.Subscription;
 
 /**
  * A fragment representing a single RepoRealm detail screen.
@@ -23,7 +27,8 @@ public class RepoDetailFragment extends BaseFragment {
      * represents.
      */
     public static final String ARG_ITEM_ID = "item_id";
-
+    @BindView(R.id.linear_layout_loader)
+    LinearLayout loaderLayout;
     /**
      * The dummy content this fragment is presenting.
      */
@@ -34,6 +39,10 @@ public class RepoDetailFragment extends BaseFragment {
      * fragment (e.g. upon screen orientation changes).
      */
     public RepoDetailFragment() {
+    }
+
+    public static RepoDetailFragment newInstance() {
+        return new RepoDetailFragment();
     }
 
     @Override
@@ -58,6 +67,11 @@ public class RepoDetailFragment extends BaseFragment {
     }
 
     @Override
+    public Subscription loadData() {
+        return null;
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.repo_detail, container, false);
@@ -66,5 +80,27 @@ public class RepoDetailFragment extends BaseFragment {
 //            ((TextView) rootView.findViewById(R.id.repo_detail)).setText(mItem.details);
 //        }
         return rootView;
+    }
+
+    @Override
+    public void showLoading() {
+        if (getActivity() != null)
+            getActivity().runOnUiThread(() -> loaderLayout.setVisibility(View.VISIBLE));
+    }
+
+    @Override
+    public void hideLoading() {
+        if (getActivity() != null)
+            getActivity().runOnUiThread(() -> loaderLayout.setVisibility(View.GONE));
+    }
+
+    @Override
+    public void showErrorWithRetry(String message) {
+//        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, mRepoRecycler, message, "RETRY", view -> onResume());
+    }
+
+    @Override
+    public void showError(String message) {
+//        showErrorSnackBar(message, mRepoRecycler, Snackbar.LENGTH_LONG);
     }
 }

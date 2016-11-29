@@ -16,4 +16,8 @@ public class PrefsUseCaseFactory {
         PrefsUseCases.init();
         sPrefsUseCase = PrefsUseCases.getInstance();
     }
+
+    public static void destoryInstance() {
+        sPrefsUseCase = null;
+    }
 }

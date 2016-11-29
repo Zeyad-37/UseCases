@@ -1,6 +1,7 @@
 package com.zeyad.genericusecase.domain.interactor;
 
 import com.zeyad.genericusecase.domain.interactors.files.FileUseCase;
+import com.zeyad.genericusecase.domain.interactors.files.FileUseCaseFactory;
 import com.zeyad.genericusecase.domain.interactors.files.IFileUseCase;
 
 import org.junit.Before;
@@ -30,7 +31,7 @@ public class FileUseCaseTest {
     @Before
     public void setUp() throws Exception {
         FileUseCase.init();
-        mFilesUseCase = FileUseCase.getInstance();
+        mFilesUseCase = FileUseCaseFactory.getInstance();
     }
 
     public static IFileUseCase createMockedfilesUseCase() {

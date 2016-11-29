@@ -31,7 +31,7 @@ public class FileUseCase implements IFileUseCase {
         sFilesUseCase = new FileUseCase(new JobExecutor(), new UIThread());
     }
 
-    public static FileUseCase getInstance() {
+    protected static FileUseCase getInstance() {
         if (sFilesUseCase == null)
             sFilesUseCase = new FileUseCase(new JobExecutor(), new UIThread());
         return sFilesUseCase;

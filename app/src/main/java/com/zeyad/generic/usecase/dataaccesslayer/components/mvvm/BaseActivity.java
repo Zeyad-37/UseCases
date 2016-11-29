@@ -33,7 +33,7 @@ public abstract class BaseActivity extends AppCompatActivity implements LoadData
     public IRxEventBus rxEventBus;
     public IBaseViewModel viewModel;
     public CompositeSubscription mCompositeSubscription;
-    boolean isNewActivity;
+    public boolean isNewActivity;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

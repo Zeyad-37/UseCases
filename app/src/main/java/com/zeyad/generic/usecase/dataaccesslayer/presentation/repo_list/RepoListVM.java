@@ -3,8 +3,8 @@ package com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list;
 import android.os.Bundle;
 
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseViewModel;
-import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.models.repo.data.RepoRealm;
-import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.models.repo.ui.RepoModel;
+import com.zeyad.generic.usecase.dataaccesslayer.models.data.RepoRealm;
+import com.zeyad.generic.usecase.dataaccesslayer.models.ui.RepoModel;
 import com.zeyad.genericusecase.data.requests.GetRequest;
 import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
 import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;

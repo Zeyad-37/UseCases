@@ -3,8 +3,8 @@ package com.zeyad.generic.usecase.dataaccesslayer;
 import android.app.Application;
 import android.util.Log;
 
-import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.models.repo.data.RepoRealm;
-import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.models.repo.mapper.RepoMapper;
+import com.zeyad.generic.usecase.dataaccesslayer.mapper.RepoMapper;
+import com.zeyad.generic.usecase.dataaccesslayer.models.data.RepoRealm;
 import com.zeyad.genericusecase.data.mappers.EntityDataMapper;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.utils.EntityMapperUtil;

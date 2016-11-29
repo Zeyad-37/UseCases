@@ -10,6 +10,7 @@ import com.zeyad.genericusecase.data.requests.FileIORequest;
 import com.zeyad.genericusecase.data.requests.GetRequest;
 import com.zeyad.genericusecase.data.requests.PostRequest;
 import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCase;
+import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
 import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
 import com.zeyad.genericusecase.domain.repositories.Repository;
 import com.zeyad.genericusecase.realm_test_models.TestModel;
@@ -496,6 +497,6 @@ public class GenericUseCaseTest {
     public IGenericUseCase getGenericUseImplementation(DataRepository datarepo, JobExecutor jobExecuter
             , UIThread uithread) {
         GenericUseCase.init(datarepo, jobExecuter, uithread);
-        return GenericUseCase.getInstance();
+        return GenericUseCaseFactory.getInstance();
     }
 }

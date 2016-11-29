@@ -16,4 +16,8 @@ public class FileUseCaseFactory {
         FileUseCase.init();
         sFilesUseCase = FileUseCase.getInstance();
     }
+
+    public static void destoryInstance() {
+        sFilesUseCase = null;
+    }
 }
