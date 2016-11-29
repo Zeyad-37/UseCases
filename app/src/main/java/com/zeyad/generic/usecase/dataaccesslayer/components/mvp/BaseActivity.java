@@ -13,10 +13,10 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.zeyad.generic.usecase.dataaccesslayer.Utils;
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.IRxEventBus;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.INavigator;
 import com.zeyad.generic.usecase.dataaccesslayer.components.snackbar.SnackBarFactory;
+import com.zeyad.generic.usecase.dataaccesslayer.utils.Utils;
 
 import java.util.List;
 

@@ -31,7 +31,7 @@ public class SnackBarFactory {
                                                  @NonNull CharSequence text, String actionText,
                                                  View.OnClickListener onClickListener) {
         return createSnackBar(snackBarType, Snackbar.make(view, text, LENGTH_INDEFINITE)
-                .setAction(actionText, onClickListener));
+                .setAction(actionText, onClickListener).setActionTextColor(Color.BLACK));
     }
 
     private static Snackbar createSnackBar(@SnackBarType String snackBarType, Snackbar snackbar) {

@@ -9,5 +9,5 @@
     android:layout_marginLeft="16dp"
     android:layout_marginRight="16dp"
     app:layoutManager="LinearLayoutManager"
-    tools:context="com.zeyad.generic.usecase.dataaccesslayer.presentation.RepoListActivity"
+    tools:context="com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.RepoListActivity"
     tools:listitem="@layout/repo_list_content" />

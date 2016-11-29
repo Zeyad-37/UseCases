@@ -10,11 +10,12 @@ import android.view.MenuItem;
 
 import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.BaseActivity;
+import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.RepoListActivity;
 
 import butterknife.BindView;
 
 /**
- * An activity representing a single Repo detail screen. This
+ * An activity representing a single RepoRealm detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
  * item details are presented side-by-side with a list of items
  * in a {@link RepoListActivity}.

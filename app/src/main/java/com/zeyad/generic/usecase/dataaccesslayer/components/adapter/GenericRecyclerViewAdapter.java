@@ -526,11 +526,11 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
     }
 
     public interface OnItemClickListener {
-        void onItemClicked(int position, ItemInfo userViewModel, ViewHolder holder);
+        void onItemClicked(int position, ItemInfo itemInfo, ViewHolder holder);
     }
 
     public interface OnItemLongClickListener {
-        boolean onItemLongClicked(int position, ItemInfo userViewModel, GenericRecyclerViewAdapter.ViewHolder holder);
+        boolean onItemLongClicked(int position, ItemInfo itemInfo, GenericRecyclerViewAdapter.ViewHolder holder);
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder implements ItemBase {

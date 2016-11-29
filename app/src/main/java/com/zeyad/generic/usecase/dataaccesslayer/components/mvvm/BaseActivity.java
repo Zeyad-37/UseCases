@@ -11,15 +11,15 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
-import com.zeyad.generic.usecase.dataaccesslayer.Utils;
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.IRxEventBus;
+import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.RxEventBusFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.LoadDataView;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.INavigator;
+import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.NavigatorFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.snackbar.SnackBarFactory;
+import com.zeyad.generic.usecase.dataaccesslayer.utils.Utils;
 
 import java.util.List;
-
-import javax.inject.Inject;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -28,9 +28,8 @@ import rx.subscriptions.CompositeSubscription;
  * @author zeyad on 11/28/16.
  */
 public abstract class BaseActivity extends AppCompatActivity implements LoadDataView {
-    @Inject
+
     public INavigator navigator;
-    @Inject
     public IRxEventBus rxEventBus;
     public IBaseViewModel viewModel;
     public CompositeSubscription mCompositeSubscription;
@@ -39,11 +38,15 @@ public abstract class BaseActivity extends AppCompatActivity implements LoadData
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        isNewActivity = (savedInstanceState == null);
+        isNewActivity = savedInstanceState == null;
+        navigator = NavigatorFactory.getInstance();
+        rxEventBus = RxEventBusFactory.getInstance();
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         mCompositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(mCompositeSubscription);
-        initialize(savedInstanceState);
-        setupUI(savedInstanceState);
+        initialize();
+        if (!isNewActivity && viewModel != null)
+            viewModel.restoreState(savedInstanceState);
+        setupUI();
     }
 
     @Override
@@ -56,17 +59,13 @@ public abstract class BaseActivity extends AppCompatActivity implements LoadData
 
     /**
      * Initialize any objects or any required dependencies.
-     *
-     * @param savedInstanceState bundle with fragment state.
      */
-    public abstract void initialize(Bundle savedInstanceState);
+    public abstract void initialize();
 
     /**
      * Setup the UI.
-     *
-     * @param savedInstanceState
      */
-    public abstract void setupUI(Bundle savedInstanceState);
+    public abstract void setupUI();
 
     public abstract Subscription loadData();
 
@@ -152,7 +151,7 @@ public abstract class BaseActivity extends AppCompatActivity implements LoadData
                                        String actionText, View.OnClickListener onClickListener) {
         runOnUiThread(() -> {
             if (view != null)
-                SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText, onClickListener);
+                SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText, onClickListener).show();
             else throw new NullPointerException("view is null");
         });
     }

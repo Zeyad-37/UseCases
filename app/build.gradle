@@ -48,14 +48,14 @@ android {
             shrinkResources true
             debuggable true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debugConfig
+//            signingConfig signingConfigs.debugConfig
         }
 
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.releaseConfig
+//            signingConfig signingConfigs.releaseConfig
         }
     }
 
@@ -76,7 +76,6 @@ ext {
     leakCanaryVersion = '1.4'
     androidSupportTest = '0.5'
     espressoCore = '2.2.2'
-    daggerVersion = '2.7'
 }
 
 dependencies {
@@ -97,9 +96,6 @@ dependencies {
     compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$rxbindingVersion"
     compile 'com.jakewharton.rxrelay:rxrelay:1.2.0'
     // Injection
-    compile "com.google.dagger:dagger:$daggerVersion"
-    apt "com.google.dagger:dagger-compiler:$daggerVersion"
-    compile 'javax.annotation:jsr250-api:1.0'
     compile "com.jakewharton:butterknife:$butterKnifeVersion"
     apt "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
     // Testing

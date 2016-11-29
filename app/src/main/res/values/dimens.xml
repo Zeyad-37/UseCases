@@ -3,7 +3,10 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="sixty_dp">60dp</dimen>
+    <dimen name="forty_eight_dp">48dp</dimen>
     <dimen name="forty_dp">40dp</dimen>
+    <dimen name="thirty_two_dp">32dp</dimen>
+    <dimen name="twenty_four_dp">24dp</dimen>
     <dimen name="sixteen_dp">16dp</dimen>
     <dimen name="eight_dp">8dp</dimen>
     <dimen name="four_dp">4dp</dimen>

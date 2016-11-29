@@ -1,0 +1,37 @@
+package com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.models.repo.data;
+
+import com.google.gson.annotations.SerializedName;
+
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
+
+/**
+ * @author zeyad on 11/29/16.
+ */
+
+public class RepoRealm extends RealmObject {
+
+    @PrimaryKey
+    @SerializedName("html_url")
+    private String url;
+    private String name;
+
+    public RepoRealm() {
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getUrl() {
+        return url;
+    }
+}

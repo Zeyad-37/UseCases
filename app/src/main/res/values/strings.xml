@@ -3,4 +3,5 @@
     <string name="exception_message_no_connection">Please check your internet connection</string>
     <string name="title_repo_list">Repos</string>
     <string name="title_repo_detail">Repo Detail</string>
+    <string name="empty_show_repos_message">No repos found :(\nPlease tap on + button to start adding repos.</string>
 </resources>

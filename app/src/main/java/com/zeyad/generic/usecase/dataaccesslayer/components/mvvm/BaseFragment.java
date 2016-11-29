@@ -6,13 +6,13 @@ import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.Toast;
 
-import com.zeyad.generic.usecase.dataaccesslayer.Utils;
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.IRxEventBus;
+import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.RxEventBusFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.LoadDataView;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.INavigator;
+import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.NavigatorFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.snackbar.SnackBarFactory;
-
-import javax.inject.Inject;
+import com.zeyad.generic.usecase.dataaccesslayer.utils.Utils;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -23,9 +23,7 @@ import rx.subscriptions.CompositeSubscription;
 
 public abstract class BaseFragment extends Fragment implements LoadDataView {
 
-    @Inject
     public INavigator navigator;
-    @Inject
     public IRxEventBus rxEventBus;
     public CompositeSubscription compositeSubscription;
     boolean isNewActivity;
@@ -38,14 +36,20 @@ public abstract class BaseFragment extends Fragment implements LoadDataView {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+        navigator = NavigatorFactory.getInstance();
+        rxEventBus = RxEventBusFactory.getInstance();
         isNewActivity = savedInstanceState == null;
+        if (!isNewActivity && viewModel != null)
+            viewModel.restoreState(savedInstanceState);
         compositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(compositeSubscription);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        initialize(savedInstanceState);
+        initialize();
+        if (savedInstanceState != null)
+            viewModel.restoreState(savedInstanceState);
     }
 
     @Override
@@ -58,10 +62,8 @@ public abstract class BaseFragment extends Fragment implements LoadDataView {
 
     /**
      * Initialize any objects or any required dependencies.
-     *
-     * @param savedInstanceState bundle with fragment state.
      */
-    public abstract void initialize(Bundle savedInstanceState);
+    public abstract void initialize();
 
     public abstract Subscription loadData();
 

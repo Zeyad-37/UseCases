@@ -9,9 +9,10 @@ import android.view.ViewGroup;
 
 import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.BaseFragment;
+import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.RepoListActivity;
 
 /**
- * A fragment representing a single Repo detail screen.
+ * A fragment representing a single RepoRealm detail screen.
  * This fragment is either contained in a {@link RepoListActivity}
  * in two-pane mode (on tablets) or a {@link RepoDetailActivity}
  * on handsets.

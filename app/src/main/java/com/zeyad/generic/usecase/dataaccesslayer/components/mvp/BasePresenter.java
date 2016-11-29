@@ -1,6 +1,6 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 
-import com.zeyad.generic.usecase.dataaccesslayer.Utils;
+import com.zeyad.generic.usecase.dataaccesslayer.utils.Utils;
 import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
 import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
 

@@ -1,6 +1,5 @@
-package com.zeyad.generic.usecase.dataaccesslayer.presentation;
+package com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list;
 
-import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.RecyclerView;
@@ -11,9 +10,15 @@ import android.widget.LinearLayout;
 
 import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.generic.usecase.dataaccesslayer.components.adapter.GenericRecyclerViewAdapter;
+import com.zeyad.generic.usecase.dataaccesslayer.components.adapter.ItemInfo;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseActivity;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseSubscriber;
 import com.zeyad.generic.usecase.dataaccesslayer.components.snackbar.SnackBarFactory;
+import com.zeyad.generic.usecase.dataaccesslayer.presentation.RepoDetailActivity;
+import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.models.repo.ui.RepoModel;
+import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.view_holders.EmptyViewHolder;
+import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.view_holders.RepoViewHolder;
+import com.zeyad.generic.usecase.dataaccesslayer.utils.Utils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,8 +39,6 @@ import static com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseSubs
  */
 public class RepoListActivity extends BaseActivity {
 
-
-    RepoListVM mRepoListVM;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.linear_layout_loader)
@@ -45,6 +48,7 @@ public class RepoListActivity extends BaseActivity {
     @BindView(R.id.fab)
     FloatingActionButton mFab;
     GenericRecyclerViewAdapter mReposAdapter;
+    private String currentFragTag;
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
@@ -52,23 +56,17 @@ public class RepoListActivity extends BaseActivity {
     private boolean twoPane;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public void initialize() {
+        viewModel = new RepoListVM();
     }
 
     @Override
-    public void initialize(Bundle savedInstanceState) {
-    }
-
-    @Override
-    public void setupUI(Bundle savedInstanceState) {
+    public void setupUI() {
         setContentView(R.layout.activity_repo_list);
         setSupportActionBar(mToolbar);
         ButterKnife.bind(this);
         mToolbar.setTitle(getTitle());
-        mFab.setOnClickListener(view -> Snackbar.make(view, "Replace with your own action",
-                Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show());
+        mFab.setOnClickListener(view -> showErrorWithRetry("ops"));
         setupRecyclerView();
         if (findViewById(R.id.repo_detail_container) != null)
             twoPane = true;
@@ -76,12 +74,15 @@ public class RepoListActivity extends BaseActivity {
 
     @Override
     public Subscription loadData() {
-        return mRepoListVM.getRepoList()
+        return ((RepoListVM) viewModel).getRepoList("Zeyad-37")
                 .doOnSubscribe(this::showLoading)
-                .subscribe(new BaseSubscriber<RepoListActivity, List>(this, ERROR_WITH_RETRY) {
+                .subscribe(new BaseSubscriber<RepoListActivity, List<RepoModel>>(this, ERROR_WITH_RETRY) {
                     @Override
-                    public void onNext(List list) {
-                        // render data
+                    public void onNext(List<RepoModel> repoModels) {
+                        List<ItemInfo> itemInfos = new ArrayList<>(repoModels.size());
+                        for (int i = 0, repoModelsSize = repoModels.size(); i < repoModelsSize; i++)
+                            itemInfos.add(new ItemInfo<>(repoModels.get(i), R.layout.item_repo));
+                        mReposAdapter.animateTo(itemInfos);
                     }
                 });
     }
@@ -90,12 +91,37 @@ public class RepoListActivity extends BaseActivity {
         mReposAdapter = new GenericRecyclerViewAdapter(getApplicationContext(), new ArrayList<>()) {
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                return null;
+                switch (viewType) {
+                    case R.layout.empty_view:
+                        return new EmptyViewHolder(mLayoutInflater.inflate(R.layout.empty_view, parent, false));
+                    case R.layout.sticky_header:
+                        return new RepoViewHolder(mLayoutInflater.inflate(R.layout.sticky_header, parent, false));
+                    case R.layout.item_repo:
+                        return new RepoViewHolder(mLayoutInflater.inflate(R.layout.item_repo, parent, false));
+                    default:
+                        return null;
+                }
             }
         };
         mReposAdapter.setAreItemsClickable(true);
-        mReposAdapter.setOnItemClickListener((position, userViewModel, holder) -> {
-
+        mReposAdapter.setOnItemClickListener((position, itemInfo, holder) -> {
+            if (twoPane) {
+//                if (itemInfo.getData() instanceof OrderViewModel) {
+                if (Utils.isNotEmpty(currentFragTag)) {
+                    removeFragment(currentFragTag);
+                }
+//                    OrderViewModel orderViewModel = (OrderViewModel) itemInfo.getData();
+//                    RepoDetailFragment orderDetailFragment = RepoDetailFragment
+//                            .newInstance(orderViewModel, false);
+//                    orderDetailFragment.setOrderDetailListener(OrderListActivity.this);
+//                    orderId = orderViewModel.getId();
+//                    currentFragTag = orderDetailFragment.getClass().getSimpleName() + orderId;
+//                    addFragment(R.id.repo_detail_container, orderDetailFragment, null, currentFragTag);
+//                }
+            } else {
+//                navigator.navigateTo(getApplicationContext(), RepoDetailActivity.getCallingIntent(getApplicationContext(),
+//                                itemInfo.getData(), false));
+            }
         });
         mRepoRecycler.setAdapter(mReposAdapter);
     }

@@ -1,6 +1,8 @@
-package com.zeyad.generic.usecase.dataaccesslayer;
+package com.zeyad.generic.usecase.dataaccesslayer.utils;
 
 import android.support.annotation.Nullable;
+
+import java.util.List;
 
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
@@ -21,5 +23,13 @@ public class Utils {
     public static void unsubscribeIfNotNull(@Nullable Subscription subscription) {
         if (subscription != null)
             subscription.unsubscribe();
+    }
+
+    public static boolean isNotEmpty(String text) {
+        return text != null && !text.isEmpty() && !text.equalsIgnoreCase("null");
+    }
+
+    public static boolean isNotEmpty(List list) {
+        return list != null && !list.isEmpty();
     }
 }

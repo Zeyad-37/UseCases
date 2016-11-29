@@ -34,6 +34,7 @@ public class BaseSubscriber<V extends LoadDataView, M> extends Subscriber<M> {
     @Override
     public void onError(Throwable throwable) {
         view.hideLoading();
+        throwable.printStackTrace();
         switch (errorPolicy) {
             case ERROR:
                 view.showError(ErrorMessageFactory.create((Exception) throwable));
@@ -44,7 +45,6 @@ public class BaseSubscriber<V extends LoadDataView, M> extends Subscriber<M> {
             default:
                 break;
         }
-        throwable.printStackTrace();
     }
 
     @Override
