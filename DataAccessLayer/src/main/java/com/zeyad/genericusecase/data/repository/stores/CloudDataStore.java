@@ -288,8 +288,8 @@ public class CloudDataStore implements DataStore {
     public Observable<?> dynamicUploadFile(String url, @NonNull File file, String key, HashMap<String, Object> parameters, boolean onWifi, boolean whileCharging,
                                            boolean queuable, Class domainClass) {
         return Observable.defer(() -> {
-            if (isEligibleForPersistenceIfNetworkNotAvailable(queuable) && Utils.isOnWifi() == onWifi
-                    && Utils.isChargingReqCompatible(Utils.isCharging(), whileCharging)) {
+            if (isEligibleForPersistenceIfNetworkNotAvailable(queuable) && Utils.isOnWifi(mContext) == onWifi
+                    && Utils.isChargingReqCompatible(Utils.isCharging(mContext), whileCharging)) {
                 queueIOFile(url, file, true, whileCharging, false);
                 return mQueueFileIO;
             } else if (isEligibleForThrowErrorIfNetworkNotAvailable())
@@ -319,8 +319,8 @@ public class CloudDataStore implements DataStore {
     public Observable<?> dynamicDownloadFile(String url, @NonNull File file, boolean onWifi,
                                              boolean whileCharging, boolean queuable) {
         return Observable.defer(() -> {
-            if (isEligibleForPersistenceIfNetworkNotAvailable(queuable) && Utils.isOnWifi() == onWifi
-                    && Utils.isChargingReqCompatible(Utils.isCharging(), whileCharging)) {
+            if (isEligibleForPersistenceIfNetworkNotAvailable(queuable) && Utils.isOnWifi(mContext) == onWifi
+                    && Utils.isChargingReqCompatible(Utils.isCharging(mContext), whileCharging)) {
                 queueIOFile(url, file, onWifi, whileCharging, true);
                 return mQueueFileIO;
             } else

@@ -18,7 +18,6 @@ import android.support.annotation.Nullable;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.zeyad.genericusecase.Config;
 
 import io.realm.Realm;
 import okhttp3.MediaType;
@@ -96,14 +95,14 @@ public class Utils {
         else return 0;
     }
 
-    public static boolean isOnWifi() {
-        return ((ConnectivityManager) Config.getInstance().getContext().getSystemService(Context.CONNECTIVITY_SERVICE))
+    public static boolean isOnWifi(Context context) {
+        return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE))
                 .getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI;
     }
 
-    public static boolean isCharging() {
+    public static boolean isCharging(Context context) {
         boolean charging = false;
-        final Intent batteryIntent = Config.getInstance().getContext().registerReceiver(null,
+        final Intent batteryIntent = context.registerReceiver(null,
                 new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         int status = batteryIntent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
         boolean batteryCharge = status == BatteryManager.BATTERY_STATUS_CHARGING;

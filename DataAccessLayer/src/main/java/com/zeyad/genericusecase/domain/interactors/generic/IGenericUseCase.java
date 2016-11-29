@@ -4,6 +4,8 @@ import com.zeyad.genericusecase.data.requests.FileIORequest;
 import com.zeyad.genericusecase.data.requests.GetRequest;
 import com.zeyad.genericusecase.data.requests.PostRequest;
 
+import java.util.List;
+
 import io.realm.RealmQuery;
 import rx.Observable;
 
@@ -14,7 +16,7 @@ public interface IGenericUseCase {
      * @param getListRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable getList(GetRequest getListRequest);
+    Observable<List> getList(GetRequest getListRequest);
 
     /**
      * Gets object from full url.

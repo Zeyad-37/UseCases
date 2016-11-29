@@ -21,6 +21,7 @@ import okhttp3.OkHttpClient;
 public class GenericUseCaseFactory {
 
     private static IGenericUseCase sGenericUseCase;
+    private static String mBaseURL;
 
     public static IGenericUseCase getInstance() {
         return sGenericUseCase;
@@ -117,6 +118,18 @@ public class GenericUseCaseFactory {
         PrefsUseCaseFactory.init();
         FileUseCaseFactory.init();
         GenericUseCase.initWithRealm(entityMapper);
+    }
+
+    public static String getBaseURL() {
+        if (mBaseURL == null)
+            throw new NullPointerException("Base Url is null");
+        if (mBaseURL.isEmpty())
+            throw new IllegalArgumentException("Base Url is empty");
+        return mBaseURL;
+    }
+
+    public static void setBaseURL(String baseURL) {
+        mBaseURL = baseURL;
     }
 
     /**

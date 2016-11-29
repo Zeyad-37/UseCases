@@ -3,6 +3,7 @@ package com.zeyad.genericusecase.data.requests;
 import android.support.annotation.NonNull;
 
 import com.zeyad.genericusecase.data.repository.DataRepository;
+import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
 
 import rx.Subscriber;
 
@@ -91,6 +92,12 @@ public class GetRequest {
 
         @NonNull
         public GetRequestBuilder url(String url) {
+            mUrl = GenericUseCaseFactory.getBaseURL() + url;
+            return this;
+        }
+
+        @NonNull
+        public GetRequestBuilder fullUrl(String url) {
             mUrl = url;
             return this;
         }

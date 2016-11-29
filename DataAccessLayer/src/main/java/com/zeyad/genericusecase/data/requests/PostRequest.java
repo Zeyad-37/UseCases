@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.genericusecase.data.repository.DataRepository;
 import com.zeyad.genericusecase.data.utils.ModelConverters;
+import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -149,6 +150,12 @@ public class PostRequest {
 
         @NonNull
         public PostRequestBuilder url(String url) {
+            this.url = GenericUseCaseFactory.getBaseURL() + url;
+            return this;
+        }
+
+        @NonNull
+        public PostRequestBuilder fullUrl(String url) {
             this.url = url;
             return this;
         }
