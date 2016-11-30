@@ -1,8 +1,8 @@
 package com.zeyad.genericusecase.domain.interactor;
 
-import com.zeyad.genericusecase.domain.interactors.files.FileUseCase;
 import com.zeyad.genericusecase.domain.interactors.files.FileUseCaseFactory;
 import com.zeyad.genericusecase.domain.interactors.files.IFileUseCase;
+import com.zeyad.genericusecase.domain.repositories.Files;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +11,6 @@ import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
 
 import java.io.FileNotFoundException;
-import java.io.IOException;
 
 import rx.Observable;
 import rx.observers.TestSubscriber;
@@ -30,22 +29,21 @@ public class FileUseCaseTest {
 
     @Before
     public void setUp() throws Exception {
-        FileUseCase.init();
+        FileUseCaseFactory.init();
         mFilesUseCase = FileUseCaseFactory.getInstance();
     }
 
-    public static IFileUseCase createMockedfilesUseCase() {
-        final IFileUseCase filesUseCase = Mockito.mock(IFileUseCase.class);
-
-        Mockito.when(filesUseCase.readFromResource(Mockito.anyString()))
+    public static Files createMockedFilesUseCase() {
+        final Files files = Mockito.mock(Files.class);
+        Mockito.when(files.readFromResource(Mockito.anyString()))
                 .thenReturn(readResponse());
-        Mockito.when(filesUseCase.readFromFile(Mockito.anyString()))
+        Mockito.when(files.readFromFile(Mockito.anyString()))
                 .thenReturn(readResponse());
-        Mockito.when(filesUseCase.saveToFile(Mockito.anyString(), Mockito.anyString()))
+        Mockito.when(files.saveToFile(Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(saveResponse());
-        Mockito.when(filesUseCase.saveToFile(Mockito.anyString(), new byte[]{}))
+        Mockito.when(files.saveToFile(Mockito.anyString(), new byte[]{}))
                 .thenReturn(saveResponse());
-        return filesUseCase;
+        return files;
     }
 
     public static Observable<String> readResponse() {
@@ -64,12 +62,15 @@ public class FileUseCaseTest {
     public void readFromResource() {
         TestSubscriber<String> subscriber = new TestSubscriber<>();
         mFilesUseCase.readFromResource("").subscribe(subscriber);
-        subscriber.assertError(new IOException());
+        subscriber.awaitTerminalEvent();
+        subscriber.assertError(new NullPointerException());
     }
 
     @Test
     public void readFromFile() {
-        assertThat(mFilesUseCase.readFromFile(""), is(equalTo(readResponse())));
+//        assertThat(mFilesUseCase.readFromFile(""), is(equalTo(readResponse())));
+        mFilesUseCase.readFromFile("").subscribe(new TestSubscriber<>());
+        Mockito.verify(createMockedFilesUseCase()).readFromFile("");
     }
 
     @Test

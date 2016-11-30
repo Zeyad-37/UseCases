@@ -2,17 +2,25 @@ package com.zeyad.genericusecase.data.requests;
 
 import android.support.annotation.Nullable;
 
+import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.powermock.api.mockito.PowerMockito.when;
 
-@RunWith(JUnit4.class)
+@RunWith(PowerMockRunner.class)
+@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
+@PrepareForTest({GenericUseCaseFactory.class})
 public class FileIORequestTest {
 
     @Nullable
@@ -20,6 +28,8 @@ public class FileIORequestTest {
 
     @Before
     public void setUp() throws Exception {
+        PowerMockito.mockStatic(GenericUseCaseFactory.class);
+        when(GenericUseCaseFactory.getBaseURL()).thenReturn("www.google.com");
         mFileIORequest = FileIORequestTestRobot.createUploadRequest();
     }
 

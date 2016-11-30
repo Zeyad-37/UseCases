@@ -74,7 +74,7 @@ public class GenericUseCase implements IGenericUseCase {
         sGenericUseCase = new GenericUseCase(dataRepository, jobExecutor, uiThread);
     }
 
-    protected static GenericUseCase getInstance() {
+    public static GenericUseCase getInstance() {
         if (sGenericUseCase == null)
             throw new NullPointerException("GenericUseCase#initRealm must be called before calling getInstance()");
         return sGenericUseCase;

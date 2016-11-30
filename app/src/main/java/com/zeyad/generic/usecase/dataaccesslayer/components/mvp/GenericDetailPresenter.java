@@ -2,7 +2,7 @@ package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 
 import android.support.annotation.NonNull;
 
-import com.zeyad.generic.usecase.dataaccesslayer.components.ErrorMessageFactory;
+import com.zeyad.generic.usecase.dataaccesslayer.components.exceptions.ErrorMessageFactory;
 
 import rx.Subscriber;
 

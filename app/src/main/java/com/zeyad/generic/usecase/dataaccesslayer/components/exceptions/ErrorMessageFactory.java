@@ -1,4 +1,4 @@
-package com.zeyad.generic.usecase.dataaccesslayer.components;
+package com.zeyad.generic.usecase.dataaccesslayer.components.exceptions;
 
 import com.zeyad.genericusecase.data.exceptions.NetworkConnectionException;
 
@@ -17,7 +17,8 @@ public class ErrorMessageFactory {
     private static final String NO_INTERNET = "Please check your internet connection",
             UNKNOWN_ERROR = "Unknown error";
 
-    private ErrorMessageFactory() {
+    public static String create(ErrorBundle exception) {
+        return exception.getMessage();
     }
 
     /**

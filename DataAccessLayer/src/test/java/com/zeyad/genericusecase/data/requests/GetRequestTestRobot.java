@@ -1,7 +1,7 @@
 package com.zeyad.genericusecase.data.requests;
 
-import com.zeyad.genericusecase.realm_test_models.TestModel;
-import com.zeyad.genericusecase.realm_test_models.TestViewModel;
+import com.zeyad.genericusecase.utils.TestModel;
+import com.zeyad.genericusecase.utils.TestViewModel;
 
 import rx.Subscriber;
 import rx.observers.TestSubscriber;
@@ -19,7 +19,7 @@ class GetRequestTestRobot {
 
     static GetRequest createGetObjectRequest() {
         return new GetRequest.GetRequestBuilder(DATA_CLASS, TO_PERSIST)
-                .url(URL)
+                .fullUrl(URL)
                 .shouldCache(SHOULD_CACHE)
                 .presentationClass(PRESENTATION_CLASS)
                 .idColumnName(ID_COLUMN_NAME)

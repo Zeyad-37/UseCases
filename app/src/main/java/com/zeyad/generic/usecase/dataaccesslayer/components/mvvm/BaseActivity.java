@@ -1,6 +1,5 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.mvvm;
 
-import android.content.ComponentCallbacks2;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -10,7 +9,6 @@ import android.util.Pair;
 import android.view.View;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.IRxEventBus;
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.RxEventBusFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.LoadDataView;
@@ -121,8 +119,6 @@ public abstract class BaseActivity extends AppCompatActivity implements LoadData
     public void onDestroy() {
         if (viewModel != null)
             viewModel.onViewDetached();
-        Glide.get(getApplicationContext()).clearMemory();
-        Glide.get(getApplicationContext()).trimMemory(ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
         super.onDestroy();
     }
 

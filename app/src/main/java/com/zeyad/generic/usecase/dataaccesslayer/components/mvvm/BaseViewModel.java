@@ -31,10 +31,12 @@ public abstract class BaseViewModel implements IBaseViewModel {
             compositeSubscription.unsubscribe();
     }
 
+    @Override
     public int getItemId() {
         return itemId;
     }
 
+    @Override
     public void setItemId(int itemId) {
         this.itemId = itemId;
     }

@@ -3,7 +3,7 @@ package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 
-import com.zeyad.generic.usecase.dataaccesslayer.components.ErrorMessageFactory;
+import com.zeyad.generic.usecase.dataaccesslayer.components.exceptions.ErrorMessageFactory;
 
 import java.util.List;
 

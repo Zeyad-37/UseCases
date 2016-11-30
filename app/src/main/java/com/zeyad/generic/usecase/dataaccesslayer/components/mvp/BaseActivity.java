@@ -1,7 +1,6 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 
 import android.app.Activity;
-import android.content.ComponentCallbacks2;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
@@ -12,7 +11,6 @@ import android.util.Pair;
 import android.view.View;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.IRxEventBus;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.INavigator;
 import com.zeyad.generic.usecase.dataaccesslayer.components.snackbar.SnackBarFactory;
@@ -82,8 +80,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public void onDestroy() {
         Utils.unsubscribeIfNotNull(mCompositeSubscription);
-        Glide.get(getApplicationContext()).clearMemory();
-        Glide.get(getApplicationContext()).trimMemory(ComponentCallbacks2.TRIM_MEMORY_COMPLETE);
 //        RappiApplication.getRefWatcher(getApplicationContext()).watch(this);
         super.onDestroy();
     }

@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.realm_test_models;
+package com.zeyad.genericusecase.utils;
 
 import io.realm.RealmModel;
 import io.realm.annotations.PrimaryKey;

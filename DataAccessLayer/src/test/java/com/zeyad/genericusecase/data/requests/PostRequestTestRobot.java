@@ -1,7 +1,7 @@
 package com.zeyad.genericusecase.data.requests;
 
-import com.zeyad.genericusecase.realm_test_models.TestModel;
-import com.zeyad.genericusecase.realm_test_models.TestViewModel;
+import com.zeyad.genericusecase.utils.TestModel;
+import com.zeyad.genericusecase.utils.TestViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -32,7 +32,7 @@ class PostRequestTestRobot {
                 .payLoad(JSON_OBJECT)
                 .presentationClass(PRESENTATION_CLASS)
                 .subscriber(SUBSCRIBER)
-                .url(URL)
+                .fullUrl(URL)
                 .build();
     }
 }

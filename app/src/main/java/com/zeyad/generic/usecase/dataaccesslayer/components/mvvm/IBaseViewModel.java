@@ -15,4 +15,8 @@ public interface IBaseViewModel {
     <V extends LoadDataView> void onViewAttached(V view, boolean isNew);
 
     void onViewDetached();
+
+    int getItemId();
+
+    void setItemId(int itemId);
 }

@@ -10,6 +10,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.test.InstrumentationRegistry;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
@@ -209,6 +210,7 @@ public class TestUtility {
     }
 
     public static void performInitialSetupOfDb() {
+        Realm.init(InstrumentationRegistry.getContext());
         Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
                 .name("app.realm")
                 .modules(Realm.getDefaultModule(), new LibraryModule())

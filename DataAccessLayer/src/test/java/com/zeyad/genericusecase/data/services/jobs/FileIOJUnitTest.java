@@ -2,9 +2,10 @@ package com.zeyad.genericusecase.data.services.jobs;
 
 import android.annotation.TargetApi;
 import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
 import android.content.pm.PackageManager;
 import android.os.Build;
-import android.support.test.runner.AndroidJUnit4;
+import android.support.test.rule.BuildConfig;
 
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
@@ -20,6 +21,10 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.powermock.core.classloader.annotations.PowerMockIgnore;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.io.IOException;
 
@@ -36,9 +41,11 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.times;
 
-@RunWith(AndroidJUnit4.class)
-//@Config(constants = BuildConfig.class)
-public class FileIOTest {
+@RunWith(RobolectricGradleTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 21)
+@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
+@PrepareForTest({JobScheduler.class})
+public class FileIOJUnitTest {
     // TODO: 9/25/16 Mock Job Scheduler
     @Before
     public void setUp() throws Exception {
@@ -47,38 +54,37 @@ public class FileIOTest {
 
     @After
     public void tearDown() throws Exception {
-        FileIOTestRobot.clearAll();
+        FileIOJUnitTestRobot.clearAll();
     }
-
 
     @Test
     public void testExecute_ifFileIsDownloaded_whenFileIsToBeDownloadedAndFileDoesNotExist() throws PackageManager.NameNotFoundException {
         FileIORequest fileIOReq =
-                FileIOTestRobot.createFileIoReq(true, true, FileIOTestRobot.createFileWhichDoesNotExist());
-        final RestApiImpl restApi = FileIOTestRobot.createRestApi();
-        FileIO fileIO = FileIOTestRobot.createFileIO(FileIOTestRobot.createMockedContext()
+                FileIOJUnitTestRobot.createFileIoReq(true, true, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
+        final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
+        FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 3
                 , fileIOReq
                 , true
-                , FileIOTestRobot.getGcmNetworkManager()
+                , FileIOJUnitTestRobot.getGcmNetworkManager()
                 , true
                 , false);
         fileIO.execute();
-        Mockito.verify(restApi).dynamicDownload(eq(FileIOTestRobot.getValidUrl()));
+        Mockito.verify(restApi).dynamicDownload(eq(FileIOJUnitTestRobot.getValidUrl()));
     }
 
     @Test
     public void testQueueIoFile_ifTrailCountIncrements_whenFileIsToBeDownloadedAndFileDoesNotExist() throws IOException, PackageManager.NameNotFoundException {
         FileIORequest fileIOReq =
-                FileIOTestRobot.createFileIoReq(true, true, FileIOTestRobot.createFileWhichDoesNotExist());
-        final RestApiImpl restApi = FileIOTestRobot.createRestApi();
-        FileIO fileIO = FileIOTestRobot.createFileIO(FileIOTestRobot.createMockedContext()
+                FileIOJUnitTestRobot.createFileIoReq(true, true, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
+        final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
+        FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 3
                 , fileIOReq
                 , true
-                , FileIOTestRobot.getGcmNetworkManager()
+                , FileIOJUnitTestRobot.getGcmNetworkManager()
                 , true
                 , false);
         fileIO.queueIOFile();
@@ -88,10 +94,10 @@ public class FileIOTest {
     @Test
     public void testQueueIoFile_ifGCMNetworkManagerIsScheduled_whenGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
         FileIORequest fileIOReq =
-                FileIOTestRobot.createFileIoReq(true, true, FileIOTestRobot.createFileWhichDoesNotExist());
-        final RestApiImpl restApi = FileIOTestRobot.createRestApi();
-        final GcmNetworkManager gcmNetworkManager = FileIOTestRobot.getGcmNetworkManager();
-        FileIO fileIO = FileIOTestRobot.createFileIO(FileIOTestRobot.createMockedContext()
+                FileIOJUnitTestRobot.createFileIoReq(true, true, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
+        final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
+        final GcmNetworkManager gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager();
+        FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 1
                 , fileIOReq
@@ -106,10 +112,10 @@ public class FileIOTest {
     @Test
     public void testQueueIoFile_ifCorrectArgumentsArePassedToGCMNetworkManager_whenGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
         FileIORequest fileIOReq =
-                FileIOTestRobot.createFileIoReq(true, false, FileIOTestRobot.createFileWhichDoesNotExist());
-        final RestApiImpl restApi = FileIOTestRobot.createRestApi();
-        final GcmNetworkManager gcmNetworkManager = FileIOTestRobot.getGcmNetworkManager();
-        FileIO fileIO = FileIOTestRobot.createFileIO(FileIOTestRobot.createMockedContext()
+                FileIOJUnitTestRobot.createFileIoReq(true, false, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
+        final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
+        final GcmNetworkManager gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager();
+        FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 1
                 , fileIOReq
@@ -133,10 +139,10 @@ public class FileIOTest {
     @Test
     public void testQueueIoFile_ifJobSchedulerIsInvoked_whenGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
         FileIORequest fileIOReq =
-                FileIOTestRobot.createFileIoReq(true, true, FileIOTestRobot.createFileWhichDoesNotExist());
-        final RestApiImpl restApi = FileIOTestRobot.createRestApi();
-        final GcmNetworkManager gcmNetworkManager = FileIOTestRobot.getGcmNetworkManager();
-        FileIO fileIO = FileIOTestRobot.createFileIO(FileIOTestRobot.createMockedContext()
+                FileIOJUnitTestRobot.createFileIoReq(true, true, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
+        final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
+        final GcmNetworkManager gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager();
+        FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 1
                 , fileIOReq
@@ -145,17 +151,17 @@ public class FileIOTest {
                 , false
                 , true);
         fileIO.queueIOFile();
-        Mockito.verify(FileIOTestRobot.getMockedJobScheduler()).schedule(Mockito.any(JobInfo.class));
+        Mockito.verify(FileIOJUnitTestRobot.getMockedJobScheduler()).schedule(Mockito.any(JobInfo.class));
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Test
     public void testQueueIoFile_ifCorrectArgumentsArePassedToJobScheduler_whenGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
         FileIORequest fileIOReq =
-                FileIOTestRobot.createFileIoReq(true, true, FileIOTestRobot.createFileWhichDoesNotExist());
-        final RestApiImpl restApi = FileIOTestRobot.createRestApi();
-        final GcmNetworkManager gcmNetworkManager = FileIOTestRobot.getGcmNetworkManager();
-        FileIO fileIO = FileIOTestRobot.createFileIO(FileIOTestRobot.createMockedContext()
+                FileIOJUnitTestRobot.createFileIoReq(true, true, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
+        final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
+        final GcmNetworkManager gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager();
+        FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 1
                 , fileIOReq
@@ -165,7 +171,7 @@ public class FileIOTest {
                 , true);
         fileIO.queueIOFile();
         ArgumentCaptor<JobInfo> argumentCaptor = ArgumentCaptor.forClass(JobInfo.class);
-        Mockito.verify(FileIOTestRobot.getMockedJobScheduler()).schedule(argumentCaptor.capture());
+        Mockito.verify(FileIOJUnitTestRobot.getMockedJobScheduler()).schedule(argumentCaptor.capture());
         assertThat(argumentCaptor.getValue().getService().getClassName(), is(equalTo(GenericJobService.class.getName())));
         assertThat(argumentCaptor.getValue().isRequireCharging(), is(fileIOReq.isWhileCharging()));
         assertThat(argumentCaptor.getValue().isPersisted(), is(true));
@@ -177,10 +183,10 @@ public class FileIOTest {
     @Test
     public void testQueueIoFile_ifGCMNetworkManagerIsNotScheduled_whenGooglePlayServicesAreNotAvailable() throws IOException, PackageManager.NameNotFoundException {
         FileIORequest fileIOReq =
-                FileIOTestRobot.createFileIoReq(true, true, FileIOTestRobot.createFileWhichDoesNotExist());
-        final RestApiImpl restApi = FileIOTestRobot.createRestApi();
-        final GcmNetworkManager gcmNetworkManager = FileIOTestRobot.getGcmNetworkManager();
-        FileIO fileIO = FileIOTestRobot.createFileIO(FileIOTestRobot.createMockedContext()
+                FileIOJUnitTestRobot.createFileIoReq(true, true, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
+        final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
+        final GcmNetworkManager gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager();
+        FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 2
                 , fileIOReq
@@ -195,17 +201,17 @@ public class FileIOTest {
     @Test
     public void testExecute_ifFileIsNotDownloaded_whenFileIsToBeDownloadedAndFileDoesExist() throws IOException, PackageManager.NameNotFoundException {
         FileIORequest fileIOReq =
-                FileIOTestRobot.createFileIoReq(true, true, FileIOTestRobot.createFileWhichDoesExist());
-        final RestApiImpl restApi = FileIOTestRobot.createRestApi();
-        FileIO fileIO = FileIOTestRobot.createFileIO(FileIOTestRobot.createMockedContext()
+                FileIOJUnitTestRobot.createFileIoReq(true, true, FileIOJUnitTestRobot.createFileWhichDoesExist());
+        final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
+        FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 3
                 , fileIOReq
                 , true
-                , FileIOTestRobot.getGcmNetworkManager()
+                , FileIOJUnitTestRobot.getGcmNetworkManager()
                 , true
                 , false);
         fileIO.execute();
-        Mockito.verify(restApi, times(0)).dynamicDownload(eq(FileIOTestRobot.getValidUrl()));
+        Mockito.verify(restApi, times(0)).dynamicDownload(eq(FileIOJUnitTestRobot.getValidUrl()));
     }
 }

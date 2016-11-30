@@ -38,7 +38,7 @@ import static com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseSubs
  * item details side-by-side using two vertical panes.
  */
 public class RepoListActivity extends BaseActivity {
-
+    RepoListVM repoListVM;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
     @BindView(R.id.linear_layout_loader)
@@ -58,6 +58,7 @@ public class RepoListActivity extends BaseActivity {
     @Override
     public void initialize() {
         viewModel = new RepoListVM();
+        repoListVM = ((RepoListVM) viewModel);
     }
 
     @Override
@@ -74,7 +75,7 @@ public class RepoListActivity extends BaseActivity {
 
     @Override
     public Subscription loadData() {
-        return ((RepoListVM) viewModel).getRepoList("Zeyad-37")
+        return repoListVM.getRepoList("Zeyad-37")
                 .doOnSubscribe(this::showLoading)
                 .subscribe(new BaseSubscriber<RepoListActivity, List<RepoModel>>(this, ERROR_WITH_RETRY) {
                     @Override
@@ -106,7 +107,7 @@ public class RepoListActivity extends BaseActivity {
         mReposAdapter.setAreItemsClickable(true);
         mReposAdapter.setOnItemClickListener((position, itemInfo, holder) -> {
             if (twoPane) {
-//                if (itemInfo.getData() instanceof OrderViewModel) {
+//                if (itemInfo.getData() instanceof RepoModel) {
                 if (Utils.isNotEmpty(currentFragTag)) {
                     removeFragment(currentFragTag);
                 }

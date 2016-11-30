@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.data;
+package com.zeyad.genericusecase.utils;
 
 import android.annotation.TargetApi;
 import android.app.job.JobInfo;
@@ -16,6 +16,7 @@ import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.gcm.GcmNetworkManager;
 import com.google.android.gms.gcm.OneoffTask;
 import com.google.gson.Gson;
+import com.zeyad.genericusecase.data.LibraryModule;
 import com.zeyad.genericusecase.data.mappers.EntityDataMapper;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.services.GenericGCMService;

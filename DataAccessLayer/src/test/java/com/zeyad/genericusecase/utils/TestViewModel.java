@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.realm_test_models;
+package com.zeyad.genericusecase.utils;
 
 public class TestViewModel {
 

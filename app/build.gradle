@@ -54,7 +54,7 @@ android {
         release {
             minifyEnabled true
             shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-fresco.pro'
 //            signingConfig signingConfigs.releaseConfig
         }
     }
@@ -88,7 +88,7 @@ dependencies {
     compile "com.android.support:design:$supportLibraryVersion"
     compile "com.android.support:cardview-v7:$supportLibraryVersion"
     // Network
-    compile 'com.github.bumptech.glide:glide:3.7.0'
+    compile 'com.facebook.fresco:fresco:0.14.1'
     // Rx
     compile "com.jakewharton.rxbinding:rxbinding:$rxbindingVersion"
     compile "com.jakewharton.rxbinding:rxbinding-appcompat-v7:$rxbindingVersion"

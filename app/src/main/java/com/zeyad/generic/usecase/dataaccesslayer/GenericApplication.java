@@ -3,6 +3,7 @@ package com.zeyad.generic.usecase.dataaccesslayer;
 import android.app.Application;
 import android.util.Log;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.zeyad.generic.usecase.dataaccesslayer.mapper.RepoMapper;
 import com.zeyad.generic.usecase.dataaccesslayer.models.data.RepoRealm;
 import com.zeyad.genericusecase.data.mappers.EntityDataMapper;
@@ -42,19 +43,24 @@ public class GenericApplication extends Application {
         super.onCreate();
         sInstance = this;
         initializeRealm();
-        GenericUseCaseFactory.initWithRealm(getApplicationContext(), new EntityMapperUtil() {
+        GenericUseCaseFactory.initWithRealm(this, new EntityMapperUtil() {
             @Override
             public EntityMapper getDataMapper(Class dataClass) {
                 if (dataClass == RepoRealm.class)
                     return new RepoMapper();
                 return new EntityDataMapper();
             }
-        }, new OkHttpClient.Builder()
+        }, provideOkHttpClientBuilder(), null);
+        GenericUseCaseFactory.setBaseURL(API_BASE_URL);
+        Fresco.initialize(this);
+    }
+
+    private OkHttpClient.Builder provideOkHttpClientBuilder() {
+        return new OkHttpClient.Builder()
                 .addInterceptor(provideHttpLoggingInterceptor())
                 .connectTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .readTimeout(TIME_OUT, TimeUnit.SECONDS)
-                .writeTimeout(TIME_OUT, TimeUnit.SECONDS), null);
-        GenericUseCaseFactory.setBaseURL(API_BASE_URL);
+                .writeTimeout(TIME_OUT, TimeUnit.SECONDS);
     }
 
     private Cache provideCache() {
