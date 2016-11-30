@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.domain.interactor;
+package com.zeyad.genericusecase.domain.interactors;
 
 import com.zeyad.genericusecase.domain.interactors.files.FileUseCaseFactory;
 import com.zeyad.genericusecase.domain.interactors.files.IFileUseCase;

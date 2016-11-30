@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.domain.interactor;
+package com.zeyad.genericusecase.domain.interactors;
 
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
