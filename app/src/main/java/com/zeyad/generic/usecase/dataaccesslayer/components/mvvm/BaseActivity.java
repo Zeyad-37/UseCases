@@ -73,12 +73,15 @@ public abstract class BaseActivity extends AppCompatActivity implements LoadData
      * @param containerViewId The container view to where add the fragment.
      * @param fragment        The fragment to be added.
      */
-    protected void addFragment(int containerViewId, Fragment fragment, List<Pair<View, String>> sharedElements) {
+    protected void addFragment(int containerViewId, Fragment fragment, List<Pair<View, String>> sharedElements,
+                               String currentFragTag) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         if (sharedElements != null)
             for (Pair<View, String> pair : sharedElements)
                 fragmentTransaction.addSharedElement(pair.first, pair.second);
-        fragmentTransaction.addToBackStack(fragment.getTag());
+        if (currentFragTag == null || currentFragTag.isEmpty())
+            fragmentTransaction.addToBackStack(fragment.getTag());
+        else fragmentTransaction.addToBackStack(currentFragTag);
         fragmentTransaction.add(containerViewId, fragment, fragment.getTag()).commit();
     }
 

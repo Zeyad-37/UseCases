@@ -15,7 +15,9 @@ import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseActivity;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseSubscriber;
 import com.zeyad.generic.usecase.dataaccesslayer.components.snackbar.SnackBarFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.models.ui.RepoModel;
+import com.zeyad.generic.usecase.dataaccesslayer.models.ui.UserModel;
 import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_detail.RepoDetailActivity;
+import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_detail.RepoDetailFragment;
 import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.view_holders.EmptyViewHolder;
 import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.view_holders.RepoViewHolder;
 import com.zeyad.generic.usecase.dataaccesslayer.utils.Utils;
@@ -49,11 +51,8 @@ public class RepoListActivity extends BaseActivity {
     FloatingActionButton mFab;
     GenericRecyclerViewAdapter mReposAdapter;
     private String currentFragTag;
-    /**
-     * Whether or not the activity is in two-pane mode, i.e. running on a tablet
-     * device.
-     */
     private boolean twoPane;
+    private int userId;
 
     @Override
     public void initialize() {
@@ -75,15 +74,15 @@ public class RepoListActivity extends BaseActivity {
 
     @Override
     public Subscription loadData() {
-        return repoListVM.getRepoList("Zeyad-37")
+        return repoListVM.getRepoList()
                 .doOnSubscribe(this::showLoading)
                 .subscribe(new BaseSubscriber<RepoListActivity, List<RepoModel>>(this, ERROR_WITH_RETRY) {
                     @Override
                     public void onNext(List<RepoModel> repoModels) {
-                        List<ItemInfo> itemInfos = new ArrayList<>(repoModels.size());
+                        List<ItemInfo> infoList = new ArrayList<>(repoModels.size());
                         for (int i = 0, repoModelsSize = repoModels.size(); i < repoModelsSize; i++)
-                            itemInfos.add(new ItemInfo<>(repoModels.get(i), R.layout.item_repo));
-                        mReposAdapter.animateTo(itemInfos);
+                            infoList.add(new ItemInfo<>(repoModels.get(i), R.layout.item_repo));
+                        mReposAdapter.animateTo(infoList);
                     }
                 });
     }
@@ -107,21 +106,20 @@ public class RepoListActivity extends BaseActivity {
         mReposAdapter.setAreItemsClickable(true);
         mReposAdapter.setOnItemClickListener((position, itemInfo, holder) -> {
             if (twoPane) {
-//                if (itemInfo.getData() instanceof RepoModel) {
-                if (Utils.isNotEmpty(currentFragTag)) {
-                    removeFragment(currentFragTag);
+                if (itemInfo.getData() instanceof UserModel) {
+                    if (Utils.isNotEmpty(currentFragTag)) {
+                        removeFragment(currentFragTag);
+                    }
+                    UserModel userModel = (UserModel) itemInfo.getData();
+                    RepoDetailFragment orderDetailFragment = RepoDetailFragment.newInstance(userModel);
+//                    orderDetailFragment.setOrderDetailListener(RepoListActivity.this);
+                    userId = userModel.getId();
+                    currentFragTag = orderDetailFragment.getClass().getSimpleName() + userId;
+                    addFragment(R.id.repo_detail_container, orderDetailFragment, null, currentFragTag);
                 }
-//                    OrderViewModel orderViewModel = (OrderViewModel) itemInfo.getData();
-//                    RepoDetailFragment orderDetailFragment = RepoDetailFragment
-//                            .newInstance(orderViewModel, false);
-//                    orderDetailFragment.setOrderDetailListener(OrderListActivity.this);
-//                    orderId = orderViewModel.getId();
-//                    currentFragTag = orderDetailFragment.getClass().getSimpleName() + orderId;
-//                    addFragment(R.id.repo_detail_container, orderDetailFragment, null, currentFragTag);
-//                }
             } else {
-//                navigator.navigateTo(getApplicationContext(), RepoDetailActivity.getCallingIntent(getApplicationContext(),
-//                                itemInfo.getData(), false));
+                navigator.navigateTo(getApplicationContext(), RepoDetailActivity.getCallingIntent(getApplicationContext(),
+                        (UserModel) itemInfo.getData()));
             }
         });
         mRepoRecycler.setAdapter(mReposAdapter);

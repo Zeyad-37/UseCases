@@ -16,11 +16,11 @@ apply from: '../config/quality/quality.gradle'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '25.0.1'
 
     defaultConfig {
         applicationId "com.zeyad.generic.usecase.dataaccesslayer"
-        minSdkVersion 16
+        minSdkVersion 17
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
@@ -66,10 +66,10 @@ android {
 }
 
 ext {
-    supportLibraryVersion = '25.0.0'
+    supportLibraryVersion = '25.0.1'
     retrofitVersion = '2.1.0'
     okhttpVersion = '3.3.1'
-    googlePlayVersion = '9.8.0'
+    googlePlayVersion = '10.0.1'
     butterKnifeVersion = '8.4.0'
     rxbindingVersion = '0.4.0'
     parcelerVersion = '1.1.1'
@@ -98,6 +98,9 @@ dependencies {
     // Injection
     compile "com.jakewharton:butterknife:$butterKnifeVersion"
     apt "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
+    // Utilities
+    compile "org.parceler:parceler-api:$parcelerVersion"
+    apt "org.parceler:parceler:$parcelerVersion"
     // Testing
     androidTestCompile "com.android.support.test:runner:$androidSupportTest"
     androidTestCompile "com.android.support.test:rules:$androidSupportTest"

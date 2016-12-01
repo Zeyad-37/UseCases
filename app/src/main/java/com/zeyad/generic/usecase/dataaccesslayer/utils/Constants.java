@@ -6,5 +6,5 @@ package com.zeyad.generic.usecase.dataaccesslayer.utils;
 
 public class Constants {
 
-    public static String API_BASE_URL = "https://github.com/";
+    public static String API_BASE_URL = "http://android10.org/myapi";
 }

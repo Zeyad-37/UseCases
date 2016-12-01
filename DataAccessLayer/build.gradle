@@ -19,7 +19,7 @@ buildscript {
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.0'
+    buildToolsVersion '25.0.1'
     defaultConfig {
         minSdkVersion 9
         targetSdkVersion 25
@@ -68,7 +68,7 @@ ext {
     supportLibraryVersion = '25.0.0'
     retrofitVersion = '2.1.0'
     okhttpVersion = '3.4.1'
-    googlePlayVersion = '9.8.0'
+    googlePlayVersion = '10.0.1'
     androidSupportTest = '0.5'
     espressoCore = '2.2.2'
     hamcrest = '1.3'

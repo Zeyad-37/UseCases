@@ -8,5 +8,5 @@ import rx.Observable;
 
 interface RepoListView {
 
-    Observable getRepoList(String name);
+    Observable getRepoList();
 }

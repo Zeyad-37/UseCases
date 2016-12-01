@@ -114,8 +114,7 @@ public class FilesRepository implements Files {
     public Observable<Boolean> saveToFile(String fullFilePath, byte[] data) {
         return Observable.defer(() -> {
             try {
-                File outFile = new File(fullFilePath);
-                FileOutputStream outStream = new FileOutputStream(outFile);
+                FileOutputStream outStream = new FileOutputStream(new File(fullFilePath));
                 outStream.write(data);
                 outStream.flush();
                 outStream.close();

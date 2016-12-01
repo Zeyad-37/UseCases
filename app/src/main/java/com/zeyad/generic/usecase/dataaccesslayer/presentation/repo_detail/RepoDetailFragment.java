@@ -10,9 +10,13 @@ import android.widget.LinearLayout;
 
 import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseFragment;
+import com.zeyad.generic.usecase.dataaccesslayer.models.ui.UserModel;
 import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.RepoListActivity;
 
+import org.parceler.Parcels;
+
 import butterknife.BindView;
+import butterknife.ButterKnife;
 import rx.Subscription;
 
 /**
@@ -26,13 +30,13 @@ public class RepoDetailFragment extends BaseFragment {
      * The fragment argument representing the item ID that this fragment
      * represents.
      */
-    public static final String ARG_ITEM_ID = "item_id";
+    public static final String ARG_ITEM = "item";
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
     /**
-     * The dummy content this fragment is presenting.
+     * The content this fragment is presenting.
      */
-//    private DummyContent.DummyItem mItem;
+    private UserModel userModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -41,29 +45,34 @@ public class RepoDetailFragment extends BaseFragment {
     public RepoDetailFragment() {
     }
 
-    public static RepoDetailFragment newInstance() {
-        return new RepoDetailFragment();
+    public static RepoDetailFragment newInstance(UserModel userModel) {
+        RepoDetailFragment repoDetailFragment = new RepoDetailFragment();
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(ARG_ITEM, Parcels.wrap(userModel));
+        repoDetailFragment.setArguments(bundle);
+        return repoDetailFragment;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments().containsKey(ARG_ITEM_ID)) {
+        if (getArguments().containsKey(ARG_ITEM)) {
             // Load the dummy content specified by the fragment
             // arguments. In a real-world scenario, use a Loader
             // to load content from a content provider.
-//            mItem = DummyContent.ITEM_MAP.get(getArguments().getString(ARG_ITEM_ID));
-            Activity activity = this.getActivity();
+            Activity activity = getActivity();
             CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
             if (appBarLayout != null) {
-//                appBarLayout.setTitle(mItem.content);
+//                appBarLayout.setTitle(userModel.content);
             }
         }
     }
 
     @Override
     public void initialize() {
-//        getComponent(UserComponent.class).inject(this);
+        if (getArguments() != null) {
+            userModel = Parcels.unwrap(getArguments().getParcelable(ARG_ITEM));
+        }
     }
 
     @Override
@@ -75,10 +84,7 @@ public class RepoDetailFragment extends BaseFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.repo_detail, container, false);
-        // Show the dummy content as text in a TextView.
-//        if (mItem != null) {
-//            ((TextView) rootView.findViewById(R.id.repo_detail)).setText(mItem.details);
-//        }
+        ButterKnife.bind(this, rootView);
         return rootView;
     }
 

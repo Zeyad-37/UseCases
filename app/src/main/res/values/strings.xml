@@ -4,4 +4,22 @@
     <string name="title_repo_list">Repos</string>
     <string name="title_repo_detail">Repo Detail</string>
     <string name="empty_show_repos_message">No repos found :(\nPlease tap on + button to start adding repos.</string>
+
+
+    <string name="transition_text">Photo Text</string>
+    <string name="transition_photo">Photo Transition</string>
+    <string name="delete">Delete</string>
+    <string name="search_list">search list</string>
+    <string name="edit">Edit</string>
+    <string name="et_email">Email</string>
+    <string name="et_full_name">Full Name</string>
+    <string name="et_followers">Followers</string>
+    <string name="et_description">Description</string>
+    <string name="title_item_list">Items</string>
+    <string name="title_item_detail">item Detail</string>
+    <string name="fab_transition">fab transition</string>
+    <string name="invalid_email_msg">Invalid Email or empty!</string>
+    <string name="invalid_name_msg">Name shouldn\'t be empty!</string>
+    <string name="invalid_number_msg">Invalid Number</string>
+    <string name="string_content_description">Non accessible view</string>
 </resources>

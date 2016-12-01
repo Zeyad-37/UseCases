@@ -14,6 +14,7 @@ import java.util.List;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
+import io.realm.internal.OutOfMemoryError;
 
 public class EntityDataMapper implements EntityMapper<Object, Object> {
     public Gson gson;
@@ -40,7 +41,12 @@ public class EntityDataMapper implements EntityMapper<Object, Object> {
             if (item instanceof List)
                 return transformAllToRealm((List) item, dataClass);
             else
-                return dataClass.cast(gson.fromJson(gson.toJson(item), dataClass));
+                try {
+                    return dataClass.cast(gson.fromJson(gson.toJson(item), dataClass));
+                } catch (OutOfMemoryError e) {
+                    e.printStackTrace();
+                    return null;
+                }
         return null;
     }
 
@@ -64,7 +70,12 @@ public class EntityDataMapper implements EntityMapper<Object, Object> {
     @Nullable
     @Override
     public Object transformToDomain(@NonNull Object o) {
-        return gson.fromJson(gson.toJson(o), o.getClass());
+        try {
+            return gson.fromJson(gson.toJson(o), o.getClass());
+        } catch (OutOfMemoryError e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     @Nullable
@@ -86,7 +97,12 @@ public class EntityDataMapper implements EntityMapper<Object, Object> {
             if (object instanceof List)
                 return transformAllToDomain((List) object, domainClass);
             else
-                return domainClass.cast(gson.fromJson(gson.toJson(object), domainClass));
+                try {
+                    return domainClass.cast(gson.fromJson(gson.toJson(object), domainClass));
+                } catch (OutOfMemoryError e) {
+                    e.printStackTrace();
+                    return null;
+                }
         return null;
     }
 
