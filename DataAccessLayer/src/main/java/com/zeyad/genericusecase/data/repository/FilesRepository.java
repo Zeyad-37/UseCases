@@ -45,7 +45,7 @@ public class FilesRepository implements Files {
                 String line;
                 while ((line = input.readLine()) != null)
                     returnString.append(line);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 return Observable.error(e);
             } finally {
