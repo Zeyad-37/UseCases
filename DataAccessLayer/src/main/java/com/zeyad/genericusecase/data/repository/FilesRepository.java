@@ -1,18 +1,17 @@
 package com.zeyad.genericusecase.data.repository;
 
+import android.content.Context;
+
 import com.google.gson.Gson;
 import com.zeyad.genericusecase.Config;
 import com.zeyad.genericusecase.domain.repositories.Files;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 
 import rx.Observable;
 
@@ -76,34 +75,25 @@ public class FilesRepository implements Files {
     @Override
     public Observable<String> readFromFile(String fullFilePath) {
         try {
-            ObjectInputStream is = new ObjectInputStream(new FileInputStream(new File(fullFilePath)));
-            String data = (String) is.readObject();
-            is.close();
-            return Observable.just(data);
-        } catch (ClassNotFoundException | IOException e) {
+            return Observable.just(new Gson().fromJson(new InputStreamReader(Config.getInstance()
+                    .getContext().openFileInput(fullFilePath)), String.class));
+        } catch (Exception e) {
             e.printStackTrace();
-            try {
-                InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(new File(fullFilePath)));
-                String data = new Gson().fromJson(inputStreamReader, String.class);
-                inputStreamReader.close();
-                return Observable.just(data);
-            } catch (IOException e1) {
-                e1.printStackTrace();
-                return Observable.error(e1);
-            }
+            return Observable.error(e);
         }
     }
 
     @Override
     public Observable<Boolean> saveToFile(String fullFilePath, String data) {
         return Observable.defer(() -> {
+            FileOutputStream outputStream;
             try {
-                ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(new File(fullFilePath)));
-                os.writeObject(data);
-                os.flush();
-                os.close();
+                outputStream = Config.getInstance().getContext().openFileOutput(new File(fullFilePath)
+                        .getName(), Context.MODE_PRIVATE);
+                outputStream.write(data.getBytes());
+                outputStream.close();
                 return Observable.just(true);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 return Observable.error(e);
             }
@@ -113,13 +103,14 @@ public class FilesRepository implements Files {
     @Override
     public Observable<Boolean> saveToFile(String fullFilePath, byte[] data) {
         return Observable.defer(() -> {
+            FileOutputStream outputStream;
             try {
-                FileOutputStream outStream = new FileOutputStream(new File(fullFilePath));
-                outStream.write(data);
-                outStream.flush();
-                outStream.close();
+                outputStream = Config.getInstance().getContext().openFileOutput(new File(fullFilePath)
+                        .getName(), Context.MODE_PRIVATE);
+                outputStream.write(data);
+                outputStream.close();
                 return Observable.just(true);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 e.printStackTrace();
                 return Observable.error(e);
             }
