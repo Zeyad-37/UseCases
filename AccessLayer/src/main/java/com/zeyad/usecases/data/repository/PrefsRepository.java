@@ -7,21 +7,15 @@ import com.google.gson.Gson;
 import com.zeyad.usecases.domain.repositories.Prefs;
 
 import rx.Observable;
-import rx.Scheduler;
-import rx.schedulers.Schedulers;
 
 
 public class PrefsRepository implements Prefs {
 
-    private static String SETTINGS_FILE_NAME = "com.use.cases.PREFS";
     private static Prefs sInstance;
     private static SharedPreferences sharedPreferences;
-    private static Scheduler mSchedulers;
 
     private PrefsRepository(Context context, String prefsFileName) {
-        SETTINGS_FILE_NAME = prefsFileName;
-        sharedPreferences = context.getSharedPreferences(SETTINGS_FILE_NAME, Context.MODE_PRIVATE);
-        mSchedulers = Schedulers.io();
+        sharedPreferences = context.getSharedPreferences(prefsFileName, Context.MODE_PRIVATE);
     }
 
     public static Prefs getInstance() throws IllegalArgumentException {
@@ -80,59 +74,43 @@ public class PrefsRepository implements Prefs {
 
     @Override
     public void set(String preKey, String value) {
-        Observable.defer(() -> Observable.just(getEditor().putString(preKey, value).commit()))
-                .subscribeOn(mSchedulers)
-                .subscribe();
+        Observable.defer(() -> Observable.just(getEditor().putString(preKey, value).commit()));
     }
 
     @Override
     public void set(String key, int value) {
-        Observable.defer(() -> Observable.just(getEditor().putInt(key, value).commit()))
-                .subscribeOn(mSchedulers)
-                .subscribe();
+        Observable.defer(() -> Observable.just(getEditor().putInt(key, value).commit()));
     }
 
     @Override
     public void set(String key, boolean value) {
-        Observable.defer(() -> Observable.just(getEditor().putBoolean(key, value).commit()))
-                .subscribeOn(mSchedulers)
-                .subscribe();
+        Observable.defer(() -> Observable.just(getEditor().putBoolean(key, value).commit()));
     }
 
     @Override
     public void set(String key, float value) {
-        Observable.defer(() -> Observable.just(getEditor().putFloat(key, value).commit()))
-                .subscribeOn(mSchedulers)
-                .subscribe();
+        Observable.defer(() -> Observable.just(getEditor().putFloat(key, value).commit()));
     }
 
     @Override
     public void set(String key, long value) {
-        Observable.defer(() -> Observable.just(getEditor().putLong(key, value).commit()))
-                .subscribeOn(mSchedulers)
-                .subscribe();
+        Observable.defer(() -> Observable.just(getEditor().putLong(key, value).commit()));
     }
 
     @Override
     public void set(String key, Object object) {
         Observable.defer(() -> Observable.just(getEditor().putString(key, new Gson().toJson(object))
-                .commit()))
-                .subscribeOn(mSchedulers)
-                .subscribe();
+                .commit()));
     }
 
     @Override
     public void remove(String key) {
-        Observable.defer(() -> Observable.just(getEditor().remove(key).commit()))
-                .subscribeOn(mSchedulers)
-                .subscribe();
+        Observable.defer(() -> Observable.just(getEditor().remove(key).commit()));
     }
 
     @Override
     public void resetPreferences() {
-        Observable.defer(() -> Observable.just(getEditor().clear().commit()))
-                .subscribeOn(mSchedulers)
-                .subscribe();
+        Observable.defer(() -> Observable.just(getEditor().clear().commit()));
     }
 
     @Override

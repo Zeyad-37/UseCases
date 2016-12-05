@@ -1,4 +1,4 @@
-package com.zeyad.usecases;
+package com.zeyad.usecases.data;
 
 import io.realm.RealmObject;
 

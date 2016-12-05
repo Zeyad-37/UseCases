@@ -85,7 +85,6 @@ class FileUseCase implements IFileUseCase {
      */
     private <T> Observable.Transformer<T, T> applySchedulers() {
         return observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor))
-                .observeOn(mPostExecutionThread.getScheduler())
-                .unsubscribeOn(Schedulers.from(mThreadExecutor));
+                .observeOn(mPostExecutionThread.getScheduler());
     }
 }

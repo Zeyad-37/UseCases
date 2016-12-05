@@ -2,10 +2,15 @@ package com.zeyad.usecases.domain.interactors.prefs;
 
 import android.content.Context;
 
+import com.zeyad.usecases.UIThread;
+import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.repository.PrefsRepository;
+import com.zeyad.usecases.domain.executors.PostExecutionThread;
+import com.zeyad.usecases.domain.executors.ThreadExecutor;
 import com.zeyad.usecases.domain.repositories.Prefs;
 
 import rx.Observable;
+import rx.schedulers.Schedulers;
 
 /**
  * @author zeyad on 11/11/16.
@@ -15,14 +20,18 @@ class PrefsUseCase implements IPrefsUseCase {
 
     private static PrefsUseCase sPrefsUseCases;
     private final Prefs mPrefs;
+    private final ThreadExecutor mThreadExecutor;
+    private final PostExecutionThread mPostExecutionThread;
 
-    private PrefsUseCase(Context context, String prefsFileName) {
+    private PrefsUseCase(Context context, String prefsFileName, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
         PrefsRepository.init(context, prefsFileName);
+        mThreadExecutor = threadExecutor;
+        mPostExecutionThread = postExecutionThread;
         mPrefs = PrefsRepository.getInstance();
     }
 
     public static void init(Context context, String prefsFileName) {
-        sPrefsUseCases = new PrefsUseCase(context, prefsFileName);
+        sPrefsUseCases = new PrefsUseCase(context, prefsFileName, new JobExecutor(), new UIThread());
     }
 
     protected static PrefsUseCase getInstance() {
@@ -33,7 +42,7 @@ class PrefsUseCase implements IPrefsUseCase {
 
     @Override
     public Observable<String> getString(String preferenceKey, String defaultValue) {
-        return mPrefs.getString(preferenceKey, defaultValue);
+        return mPrefs.getString(preferenceKey, defaultValue).compose(applySchedulers());
     }
 
     @Override
@@ -53,7 +62,7 @@ class PrefsUseCase implements IPrefsUseCase {
 
     @Override
     public Observable<Integer> getInt(String preferenceKey, int defaultValue) {
-        return mPrefs.getInt(preferenceKey, defaultValue);
+        return mPrefs.getInt(preferenceKey, defaultValue).compose(applySchedulers());
     }
 
     @Override
@@ -73,7 +82,7 @@ class PrefsUseCase implements IPrefsUseCase {
 
     @Override
     public Observable<Float> getFloat(String preferenceKey, float defaultValue) {
-        return mPrefs.getFloat(preferenceKey, defaultValue);
+        return mPrefs.getFloat(preferenceKey, defaultValue).compose(applySchedulers());
     }
 
     @Override
@@ -93,7 +102,7 @@ class PrefsUseCase implements IPrefsUseCase {
 
     @Override
     public Observable<Long> getLong(String preferenceKey, long defaultValue) {
-        return mPrefs.getLong(preferenceKey, defaultValue);
+        return mPrefs.getLong(preferenceKey, defaultValue).compose(applySchedulers());
     }
 
     @Override
@@ -113,7 +122,7 @@ class PrefsUseCase implements IPrefsUseCase {
 
     @Override
     public Observable<Boolean> getBoolean(String preferenceKey, boolean defaultValue) {
-        return mPrefs.getBoolean(preferenceKey, defaultValue);
+        return mPrefs.getBoolean(preferenceKey, defaultValue).compose(applySchedulers());
     }
 
     @Override
@@ -133,7 +142,7 @@ class PrefsUseCase implements IPrefsUseCase {
 
     @Override
     public <T> Observable<T> getObject(String preferenceKey, Class<T> classOfT) {
-        return mPrefs.getObject(preferenceKey, classOfT);
+        return mPrefs.getObject(preferenceKey, classOfT).compose(applySchedulers());
     }
 
     @Override
@@ -184,5 +193,16 @@ class PrefsUseCase implements IPrefsUseCase {
     @Override
     public void resetPreferences() {
         mPrefs.resetPreferences();
+    }
+
+    /**
+     * Apply the default android schedulers to a observable
+     *
+     * @param <T> the current observable
+     * @return the transformed observable
+     */
+    private <T> Observable.Transformer<T, T> applySchedulers() {
+        return observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor))
+                .observeOn(mPostExecutionThread.getScheduler());
     }
 }

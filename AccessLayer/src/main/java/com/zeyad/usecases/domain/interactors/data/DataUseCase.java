@@ -191,7 +191,6 @@ public class DataUseCase implements IDataUseCase {
      */
     private <T> Observable.Transformer<T, T> applySchedulers() {
         return observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor))
-                .observeOn(mPostExecutionThread.getScheduler())
-                .unsubscribeOn(Schedulers.from(mThreadExecutor));
+                .observeOn(mPostExecutionThread.getScheduler());
     }
 }
