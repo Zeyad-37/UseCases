@@ -1,7 +1,7 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/Zeyad-37/GenericUseCase/blob/master/LICENSE)
-# GenericUseCase
+# UseCases
 
-Is a library that is a generic implementation of the Domain and Data layers in a clean architecture. 
+Is a library that is a generic implementation of the Domain and Data layers in a clean architecture.
 
 # Motivation
 
@@ -19,17 +19,28 @@ In most tasks, we need to make either a IO operation, whether from the server,
 
 # Requirements
 
-Generic Use Case Library can be included in any Android application that supports Android 2.3 (Gingerbread) and later. 
+UseCases Library can be included in any Android application that supports Android 2.3 (Gingerbread) and later. 
 
 # Installation
 
-coming soon
+Easiest way to start
+```
+// For Data Access
+DataUseCaseFactory.initWithRealm(context); 
+DataUseCaseFactory.getInstance();
+// For File Access
+FileUseCaseFactory.init(context);
+FileUseCaseFactory.getInstance();
+// For Shared Prefs Access
+PrefsUseCaseFactory.init(context);
+PrefsUseCaseFactory.getInstance();
+```
 
 # Code Example
 
 Get Object From Server:
 ```
-mGenericUseCase.getObject(new GetRequest
+mDataUseCase.getObject(new GetRequest
         .GetRequestBuilder(OrderRealmModel.class, true) // true to save result to db, false otherwise.
         .presentationClass(OrderViewModel.class)
         .url(FULL_URL)
@@ -53,7 +64,7 @@ mGenericUseCase.getObject(new GetRequest
 ```
 Get Object From DB:
 ```
-mGenericUseCase.getObject(new GetRequest
+mDataUseCase.getObject(new GetRequest
         .GetRequestBuilder(OrderRealmModel.class, true)
         .presentationClass(OrderViewModel.class)
         .idColumnName(OrderViewModel.ID)
@@ -62,7 +73,7 @@ mGenericUseCase.getObject(new GetRequest
 ```
 Get List From Server:
 ```
-mGenericUseCase.getList(new GetRequest
+mDataUseCase.getList(new GetRequest
         .GetRequestBuilder(OrdersRealmModel.class, false)
         .presentationClass(OrderViewModel.class)
         .url(FULL_URL)
@@ -84,14 +95,14 @@ mGenericUseCase.getList(new GetRequest
 ```
 Get List From DB:
 ```
-mGenericUseCase.getList(new GetRequest
+mDataUseCase.getList(new GetRequest
         .GetRequestBuilder(OrdersRealmModel.class, false)
         .presentationClass(OrderViewModel.class)
         .build());
 ```
 Post/Put Object to Server:
 ```
-mGenericUseCase.postObject(new PostRequest // putObject
+mDataUseCase.postObject(new PostRequest // putObject
         .PostRequestBuilder(OrdersRealmModel.class, true)
         .idColumnName(OrderViewModel.ID)
         .presentationClass(OrderViewModel.class)
@@ -101,7 +112,7 @@ mGenericUseCase.postObject(new PostRequest // putObject
 ```
 Post/Put Object to DB:
 ```
-mGenericUseCase.postObject(new PostRequest // putObject
+mDataUseCase.postObject(new PostRequest // putObject
         .PostRequestBuilder(OrdersRealmModel.class, true)
         .idColumnName(OrderViewModel.ID)
         .presentationClass(OrderViewModel.class)
@@ -110,7 +121,7 @@ mGenericUseCase.postObject(new PostRequest // putObject
 ```
 Post/Put List to Server:
 ```
-mGenericUseCase.postList(new PostRequest // putList
+mDataUseCase.postList(new PostRequest // putList
         .PostRequestBuilder(OrdersRealmModel.class, true)
         .presentationClass(OrdersViewModel.class)
         .payLoad(OrdersViewModel.toJSONArray())
@@ -120,7 +131,7 @@ mGenericUseCase.postList(new PostRequest // putList
 ```
 Post/Put List to DB:
 ```
-mGenericUseCase.postList(new PostRequest // putList
+mDataUseCase.postList(new PostRequest // putList
         .PostRequestBuilder(OrdersRealmModel.class, true)
         .presentationClass(OrdersViewModel.class)
         .payLoad(OrdersViewModel.toJSONArray())
@@ -129,14 +140,23 @@ mGenericUseCase.postList(new PostRequest // putList
 ```
 Delete All from DB:
 ```
-getGenericUseCase().deleteAll(new PostRequest
+mDataUseCase().deleteAll(new PostRequest
         .PostRequestBuilder(OrdersRealmModel.class, true)
         .idColumnName(OrdersRealmModel.ID)
         .build())
 ```
+Delete Collection from Server
+```
+mDataUseCase().deleteCollection(new PostRequest // putList
+        .PostRequestBuilder(OrdersRealmModel.class, true)
+        .presentationClass(OrdersViewModel.class)
+        .payLoad(OrdersViewModel.toJSONArrayOfId())
+        .url(FULL_URL)
+        .build())
+```
 Upload File
 ```
-mGenericUseCase.uploadFile(new FileIORequest
+mFileUseCase.uploadFile(new FileIORequest
         .FileIORequestBuilder(FULL_URL, new File())
         .onWifi(true)
         .whileCharging(false)
@@ -146,7 +166,7 @@ mGenericUseCase.uploadFile(new FileIORequest
 ```
 Download File
 ```
-mGenericUseCase.downloadFile(new FileIORequest
+mFileUseCase.downloadFile(new FileIORequest
         .FileIORequestBuilder(FULL_URL, new File())
         .onWifi(true)
         .whileCharging(false)
@@ -156,21 +176,12 @@ mGenericUseCase.downloadFile(new FileIORequest
 ```
 Read from File
 ```
-mGenericUseCase.readFile(String fullFilePath);
+mFileUseCase.readFile(String fullFilePath);
 ```
 Write to File
 ```
-mGenericUseCase.writeToFile(String fullFilePath, String data);
-mGenericUseCase.writeToFile(String fullFilePath, byte[] data);
-```
-Delete Collection from Server
-```
-getGenericUseCase().deleteCollection(new PostRequest // putList
-        .PostRequestBuilder(OrdersRealmModel.class, true)
-        .presentationClass(OrdersViewModel.class)
-        .payLoad(OrdersViewModel.toJSONArrayOfId())
-        .url(FULL_URL)
-        .build())
+mFileUseCase.writeToFile(String fullFilePath, String data);
+mFileUseCase.writeToFile(String fullFilePath, byte[] data);
 ```
 # Contributors
 
