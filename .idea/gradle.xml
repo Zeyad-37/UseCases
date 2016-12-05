@@ -8,7 +8,7 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/DataAccessLayer" />
+            <option value="$PROJECT_DIR$/AccessLayer" />
             <option value="$PROJECT_DIR$/app" />
           </set>
         </option>

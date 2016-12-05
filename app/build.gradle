@@ -63,6 +63,11 @@ android {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
     }
+
+    lintOptions {
+        abortOnError true
+        disable 'InvalidPackage'
+    }
 }
 
 ext {
@@ -80,7 +85,7 @@ ext {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile project(':DataAccessLayer')
+    compile project(':AccessLayer')
     // Support
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
     compile "com.android.support:support-v4:$supportLibraryVersion"
@@ -101,7 +106,11 @@ dependencies {
     // Utilities
     compile "org.parceler:parceler-api:$parcelerVersion"
     apt "org.parceler:parceler:$parcelerVersion"
+    compile ("io.flowup:android-sdk:0.2.4") {
+        exclude group: 'com.google.android.gms'
+    }
     // Testing
+    testCompile 'io.flowup:android-sdk-no-op:0.2.4'
     androidTestCompile "com.android.support.test:runner:$androidSupportTest"
     androidTestCompile "com.android.support.test:rules:$androidSupportTest"
     androidTestCompile "com.android.support:support-annotations:$supportLibraryVersion"

@@ -6,6 +6,7 @@ import android.util.Log;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.zeyad.generic.usecase.dataaccesslayer.mapper.RepoMapper;
 import com.zeyad.generic.usecase.dataaccesslayer.models.data.RepoRealm;
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.mappers.EntityDataMapper;
 import com.zeyad.usecases.data.mappers.EntityMapper;
 import com.zeyad.usecases.data.utils.EntityMapperUtil;
@@ -14,6 +15,7 @@ import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import java.io.File;
 import java.util.concurrent.TimeUnit;
 
+import io.flowup.FlowUp;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.rx.RealmObservableFactory;
@@ -51,8 +53,9 @@ public class GenericApplication extends Application {
                 return new EntityDataMapper();
             }
         }, provideOkHttpClientBuilder(), null);
-        DataUseCaseFactory.setBaseURL(API_BASE_URL);
+        Config.setBaseURL(API_BASE_URL);
         Fresco.initialize(this);
+        initializeFlowUp();
     }
 
     private OkHttpClient.Builder provideOkHttpClientBuilder() {
@@ -97,5 +100,12 @@ public class GenericApplication extends Application {
                 .rxFactory(new RealmObservableFactory())
                 .deleteRealmIfMigrationNeeded()
                 .build());
+    }
+
+    private void initializeFlowUp() {
+        FlowUp.Builder.with(this)
+                .apiKey(getString(R.string.flow_up_api_key))
+                .forceReports(BuildConfig.DEBUG)
+                .start();
     }
 }
