@@ -1,8 +1,8 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 
 import com.zeyad.generic.usecase.dataaccesslayer.utils.Utils;
-import com.zeyad.genericusecase.domain.interactors.data.DataUseCaseFactory;
-import com.zeyad.genericusecase.domain.interactors.data.IDataUseCase;
+import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
+import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
 import rx.subscriptions.CompositeSubscription;
 

@@ -3,8 +3,8 @@ package com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_detail;
 import android.os.Bundle;
 
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseViewModel;
-import com.zeyad.genericusecase.domain.interactors.data.DataUseCaseFactory;
-import com.zeyad.genericusecase.domain.interactors.data.IDataUseCase;
+import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
+import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
 /**
  * @author zeyad on 11/29/16.

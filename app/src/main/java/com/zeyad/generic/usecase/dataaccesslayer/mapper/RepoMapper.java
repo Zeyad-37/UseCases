@@ -2,8 +2,8 @@ package com.zeyad.generic.usecase.dataaccesslayer.mapper;
 
 import android.support.annotation.NonNull;
 
-import com.zeyad.genericusecase.data.mappers.EntityDataMapper;
-import com.zeyad.genericusecase.data.mappers.EntityMapper;
+import com.zeyad.usecases.data.mappers.EntityDataMapper;
+import com.zeyad.usecases.data.mappers.EntityMapper;
 
 import java.util.ArrayList;
 import java.util.List;

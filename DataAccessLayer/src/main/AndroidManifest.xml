@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.zeyad.genericusecase">
+    package="com.zeyad.usecases">
 
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
@@ -11,11 +11,11 @@
         android:supportsRtl="true">
 
         <service
-            android:name=".data.services.GenericJobService"
+            android:name="com.zeyad.usecases.data.services.GenericJobService"
             android:permission="android.permission.BIND_JOB_SERVICE" />
 
         <service
-            android:name=".data.services.GenericGCMService"
+            android:name="com.zeyad.usecases.data.services.GenericGCMService"
             android:exported="true"
             android:permission="com.google.android.gms.permission.BIND_NETWORK_TASK_SERVICE">
             <intent-filter>
@@ -24,7 +24,7 @@
         </service>
 
         <service
-            android:name=".data.services.GenericNetworkQueueIntentService"
+            android:name="com.zeyad.usecases.data.services.GenericNetworkQueueIntentService"
             android:enabled="true"
             android:exported="false" />
     </application>

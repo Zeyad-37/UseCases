@@ -5,9 +5,9 @@ import android.os.Bundle;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseViewModel;
 import com.zeyad.generic.usecase.dataaccesslayer.models.data.UserRealm;
 import com.zeyad.generic.usecase.dataaccesslayer.models.ui.UserModel;
-import com.zeyad.genericusecase.data.requests.GetRequest;
-import com.zeyad.genericusecase.domain.interactors.data.DataUseCaseFactory;
-import com.zeyad.genericusecase.domain.interactors.data.IDataUseCase;
+import com.zeyad.usecases.data.requests.GetRequest;
+import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
+import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
 import rx.Observable;
 

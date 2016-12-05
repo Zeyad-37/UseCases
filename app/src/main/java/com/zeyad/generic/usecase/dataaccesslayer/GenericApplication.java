@@ -6,10 +6,10 @@ import android.util.Log;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.zeyad.generic.usecase.dataaccesslayer.mapper.RepoMapper;
 import com.zeyad.generic.usecase.dataaccesslayer.models.data.RepoRealm;
-import com.zeyad.genericusecase.data.mappers.EntityDataMapper;
-import com.zeyad.genericusecase.data.mappers.EntityMapper;
-import com.zeyad.genericusecase.data.utils.EntityMapperUtil;
-import com.zeyad.genericusecase.domain.interactors.data.DataUseCaseFactory;
+import com.zeyad.usecases.data.mappers.EntityDataMapper;
+import com.zeyad.usecases.data.mappers.EntityMapper;
+import com.zeyad.usecases.data.utils.EntityMapperUtil;
+import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
