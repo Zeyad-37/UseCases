@@ -95,7 +95,7 @@ public class PrefsUseCase implements IPrefsUseCase {
 
     @Override
     public Observable<Long> getLong(String preferenceKey) {
-        return getLong(preferenceKey, 0l);
+        return getLong(preferenceKey, 0L);
     }
 
     @Override
