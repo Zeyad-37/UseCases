@@ -12,7 +12,6 @@ public class Config {
     private static Config sInstance;
     private static DataStoreFactory mDataStoreFactory;
     private Context mContext;
-    private String mPrefFileName;
     private static String mBaseURL;
     private boolean mUseApiWithCache;
     private int mDBType;
@@ -60,14 +59,6 @@ public class Config {
 
     public void setUseApiWithCache(boolean useApiWithCache) {
         mUseApiWithCache = useApiWithCache;
-    }
-
-    public String getPrefFileName() {
-        return mPrefFileName;
-    }
-
-    public void setPrefFileName(String prefFileName) {
-        mPrefFileName = prefFileName;
     }
 
     public int getDBType() {

@@ -14,8 +14,8 @@ public class PrefsUseCaseFactory {
         return sPrefsUseCase;
     }
 
-    public static void init(Context context) {
-        PrefsUseCase.init(context);
+    public static void init(Context context, String prefsFileName) {
+        PrefsUseCase.init(context, prefsFileName);
         sPrefsUseCase = PrefsUseCase.getInstance();
     }
 

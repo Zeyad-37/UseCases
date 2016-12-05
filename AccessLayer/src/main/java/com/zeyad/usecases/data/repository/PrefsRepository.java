@@ -13,12 +13,13 @@ import rx.schedulers.Schedulers;
 
 public class PrefsRepository implements Prefs {
 
-    private static final String SETTINGS_FILE_NAME = "com.genericusecase.PREFS";
+    private static String SETTINGS_FILE_NAME = "com.use.cases.PREFS";
     private static Prefs sInstance;
     private static SharedPreferences sharedPreferences;
     private static Scheduler mSchedulers;
 
-    private PrefsRepository(Context context) {
+    private PrefsRepository(Context context, String prefsFileName) {
+        SETTINGS_FILE_NAME = prefsFileName;
         sharedPreferences = context.getSharedPreferences(SETTINGS_FILE_NAME, Context.MODE_PRIVATE);
         mSchedulers = Schedulers.io();
     }
@@ -29,8 +30,8 @@ public class PrefsRepository implements Prefs {
         return sInstance;
     }
 
-    public static void init(Context context) {
-        sInstance = new PrefsRepository(context);
+    public static void init(Context context, String prefsFileName) {
+        sInstance = new PrefsRepository(context, prefsFileName);
     }
 
     private synchronized SharedPreferences getPreferencesFile() {

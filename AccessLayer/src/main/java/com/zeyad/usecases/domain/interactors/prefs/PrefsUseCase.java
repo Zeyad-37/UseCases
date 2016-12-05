@@ -16,13 +16,13 @@ class PrefsUseCase implements IPrefsUseCase {
     private static PrefsUseCase sPrefsUseCases;
     private final Prefs mPrefs;
 
-    private PrefsUseCase(Context context) {
-        PrefsRepository.init(context);
+    private PrefsUseCase(Context context, String prefsFileName) {
+        PrefsRepository.init(context, prefsFileName);
         mPrefs = PrefsRepository.getInstance();
     }
 
-    public static void init(Context context) {
-        sPrefsUseCases = new PrefsUseCase(context);
+    public static void init(Context context, String prefsFileName) {
+        sPrefsUseCases = new PrefsUseCase(context, prefsFileName);
     }
 
     protected static PrefsUseCase getInstance() {

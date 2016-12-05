@@ -31,7 +31,6 @@ public class DataUseCaseFactory {
      */
     public static void initWithoutDB(@NonNull Context context) {
         Config.init(context);
-        Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
         ApiConnectionFactory.init();
         DataUseCase.initWithoutDB(new EntityMapperUtil() {
             @NonNull
@@ -52,7 +51,6 @@ public class DataUseCaseFactory {
      */
     public static void initWithoutDB(@NonNull Context context, OkHttpClient.Builder okhttpBuilder, Cache cache) {
         Config.init(context);
-        Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
         if (okhttpBuilder == null)
             ApiConnectionFactory.init();
         else ApiConnectionFactory.init(okhttpBuilder, cache);
@@ -63,6 +61,16 @@ public class DataUseCaseFactory {
                 return new EntityDataMapper();
             }
         });
+        sGenericUseCase = DataUseCase.getInstance();
+    }
+
+    /**
+     * initializes the Generic Use Case with Realm given context.
+     *
+     * @param context      context of application
+     */
+    public static void initWithRealm(@NonNull Context context) {
+        initCore(context, null, null, null);
         sGenericUseCase = DataUseCase.getInstance();
     }
 
@@ -96,7 +104,6 @@ public class DataUseCaseFactory {
         if (!Utils.doesContextBelongsToApplication(context))
             throw new IllegalArgumentException("Context should be application context only.");
         Config.init(context);
-        Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
         if (okhttpBuilder == null)
             ApiConnectionFactory.init();
         else ApiConnectionFactory.init(okhttpBuilder, cache);
