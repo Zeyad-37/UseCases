@@ -9,7 +9,7 @@ import com.zeyad.generic.usecase.dataaccesslayer.models.data.RepoRealm;
 import com.zeyad.genericusecase.data.mappers.EntityDataMapper;
 import com.zeyad.genericusecase.data.mappers.EntityMapper;
 import com.zeyad.genericusecase.data.utils.EntityMapperUtil;
-import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
+import com.zeyad.genericusecase.domain.interactors.data.DataUseCaseFactory;
 
 import java.io.File;
 import java.util.concurrent.TimeUnit;
@@ -43,7 +43,7 @@ public class GenericApplication extends Application {
         super.onCreate();
         sInstance = this;
         initializeRealm();
-        GenericUseCaseFactory.initWithRealm(this, new EntityMapperUtil() {
+        DataUseCaseFactory.initWithRealm(this, new EntityMapperUtil() {
             @Override
             public EntityMapper getDataMapper(Class dataClass) {
                 if (dataClass == RepoRealm.class)
@@ -51,7 +51,7 @@ public class GenericApplication extends Application {
                 return new EntityDataMapper();
             }
         }, provideOkHttpClientBuilder(), null);
-        GenericUseCaseFactory.setBaseURL(API_BASE_URL);
+        DataUseCaseFactory.setBaseURL(API_BASE_URL);
         Fresco.initialize(this);
     }
 

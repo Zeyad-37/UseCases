@@ -1,4 +1,4 @@
-package com.zeyad.genericusecase.domain.interactors.generic;
+package com.zeyad.genericusecase.domain.interactors.data;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -12,18 +12,16 @@ import com.zeyad.genericusecase.data.network.ApiConnectionFactory;
 import com.zeyad.genericusecase.data.utils.EntityMapperUtil;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
 import com.zeyad.genericusecase.data.utils.Utils;
-import com.zeyad.genericusecase.domain.interactors.files.FileUseCaseFactory;
-import com.zeyad.genericusecase.domain.interactors.prefs.PrefsUseCaseFactory;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 
-public class GenericUseCaseFactory {
+public class DataUseCaseFactory {
 
-    private static IGenericUseCase sGenericUseCase;
+    private static IDataUseCase sGenericUseCase;
     private static String mBaseURL;
 
-    public static IGenericUseCase getInstance() {
+    public static IDataUseCase getInstance() {
         return sGenericUseCase;
     }
 
@@ -36,16 +34,14 @@ public class GenericUseCaseFactory {
         Config.init(context);
         Config.getInstance().setPrefFileName("com.generic.use.case.PREFS");
         ApiConnectionFactory.init();
-        GenericUseCase.initWithoutDB(new EntityMapperUtil() {
+        DataUseCase.initWithoutDB(new EntityMapperUtil() {
             @NonNull
             @Override
             public EntityMapper getDataMapper(Class dataClass) {
                 return new EntityDataMapper();
             }
         });
-        PrefsUseCaseFactory.init();
-        FileUseCaseFactory.init();
-        sGenericUseCase = GenericUseCase.getInstance();
+        sGenericUseCase = DataUseCase.getInstance();
     }
 
     /**
@@ -61,16 +57,14 @@ public class GenericUseCaseFactory {
         if (okhttpBuilder == null)
             ApiConnectionFactory.init();
         else ApiConnectionFactory.init(okhttpBuilder, cache);
-        GenericUseCase.initWithoutDB(new EntityMapperUtil() {
+        DataUseCase.initWithoutDB(new EntityMapperUtil() {
             @NonNull
             @Override
             public EntityMapper getDataMapper(Class dataClass) {
                 return new EntityDataMapper();
             }
         });
-        PrefsUseCaseFactory.init();
-        FileUseCaseFactory.init();
-        sGenericUseCase = GenericUseCase.getInstance();
+        sGenericUseCase = DataUseCase.getInstance();
     }
 
     /**
@@ -81,7 +75,7 @@ public class GenericUseCaseFactory {
      */
     public static void initWithRealm(@NonNull Context context, @Nullable IEntityMapperUtil entityMapper) {
         initCore(context, entityMapper, null, null);
-        sGenericUseCase = GenericUseCase.getInstance();
+        sGenericUseCase = DataUseCase.getInstance();
     }
 
     /**
@@ -95,7 +89,7 @@ public class GenericUseCaseFactory {
     public static void initWithRealm(@NonNull Context context, @Nullable IEntityMapperUtil entityMapper,
                                      OkHttpClient.Builder okhttpBuilder, Cache cache) {
         initCore(context, entityMapper, okhttpBuilder, cache);
-        sGenericUseCase = GenericUseCase.getInstance();
+        sGenericUseCase = DataUseCase.getInstance();
     }
 
     static void initCore(@NonNull Context context, @Nullable IEntityMapperUtil entityMapper,
@@ -115,9 +109,7 @@ public class GenericUseCaseFactory {
                     return new EntityDataMapper();
                 }
             };
-        PrefsUseCaseFactory.init();
-        FileUseCaseFactory.init();
-        GenericUseCase.initWithRealm(entityMapper);
+        DataUseCase.initWithRealm(entityMapper);
     }
 
     public static void destoryInstance() {
@@ -139,10 +131,10 @@ public class GenericUseCaseFactory {
     /**
      * This method is meant for test purposes only. Use other versions of initRealm for production code.
      *
-     * @param genericUseCase mocked generic use(expected) or any IGenericUseCase implementation
+     * @param genericUseCase mocked generic use(expected) or any IDataUseCase implementation
      */
     @VisibleForTesting
-    private static void init(IGenericUseCase genericUseCase) {
+    private static void init(IDataUseCase genericUseCase) {
         sGenericUseCase = genericUseCase;
     }
 }

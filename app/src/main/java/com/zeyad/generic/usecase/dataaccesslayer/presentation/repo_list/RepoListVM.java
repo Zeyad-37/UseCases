@@ -6,8 +6,8 @@ import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseViewModel;
 import com.zeyad.generic.usecase.dataaccesslayer.models.data.UserRealm;
 import com.zeyad.generic.usecase.dataaccesslayer.models.ui.UserModel;
 import com.zeyad.genericusecase.data.requests.GetRequest;
-import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
-import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
+import com.zeyad.genericusecase.domain.interactors.data.DataUseCaseFactory;
+import com.zeyad.genericusecase.domain.interactors.data.IDataUseCase;
 
 import rx.Observable;
 
@@ -17,11 +17,11 @@ import rx.Observable;
 class RepoListVM extends BaseViewModel implements RepoListView {
 
     //    private static final String USER_NAME = "userName";
-    private final IGenericUseCase genericUseCase;
+    private final IDataUseCase genericUseCase;
 //    private String userName;
 
     RepoListVM() {
-        genericUseCase = GenericUseCaseFactory.getInstance();
+        genericUseCase = DataUseCaseFactory.getInstance();
     }
 
     @Override

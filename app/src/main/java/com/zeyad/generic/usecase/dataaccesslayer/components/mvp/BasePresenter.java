@@ -1,8 +1,8 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 
 import com.zeyad.generic.usecase.dataaccesslayer.utils.Utils;
-import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
-import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
+import com.zeyad.genericusecase.domain.interactors.data.DataUseCaseFactory;
+import com.zeyad.genericusecase.domain.interactors.data.IDataUseCase;
 
 import rx.subscriptions.CompositeSubscription;
 
@@ -10,12 +10,12 @@ import rx.subscriptions.CompositeSubscription;
  * @author by zeyad on 31/05/16.
  */
 public abstract class BasePresenter {
-    private final IGenericUseCase mGenericUseCase;
+    private final IDataUseCase mGenericUseCase;
 
     private CompositeSubscription mCompositeSubscription;
 
     public BasePresenter() {
-        mGenericUseCase = GenericUseCaseFactory.getInstance();
+        mGenericUseCase = DataUseCaseFactory.getInstance();
         mCompositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(mCompositeSubscription);
     }
 
@@ -27,7 +27,7 @@ public abstract class BasePresenter {
         Utils.unsubscribeIfNotNull(mCompositeSubscription);
     }
 
-    public IGenericUseCase getGenericUseCase() {
+    public IDataUseCase getGenericUseCase() {
         return mGenericUseCase;
     }
 

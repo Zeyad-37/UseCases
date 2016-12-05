@@ -3,8 +3,8 @@ package com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_detail;
 import android.os.Bundle;
 
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseViewModel;
-import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
-import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
+import com.zeyad.genericusecase.domain.interactors.data.DataUseCaseFactory;
+import com.zeyad.genericusecase.domain.interactors.data.IDataUseCase;
 
 /**
  * @author zeyad on 11/29/16.
@@ -12,10 +12,10 @@ import com.zeyad.genericusecase.domain.interactors.generic.IGenericUseCase;
 
 public class RepoDetailVM extends BaseViewModel {
 
-    private final IGenericUseCase genericUseCase;
+    private final IDataUseCase genericUseCase;
 
     RepoDetailVM() {
-        genericUseCase = GenericUseCaseFactory.getInstance();
+        genericUseCase = DataUseCaseFactory.getInstance();
     }
 
     @Override

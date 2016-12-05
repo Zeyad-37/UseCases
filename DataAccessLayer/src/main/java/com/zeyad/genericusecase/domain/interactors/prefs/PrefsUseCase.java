@@ -1,5 +1,7 @@
 package com.zeyad.genericusecase.domain.interactors.prefs;
 
+import android.content.Context;
+
 import com.zeyad.genericusecase.data.repository.PrefsRepository;
 import com.zeyad.genericusecase.domain.repositories.Prefs;
 
@@ -9,22 +11,23 @@ import rx.Observable;
  * @author zeyad on 11/11/16.
  */
 
-public class PrefsUseCase implements IPrefsUseCase {
+class PrefsUseCase implements IPrefsUseCase {
 
     private static PrefsUseCase sPrefsUseCases;
     private final Prefs mPrefs;
 
-    private PrefsUseCase() {
+    private PrefsUseCase(Context context) {
+        PrefsRepository.init(context);
         mPrefs = PrefsRepository.getInstance();
     }
 
-    public static void init() {
-        sPrefsUseCases = new PrefsUseCase();
+    public static void init(Context context) {
+        sPrefsUseCases = new PrefsUseCase(context);
     }
 
     protected static PrefsUseCase getInstance() {
         if (sPrefsUseCases == null)
-            sPrefsUseCases = new PrefsUseCase();
+            throw new NullPointerException("PrefsUseCase is null. please call PrefsUseCaseFactory#init(context)");
         return sPrefsUseCases;
     }
 

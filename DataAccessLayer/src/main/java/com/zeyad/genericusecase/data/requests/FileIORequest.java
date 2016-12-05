@@ -2,7 +2,7 @@ package com.zeyad.genericusecase.data.requests;
 
 import android.support.annotation.NonNull;
 
-import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
+import com.zeyad.genericusecase.domain.interactors.data.DataUseCaseFactory;
 
 import java.io.File;
 import java.util.HashMap;
@@ -97,7 +97,7 @@ public class FileIORequest {
 
         @NonNull
         public FileIORequestBuilder url(String url) {
-            this.url = GenericUseCaseFactory.getBaseURL() + url;
+            this.url = DataUseCaseFactory.getBaseURL() + url;
             return this;
         }
 

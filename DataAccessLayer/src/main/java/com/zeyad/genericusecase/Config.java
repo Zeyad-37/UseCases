@@ -4,11 +4,13 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
+
 public class Config {
 
-    private static final String NO_CONTEXT_ERROR = "Config.init(context) must be called before or Config.setContext(context)";
     public static final int NONE = 0, REALM = 1;
     private static Config sInstance;
+    private static DataStoreFactory mDataStoreFactory;
     private Context mContext;
     private String mPrefFileName;
     private boolean mUseApiWithCache;
@@ -44,8 +46,6 @@ public class Config {
 
     @Nullable
     public Context getContext() {
-        if (mContext == null)
-            throw new NullPointerException(NO_CONTEXT_ERROR);
         return mContext;
     }
 
@@ -75,5 +75,13 @@ public class Config {
 
     public void setDBType(int dBType) {
         mDBType = dBType;
+    }
+
+    public DataStoreFactory getDataStoreFactory() {
+        return mDataStoreFactory;
+    }
+
+    public void setDataStoreFactory(DataStoreFactory dataStoreFactory) {
+        mDataStoreFactory = dataStoreFactory;
     }
 }

@@ -2,34 +2,34 @@ package com.zeyad.genericusecase.data.repository;
 
 import android.support.annotation.NonNull;
 
+import com.zeyad.genericusecase.Config;
 import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
 import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
-import com.zeyad.genericusecase.domain.repositories.Repository;
+import com.zeyad.genericusecase.domain.repositories.Data;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.File;
-import java.util.HashMap;
 import java.util.List;
 
 import io.realm.RealmQuery;
 import rx.Observable;
 
-public class DataRepository implements Repository {
+public class DataRepository implements Data {
 
     public static final String DEFAULT_ID_KEY = "id";
     private final DataStoreFactory mDataStoreFactory;
     private final IEntityMapperUtil mEntityMapperUtil;
 
     /**
-     * Constructs a {@link Repository}.
+     * Constructs a {@link Data}.
      *
      * @param dataStoreFactory A factory to construct different data source implementations.
      */
     public DataRepository(DataStoreFactory dataStoreFactory, IEntityMapperUtil entityMapperUtil) {
         mDataStoreFactory = dataStoreFactory;
         mEntityMapperUtil = entityMapperUtil;
+        Config.getInstance().setDataStoreFactory(dataStoreFactory);
     }
 
     /**
@@ -128,23 +128,6 @@ public class DataRepository implements Repository {
         } catch (IllegalAccessException e) {
             return Observable.error(e);
         }
-    }
-
-    @NonNull
-    @Override
-    public Observable<?> uploadFileDynamically(String url, File file, String key, HashMap<String, Object> parameters, boolean onWifi, boolean whileCharging,
-                                               boolean queuable, Class domainClass, Class dataClass) {
-        return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
-                .dynamicUploadFile(url, file, key, parameters, onWifi, queuable, whileCharging, domainClass);
-    }
-
-
-    @NonNull
-    @Override
-    public Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
-                                                 boolean queuable, Class domainClass, Class dataClass) {
-        return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
-                .dynamicDownloadFile(url, file, onWifi, whileCharging, queuable);
     }
 
     @NonNull

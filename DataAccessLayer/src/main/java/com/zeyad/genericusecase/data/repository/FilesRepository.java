@@ -1,9 +1,15 @@
 package com.zeyad.genericusecase.data.repository;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.zeyad.genericusecase.Config;
+import com.zeyad.genericusecase.data.mappers.EntityDataMapper;
+import com.zeyad.genericusecase.data.mappers.EntityMapper;
+import com.zeyad.genericusecase.data.repository.stores.DataStoreFactory;
+import com.zeyad.genericusecase.data.utils.EntityMapperUtil;
+import com.zeyad.genericusecase.data.utils.IEntityMapperUtil;
 import com.zeyad.genericusecase.domain.repositories.Files;
 
 import java.io.BufferedReader;
@@ -12,6 +18,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.HashMap;
 
 import rx.Observable;
 
@@ -21,14 +28,38 @@ import rx.Observable;
 
 public class FilesRepository implements Files {
     private static Files sInstance;
+    private final DataStoreFactory mDataStoreFactory;
+    private final IEntityMapperUtil mEntityMapperUtil;
 
-    private FilesRepository() {
+    private FilesRepository(Context context) {
+        if (Config.getInstance().getDataStoreFactory() == null) {
+            mDataStoreFactory = new DataStoreFactory(Config.getInstance().getContext() == null ?
+                    context : Config.getInstance().getContext());
+            Config.getInstance().setDataStoreFactory(mDataStoreFactory);
+        } else
+            mDataStoreFactory = Config.getInstance().getDataStoreFactory();
+        mEntityMapperUtil = new EntityMapperUtil() {
+            @Override
+            public EntityMapper getDataMapper(Class dataClass) {
+                return new EntityDataMapper();
+            }
+        };
     }
 
-    public static Files getInstance() {
+    public static Files getInstance() throws IllegalArgumentException {
         if (sInstance == null)
-            sInstance = new FilesRepository();
+            throw new NullPointerException("FilesRepository is null, please call FilesRepository#init(Context) first");
         return sInstance;
+    }
+
+    public static Files getInstance(Context context) {
+        if (sInstance == null)
+            sInstance = new FilesRepository(context);
+        return sInstance;
+    }
+
+    public static void init(Context context) {
+        sInstance = new FilesRepository(context);
     }
 
     @Override
@@ -115,5 +146,23 @@ public class FilesRepository implements Files {
                 return Observable.error(e);
             }
         });
+    }
+
+    @NonNull
+    @Override
+    public Observable<?> uploadFileDynamically(String url, File file, String key, HashMap<String, Object> parameters,
+                                               boolean onWifi, boolean whileCharging, boolean queuable,
+                                               Class domainClass, Class dataClass) {
+        return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
+                .dynamicUploadFile(url, file, key, parameters, onWifi, queuable, whileCharging, domainClass);
+    }
+
+
+    @NonNull
+    @Override
+    public Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
+                                                 boolean queuable, Class domainClass, Class dataClass) {
+        return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
+                .dynamicDownloadFile(url, file, onWifi, whileCharging, queuable);
     }
 }

@@ -1,6 +1,5 @@
-package com.zeyad.genericusecase.domain.interactors.generic;
+package com.zeyad.genericusecase.domain.interactors.data;
 
-import com.zeyad.genericusecase.data.requests.FileIORequest;
 import com.zeyad.genericusecase.data.requests.GetRequest;
 import com.zeyad.genericusecase.data.requests.PostRequest;
 
@@ -9,7 +8,7 @@ import java.util.List;
 import io.realm.RealmQuery;
 import rx.Observable;
 
-public interface IGenericUseCase {
+public interface IDataUseCase {
     /**
      * Gets list from full url.
      *
@@ -93,20 +92,4 @@ public interface IGenericUseCase {
      * @return
      */
     Observable searchDisk(RealmQuery realmQuery, Class presentationClass);
-
-    /**
-     * Uploads a file to a url.
-     *
-     * @param fileIORequest contains the attributes of the request,
-     * @return Observable with the Object response.
-     */
-    Observable uploadFile(FileIORequest fileIORequest);
-
-    /**
-     * Downloads file from the give url.
-     *
-     * @param fileIORequest contains the attributes of the request,
-     * @return Observable with the ResponseBody
-     */
-    Observable downloadFile(FileIORequest fileIORequest);
 }

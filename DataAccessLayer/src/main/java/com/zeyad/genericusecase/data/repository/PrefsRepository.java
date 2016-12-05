@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
-import com.zeyad.genericusecase.Config;
 import com.zeyad.genericusecase.domain.repositories.Prefs;
 
 import rx.Observable;
@@ -24,10 +23,14 @@ public class PrefsRepository implements Prefs {
         mSchedulers = Schedulers.io();
     }
 
-    public static Prefs getInstance() {
+    public static Prefs getInstance() throws IllegalArgumentException {
         if (sInstance == null)
-            sInstance = new PrefsRepository(Config.getInstance().getContext());
+            throw new NullPointerException("PrefsUseCase is null. please call PrefsUseCaseFactory#init(context)");
         return sInstance;
+    }
+
+    public static void init(Context context) {
+        sInstance = new PrefsRepository(context);
     }
 
     private synchronized SharedPreferences getPreferencesFile() {

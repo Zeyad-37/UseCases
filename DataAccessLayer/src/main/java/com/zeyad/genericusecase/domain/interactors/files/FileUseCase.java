@@ -1,8 +1,11 @@
 package com.zeyad.genericusecase.domain.interactors.files;
 
+import android.content.Context;
+
 import com.zeyad.genericusecase.UIThread;
 import com.zeyad.genericusecase.data.executor.JobExecutor;
 import com.zeyad.genericusecase.data.repository.FilesRepository;
+import com.zeyad.genericusecase.data.requests.FileIORequest;
 import com.zeyad.genericusecase.domain.executors.PostExecutionThread;
 import com.zeyad.genericusecase.domain.executors.ThreadExecutor;
 import com.zeyad.genericusecase.domain.repositories.Files;
@@ -13,27 +16,27 @@ import rx.schedulers.Schedulers;
 /**
  * @author zeyad on 11/11/16.
  */
-
-public class FileUseCase implements IFileUseCase {
+class FileUseCase implements IFileUseCase {
 
     private static FileUseCase sFilesUseCase;
     private final Files mFiles;
     private final ThreadExecutor mThreadExecutor;
     private final PostExecutionThread mPostExecutionThread;
 
-    private FileUseCase(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+    private FileUseCase(Context context, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
         mThreadExecutor = threadExecutor;
         mPostExecutionThread = postExecutionThread;
+        FilesRepository.init(context);
         mFiles = FilesRepository.getInstance();
     }
 
-    public static void init() {
-        sFilesUseCase = new FileUseCase(new JobExecutor(), new UIThread());
+    public static void init(Context context) {
+        sFilesUseCase = new FileUseCase(context, new JobExecutor(), new UIThread());
     }
 
     protected static FileUseCase getInstance() {
         if (sFilesUseCase == null)
-            sFilesUseCase = new FileUseCase(new JobExecutor(), new UIThread());
+            throw new NullPointerException("FileUseCase#initRealm must be called before calling getInstance()");
         return sFilesUseCase;
     }
 
@@ -56,6 +59,22 @@ public class FileUseCase implements IFileUseCase {
     @Override
     public Observable<Boolean> saveToFile(String fullFilePath, byte[] data) {
         return mFiles.saveToFile(fullFilePath, data).compose(applySchedulers());
+    }
+
+    @Override
+    public Observable uploadFile(FileIORequest fileIORequest) {
+        return mFiles.uploadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
+                fileIORequest.getKey(), fileIORequest.getParameters(), fileIORequest.onWifi(),
+                fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
+                fileIORequest.getPresentationClass(), fileIORequest.getDataClass())
+                .compose(applySchedulers());
+    }
+
+    @Override
+    public Observable downloadFile(FileIORequest fileIORequest) {
+        return mFiles.downloadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
+                fileIORequest.onWifi(), fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
+                fileIORequest.getPresentationClass(), fileIORequest.getDataClass()).compose(applySchedulers());
     }
 
     /**

@@ -2,7 +2,7 @@ package com.zeyad.genericusecase.data.requests;
 
 import android.support.annotation.Nullable;
 
-import com.zeyad.genericusecase.domain.interactors.generic.GenericUseCaseFactory;
+import com.zeyad.genericusecase.domain.interactors.data.DataUseCaseFactory;
 
 import org.junit.After;
 import org.junit.Before;
@@ -20,7 +20,7 @@ import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest({GenericUseCaseFactory.class})
+@PrepareForTest({DataUseCaseFactory.class})
 public class GetRequestTest {
 
     @Nullable
@@ -28,8 +28,8 @@ public class GetRequestTest {
 
     @Before
     public void setUp() throws Exception {
-        PowerMockito.mockStatic(GenericUseCaseFactory.class);
-        when(GenericUseCaseFactory.getBaseURL()).thenReturn("www.google.com");
+        PowerMockito.mockStatic(DataUseCaseFactory.class);
+        when(DataUseCaseFactory.getBaseURL()).thenReturn("www.google.com");
         mGetRequest = GetRequestTestRobot.createGetObjectRequest();
     }
 

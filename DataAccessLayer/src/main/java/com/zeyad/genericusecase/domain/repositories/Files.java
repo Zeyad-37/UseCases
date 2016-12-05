@@ -1,5 +1,10 @@
 package com.zeyad.genericusecase.domain.repositories;
 
+import android.support.annotation.NonNull;
+
+import java.io.File;
+import java.util.HashMap;
+
 import rx.Observable;
 
 /**
@@ -40,4 +45,13 @@ public interface Files {
      * @return Observable with the boolean of success.
      */
     Observable<Boolean> saveToFile(String fullFilePath, byte[] data);
+
+    @NonNull
+    Observable<?> uploadFileDynamically(String url, File file, String key, HashMap<String, Object> parameters,
+                                        boolean onWifi, boolean whileCharging, boolean queuable,
+                                        Class domainClass, Class dataClass);
+
+    @NonNull
+    Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
+                                          boolean queuable, Class domainClass, Class dataClass);
 }
