@@ -13,8 +13,8 @@ public class PrefsUseCaseFactory {
     }
 
     public static void init() {
-        PrefsUseCases.init();
-        sPrefsUseCase = PrefsUseCases.getInstance();
+        PrefsUseCase.init();
+        sPrefsUseCase = PrefsUseCase.getInstance();
     }
 
     public static void destoryInstance() {
