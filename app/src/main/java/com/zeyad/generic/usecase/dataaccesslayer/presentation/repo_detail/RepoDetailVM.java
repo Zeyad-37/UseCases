@@ -12,10 +12,10 @@ import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
 public class RepoDetailVM extends BaseViewModel {
 
-    private final IDataUseCase genericUseCase;
+    private final IDataUseCase dataUseCase;
 
     RepoDetailVM() {
-        genericUseCase = DataUseCaseFactory.getInstance();
+        dataUseCase = DataUseCaseFactory.getInstance();
     }
 
     @Override

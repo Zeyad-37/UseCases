@@ -11,10 +11,10 @@ import android.widget.LinearLayout;
 import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.generic.usecase.dataaccesslayer.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.generic.usecase.dataaccesslayer.components.adapter.ItemInfo;
+import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.LoadDataView;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseActivity;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseSubscriber;
 import com.zeyad.generic.usecase.dataaccesslayer.components.snackbar.SnackBarFactory;
-import com.zeyad.generic.usecase.dataaccesslayer.models.ui.RepoModel;
 import com.zeyad.generic.usecase.dataaccesslayer.models.ui.UserModel;
 import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_detail.RepoDetailActivity;
 import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_detail.RepoDetailFragment;
@@ -39,7 +39,7 @@ import static com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseSubs
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class RepoListActivity extends BaseActivity {
+public class RepoListActivity extends BaseActivity implements LoadDataView {
     RepoListVM repoListVM;
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -74,11 +74,11 @@ public class RepoListActivity extends BaseActivity {
 
     @Override
     public Subscription loadData() {
-        return repoListVM.getRepoList()
+        return repoListVM.getUserList()
                 .doOnSubscribe(this::showLoading)
-                .subscribe(new BaseSubscriber<RepoListActivity, List<RepoModel>>(this, ERROR_WITH_RETRY) {
+                .subscribe(new BaseSubscriber<RepoListActivity, List<UserModel>>(this, ERROR_WITH_RETRY) {
                     @Override
-                    public void onNext(List<RepoModel> repoModels) {
+                    public void onNext(List<UserModel> repoModels) {
                         List<ItemInfo> infoList = new ArrayList<>(repoModels.size());
                         for (int i = 0, repoModelsSize = repoModels.size(); i < repoModelsSize; i++)
                             infoList.add(new ItemInfo<>(repoModels.get(i), R.layout.item_repo));

@@ -16,17 +16,16 @@ import rx.Observable;
  */
 class RepoListVM extends BaseViewModel implements RepoListView {
 
-    //    private static final String USER_NAME = "userName";
     private final IDataUseCase genericUseCase;
-//    private String userName;
 
     RepoListVM() {
         genericUseCase = DataUseCaseFactory.getInstance();
     }
 
     @Override
-    public Observable getRepoList() {
-        return genericUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
+    public Observable getUserList() {
+        return genericUseCase.getList(new GetRequest
+                .GetRequestBuilder(UserRealm.class, true)
                 .presentationClass(UserModel.class)
                 .url("users/users.json")
                 .build());
@@ -34,13 +33,10 @@ class RepoListVM extends BaseViewModel implements RepoListView {
 
     @Override
     public Bundle getState() {
-        Bundle bundle = new Bundle();
-//        bundle.putString(USER_NAME, userName);
-        return bundle;
+        return null;
     }
 
     @Override
     public void restoreState(Bundle state) {
-//        userName = state.getString(USER_NAME, "");
     }
 }

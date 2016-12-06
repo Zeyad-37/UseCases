@@ -1,15 +1,13 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.mvvm;
 
-import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.LoadDataView;
-
 import rx.subscriptions.CompositeSubscription;
 
 /**
  * @author zeyad on 11/28/16.
  */
 
-public abstract class BaseViewModel implements IBaseViewModel {
-    public LoadDataView view;
+public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
+    public V view;
     public boolean isNewView;
     private int itemId;
     private CompositeSubscription compositeSubscription;
@@ -20,7 +18,7 @@ public abstract class BaseViewModel implements IBaseViewModel {
     }
 
     @Override
-    public <V extends LoadDataView> void onViewAttached(V view, boolean isNew) {
+    public void onViewAttached(V view, boolean isNew) {
         this.view = view;
         isNewView = isNew;
     }

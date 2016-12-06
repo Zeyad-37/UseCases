@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 
 import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseActivity;
+import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.LoadDataView;
 import com.zeyad.generic.usecase.dataaccesslayer.components.snackbar.SnackBarFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.models.ui.UserModel;
 import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.RepoListActivity;
@@ -26,7 +27,7 @@ import rx.Subscription;
  * item details are presented side-by-side with a list of items
  * in a {@link RepoListActivity}.
  */
-public class RepoDetailActivity extends BaseActivity {
+public class RepoDetailActivity extends BaseActivity implements LoadDataView{
     public static final String ARG_ITEM = "item";
     @BindView(R.id.detail_toolbar)
     Toolbar toolbar;

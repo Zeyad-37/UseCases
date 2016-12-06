@@ -2,6 +2,8 @@ package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 
 import android.support.v7.widget.RecyclerView;
 
+import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.LoadDataView;
+
 import java.util.List;
 
 /**

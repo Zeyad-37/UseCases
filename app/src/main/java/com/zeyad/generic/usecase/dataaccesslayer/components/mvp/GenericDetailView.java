@@ -1,5 +1,7 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
 
+import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.LoadDataView;
+
 /**
  * @author by zeyad on 16/05/16.
  */

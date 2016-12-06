@@ -1,7 +1,6 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.mvvm;
 
 import com.zeyad.generic.usecase.dataaccesslayer.components.exceptions.ErrorMessageFactory;
-import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.LoadDataView;
 
 import rx.Subscriber;
 

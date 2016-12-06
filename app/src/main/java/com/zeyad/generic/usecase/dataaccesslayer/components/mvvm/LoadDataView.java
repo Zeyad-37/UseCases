@@ -1,4 +1,4 @@
-package com.zeyad.generic.usecase.dataaccesslayer.components.mvp;
+package com.zeyad.generic.usecase.dataaccesslayer.components.mvvm;
 
 /**
  * Interface representing a View that will use to load data.

@@ -10,6 +10,7 @@ import android.widget.LinearLayout;
 
 import com.zeyad.generic.usecase.dataaccesslayer.R;
 import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.BaseFragment;
+import com.zeyad.generic.usecase.dataaccesslayer.components.mvvm.LoadDataView;
 import com.zeyad.generic.usecase.dataaccesslayer.models.ui.UserModel;
 import com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.RepoListActivity;
 
@@ -25,7 +26,7 @@ import rx.Subscription;
  * in two-pane mode (on tablets) or a {@link RepoDetailActivity}
  * on handsets.
  */
-public class RepoDetailFragment extends BaseFragment {
+public class RepoDetailFragment extends BaseFragment implements LoadDataView{
     /**
      * The fragment argument representing the item ID that this fragment
      * represents.

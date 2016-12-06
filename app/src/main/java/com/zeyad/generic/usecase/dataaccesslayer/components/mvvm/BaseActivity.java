@@ -11,7 +11,6 @@ import android.widget.Toast;
 
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.IRxEventBus;
 import com.zeyad.generic.usecase.dataaccesslayer.components.eventbus.RxEventBusFactory;
-import com.zeyad.generic.usecase.dataaccesslayer.components.mvp.LoadDataView;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.INavigator;
 import com.zeyad.generic.usecase.dataaccesslayer.components.navigation.NavigatorFactory;
 import com.zeyad.generic.usecase.dataaccesslayer.components.snackbar.SnackBarFactory;
@@ -25,7 +24,7 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseActivity extends AppCompatActivity implements LoadDataView {
+public abstract class BaseActivity extends AppCompatActivity {
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
