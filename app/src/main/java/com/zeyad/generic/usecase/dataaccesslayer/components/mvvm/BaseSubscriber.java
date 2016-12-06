@@ -17,7 +17,7 @@ public class BaseSubscriber<V extends LoadDataView, M> extends Subscriber<M> {
     public BaseSubscriber(V view, int errorPolicy) {
         this.view = view;
         if (errorPolicy < 0 || errorPolicy > 2)
-            throw new IllegalArgumentException("Error policy does not exist");
+            errorPolicy = 0;
         this.errorPolicy = errorPolicy;
     }
 
