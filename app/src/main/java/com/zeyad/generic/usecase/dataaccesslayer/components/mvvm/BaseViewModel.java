@@ -7,8 +7,8 @@ import rx.subscriptions.CompositeSubscription;
  */
 
 public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
-    public V view;
-    public boolean isNewView;
+    private V view;
+    private boolean isNewView;
     private int itemId;
     private CompositeSubscription compositeSubscription;
 
@@ -37,5 +37,21 @@ public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
     @Override
     public void setItemId(int itemId) {
         this.itemId = itemId;
+    }
+
+    public V getView() {
+        return view;
+    }
+
+    public void setView(V view) {
+        this.view = view;
+    }
+
+    public boolean isNewView() {
+        return isNewView;
+    }
+
+    public void setNewView(boolean newView) {
+        isNewView = newView;
     }
 }
