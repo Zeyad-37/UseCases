@@ -1,26 +1,21 @@
 package com.zeyad.usecases.data.services.jobs;
 
-import android.app.job.JobInfo;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
-import android.os.PersistableBundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.OneoffTask;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
+import com.google.gson.ExclusionStrategy;
+import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
-import com.zeyad.usecases.R;
+import com.google.gson.GsonBuilder;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
-import com.zeyad.usecases.data.repository.stores.CloudDataStore;
 import com.zeyad.usecases.data.requests.FileIORequest;
-import com.zeyad.usecases.data.services.GenericGCMService;
-import com.zeyad.usecases.data.services.GenericJobService;
 import com.zeyad.usecases.data.utils.Utils;
 
 import java.io.FileOutputStream;
@@ -30,57 +25,76 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.realm.RealmList;
+import io.realm.RealmModel;
+import io.realm.RealmObject;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Subscription;
 import rx.subscriptions.Subscriptions;
 
-import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
-import static android.app.job.JobInfo.NETWORK_TYPE_UNMETERED;
-import static com.google.android.gms.gcm.Task.NETWORK_STATE_CONNECTED;
-import static com.google.android.gms.gcm.Task.NETWORK_STATE_UNMETERED;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.JOB_TYPE;
 import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.PAYLOAD;
 import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.TRIAL_COUNT;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.UPLOAD_FILE;
 
 /**
  * @author Zeyad on 6/05/16.
  */
 public class FileIO {
-    private static final String TAG = com.zeyad.usecases.data.services.jobs.FileIO.class.getSimpleName();
+    private static final String TAG = FileIO.class.getSimpleName();
+    private static int mTrailCount;
+    private final FirebaseJobDispatcher mDispatcher;
+    private final FileIORequest mFileIORequest;
     private final Context mContext;
     private final RestApi mRestApi;
-    private int mTrailCount;
-    private FileIORequest mFileIORequest;
+    private final Gson gson;
     private boolean mIsDownload;
-    private GcmNetworkManager mGcmNetworkManager;
-    private boolean mGooglePlayServicesAvailable;
 
     public FileIO(@NonNull Intent intent, @NonNull Context context, boolean isDownload) {
+        gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
+            @Override
+            public boolean shouldSkipField(FieldAttributes f) {
+                return f.getDeclaringClass().equals(RealmObject.class)
+                        && f.getDeclaredClass().equals(RealmModel.class)
+                        && f.getDeclaringClass().equals(RealmList.class);
+            }
+
+            @Override
+            public boolean shouldSkipClass(Class<?> clazz) {
+                return false;
+            }
+        }).create();
         mRestApi = new RestApiImpl();
         mContext = context;
         mTrailCount = intent.getIntExtra(TRIAL_COUNT, 0);
         mFileIORequest = new Gson().fromJson(intent.getStringExtra(PAYLOAD), FileIORequest.class);
         mIsDownload = isDownload;
-        mGcmNetworkManager = GcmNetworkManager.getInstance(mContext);
-        mGooglePlayServicesAvailable = Utils.isGooglePlayServicesAvailable(mContext);
+        mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
     }
 
     /**
      * This constructor meant to be used in testing and restricted environments only. Use public constructors instead.
      */
-    FileIO(Context context, RestApi restApi, int trailCount, FileIORequest fileIORequest, boolean isDownload,
-           GcmNetworkManager gcmNetworkManager, boolean googlePlayServicesAvailable, boolean hasLollipop) {
+    FileIO(Context context, RestApi restApi, int trailCount, FileIORequest fileIORequest, boolean isDownload) {
+        gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
+            @Override
+            public boolean shouldSkipField(FieldAttributes f) {
+                return f.getDeclaringClass().equals(RealmObject.class)
+                        && f.getDeclaredClass().equals(RealmModel.class)
+                        && f.getDeclaringClass().equals(RealmList.class);
+            }
+
+            @Override
+            public boolean shouldSkipClass(Class<?> clazz) {
+                return false;
+            }
+        }).create();
         mContext = context;
         mRestApi = restApi;
         mTrailCount = trailCount;
         mFileIORequest = fileIORequest;
         mIsDownload = isDownload;
-        mGcmNetworkManager = gcmNetworkManager;
-        mGooglePlayServicesAvailable = googlePlayServicesAvailable;
+        mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
     }
 
     @Nullable
@@ -154,36 +168,7 @@ public class FileIO {
     void queueIOFile() {
         mTrailCount++;
         if (mTrailCount < 3) {
-            if (mGooglePlayServicesAvailable) {
-                Bundle extras = new Bundle();
-                extras.putString(JOB_TYPE, mIsDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
-                extras.putString(PAYLOAD, new Gson().toJson(mFileIORequest));
-                mGcmNetworkManager.schedule(new OneoffTask.Builder()
-                        .setService(GenericGCMService.class)
-                        .setRequiredNetwork(mFileIORequest.onWifi() ? NETWORK_STATE_UNMETERED : NETWORK_STATE_CONNECTED)
-                        .setRequiresCharging(mFileIORequest.isWhileCharging())
-                        .setUpdateCurrent(false)
-                        .setPersisted(true)
-                        .setExtras(extras)
-                        .setTag(CloudDataStore.FILE_IO_TAG)
-                        .setExecutionWindow(0, 30)
-                        .build());
-                Log.d(TAG, mContext.getString(R.string.requeued, "GcmNetworkManager", "true"));
-            } else {
-                if (Utils.hasLollipop()) {
-                    PersistableBundle persistableBundle = new PersistableBundle();
-                    persistableBundle.putString(JOB_TYPE, mIsDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
-                    persistableBundle.putString(PAYLOAD, new Gson().toJson(mFileIORequest));
-                    boolean isScheduled = Utils.scheduleJob(mContext, new JobInfo.Builder(1,
-                            new ComponentName(mContext, GenericJobService.class))
-                            .setRequiredNetworkType(mFileIORequest.onWifi() ? NETWORK_TYPE_UNMETERED : NETWORK_TYPE_ANY)
-                            .setRequiresCharging(mFileIORequest.isWhileCharging())
-                            .setPersisted(true)
-                            .setExtras(persistableBundle)
-                            .build());
-                    Log.d(TAG, mContext.getString(R.string.requeued, "JobScheduler", String.valueOf(isScheduled)));
-                }
-            }
+            Utils.queueFileIOCore(mDispatcher, mIsDownload, mFileIORequest, gson);
         }
     }
 

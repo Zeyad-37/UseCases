@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.os.Build;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.firebase.jobdispatcher.Job;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -157,7 +159,7 @@ public class GenericJobServiceTest {
 
     @Test
     public void testJobSchedule_ifJobServiceIsScheduled_whenMethodIsCalled() {
-        final JobInfo mockedJobInfo = GenericJobServiceTestRobot.scheduleJob();
+        final Job mockedJobInfo = GenericJobServiceTestRobot.scheduleJob();
         Mockito.verify(GenericJobServiceTestRobot.getMockedJobScheduler()).schedule(mockedJobInfo);
     }
 }

@@ -1,10 +1,7 @@
 package com.zeyad.usecases.data.utils;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.Service;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -13,11 +10,20 @@ import android.net.Network;
 import android.net.NetworkInfo;
 import android.os.BatteryManager;
 import android.os.Build;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
+import com.firebase.jobdispatcher.Constraint;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.Lifetime;
+import com.firebase.jobdispatcher.RetryStrategy;
+import com.firebase.jobdispatcher.Trigger;
+import com.google.gson.Gson;
+import com.zeyad.usecases.data.requests.FileIORequest;
+import com.zeyad.usecases.data.requests.PostRequest;
+import com.zeyad.usecases.data.services.GenericJobService;
+import com.zeyad.usecases.data.services.GenericNetworkQueueIntentService;
 
 import io.realm.Realm;
 import okhttp3.MediaType;
@@ -25,6 +31,11 @@ import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
+
+import static com.zeyad.usecases.data.repository.stores.CloudDataStore.FILE_IO_TAG;
+import static com.zeyad.usecases.data.repository.stores.CloudDataStore.POST_TAG;
+import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
+import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.UPLOAD_FILE;
 
 public class Utils {
     public static boolean doesContextBelongsToApplication(Context mContext) {
@@ -62,18 +73,8 @@ public class Utils {
         return false;
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static boolean scheduleJob(@NonNull Context context, JobInfo jobInfo) {
-        JobScheduler scheduler = (JobScheduler) context.getSystemService(Context.JOB_SCHEDULER_SERVICE);
-        return scheduler.schedule(jobInfo) == 1;
-    }
-
     public static boolean hasLollipop() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
-    }
-
-    public static boolean isGooglePlayServicesAvailable(@NonNull Context context) {
-        return GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
     }
 
     @Nullable
@@ -125,9 +126,45 @@ public class Utils {
         return !doWhileCharging || isChargingCurrently;
     }
 
-    public static final String MULTIPART_FORM_DATA = "multipart/form-data";
+    private static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
     public static RequestBody createPartFromString(Object descriptionString) {
         return RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), String.valueOf(descriptionString));
+    }
+
+    public static void queuePostCore(FirebaseJobDispatcher dispatcher, PostRequest postRequest, Gson gson) {
+        Bundle extras = new Bundle(2);
+        extras.putString(GenericNetworkQueueIntentService.JOB_TYPE, GenericNetworkQueueIntentService.POST);
+        extras.putString(GenericNetworkQueueIntentService.PAYLOAD, gson.toJson(postRequest));
+        dispatcher.mustSchedule(dispatcher.newJobBuilder()
+                .setService(GenericJobService.class)
+                .setTag(POST_TAG)
+                .setRecurring(false)
+                .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
+                .setTrigger(Trigger.executionWindow(0, 60))
+                .setReplaceCurrent(false)
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .setConstraints(Constraint.ON_ANY_NETWORK, Constraint.DEVICE_CHARGING)
+                .setExtras(extras)
+                .build());
+    }
+
+    public static void queueFileIOCore(FirebaseJobDispatcher dispatcher, boolean isDownload,
+                                       FileIORequest fileIORequest, Gson gson) {
+        Bundle extras = new Bundle(2);
+        extras.putString(GenericNetworkQueueIntentService.JOB_TYPE, isDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
+        extras.putString(GenericNetworkQueueIntentService.PAYLOAD, gson.toJson(fileIORequest));
+        dispatcher.mustSchedule(dispatcher.newJobBuilder()
+                .setService(GenericJobService.class)
+                .setTag(FILE_IO_TAG)
+                .setRecurring(false)
+                .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
+                .setTrigger(Trigger.executionWindow(0, 60))
+                .setReplaceCurrent(false)
+                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                .setConstraints(fileIORequest.onWifi() ? Constraint.ON_UNMETERED_NETWORK : Constraint.ON_ANY_NETWORK,
+                        fileIORequest.isWhileCharging() ? Constraint.DEVICE_CHARGING : 0)
+                .setExtras(extras)
+                .build());
     }
 }

@@ -1,13 +1,14 @@
 package com.zeyad.usecases.data.services;
 
 import android.annotation.TargetApi;
-import android.app.job.JobInfo;
-import android.app.job.JobParameters;
-import android.app.job.JobScheduler;
 import android.content.Context;
 import android.os.Build;
-import android.os.PersistableBundle;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
+
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.Job;
+import com.firebase.jobdispatcher.JobParameters;
 
 import org.mockito.Mockito;
 
@@ -23,19 +24,19 @@ public class GenericJobServiceTestRobot {
 
     private static final String TASK_PARAM_PAYLOAD = "some_payload";
     private static final Context MOCKED_CONTEXT = Mockito.mock(Context.class);
-    private static final JobScheduler JOB_SCHEDULER = Mockito.mock(JobScheduler.class);
+    private static final FirebaseJobDispatcher JOB_SCHEDULER = Mockito.mock(FirebaseJobDispatcher.class);
 
-    private static JobParameters createJobParam(String tag, String jobType) {
+    private static JobParameters createJobParam(String jobType) {
         JobParameters jobParameters = Mockito.mock(JobParameters.class);
-        final PersistableBundle extraBundle = getJobParamsExtraBundle(jobType);
+        final Bundle extraBundle = getJobParamsExtraBundle(jobType);
         Mockito.when(jobParameters.getExtras()).thenReturn(extraBundle);
 //        Mockito.when(jobParameters.getTag()).thenReturn(tag);
         return jobParameters;
     }
 
     @NonNull
-    private static PersistableBundle getJobParamsExtraBundle(String jobType) {
-        final PersistableBundle bundle = new PersistableBundle();
+    private static Bundle getJobParamsExtraBundle(String jobType) {
+        final Bundle bundle = new Bundle(2);
         bundle.putString(PAYLOAD, TASK_PARAM_PAYLOAD);
         bundle.putString(JOB_TYPE, jobType);
         return bundle;
@@ -56,29 +57,29 @@ public class GenericJobServiceTestRobot {
         final GenericJobService service = new GenericJobService();
         service.setContext(getMockedContext());
         service.setApplicationContext(getMockedContext());
-        return service.onStartJob(createJobParam(GenericGCMService.TAG_TASK_ONE_OFF_LOG, DOWNLOAD_FILE));
+        return service.onStartJob(createJobParam(DOWNLOAD_FILE));
     }
 
     static boolean runForUploadFile() {
         final GenericJobService service = new GenericJobService();
         service.setContext(getMockedContext());
         service.setApplicationContext(getMockedContext());
-        return service.onStartJob(createJobParam(GenericGCMService.TAG_TASK_ONE_OFF_LOG, UPLOAD_FILE));
+        return service.onStartJob(createJobParam(UPLOAD_FILE));
     }
 
     static boolean runForPost() {
         final GenericJobService service = new GenericJobService();
         service.setContext(getMockedContext());
         service.setApplicationContext(getMockedContext());
-        return service.onStartJob(createJobParam(GenericGCMService.TAG_TASK_ONE_OFF_LOG, POST));
+        return service.onStartJob(createJobParam(POST));
     }
 
     static void clearAll() {
         Mockito.reset(MOCKED_CONTEXT);
     }
 
-    static JobInfo scheduleJob() {
-        final JobInfo mockedJobInfo = Mockito.mock(JobInfo.class);
+    static Job scheduleJob() {
+        final Job mockedJobInfo = Mockito.mock(Job.class);
         final GenericJobService genericJobService = new GenericJobService();
         genericJobService.setContext(GenericJobServiceTestRobot.getMockedContext());
         genericJobService.setApplicationContext(GenericJobServiceTestRobot.getMockedContext());
@@ -86,7 +87,7 @@ public class GenericJobServiceTestRobot {
         return mockedJobInfo;
     }
 
-    public static JobScheduler getMockedJobScheduler() {
+    public static FirebaseJobDispatcher getMockedJobScheduler() {
         return JOB_SCHEDULER;
     }
 }

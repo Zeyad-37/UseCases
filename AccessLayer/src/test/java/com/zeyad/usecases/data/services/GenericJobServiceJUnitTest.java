@@ -1,11 +1,12 @@
 package com.zeyad.usecases.data.services;
 
 import android.annotation.TargetApi;
-import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.Intent;
 import android.os.Build;
 import android.support.test.rule.BuildConfig;
+
+import com.firebase.jobdispatcher.Job;
 
 import org.junit.After;
 import org.junit.Before;
@@ -164,7 +165,7 @@ public class GenericJobServiceJUnitTest {
 
     @Test
     public void testJobSchedule_ifJobServiceIsScheduled_whenMethodIsCalled() {
-        final JobInfo mockedJobInfo = GenericJobServiceJUnitTestRobot.scheduleJob();
+        final Job mockedJobInfo = GenericJobServiceJUnitTestRobot.scheduleJob();
         Mockito.verify(GenericJobServiceJUnitTestRobot.getMockedJobScheduler()).schedule(mockedJobInfo);
     }
 }

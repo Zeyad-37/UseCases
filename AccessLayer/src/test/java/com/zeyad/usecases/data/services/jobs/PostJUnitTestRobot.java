@@ -7,7 +7,7 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.google.android.gms.gcm.GcmNetworkManager;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.PostRequest;
@@ -50,10 +50,8 @@ public class PostJUnitTestRobot {
     }
 
     @NonNull
-    static Post createPost(Context context, PostRequest postRequest, RestApi restApi, int trailCount,
-                           boolean hasLollipop, boolean isPlayServicesAvailable, boolean networkAvailable,
-                           GcmNetworkManager gcmNetworkManager) {
-        return new Post(context, postRequest, restApi, trailCount, isPlayServicesAvailable);
+    static Post createPost(Context context, PostRequest postRequest, RestApi restApi, int trailCount) {
+        return new Post(context, postRequest, restApi, trailCount);
     }
 
     static String getValidUrl() {
@@ -211,8 +209,8 @@ public class PostJUnitTestRobot {
         reset(RESPONSE_BODY, INPUT_STREAM, JOB_SCHEDULER);
     }
 
-    static GcmNetworkManager getGcmNetworkManager() {
-        return mock(GcmNetworkManager.class);
+    static FirebaseJobDispatcher getGcmNetworkManager() {
+        return mock(FirebaseJobDispatcher.class);
     }
 
 }

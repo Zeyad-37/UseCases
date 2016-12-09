@@ -1,26 +1,16 @@
 package com.zeyad.usecases.data;
 
-import android.annotation.TargetApi;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.test.InstrumentationRegistry;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.gcm.GcmNetworkManager;
-import com.google.android.gms.gcm.OneoffTask;
 import com.google.gson.Gson;
 import com.zeyad.usecases.data.mappers.EntityDataMapper;
 import com.zeyad.usecases.data.mappers.EntityMapper;
-import com.zeyad.usecases.data.services.GenericGCMService;
-import com.zeyad.usecases.data.services.GenericJobService;
 import com.zeyad.usecases.data.services.realm_test_models.TestModel;
 import com.zeyad.usecases.data.utils.EntityMapperUtil;
 import com.zeyad.usecases.data.utils.IEntityMapperUtil;
@@ -29,7 +19,6 @@ import com.zeyad.usecases.data.utils.Utils;
 import org.hamcrest.Matchers;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import java.io.PrintWriter;
@@ -44,16 +33,6 @@ import io.realm.rx.RealmObservableFactory;
 import rx.exceptions.CompositeException;
 import rx.observers.TestSubscriber;
 
-import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
-import static android.app.job.JobInfo.NETWORK_TYPE_UNMETERED;
-import static com.google.android.gms.gcm.Task.NETWORK_STATE_CONNECTED;
-import static com.google.android.gms.gcm.Task.NETWORK_STATE_UNMETERED;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.JOB_TYPE;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.POST;
-import static org.hamcrest.CoreMatchers.equalTo;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 public class TestUtility {
@@ -168,10 +147,6 @@ public class TestUtility {
         return mockedContext;
     }
 
-    public static boolean isGooglePlayerServicesEnabled(@NonNull Context context) {
-        return GoogleApiAvailability.getInstance() != null && GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context) == ConnectionResult.SUCCESS;
-    }
-
     private static String getStackTrace(@NonNull Throwable throwable) {
 
         StringWriter errors = new StringWriter();
@@ -219,67 +194,65 @@ public class TestUtility {
                 .build());
     }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static void applyAssertsOnSchedulingForeFileIO(boolean onWifi,
-                                                          boolean whileCharging,
-                                                          GcmNetworkManager gcmNetworkManager,
-                                                          boolean isGoogleServicesAvailable,
-                                                          boolean hasLollipop,
-                                                          JobScheduler jobScheduler) {
-        if (isGoogleServicesAvailable) {
-            ArgumentCaptor<OneoffTask> peopleCaptor = ArgumentCaptor.forClass(OneoffTask.class);
-            Mockito.verify(gcmNetworkManager).schedule(peopleCaptor.capture());
-            assertThat(peopleCaptor.getValue().getWindowEnd(), is(30L));
-            assertThat(peopleCaptor.getValue().getWindowStart(), is(0L));
-            assertThat(peopleCaptor.getValue().getRequiresCharging(), is(false));
-            assertThat(peopleCaptor.getValue().getExtras(), is(notNullValue()));
-            assertThat(peopleCaptor.getValue().getExtras().getString(JOB_TYPE), is(DOWNLOAD_FILE));
-            assertThat(peopleCaptor.getValue().getServiceName(), is(GenericGCMService.class.getName()));
-            assertThat(peopleCaptor.getValue().getRequiredNetwork(), is(onWifi ? NETWORK_STATE_UNMETERED : NETWORK_STATE_CONNECTED));
-        } else if (hasLollipop) {
-            ArgumentCaptor<JobInfo> argumentCaptor = ArgumentCaptor.forClass(JobInfo.class);
-            Mockito.verify(jobScheduler).schedule(argumentCaptor.capture());
-            assertThat(argumentCaptor.getValue().getService().getClassName(), is(equalTo(GenericJobService.class.getName())));
-            assertThat(argumentCaptor.getValue().isRequireCharging(), is(whileCharging));
-            assertThat(argumentCaptor.getValue().isPersisted(), is(true));
-            assertThat(argumentCaptor.getValue().getNetworkType(), is(onWifi ? NETWORK_TYPE_UNMETERED : NETWORK_TYPE_ANY));
-            assertThat(argumentCaptor.getValue().getExtras(), is(notNullValue()));
-            assertThat(argumentCaptor.getValue().getExtras().getString(JOB_TYPE), is(DOWNLOAD_FILE));
-        } else {
-            Mockito.verify(jobScheduler).schedule(Mockito.any(JobInfo.class));
-            Mockito.verify(gcmNetworkManager).schedule(Mockito.any(OneoffTask.class));
-        }
-    }
-
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public static void applyAssertsOnSchedulingForPost(GcmNetworkManager gcmNetworkManager,
-                                                       boolean isGoogleServicesAvailable,
-                                                       boolean hasLollipop,
-                                                       JobScheduler jobScheduler) {
-        if (isGoogleServicesAvailable) {
-            ArgumentCaptor<OneoffTask> peopleCaptor = ArgumentCaptor.forClass(OneoffTask.class);
-            Mockito.verify(gcmNetworkManager).schedule(peopleCaptor.capture());
-            assertThat(peopleCaptor.getValue().getWindowEnd(), is(30L));
-            assertThat(peopleCaptor.getValue().getWindowStart(), is(0L));
-            assertThat(peopleCaptor.getValue().getRequiresCharging(), is(false));
-            assertThat(peopleCaptor.getValue().getExtras(), is(notNullValue()));
-            assertThat(peopleCaptor.getValue().getExtras().getString(JOB_TYPE), is(POST));
-            assertThat(peopleCaptor.getValue().getServiceName(), is(GenericGCMService.class.getName()));
-            assertThat(peopleCaptor.getValue().getRequiredNetwork(), is(NETWORK_STATE_CONNECTED));
-        } else if (hasLollipop) {
-            ArgumentCaptor<JobInfo> argumentCaptor = ArgumentCaptor.forClass(JobInfo.class);
-            Mockito.verify(jobScheduler).schedule(argumentCaptor.capture());
-            assertThat(argumentCaptor.getValue().getService().getClassName(), is(equalTo(GenericJobService.class.getName())));
-            assertThat(argumentCaptor.getValue().isRequireCharging(), is(false));
-            assertThat(argumentCaptor.getValue().isPersisted(), is(true));
-            assertThat(argumentCaptor.getValue().getNetworkType(), is(NETWORK_TYPE_ANY));
-            assertThat(argumentCaptor.getValue().getExtras(), is(notNullValue()));
-            assertThat(argumentCaptor.getValue().getExtras().getString(JOB_TYPE), is(POST));
-        } else {
-            Mockito.verify(jobScheduler).schedule(Mockito.any(JobInfo.class));
-            Mockito.verify(gcmNetworkManager).schedule(Mockito.any(OneoffTask.class));
-        }
-    }
+//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+//    public static void applyAssertsOnSchedulingForeFileIO(boolean onWifi,
+//                                                          boolean whileCharging,
+//
+//                                                          JobScheduler jobScheduler) {
+//        if (isGoogleServicesAvailable) {
+//            ArgumentCaptor<OneoffTask> peopleCaptor = ArgumentCaptor.forClass(OneoffTask.class);
+//            Mockito.verify(gcmNetworkManager).schedule(peopleCaptor.capture());
+//            assertThat(peopleCaptor.getValue().getWindowEnd(), is(30L));
+//            assertThat(peopleCaptor.getValue().getWindowStart(), is(0L));
+//            assertThat(peopleCaptor.getValue().getRequiresCharging(), is(false));
+//            assertThat(peopleCaptor.getValue().getExtras(), is(notNullValue()));
+//            assertThat(peopleCaptor.getValue().getExtras().getString(JOB_TYPE), is(DOWNLOAD_FILE));
+//            assertThat(peopleCaptor.getValue().getServiceName(), is(GenericGCMService.class.getName()));
+//            assertThat(peopleCaptor.getValue().getRequiredNetwork(), is(onWifi ? NETWORK_STATE_UNMETERED : NETWORK_STATE_CONNECTED));
+//        } else if (hasLollipop) {
+//            ArgumentCaptor<JobInfo> argumentCaptor = ArgumentCaptor.forClass(JobInfo.class);
+//            Mockito.verify(jobScheduler).schedule(argumentCaptor.capture());
+//            assertThat(argumentCaptor.getValue().getService().getClassName(), is(equalTo(GenericJobService.class.getName())));
+//            assertThat(argumentCaptor.getValue().isRequireCharging(), is(whileCharging));
+//            assertThat(argumentCaptor.getValue().isPersisted(), is(true));
+//            assertThat(argumentCaptor.getValue().getNetworkType(), is(onWifi ? NETWORK_TYPE_UNMETERED : NETWORK_TYPE_ANY));
+//            assertThat(argumentCaptor.getValue().getExtras(), is(notNullValue()));
+//            assertThat(argumentCaptor.getValue().getExtras().getString(JOB_TYPE), is(DOWNLOAD_FILE));
+//        } else {
+//            Mockito.verify(jobScheduler).schedule(Mockito.any(JobInfo.class));
+//            Mockito.verify(gcmNetworkManager).schedule(Mockito.any(OneoffTask.class));
+//        }
+//    }
+//
+//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+//    public static void applyAssertsOnSchedulingForPost(GcmNetworkManager gcmNetworkManager,
+//                                                       boolean isGoogleServicesAvailable,
+//                                                       boolean hasLollipop,
+//                                                       JobScheduler jobScheduler) {
+//        if (isGoogleServicesAvailable) {
+//            ArgumentCaptor<OneoffTask> peopleCaptor = ArgumentCaptor.forClass(OneoffTask.class);
+//            Mockito.verify(gcmNetworkManager).schedule(peopleCaptor.capture());
+//            assertThat(peopleCaptor.getValue().getWindowEnd(), is(30L));
+//            assertThat(peopleCaptor.getValue().getWindowStart(), is(0L));
+//            assertThat(peopleCaptor.getValue().getRequiresCharging(), is(false));
+//            assertThat(peopleCaptor.getValue().getExtras(), is(notNullValue()));
+//            assertThat(peopleCaptor.getValue().getExtras().getString(JOB_TYPE), is(POST));
+//            assertThat(peopleCaptor.getValue().getServiceName(), is(GenericGCMService.class.getName()));
+//            assertThat(peopleCaptor.getValue().getRequiredNetwork(), is(NETWORK_STATE_CONNECTED));
+//        } else if (hasLollipop) {
+//            ArgumentCaptor<JobInfo> argumentCaptor = ArgumentCaptor.forClass(JobInfo.class);
+//            Mockito.verify(jobScheduler).schedule(argumentCaptor.capture());
+//            assertThat(argumentCaptor.getValue().getService().getClassName(), is(equalTo(GenericJobService.class.getName())));
+//            assertThat(argumentCaptor.getValue().isRequireCharging(), is(false));
+//            assertThat(argumentCaptor.getValue().isPersisted(), is(true));
+//            assertThat(argumentCaptor.getValue().getNetworkType(), is(NETWORK_TYPE_ANY));
+//            assertThat(argumentCaptor.getValue().getExtras(), is(notNullValue()));
+//            assertThat(argumentCaptor.getValue().getExtras().getString(JOB_TYPE), is(POST));
+//        } else {
+//            Mockito.verify(jobScheduler).schedule(Mockito.any(JobInfo.class));
+//            Mockito.verify(gcmNetworkManager).schedule(Mockito.any(OneoffTask.class));
+//        }
+//    }
 
     public interface Executor {
 

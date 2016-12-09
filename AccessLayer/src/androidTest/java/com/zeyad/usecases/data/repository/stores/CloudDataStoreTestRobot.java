@@ -7,10 +7,7 @@ import android.content.res.Resources;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.CommonStatusCodes;
-import com.google.android.gms.gcm.GcmNetworkManager;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.google.gson.Gson;
 import com.zeyad.usecases.data.TestUtility;
 import com.zeyad.usecases.data.ToStringArgumentMatcher;
@@ -128,17 +125,6 @@ class CloudDataStoreTestRobot {
     @NonNull
     static Class getValidDataClass() {
         return TestModel.class;
-    }
-
-    static GoogleApiAvailability createMockedGoogleApiAvailability() {
-        GoogleApiAvailability googleApiAvailaibility = Mockito.mock(GoogleApiAvailability.class);
-        Mockito.when(googleApiAvailaibility.isGooglePlayServicesAvailable(Mockito.any())).thenReturn(ConnectionResult.SUCCESS);
-        return googleApiAvailaibility;
-    }
-
-    static void changeStateOfGoogleApi(@NonNull GoogleApiAvailability googleApiAvailaibility, boolean state) {
-        Mockito.when(googleApiAvailaibility.isGooglePlayServicesAvailable(Mockito.any()))
-                .thenReturn(state ? ConnectionResult.SUCCESS : ConnectionResult.API_UNAVAILABLE);
     }
 
     static RestApi createMockedRestApi(boolean toCache) {
@@ -334,21 +320,8 @@ class CloudDataStoreTestRobot {
         return TestUtility.changeStateOfNetwork(getMockedContext(), toEnable);
     }
 
-    static void changeHasLollipop(@NonNull CloudDataStore cloudDataStore, boolean state) {
-        cloudDataStore.setHasLollipop(state);
-    }
-
     static boolean isNetworkEnabled() {
         return Utils.isNetworkAvailable(getMockedContext());
-    }
-
-    static boolean isGooglePlayerServicesEnabled(@NonNull CloudDataStore cloudDataStore) {
-        return cloudDataStore.getGoogleApiAvailability().isGooglePlayServicesAvailable(getMockedContext())
-                == CommonStatusCodes.SUCCESS;
-    }
-
-    static boolean hasLollipop(@NonNull CloudDataStore cloudDataStore) {
-        return cloudDataStore.isHasLollipop();
     }
 
     static <T> T argThis(T arg) {
@@ -403,7 +376,7 @@ class CloudDataStoreTestRobot {
         return jsonArray.put(createTestModelJSON());
     }
 
-    static GcmNetworkManager getGcmNetworkManager() {
-        return Mockito.mock(GcmNetworkManager.class);
+    static FirebaseJobDispatcher getGcmNetworkManager() {
+        return Mockito.mock(FirebaseJobDispatcher.class);
     }
 }

@@ -8,7 +8,7 @@ import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.google.android.gms.gcm.GcmNetworkManager;
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.FileIORequest;
@@ -86,15 +86,14 @@ class FileIOTestRobot {
         return new File(Environment.getExternalStorageDirectory(), "someFile.txt");
     }
 
-    static GcmNetworkManager getGcmNetworkManager() {
-        return Mockito.mock(GcmNetworkManager.class);
+    static FirebaseJobDispatcher getGcmNetworkManager() {
+        return Mockito.mock(FirebaseJobDispatcher.class);
     }
 
     @NonNull
     static FileIO createFileIO(Context mockedContext, RestApi mockedRestApi, int trailCount
-            , FileIORequest fileIoReq, boolean toDownLoad, GcmNetworkManager mockedNetorkManager, boolean googlePlayServicesAvailable, boolean hasLollipop) {
-        return new FileIO(mockedContext, mockedRestApi, trailCount
-                , fileIoReq, toDownLoad, mockedNetorkManager, googlePlayServicesAvailable, hasLollipop);
+            , FileIORequest fileIoReq, boolean toDownLoad) {
+        return new FileIO(mockedContext, mockedRestApi, trailCount, fileIoReq, toDownLoad);
     }
 
     @NonNull
