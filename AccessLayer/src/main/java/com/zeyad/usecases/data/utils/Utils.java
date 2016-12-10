@@ -32,12 +32,12 @@ import rx.Observable;
 import rx.Subscription;
 import rx.subscriptions.CompositeSubscription;
 
-import static com.zeyad.usecases.data.repository.stores.CloudDataStore.FILE_IO_TAG;
-import static com.zeyad.usecases.data.repository.stores.CloudDataStore.POST_TAG;
 import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
 import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.UPLOAD_FILE;
 
 public class Utils {
+    private static final String MULTIPART_FORM_DATA = "multipart/form-data";
+
     public static boolean doesContextBelongsToApplication(Context mContext) {
         return !(mContext instanceof Activity || mContext instanceof Service);
     }
@@ -126,10 +126,12 @@ public class Utils {
         return !doWhileCharging || isChargingCurrently;
     }
 
-    private static final String MULTIPART_FORM_DATA = "multipart/form-data";
-
     public static RequestBody createPartFromString(Object descriptionString) {
         return RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), String.valueOf(descriptionString));
+    }
+
+    public static boolean hasKitKat() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
     }
 
     public static void queuePostCore(FirebaseJobDispatcher dispatcher, PostRequest postRequest, Gson gson) {
@@ -138,7 +140,7 @@ public class Utils {
         extras.putString(GenericNetworkQueueIntentService.PAYLOAD, gson.toJson(postRequest));
         dispatcher.mustSchedule(dispatcher.newJobBuilder()
                 .setService(GenericJobService.class)
-                .setTag(POST_TAG)
+                .setTag(GenericNetworkQueueIntentService.POST)
                 .setRecurring(false)
                 .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
                 .setTrigger(Trigger.executionWindow(0, 60))
@@ -156,7 +158,7 @@ public class Utils {
         extras.putString(GenericNetworkQueueIntentService.PAYLOAD, gson.toJson(fileIORequest));
         dispatcher.mustSchedule(dispatcher.newJobBuilder()
                 .setService(GenericJobService.class)
-                .setTag(FILE_IO_TAG)
+                .setTag(isDownload ? DOWNLOAD_FILE : UPLOAD_FILE)
                 .setRecurring(false)
                 .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
                 .setTrigger(Trigger.executionWindow(0, 60))

@@ -111,26 +111,26 @@ public class IApiConnectionTest {
 
     @Test
     public void testDynamicPostObject() throws Exception {
-        mApiConnection.dynamicPostObject(mValidUrl, mMockedRequestBody);
-        Mockito.verify(mRestApiWithoutCache).dynamicPostObject(eq(mValidUrl), eq(mMockedRequestBody));
+        mApiConnection.dynamicPost(mValidUrl, mMockedRequestBody);
+        Mockito.verify(mRestApiWithoutCache).dynamicPost(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
     @Test
     public void testDynamicPostList() throws Exception {
-        mApiConnection.dynamicPostList(mValidUrl, mMockedRequestBody);
-        Mockito.verify(mRestApiWithoutCache).dynamicPostList(eq(mValidUrl), eq(mMockedRequestBody));
+        mApiConnection.dynamicPost(mValidUrl, mMockedRequestBody);
+        Mockito.verify(mRestApiWithoutCache).dynamicPost(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
     @Test
     public void testDynamicPutObject() throws Exception {
-        mApiConnection.dynamicPutObject(mValidUrl, mMockedRequestBody);
-        Mockito.verify(mRestApiWithoutCache).dynamicPutObject(eq(mValidUrl), eq(mMockedRequestBody));
+        mApiConnection.dynamicPut(mValidUrl, mMockedRequestBody);
+        Mockito.verify(mRestApiWithoutCache).dynamicPut(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
     @Test
     public void testDynamicPutList() throws Exception {
-        mApiConnection.dynamicPutList(mValidUrl, mMockedRequestBody);
-        Mockito.verify(mRestApiWithoutCache).dynamicPutList(eq(mValidUrl), eq(mMockedRequestBody));
+        mApiConnection.dynamicPut(mValidUrl, mMockedRequestBody);
+        Mockito.verify(mRestApiWithoutCache).dynamicPut(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
     @Test
@@ -141,14 +141,14 @@ public class IApiConnectionTest {
 
     @Test
     public void testDynamicDeleteList() throws Exception {
-        mApiConnection.dynamicDeleteList(mValidUrl, mMockedRequestBody);
-        Mockito.verify(mRestApiWithoutCache).dynamicDeleteList(eq(mValidUrl), eq(mMockedRequestBody));
+        mApiConnection.dynamicDelete(mValidUrl, mMockedRequestBody);
+        Mockito.verify(mRestApiWithoutCache).dynamicDelete(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
     @Test
     public void testDynamicDeleteObject() throws Exception {
-        mApiConnection.dynamicDeleteObject(mValidUrl, mMockedRequestBody);
-        Mockito.verify(mRestApiWithoutCache).dynamicDeleteObject(eq(mValidUrl), eq(mMockedRequestBody));
+        mApiConnection.dynamicDelete(mValidUrl, mMockedRequestBody);
+        Mockito.verify(mRestApiWithoutCache).dynamicDelete(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
     private RestApi getCurrentSetRestApiWithoutCache(@NonNull IApiConnection apiConnection) {

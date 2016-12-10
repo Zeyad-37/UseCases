@@ -6,10 +6,10 @@ import android.util.Log;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.zeyad.generic.usecase.dataaccesslayer.mapper.RepoMapper;
 import com.zeyad.generic.usecase.dataaccesslayer.models.data.RepoRealm;
-import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.mappers.EntityDataMapper;
 import com.zeyad.usecases.data.mappers.EntityMapper;
 import com.zeyad.usecases.data.utils.EntityMapperUtil;
+import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
 import java.io.File;
@@ -33,8 +33,8 @@ import static com.zeyad.generic.usecase.dataaccesslayer.utils.Constants.API_BASE
 
 public class GenericApplication extends Application {
 
-    private static GenericApplication sInstance;
     private static final int TIME_OUT = 15;
+    private static GenericApplication sInstance;
 
     public static GenericApplication getInstance() {
         return sInstance;
@@ -45,15 +45,20 @@ public class GenericApplication extends Application {
         super.onCreate();
         sInstance = this;
         initializeRealm();
-        DataUseCaseFactory.initWithRealm(this, new EntityMapperUtil() {
-            @Override
-            public EntityMapper getDataMapper(Class dataClass) {
-                if (dataClass == RepoRealm.class)
-                    return new RepoMapper();
-                return new EntityDataMapper();
-            }
-        }, provideOkHttpClientBuilder(), null);
-        Config.setBaseURL(API_BASE_URL);
+        DataUseCaseFactory.init(new DataUseCaseConfig.Builder(this)
+                .baseUrl(API_BASE_URL)
+                .withCache(true)
+                .withRealm(true)
+                .entityMapper(new EntityMapperUtil() {
+                    @Override
+                    public EntityMapper getDataMapper(Class dataClass) {
+                        if (dataClass == RepoRealm.class)
+                            return new RepoMapper();
+                        return new EntityDataMapper();
+                    }
+                })
+                .okHttpBuilder(provideOkHttpClientBuilder())
+                .build());
         Fresco.initialize(this);
         initializeFlowUp();
     }

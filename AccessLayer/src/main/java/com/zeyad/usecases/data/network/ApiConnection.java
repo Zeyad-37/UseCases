@@ -50,7 +50,7 @@ import rx.Observable;
  * Implements {@link Callable} so when executed asynchronously can
  * return a value.
  */
-class ApiConnection implements com.zeyad.usecases.data.network.IApiConnection {
+class ApiConnection implements IApiConnection {
     private static final String CACHING_DISABLED = "There would be no caching. Since caching module is disabled.",
             BUILDER_NULL = "OkHttp builder can not be null", CACHE_CONTROL = "Cache-Control";
     private static final int TIME_OUT = 15;
@@ -155,23 +155,13 @@ class ApiConnection implements com.zeyad.usecases.data.network.IApiConnection {
     }
 
     @Override
-    public Observable<Object> dynamicPostObject(String url, RequestBody requestBody) {
-        return getRestApi().dynamicPostObject(url, requestBody);
+    public Observable<Object> dynamicPost(String url, RequestBody requestBody) {
+        return getRestApi().dynamicPost(url, requestBody);
     }
 
     @Override
-    public Observable<List> dynamicPostList(String url, RequestBody requestBody) {
-        return getRestApi().dynamicPostList(url, requestBody);
-    }
-
-    @Override
-    public Observable<Object> dynamicPutObject(String url, RequestBody requestBody) {
-        return getRestApi().dynamicPutObject(url, requestBody);
-    }
-
-    @Override
-    public Observable<List> dynamicPutList(String url, RequestBody requestBody) {
-        return getRestApi().dynamicPutList(url, requestBody);
+    public Observable<Object> dynamicPut(String url, RequestBody requestBody) {
+        return getRestApi().dynamicPut(url, requestBody);
     }
 
     @Override
@@ -180,13 +170,8 @@ class ApiConnection implements com.zeyad.usecases.data.network.IApiConnection {
     }
 
     @Override
-    public Observable<List> dynamicDeleteList(String url, RequestBody body) {
-        return getRestApi().dynamicDeleteList(url, body);
-    }
-
-    @Override
-    public Observable<Object> dynamicDeleteObject(String url, RequestBody body) {
-        return getRestApi().dynamicDeleteObject(url, body);
+    public Observable<Object> dynamicDelete(String url, RequestBody body) {
+        return getRestApi().dynamicDelete(url, body);
     }
 
     RestApi getRestApiWithoutCache() {

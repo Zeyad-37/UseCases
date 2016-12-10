@@ -11,6 +11,7 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.PostRequest;
@@ -62,19 +63,7 @@ public class Post {
     };
 
     public Post(@NonNull Intent intent, @NonNull Context context) {
-        gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(FieldAttributes f) {
-                return f.getDeclaringClass().equals(RealmObject.class)
-                        && f.getDeclaredClass().equals(RealmModel.class)
-                        && f.getDeclaringClass().equals(RealmList.class);
-            }
-
-            @Override
-            public boolean shouldSkipClass(Class<?> clazz) {
-                return false;
-            }
-        }).create();
+        gson = Config.getGson();
         mRestApi = new RestApiImpl();
         mContext = context;
         mTrailCount = intent.getIntExtra(TRIAL_COUNT, 0);
@@ -117,29 +106,29 @@ public class Post {
             switch (mPostRequest.getMethod()) {
                 case PostRequest.POST:
                     if (isObject)
-                        return mRestApi.dynamicPostObject(mPostRequest.getUrl(), RequestBody
+                        return mRestApi.dynamicPost(mPostRequest.getUrl(), RequestBody
                                 .create(MediaType.parse(APPLICATION_JSON), bundle))
                                 .subscribe(handleError);
                     else
-                        return mRestApi.dynamicPostList(mPostRequest.getUrl(), RequestBody.create(MediaType
+                        return mRestApi.dynamicPost(mPostRequest.getUrl(), RequestBody.create(MediaType
                                 .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString()))
                                 .subscribe(handleError);
                 case PostRequest.PUT:
                     if (isObject)
-                        return mRestApi.dynamicPutObject(mPostRequest.getUrl(), RequestBody
+                        return mRestApi.dynamicPut(mPostRequest.getUrl(), RequestBody
                                 .create(MediaType.parse(APPLICATION_JSON), bundle))
                                 .subscribe(handleError);
                     else
-                        return mRestApi.dynamicPutList(mPostRequest.getUrl(), RequestBody.create(MediaType
+                        return mRestApi.dynamicPut(mPostRequest.getUrl(), RequestBody.create(MediaType
                                 .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString()))
                                 .subscribe(handleError);
                 case PostRequest.DELETE:
                     if (isObject)
-                        return mRestApi.dynamicDeleteObject(mPostRequest.getUrl(), RequestBody
+                        return mRestApi.dynamicDelete(mPostRequest.getUrl(), RequestBody
                                 .create(MediaType.parse(APPLICATION_JSON), bundle))
                                 .subscribe(handleError);
                     else
-                        return mRestApi.dynamicDeleteList(mPostRequest.getUrl(), RequestBody.create(MediaType
+                        return mRestApi.dynamicDelete(mPostRequest.getUrl(), RequestBody.create(MediaType
                                 .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString()))
                                 .subscribe(handleError);
             }

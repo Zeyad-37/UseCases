@@ -17,7 +17,6 @@ import rx.Subscriber;
 class RestApiTestRobot {
     public static IApiConnection createMockedApiConnection() {
         final IApiConnection apiConnection = Mockito.mock(IApiConnection.class);
-
         Mockito.when(apiConnection.dynamicDownload(Mockito.anyString()))
                 .thenReturn(getResponseBodyObservable());
         Mockito.when(apiConnection.dynamicGetObject(Mockito.anyString()))
@@ -28,20 +27,16 @@ class RestApiTestRobot {
                 .thenReturn(getListObservable());
         Mockito.when(apiConnection.dynamicGetList(Mockito.anyString(), Mockito.anyBoolean()))
                 .thenReturn(getListObservable());
-        Mockito.when(apiConnection.dynamicPostObject(Mockito.anyString(), Mockito.any()))
+        Mockito.when(apiConnection.dynamicPost(Mockito.anyString(), Mockito.any()))
                 .thenReturn(getObjectObservable());
-        Mockito.when(apiConnection.dynamicPostList(Mockito.anyString(), Mockito.any()))
-                .thenReturn(getListObservable());
-        Mockito.when(apiConnection.dynamicPutObject(Mockito.anyString(), Mockito.any()))
+        Mockito.when(apiConnection.dynamicPut(Mockito.anyString(), Mockito.any()))
                 .thenReturn(getObjectObservable());
-        Mockito.when(apiConnection.dynamicPutList(Mockito.anyString(), Mockito.any()))
-                .thenReturn(getListObservable());
         Mockito.when(apiConnection.upload(Mockito.anyString(), Mockito.any(Map.class),
                 Mockito.any(MultipartBody.Part.class)))
                 .thenReturn(getObjectObservable());
-        Mockito.when(apiConnection.dynamicDeleteList(Mockito.anyString(), Mockito.any()))
-                .thenReturn(getListObservable());
-        Mockito.when(apiConnection.dynamicDeleteObject(Mockito.anyString(), Mockito.any(RequestBody.class)))
+        Mockito.when(apiConnection.dynamicDelete(Mockito.anyString(), Mockito.any()))
+                .thenReturn(getObjectObservable());
+        Mockito.when(apiConnection.dynamicDelete(Mockito.anyString(), Mockito.any(RequestBody.class)))
                 .thenReturn(getObjectObservable());
         return apiConnection;
     }

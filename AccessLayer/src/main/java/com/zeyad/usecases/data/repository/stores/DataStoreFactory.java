@@ -4,15 +4,15 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.zeyad.usecases.Config;
 import com.zeyad.usecases.R;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.mappers.EntityMapper;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.utils.Utils;
+import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
-import static com.zeyad.usecases.Config.NONE;
 import static com.zeyad.usecases.Config.getInstance;
+import static com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory.NONE;
 
 public class DataStoreFactory {
 
@@ -23,7 +23,6 @@ public class DataStoreFactory {
     public DataStoreFactory(Context context) {
         mContext = context;
         mDataBaseManager = null;
-        Config.getInstance().setDBType(NONE);
     }
 
     public DataStoreFactory(@Nullable DataBaseManager dataBaseManager, Context context) {
@@ -51,7 +50,7 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore disk(EntityMapper entityDataMapper) throws IllegalAccessException {
-        if (Config.getInstance().getDBType() == NONE || mDataBaseManager == null)
+        if (DataUseCaseFactory.getDBType() == NONE || mDataBaseManager == null)
             throw new IllegalAccessException(getInstance().getContext().getString(R.string.no_db));
         return new DiskDataStore(mDataBaseManager, entityDataMapper);
     }

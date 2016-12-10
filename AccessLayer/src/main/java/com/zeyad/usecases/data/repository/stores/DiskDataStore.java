@@ -2,9 +2,11 @@ package com.zeyad.usecases.data.repository.stores;
 
 import android.support.annotation.NonNull;
 
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.mappers.EntityMapper;
 import com.zeyad.usecases.data.utils.ModelConverters;
+import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -15,6 +17,10 @@ import java.util.List;
 
 import io.realm.RealmQuery;
 import rx.Observable;
+import st.lowlevel.storo.Storo;
+import st.lowlevel.storo.StoroBuilder;
+
+import static com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory.CACHE_SIZE;
 
 public class DiskDataStore implements DataStore {
     private static final String IO_DB_ERROR = "Can not IO file to local DB";
@@ -29,28 +35,31 @@ public class DiskDataStore implements DataStore {
     DiskDataStore(DataBaseManager realmManager, EntityMapper entityDataMapper) {
         mDataBaseManager = realmManager;
         mEntityDataMapper = entityDataMapper;
-//        StoroBuilder.configure(8192)  // maximum size to allocate in bytes
-//                .setDefaultCacheDirectory(Config.getInstance().getContext())
-//                .initialize();
+        if (DataUseCaseFactory.isWithCache())
+            StoroBuilder.configure(CACHE_SIZE)
+                    .setDefaultCacheDirectory(Config.getInstance().getContext())
+                    .initialize();
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicGetObject(String url, String idColumnName, int itemId, Class domainClass,
                                           Class dataClass, boolean persist, boolean shouldCache) {
-//        if (Storo.contains(dataClass.getSimpleName() + itemId))
-//            return Storo.get(dataClass.getSimpleName() + itemId, dataClass).async();
-//        else
-        return mDataBaseManager.getById(idColumnName, itemId, dataClass)
-                .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel));
+        if (DataUseCaseFactory.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
+            return Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
+                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel));
+        else
+            return mDataBaseManager.getById(idColumnName, itemId, dataClass)
+                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel));
     }
 
     @NonNull
     @Override
     public Observable<List> dynamicGetList(String url, Class domainClass, Class dataClass, boolean persist,
                                            boolean shouldCache) {
-//        if (Storo.contains(dataClass.getSimpleName()))
-//            return Storo.get(dataClass.getSimpleName(), dataClass).async();
+//        if (DataUseCaseFactory.isWithCache() && Storo.contains(dataClass.getSimpleName()))
+//            return Storo.get(dataClass.getSimpleName(), dataClass).async()
+//                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel));
 //        else
         return mDataBaseManager.getAll(dataClass)
                 .map(realmModels -> mEntityDataMapper.transformAllToDomain(realmModels));
@@ -75,56 +84,76 @@ public class DiskDataStore implements DataStore {
     public Observable<?> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
                                                  Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.evictCollection(idColumnName,
-                ModelConverters.convertToListOfId(jsonArray), dataClass);
-//                .doOnNext(o -> {
-//                    List<Long> convertToListOfId = ModelConverters.convertToListOfId(jsonArray);
-//                    for (int i = 0, convertToListOfIdSize = convertToListOfId != null ? convertToListOfId.size() : 0;
-//                         i < convertToListOfIdSize; i++)
-//                        Storo.delete(dataClass.getSimpleName() + convertToListOfId.get(i));
-//                });
+                ModelConverters.convertToListOfId(jsonArray), dataClass)
+                .doOnNext(o -> {
+                    if (DataUseCaseFactory.isWithCache()) {
+                        List<Long> convertToListOfId = ModelConverters.convertToListOfId(jsonArray);
+                        for (int i = 0, convertToListOfIdSize = convertToListOfId != null ? convertToListOfId.size() : 0;
+                             i < convertToListOfIdSize; i++)
+                            Storo.delete(dataClass.getSimpleName() + convertToListOfId.get(i));
+                    }
+                });
     }
 
     @NonNull
     @Override
     public Observable<Boolean> dynamicDeleteAll(String url, Class dataClass, boolean persist) {
-        return mDataBaseManager.evictAll(dataClass);
-//                .doOnNext(o -> Storo.delete(dataClass.getSimpleName()));
+        return Observable.error(new IllegalAccessException(IO_DB_ERROR));
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicPostObject(String url, String idColumnName, JSONObject jsonObject,
                                            Class domainClass, Class dataClass, boolean persist, boolean queuable) {
-        return mDataBaseManager.put(jsonObject, idColumnName, dataClass);
-//                .doOnNext(o -> Storo.put(dataClass.getSimpleName() + jsonObject.opt(idColumnName).toString(),
-//                        new Gson().fromJson(jsonObject.toString(), dataClass)).execute());
+        return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+                .doOnNext(o -> {
+                    if (DataUseCaseFactory.isWithCache())
+                        cacheObject(idColumnName, jsonObject, dataClass);
+                });
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
                                          Class domainClass, Class dataClass, boolean persist, boolean queuable) {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass);
-//                .doOnNext(o -> Storo.put(dataClass.getSimpleName(),
-//                        new Gson().fromJson(jsonArray.toString(), dataClass)).execute());
+        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
+                .doOnNext(o -> {
+                    if (DataUseCaseFactory.isWithCache())
+                        cacheList(idColumnName, jsonArray, dataClass);
+                });
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicPutObject(String url, String idColumnName, JSONObject jsonObject,
                                           Class domainClass, Class dataClass, boolean persist, boolean queuable) {
-        return mDataBaseManager.put(jsonObject, idColumnName, dataClass);
-//                .doOnNext(o -> Storo.put(dataClass.getSimpleName() + jsonObject.opt(idColumnName).toString(),
-//                        new Gson().fromJson(jsonObject.toString(), dataClass)).execute());
+        return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+                .doOnNext(o -> {
+                    if (DataUseCaseFactory.isWithCache())
+                        cacheObject(idColumnName, jsonObject, dataClass);
+                });
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
                                         Class domainClass, Class dataClass, boolean persist, boolean queuable) {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass);
-//                .doOnNext(o -> Storo.put(dataClass.getSimpleName(),
-//                        new Gson().fromJson(jsonArray.toString(), dataClass)).execute());
+        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
+                .doOnNext(o -> {
+                    if (DataUseCaseFactory.isWithCache())
+                        cacheList(idColumnName, jsonArray, dataClass);
+                });
+    }
+
+    private void cacheObject(String idColumnName, JSONObject jsonObject, Class dataClass) {
+        Storo.put(dataClass.getSimpleName() + jsonObject.optString(idColumnName),
+                gson.fromJson(jsonObject.toString(), dataClass)).execute();
+    }
+
+    private void cacheList(String idColumnName, JSONArray jsonArray, Class dataClass) {
+        for (int i = 0, size = jsonArray.length(); i < size; i++) {
+            cacheObject(idColumnName, jsonArray.optJSONObject(i), dataClass);
+        }
     }
 
     @NonNull

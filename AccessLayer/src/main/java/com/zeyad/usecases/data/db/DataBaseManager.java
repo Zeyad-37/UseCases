@@ -68,7 +68,7 @@ public interface DataBaseManager {
      * @param realmObjects Element to insert in the DB.
      * @param dataClass    Class type of the items to be put.
      */
-    void putAll(List<RealmObject> realmObjects, Class dataClass);
+    Observable<?> putAll(List<RealmObject> realmObjects, Class dataClass);
 
     /**
      * Puts and element into the DB.

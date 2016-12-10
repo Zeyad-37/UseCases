@@ -1,6 +1,5 @@
 package com.zeyad.usecases.data.db;
 
-import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -22,13 +21,15 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
 
+import static com.zeyad.usecases.data.utils.Utils.hasKitKat;
+
 /**
  * {@link DataBaseManager} implementation.
  */
 public class RealmManager implements DataBaseManager {
 
-    private static final String REALM_OBJECT_INVALID = "RealmObject is invalid", JSON_INVALID = "JSONObject is invalid",
-            NO_ID = "Could not find id!";
+    private static final String REALM_OBJECT_INVALID = "RealmObject is invalid",
+            JSON_INVALID = "JSONObject is invalid", NO_ID = "Could not find id!";
     private static DataBaseManager sInstance;
 
     private RealmManager() {
@@ -66,7 +67,7 @@ public class RealmManager implements DataBaseManager {
             int finalItemId = itemId;
             if (finalItemId <= 0)
                 finalItemId = Utils.getMaxId(dataClass, idColumnName);
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            if (hasKitKat())
                 try (Realm realm = Realm.getDefaultInstance()) {
                     return Observable.just(realm.copyFromRealm(realm.where(dataClass)
                             .equalTo(idColumnName, finalItemId).findFirst()));
@@ -92,7 +93,7 @@ public class RealmManager implements DataBaseManager {
     @Override
     public Observable<List> getAll(Class clazz) {
         return Observable.defer(() -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            if (hasKitKat())
                 try (Realm realm = Realm.getDefaultInstance()) {
                     return Observable.just(realm.copyFromRealm(realm.where(clazz).findAll()));
                 }
@@ -118,7 +119,7 @@ public class RealmManager implements DataBaseManager {
     @Override
     public Observable<List> getWhere(Class clazz, String query, @NonNull String filterKey) {
         return Observable.defer(() -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            if (hasKitKat())
                 try (Realm realm = Realm.getDefaultInstance()) {
                     return Observable.just(realm.copyFromRealm(realm.where(clazz)
                             .beginsWith(filterKey, query, Case.INSENSITIVE).findAll()));
@@ -144,7 +145,7 @@ public class RealmManager implements DataBaseManager {
     @Override
     public Observable<List> getWhere(@NonNull RealmQuery realmQuery) {
         return Observable.defer(() -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            if (hasKitKat())
                 try (Realm realm = Realm.getDefaultInstance()) {
                     return Observable.just(realm.copyFromRealm(realmQuery.findAll()));
                 }
@@ -170,7 +171,7 @@ public class RealmManager implements DataBaseManager {
     public Observable<?> put(@Nullable RealmObject realmObject, @NonNull Class dataClass) {
         if (realmObject != null) {
             return Observable.defer(() -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                if (hasKitKat())
                     try (Realm realm = Realm.getDefaultInstance()) {
                         RealmObject result = executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmObject));
                         if (RealmObject.isValid(result)) {
@@ -206,7 +207,7 @@ public class RealmManager implements DataBaseManager {
     public Observable<?> put(@Nullable RealmModel realmModel, @NonNull Class dataClass) {
         if (realmModel != null) {
             return Observable.defer(() -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                if (hasKitKat())
                     try (Realm realm = Realm.getDefaultInstance()) {
                         RealmModel result = executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmModel));
                         if (RealmObject.isValid(result)) {
@@ -247,7 +248,7 @@ public class RealmManager implements DataBaseManager {
                 } catch (@NonNull JSONException | IllegalArgumentException e) {
                     return Observable.error(e);
                 }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+                if (hasKitKat())
                     try (Realm realm = Realm.getDefaultInstance()) {
                         RealmModel result = executeWriteOperationInRealm(realm, () -> realm.createOrUpdateObjectFromJson(dataClass, jsonObject));
                         if (RealmObject.isValid(result)) {
@@ -288,7 +289,7 @@ public class RealmManager implements DataBaseManager {
             } catch (@NonNull JSONException | IllegalArgumentException e) {
                 return Observable.error(e);
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            if (hasKitKat())
                 try (Realm realm = Realm.getDefaultInstance()) {
                     executeWriteOperationInRealm(realm, () -> realm.createOrUpdateAllFromJson(dataClass, jsonArray));
                     return Observable.just(Boolean.TRUE);
@@ -312,9 +313,9 @@ public class RealmManager implements DataBaseManager {
      * @param dataClass   Class type of the items to be put.
      */
     @Override
-    public void putAll(@NonNull List<RealmObject> realmModels, @NonNull Class dataClass) {
-        Observable.defer(() -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+    public Observable<?> putAll(@NonNull List<RealmObject> realmModels, @NonNull Class dataClass) {
+        return Observable.defer(() -> {
+            if (hasKitKat())
                 try (Realm realm = Realm.getDefaultInstance()) {
                     executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmModels));
                     return Observable.just(Boolean.TRUE);
@@ -328,8 +329,7 @@ public class RealmManager implements DataBaseManager {
                     closeRealm(realm);
                 }
             }
-        }).subscribeOn(Schedulers.immediate())
-                .subscribe(new PutAllSubscriberClass(realmModels));
+        });
     }
 
     /**
@@ -341,7 +341,7 @@ public class RealmManager implements DataBaseManager {
     @Override
     public Observable<Boolean> evictAll(@NonNull Class clazz) {
         return Observable.defer(() -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            if (hasKitKat())
                 try (Realm realm = Realm.getDefaultInstance()) {
                     executeWriteOperationInRealm(realm, () -> realm.delete(clazz));
                     return Observable.just(Boolean.TRUE);
@@ -367,7 +367,7 @@ public class RealmManager implements DataBaseManager {
     @Override
     public void evict(@NonNull final RealmObject realmModel, @NonNull Class clazz) {
         Observable.defer(() -> {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+            if (hasKitKat())
                 try (Realm realm = Realm.getDefaultInstance()) {
                     executeWriteOperationInRealm(realm, (Executor) realmModel::deleteFromRealm);
                     return Observable.just(Boolean.TRUE);
@@ -394,7 +394,7 @@ public class RealmManager implements DataBaseManager {
      */
     @Override
     public boolean evictById(@NonNull Class clazz, @NonNull String idFieldName, final long idFieldValue) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+        if (hasKitKat())
             try (Realm realm = Realm.getDefaultInstance()) {
                 RealmModel toDelete = realm.where(clazz).equalTo(idFieldName, idFieldValue).findFirst();
                 if (toDelete != null) {
@@ -462,15 +462,6 @@ public class RealmManager implements DataBaseManager {
         return toReturnValue;
     }
 
-    private interface Executor {
-        void run();
-    }
-
-    private interface ExecuteAndReturn<T> {
-        @NonNull
-        T run();
-    }
-
     @NonNull
     private JSONArray updateJsonArrayWithIdValue(@NonNull JSONArray jsonArray, @Nullable String idColumnName,
                                                  Class dataClass)
@@ -492,6 +483,15 @@ public class RealmManager implements DataBaseManager {
         if (jsonObject.getInt(idColumnName) == 0)
             jsonObject.put(idColumnName, Utils.getNextId(dataClass, idColumnName));
         return jsonObject;
+    }
+
+    private interface Executor {
+        void run();
+    }
+
+    private interface ExecuteAndReturn<T> {
+        @NonNull
+        T run();
     }
 
     private class EvictSubscriberClass extends Subscriber<Object> {
@@ -516,28 +516,5 @@ public class RealmManager implements DataBaseManager {
             Log.d(RealmManager.class.getName(), mClazz.getName() + " deleted!");
         }
 
-    }
-
-    private class PutAllSubscriberClass extends Subscriber<Object> {
-
-        private final List<RealmObject> mRealmModels;
-
-        PutAllSubscriberClass(List<RealmObject> realmModels) {
-            mRealmModels = realmModels;
-        }
-
-        @Override
-        public void onCompleted() {
-        }
-
-        @Override
-        public void onError(@NonNull Throwable e) {
-            e.printStackTrace();
-        }
-
-        @Override
-        public void onNext(Object o) {
-            Log.d(RealmManager.class.getName(), "all " + mRealmModels.getClass().getName() + "s added!");
-        }
     }
 }

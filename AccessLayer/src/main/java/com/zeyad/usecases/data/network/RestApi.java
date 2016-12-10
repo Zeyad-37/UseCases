@@ -36,22 +36,13 @@ public interface RestApi {
     Observable<List> dynamicGetList(@Url String url, boolean shouldCache);
 
     @POST
-    Observable<Object> dynamicPostObject(@Url String url, @Body RequestBody body);
-
-    @POST
-    Observable<List> dynamicPostList(@Url String url, @Body RequestBody body);
+    Observable<Object> dynamicPost(@Url String url, @Body RequestBody body);
 
     @PUT
-    Observable<Object> dynamicPutObject(@Url String url, @Body RequestBody body);
-
-    @PUT
-    Observable<List> dynamicPutList(@Url String url, @Body RequestBody body);
+    Observable<Object> dynamicPut(@Url String url, @Body RequestBody body);
 
     @DELETE
-    Observable<Object> dynamicDeleteObject(@Url String url, @Body RequestBody body);
-
-    @DELETE
-    Observable<List> dynamicDeleteList(@Url String url, @Body RequestBody body);
+    Observable<Object> dynamicDelete(@Url String url, @Body RequestBody body);
 
     @Streaming
     @GET

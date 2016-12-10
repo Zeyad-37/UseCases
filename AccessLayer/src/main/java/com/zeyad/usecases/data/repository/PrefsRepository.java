@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 import com.google.gson.Gson;
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.domain.repositories.Prefs;
 
 import rx.Observable;
@@ -12,10 +13,12 @@ import rx.Observable;
 public class PrefsRepository implements Prefs {
 
     private static Prefs sInstance;
+    private static Gson mGson;
     private static SharedPreferences sharedPreferences;
 
     private PrefsRepository(Context context, String prefsFileName) {
         sharedPreferences = context.getSharedPreferences(prefsFileName, Context.MODE_PRIVATE);
+        mGson = Config.getGson();
     }
 
     public static Prefs getInstance() throws IllegalArgumentException {
@@ -68,7 +71,7 @@ public class PrefsRepository implements Prefs {
 
     @Override
     public <T> Observable<T> getObject(String preferenceKey, Class<T> classOfT) {
-        return Observable.defer(() -> Observable.just(new Gson().fromJson(getString(preferenceKey, "")
+        return Observable.defer(() -> Observable.just(mGson.fromJson(getString(preferenceKey, "")
                 .toBlocking().first(), classOfT)));
     }
 
@@ -99,7 +102,7 @@ public class PrefsRepository implements Prefs {
 
     @Override
     public void set(String key, Object object) {
-        Observable.defer(() -> Observable.just(getEditor().putString(key, new Gson().toJson(object))
+        Observable.defer(() -> Observable.just(getEditor().putString(key, mGson.toJson(object))
                 .commit()));
     }
 

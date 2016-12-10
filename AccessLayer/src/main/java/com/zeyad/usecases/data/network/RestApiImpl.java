@@ -54,7 +54,7 @@ public class RestApiImpl implements RestApi {
     }
 
     /**
-     * Gets object from full url.
+     * Gets Object from full url.
      *
      * @return Observable with the Object.
      */
@@ -64,7 +64,7 @@ public class RestApiImpl implements RestApi {
     }
 
     /**
-     * Gets object from full url.
+     * Gets Object from full url.
      *
      * @param shouldCache should retrofit cache the response.
      * @return Observable with the Object.
@@ -102,19 +102,8 @@ public class RestApiImpl implements RestApi {
      * @return Observable with the Object.
      */
     @Override
-    public Observable<Object> dynamicPostObject(@Url String url, RequestBody body) {
-        return mApiConnection.dynamicPostObject(url, body);
-    }
-
-    /**
-     * Post list to full url.
-     *
-     * @param body payload to send.
-     * @return Observable with the list.
-     */
-    @Override
-    public Observable<List> dynamicPostList(@Url String url, @Body RequestBody body) {
-        return mApiConnection.dynamicPostList(url, body);
+    public Observable<Object> dynamicPost(@Url String url, RequestBody body) {
+        return mApiConnection.dynamicPost(url, body);
     }
 
     /**
@@ -124,19 +113,8 @@ public class RestApiImpl implements RestApi {
      * @return Observable with the Object.
      */
     @Override
-    public Observable<Object> dynamicPutObject(@Url String url, @Body RequestBody body) {
-        return mApiConnection.dynamicPutObject(url, body);
-    }
-
-    /**
-     * Put list to full url.
-     *
-     * @param body payload to send.
-     * @return Observable with the list.
-     */
-    @Override
-    public Observable<List> dynamicPutList(@Url String url, @Body RequestBody body) {
-        return mApiConnection.dynamicPutList(url, body);
+    public Observable<Object> dynamicPut(@Url String url, @Body RequestBody body) {
+        return mApiConnection.dynamicPut(url, body);
     }
 
     /**
@@ -146,18 +124,7 @@ public class RestApiImpl implements RestApi {
      * @return Observable with the Object.
      */
     @Override
-    public Observable<Object> dynamicDeleteObject(@Url String url, @Body RequestBody body) {
-        return mApiConnection.dynamicDeleteObject(url, body);
-    }
-
-    /**
-     * Deletes list from full url.
-     *
-     * @param body payload to send.
-     * @return Observable with the list.
-     */
-    @Override
-    public Observable<List> dynamicDeleteList(@Url String url, @Body RequestBody body) {
-        return mApiConnection.dynamicDeleteList(url, body);
+    public Observable<Object> dynamicDelete(@Url String url, @Body RequestBody body) {
+        return mApiConnection.dynamicDelete(url, body);
     }
 }

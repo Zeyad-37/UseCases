@@ -27,6 +27,7 @@ import rx.Observable;
  */
 
 public class FilesRepository implements Files {
+    private static Gson mGson;
     private static Files sInstance;
     private final DataStoreFactory mDataStoreFactory;
     private final IEntityMapperUtil mEntityMapperUtil;
@@ -44,6 +45,7 @@ public class FilesRepository implements Files {
                 return new EntityDataMapper();
             }
         };
+        mGson = Config.getGson();
     }
 
     public static Files getInstance() throws IllegalArgumentException {
@@ -106,7 +108,7 @@ public class FilesRepository implements Files {
     @Override
     public Observable<String> readFromFile(String fullFilePath) {
         try {
-            return Observable.just(new Gson().fromJson(new InputStreamReader(Config.getInstance()
+            return Observable.just(mGson.fromJson(new InputStreamReader(Config.getInstance()
                     .getContext().openFileInput(fullFilePath)), String.class));
         } catch (Exception e) {
             e.printStackTrace();

@@ -132,19 +132,20 @@ class CloudDataStoreTestJUnitRobot {
         final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
         final ResponseBodyObservable RESPONSE_BODY_OBSERVABLE = Mockito.mock(ResponseBodyObservable.class);
         final RestApiImpl mock = Mockito.mock(RestApiImpl.class);
-        Mockito.doReturn(LIST_OBSERVABLE).when(mock).dynamicDeleteList(Mockito.anyString(), Mockito.any());
+        Mockito.doReturn(LIST_OBSERVABLE).when(mock).dynamicDelete(Mockito.anyString(), Mockito.any());
         Mockito.when(mock.dynamicGetObject(Mockito.any(), Mockito.anyBoolean())).thenReturn(OBJECT_OBSERVABLE);
         Mockito.when(mock.dynamicGetObject(Mockito.any())).thenReturn(OBJECT_OBSERVABLE);
         Mockito.doReturn(getListObservable()).when(mock).dynamicGetList(Mockito.any());
         Mockito.doReturn(getListObservable()).when(mock).dynamicGetList(Mockito.any(), Mockito.anyBoolean());
-        Mockito.when(mock.dynamicPostObject(Mockito.any(), Mockito.any())).thenReturn(OBJECT_OBSERVABLE);
-        Mockito.doReturn(LIST_OBSERVABLE).when(mock).dynamicPostList(Mockito.any(), Mockito.any());
-        Mockito.when(mock.dynamicPutObject(Mockito.any(), Mockito.any())).thenReturn(OBJECT_OBSERVABLE);
-        Mockito.doReturn(LIST_OBSERVABLE).when(mock).dynamicPutList(Mockito.any(), Mockito.any());
-        Mockito.when(mock.dynamicDeleteObject(Mockito.any(), Mockito.any())).thenReturn(OBJECT_OBSERVABLE);
-        Mockito.doReturn(LIST_OBSERVABLE).when(mock).dynamicDeleteList(Mockito.any(), Mockito.any());
+        Mockito.when(mock.dynamicPost(Mockito.any(), Mockito.any())).thenReturn(OBJECT_OBSERVABLE);
+        Mockito.doReturn(LIST_OBSERVABLE).when(mock).dynamicPost(Mockito.any(), Mockito.any());
+        Mockito.when(mock.dynamicPut(Mockito.any(), Mockito.any())).thenReturn(OBJECT_OBSERVABLE);
+        Mockito.doReturn(LIST_OBSERVABLE).when(mock).dynamicPut(Mockito.any(), Mockito.any());
+        Mockito.when(mock.dynamicDelete(Mockito.any(), Mockito.any())).thenReturn(OBJECT_OBSERVABLE);
+        Mockito.doReturn(LIST_OBSERVABLE).when(mock).dynamicDelete(Mockito.any(), Mockito.any());
         Mockito.when(mock.dynamicDownload(getFileUrl())).thenReturn(RESPONSE_BODY_OBSERVABLE);
-        Mockito.when(mock.upload(Mockito.any(), Mockito.any(Map.class), Mockito.any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
+        Mockito.when(mock.upload(Mockito.any(), Mockito.any(Map.class), Mockito.any(MultipartBody.Part.class)))
+                .thenReturn(OBJECT_OBSERVABLE);
         return mock;
     }
 

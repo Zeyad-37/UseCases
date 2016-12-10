@@ -96,7 +96,6 @@ public class PostTest {
     @Test
     public void testExecute_ifJobSchedulerIsInvoked_whenNetworkNotAvailableAndGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
         final Context mockedContext = PostTestRobot.createMockedContext();
-        final FirebaseJobDispatcher gcmNetworkManager = PostTestRobot.getGcmNetworkManager();
         Post post = PostTestRobot.createPost(mockedContext
                 , PostTestRobot.createPostRequestForHashmap(null, PostRequest.POST)
                 , PostTestRobot.createRestApi()
@@ -109,7 +108,6 @@ public class PostTest {
     @Test
     public void testExecute_ifCorrectArgumentsArePassedToJobScheduler_whenNetworkNotAvailableAndGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
         final Context mockedContext = PostTestRobot.createMockedContext();
-        final FirebaseJobDispatcher gcmNetworkManager = PostTestRobot.getGcmNetworkManager();
         Post post = PostTestRobot.createPost(mockedContext
                 , PostTestRobot.createPostRequestForHashmap(null, PostRequest.POST)
                 , PostTestRobot.createRestApi()
@@ -140,117 +138,108 @@ public class PostTest {
     @Test
     public void testExecute_ifRestApiDynamicPostObjectIsCalled_whenNetworkIsAvailableAndHashmapAndPostMethodIsPassed() throws Exception {
         final Context mockedContext = PostTestRobot.createMockedContext();
-        final FirebaseJobDispatcher gcmNetworkManager = PostTestRobot.getGcmNetworkManager();
         final RestApiImpl restApi = PostTestRobot.createRestApi();
         Post post = PostTestRobot.createPost(mockedContext
                 , PostTestRobot.createPostRequestForHashmap(new TestSubscriber<>(), PostRequest.POST)
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicPostObject(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicPost(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
     public void testExecute_ifRestApiDynamicPostObjectIsCalled_whenNetworkIsAvailableAndJsonObjectAndPostMethodIsPassed() throws Exception {
         final Context mockedContext = PostTestRobot.createMockedContext();
-        final FirebaseJobDispatcher gcmNetworkManager = PostTestRobot.getGcmNetworkManager();
         final RestApiImpl restApi = PostTestRobot.createRestApi();
         Post post = PostTestRobot.createPost(mockedContext
                 , PostTestRobot.createPostRequestForJsonObject(new TestSubscriber<>(), PostRequest.POST)
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicPostObject(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicPost(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
     public void testExecute_ifRestApiDynamicPostListIsCalled_whenNetworkIsAvailableAndJsonArrayAndPostMethodIsPassed() throws Exception {
         final Context mockedContext = PostTestRobot.createMockedContext();
-        final FirebaseJobDispatcher gcmNetworkManager = PostTestRobot.getGcmNetworkManager();
         final RestApiImpl restApi = PostTestRobot.createRestApi();
         Post post = PostTestRobot.createPost(mockedContext
                 , PostTestRobot.createPostRequestForJsonArray(new TestSubscriber<>(), PostRequest.POST)
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicPostList(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicPost(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
     public void testExecute_ifRestApiDynamicPutObjectIsCalled_whenNetworkIsAvailableAndHashmapAndPutMethodIsPassed() throws Exception {
         final Context mockedContext = PostTestRobot.createMockedContext();
-        final FirebaseJobDispatcher gcmNetworkManager = PostTestRobot.getGcmNetworkManager();
         final RestApiImpl restApi = PostTestRobot.createRestApi();
         Post post = PostTestRobot.createPost(mockedContext
                 , PostTestRobot.createPostRequestForHashmap(new TestSubscriber<>(), PostRequest.PUT)
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicPutObject(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicPut(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
     public void testExecute_ifRestApiDynamicPutObjectIsCalled_whenNetworkIsAvailableAndJsonObjectAndPutMethodIsPassed() throws Exception {
         final Context mockedContext = PostTestRobot.createMockedContext();
-        final FirebaseJobDispatcher gcmNetworkManager = PostTestRobot.getGcmNetworkManager();
         final RestApiImpl restApi = PostTestRobot.createRestApi();
         Post post = PostTestRobot.createPost(mockedContext
                 , PostTestRobot.createPostRequestForJsonObject(new TestSubscriber<>(), PostRequest.PUT)
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicPutObject(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicPut(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
     public void testExecute_ifRestApiDynamicPutListIsCalled_whenNetworkIsAvailableAndJsonArrayAndPutMethodIsPassed() throws Exception {
         final Context mockedContext = PostTestRobot.createMockedContext();
-        final FirebaseJobDispatcher gcmNetworkManager = PostTestRobot.getGcmNetworkManager();
         final RestApiImpl restApi = PostTestRobot.createRestApi();
         Post post = PostTestRobot.createPost(mockedContext
                 , PostTestRobot.createPostRequestForJsonArray(new TestSubscriber<>(), PostRequest.PUT)
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicPutList(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicPut(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
     public void testExecute_ifRestApiDynamicDeleteObjectIsCalled_whenNetworkIsAvailableAndHashmapAndDeleteMethodIsPassed() throws Exception {
         final Context mockedContext = PostTestRobot.createMockedContext();
-        final FirebaseJobDispatcher gcmNetworkManager = PostTestRobot.getGcmNetworkManager();
         final RestApiImpl restApi = PostTestRobot.createRestApi();
         Post post = PostTestRobot.createPost(mockedContext
                 , PostTestRobot.createPostRequestForHashmap(new TestSubscriber<>(), PostRequest.DELETE)
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicDeleteObject(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicDelete(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
     public void testExecute_ifRestApiDynamicDeleteObjectIsCalled_whenNetworkIsAvailableAndJsonObjectAndDeleteMethodIsPassed() throws Exception {
         final Context mockedContext = PostTestRobot.createMockedContext();
-        final FirebaseJobDispatcher gcmNetworkManager = PostTestRobot.getGcmNetworkManager();
         final RestApiImpl restApi = PostTestRobot.createRestApi();
         Post post = PostTestRobot.createPost(mockedContext
                 , PostTestRobot.createPostRequestForJsonObject(new TestSubscriber<>(), PostRequest.DELETE)
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicDeleteObject(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicDelete(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
     public void testExecute_ifRestApiDynamicDeleteListIsCalled_whenNetworkIsAvailableAndJsonArrayAndDeleteMethodIsPassed() throws Exception {
         final Context mockedContext = PostTestRobot.createMockedContext();
-        final FirebaseJobDispatcher gcmNetworkManager = PostTestRobot.getGcmNetworkManager();
         final RestApiImpl restApi = PostTestRobot.createRestApi();
         Post post = PostTestRobot.createPost(mockedContext
                 , PostTestRobot.createPostRequestForJsonArray(new TestSubscriber<>(), PostRequest.DELETE)
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicDeleteList(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicDelete(eq(PostTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 }

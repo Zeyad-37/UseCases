@@ -3,36 +3,19 @@ package com.zeyad.usecases.data.mappers;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.zeyad.usecases.Config;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.RealmList;
-import io.realm.RealmModel;
-import io.realm.RealmObject;
 import io.realm.internal.OutOfMemoryError;
 
 public class EntityDataMapper implements EntityMapper<Object, Object> {
     public Gson gson;
 
     public EntityDataMapper() {
-        gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(@NonNull FieldAttributes f) {
-                return f.getDeclaringClass().equals(RealmObject.class)
-                        && f.getDeclaredClass().equals(RealmModel.class)
-                        && f.getDeclaringClass().equals(RealmList.class);
-            }
-
-            @Override
-            public boolean shouldSkipClass(Class<?> clazz) {
-                return false;
-            }
-        }).create();
+        gson = Config.getGson();
     }
 
     @Override

@@ -2,9 +2,9 @@ package com.zeyad.usecases.data.db;
 
 import android.support.annotation.Nullable;
 
-import com.zeyad.usecases.Config;
+import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
-import static com.zeyad.usecases.Config.REALM;
+import static com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory.REALM;
 
 /**
  * DatabaseManager interface implementer.
@@ -15,7 +15,7 @@ public class DatabaseManagerFactory {
      */
     @Nullable
     public static DataBaseManager getInstance() {
-        if (Config.getInstance().getDBType() == REALM)
+        if (DataUseCaseFactory.getDBType() == REALM)
             return RealmManager.getInstance();
         return null;
     }
@@ -25,6 +25,5 @@ public class DatabaseManagerFactory {
      */
     public static void initRealm() {
         RealmManager.init();
-        Config.getInstance().setDBType(REALM);
     }
 }

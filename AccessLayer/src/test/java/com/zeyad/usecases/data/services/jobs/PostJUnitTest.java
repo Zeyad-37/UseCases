@@ -151,7 +151,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicPostObject(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicPost(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
@@ -163,7 +163,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicPostObject(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicPost(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
@@ -175,7 +175,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicPostList(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicPost(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
@@ -187,7 +187,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicPutObject(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicPut(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
@@ -199,7 +199,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicPutObject(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicPut(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
@@ -211,7 +211,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicPutList(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicPut(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
@@ -223,7 +223,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicDeleteObject(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicDelete(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
@@ -235,7 +235,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicDeleteObject(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicDelete(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
@@ -247,6 +247,6 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        Mockito.verify(restApi, times(1)).dynamicDeleteList(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
+        Mockito.verify(restApi, times(1)).dynamicDelete(eq(PostJUnitTestRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 }

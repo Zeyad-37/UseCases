@@ -393,7 +393,7 @@ public class CloudDataStoreJUnitTest {
         assumeTrue(CloudDataStoreTestJUnitRobot.isNetworkEnabled());
         CloudDataStoreTestJUnitRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedRestApi, times(1))
-                .dynamicPostObject(Mockito.anyString(), Mockito.any(RequestBody.class));
+                .dynamicPost(Mockito.anyString(), Mockito.any(RequestBody.class));
     }
 
     @Test
@@ -529,7 +529,7 @@ public class CloudDataStoreJUnitTest {
         assumeTrue(CloudDataStoreTestJUnitRobot.isNetworkEnabled());
         CloudDataStoreTestJUnitRobot.dynamicPostList(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedRestApi, times(1))
-                .dynamicPostList(eq(CloudDataStoreTestJUnitRobot.getValidUrl()), Mockito.any(RequestBody.class));
+                .dynamicPost(eq(CloudDataStoreTestJUnitRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test
@@ -654,7 +654,7 @@ public class CloudDataStoreJUnitTest {
         assumeTrue(CloudDataStoreTestJUnitRobot.isNetworkEnabled());
         CloudDataStoreTestJUnitRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedRestApi, times(1))
-                .dynamicPutObject(eq(CloudDataStoreTestJUnitRobot.getValidUrl()),
+                .dynamicPut(eq(CloudDataStoreTestJUnitRobot.getValidUrl()),
                         Mockito.any(RequestBody.class));
     }
 
@@ -793,7 +793,7 @@ public class CloudDataStoreJUnitTest {
         assumeTrue(CloudDataStoreTestJUnitRobot.isNetworkEnabled());
         CloudDataStoreTestJUnitRobot.dynamicPutList(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedRestApi, times(1))
-                .dynamicPutList(eq(CloudDataStoreTestJUnitRobot.getValidUrl()), Mockito.any(RequestBody.class));
+                .dynamicPut(eq(CloudDataStoreTestJUnitRobot.getValidUrl()), Mockito.any(RequestBody.class));
     }
 
     @Test

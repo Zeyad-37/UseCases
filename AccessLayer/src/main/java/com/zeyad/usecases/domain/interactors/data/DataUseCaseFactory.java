@@ -1,134 +1,63 @@
 package com.zeyad.usecases.domain.interactors.data;
 
-import android.content.Context;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.data.mappers.EntityDataMapper;
-import com.zeyad.usecases.data.mappers.EntityMapper;
 import com.zeyad.usecases.data.network.ApiConnectionFactory;
-import com.zeyad.usecases.data.utils.EntityMapperUtil;
-import com.zeyad.usecases.data.utils.IEntityMapperUtil;
 import com.zeyad.usecases.data.utils.Utils;
 
-import okhttp3.Cache;
-import okhttp3.OkHttpClient;
-
 public class DataUseCaseFactory {
-
-    private static IDataUseCase sGenericUseCase;
+    public static final int NONE = 0, REALM = 1;
+    public static int CACHE_SIZE;
+    private static boolean withCache;
+    private static int mDBType;
+    private static IDataUseCase sDataUseCase;
 
     public static IDataUseCase getInstance() {
-        return sGenericUseCase;
+        return sDataUseCase;
     }
 
-    /**
-     * initializes the Generic Use Case with given context without a DB option.
-     *
-     * @param context context of application
-     */
-    public static void initWithoutDB(@NonNull Context context) {
-        Config.init(context);
-        ApiConnectionFactory.init();
-        DataUseCase.initWithoutDB(new EntityMapperUtil() {
-            @NonNull
-            @Override
-            public EntityMapper getDataMapper(Class dataClass) {
-                return new EntityDataMapper();
-            }
-        });
-        sGenericUseCase = DataUseCase.getInstance();
-    }
-
-    /**
-     * initializes the Generic Use Case with given context without a DB option.
-     *
-     * @param context       context of application
-     * @param okhttpBuilder OkHttp3 builder
-     * @param cache         cache module
-     */
-    public static void initWithoutDB(@NonNull Context context, OkHttpClient.Builder okhttpBuilder, Cache cache) {
-        Config.init(context);
-        if (okhttpBuilder == null)
-            ApiConnectionFactory.init();
-        else ApiConnectionFactory.init(okhttpBuilder, cache);
-        DataUseCase.initWithoutDB(new EntityMapperUtil() {
-            @NonNull
-            @Override
-            public EntityMapper getDataMapper(Class dataClass) {
-                return new EntityDataMapper();
-            }
-        });
-        sGenericUseCase = DataUseCase.getInstance();
-    }
-
-    /**
-     * initializes the Generic Use Case with Realm given context.
-     *
-     * @param context      context of application
-     */
-    public static void initWithRealm(@NonNull Context context) {
-        initCore(context, null, null, null);
-        sGenericUseCase = DataUseCase.getInstance();
-    }
-
-    /**
-     * initializes the Generic Use Case with Realm given context.
-     *
-     * @param context      context of application
-     * @param entityMapper mapper from data layer to presentation layer
-     */
-    public static void initWithRealm(@NonNull Context context, @Nullable IEntityMapperUtil entityMapper) {
-        initCore(context, entityMapper, null, null);
-        sGenericUseCase = DataUseCase.getInstance();
-    }
-
-    /**
-     * initializes the Generic Use Case with Realm given context.
-     *
-     * @param context       context of activity/application
-     * @param entityMapper  mapper from data layer to presentation layer
-     * @param okhttpBuilder OkHttp3 builder
-     * @param entityMapper  cache module
-     */
-    public static void initWithRealm(@NonNull Context context, @Nullable IEntityMapperUtil entityMapper,
-                                     OkHttpClient.Builder okhttpBuilder, Cache cache) {
-        initCore(context, entityMapper, okhttpBuilder, cache);
-        sGenericUseCase = DataUseCase.getInstance();
-    }
-
-    static void initCore(@NonNull Context context, @Nullable IEntityMapperUtil entityMapper,
-                         OkHttpClient.Builder okhttpBuilder, Cache cache) {
-        if (!Utils.doesContextBelongsToApplication(context))
+    public static void init(DataUseCaseConfig config) {
+        if (!Utils.doesContextBelongsToApplication(config.getContext()))
             throw new IllegalArgumentException("Context should be application context only.");
-        Config.init(context);
-        if (okhttpBuilder == null)
+        Config.init(config.getContext());
+        if (config.getOkHttpBuilder() == null) {
             ApiConnectionFactory.init();
-        else ApiConnectionFactory.init(okhttpBuilder, cache);
-        if (entityMapper == null)
-            entityMapper = new EntityMapperUtil() {
-                @NonNull
-                @Override
-                public EntityMapper getDataMapper(Class dataClass) {
-                    return new EntityDataMapper();
-                }
-            };
-        DataUseCase.initWithRealm(entityMapper);
+        } else {
+            ApiConnectionFactory.init(config.getOkHttpBuilder(), config.getCache());
+        }
+        if (config.isWithRealm()) {
+            mDBType = REALM;
+            DataUseCase.initWithRealm(config.getEntityMapper());
+        } else {
+            mDBType = NONE;
+            DataUseCase.initWithoutDB(config.getEntityMapper());
+        }
+        sDataUseCase = DataUseCase.getInstance();
+        CACHE_SIZE = config.getCacheSize();
+        withCache = config.isWithCache();
+        Config.setBaseURL(config.getBaseUrl());
     }
 
     public static void destoryInstance() {
-        sGenericUseCase = null;
+        sDataUseCase = null;
+    }
+
+    public static boolean isWithCache() {
+        return withCache;
+    }
+
+    public static int getDBType() {
+        return mDBType;
     }
 
     /**
      * This method is meant for test purposes only. Use other versions of initRealm for production code.
      *
-     * @param genericUseCase mocked generic use(expected) or any IDataUseCase implementation
+     * @param dataUseCase mocked generic use(expected) or any IDataUseCase implementation
      */
     @VisibleForTesting
-    private static void init(IDataUseCase genericUseCase) {
-        sGenericUseCase = genericUseCase;
+    static void init(IDataUseCase dataUseCase) {
+        sDataUseCase = dataUseCase;
     }
 }

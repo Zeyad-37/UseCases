@@ -2,6 +2,9 @@ package com.zeyad.usecases.data.repository.stores;
 
 import android.support.annotation.NonNull;
 
+import com.google.gson.Gson;
+import com.zeyad.usecases.Config;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -16,6 +19,7 @@ import rx.Observable;
  * Interface that represents a data store from where data is retrieved.
  */
 public interface DataStore {
+    Gson gson = Config.getGson();
 
     @NonNull
     Observable<List> dynamicGetList(final String url, Class domainClass, Class dataClass, boolean persist,

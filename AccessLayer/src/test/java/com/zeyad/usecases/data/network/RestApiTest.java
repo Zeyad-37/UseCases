@@ -75,32 +75,32 @@ public class RestApiTest {
 
     @Test
     public void testDynamicPostObject() throws Exception {
-        assertThat(mRestApi.dynamicPostObject(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.dynamicPostObject(mValidUrl, mRequestBody))));
+        assertThat(mRestApi.dynamicPost(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.dynamicPost(mValidUrl, mRequestBody))));
     }
 
     @Test
     public void testDynamicPostList() throws Exception {
-        assertThat(mRestApi.dynamicPostList(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.dynamicPostList(mValidUrl, mRequestBody))));
+        assertThat(mRestApi.dynamicPost(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.dynamicPost(mValidUrl, mRequestBody))));
     }
 
     @Test
     public void testDynamicPutObject() throws Exception {
-        assertThat(mRestApi.dynamicPutObject(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.dynamicPutObject(mValidUrl, mRequestBody))));
+        assertThat(mRestApi.dynamicPut(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.dynamicPut(mValidUrl, mRequestBody))));
     }
 
     @Test
     public void testDynamicPutList() throws Exception {
-        assertThat(mRestApi.dynamicPutList(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.dynamicPutList(mValidUrl, mRequestBody))));
+        assertThat(mRestApi.dynamicPut(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.dynamicPut(mValidUrl, mRequestBody))));
     }
 
     @Test
     public void testDynamicDeleteObject() throws Exception {
-        assertThat(mRestApi.dynamicDeleteObject(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.dynamicDeleteObject(mValidUrl, mRequestBody))));
+        assertThat(mRestApi.dynamicDelete(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.dynamicDelete(mValidUrl, mRequestBody))));
     }
 
     @Test
     public void testDynamicDeleteList() throws Exception {
-        assertThat(mRestApi.dynamicDeleteList(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.dynamicDeleteList(mValidUrl, mRequestBody))));
+        assertThat(mRestApi.dynamicDelete(mValidUrl, mRequestBody), is(equalTo(mMockedApiConnection.dynamicDelete(mValidUrl, mRequestBody))));
     }
 
     @Test

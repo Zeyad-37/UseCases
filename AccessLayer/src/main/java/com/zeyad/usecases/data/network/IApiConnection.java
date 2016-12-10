@@ -26,17 +26,11 @@ interface IApiConnection {
 
     Observable<List> dynamicGetList(String url, boolean shouldCache);
 
-    Observable<Object> dynamicPostObject(String url, RequestBody requestBody);
+    Observable<Object> dynamicPost(String url, RequestBody requestBody);
 
-    Observable<List> dynamicPostList(String url, RequestBody requestBody);
-
-    Observable<Object> dynamicPutObject(String url, RequestBody requestBody);
-
-    Observable<List> dynamicPutList(String url, RequestBody requestBody);
+    Observable<Object> dynamicPut(String url, RequestBody requestBody);
 
     Observable<Object> upload(String url, Map<String, RequestBody> partMap, MultipartBody.Part file);
 
-    Observable<List> dynamicDeleteList(String url, RequestBody body);
-
-    Observable<Object> dynamicDeleteObject(String url, RequestBody body);
+    Observable<Object> dynamicDelete(String url, RequestBody body);
 }

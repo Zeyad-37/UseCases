@@ -104,21 +104,16 @@ public class PostJUnitTestRobot {
     }
 
     static RestApiImpl createRestApi() {
-        final Observable<List> LIST_OBSERVABLE = getListObservable();
         final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
         final RestApiImpl mock = mock(RestApiImpl.class);
         when(mock.dynamicDownload(anyString())).thenReturn(getResponseBodyObservable());
-        when(mock.dynamicDeleteList(anyString(), any())).thenReturn(LIST_OBSERVABLE);
+        when(mock.dynamicDelete(anyString(), any())).thenReturn(OBJECT_OBSERVABLE);
         when(mock.dynamicGetObject(any(), anyBoolean())).thenReturn(OBJECT_OBSERVABLE);
         when(mock.dynamicGetObject(any())).thenReturn(OBJECT_OBSERVABLE);
         when(mock.dynamicGetList(any())).thenReturn(getListObservable());
         when(mock.dynamicGetList(any(), anyBoolean())).thenReturn(getListObservable());
-        when(mock.dynamicPostObject(any(), any())).thenReturn(OBJECT_OBSERVABLE);
-        when(mock.dynamicPostList(any(), any())).thenReturn(LIST_OBSERVABLE);
-        when(mock.dynamicPutObject(any(), any())).thenReturn(OBJECT_OBSERVABLE);
-        when(mock.dynamicPutList(any(), any())).thenReturn(LIST_OBSERVABLE);
-        when(mock.dynamicDeleteObject(any(), any())).thenReturn(OBJECT_OBSERVABLE);
-        when(mock.dynamicDeleteList(any(), any())).thenReturn(LIST_OBSERVABLE);
+        when(mock.dynamicPost(any(), any())).thenReturn(OBJECT_OBSERVABLE);
+        when(mock.dynamicPut(any(), any())).thenReturn(OBJECT_OBSERVABLE);
         when(mock.upload(any(), any(Map.class), any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
         return mock;
     }

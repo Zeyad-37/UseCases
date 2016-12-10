@@ -9,10 +9,8 @@ import android.webkit.MimeTypeMap;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.FileIORequest;
@@ -25,9 +23,6 @@ import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.realm.RealmList;
-import io.realm.RealmModel;
-import io.realm.RealmObject;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -51,23 +46,11 @@ public class FileIO {
     private boolean mIsDownload;
 
     public FileIO(@NonNull Intent intent, @NonNull Context context, boolean isDownload) {
-        gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(FieldAttributes f) {
-                return f.getDeclaringClass().equals(RealmObject.class)
-                        && f.getDeclaredClass().equals(RealmModel.class)
-                        && f.getDeclaringClass().equals(RealmList.class);
-            }
-
-            @Override
-            public boolean shouldSkipClass(Class<?> clazz) {
-                return false;
-            }
-        }).create();
+        gson = Config.getGson();
         mRestApi = new RestApiImpl();
         mContext = context;
         mTrailCount = intent.getIntExtra(TRIAL_COUNT, 0);
-        mFileIORequest = new Gson().fromJson(intent.getStringExtra(PAYLOAD), FileIORequest.class);
+        mFileIORequest = gson.fromJson(intent.getStringExtra(PAYLOAD), FileIORequest.class);
         mIsDownload = isDownload;
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
     }
@@ -76,19 +59,7 @@ public class FileIO {
      * This constructor meant to be used in testing and restricted environments only. Use public constructors instead.
      */
     FileIO(Context context, RestApi restApi, int trailCount, FileIORequest fileIORequest, boolean isDownload) {
-        gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(FieldAttributes f) {
-                return f.getDeclaringClass().equals(RealmObject.class)
-                        && f.getDeclaredClass().equals(RealmModel.class)
-                        && f.getDeclaringClass().equals(RealmList.class);
-            }
-
-            @Override
-            public boolean shouldSkipClass(Class<?> clazz) {
-                return false;
-            }
-        }).create();
+        gson = Config.getGson();
         mContext = context;
         mRestApi = restApi;
         mTrailCount = trailCount;
