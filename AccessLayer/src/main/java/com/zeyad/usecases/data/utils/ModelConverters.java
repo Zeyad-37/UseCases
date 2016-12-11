@@ -5,39 +5,11 @@ import android.support.annotation.Nullable;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class ModelConverters {
-
-    @NonNull
-    public static JSONObject convertToJsonObject(Map hashMap) {
-        return new JSONObject(hashMap);
-    }
-
-    @NonNull
-    public static JSONArray convertToJsonArray(@NonNull HashMap<String, Object> hashMap) {
-        final JSONArray jsonArray = new JSONArray();
-        for (Object object : hashMap.values())
-            jsonArray.put(object);
-        return jsonArray;
-    }
-
-    public static String convertToString(@NonNull JSONArray jsonArray) {
-        return jsonArray.toString();
-    }
-
-    public static String convertToString(@NonNull JSONObject jsonObject) {
-        return jsonObject.toString();
-    }
-
-    public static String convertToString(Map hashMap) {
-        return convertToString(convertToJsonObject(hashMap));
-    }
 
     @Nullable
     public static List<Long> convertToListOfId(@Nullable JSONArray jsonArray) {
@@ -60,10 +32,10 @@ public class ModelConverters {
     }
 
     @NonNull
-    public static JSONArray convertToJsonArray(@NonNull List hashMap) {
+    public static JSONArray convertToJsonArray(@NonNull List list) {
         final JSONArray jsonArray = new JSONArray();
-        for (int i = 0, hashMapSize = hashMap.size(); i < hashMapSize; i++)
-            jsonArray.put(hashMap.get(i));
+        for (int i = 0, hashMapSize = list.size(); i < hashMapSize; i++)
+            jsonArray.put(list.get(i));
         return jsonArray;
     }
 }

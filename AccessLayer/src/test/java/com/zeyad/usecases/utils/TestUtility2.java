@@ -11,8 +11,8 @@ import com.google.gson.Gson;
 import com.zeyad.usecases.data.LibraryModule;
 import com.zeyad.usecases.data.mappers.EntityDataMapper;
 import com.zeyad.usecases.data.mappers.EntityMapper;
-import com.zeyad.usecases.data.utils.EntityMapperUtil;
-import com.zeyad.usecases.data.utils.IEntityMapperUtil;
+import com.zeyad.usecases.data.mappers.EntityMapperUtil;
+import com.zeyad.usecases.data.mappers.IEntityMapperUtil;
 import com.zeyad.usecases.data.utils.Utils;
 
 import org.hamcrest.Matchers;

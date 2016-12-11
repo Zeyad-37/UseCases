@@ -4,11 +4,11 @@ import com.zeyad.usecases.Config;
 import com.zeyad.usecases.UIThread;
 import com.zeyad.usecases.data.db.DatabaseManagerFactory;
 import com.zeyad.usecases.data.executor.JobExecutor;
+import com.zeyad.usecases.data.mappers.IEntityMapperUtil;
 import com.zeyad.usecases.data.repository.DataRepository;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
-import com.zeyad.usecases.data.utils.IEntityMapperUtil;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.executors.ThreadExecutor;
 import com.zeyad.usecases.domain.repositories.Data;
@@ -55,7 +55,8 @@ public class DataUseCase implements IDataUseCase {
     static void initWithRealm(IEntityMapperUtil entityMapper) {
         DatabaseManagerFactory.initRealm();
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
-                .getInstance(), Config.getInstance().getContext()), entityMapper), new JobExecutor(), new UIThread());
+                .getInstance(), Config.getInstance().getContext()), entityMapper), new JobExecutor(),
+                new UIThread());
     }
 
     /**

@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.repository.DataRepository;
-import com.zeyad.usecases.data.utils.ModelConverters;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -85,9 +84,12 @@ public class PostRequest {
     public JSONArray getArrayBundle() {
         if (jsonArray != null)
             return jsonArray;
-        else if (keyValuePairs != null)
-            return ModelConverters.convertToJsonArray(keyValuePairs);
-        else return new JSONArray();
+        else if (keyValuePairs != null) {
+            final JSONArray jsonArray = new JSONArray();
+            for (Object object : keyValuePairs.values())
+                jsonArray.put(object);
+            return jsonArray;
+        } else return new JSONArray();
     }
 
     public String getUrl() {

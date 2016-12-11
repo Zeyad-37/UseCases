@@ -49,7 +49,7 @@ public class GenericJobService extends JobService {
     }
 
     @Override
-    public boolean onStartJob(@NonNull JobParameters params) { // return true if u r doing background thread work, else return false
+    public boolean onStartJob(@NonNull JobParameters params) {
         if (params.getExtras() != null)
             switch (params.getExtras().getString(JOB_TYPE, "")) {
                 case DOWNLOAD_FILE:

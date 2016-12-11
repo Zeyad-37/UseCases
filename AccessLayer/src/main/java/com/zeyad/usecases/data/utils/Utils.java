@@ -3,17 +3,15 @@ package com.zeyad.usecases.data.utils;
 import android.app.Activity;
 import android.app.Service;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
-import android.os.BatteryManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
+import com.facebook.network.connectionclass.ConnectionClassManager;
+import com.facebook.network.connectionclass.ConnectionQuality;
 import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.Lifetime;
@@ -29,8 +27,6 @@ import io.realm.Realm;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import rx.Observable;
-import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
 
 import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
 import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.UPLOAD_FILE;
@@ -46,7 +42,6 @@ public class Utils {
         return Utils.getMaxId(clazz, column) + 1;
     }
 
-    // Simple logging to let us know what each source is returning
     public static Observable.Transformer<?, ?> logSources(final String source) {
         return observable -> observable.doOnNext(entities -> {
             if (entities == null)
@@ -57,7 +52,8 @@ public class Utils {
     }
 
     public static boolean isNetworkAvailable(@NonNull Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context
+                .CONNECTIVITY_SERVICE);
         if (hasLollipop()) {
             Network[] networks = connectivityManager.getAllNetworks();
             for (Network network : networks)
@@ -73,20 +69,13 @@ public class Utils {
         return false;
     }
 
+    public static boolean isNetworkDecent() {
+        return ConnectionClassManager.getInstance().getCurrentBandwidthQuality()
+                .compareTo(ConnectionQuality.MODERATE) >= 0;
+    }
+
     public static boolean hasLollipop() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
-    }
-
-    @Nullable
-    public static CompositeSubscription getNewCompositeSubIfUnsubscribed(@Nullable CompositeSubscription subscription) {
-        if (subscription == null || subscription.isUnsubscribed())
-            return new CompositeSubscription();
-        return subscription;
-    }
-
-    public static void unsubscribeIfNotNull(@Nullable Subscription subscription) {
-        if (subscription != null)
-            subscription.unsubscribe();
     }
 
     public static int getMaxId(Class clazz, String column) {
@@ -94,36 +83,6 @@ public class Utils {
         if (currentMax != null)
             return currentMax.intValue();
         else return 0;
-    }
-
-    public static boolean isOnWifi(Context context) {
-        return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE))
-                .getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI;
-    }
-
-    public static boolean isCharging(Context context) {
-        boolean charging = false;
-        final Intent batteryIntent = context.registerReceiver(null,
-                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        int status = batteryIntent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-        boolean batteryCharge = status == BatteryManager.BATTERY_STATUS_CHARGING;
-
-        int chargePlug = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-        boolean usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
-        boolean acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
-
-        if (batteryCharge) charging = true;
-        if (usbCharge) charging = true;
-        if (acCharge) charging = true;
-
-        return charging;
-//        Intent intent = Config.getInstance().getContext().registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-//        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-//        return plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB;
-    }
-
-    public static boolean isChargingReqCompatible(boolean isChargingCurrently, boolean doWhileCharging) {
-        return !doWhileCharging || isChargingCurrently;
     }
 
     public static RequestBody createPartFromString(Object descriptionString) {

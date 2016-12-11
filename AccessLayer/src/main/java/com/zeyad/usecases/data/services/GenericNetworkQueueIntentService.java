@@ -8,7 +8,6 @@ import android.util.Log;
 import com.zeyad.usecases.R;
 import com.zeyad.usecases.data.services.jobs.FileIO;
 import com.zeyad.usecases.data.services.jobs.Post;
-import com.zeyad.usecases.data.utils.Utils;
 
 import rx.subscriptions.CompositeSubscription;
 
@@ -26,7 +25,8 @@ public class GenericNetworkQueueIntentService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        mCompositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(mCompositeSubscription);
+        if (mCompositeSubscription == null || mCompositeSubscription.isUnsubscribed())
+            mCompositeSubscription = new CompositeSubscription();
         switch (intent.getStringExtra(JOB_TYPE)) {
             case POST:
                 mCompositeSubscription.add(new Post(intent, getApplicationContext()).execute());
@@ -47,7 +47,8 @@ public class GenericNetworkQueueIntentService extends IntentService {
 
     @Override
     public void onDestroy() {
-        Utils.unsubscribeIfNotNull(mCompositeSubscription);
+        if (mCompositeSubscription != null)
+            mCompositeSubscription.unsubscribe();
         super.onDestroy();
     }
 }

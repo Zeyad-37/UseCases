@@ -4,10 +4,10 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.zeyad.usecases.data.mappers.EntityDataMapper;
 import com.zeyad.usecases.data.mappers.EntityMapper;
+import com.zeyad.usecases.data.mappers.IEntityMapperUtil;
 import com.zeyad.usecases.data.repository.stores.DataStore;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.services.realm_test_models.TestModel;
-import com.zeyad.usecases.data.utils.IEntityMapperUtil;
 
 import org.junit.Before;
 import org.junit.Rule;

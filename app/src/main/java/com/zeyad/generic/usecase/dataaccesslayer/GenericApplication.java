@@ -8,7 +8,7 @@ import com.zeyad.generic.usecase.dataaccesslayer.mapper.RepoMapper;
 import com.zeyad.generic.usecase.dataaccesslayer.models.data.RepoRealm;
 import com.zeyad.usecases.data.mappers.EntityDataMapper;
 import com.zeyad.usecases.data.mappers.EntityMapper;
-import com.zeyad.usecases.data.utils.EntityMapperUtil;
+import com.zeyad.usecases.data.mappers.EntityMapperUtil;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 

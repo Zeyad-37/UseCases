@@ -1,6 +1,4 @@
-package com.zeyad.usecases.data.utils;
-
-import com.zeyad.usecases.data.mappers.EntityMapper;
+package com.zeyad.usecases.data.mappers;
 
 public abstract class EntityMapperUtil implements IEntityMapperUtil {
 

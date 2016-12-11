@@ -1,6 +1,10 @@
 package com.zeyad.usecases.data.repository.stores;
 
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.os.BatteryManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
@@ -123,7 +127,7 @@ public class CloudDataStore implements DataStore {
             } else if (!Utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
             return mRestApi.dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
-                    ModelConverters.convertToString(jsonObject)))
+                    jsonObject.toString()))
                     //.compose(applyExponentialBackoff())
                     .doOnError(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
@@ -169,7 +173,7 @@ public class CloudDataStore implements DataStore {
             } else if (!Utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
             return mRestApi.dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
-                    ModelConverters.convertToString(jsonObject)))
+                    jsonObject.toString()))
                     //.compose(applyExponentialBackoff())
                     .doOnError(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
@@ -192,7 +196,7 @@ public class CloudDataStore implements DataStore {
             } else if (!Utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
             return mRestApi.dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
-                    ModelConverters.convertToString(jsonArray)))
+                    jsonArray.toString()))
                     //.compose(applyExponentialBackoff())
                     .doOnError(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
@@ -217,7 +221,7 @@ public class CloudDataStore implements DataStore {
             } else if (!Utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
             return mRestApi.dynamicDelete(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
-                    ModelConverters.convertToString(jsonArray)))
+                    jsonArray.toString()))
                     //.compose(applyExponentialBackoff())
                     .doOnError(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
@@ -237,8 +241,8 @@ public class CloudDataStore implements DataStore {
     public Observable<?> dynamicUploadFile(String url, @NonNull File file, String key, HashMap<String, Object> parameters,
                                            boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass) {
         return Observable.defer(() -> {
-            if (isQueuableIfOutOfNetwork(queuable) && Utils.isOnWifi(mContext) == onWifi
-                    && Utils.isChargingReqCompatible(Utils.isCharging(mContext), whileCharging)) {
+            if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(mContext) == onWifi
+                    && isChargingReqCompatible(isCharging(mContext), whileCharging)) {
                 queueIOFile(url, file, true, whileCharging, false);
                 return mQueueFileIO;
             } else if (!Utils.isNetworkAvailable(mContext))
@@ -266,8 +270,8 @@ public class CloudDataStore implements DataStore {
     public Observable<?> dynamicDownloadFile(String url, @NonNull File file, boolean onWifi,
                                              boolean whileCharging, boolean queuable) {
         return Observable.defer(() -> {
-            if (isQueuableIfOutOfNetwork(queuable) && Utils.isOnWifi(mContext) == onWifi
-                    && Utils.isChargingReqCompatible(Utils.isCharging(mContext), whileCharging)) {
+            if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(mContext) == onWifi
+                    && isChargingReqCompatible(isCharging(mContext), whileCharging)) {
                 queueIOFile(url, file, onWifi, whileCharging, true);
                 return mQueueFileIO;
             } else
@@ -350,17 +354,46 @@ public class CloudDataStore implements DataStore {
         return queuable && !Utils.isNetworkAvailable(mContext);
     }
 
-    private boolean queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload) {
+    private boolean isChargingReqCompatible(boolean isChargingCurrently, boolean doWhileCharging) {
+        return !doWhileCharging || isChargingCurrently;
+    }
+
+    private boolean isCharging(Context context) {
+        boolean charging = false;
+        final Intent batteryIntent = context.registerReceiver(null,
+                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        int status = batteryIntent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+        boolean batteryCharge = status == BatteryManager.BATTERY_STATUS_CHARGING;
+
+        int chargePlug = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+        boolean usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
+        boolean acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
+
+        if (batteryCharge) charging = true;
+        if (usbCharge) charging = true;
+        if (acCharge) charging = true;
+
+        return charging;
+//        Intent intent = Config.getInstance().getContext().registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+//        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+//        return plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB;
+    }
+
+    private boolean isOnWifi(Context context) {
+        return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE))
+                .getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI;
+    }
+
+    private void queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload) {
         Utils.queueFileIOCore(mDispatcher, isDownload, new FileIORequest.FileIORequestBuilder(url, file)
                 .onWifi(onWifi)
                 .whileCharging(whileCharging)
                 .build(), gson);
-        return true;
     }
 
-    private boolean queuePost(String method, String url, String idColumnName, JSONArray jsonArray,
-                              boolean persist) {
-        return queuePostCore(new PostRequest.PostRequestBuilder(null, persist)
+    private void queuePost(String method, String url, String idColumnName, JSONArray jsonArray,
+                           boolean persist) {
+        queuePostCore(new PostRequest.PostRequestBuilder(null, persist)
                 .idColumnName(idColumnName)
                 .payLoad(jsonArray)
                 .url(url)
@@ -368,9 +401,9 @@ public class CloudDataStore implements DataStore {
                 .build());
     }
 
-    private boolean queuePost(String method, String url, String idColumnName, JSONObject jsonObject,
-                              boolean persist) {
-        return queuePostCore(new PostRequest.PostRequestBuilder(null, persist)
+    private void queuePost(String method, String url, String idColumnName, JSONObject jsonObject,
+                           boolean persist) {
+        queuePostCore(new PostRequest.PostRequestBuilder(null, persist)
                 .idColumnName(idColumnName)
                 .payLoad(jsonObject)
                 .url(url)
@@ -378,9 +411,8 @@ public class CloudDataStore implements DataStore {
                 .build());
     }
 
-    private boolean queuePostCore(PostRequest postRequest) {
+    private void queuePostCore(PostRequest postRequest) {
         Utils.queuePostCore(mDispatcher, postRequest, gson);
-        return true;
     }
 
     private void persistGeneric(Object object, String idColumnName, Class dataClass) {

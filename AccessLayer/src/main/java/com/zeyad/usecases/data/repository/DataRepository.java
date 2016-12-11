@@ -3,8 +3,8 @@ package com.zeyad.usecases.data.repository;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
+import com.zeyad.usecases.data.mappers.IEntityMapperUtil;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
-import com.zeyad.usecases.data.utils.IEntityMapperUtil;
 import com.zeyad.usecases.domain.repositories.Data;
 
 import org.json.JSONArray;

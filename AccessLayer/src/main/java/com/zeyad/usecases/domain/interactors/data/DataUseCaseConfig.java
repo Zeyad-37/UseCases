@@ -5,8 +5,8 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.data.mappers.EntityDataMapper;
 import com.zeyad.usecases.data.mappers.EntityMapper;
-import com.zeyad.usecases.data.utils.EntityMapperUtil;
-import com.zeyad.usecases.data.utils.IEntityMapperUtil;
+import com.zeyad.usecases.data.mappers.EntityMapperUtil;
+import com.zeyad.usecases.data.mappers.IEntityMapperUtil;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;

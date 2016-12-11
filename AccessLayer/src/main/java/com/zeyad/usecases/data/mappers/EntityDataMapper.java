@@ -52,24 +52,29 @@ public class EntityDataMapper implements EntityMapper<Object, Object> {
 
     @Nullable
     @Override
-    public Object transformToDomain(@NonNull Object o) {
-        try {
-            return gson.fromJson(gson.toJson(o), o.getClass());
-        } catch (OutOfMemoryError e) {
-            e.printStackTrace();
-            return null;
-        }
+    public Object transformToDomain(@NonNull Object item) {
+        if (item instanceof List)
+            return transformAllToDomain((List) item);
+        else
+            try {
+                return item.getClass().cast(gson.fromJson(gson.toJson(item), item.getClass()));
+//                return gson.fromJson(gson.toJson(item), item.getClass());
+            } catch (OutOfMemoryError e) {
+                e.printStackTrace();
+                return null;
+            }
     }
 
     @Nullable
     @Override
     public List<Object> transformAllToDomain(@NonNull List<Object> objectList) {
         List<Object> list = new ArrayList<>(objectList.size());
-        for (int i = 0, objectListSize = objectList.size(); i < objectListSize; i++)
-            list.add(transformToDomain(objectList.get(i)));
-        for (int i = 0, size = list.size(); i < size; i++)
-            if (list.get(i) == null)
-                list.remove(i);
+        Object object;
+        for (int i = 0, objectListSize = objectList.size(); i < objectListSize; i++) {
+            object = transformToDomain(objectList.get(i));
+            if (object != null)
+                list.add(object);
+        }
         return list;
     }
 
@@ -98,12 +103,13 @@ public class EntityDataMapper implements EntityMapper<Object, Object> {
     @NonNull
     @Override
     public List<Object> transformAllToDomain(@NonNull List list, @NonNull Class domainClass) {
-        List<Object> objects = new ArrayList<>();
-        for (int i = 0; i < list.size(); i++)
-            objects.add(transformToDomain(list.get(i), domainClass));
-        for (int i = 0; i < objects.size(); i++)
-            if (objects.get(i) == null)
-                objects.remove(i);
-        return objects;
+        List<Object> domainObjects = new ArrayList<>();
+        Object object;
+        for (int i = 0, size = list.size(); i < size; i++) {
+            object = transformToDomain(list.get(i), domainClass);
+            if (object != null)
+                domainObjects.add(object);
+        }
+        return domainObjects;
     }
 }
