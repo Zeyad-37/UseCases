@@ -44,7 +44,6 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Subscriber;
-import rx.functions.Action1;
 import rx.schedulers.Schedulers;
 import st.lowlevel.storo.Storo;
 
@@ -93,7 +92,7 @@ public class CloudDataStore implements DataStore {
                 //.compose(applyExponentialBackoff())
                 .doOnNext(object -> {
                     if (willPersist(persist))
-                        new SaveGenericToDBAction(dataClass, idColumnName).call(object);
+                        persistGeneric(object, idColumnName, dataClass);
                 })
                 .map(entity -> mEntityDataMapper.transformToDomain(entity, domainClass));
     }
@@ -106,7 +105,7 @@ public class CloudDataStore implements DataStore {
                 //.compose(applyExponentialBackoff())
                 .doOnNext(list -> {
                     if (willPersist(persist))
-                        new SaveAllGenericsToDBAction(dataClass).call(list);
+                        persistAllGenerics(list, dataClass);
                 })
                 .map(entities -> mEntityDataMapper.transformAllToDomain(entities, domainClass));
     }
@@ -117,7 +116,7 @@ public class CloudDataStore implements DataStore {
                                            Class domainClass, Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
-                new SaveGenericToDBAction(dataClass, idColumnName).call(jsonObject);
+                persistGeneric(jsonObject, idColumnName, dataClass);
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(POST, url, idColumnName, jsonObject, persist);
                 return Observable.empty();
@@ -140,7 +139,7 @@ public class CloudDataStore implements DataStore {
                                          Class domainClass, Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
-                new SaveGenericToDBAction(dataClass, idColumnName).call(jsonArray);
+                persistGeneric(jsonArray, idColumnName, dataClass);
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(POST, url, idColumnName, jsonArray, persist);
                 return Observable.empty();
@@ -163,7 +162,7 @@ public class CloudDataStore implements DataStore {
                                           Class domainClass, Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
-                new SaveGenericToDBAction(dataClass, idColumnName).call(jsonObject);
+                persistGeneric(jsonObject, idColumnName, dataClass);
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(PUT, url, idColumnName, jsonObject, persist);
                 return Observable.empty();
@@ -186,7 +185,7 @@ public class CloudDataStore implements DataStore {
                                         Class domainClass, Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
-                new SaveGenericToDBAction(dataClass, idColumnName).call(jsonArray);
+                persistGeneric(jsonArray, idColumnName, dataClass);
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(PUT, url, idColumnName, jsonArray, persist);
                 return Observable.empty();
@@ -211,7 +210,7 @@ public class CloudDataStore implements DataStore {
         return Observable.defer(() -> {
             List<Long> ids = ModelConverters.convertToListOfId(jsonArray);
             if (willPersist(persist))
-                new DeleteCollectionGenericsFromDBAction(dataClass, idColumnName).call(ids);
+                deleteFromPersistence(ids, idColumnName, dataClass);
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(DELETE, url, idColumnName, jsonArray, persist);
                 return Observable.empty();
@@ -384,6 +383,77 @@ public class CloudDataStore implements DataStore {
         return true;
     }
 
+    private void persistGeneric(Object object, String idColumnName, Class dataClass) {
+        if (object instanceof File)
+            return;
+        Object mappedObject = null;
+        Observable<?> observable = null;
+        if (mDataBaseManager instanceof RealmManager) {
+            try {
+                if (!(object instanceof JSONArray) && !(object instanceof Map))
+                    mappedObject = mEntityDataMapper.transformToRealm(object, dataClass);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            if (mappedObject instanceof RealmObject)
+                observable = mDataBaseManager.put((RealmObject) mappedObject, dataClass);
+            else if (mappedObject instanceof RealmModel)
+                observable = mDataBaseManager.put((RealmModel) mappedObject, dataClass);
+            else try {
+                    if (object instanceof JSONArray) {
+                        JSONArray jsonArray = (JSONArray) object;
+                        observable = mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
+                                .flatMap(o -> {
+                                    JSONObject jsonObject;
+                                    for (int i = 0, size = jsonArray.length(); i < size; i++) {
+                                        jsonObject = jsonArray.optJSONObject(i);
+                                        Storo.put(dataClass.getSimpleName()
+                                                        + jsonObject.optString(idColumnName),
+                                                gson.fromJson(jsonObject.toString(), dataClass)).execute();
+                                    }
+                                    return Observable.just(true);
+                                });
+                    } else if (object instanceof List) {
+                        observable = mDataBaseManager.putAll((List<RealmObject>) mEntityDataMapper
+                                .transformAllToRealm((List) object, dataClass), dataClass);
+                    } else {
+                        JSONObject jsonObject;
+                        if (object instanceof Map) {
+                            jsonObject = new JSONObject(((Map) object));
+                        } else if (object instanceof String) {
+                            jsonObject = new JSONObject((String) object);
+                        } else if (object instanceof JSONObject) {
+                            jsonObject = ((JSONObject) object);
+                        } else
+                            jsonObject = new JSONObject(gson.toJson(object, dataClass));
+                        observable = mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+                                .flatMap(o -> Observable.just(Storo.put(dataClass.getSimpleName()
+                                                + jsonObject.optString(idColumnName),
+                                        gson.fromJson(jsonObject.toString(), dataClass)).execute()));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    observable = Observable.error(e);
+                }
+        }
+        if (observable != null)
+            observable.subscribeOn(Schedulers.io())
+                    .subscribe(new SimpleSubscriber(object));
+    }
+
+    private void persistAllGenerics(List collection, Class dataClass) {
+        mDataBaseManager.putAll(mEntityDataMapper.transformAllToRealm(collection, dataClass), dataClass)
+                .subscribeOn(Schedulers.io())
+                .subscribe(new SimpleSubscriber(collection));
+    }
+
+    private void deleteFromPersistence(List collection, String idColumnName, Class dataClass) {
+        for (int i = 0, collectionSize = collection.size(); i < collectionSize; i++) {
+            mDataBaseManager.evictById(dataClass, idColumnName, (long) collection.get(i));
+            Storo.delete(dataClass.getSimpleName() + (long) collection.get(i));
+        }
+    }
+
     private static class SimpleSubscriber extends Subscriber<Object> {
         private final Object mObject;
 
@@ -405,108 +475,6 @@ public class CloudDataStore implements DataStore {
         @Override
         public void onNext(Object o) {
             Log.d(TAG, mObject.getClass().getName() + " added!");
-        }
-    }
-
-    private final class SaveGenericToDBAction implements Action1<Object> {
-        private Class mDataClass;
-        private String mIdColumnName;
-
-        SaveGenericToDBAction(Class dataClass, String idColumnName) {
-            mDataClass = dataClass;
-            mIdColumnName = idColumnName;
-        }
-
-        @Override
-        public void call(Object object) {
-            if (object instanceof File)
-                return;
-            Object mappedObject = null;
-            Observable<?> observable = null;
-            if (mDataBaseManager instanceof RealmManager) {
-                try {
-                    if (!(object instanceof JSONArray) && !(object instanceof Map))
-                        mappedObject = mEntityDataMapper.transformToRealm(object, mDataClass);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-                if (mappedObject instanceof RealmObject)
-                    observable = mDataBaseManager.put((RealmObject) mappedObject, mDataClass);
-                else if (mappedObject instanceof RealmModel)
-                    observable = mDataBaseManager.put((RealmModel) mappedObject, mDataClass);
-                else try {
-                        if (object instanceof JSONArray) {
-                            JSONArray jsonArray = (JSONArray) object;
-                            observable = mDataBaseManager.putAll(jsonArray, mIdColumnName, mDataClass)
-                                    .flatMap(o -> {
-                                        JSONObject jsonObject;
-                                        for (int i = 0, size = jsonArray.length(); i < size; i++) {
-                                            jsonObject = jsonArray.optJSONObject(i);
-                                            Storo.put(mDataClass.getSimpleName()
-                                                            + jsonObject.optString(mIdColumnName),
-                                                    gson.fromJson(jsonObject.toString(), mDataClass)).execute();
-                                        }
-                                        return Observable.just(true);
-                                    });
-                        } else if (object instanceof List) {
-                            observable = mDataBaseManager.putAll((List<RealmObject>) mEntityDataMapper
-                                    .transformAllToRealm((List) object, mDataClass), mDataClass);
-                        } else {
-                            JSONObject jsonObject;
-                            if (object instanceof Map) {
-                                jsonObject = new JSONObject(((Map) object));
-                            } else if (object instanceof String) {
-                                jsonObject = new JSONObject((String) object);
-                            } else if (object instanceof JSONObject) {
-                                jsonObject = ((JSONObject) object);
-                            } else
-                                jsonObject = new JSONObject(gson.toJson(object, mDataClass));
-                            observable = mDataBaseManager.put(jsonObject, mIdColumnName, mDataClass)
-                                    .flatMap(o -> Observable.just(Storo.put(mDataClass.getSimpleName()
-                                                    + jsonObject.optString(mIdColumnName),
-                                            gson.fromJson(jsonObject.toString(), mDataClass)).execute()));
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        observable = Observable.error(e);
-                    }
-            }
-            if (observable != null)
-                observable.subscribeOn(Schedulers.io())
-                        .subscribe(new SimpleSubscriber(object));
-        }
-    }
-
-    private final class SaveAllGenericsToDBAction implements Action1<List> {
-        private Class mDataClass;
-
-        SaveAllGenericsToDBAction(Class dataClass) {
-            mDataClass = dataClass;
-        }
-
-        @Override
-        public void call(List collection) {
-            mDataBaseManager.putAll(mEntityDataMapper.transformAllToRealm(collection, mDataClass),
-                    mDataClass).subscribeOn(Schedulers.io())
-                    .subscribe(new SimpleSubscriber(collection));
-        }
-    }
-
-    private final class DeleteCollectionGenericsFromDBAction implements Action1<List> {
-        private Class mDataClass;
-        private String mIdFieldName;
-
-        DeleteCollectionGenericsFromDBAction(Class dataClass, String idFieldName) {
-            mDataClass = dataClass;
-            mIdFieldName = idFieldName;
-        }
-
-        @Override
-        public void call(List collection) {
-            for (int i = 0, collectionSize = collection.size(); i < collectionSize; i++) {
-                mDataBaseManager.evictById(mDataClass, mIdFieldName, (long) collection.get(i));
-                Storo.delete(mDataClass.getSimpleName() + (long) collection.get(i));
-            }
         }
     }
 }
