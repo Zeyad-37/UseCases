@@ -4,7 +4,7 @@ package com.zeyad.usecase.codegen;
  * @author zeyad on 12/12/16.
  */
 
-public class Reformatter {
+class Reformatter {
     static String fixup(String s) {
         s = removeTrailingSpace(s);
         s = compressBlankLines(s);
@@ -13,8 +13,7 @@ public class Reformatter {
     }
 
     private static String removeTrailingSpace(String s) {
-        // Remove trailing space from all lines. This is mainly to make it easier to find
-        // blank lines later.
+        // Remove trailing space from all lines. This is mainly to make it easier to find blank lines later.
         if (!s.endsWith("\n")) {
             s += '\n';
         }

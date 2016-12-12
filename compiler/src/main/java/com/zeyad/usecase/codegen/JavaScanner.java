@@ -3,8 +3,7 @@ package com.zeyad.usecase.codegen;
 /**
  * @author zeyad on 12/12/16.
  */
-
-public class JavaScanner {
+class JavaScanner {
 
     private final String s;
 

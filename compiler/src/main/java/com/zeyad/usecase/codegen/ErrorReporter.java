@@ -8,7 +8,7 @@ import javax.tools.Diagnostic;
 /**
  * @author zeyad on 12/12/16.
  */
-public class ErrorReporter {
+class ErrorReporter {
 
     private final Messager messager;
 

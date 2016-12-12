@@ -52,7 +52,7 @@ import static javax.lang.model.type.TypeKind.WILDCARD;
  * @author Gregory Kick
  * @since 2.0
  */
-public final class MoreTypes {
+final class MoreTypes {
     private static final Class<?> INTERSECTION_TYPE;
     private static final Method GET_BOUNDS;
     private static final TypeVisitor<Boolean, EqualVisitorParam> EQUAL_VISITOR =
@@ -77,21 +77,16 @@ public final class MoreTypes {
                         DeclaredType b = (DeclaredType) p.type;
                         Element aElement = a.asElement();
                         Element bElement = b.asElement();
-                        Set<ComparedElements> newVisiting = visitingSetPlus(
-                                p.visiting, aElement, a.getTypeArguments(), bElement, b.getTypeArguments());
-                        if (newVisiting.equals(p.visiting)) {
-                            // We're already visiting this pair of elements.
-                            // This can happen for example with Enum in Enum<E extends Enum<E>>. Return a
-                            // provisional true value since if the Elements are not in fact equal the original
-                            // visitor of Enum will discover that. We have to check both Elements being compared
-                            // though to avoid missing the fact that one of the types being compared
-                            // differs at exactly this point.
-                            return true;
-                        }
-                        return aElement.equals(bElement)
-                                && equal(a.getEnclosingType(), a.getEnclosingType(), newVisiting)
-                                && equalLists(a.getTypeArguments(), b.getTypeArguments(), newVisiting);
-
+                        Set<ComparedElements> newVisiting = visitingSetPlus(p.visiting, aElement,
+                                a.getTypeArguments(), bElement, b.getTypeArguments());
+                        // We're already visiting this pair of elements.
+                        // This can happen for example with Enum in Enum<E extends Enum<E>>. Return a
+                        // provisional true value since if the Elements are not in fact equal the original
+                        // visitor of Enum will discover that. We have to check both Elements being compared
+                        // though to avoid missing the fact that one of the types being compared
+                        // differs at exactly this point.
+                        return newVisiting.equals(p.visiting) || aElement.equals(bElement) && equal(a.getEnclosingType(),
+                                a.getEnclosingType(), newVisiting) && equalLists(a.getTypeArguments(), b.getTypeArguments(), newVisiting);
                     }
                     return false;
                 }
@@ -153,109 +148,104 @@ public final class MoreTypes {
                     throw new UnsupportedOperationException();
                 }
 
-                private Set<ComparedElements> visitingSetPlus(
-                        Set<ComparedElements> visiting, Element a, Element b) {
+                private Set<ComparedElements> visitingSetPlus(Set<ComparedElements> visiting, Element a,
+                                                              Element b) {
                     ImmutableList<TypeMirror> noArguments = ImmutableList.of();
                     return visitingSetPlus(visiting, a, noArguments, b, noArguments);
                 }
 
-                private Set<ComparedElements> visitingSetPlus(
-                        Set<ComparedElements> visiting,
-                        Element a, List<? extends TypeMirror> aArguments,
-                        Element b, List<? extends TypeMirror> bArguments) {
-                    ComparedElements comparedElements =
-                            new ComparedElements(
-                                    a, ImmutableList.copyOf(aArguments),
-                                    b, ImmutableList.copyOf(bArguments));
-                    Set<ComparedElements> newVisiting = new HashSet<ComparedElements>(visiting);
+                private Set<ComparedElements> visitingSetPlus(Set<ComparedElements> visiting, Element a,
+                                                              List<? extends TypeMirror> aArguments,
+                                                              Element b, List<? extends TypeMirror> bArguments) {
+                    ComparedElements comparedElements = new ComparedElements(a, ImmutableList.copyOf(aArguments),
+                            b, ImmutableList.copyOf(bArguments));
+                    Set<ComparedElements> newVisiting = new HashSet<>(visiting);
                     newVisiting.add(comparedElements);
                     return newVisiting;
                 }
             };
     private static final int HASH_SEED = 17;
     private static final int HASH_MULTIPLIER = 31;
-    private static final TypeVisitor<Integer, Set<Element>> HASH_VISITOR =
-            new SimpleTypeVisitor6<Integer, Set<Element>>() {
-                int hashKind(int seed, TypeMirror t) {
-                    int result = seed * HASH_MULTIPLIER;
-                    result += t.getKind().hashCode();
-                    return result;
-                }
+    private static final TypeVisitor<Integer, Set<Element>> HASH_VISITOR = new SimpleTypeVisitor6<Integer, Set<Element>>() {
+        int hashKind(int seed, TypeMirror t) {
+            int result = seed * HASH_MULTIPLIER;
+            result += t.getKind().hashCode();
+            return result;
+        }
 
-                @Override
-                protected Integer defaultAction(TypeMirror e, Set<Element> visiting) {
-                    return hashKind(HASH_SEED, e);
-                }
+        @Override
+        protected Integer defaultAction(TypeMirror e, Set<Element> visiting) {
+            return hashKind(HASH_SEED, e);
+        }
 
-                @Override
-                public Integer visitArray(ArrayType t, Set<Element> visiting) {
-                    int result = hashKind(HASH_SEED, t);
-                    result *= HASH_MULTIPLIER;
-                    result += t.getComponentType().accept(this, visiting);
-                    return result;
-                }
+        @Override
+        public Integer visitArray(ArrayType t, Set<Element> visiting) {
+            int result = hashKind(HASH_SEED, t);
+            result *= HASH_MULTIPLIER;
+            result += t.getComponentType().accept(this, visiting);
+            return result;
+        }
 
-                @Override
-                public Integer visitDeclared(DeclaredType t, Set<Element> visiting) {
-                    Element element = t.asElement();
-                    if (visiting.contains(element)) {
-                        return 0;
-                    }
-                    Set<Element> newVisiting = new HashSet<Element>(visiting);
-                    newVisiting.add(element);
-                    int result = hashKind(HASH_SEED, t);
-                    result *= HASH_MULTIPLIER;
-                    result += t.asElement().hashCode();
-                    result *= HASH_MULTIPLIER;
-                    result += t.getEnclosingType().accept(this, newVisiting);
-                    result *= HASH_MULTIPLIER;
-                    result += hashList(t.getTypeArguments(), newVisiting);
-                    return result;
-                }
+        @Override
+        public Integer visitDeclared(DeclaredType t, Set<Element> visiting) {
+            Element element = t.asElement();
+            if (visiting.contains(element)) {
+                return 0;
+            }
+            Set<Element> newVisiting = new HashSet<>(visiting);
+            newVisiting.add(element);
+            int result = hashKind(HASH_SEED, t);
+            result *= HASH_MULTIPLIER;
+            result += t.asElement().hashCode();
+            result *= HASH_MULTIPLIER;
+            result += t.getEnclosingType().accept(this, newVisiting);
+            result *= HASH_MULTIPLIER;
+            result += hashList(t.getTypeArguments(), newVisiting);
+            return result;
+        }
 
-                @Override
-                public Integer visitExecutable(ExecutableType t, Set<Element> visiting) {
-                    int result = hashKind(HASH_SEED, t);
-                    result *= HASH_MULTIPLIER;
-                    result += hashList(t.getParameterTypes(), visiting);
-                    result *= HASH_MULTIPLIER;
-                    result += t.getReturnType().accept(this, visiting);
-                    result *= HASH_MULTIPLIER;
-                    result += hashList(t.getThrownTypes(), visiting);
-                    result *= HASH_MULTIPLIER;
-                    result += hashList(t.getTypeVariables(), visiting);
-                    return result;
-                }
+        @Override
+        public Integer visitExecutable(ExecutableType t, Set<Element> visiting) {
+            int result = hashKind(HASH_SEED, t);
+            result *= HASH_MULTIPLIER;
+            result += hashList(t.getParameterTypes(), visiting);
+            result *= HASH_MULTIPLIER;
+            result += t.getReturnType().accept(this, visiting);
+            result *= HASH_MULTIPLIER;
+            result += hashList(t.getThrownTypes(), visiting);
+            result *= HASH_MULTIPLIER;
+            result += hashList(t.getTypeVariables(), visiting);
+            return result;
+        }
 
-                @Override
-                public Integer visitTypeVariable(TypeVariable t, Set<Element> visiting) {
-                    int result = hashKind(HASH_SEED, t);
-                    result *= HASH_MULTIPLIER;
-                    result += t.getLowerBound().accept(this, visiting);
-                    TypeParameterElement element = (TypeParameterElement) t.asElement();
-                    for (TypeMirror bound : element.getBounds()) {
-                        result *= HASH_MULTIPLIER;
-                        result += bound.accept(this, visiting);
-                    }
-                    return result;
-                }
+        @Override
+        public Integer visitTypeVariable(TypeVariable t, Set<Element> visiting) {
+            int result = hashKind(HASH_SEED, t);
+            result *= HASH_MULTIPLIER;
+            result += t.getLowerBound().accept(this, visiting);
+            TypeParameterElement element = (TypeParameterElement) t.asElement();
+            for (TypeMirror bound : element.getBounds()) {
+                result *= HASH_MULTIPLIER;
+                result += bound.accept(this, visiting);
+            }
+            return result;
+        }
 
-                @Override
-                public Integer visitWildcard(WildcardType t, Set<Element> visiting) {
-                    int result = hashKind(HASH_SEED, t);
-                    result *= HASH_MULTIPLIER;
-                    result +=
-                            (t.getExtendsBound() == null) ? 0 : t.getExtendsBound().accept(this, visiting);
-                    result *= HASH_MULTIPLIER;
-                    result += (t.getSuperBound() == null) ? 0 : t.getSuperBound().accept(this, visiting);
-                    return result;
-                }
+        @Override
+        public Integer visitWildcard(WildcardType t, Set<Element> visiting) {
+            int result = hashKind(HASH_SEED, t);
+            result *= HASH_MULTIPLIER;
+            result += (t.getExtendsBound() == null) ? 0 : t.getExtendsBound().accept(this, visiting);
+            result *= HASH_MULTIPLIER;
+            result += (t.getSuperBound() == null) ? 0 : t.getSuperBound().accept(this, visiting);
+            return result;
+        }
 
-                @Override
-                public Integer visitUnknown(TypeMirror t, Set<Element> visiting) {
-                    throw new UnsupportedOperationException();
-                }
-            };
+        @Override
+        public Integer visitUnknown(TypeMirror t, Set<Element> visiting) {
+            throw new UnsupportedOperationException();
+        }
+    };
     private static final Equivalence<TypeMirror> TYPE_EQUIVALENCE = new Equivalence<TypeMirror>() {
         @Override
         protected boolean doEquivalent(TypeMirror a, TypeMirror b) {
@@ -267,28 +257,27 @@ public final class MoreTypes {
             return MoreTypes.hash(t, ImmutableSet.of());
         }
     };
-    private static final TypeVisitor<Element, Void> AS_ELEMENT_VISITOR =
-            new SimpleTypeVisitor6<Element, Void>() {
-                @Override
-                protected Element defaultAction(TypeMirror e, Void p) {
-                    throw new IllegalArgumentException(e + "cannot be converted to an Element");
-                }
+    private static final TypeVisitor<Element, Void> AS_ELEMENT_VISITOR = new SimpleTypeVisitor6<Element, Void>() {
+        @Override
+        protected Element defaultAction(TypeMirror e, Void p) {
+            throw new IllegalArgumentException(e + "cannot be converted to an Element");
+        }
 
-                @Override
-                public Element visitDeclared(DeclaredType t, Void p) {
-                    return t.asElement();
-                }
+        @Override
+        public Element visitDeclared(DeclaredType t, Void p) {
+            return t.asElement();
+        }
 
-                @Override
-                public Element visitError(ErrorType t, Void p) {
-                    return t.asElement();
-                }
+        @Override
+        public Element visitError(ErrorType t, Void p) {
+            return t.asElement();
+        }
 
-                @Override
-                public Element visitTypeVariable(TypeVariable t, Void p) {
-                    return t.asElement();
-                }
-            };
+        @Override
+        public Element visitTypeVariable(TypeVariable t, Void p) {
+            return t.asElement();
+        }
+    };
 
     static {
         Class<?> c;
@@ -347,8 +336,7 @@ public final class MoreTypes {
     // reflection whether IntersectionType exists, and if it does we extract the bounds of the
     // intersection ((Number, Comparable<T>) in the example) and compare them directly.
     @SuppressWarnings("unchecked")
-    private static boolean equalIntersectionTypes(
-            TypeMirror a, TypeMirror b, Set<ComparedElements> visiting) {
+    private static boolean equalIntersectionTypes(TypeMirror a, TypeMirror b, Set<ComparedElements> visiting) {
         if (!isIntersectionType(b)) {
             return false;
         }
@@ -363,9 +351,7 @@ public final class MoreTypes {
         return equalLists(aBounds, bBounds, visiting);
     }
 
-    private static boolean equalLists(
-            List<? extends TypeMirror> a, List<? extends TypeMirror> b,
-            Set<ComparedElements> visiting) {
+    private static boolean equalLists(List<? extends TypeMirror> a, List<? extends TypeMirror> b, Set<ComparedElements> visiting) {
         int size = a.size();
         if (size != b.size()) {
             return false;
@@ -576,9 +562,7 @@ public final class MoreTypes {
         }, "type variable");
     }
 
-    //
     // visitUnionType would go here, but it is a 1.7 API.
-    //
 
     /**
      * Returns a {@link WildcardType} if the {@link TypeMirror} represents a wildcard type
@@ -700,7 +684,6 @@ public final class MoreTypes {
         checkNotNull(types);
         checkNotNull(elements);
         checkNotNull(type);
-
         final TypeMirror objectType =
                 elements.getTypeElement(Object.class.getCanonicalName()).asType();
         // It's guaranteed there's only a single CLASS superclass because java doesn't have multiple
@@ -715,9 +698,7 @@ public final class MoreTypes {
                                 && !types.isSameType(objectType, input);
                     }
                 }), null);
-        return superclass != null
-                ? Optional.of(MoreTypes.asDeclared(superclass))
-                : Optional.absent();
+        return superclass != null ? Optional.of(MoreTypes.asDeclared(superclass)) : Optional.absent();
     }
 
     /**
@@ -727,8 +708,7 @@ public final class MoreTypes {
      * {@code container} of type {@code Set<String>}, and a variable corresponding to the {@code E e}
      * parameter in the {@code Set.add(E e)} method, this will return a TypeMirror for {@code String}.
      */
-    public static TypeMirror asMemberOf(Types types, DeclaredType container,
-                                        VariableElement variable) {
+    public static TypeMirror asMemberOf(Types types, DeclaredType container, VariableElement variable) {
         if (variable.getKind().equals(ElementKind.PARAMETER)) {
             ExecutableElement methodOrConstructor =
                     MoreElements.asExecutable(variable.getEnclosingElement());
@@ -779,11 +759,7 @@ public final class MoreTypes {
         final Element b;
         final ImmutableList<TypeMirror> bArguments;
 
-        ComparedElements(
-                Element a,
-                ImmutableList<TypeMirror> aArguments,
-                Element b,
-                ImmutableList<TypeMirror> bArguments) {
+        ComparedElements(Element a, ImmutableList<TypeMirror> aArguments, Element b, ImmutableList<TypeMirror> bArguments) {
             this.a = a;
             this.aArguments = aArguments;
             this.b = b;

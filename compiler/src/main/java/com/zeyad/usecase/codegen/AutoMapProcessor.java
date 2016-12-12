@@ -48,7 +48,6 @@ import static javax.lang.model.element.Modifier.STATIC;
 /**
  * @author zeyad on 12/12/16.
  */
-
 public class AutoMapProcessor extends AbstractProcessor {
     private ErrorReporter mErrorReporter;
     private Types mTypeUtils;
@@ -98,7 +97,6 @@ public class AutoMapProcessor extends AbstractProcessor {
         String source = generateClass(type, className, type.getSimpleName().toString(), false);
         source = Reformatter.fixup(source);
         writeSourceFile(fqClassName, source, type);
-
     }
 
     private void writeSourceFile(String className, String text, TypeElement originatingType) {
@@ -175,8 +173,7 @@ public class AutoMapProcessor extends AbstractProcessor {
         if (!typeAdapters.isEmpty()) {
             typeAdapters.values().forEach(subClass::addField);
         }
-        JavaFile javaFile = JavaFile.builder(pkg, subClass.build()).build();
-        return javaFile.toString();
+        return JavaFile.builder(pkg, subClass.build()).build().toString();
     }
 
     private MethodSpec generateConstructor(ImmutableList<Property> properties) {

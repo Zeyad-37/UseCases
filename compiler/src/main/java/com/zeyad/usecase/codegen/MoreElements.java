@@ -183,8 +183,7 @@ public final class MoreElements {
      * safer alternative to calling {@link Element#getAnnotation} as it avoids any interaction with
      * annotation proxies.
      */
-    public static Optional<AnnotationMirror> getAnnotationMirror(Element element,
-                                                                 Class<? extends Annotation> annotationClass) {
+    public static Optional<AnnotationMirror> getAnnotationMirror(Element element, Class<? extends Annotation> annotationClass) {
         String annotationClassName = annotationClass.getCanonicalName();
         for (AnnotationMirror annotationMirror : element.getAnnotationMirrors()) {
             TypeElement annotationTypeElement = asType(annotationMirror.getAnnotationType().asElement());
@@ -223,12 +222,7 @@ public final class MoreElements {
      * </pre>
      */
     public static Predicate<Element> hasModifiers(final Set<Modifier> modifiers) {
-        return new Predicate<Element>() {
-            @Override
-            public boolean apply(Element input) {
-                return input.getModifiers().containsAll(modifiers);
-            }
-        };
+        return input -> input.getModifiers().containsAll(modifiers);
     }
 
     /**
@@ -249,8 +243,7 @@ public final class MoreElements {
      *                     -->.{@link javax.annotation.processing.ProcessingEnvironment
      *                     getElementUtils()}
      */
-    public static ImmutableSet<ExecutableElement> getLocalAndInheritedMethods(
-            TypeElement type, Elements elementUtils) {
+    public static ImmutableSet<ExecutableElement> getLocalAndInheritedMethods(TypeElement type, Elements elementUtils) {
 
         SetMultimap<String, ExecutableElement> methodMap = LinkedHashMultimap.create();
         getLocalAndInheritedMethods(getPackage(type), type, methodMap);
@@ -263,9 +256,9 @@ public final class MoreElements {
         Set<ExecutableElement> overridden = new LinkedHashSet<ExecutableElement>();
         for (String methodName : methodMap.keySet()) {
             List<ExecutableElement> methodList = ImmutableList.copyOf(methodMap.get(methodName));
-            for (int i = 0; i < methodList.size(); i++) {
+            for (int i = 0, size = methodList.size(); i < size; i++) {
                 ExecutableElement methodI = methodList.get(i);
-                for (int j = i + 1; j < methodList.size(); j++) {
+                for (int j = i + 1; j < size; j++) {
                     ExecutableElement methodJ = methodList.get(j);
                     if (elementUtils.overrides(methodJ, methodI, type)) {
                         overridden.add(methodI);
@@ -273,7 +266,7 @@ public final class MoreElements {
                 }
             }
         }
-        Set<ExecutableElement> methods = new LinkedHashSet<ExecutableElement>(methodMap.values());
+        Set<ExecutableElement> methods = new LinkedHashSet<>(methodMap.values());
         methods.removeAll(overridden);
         return ImmutableSet.copyOf(methods);
     }
@@ -288,7 +281,6 @@ public final class MoreElements {
     // always precede those in descendant types.
     private static void getLocalAndInheritedMethods(
             PackageElement pkg, TypeElement type, SetMultimap<String, ExecutableElement> methods) {
-
         for (TypeMirror superInterface : type.getInterfaces()) {
             getLocalAndInheritedMethods(pkg, MoreTypes.asTypeElement(superInterface), methods);
         }
