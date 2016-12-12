@@ -34,6 +34,10 @@ class FileUseCase implements IFileUseCase {
         sFilesUseCase = new FileUseCase(context, new JobExecutor(), new UIThread());
     }
 
+    public static void init(Context context, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+        sFilesUseCase = new FileUseCase(context, threadExecutor, postExecutionThread);
+    }
+
     protected static FileUseCase getInstance() {
         if (sFilesUseCase == null)
             throw new NullPointerException("FileUseCase#initRealm must be called before calling getInstance()");

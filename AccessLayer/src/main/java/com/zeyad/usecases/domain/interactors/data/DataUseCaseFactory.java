@@ -13,10 +13,20 @@ public class DataUseCaseFactory {
     private static int mDBType;
     private static IDataUseCase sDataUseCase;
 
+    /**
+     * @return IDataUseCase the implementation instance of IDataUseCase, throws NullPointerException if null.
+     */
     public static IDataUseCase getInstance() {
+        if (sDataUseCase == null)
+            throw new NullPointerException("DataUseCaseFactory#init must be called before calling getInstance()");
         return sDataUseCase;
     }
 
+    /**
+     * Initialization method, that takes a DataUseCaseConfig object to setup DataUseCase Singleton instance.
+     *
+     * @param config configuration object to DataUseCase.
+     */
     public static void init(DataUseCaseConfig config) {
         if (!Utils.doesContextBelongsToApplication(config.getContext()))
             throw new IllegalArgumentException("Context should be application context only.");
@@ -28,10 +38,10 @@ public class DataUseCaseFactory {
         }
         if (config.isWithRealm()) {
             mDBType = REALM;
-            DataUseCase.initWithRealm(config.getEntityMapper());
+            DataUseCase.initWithRealm(config.getEntityMapper(), config.getThreadExecutor(), config.getPostExecutionThread());
         } else {
             mDBType = NONE;
-            DataUseCase.initWithoutDB(config.getEntityMapper());
+            DataUseCase.initWithoutDB(config.getEntityMapper(), config.getThreadExecutor(), config.getPostExecutionThread());
         }
         sDataUseCase = DataUseCase.getInstance();
         CACHE_SIZE = config.getCacheSize();
@@ -39,14 +49,23 @@ public class DataUseCaseFactory {
         Config.setBaseURL(config.getBaseUrl());
     }
 
+    /**
+     * Destroys the singleton instance of DataUseCase.
+     */
     public static void destoryInstance() {
         sDataUseCase = null;
     }
 
+    /**
+     * @return withCache, whether DataUseCase is using caching or not.
+     */
     public static boolean isWithCache() {
         return withCache;
     }
 
+    /**
+     * @return returns database type, whether realm or none.
+     */
     public static int getDBType() {
         return mDBType;
     }

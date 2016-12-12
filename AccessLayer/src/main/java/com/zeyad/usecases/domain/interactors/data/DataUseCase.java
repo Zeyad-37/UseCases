@@ -41,9 +41,9 @@ public class DataUseCase implements IDataUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    static void initWithoutDB(IEntityMapperUtil entityMapper) {
+    static void initWithoutDB(IEntityMapperUtil entityMapper, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(Config.getInstance()
-                .getContext()), entityMapper), new JobExecutor(), new UIThread());
+                .getContext()), entityMapper), threadExecutor, postExecutionThread);
     }
 
     /**
@@ -52,11 +52,11 @@ public class DataUseCase implements IDataUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    static void initWithRealm(IEntityMapperUtil entityMapper) {
+    static void initWithRealm(IEntityMapperUtil entityMapper, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
         DatabaseManagerFactory.initRealm();
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
-                .getInstance(), Config.getInstance().getContext()), entityMapper), new JobExecutor(),
-                new UIThread());
+                .getInstance(), Config.getInstance().getContext()), entityMapper), threadExecutor,
+                postExecutionThread);
     }
 
     /**

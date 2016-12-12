@@ -1,5 +1,6 @@
 package com.zeyad.usecases.data.db;
 
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -20,8 +21,6 @@ import io.realm.RealmQuery;
 import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
-
-import static com.zeyad.usecases.data.utils.Utils.hasKitKat;
 
 /**
  * {@link DataBaseManager} implementation.
@@ -483,6 +482,10 @@ public class RealmManager implements DataBaseManager {
         if (jsonObject.getInt(idColumnName) == 0)
             jsonObject.put(idColumnName, Utils.getNextId(dataClass, idColumnName));
         return jsonObject;
+    }
+
+    private static boolean hasKitKat() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
     }
 
     private interface Executor {

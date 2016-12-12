@@ -34,6 +34,10 @@ class PrefsUseCase implements IPrefsUseCase {
         sPrefsUseCases = new PrefsUseCase(context, prefsFileName, new JobExecutor(), new UIThread());
     }
 
+    public static void init(Context context, String prefsFileName, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+        sPrefsUseCases = new PrefsUseCase(context, prefsFileName, threadExecutor, postExecutionThread);
+    }
+
     protected static PrefsUseCase getInstance() {
         if (sPrefsUseCases == null)
             throw new NullPointerException("PrefsUseCase is null. please call PrefsUseCaseFactory#init(context)");

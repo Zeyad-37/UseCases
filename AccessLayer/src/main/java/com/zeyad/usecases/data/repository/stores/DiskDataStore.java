@@ -83,11 +83,10 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<?> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
                                                  Class dataClass, boolean persist, boolean queuable) {
-        return mDataBaseManager.evictCollection(idColumnName,
-                ModelConverters.convertToListOfId(jsonArray), dataClass)
+        List<Long> convertToListOfId = ModelConverters.convertToListOfId(jsonArray);
+        return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
                 .doOnNext(o -> {
                     if (DataUseCaseFactory.isWithCache()) {
-                        List<Long> convertToListOfId = ModelConverters.convertToListOfId(jsonArray);
                         for (int i = 0, convertToListOfIdSize = convertToListOfId != null ? convertToListOfId.size() : 0;
                              i < convertToListOfIdSize; i++)
                             Storo.delete(dataClass.getSimpleName() + convertToListOfId.get(i));

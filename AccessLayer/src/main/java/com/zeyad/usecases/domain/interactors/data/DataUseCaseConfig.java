@@ -3,10 +3,14 @@ package com.zeyad.usecases.domain.interactors.data;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
+import com.zeyad.usecases.UIThread;
+import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.mappers.EntityDataMapper;
 import com.zeyad.usecases.data.mappers.EntityMapper;
 import com.zeyad.usecases.data.mappers.EntityMapperUtil;
 import com.zeyad.usecases.data.mappers.IEntityMapperUtil;
+import com.zeyad.usecases.domain.executors.PostExecutionThread;
+import com.zeyad.usecases.domain.executors.ThreadExecutor;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
@@ -24,6 +28,8 @@ public class DataUseCaseConfig {
     private String baseUrl;
     private boolean withCache, withRealm;
     private int cacheSize;
+    private ThreadExecutor threadExecutor;
+    private PostExecutionThread postExecutionThread;
 
     private DataUseCaseConfig(Builder dataUseCaseConfigBuilder) {
         context = dataUseCaseConfigBuilder.getContext();
@@ -34,6 +40,8 @@ public class DataUseCaseConfig {
         withCache = dataUseCaseConfigBuilder.isWithCache();
         withRealm = dataUseCaseConfigBuilder.isWithRealm();
         cacheSize = dataUseCaseConfigBuilder.getCacheSize();
+        threadExecutor = dataUseCaseConfigBuilder.getThreadExecutor();
+        postExecutionThread = dataUseCaseConfigBuilder.getPostExecutionThread();
     }
 
     public Context getContext() {
@@ -57,16 +65,20 @@ public class DataUseCaseConfig {
         return entityMapper;
     }
 
+    public ThreadExecutor getThreadExecutor() {
+        return threadExecutor == null ? new JobExecutor() : threadExecutor;
+    }
+
+    public PostExecutionThread getPostExecutionThread() {
+        return postExecutionThread == null ? new UIThread() : postExecutionThread;
+    }
+
     OkHttpClient.Builder getOkHttpBuilder() {
         return okHttpBuilder;
     }
 
     public Cache getCache() {
         return cache;
-    }
-
-    public void setCache(Cache cache) {
-        this.cache = cache;
     }
 
     String getBaseUrl() {
@@ -93,9 +105,23 @@ public class DataUseCaseConfig {
         private String baseUrl;
         private boolean withCache, withRealm;
         private int cacheSize;
+        private ThreadExecutor threadExecutor;
+        private PostExecutionThread postExecutionThread;
 
         public Builder(Context context) {
             this.context = context;
+        }
+
+        @NonNull
+        public Builder threadExecutor(ThreadExecutor threadExecutor) {
+            this.threadExecutor = threadExecutor;
+            return this;
+        }
+
+        @NonNull
+        public Builder postExecutionThread(PostExecutionThread postExecutionThread) {
+            this.postExecutionThread = postExecutionThread;
+            return this;
         }
 
         @NonNull
@@ -144,8 +170,12 @@ public class DataUseCaseConfig {
             return context;
         }
 
-        void setContext(Context context) {
-            this.context = context;
+        public ThreadExecutor getThreadExecutor() {
+            return threadExecutor;
+        }
+
+        public PostExecutionThread getPostExecutionThread() {
+            return postExecutionThread;
         }
 
         IEntityMapperUtil getEntityMapper() {
