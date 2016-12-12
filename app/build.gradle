@@ -19,7 +19,7 @@ android {
     buildToolsVersion '25.0.1'
 
     defaultConfig {
-        applicationId "com.zeyad.generic.usecase.dataaccesslayer"
+        applicationId "com.zeyad.usecase.accesslayer"
         minSdkVersion 17
         targetSdkVersion 25
         versionCode 1

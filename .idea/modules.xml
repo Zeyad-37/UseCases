@@ -6,6 +6,8 @@
       <module fileurl="file://$PROJECT_DIR$/DataAccessLayer.iml" filepath="$PROJECT_DIR$/DataAccessLayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/GenericUseCases.iml" filepath="$PROJECT_DIR$/GenericUseCases.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/compiler/compiler.iml" filepath="$PROJECT_DIR$/compiler/compiler.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mapannotations/mapannotations.iml" filepath="$PROJECT_DIR$/mapannotations/mapannotations.iml" />
     </modules>
   </component>
 </project>

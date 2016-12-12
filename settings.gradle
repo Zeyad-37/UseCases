@@ -1,1 +1,1 @@
-include ':app', ':AccessLayer'
+include ':app', ':AccessLayer', ':compiler', ':mapannotations'
