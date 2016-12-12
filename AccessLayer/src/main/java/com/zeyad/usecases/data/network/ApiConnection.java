@@ -76,7 +76,7 @@ class ApiConnection implements IApiConnection {
     }
 
     /**
-     * Meant only for mocking and tetsing purposed.
+     * Meant only for mocking and testing purposes.
      *
      * @param restApiWithoutCache
      * @param restApiWithCache
@@ -102,7 +102,7 @@ class ApiConnection implements IApiConnection {
     }
 
     /**
-     * Meant only for mocking and tetsing purposed.
+     * Meant only for mocking and testing purposed.
      *
      * @param restApiWithoutCache
      * @param restApiWithCache
@@ -120,7 +120,6 @@ class ApiConnection implements IApiConnection {
 
     @Override
     public Observable<ResponseBody> dynamicDownload(String url) {
-
         return getRestApi().dynamicDownload(url);
     }
 
@@ -199,11 +198,10 @@ class ApiConnection implements IApiConnection {
         return chain -> {
             Request request = chain.request();
             if (!Utils.isNetworkAvailable(Config.getInstance().getContext())) {
-                CacheControl cacheControl = new CacheControl.Builder()
-                        .maxStale(1, TimeUnit.DAYS)
-                        .build();
                 request = request.newBuilder()
-                        .cacheControl(cacheControl)
+                        .cacheControl(new CacheControl.Builder()
+                                .maxStale(1, TimeUnit.HOURS)
+                                .build())
                         .build();
             }
             return chain.proceed(request);

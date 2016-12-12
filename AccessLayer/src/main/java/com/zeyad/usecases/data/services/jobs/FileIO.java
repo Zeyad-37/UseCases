@@ -27,7 +27,6 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Subscription;
-import rx.subscriptions.Subscriptions;
 
 import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.PAYLOAD;
 import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.TRIAL_COUNT;
@@ -79,51 +78,51 @@ public class FileIO {
 
     public Subscription execute() {
         if (mIsDownload) {
-            if (!mFileIORequest.getFile().exists()) {
-                return mRestApi.dynamicDownload(mFileIORequest.getUrl()).subscribe(responseBody -> {
-                    InputStream inputStream = null;
-                    OutputStream outputStream = null;
-                    try {
-                        byte[] fileReader = new byte[4096];
-                        long fileSize = responseBody.contentLength();
-                        long fileSizeDownloaded = 0;
-                        outputStream = new FileOutputStream(mFileIORequest.getFile());
-                        inputStream = responseBody.byteStream();
-                        while (true) {
-                            int read = inputStream.read(fileReader);
-                            if (read == -1)
-                                break;
-                            outputStream.write(fileReader, 0, read);
-                            fileSizeDownloaded += read;
-                            Log.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
+            if (!mFileIORequest.getFile().exists())
+                mFileIORequest.getFile().mkdir();
+            return mRestApi.dynamicDownload(mFileIORequest.getUrl())
+                    .doOnSubscribe(() -> Log.d(TAG, "Downloading " + mFileIORequest.getFile().getName()))
+                    .subscribe(responseBody -> {
+                        InputStream inputStream = null;
+                        OutputStream outputStream = null;
+                        try {
+                            byte[] fileReader = new byte[4096];
+                            long fileSize = responseBody.contentLength();
+                            long fileSizeDownloaded = 0;
+                            outputStream = new FileOutputStream(mFileIORequest.getFile());
+                            inputStream = responseBody.byteStream();
+                            while (true) {
+                                int read = inputStream.read(fileReader);
+                                if (read == -1)
+                                    break;
+                                outputStream.write(fileReader, 0, read);
+                                fileSizeDownloaded += read;
+                                Log.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
+                            }
+                            outputStream.flush();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        } finally {
+                            if (inputStream != null)
+                                try {
+                                    inputStream.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                            if (outputStream != null)
+                                try {
+                                    outputStream.close();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                         }
-                        outputStream.flush();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } finally {
-                        if (inputStream != null)
-                            try {
-                                inputStream.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                        if (outputStream != null)
-                            try {
-                                outputStream.close();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                    }
-                }, throwable -> {
-                    queueIOFile();
-                    throwable.printStackTrace();
-                });
-            }
-            return Subscriptions.empty();
+                    }, throwable -> {
+                        queueIOFile();
+                        throwable.printStackTrace();
+                    });
         } else {
-            RequestBody requestFile = RequestBody.create(MediaType
-                    .parse(getMimeType(mFileIORequest.getFile()
-                            .getAbsolutePath())), mFileIORequest.getFile());
+            RequestBody requestFile = RequestBody.create(MediaType.parse(getMimeType(mFileIORequest.getFile()
+                    .getAbsolutePath())), mFileIORequest.getFile());
             HashMap<String, RequestBody> map = new HashMap<>();
             map.put(mFileIORequest.getKey(), requestFile);
             if (mFileIORequest.getParameters() != null && !mFileIORequest.getParameters().isEmpty())
@@ -131,6 +130,7 @@ public class FileIO {
                     map.put(entry.getKey(), Utils.createPartFromString(entry.getValue()));
             return mRestApi.upload(mFileIORequest.getUrl(), map, MultipartBody.Part
                     .createFormData(mFileIORequest.getKey(), mFileIORequest.getFile().getName(), requestFile))
+                    .doOnSubscribe(() -> Log.d(TAG, "Uploading " + mFileIORequest.getFile().getName()))
                     .subscribe(o -> {
                     }, throwable -> queueIOFile());
         }

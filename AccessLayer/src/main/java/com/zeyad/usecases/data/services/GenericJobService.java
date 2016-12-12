@@ -21,7 +21,7 @@ import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.
 
 public class GenericJobService extends JobService {
 
-    private static final String TAG = GenericJobService.class.getName();
+    private static final String TAG = GenericJobService.class.getSimpleName();
     private Context mContext;
     private Context mApplicationContext;
 

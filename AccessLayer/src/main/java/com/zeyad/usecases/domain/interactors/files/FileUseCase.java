@@ -2,12 +2,12 @@ package com.zeyad.usecases.domain.interactors.files;
 
 import android.content.Context;
 
-import com.zeyad.usecases.UIThread;
 import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.repository.FilesRepository;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.executors.ThreadExecutor;
+import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.repositories.Files;
 
 import rx.Observable;

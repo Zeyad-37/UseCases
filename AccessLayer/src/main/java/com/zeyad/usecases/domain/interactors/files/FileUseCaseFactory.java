@@ -13,6 +13,7 @@ import com.zeyad.usecases.domain.executors.ThreadExecutor;
 public class FileUseCaseFactory {
 
     private static IFileUseCase sFilesUseCase;
+
     /**
      * @return IFileUseCase the implementation instance of IDataUseCase, throws NullPointerException if null.
      */

@@ -1,7 +1,6 @@
 package com.zeyad.usecases.domain.interactors.data;
 
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.UIThread;
 import com.zeyad.usecases.data.db.DatabaseManagerFactory;
 import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.mappers.IEntityMapperUtil;
@@ -11,6 +10,7 @@ import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.executors.ThreadExecutor;
+import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.repositories.Data;
 
 import java.util.List;

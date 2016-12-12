@@ -1,7 +1,6 @@
 package com.zeyad.usecases.data.services;
 
 import android.annotation.TargetApi;
-import android.app.job.JobScheduler;
 import android.content.Context;
 import android.os.Build;
 import android.os.Bundle;

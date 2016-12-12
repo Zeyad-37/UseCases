@@ -1,6 +1,4 @@
-package com.zeyad.usecases;
-
-import com.zeyad.usecases.domain.executors.PostExecutionThread;
+package com.zeyad.usecases.domain.executors;
 
 import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;

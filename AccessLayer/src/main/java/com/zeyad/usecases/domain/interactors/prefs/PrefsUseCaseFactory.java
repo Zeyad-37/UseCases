@@ -13,6 +13,7 @@ import com.zeyad.usecases.domain.executors.ThreadExecutor;
 public class PrefsUseCaseFactory {
 
     private static IPrefsUseCase sPrefsUseCase;
+
     /**
      * @return IPrefsUseCase the implementation instance of IDataUseCase, throws NullPointerException if null.
      */

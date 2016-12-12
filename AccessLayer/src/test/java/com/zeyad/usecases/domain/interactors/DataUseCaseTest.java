@@ -4,12 +4,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.UIThread;
 import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.repository.DataRepository;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
+import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;

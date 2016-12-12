@@ -2,11 +2,11 @@ package com.zeyad.usecases.domain.interactors.prefs;
 
 import android.content.Context;
 
-import com.zeyad.usecases.UIThread;
 import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.repository.PrefsRepository;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.executors.ThreadExecutor;
+import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.repositories.Prefs;
 
 import rx.Observable;

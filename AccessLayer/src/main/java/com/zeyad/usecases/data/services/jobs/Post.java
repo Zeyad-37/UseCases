@@ -108,28 +108,40 @@ public class Post {
                     if (isObject)
                         return mRestApi.dynamicPost(mPostRequest.getUrl(), RequestBody
                                 .create(MediaType.parse(APPLICATION_JSON), bundle))
+                                .doOnSubscribe(() -> Log.d(TAG, "Posting " + mPostRequest.getDataClass()
+                                        .getSimpleName()))
                                 .subscribe(handleError);
                     else
                         return mRestApi.dynamicPost(mPostRequest.getUrl(), RequestBody.create(MediaType
                                 .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString()))
+                                .doOnSubscribe(() -> Log.d(TAG, "Posting List of " + mPostRequest
+                                        .getDataClass().getSimpleName()))
                                 .subscribe(handleError);
                 case PostRequest.PUT:
                     if (isObject)
                         return mRestApi.dynamicPut(mPostRequest.getUrl(), RequestBody
                                 .create(MediaType.parse(APPLICATION_JSON), bundle))
+                                .doOnSubscribe(() -> Log.d(TAG, "Puting " + mPostRequest.getDataClass()
+                                        .getSimpleName()))
                                 .subscribe(handleError);
                     else
                         return mRestApi.dynamicPut(mPostRequest.getUrl(), RequestBody.create(MediaType
                                 .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString()))
+                                .doOnSubscribe(() -> Log.d(TAG, "Puting " + mPostRequest.getDataClass()
+                                        .getSimpleName()))
                                 .subscribe(handleError);
                 case PostRequest.DELETE:
                     if (isObject)
                         return mRestApi.dynamicDelete(mPostRequest.getUrl(), RequestBody
                                 .create(MediaType.parse(APPLICATION_JSON), bundle))
+                                .doOnSubscribe(() -> Log.d(TAG, "Deleting " + mPostRequest.getDataClass()
+                                        .getSimpleName()))
                                 .subscribe(handleError);
                     else
                         return mRestApi.dynamicDelete(mPostRequest.getUrl(), RequestBody.create(MediaType
                                 .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString()))
+                                .doOnSubscribe(() -> Log.d(TAG, "Deleting List of " + mPostRequest
+                                        .getPresentationClass().getSimpleName()))
                                 .subscribe(handleError);
             }
         } else

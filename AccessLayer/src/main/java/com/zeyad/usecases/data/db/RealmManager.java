@@ -32,7 +32,6 @@ public class RealmManager implements DataBaseManager {
     private static DataBaseManager sInstance;
 
     private RealmManager() {
-
     }
 
     /**
@@ -50,6 +49,10 @@ public class RealmManager implements DataBaseManager {
         if (sInstance == null)
             init();
         return sInstance;
+    }
+
+    private static boolean hasKitKat() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
     }
 
     /**
@@ -463,29 +466,23 @@ public class RealmManager implements DataBaseManager {
 
     @NonNull
     private JSONArray updateJsonArrayWithIdValue(@NonNull JSONArray jsonArray, @Nullable String idColumnName,
-                                                 Class dataClass)
-            throws JSONException, IllegalArgumentException {
+                                                 Class dataClass) throws JSONException {
         if (idColumnName == null || idColumnName.isEmpty())
             throw new IllegalArgumentException(NO_ID);
         for (int i = 0, length = jsonArray.length(); i < length; i++)
-            if (jsonArray.get(i) instanceof JSONObject)
-                updateJsonObjectWithIdValue(jsonArray.getJSONObject(i), idColumnName, dataClass);
+            if (jsonArray.opt(i) instanceof JSONObject)
+                updateJsonObjectWithIdValue(jsonArray.optJSONObject(i), idColumnName, dataClass);
         return jsonArray;
     }
 
     @NonNull
     private JSONObject updateJsonObjectWithIdValue(@NonNull JSONObject jsonObject, @Nullable String idColumnName,
-                                                   Class dataClass)
-            throws JSONException, IllegalArgumentException {
+                                                   Class dataClass) throws JSONException {
         if (idColumnName == null || idColumnName.isEmpty())
             throw new IllegalArgumentException(NO_ID);
-        if (jsonObject.getInt(idColumnName) == 0)
+        if (jsonObject.optInt(idColumnName) == 0)
             jsonObject.put(idColumnName, Utils.getNextId(dataClass, idColumnName));
         return jsonObject;
-    }
-
-    private static boolean hasKitKat() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
     }
 
     private interface Executor {
@@ -497,7 +494,7 @@ public class RealmManager implements DataBaseManager {
         T run();
     }
 
-    private class EvictSubscriberClass extends Subscriber<Object> {
+    private static class EvictSubscriberClass extends Subscriber<Object> {
 
         private final Class mClazz;
 

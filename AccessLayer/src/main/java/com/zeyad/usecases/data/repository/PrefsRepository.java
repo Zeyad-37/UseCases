@@ -23,7 +23,7 @@ public class PrefsRepository implements Prefs {
 
     public static Prefs getInstance() throws IllegalArgumentException {
         if (sInstance == null)
-            throw new NullPointerException("PrefsUseCase is null. please call PrefsUseCaseFactory#init(context)");
+            throw new NullPointerException("PrefsUseCase is null. please call PrefsUseCaseFactory#init");
         return sInstance;
     }
 

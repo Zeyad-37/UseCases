@@ -59,7 +59,7 @@ import static com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory.NONE
 public class CloudDataStore implements DataStore {
 
     public static final String APPLICATION_JSON = "application/json";
-    static final String TAG = CloudDataStore.class.getName();
+    static final String TAG = CloudDataStore.class.getSimpleName();
     private static final int COUNTER_START = 1, ATTEMPTS = 3;
     private static final String MULTIPART_FORM_DATA = "multipart/form-data";
     final DataBaseManager mDataBaseManager;
@@ -257,7 +257,6 @@ public class CloudDataStore implements DataStore {
             }
             return mRestApi.upload(url, map, MultipartBody.Part.createFormData(key, file.getName(), requestFile))
                     .doOnError(throwable -> {
-                        throwable.printStackTrace();
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
                             queueIOFile(url, file, true, whileCharging, false);
                     })
@@ -277,7 +276,6 @@ public class CloudDataStore implements DataStore {
             } else
                 return mRestApi.dynamicDownload(url)
                         .doOnError(throwable -> {
-                            throwable.printStackTrace();
                             if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
                                 queueIOFile(url, file, true, whileCharging, false);
                         })
@@ -320,13 +318,13 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass) {
-        return Observable.error(new Exception(mContext.getString(R.string.search_disk_error_cloud)));
+        return Observable.error(new IllegalAccessException(mContext.getString(R.string.search_disk_error_cloud)));
     }
 
     @NonNull
     @Override
     public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
-        return Observable.error(new Exception(mContext.getString(R.string.search_disk_error_cloud)));
+        return Observable.error(new IllegalAccessException(mContext.getString(R.string.search_disk_error_cloud)));
     }
 
     private <T> Observable.Transformer<T, T> applyExponentialBackoff() {
@@ -360,19 +358,17 @@ public class CloudDataStore implements DataStore {
 
     private boolean isCharging(Context context) {
         boolean charging = false;
-        final Intent batteryIntent = context.registerReceiver(null,
-                new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        int status = batteryIntent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
-        boolean batteryCharge = status == BatteryManager.BATTERY_STATUS_CHARGING;
-
-        int chargePlug = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-        boolean usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
-        boolean acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
-
-        if (batteryCharge) charging = true;
-        if (usbCharge) charging = true;
-        if (acCharge) charging = true;
-
+        final Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
+        if (batteryIntent != null) {
+            int status = batteryIntent.getIntExtra(BatteryManager.EXTRA_STATUS, -1);
+            boolean batteryCharge = status == BatteryManager.BATTERY_STATUS_CHARGING;
+            int chargePlug = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
+            boolean usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
+            boolean acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
+            if (batteryCharge) charging = true;
+            if (usbCharge) charging = true;
+            if (acCharge) charging = true;
+        }
         return charging;
 //        Intent intent = Config.getInstance().getContext().registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
 //        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);

@@ -32,12 +32,6 @@ public class FileUseCaseTest {
 
     private IFileUseCase mFilesUseCase;
 
-    @Before
-    public void setUp() throws Exception {
-        FileUseCaseFactory.init(RuntimeEnvironment.application.getApplicationContext());
-        mFilesUseCase = FileUseCaseFactory.getInstance();
-    }
-
     public static Files createMockedFilesUseCase() {
         final Files files = Mockito.mock(Files.class);
         Mockito.when(files.readFromResource(Mockito.anyString()))
@@ -59,7 +53,13 @@ public class FileUseCaseTest {
         return Observable.just(true);
     }
 
-    public Observable FileNotFoundException() {
+    @Before
+    public void setUp() throws Exception {
+        FileUseCaseFactory.init(RuntimeEnvironment.application.getApplicationContext());
+        mFilesUseCase = FileUseCaseFactory.getInstance();
+    }
+
+    public Observable fileNotFoundException() {
         return Observable.error(new FileNotFoundException());
     }
 

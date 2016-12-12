@@ -1,7 +1,6 @@
 package com.zeyad.usecases.data.services;
 
 import android.annotation.TargetApi;
-import android.app.job.JobInfo;
 import android.content.Intent;
 import android.os.Build;
 import android.support.test.runner.AndroidJUnit4;

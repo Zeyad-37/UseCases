@@ -44,7 +44,7 @@ public class RestApiImpl implements RestApi {
     /**
      * Uploads a file to a url.
      *
-     * @param url         destination address.
+     * @param url     destination address.
      * @param partMap request body contains the file to be uploaded.
      * @return Observable with the Object response.
      */
