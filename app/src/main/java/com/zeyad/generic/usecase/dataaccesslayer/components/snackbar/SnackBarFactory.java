@@ -7,6 +7,8 @@ import android.support.annotation.StringRes;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
+import com.zeyad.generic.usecase.dataaccesslayer.utils.Utils;
+
 import java.lang.annotation.Retention;
 
 import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
@@ -14,8 +16,8 @@ import static java.lang.annotation.RetentionPolicy.SOURCE;
 
 public class SnackBarFactory {
 
-    public static final String TYPE_INFO = "type_info";
-    public static final String TYPE_ERROR = "type_error";
+    public static final String TYPE_INFO = "typeInfo";
+    public static final String TYPE_ERROR = "typeError";
 
     public static Snackbar getSnackBar(@SnackBarType String snackBarType, @NonNull View view,
                                        @StringRes int stringId, int duration) {
@@ -31,7 +33,8 @@ public class SnackBarFactory {
                                                  @NonNull CharSequence text, String actionText,
                                                  View.OnClickListener onClickListener) {
         return createSnackBar(snackBarType, Snackbar.make(view, text, LENGTH_INDEFINITE)
-                .setAction(actionText, onClickListener).setActionTextColor(Color.BLACK));
+                .setAction(Utils.isNotEmpty(actionText) ? actionText : "RETRY", onClickListener)
+                .setActionTextColor(Color.BLACK));
     }
 
     private static Snackbar createSnackBar(@SnackBarType String snackBarType, Snackbar snackbar) {

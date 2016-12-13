@@ -10,8 +10,8 @@ import rx.Subscriber;
 
 public class BaseSubscriber<V extends LoadDataView, M> extends Subscriber<M> {
     public final static int NO_ERROR = 0, ERROR = 1, ERROR_WITH_RETRY = 2;
-    V view;
-    int errorPolicy;
+    private V view;
+    private int errorPolicy;
 
     public BaseSubscriber(V view, int errorPolicy) {
         this.view = view;

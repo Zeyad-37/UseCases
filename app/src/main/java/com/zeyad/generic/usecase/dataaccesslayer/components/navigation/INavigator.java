@@ -7,5 +7,5 @@ import android.content.Intent;
 public interface INavigator {
     void navigateTo(Context context, Intent intent);
 
-    void navigateToForResult(Activity activity, Intent intent, int requestCode);
+    void startForResult(Activity activity, Intent intent, int requestCode);
 }

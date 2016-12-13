@@ -17,7 +17,7 @@ import com.zeyad.usecases.R;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
-import com.zeyad.usecases.data.mappers.EntityMapper;
+import com.zeyad.usecases.data.mappers.IDaoMapper;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.PostRequest;
@@ -63,7 +63,7 @@ public class CloudDataStore implements DataStore {
     private static final int COUNTER_START = 1, ATTEMPTS = 3;
     private static final String MULTIPART_FORM_DATA = "multipart/form-data";
     final DataBaseManager mDataBaseManager;
-    private final EntityMapper mEntityDataMapper;
+    private final IDaoMapper mEntityDataMapper;
     private final Context mContext;
     private final Observable<Object> mErrorObservableNotPersisted, mQueueFileIO;
     private final RestApi mRestApi;
@@ -76,7 +76,7 @@ public class CloudDataStore implements DataStore {
      * @param restApi         The {@link RestApi} implementation to use.
      * @param dataBaseManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    CloudDataStore(RestApi restApi, DataBaseManager dataBaseManager, EntityMapper entityDataMapper) {
+    CloudDataStore(RestApi restApi, DataBaseManager dataBaseManager, IDaoMapper entityDataMapper) {
         mRestApi = restApi;
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
@@ -98,7 +98,7 @@ public class CloudDataStore implements DataStore {
                     if (willPersist(persist))
                         persistGeneric(object, idColumnName, dataClass);
                 })
-                .map(entity -> mEntityDataMapper.transformToDomain(entity, domainClass));
+                .map(entity -> mEntityDataMapper.mapToDomain(entity, domainClass));
     }
 
     @NonNull
@@ -111,7 +111,7 @@ public class CloudDataStore implements DataStore {
                     if (willPersist(persist))
                         persistAllGenerics(list, dataClass);
                 })
-                .map(entities -> mEntityDataMapper.transformAllToDomain(entities, domainClass));
+                .map(entities -> mEntityDataMapper.mapAllToDomain(entities, domainClass));
     }
 
     @NonNull
@@ -133,7 +133,7 @@ public class CloudDataStore implements DataStore {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
                             queuePost(POST, url, idColumnName, jsonObject, persist);
                     })
-                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel, domainClass));
+                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         });
     }
 
@@ -156,7 +156,7 @@ public class CloudDataStore implements DataStore {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
                             queuePost(POST, url, idColumnName, jsonArray, persist);
                     })
-                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel, domainClass));
+                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         });
     }
 
@@ -179,7 +179,7 @@ public class CloudDataStore implements DataStore {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
                             queuePost(PUT, url, idColumnName, jsonObject, persist);
                     })
-                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel, domainClass));
+                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         });
     }
 
@@ -202,7 +202,7 @@ public class CloudDataStore implements DataStore {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
                             queuePost(PUT, url, idColumnName, jsonArray, persist);
                     })
-                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel, domainClass));
+                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         });
     }
 
@@ -260,7 +260,7 @@ public class CloudDataStore implements DataStore {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
                             queueIOFile(url, file, true, whileCharging, false);
                     })
-                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel, domainClass));
+                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         });
     }
 
@@ -419,7 +419,7 @@ public class CloudDataStore implements DataStore {
         if (mDataBaseManager instanceof RealmManager) {
             try {
                 if (!(object instanceof JSONArray) && !(object instanceof Map))
-                    mappedObject = mEntityDataMapper.transformToRealm(object, dataClass);
+                    mappedObject = mEntityDataMapper.mapToRealm(object, dataClass);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -443,7 +443,7 @@ public class CloudDataStore implements DataStore {
                                 });
                     } else if (object instanceof List) {
                         observable = mDataBaseManager.putAll((List<RealmObject>) mEntityDataMapper
-                                .transformAllToRealm((List) object, dataClass), dataClass);
+                                .mapAllToRealm((List) object, dataClass), dataClass);
                     } else {
                         JSONObject jsonObject;
                         if (object instanceof Map) {
@@ -470,7 +470,7 @@ public class CloudDataStore implements DataStore {
     }
 
     private void persistAllGenerics(List collection, Class dataClass) {
-        mDataBaseManager.putAll(mEntityDataMapper.transformAllToRealm(collection, dataClass), dataClass)
+        mDataBaseManager.putAll(mEntityDataMapper.mapAllToRealm(collection, dataClass), dataClass)
                 .subscribeOn(Schedulers.io())
                 .subscribe(new SimpleSubscriber(collection));
     }

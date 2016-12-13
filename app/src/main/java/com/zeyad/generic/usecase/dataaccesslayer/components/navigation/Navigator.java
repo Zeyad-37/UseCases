@@ -15,7 +15,7 @@ class Navigator implements INavigator {
         // empty
     }
 
-    static INavigator getInstance() {
+    protected static INavigator getInstance() {
         if (mInstance == null) {
             mInstance = new Navigator();
         }
@@ -28,7 +28,7 @@ class Navigator implements INavigator {
     }
 
     @Override
-    public void navigateToForResult(Activity activity, Intent intent, int requestCode) {
+    public void startForResult(Activity activity, Intent intent, int requestCode) {
         activity.startActivityForResult(intent, requestCode);
     }
 }

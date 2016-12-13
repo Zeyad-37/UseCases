@@ -1,4 +1,4 @@
-package com.zeyad.generic.usecase.dataaccesslayer.components.exceptions;
+package com.zeyad.usecases.data.exceptions;
 
 /**
  * @author zeyad on 11/30/16.

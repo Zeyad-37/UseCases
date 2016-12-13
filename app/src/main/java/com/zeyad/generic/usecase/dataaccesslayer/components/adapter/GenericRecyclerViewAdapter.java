@@ -24,8 +24,8 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
     private OnItemClickListener mOnItemClickListener;
     private OnItemLongClickListener mOnItemLongClickListener;
     private SparseBooleanArray mSelectedItems;
-    private boolean mIsLoadingFooterAdded = false;
-    private boolean mHasHeader = false, mHasFooter = false, allowSelection = false, areItemsClickable = true, areItemsExpandable = false;
+    private boolean mIsLoadingFooterAdded = false, mHasHeader = false, mHasFooter = false, allowSelection = false,
+            areItemsClickable = true, areItemsExpandable = false;
     private int expandedPosition = -1;
 
     public GenericRecyclerViewAdapter(Context context, List<ItemInfo> list) {
@@ -264,22 +264,34 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
 
     public void appendList(List<ItemInfo> dataSet) {
         validateList(dataSet);
-        if (dataSet.size() > 0) {
-            mDataList.addAll(dataSet);
-            notifyDataSetChanged();
-        }
+        mDataList.addAll(dataSet);
+        notifyDataSetChanged();
     }
 
     public void appendList(int position, List<ItemInfo> dataSet) {
         validateList(dataSet);
-        if (dataSet.size() > 0) {
-            mDataList.addAll(position, dataSet);
-            notifyDataSetChanged();
-        }
+        mDataList.addAll(position, dataSet);
+        notifyDataSetChanged();
     }
 
     public boolean isSectionHeader(int index) {
         return mDataList.get(index).getId() == ItemInfo.SECTION_HEADER;
+    }
+
+    public boolean isCardSectionHeader(int index) {
+        return mDataList.get(index).getId() == ItemInfo.CARD_SECTION_HEADER;
+    }
+
+    public boolean isFooter(int index) {
+        return mDataList.get(index).getId() == ItemInfo.FOOTER;
+    }
+
+    public boolean isHeader(int index) {
+        return mDataList.get(index).getId() == ItemInfo.HEADER;
+    }
+
+    public boolean isLoading(int index) {
+        return mDataList.get(index).getId() == ItemInfo.LOADING;
     }
 
     public void addSectionHeader(int index, String title) {
@@ -292,6 +304,10 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
 
     public void addSectionHeaderWithId(int index, String title, long id) {
         addItem(index, new ItemInfo<>(title, ItemInfo.SECTION_HEADER).setId(id));
+    }
+
+    public void addCardSectionHeaderWithId(int index, String title, long id) {
+        addItem(index, new ItemInfo<>(title, ItemInfo.CARD_SECTION_HEADER).setId(id));
     }
 
     public void removeSectionHeader(int index) throws Exception {
@@ -312,7 +328,9 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         ItemInfo item;
         for (int i = 0; i < pureSet.size(); i++) {
             item = pureSet.get(i);
-            if (item.getData() instanceof String)
+            if (item.getId() == ItemInfo.SECTION_HEADER || item.getId() == ItemInfo.CARD_SECTION_HEADER
+                    || item.getId() == ItemInfo.FOOTER || item.getId() == ItemInfo.HEADER
+                    || item.getId() == ItemInfo.LOADING)
                 pureSet.remove(item);
         }
         return pureSet;
@@ -346,10 +364,10 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
      * @param position Position of the item to check
      * @return true if the item is selected, false otherwise
      */
-    public boolean isSelected(int position) throws Exception {
+    public boolean isSelected(int position) throws IllegalStateException {
         if (allowSelection)
             return getSelectedItems().contains(position);
-        else throw new Exception("Selection mode is disabled!");
+        else throw new IllegalStateException("Selection mode is disabled!");
     }
 
     /**
@@ -357,7 +375,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
      *
      * @param position Position of the item to toggle the selection status for
      */
-    public boolean toggleSelection(int position) throws Exception {
+    public boolean toggleSelection(int position) throws IllegalStateException {
         if (allowSelection) {
             boolean isSelected;
             if (mSelectedItems.get(position, false)) {
@@ -369,7 +387,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
             }
             notifyItemChanged(position);
             return isSelected;
-        } else throw new Exception("Selection mode is disabled!");
+        } else throw new IllegalStateException("Selection mode is disabled!");
     }
 
     /**
@@ -377,11 +395,11 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
      *
      * @param position Position of the item to toggle the selection status for
      */
-    public void selectItem(int position) throws Exception {
+    public void selectItem(int position) throws IllegalStateException {
         if (allowSelection) {
             mSelectedItems.put(position, true);
             notifyItemChanged(position);
-        } else throw new Exception("Selection mode is disabled!");
+        } else throw new IllegalStateException("Selection mode is disabled!");
     }
 
     /**
@@ -389,22 +407,22 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
      *
      * @param position Position of the item to toggle the selection status for
      */
-    public void unSelectItem(int position) throws Exception {
+    public void unSelectItem(int position) throws IllegalStateException {
         if (allowSelection)
             mSelectedItems.delete(position);
-        else throw new Exception("Selection mode is disabled!");
+        else throw new IllegalStateException("Selection mode is disabled!");
     }
 
     /**
      * Clear the selection status for all items
      */
-    public void clearSelection() throws Exception {
+    public void clearSelection() throws IllegalStateException {
         if (allowSelection) {
             List<Integer> selection = getSelectedItems();
             mSelectedItems.clear();
             for (Integer i : selection)
                 notifyItemChanged(i);
-        } else throw new Exception("Selection mode is disabled!");
+        } else throw new IllegalStateException("Selection mode is disabled!");
     }
 
     /**
@@ -412,10 +430,10 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
      *
      * @return Selected items count
      */
-    public int getSelectedItemCount() throws Exception {
+    public int getSelectedItemCount() throws IllegalStateException {
         if (allowSelection)
             return mSelectedItems.size();
-        else throw new Exception("Selection mode is disabled!");
+        else throw new IllegalStateException("Selection mode is disabled!");
     }
 
     /**
@@ -423,13 +441,13 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
      *
      * @return List of selected items ids
      */
-    public List<Integer> getSelectedItems() throws Exception {
+    public List<Integer> getSelectedItems() throws IllegalStateException {
         if (allowSelection) {
             List<Integer> items = new ArrayList<>(mSelectedItems.size());
             for (int i = 0; i < mSelectedItems.size(); ++i)
                 items.add(mSelectedItems.keyAt(i));
             return items;
-        } else throw new Exception("Selection mode is disabled!");
+        } else throw new IllegalStateException("Selection mode is disabled!");
     }
 
     public void removeItems(List<Integer> positions) {

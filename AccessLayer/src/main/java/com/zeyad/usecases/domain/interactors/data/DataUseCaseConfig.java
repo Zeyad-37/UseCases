@@ -4,10 +4,10 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.data.executor.JobExecutor;
-import com.zeyad.usecases.data.mappers.EntityDataMapper;
-import com.zeyad.usecases.data.mappers.EntityMapper;
-import com.zeyad.usecases.data.mappers.EntityMapperUtil;
-import com.zeyad.usecases.data.mappers.IEntityMapperUtil;
+import com.zeyad.usecases.data.mappers.DaoMapperUtil;
+import com.zeyad.usecases.data.mappers.DefaultDaoMapper;
+import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.IDaoMapperUtil;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.executors.ThreadExecutor;
 import com.zeyad.usecases.domain.executors.UIThread;
@@ -22,7 +22,7 @@ import okhttp3.OkHttpClient;
 public class DataUseCaseConfig {
 
     private Context context;
-    private IEntityMapperUtil entityMapper;
+    private IDaoMapperUtil entityMapper;
     private OkHttpClient.Builder okHttpBuilder;
     private Cache cache;
     private String baseUrl;
@@ -52,13 +52,13 @@ public class DataUseCaseConfig {
         this.context = context;
     }
 
-    IEntityMapperUtil getEntityMapper() {
+    IDaoMapperUtil getEntityMapper() {
         if (entityMapper == null) {
-            return new EntityMapperUtil() {
+            return new DaoMapperUtil() {
                 @NonNull
                 @Override
-                public EntityMapper getDataMapper(Class dataClass) {
-                    return new EntityDataMapper();
+                public IDaoMapper getDataMapper(Class dataClass) {
+                    return new DefaultDaoMapper();
                 }
             };
         }
@@ -99,7 +99,7 @@ public class DataUseCaseConfig {
 
     public static class Builder {
         private Context context;
-        private IEntityMapperUtil entityMapper;
+        private IDaoMapperUtil entityMapper;
         private OkHttpClient.Builder okHttpBuilder;
         private Cache cache;
         private String baseUrl;
@@ -131,7 +131,7 @@ public class DataUseCaseConfig {
         }
 
         @NonNull
-        public Builder entityMapper(IEntityMapperUtil entityMapper) {
+        public Builder entityMapper(IDaoMapperUtil entityMapper) {
             this.entityMapper = entityMapper;
             return this;
         }
@@ -178,7 +178,7 @@ public class DataUseCaseConfig {
             return postExecutionThread;
         }
 
-        IEntityMapperUtil getEntityMapper() {
+        IDaoMapperUtil getEntityMapper() {
             return entityMapper;
         }
 

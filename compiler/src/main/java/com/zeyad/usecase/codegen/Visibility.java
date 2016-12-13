@@ -19,7 +19,7 @@ import static javax.lang.model.element.ElementKind.PACKAGE;
  *
  * @author Gregory Kick
  */
-public enum Visibility {
+enum Visibility {
     PRIVATE,
     DEFAULT,
     PROTECTED,

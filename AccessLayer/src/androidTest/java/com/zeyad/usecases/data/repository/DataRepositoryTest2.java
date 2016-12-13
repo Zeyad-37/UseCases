@@ -2,9 +2,9 @@ package com.zeyad.usecases.data.repository;
 
 import android.support.test.runner.AndroidJUnit4;
 
-import com.zeyad.usecases.data.mappers.EntityDataMapper;
-import com.zeyad.usecases.data.mappers.EntityMapper;
-import com.zeyad.usecases.data.mappers.IEntityMapperUtil;
+import com.zeyad.usecases.data.mappers.DaoMapper;
+import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.IDaoMapperUtil;
 import com.zeyad.usecases.data.repository.stores.DataStore;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.services.realm_test_models.TestModel;
@@ -39,22 +39,22 @@ public class DataRepositoryTest2 {
     private DataRepository dataRepository;
     private DataStoreFactory mockDataStoreFactory;
     private DataStore mockDataStore;
-    private EntityMapper mockEntityMapper;
+    private IDaoMapper mockIDaoMapper;
 
     @Before
     public void setUp() {
         mockDataStoreFactory = Mockito.mock(DataStoreFactory.class);
-        IEntityMapperUtil mockEntityDataMapper = Mockito.mock(IEntityMapperUtil.class);
+        IDaoMapperUtil mockEntityDataMapper = Mockito.mock(IDaoMapperUtil.class);
         mockDataStore = Mockito.mock(DataStore.class);
-        mockEntityMapper = Mockito.mock(EntityDataMapper.class);
+        mockIDaoMapper = Mockito.mock(DaoMapper.class);
         dataRepository = new DataRepository(mockDataStoreFactory, mockEntityDataMapper);
 //        try {
-//            given(mockDataStoreFactory.dynamically(anyString(), true, mockEntityMapper))
+//            given(mockDataStoreFactory.dynamically(anyString(), true, mockIDaoMapper))
 //                    .willReturn(mockDataStore);
 //        } catch (IllegalAccessException e) {
 //            e.printStackTrace();
 //        }
-//        given(mockDataStoreFactory.cloud(mockEntityMapper)).willReturn(mockDataStore);
+//        given(mockDataStoreFactory.cloud(mockIDaoMapper)).willReturn(mockDataStore);
     }
 
     @Test
@@ -64,7 +64,7 @@ public class DataRepositoryTest2 {
 
         dataRepository.getListDynamically(anyString(), any(), any(), anyBoolean(), anyBoolean());
 
-//        verify(mockDataStoreFactory).cloud(eq(mockEntityMapper));
+//        verify(mockDataStoreFactory).cloud(eq(mockIDaoMapper));
 //        verify(mockDataStore).dynamicGetList(eq(anyString()), eq(any()), eq(any()), eq(anyBoolean()),
 //                eq(anyBoolean()));
 
@@ -85,7 +85,7 @@ public class DataRepositoryTest2 {
         dataRepository.getObjectDynamicallyById(anyString(), anyString(), anyInt(), any(), any(),
                 anyBoolean(), anyBoolean());
 
-        verify(mockDataStoreFactory).dynamically(eq(anyString()), eq(anyBoolean()), eq(mockEntityMapper));
+        verify(mockDataStoreFactory).dynamically(eq(anyString()), eq(anyBoolean()), eq(mockIDaoMapper));
         verify(mockDataStore).dynamicGetObject(eq(anyString()), eq(anyString()), eq(anyInt()), eq(any()),
                 eq(any()), eq(anyBoolean()), eq(anyBoolean()));
     }

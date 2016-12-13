@@ -14,11 +14,11 @@ public class Store<T> {
     private final Relay<T, T> storeSubject;
 
     public Store() {
-        this.storeSubject = BehaviorRelay.<T>create().toSerialized();
+        storeSubject = BehaviorRelay.<T>create().toSerialized();
     }
 
     public Store(T defaultValue) {
-        this.storeSubject = BehaviorRelay.create(defaultValue).toSerialized();
+        storeSubject = BehaviorRelay.create(defaultValue).toSerialized();
     }
 
     public Observable<T> observe() {

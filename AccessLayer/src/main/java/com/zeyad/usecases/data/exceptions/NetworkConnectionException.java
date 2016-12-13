@@ -3,7 +3,7 @@ package com.zeyad.usecases.data.exceptions;
 /**
  * Exception throw by the application when a there is a network connection exception.
  */
-public class NetworkConnectionException extends Exception {
+public class NetworkConnectionException extends Exception implements IErrorBundle {
 
     public NetworkConnectionException() {
         super();
@@ -19,5 +19,10 @@ public class NetworkConnectionException extends Exception {
 
     public NetworkConnectionException(final Throwable cause) {
         super(cause);
+    }
+
+    @Override
+    public Exception getException() {
+        return this;
     }
 }

@@ -1,5 +1,6 @@
 package com.zeyad.generic.usecase.dataaccesslayer.components.exceptions;
 
+import com.zeyad.usecases.data.exceptions.ErrorBundle;
 import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
 
 import org.json.JSONException;

@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
-import com.zeyad.usecases.data.mappers.EntityMapper;
+import com.zeyad.usecases.data.mappers.IDaoMapper;
 import com.zeyad.usecases.data.utils.ModelConverters;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
@@ -25,14 +25,14 @@ import static com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory.CACH
 public class DiskDataStore implements DataStore {
     private static final String IO_DB_ERROR = "Can not IO file to local DB";
     private DataBaseManager mDataBaseManager;
-    private EntityMapper mEntityDataMapper;
+    private IDaoMapper mEntityDataMapper;
 
     /**
      * Construct a {@link DataStore} based file system data store.
      *
      * @param realmManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    DiskDataStore(DataBaseManager realmManager, EntityMapper entityDataMapper) {
+    DiskDataStore(DataBaseManager realmManager, IDaoMapper entityDataMapper) {
         mDataBaseManager = realmManager;
         mEntityDataMapper = entityDataMapper;
         if (DataUseCaseFactory.isWithCache())
@@ -47,10 +47,10 @@ public class DiskDataStore implements DataStore {
                                           Class dataClass, boolean persist, boolean shouldCache) {
         if (DataUseCaseFactory.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
             return Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
-                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel));
+                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel));
         else
             return mDataBaseManager.getById(idColumnName, itemId, dataClass)
-                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel));
+                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel));
     }
 
     @NonNull
@@ -59,24 +59,24 @@ public class DiskDataStore implements DataStore {
                                            boolean shouldCache) {
 //        if (DataUseCaseFactory.isWithCache() && Storo.contains(dataClass.getSimpleName()))
 //            return Storo.get(dataClass.getSimpleName(), dataClass).async()
-//                    .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel));
+//                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel));
 //        else
         return mDataBaseManager.getAll(dataClass)
-                .map(realmModels -> mEntityDataMapper.transformAllToDomain(realmModels));
+                .map(realmModels -> mEntityDataMapper.mapAllToDomain(realmModels));
     }
 
     @NonNull
     @Override
     public Observable<?> searchDisk(String query, String column, Class domainClass, Class dataClass) {
         return mDataBaseManager.getWhere(dataClass, query, column)
-                .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel));
+                .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel));
     }
 
     @NonNull
     @Override
     public Observable<?> searchDisk(RealmQuery query, Class domainClass) {
         return mDataBaseManager.getWhere(query)
-                .map(realmModel -> mEntityDataMapper.transformToDomain(realmModel));
+                .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel));
     }
 
     @NonNull

@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 
 import com.zeyad.usecases.R;
 import com.zeyad.usecases.data.db.DataBaseManager;
-import com.zeyad.usecases.data.mappers.EntityMapper;
+import com.zeyad.usecases.data.mappers.IDaoMapper;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
@@ -36,7 +36,7 @@ public class DataStoreFactory {
      * Create {@link DataStore} .
      */
     @NonNull
-    public DataStore dynamically(@NonNull String url, boolean isGet, EntityMapper entityDataMapper) throws IllegalAccessException {
+    public DataStore dynamically(@NonNull String url, boolean isGet, IDaoMapper entityDataMapper) throws IllegalAccessException {
         if (!url.isEmpty() && (!isGet || Utils.isNetworkAvailable(mContext)))
             return new CloudDataStore(new RestApiImpl(), mDataBaseManager, entityDataMapper);
         else if (mDataBaseManager == null)
@@ -49,7 +49,7 @@ public class DataStoreFactory {
      * Creates a disk {@link DataStore}.
      */
     @NonNull
-    public DataStore disk(EntityMapper entityDataMapper) throws IllegalAccessException {
+    public DataStore disk(IDaoMapper entityDataMapper) throws IllegalAccessException {
         if (DataUseCaseFactory.getDBType() == NONE || mDataBaseManager == null)
             throw new IllegalAccessException(getInstance().getContext().getString(R.string.no_db));
         return new DiskDataStore(mDataBaseManager, entityDataMapper);
@@ -59,7 +59,7 @@ public class DataStoreFactory {
      * Creates a cloud {@link DataStore}.
      */
     @NonNull
-    public DataStore cloud(EntityMapper entityDataMapper) {
+    public DataStore cloud(IDaoMapper entityDataMapper) {
         return new CloudDataStore(new RestApiImpl(), mDataBaseManager, entityDataMapper);
     }
 }

@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * @author Zeyad on 11/05/16.
  */
-public interface EntityMapper<D, R> {
+public interface IDaoMapper {
     /**
      * Transform item to its realm counter part.
      *
@@ -16,7 +16,7 @@ public interface EntityMapper<D, R> {
      * @param dataClass Realm Class to be converted to.
      * @return
      */
-    R transformToRealm(D item, Class dataClass);
+    Object mapToRealm(Object item, Class dataClass);
 
     /**
      * Transform a list items to its realm counter part.
@@ -26,7 +26,7 @@ public interface EntityMapper<D, R> {
      * @return
      */
     @NonNull
-    List transformAllToRealm(List<D> list, Class dataClass);
+    List mapAllToRealm(List<Object> list, Class dataClass);
 
     /**
      * Transforms entity to its domain counter part.
@@ -35,7 +35,7 @@ public interface EntityMapper<D, R> {
      * @return
      */
     @Nullable
-    D transformToDomain(R entity);
+    Object mapToDomain(Object entity);
 
     /**
      * Transforms entities to its domain counter part.
@@ -44,7 +44,7 @@ public interface EntityMapper<D, R> {
      * @return
      */
     @Nullable
-    List transformAllToDomain(List<R> entities);
+    List mapAllToDomain(List<Object> entities);
 
     /**
      * Transforms realmInstance to its domain counter part.
@@ -54,7 +54,7 @@ public interface EntityMapper<D, R> {
      * @return
      */
     @Nullable
-    D transformToDomain(R realmInstance, Class domainClass);
+    Object mapToDomain(Object realmInstance, Class domainClass);
 
     /**
      * Transforms realmInstances to its domain counter part.
@@ -64,5 +64,5 @@ public interface EntityMapper<D, R> {
      * @return
      */
     @NonNull
-    List transformAllToDomain(List<R> realmInstances, Class domainClass);
+    List mapAllToDomain(List<Object> realmInstances, Class domainClass);
 }

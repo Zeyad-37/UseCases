@@ -1,4 +1,4 @@
-package com.zeyad.generic.usecase.dataaccesslayer.components.exceptions;
+package com.zeyad.usecases.data.exceptions;
 
 /**
  * @author zeyad on 11/30/16.
@@ -12,10 +12,6 @@ public class ErrorBundle implements IErrorBundle {
         this.exception = exception;
     }
 
-    public void setException(Exception exception) {
-        this.exception = exception;
-    }
-
     @Override
     public String getMessage() {
         return exception.getLocalizedMessage();
@@ -24,5 +20,9 @@ public class ErrorBundle implements IErrorBundle {
     @Override
     public Exception getException() {
         return exception;
+    }
+
+    public void setException(Exception exception) {
+        this.exception = exception;
     }
 }

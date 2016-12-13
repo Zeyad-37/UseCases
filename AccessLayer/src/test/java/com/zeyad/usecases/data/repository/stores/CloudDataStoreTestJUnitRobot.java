@@ -11,7 +11,7 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.google.gson.Gson;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.RealmManagerImplJUnitUtils;
-import com.zeyad.usecases.data.mappers.EntityMapper;
+import com.zeyad.usecases.data.mappers.IDaoMapper;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.utils.Utils;
@@ -53,45 +53,45 @@ class CloudDataStoreTestJUnitRobot {
     private static final File MOCKED_FILE = Mockito.mock(File.class);
     private static final JobScheduler JOB_SCHEDULER = Mockito.mock(JobScheduler.class);
 
-    static EntityMapper<Object, Object> createMockedEntityMapper() {
+    static IDaoMapper createMockedEntityMapper() {
         final TestModelViewModelMapper viewModelMapper
                 = Mockito.mock(TestModelViewModelMapper.class);
-        Mockito.when(viewModelMapper.transformAllToDomain(Mockito.anyList()))
+        Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList()))
                 .thenReturn(new ArrayList<>());
-        Mockito.when(viewModelMapper.transformAllToDomain(Mockito.anyList(), Mockito.any()))
+        Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList(), Mockito.any()))
                 .thenReturn(new ArrayList<>());
-        Mockito.when(viewModelMapper.transformAllToRealm(Mockito.anyList(), Mockito.any()))
+        Mockito.when(viewModelMapper.mapAllToRealm(Mockito.anyList(), Mockito.any()))
                 .thenReturn(new ArrayList<>());
-        Mockito.when(viewModelMapper.transformToRealm(Mockito.any(), Mockito.any()))
+        Mockito.when(viewModelMapper.mapToRealm(Mockito.any(), Mockito.any()))
                 .thenReturn("");
-        Mockito.when(viewModelMapper.transformToDomain(Mockito.any()))
+        Mockito.when(viewModelMapper.mapToDomain(Mockito.any()))
                 .thenReturn("");
-        Mockito.when(viewModelMapper.transformToDomain(Mockito.any(), Mockito.any()))
+        Mockito.when(viewModelMapper.mapToDomain(Mockito.any(), Mockito.any()))
                 .thenReturn("");
         return viewModelMapper;
     }
 
-    static EntityMapper<Object, Object> createMockedEntityMapperWithActualMethodCalls() {
+    static IDaoMapper createMockedEntityMapperWithActualMethodCalls() {
         final TestModelViewModelMapper viewModelMapper
                 = Mockito.mock(TestModelViewModelMapper.class);
-        Mockito.when(viewModelMapper.transformAllToDomain(Mockito.anyList()))
+        Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList()))
                 .thenAnswer(invocation -> new TestModelViewModelMapper()
-                        .transformAllToDomain((List<Object>) invocation.getArguments()[0]));
-        Mockito.when(viewModelMapper.transformAllToDomain(Mockito.anyList(), Mockito.any()))
+                        .mapAllToDomain((List<Object>) invocation.getArguments()[0]));
+        Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList(), Mockito.any()))
                 .thenAnswer(invocation -> new TestModelViewModelMapper()
-                        .transformAllToDomain((List<Object>) invocation.getArguments()[0], (Class) invocation.getArguments()[1]));
-        Mockito.when(viewModelMapper.transformAllToRealm(Mockito.anyList(), Mockito.any()))
+                        .mapAllToDomain((List<Object>) invocation.getArguments()[0], (Class) invocation.getArguments()[1]));
+        Mockito.when(viewModelMapper.mapAllToRealm(Mockito.anyList(), Mockito.any()))
                 .thenAnswer(invocation -> new TestModelViewModelMapper()
-                        .transformAllToRealm((List<Object>) invocation.getArguments()[0], (Class) invocation.getArguments()[1]));
-        Mockito.when(viewModelMapper.transformToRealm(Mockito.any(), Mockito.any()))
+                        .mapAllToRealm((List<Object>) invocation.getArguments()[0], (Class) invocation.getArguments()[1]));
+        Mockito.when(viewModelMapper.mapToRealm(Mockito.any(), Mockito.any()))
                 .thenAnswer(invocation -> new TestModelViewModelMapper()
-                        .transformToRealm(invocation.getArguments()[0], (Class) invocation.getArguments()[1]));
-        Mockito.when(viewModelMapper.transformToDomain(Mockito.any()))
+                        .mapToRealm(invocation.getArguments()[0], (Class) invocation.getArguments()[1]));
+        Mockito.when(viewModelMapper.mapToDomain(Mockito.any()))
                 .thenAnswer(invocation -> new TestModelViewModelMapper()
-                        .transformToDomain(invocation.getArguments()[0]));
-        Mockito.when(viewModelMapper.transformToDomain(Mockito.any(), Mockito.any()))
+                        .mapToDomain(invocation.getArguments()[0]));
+        Mockito.when(viewModelMapper.mapToDomain(Mockito.any(), Mockito.any()))
                 .thenAnswer(invocation -> new TestModelViewModelMapper()
-                        .transformToDomain(invocation.getArguments()[0], (Class) invocation.getArguments()[1]))
+                        .mapToDomain(invocation.getArguments()[0], (Class) invocation.getArguments()[1]))
         ;
         return viewModelMapper;
     }

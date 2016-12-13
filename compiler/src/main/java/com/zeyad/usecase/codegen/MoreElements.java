@@ -35,7 +35,7 @@ import static javax.lang.model.element.ElementKind.PACKAGE;
  * @author Gregory Kick
  */
 @Beta
-public final class MoreElements {
+final class MoreElements {
     private static final ElementVisitor<PackageElement, Void> PACKAGE_ELEMENT_VISITOR =
             new SimpleElementVisitor6<PackageElement, Void>() {
                 @Override

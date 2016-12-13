@@ -5,10 +5,10 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.data.mappers.EntityDataMapper;
-import com.zeyad.usecases.data.mappers.EntityMapper;
-import com.zeyad.usecases.data.mappers.EntityMapperUtil;
-import com.zeyad.usecases.data.mappers.IEntityMapperUtil;
+import com.zeyad.usecases.data.mappers.DaoMapperUtil;
+import com.zeyad.usecases.data.mappers.DefaultDaoMapper;
+import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.IDaoMapperUtil;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.domain.repositories.Files;
 
@@ -30,7 +30,7 @@ public class FilesRepository implements Files {
     private static Gson mGson;
     private static Files sInstance;
     private final DataStoreFactory mDataStoreFactory;
-    private final IEntityMapperUtil mEntityMapperUtil;
+    private final IDaoMapperUtil mEntityMapperUtil;
 
     private FilesRepository(Context context) {
         if (Config.getInstance().getDataStoreFactory() == null) {
@@ -39,10 +39,10 @@ public class FilesRepository implements Files {
             Config.getInstance().setDataStoreFactory(mDataStoreFactory);
         } else
             mDataStoreFactory = Config.getInstance().getDataStoreFactory();
-        mEntityMapperUtil = new EntityMapperUtil() {
+        mEntityMapperUtil = new DaoMapperUtil() {
             @Override
-            public EntityMapper getDataMapper(Class dataClass) {
-                return new EntityDataMapper();
+            public IDaoMapper getDataMapper(Class dataClass) {
+                return new DefaultDaoMapper();
             }
         };
         mGson = Config.getGson();
