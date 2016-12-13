@@ -2,12 +2,12 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AccessLayer/AccessLayer.iml" filepath="$PROJECT_DIR$/AccessLayer/AccessLayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/DataAccessLayer.iml" filepath="$PROJECT_DIR$/DataAccessLayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/GenericUseCases.iml" filepath="$PROJECT_DIR$/GenericUseCases.iml" />
-      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/accessLayer/AccessLayer.iml" filepath="$PROJECT_DIR$/accessLayer/AccessLayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/compiler/compiler.iml" filepath="$PROJECT_DIR$/compiler/compiler.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mapannotations/mapannotations.iml" filepath="$PROJECT_DIR$/mapannotations/mapannotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/mapAnnotations/mapAnnotations.iml" filepath="$PROJECT_DIR$/mapAnnotations/mapAnnotations.iml" />
+      <module fileurl="file://$PROJECT_DIR$/sampleApp/sampleApp.iml" filepath="$PROJECT_DIR$/sampleApp/sampleApp.iml" />
     </modules>
   </component>
 </project>

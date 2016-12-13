@@ -1,0 +1,123 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'me.tatarka.retrolambda'
+apply plugin: 'android-apt'
+apply plugin: 'maven'
+apply plugin: 'realm-android'
+apply from: '../config/quality/quality.gradle'
+
+buildscript {
+    repositories {
+        jcenter()
+    }
+
+    dependencies {
+        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+        classpath 'me.tatarka:gradle-retrolambda:3.2.5'
+    }
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion '25.0.1'
+    defaultConfig {
+        minSdkVersion 12
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+        multiDexEnabled true
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+//            consumerProguardFiles 'proguard-project.txt'
+        }
+        release {
+//            consumerProguardFiles 'proguard-project.txt'
+        }
+    }
+
+    lintOptions {
+        abortOnError true
+        disable 'InvalidPackage'
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+        unitTests.all {
+            // All the usual Gradle options.
+            jvmArgs '-XX:MaxPermSize=256m'
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+        incremental false
+    }
+
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+    }
+}
+
+ext {
+    supportLibraryVersion = '25.0.0'
+    retrofitVersion = '2.1.0'
+    okhttpVersion = '3.4.1'
+    androidSupportTest = '0.5'
+    espressoCore = '2.2.2'
+    hamcrest = '1.3'
+    junit = '4.12'
+    robolectric = '3.0'
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile 'com.android.support:multidex:1.0.1'
+    //Job Dispatcher
+    compile 'com.firebase:firebase-jobdispatcher:0.5.0'
+    // Network
+    compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    compile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    compile "com.squareup.retrofit2:adapter-rxjava:$retrofitVersion"
+    compile "com.squareup.okhttp3:okhttp:$okhttpVersion"
+    compile "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
+    compile 'com.facebook.network.connectionclass:connectionclass:1.0.1'
+    // Rx
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'io.reactivex:rxjava:1.1.7'
+    // Cache
+    compile('com.github.lowlevel-studios:storo:1.0.3') {
+        transitive = true
+    }
+    //test compile libraries
+    androidTestCompile "com.android.support.test:runner:$androidSupportTest"
+    androidTestCompile "com.android.support.test:rules:$androidSupportTest"
+    androidTestCompile "junit:junit:$junit"
+    androidTestCompile "org.hamcrest:hamcrest-library:$hamcrest"
+    androidTestCompile "com.android.support:support-annotations:$supportLibraryVersion"
+    androidTestCompile "com.android.support.test.espresso:espresso-core:$espressoCore"
+    androidTestCompile 'org.mockito:mockito-core:1.10.17'
+    androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
+    androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+    androidTestCompile "org.robolectric:robolectric:$robolectric"
+
+    testCompile "org.robolectric:robolectric:$robolectric"
+    testCompile "junit:junit:$junit"
+    testCompile "org.hamcrest:hamcrest-library:$hamcrest"
+    testCompile "com.android.support:support-annotations:$supportLibraryVersion"
+    testCompile "com.android.support.test.espresso:espresso-core:$espressoCore"
+//    testCompile "org.mockito:mockito-core:2.0.57-beta"
+
+    testCompile "org.mockito:mockito-core:1.10.19"
+    testCompile 'org.robolectric:shadows-support-v4:3.0'
+    testCompile "org.powermock:powermock-module-junit4:1.6.2"
+    testCompile "org.powermock:powermock-module-junit4-rule:1.6.2"
+    testCompile "org.powermock:powermock-api-mockito:1.6.2"
+    testCompile "org.powermock:powermock-classloading-xstream:1.6.2"
+}

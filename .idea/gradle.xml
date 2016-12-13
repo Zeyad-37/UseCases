@@ -8,10 +8,10 @@
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$" />
-            <option value="$PROJECT_DIR$/AccessLayer" />
-            <option value="$PROJECT_DIR$/app" />
+            <option value="$PROJECT_DIR$/accessLayer" />
             <option value="$PROJECT_DIR$/compiler" />
-            <option value="$PROJECT_DIR$/mapannotations" />
+            <option value="$PROJECT_DIR$/mapAnnotations" />
+            <option value="$PROJECT_DIR$/sampleApp" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
