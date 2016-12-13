@@ -9,10 +9,10 @@ import android.support.annotation.Nullable;
 import android.support.test.InstrumentationRegistry;
 
 import com.google.gson.Gson;
-import com.zeyad.usecases.data.mappers.DaoMapperUtil;
-import com.zeyad.usecases.data.mappers.DefaultDaoMapper;
-import com.zeyad.usecases.data.mappers.IDaoMapper;
-import com.zeyad.usecases.data.mappers.IDaoMapperUtil;
+import com.zeyad.usecases.data.mappers.DAOMapperUtil;
+import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapperUtil;
 import com.zeyad.usecases.data.services.realm_test_models.TestModel;
 import com.zeyad.usecases.data.utils.Utils;
 
@@ -164,11 +164,11 @@ public class TestUtility {
     }
 
     @NonNull
-    public static IDaoMapperUtil createEntityMapper() {
-        return new DaoMapperUtil() {
+    public static IDAOMapperUtil createEntityMapper() {
+        return new DAOMapperUtil() {
             @NonNull
             @Override
-            public IDaoMapper getDataMapper(Class dataClass) {
+            public IDAOMapper getDataMapper(Class dataClass) {
 //                if (dataClass == ProfileRealmModel.class) {
 //                    return new ProfileEntityMapper();
 //                } else if (dataClass == IncomingRealmModel.class) {
@@ -178,7 +178,7 @@ public class TestUtility {
 //                } else if (dataClass == RoutesRealmModel.class) {
 //                    return new RoutesEntityMapper();
 //                } else {
-                return new DefaultDaoMapper();
+                return new DefaultDAOMapper();
 //                }
             }
         };

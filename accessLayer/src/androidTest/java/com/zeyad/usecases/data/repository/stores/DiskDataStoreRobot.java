@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.data.TestUtility;
 import com.zeyad.usecases.data.db.DataBaseManager;
-import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.repository.DataRepository;
 import com.zeyad.usecases.data.services.realm_test_models.TestModel;
 import com.zeyad.usecases.data.services.realm_test_models.TestViewModel;
@@ -28,16 +28,16 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
     @NonNull
     private final Random mRandom;
     private final DataBaseManager mDBManager;
-    private final IDaoMapper mIDaoMapper;
+    private final IDAOMapper mIDAOMapper;
 
-    private DiskDataStoreRobot(DataBaseManager dbManager, IDaoMapper enitityMapper) {
+    private DiskDataStoreRobot(DataBaseManager dbManager, IDAOMapper enitityMapper) {
         mDBManager = dbManager;
-        mIDaoMapper = enitityMapper;
+        mIDAOMapper = enitityMapper;
         mRandom = new Random();
     }
 
     @NonNull
-    public static DiskDataStoreRobotInterface newInstance(DataBaseManager dbManager, IDaoMapper enitityMapper) {
+    public static DiskDataStoreRobotInterface newInstance(DataBaseManager dbManager, IDAOMapper enitityMapper) {
         return new DiskDataStoreRobot(dbManager, enitityMapper);
     }
 
@@ -50,7 +50,7 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
     @NonNull
     @Override
     public DataStore createDiskDataStore() {
-        return new DiskDataStore(mDBManager, mIDaoMapper);
+        return new DiskDataStore(mDBManager, mIDAOMapper);
     }
 
     @Override

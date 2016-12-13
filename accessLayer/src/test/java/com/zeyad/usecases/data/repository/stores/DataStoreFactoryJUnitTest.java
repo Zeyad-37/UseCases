@@ -6,7 +6,7 @@ import android.support.test.rule.BuildConfig;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
-import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.ApiConnectionFactory;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.utils.TestUtility2;
@@ -35,7 +35,7 @@ public class DataStoreFactoryJUnitTest {
 
     private DataBaseManager mDataBaseManager;
     private Context mMockedContext;
-    private IDaoMapper mIDaoMapper;
+    private IDAOMapper mIDAOMapper;
     private DataStoreFactory mDataStoreFactory;
 
     @Before
@@ -44,7 +44,7 @@ public class DataStoreFactoryJUnitTest {
         ApiConnectionFactory.init();
         mDataBaseManager = DataStoreFactoryJUnitRobot.createMockedDataBaseManager();
         mMockedContext = CloudDataStoreTestJUnitRobot.getMockedContext();
-        mIDaoMapper = DataStoreFactoryJUnitRobot.createMockedEntityMapper();
+        mIDAOMapper = DataStoreFactoryJUnitRobot.createMockedEntityMapper();
         mDataStoreFactory = DataStoreFactoryJUnitRobot.createDataStoreFactory(mDataBaseManager, mMockedContext);
     }
 
@@ -56,7 +56,7 @@ public class DataStoreFactoryJUnitTest {
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValid() throws IllegalAccessException {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItems(mDataBaseManager);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
-                mIDaoMapper), is(instanceOf(DiskDataStore.class)));
+                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
 
 
@@ -65,7 +65,7 @@ public class DataStoreFactoryJUnitTest {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItems(mDataBaseManager);
         TestUtility2.changeStateOfNetwork(mMockedContext, false);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
-                mIDaoMapper), is(instanceOf(DiskDataStore.class)));
+                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
@@ -73,7 +73,7 @@ public class DataStoreFactoryJUnitTest {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItems(mDataBaseManager);
         TestUtility2.changeStateOfNetwork(mMockedContext, false);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
-                mIDaoMapper), is(instanceOf(DiskDataStore.class)));
+                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
@@ -81,7 +81,7 @@ public class DataStoreFactoryJUnitTest {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItems(mDataBaseManager);
         TestUtility2.changeStateOfNetwork(mMockedContext, true);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
-                mIDaoMapper), is(instanceOf(DiskDataStore.class)));
+                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
@@ -89,14 +89,14 @@ public class DataStoreFactoryJUnitTest {
         Mockito.when(Utils.isNetworkAvailable(InstrumentationRegistry.getContext())).thenReturn(true);
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getSomeValidUrl(), Mockito.anyBoolean(),
-                mIDaoMapper), is(instanceOf(CloudDataStore.class)));
+                mIDAOMapper), is(instanceOf(CloudDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItem() throws IllegalAccessException {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
-                mIDaoMapper), is(instanceOf(DiskDataStore.class)));
+                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
 
 
@@ -105,7 +105,7 @@ public class DataStoreFactoryJUnitTest {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
         TestUtility2.changeStateOfNetwork(mMockedContext, false);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
-                mIDaoMapper), is(instanceOf(DiskDataStore.class)));
+                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class DataStoreFactoryJUnitTest {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItem(mDataBaseManager);
         TestUtility2.changeStateOfNetwork(mMockedContext, false);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
-                mIDaoMapper), is(instanceOf(DiskDataStore.class)));
+                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
@@ -121,24 +121,24 @@ public class DataStoreFactoryJUnitTest {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItem(mDataBaseManager);
         TestUtility2.changeStateOfNetwork(mMockedContext, true);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
-                mIDaoMapper), is(instanceOf(DiskDataStore.class)));
+                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmptyForSingleItem() throws IllegalAccessException {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getSomeValidUrl(), Mockito.anyBoolean(),
-                mIDaoMapper), is(instanceOf(CloudDataStore.class)));
+                mIDAOMapper), is(instanceOf(CloudDataStore.class)));
     }
 
     @Test
     public void testDiskMethod_ifExpectedDataStoreIsReturned_whenMockedEntityMapperIsPassed() throws IllegalAccessException {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItem(mDataBaseManager);
-        assertThat(mDataStoreFactory.disk(mIDaoMapper), is(notNullValue()));
+        assertThat(mDataStoreFactory.disk(mIDAOMapper), is(notNullValue()));
     }
 
     @Test
     public void testDiskMethod_ifExpectedCloudStoreIsReturned_whenMockedEntityMapperIsPassed() {
-        assertThat(mDataStoreFactory.cloud(mIDaoMapper), is(notNullValue()));
+        assertThat(mDataStoreFactory.cloud(mIDAOMapper), is(notNullValue()));
     }
 }

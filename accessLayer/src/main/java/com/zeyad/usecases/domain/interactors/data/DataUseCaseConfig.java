@@ -4,10 +4,10 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.data.executor.JobExecutor;
-import com.zeyad.usecases.data.mappers.DaoMapperUtil;
-import com.zeyad.usecases.data.mappers.DefaultDaoMapper;
-import com.zeyad.usecases.data.mappers.IDaoMapper;
-import com.zeyad.usecases.data.mappers.IDaoMapperUtil;
+import com.zeyad.usecases.data.mappers.DAOMapperUtil;
+import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapperUtil;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.executors.ThreadExecutor;
 import com.zeyad.usecases.domain.executors.UIThread;
@@ -22,7 +22,7 @@ import okhttp3.OkHttpClient;
 public class DataUseCaseConfig {
 
     private Context context;
-    private IDaoMapperUtil entityMapper;
+    private IDAOMapperUtil entityMapper;
     private OkHttpClient.Builder okHttpBuilder;
     private Cache cache;
     private String baseUrl;
@@ -52,13 +52,13 @@ public class DataUseCaseConfig {
         this.context = context;
     }
 
-    IDaoMapperUtil getEntityMapper() {
+    IDAOMapperUtil getEntityMapper() {
         if (entityMapper == null) {
-            return new DaoMapperUtil() {
+            return new DAOMapperUtil() {
                 @NonNull
                 @Override
-                public IDaoMapper getDataMapper(Class dataClass) {
-                    return new DefaultDaoMapper();
+                public IDAOMapper getDataMapper(Class dataClass) {
+                    return new DefaultDAOMapper();
                 }
             };
         }
@@ -99,7 +99,7 @@ public class DataUseCaseConfig {
 
     public static class Builder {
         private Context context;
-        private IDaoMapperUtil entityMapper;
+        private IDAOMapperUtil entityMapper;
         private OkHttpClient.Builder okHttpBuilder;
         private Cache cache;
         private String baseUrl;
@@ -131,7 +131,7 @@ public class DataUseCaseConfig {
         }
 
         @NonNull
-        public Builder entityMapper(IDaoMapperUtil entityMapper) {
+        public Builder entityMapper(IDAOMapperUtil entityMapper) {
             this.entityMapper = entityMapper;
             return this;
         }
@@ -178,7 +178,7 @@ public class DataUseCaseConfig {
             return postExecutionThread;
         }
 
-        IDaoMapperUtil getEntityMapper() {
+        IDAOMapperUtil getEntityMapper() {
             return entityMapper;
         }
 

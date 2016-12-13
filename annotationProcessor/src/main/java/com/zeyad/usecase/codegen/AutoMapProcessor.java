@@ -32,6 +32,7 @@ import javax.lang.model.SourceVersion;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
@@ -156,7 +157,6 @@ public class AutoMapProcessor extends AbstractProcessor {
         // get the automap version
         // Generate the AutoMap_??? class
         String pkg = TypeUtil.packageNameOf(type);
-        TypeName classTypeName = ClassName.get(pkg, className);
         TypeSpec.Builder subClass = TypeSpec.classBuilder(className)
                 // Add the version
                 .addField(TypeName.INT, "version", PRIVATE)
@@ -269,6 +269,31 @@ public class AutoMapProcessor extends AbstractProcessor {
         // In principle type.getEnclosingElement() could be an ExecutableElement (for a class
         // declared inside a method), but since RoundEnvironment.getElementsAnnotatedWith doesn't
         // return such classes we won't see them here.
+    }
+
+    public void generateDataClassFile() {
+
+    }
+
+    public TypeSpec generateDAOMapper(String className) {
+        MethodSpec mapToDomainManual = MethodSpec.methodBuilder("main")
+                .addModifiers(Modifier.PUBLIC)
+                .returns(Object.class)
+                .addAnnotation(Override.class)
+                .addParameter(Object.class, "object")
+//                .addStatement("$T.out.println($S)", System.class, "Hello, JavaPoet!")
+                .build();
+
+        MethodSpec constructor = MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PUBLIC)
+                .build();
+
+        return TypeSpec.classBuilder(className)
+//                .superclass(DAOMapper.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addMethod(constructor)
+                .addMethod(mapToDomainManual)
+                .build();
     }
 
     static final class Property {

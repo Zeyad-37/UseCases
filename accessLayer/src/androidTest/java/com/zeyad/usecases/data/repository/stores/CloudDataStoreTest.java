@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import com.zeyad.usecases.data.TestUtility;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
-import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.services.realm_test_models.TestModel;
 
@@ -53,7 +53,7 @@ public class CloudDataStoreTest {
     private CloudDataStore mCloudDataStore;
     private RestApi mMockedRestApi;
     private DataBaseManager mMockedDBManager;
-    private IDaoMapper mIDaoMapper;
+    private IDAOMapper mIDAOMapper;
 
     public CloudDataStoreTest(boolean callRealMethodsOfEntityMapper, boolean toPersist, boolean toCache) {
         mCallRealMethodsOfEntityMapper = callRealMethodsOfEntityMapper;
@@ -81,10 +81,10 @@ public class CloudDataStoreTest {
         mMockedRestApi = CloudDataStoreTestRobot.createMockedRestApi(mToCache);
         mMockedDBManager = CloudDataStoreTestRobot.createDBManagerWithMockedContext();
         if (mCallRealMethodsOfEntityMapper) {
-            mIDaoMapper = CloudDataStoreTestRobot.createMockedEntityMapperWithActualMethodCalls();
+            mIDAOMapper = CloudDataStoreTestRobot.createMockedEntityMapperWithActualMethodCalls();
         } else
-            mIDaoMapper = CloudDataStoreTestRobot.createMockedEntityMapper();
-        mCloudDataStore = new CloudDataStore(mMockedRestApi, mMockedDBManager, mIDaoMapper);
+            mIDAOMapper = CloudDataStoreTestRobot.createMockedEntityMapper();
+        mCloudDataStore = new CloudDataStore(mMockedRestApi, mMockedDBManager, mIDAOMapper);
     }
 
     @After
@@ -109,10 +109,10 @@ public class CloudDataStoreTest {
     @Test
     public void testDynamicGetList_ifEntitiesAreMapped_whenResponseIsReceived() {
         CloudDataStoreTestRobot.dynamicGetList(mCloudDataStore, mToPersist);
-        InOrder inorder = Mockito.inOrder(mIDaoMapper, mIDaoMapper);
-        inorder.verify(mIDaoMapper, times(mToPersist ? 1 : 0))
+        InOrder inorder = Mockito.inOrder(mIDAOMapper, mIDAOMapper);
+        inorder.verify(mIDAOMapper, times(mToPersist ? 1 : 0))
                 .mapAllToRealm(Mockito.anyList(), Mockito.any());
-        inorder.verify(mIDaoMapper, times(1))
+        inorder.verify(mIDAOMapper, times(1))
                 .mapAllToDomain(Mockito.any()
                         , Mockito.any());
     }
@@ -134,7 +134,7 @@ public class CloudDataStoreTest {
     @Test
     public void testDynamicGetList_ifEntitiesAreMapped_whenResponseIsReceivedCacheVersion() {
         CloudDataStoreTestRobot.dynamicGetList(mCloudDataStore, mToPersist, mToCache);
-        Mockito.verify(mIDaoMapper, times(1))
+        Mockito.verify(mIDAOMapper, times(1))
                 .mapAllToDomain(Mockito.any()
                         , Mockito.any());
     }
@@ -142,25 +142,25 @@ public class CloudDataStoreTest {
     @Test
     public void testDynamicGetList_ifDataClassIsSameAsSend_whenArgumentsArePassed() {
         CloudDataStoreTestRobot.dynamicGetList(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(mToPersist ? 1 : 0)).mapAllToRealm(Mockito.anyList(), eq(CloudDataStoreTestRobot.getValidDataClass()));
+        Mockito.verify(mIDAOMapper, times(mToPersist ? 1 : 0)).mapAllToRealm(Mockito.anyList(), eq(CloudDataStoreTestRobot.getValidDataClass()));
     }
 
     @Test
     public void testDynamicGetList_ifDataClassIsSameAsSent_whenArgumentsArePassedCacheVersion() {
         CloudDataStoreTestRobot.dynamicGetList(mCloudDataStore, mToPersist, mToCache);
-        Mockito.verify(mIDaoMapper, times(mToPersist ? 1 : 0)).mapAllToRealm(Mockito.anyList(), eq(CloudDataStoreTestRobot.getValidDataClass()));
+        Mockito.verify(mIDAOMapper, times(mToPersist ? 1 : 0)).mapAllToRealm(Mockito.anyList(), eq(CloudDataStoreTestRobot.getValidDataClass()));
     }
 
     @Test
     public void testDynamicGetList_ifDomainClassIsSameAsSend_whenArgumentsArePassed() {
         CloudDataStoreTestRobot.dynamicGetList(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(1)).mapAllToDomain(Mockito.anyList(), eq(CloudDataStoreTestRobot.getValidDomainClass()));
+        Mockito.verify(mIDAOMapper, times(1)).mapAllToDomain(Mockito.anyList(), eq(CloudDataStoreTestRobot.getValidDomainClass()));
     }
 
     @Test
     public void testDynamicGetList_ifDomainClassIsSameAsSent_whenArgumentsArePassedCacheVersion() {
         CloudDataStoreTestRobot.dynamicGetList(mCloudDataStore, mToPersist, mToCache);
-        Mockito.verify(mIDaoMapper, times(1)).mapAllToDomain(Mockito.anyList(), eq(CloudDataStoreTestRobot.getValidDomainClass()));
+        Mockito.verify(mIDAOMapper, times(1)).mapAllToDomain(Mockito.anyList(), eq(CloudDataStoreTestRobot.getValidDomainClass()));
     }
 
     @Test
@@ -178,7 +178,7 @@ public class CloudDataStoreTest {
     @Test
     public void testDynamicGetObject_ifDataClassIsSameAsSet_whenAreArgumentsArePassed() {
         CloudDataStoreTestRobot.dynamicGetObject(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(mToPersist ? 1 : 0)).mapToRealm(Mockito.anyObject(), eq(CloudDataStoreTestRobot.getValidDataClass()));
+        Mockito.verify(mIDAOMapper, times(mToPersist ? 1 : 0)).mapToRealm(Mockito.anyObject(), eq(CloudDataStoreTestRobot.getValidDataClass()));
     }
 
     @Test
@@ -191,7 +191,7 @@ public class CloudDataStoreTest {
     @Test
     public void testDynamicGetObject_ifDataClassIsSameAsSet_whenAreArgumentsArePassedCacheVersion() {
         CloudDataStoreTestRobot.dynamicGetObject(mCloudDataStore, mToPersist, mToCache);
-        Mockito.verify(mIDaoMapper, times(mToPersist ? 1 : 0)).mapToRealm(Mockito.anyObject(), eq(CloudDataStoreTestRobot.getValidDataClass()));
+        Mockito.verify(mIDAOMapper, times(mToPersist ? 1 : 0)).mapToRealm(Mockito.anyObject(), eq(CloudDataStoreTestRobot.getValidDataClass()));
     }
 
     @Test
@@ -242,7 +242,7 @@ public class CloudDataStoreTest {
     @Test
     public void testDynamicGetObject_ifEntitiesAreMapped_whenResponseIsReceived() {
         CloudDataStoreTestRobot.dynamicGetObject(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(1))
+        Mockito.verify(mIDAOMapper, times(1))
                 .mapToDomain(Mockito.any()
                         , Mockito.any());
     }
@@ -250,7 +250,7 @@ public class CloudDataStoreTest {
     @Test
     public void testDynamicGetObject_ifEntitiesAreMapped_whenResponseIsReceivedCacheVersion() {
         CloudDataStoreTestRobot.dynamicGetObject(mCloudDataStore, mToPersist, mToCache);
-        Mockito.verify(mIDaoMapper, times(1))
+        Mockito.verify(mIDAOMapper, times(1))
                 .mapToDomain(Mockito.any()
                         , Mockito.any());
     }
@@ -299,7 +299,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(false);
         assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(mToPersist ? 1 : 0))
+        Mockito.verify(mIDAOMapper, times(mToPersist ? 1 : 0))
                 .mapToRealm(Mockito.any(), Mockito.any());
     }
 
@@ -329,7 +329,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(false);
         assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(mToPersist ? 1 : 0))
+        Mockito.verify(mIDAOMapper, times(mToPersist ? 1 : 0))
                 .mapToRealm(Mockito.any(), Mockito.any());
     }
 
@@ -359,7 +359,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(false);
         assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(mToPersist ? 1 : 0))
+        Mockito.verify(mIDAOMapper, times(mToPersist ? 1 : 0))
                 .mapToRealm(Mockito.any(), Mockito.any());
     }
 
@@ -392,7 +392,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(true);
         assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostJsonObject(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(1))
+        Mockito.verify(mIDAOMapper, times(1))
                 .mapToDomain(Mockito.anyString(), Mockito.any());
     }
 
@@ -443,7 +443,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(false);
         assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(0))
+        Mockito.verify(mIDAOMapper, times(0))
                 .mapToRealm(Mockito.any(), Mockito.any());
     }
 
@@ -469,7 +469,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(false);
         assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(0))
+        Mockito.verify(mIDAOMapper, times(0))
                 .mapToRealm(Mockito.any(), Mockito.any());
     }
 
@@ -495,7 +495,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(false);
         assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(0))
+        Mockito.verify(mIDAOMapper, times(0))
                 .mapToRealm(Mockito.any(), Mockito.any());
     }
 
@@ -528,7 +528,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(true);
         assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPostList(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(1))
+        Mockito.verify(mIDAOMapper, times(1))
                 .mapAllToDomain(Mockito.any(), eq(CloudDataStoreTestRobot.getValidDomainClass()));
     }
 
@@ -654,7 +654,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(true);
         assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(1))
+        Mockito.verify(mIDAOMapper, times(1))
                 .mapToDomain(Mockito.anyString(), Mockito.any());
     }
 
@@ -707,7 +707,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(false);
         assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(0))
+        Mockito.verify(mIDAOMapper, times(0))
                 .mapToRealm(Mockito.any(), Mockito.any());
     }
 
@@ -733,7 +733,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(false);
         assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(0))
+        Mockito.verify(mIDAOMapper, times(0))
                 .mapToRealm(Mockito.any(), Mockito.any());
     }
 
@@ -759,7 +759,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(false);
         assumeFalse(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(0))
+        Mockito.verify(mIDAOMapper, times(0))
                 .mapToRealm(Mockito.any(), Mockito.any());
     }
 
@@ -792,7 +792,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(true);
         assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicPutList(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(1))
+        Mockito.verify(mIDAOMapper, times(1))
                 .mapAllToDomain(Mockito.any(), eq(CloudDataStoreTestRobot.getValidDomainClass()));
     }
 
@@ -891,7 +891,7 @@ public class CloudDataStoreTest {
         CloudDataStoreTestRobot.changeNetworkState(true);
         assumeTrue(CloudDataStoreTestRobot.isNetworkEnabled());
         CloudDataStoreTestRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
-        Mockito.verify(mIDaoMapper, times(1))
+        Mockito.verify(mIDAOMapper, times(1))
                 .mapToDomain(Mockito.anyString(), Mockito.any());
     }
 

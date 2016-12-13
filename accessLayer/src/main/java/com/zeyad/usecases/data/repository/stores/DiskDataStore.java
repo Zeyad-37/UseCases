@@ -4,7 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
-import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.utils.ModelConverters;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
@@ -25,14 +25,14 @@ import static com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory.CACH
 public class DiskDataStore implements DataStore {
     private static final String IO_DB_ERROR = "Can not IO file to local DB";
     private DataBaseManager mDataBaseManager;
-    private IDaoMapper mEntityDataMapper;
+    private IDAOMapper mEntityDataMapper;
 
     /**
      * Construct a {@link DataStore} based file system data store.
      *
      * @param realmManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    DiskDataStore(DataBaseManager realmManager, IDaoMapper entityDataMapper) {
+    DiskDataStore(DataBaseManager realmManager, IDAOMapper entityDataMapper) {
         mDataBaseManager = realmManager;
         mEntityDataMapper = entityDataMapper;
         if (DataUseCaseFactory.isWithCache())

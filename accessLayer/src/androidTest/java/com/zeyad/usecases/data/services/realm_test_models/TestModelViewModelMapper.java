@@ -4,14 +4,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
-import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
 
 import org.mockito.internal.invocation.AbstractAwareMethod;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestModelViewModelMapper implements IDaoMapper, AbstractAwareMethod {
+public class TestModelViewModelMapper implements IDAOMapper, AbstractAwareMethod {
 
     @Override
     public Object mapToRealm(Object item, @NonNull Class dataClass) {

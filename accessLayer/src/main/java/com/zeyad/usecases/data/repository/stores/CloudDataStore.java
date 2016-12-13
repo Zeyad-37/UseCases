@@ -17,7 +17,7 @@ import com.zeyad.usecases.R;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
-import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.PostRequest;
@@ -63,7 +63,7 @@ public class CloudDataStore implements DataStore {
     private static final int COUNTER_START = 1, ATTEMPTS = 3;
     private static final String MULTIPART_FORM_DATA = "multipart/form-data";
     final DataBaseManager mDataBaseManager;
-    private final IDaoMapper mEntityDataMapper;
+    private final IDAOMapper mEntityDataMapper;
     private final Context mContext;
     private final Observable<Object> mErrorObservableNotPersisted, mQueueFileIO;
     private final RestApi mRestApi;
@@ -76,7 +76,7 @@ public class CloudDataStore implements DataStore {
      * @param restApi         The {@link RestApi} implementation to use.
      * @param dataBaseManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    CloudDataStore(RestApi restApi, DataBaseManager dataBaseManager, IDaoMapper entityDataMapper) {
+    CloudDataStore(RestApi restApi, DataBaseManager dataBaseManager, IDAOMapper entityDataMapper) {
         mRestApi = restApi;
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;

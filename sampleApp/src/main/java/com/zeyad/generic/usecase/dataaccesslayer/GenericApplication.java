@@ -6,9 +6,9 @@ import android.util.Log;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.zeyad.generic.usecase.dataaccesslayer.mapper.RepoMapper;
 import com.zeyad.generic.usecase.dataaccesslayer.models.data.RepoRealm;
-import com.zeyad.usecases.data.mappers.DaoMapperUtil;
-import com.zeyad.usecases.data.mappers.DefaultDaoMapper;
-import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.DAOMapperUtil;
+import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
@@ -49,12 +49,12 @@ public class GenericApplication extends Application {
                 .baseUrl(API_BASE_URL)
                 .withCache(true)
                 .withRealm(true)
-                .entityMapper(new DaoMapperUtil() {
+                .entityMapper(new DAOMapperUtil() {
                     @Override
-                    public IDaoMapper getDataMapper(Class dataClass) {
+                    public IDAOMapper getDataMapper(Class dataClass) {
                         if (dataClass == RepoRealm.class)
                             return new RepoMapper();
-                        return new DefaultDaoMapper();
+                        return new DefaultDAOMapper();
                     }
                 })
                 .okHttpBuilder(provideOkHttpClientBuilder())

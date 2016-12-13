@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.RealmManager;
-import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.services.realm_test_models.TestModel;
 import com.zeyad.usecases.data.services.realm_test_models.TestModelViewModelMapper;
 
@@ -48,7 +48,7 @@ class DataStoreFactoryRobot {
         return mockedDbManager;
     }
 
-    static IDaoMapper createMockedEntityMapper() {
+    static IDAOMapper createMockedEntityMapper() {
         return Mockito.mock(TestModelViewModelMapper.class);
     }
 

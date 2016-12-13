@@ -11,7 +11,7 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.google.gson.Gson;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.RealmManagerImplJUnitUtils;
-import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.utils.Utils;
@@ -53,7 +53,7 @@ class CloudDataStoreTestJUnitRobot {
     private static final File MOCKED_FILE = Mockito.mock(File.class);
     private static final JobScheduler JOB_SCHEDULER = Mockito.mock(JobScheduler.class);
 
-    static IDaoMapper createMockedEntityMapper() {
+    static IDAOMapper createMockedEntityMapper() {
         final TestModelViewModelMapper viewModelMapper
                 = Mockito.mock(TestModelViewModelMapper.class);
         Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList()))
@@ -71,7 +71,7 @@ class CloudDataStoreTestJUnitRobot {
         return viewModelMapper;
     }
 
-    static IDaoMapper createMockedEntityMapperWithActualMethodCalls() {
+    static IDAOMapper createMockedEntityMapperWithActualMethodCalls() {
         final TestModelViewModelMapper viewModelMapper
                 = Mockito.mock(TestModelViewModelMapper.class);
         Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList()))

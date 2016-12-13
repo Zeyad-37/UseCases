@@ -13,7 +13,7 @@ import com.zeyad.usecases.data.TestUtility;
 import com.zeyad.usecases.data.ToStringArgumentMatcher;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.RealmManagerImplUtils;
-import com.zeyad.usecases.data.mappers.IDaoMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.mockable.ResponseBodyObservable;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
@@ -53,7 +53,7 @@ class CloudDataStoreTestRobot {
     private static final File MOCKED_FILE = Mockito.mock(File.class);
     private static final JobScheduler JOB_SCHEDULER = Mockito.mock(JobScheduler.class);
 
-    static IDaoMapper createMockedEntityMapper() {
+    static IDAOMapper createMockedEntityMapper() {
         final TestModelViewModelMapper viewModelMapper
                 = Mockito.mock(TestModelViewModelMapper.class);
         Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList()))
@@ -71,7 +71,7 @@ class CloudDataStoreTestRobot {
         return viewModelMapper;
     }
 
-    static IDaoMapper createMockedEntityMapperWithActualMethodCalls() {
+    static IDAOMapper createMockedEntityMapperWithActualMethodCalls() {
         final TestModelViewModelMapper viewModelMapper
                 = Mockito.mock(TestModelViewModelMapper.class);
         Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList()))
