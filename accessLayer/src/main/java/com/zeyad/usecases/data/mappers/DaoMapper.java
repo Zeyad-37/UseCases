@@ -27,8 +27,8 @@ public abstract class DaoMapper implements IDaoMapper {
             if (item instanceof List)
                 return mapAllToRealm((List) item, dataClass);
             else try {
-                return dataClass.cast(gson.fromJson(gson.toJson(item), dataClass));
-//                return gson.fromJson(gson.toJson(item), dataClass);
+//                return dataClass.cast(gson.fromJson(gson.toJson(item), dataClass));
+                return gson.fromJson(gson.toJson(item), dataClass);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -107,7 +107,8 @@ public abstract class DaoMapper implements IDaoMapper {
     private Object mapToDomainHelper(@Nullable Object object, @NonNull Class domainClass) {
         try {
 //            if (dataClass == null || domainClass == dataClass)// both Pojos
-            return domainClass.cast(gson.fromJson(gson.toJson(object), domainClass));
+//            return domainClass.cast(gson.fromJson(gson.toJson(object), domainClass));
+            return gson.fromJson(gson.toJson(object), domainClass);
 //            else return mapToDomainManual(object);
         } catch (Exception e1) {
             e1.printStackTrace();

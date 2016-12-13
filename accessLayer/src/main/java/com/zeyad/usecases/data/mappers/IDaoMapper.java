@@ -26,7 +26,7 @@ public interface IDaoMapper {
      * @return
      */
     @NonNull
-    List mapAllToRealm(List<Object> list, Class dataClass);
+    List<Object> mapAllToRealm(List<Object> list, Class dataClass);
 
     /**
      * Transforms entity to its domain counter part.
@@ -41,10 +41,10 @@ public interface IDaoMapper {
      * Transforms entities to its domain counter part.
      *
      * @param entities entities to be converted.
-     * @return
+     * @return List
      */
     @Nullable
-    List mapAllToDomain(List<Object> entities);
+    List<Object> mapAllToDomain(List<Object> entities);
 
     /**
      * Transforms realmInstance to its domain counter part.
@@ -64,5 +64,5 @@ public interface IDaoMapper {
      * @return
      */
     @NonNull
-    List mapAllToDomain(List<Object> realmInstances, Class domainClass);
+    List<Object> mapAllToDomain(List<Object> realmInstances, Class domainClass);
 }
