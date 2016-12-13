@@ -21,15 +21,11 @@ import com.google.gson.Gson;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.services.GenericJobService;
-import com.zeyad.usecases.data.services.GenericNetworkQueueIntentService;
 
 import io.realm.Realm;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import rx.Observable;
-
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.UPLOAD_FILE;
 
 public class Utils {
     private static final String MULTIPART_FORM_DATA = "multipart/form-data";
@@ -91,11 +87,11 @@ public class Utils {
 
     public static void queuePostCore(FirebaseJobDispatcher dispatcher, PostRequest postRequest, Gson gson) {
         Bundle extras = new Bundle(2);
-        extras.putString(GenericNetworkQueueIntentService.JOB_TYPE, GenericNetworkQueueIntentService.POST);
-        extras.putString(GenericNetworkQueueIntentService.PAYLOAD, gson.toJson(postRequest));
+        extras.putString(GenericJobService.JOB_TYPE, GenericJobService.POST);
+        extras.putString(GenericJobService.PAYLOAD, gson.toJson(postRequest));
         dispatcher.mustSchedule(dispatcher.newJobBuilder()
                 .setService(GenericJobService.class)
-                .setTag(GenericNetworkQueueIntentService.POST)
+                .setTag(GenericJobService.POST)
                 .setRecurring(false)
                 .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
                 .setTrigger(Trigger.executionWindow(0, 60))
@@ -109,11 +105,11 @@ public class Utils {
     public static void queueFileIOCore(FirebaseJobDispatcher dispatcher, boolean isDownload,
                                        FileIORequest fileIORequest, Gson gson) {
         Bundle extras = new Bundle(2);
-        extras.putString(GenericNetworkQueueIntentService.JOB_TYPE, isDownload ? DOWNLOAD_FILE : UPLOAD_FILE);
-        extras.putString(GenericNetworkQueueIntentService.PAYLOAD, gson.toJson(fileIORequest));
+        extras.putString(GenericJobService.JOB_TYPE, isDownload ? GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE);
+        extras.putString(GenericJobService.PAYLOAD, gson.toJson(fileIORequest));
         dispatcher.mustSchedule(dispatcher.newJobBuilder()
                 .setService(GenericJobService.class)
-                .setTag(isDownload ? DOWNLOAD_FILE : UPLOAD_FILE)
+                .setTag(isDownload ? GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE)
                 .setRecurring(false)
                 .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
                 .setTrigger(Trigger.executionWindow(0, 60))

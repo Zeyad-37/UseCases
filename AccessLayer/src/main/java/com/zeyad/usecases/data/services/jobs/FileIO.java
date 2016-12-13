@@ -1,7 +1,6 @@
 package com.zeyad.usecases.data.services.jobs;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -28,9 +27,6 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Subscription;
 
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.PAYLOAD;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.TRIAL_COUNT;
-
 /**
  * @author Zeyad on 6/05/16.
  */
@@ -44,12 +40,12 @@ public class FileIO {
     private final Gson gson;
     private boolean mIsDownload;
 
-    public FileIO(@NonNull Intent intent, @NonNull Context context, boolean isDownload) {
+    public FileIO(int trailCount, @NonNull String payLoad, @NonNull Context context, boolean isDownload) {
         gson = Config.getGson();
         mRestApi = new RestApiImpl();
         mContext = context;
-        mTrailCount = intent.getIntExtra(TRIAL_COUNT, 0);
-        mFileIORequest = gson.fromJson(intent.getStringExtra(PAYLOAD), FileIORequest.class);
+        mTrailCount = trailCount;
+        mFileIORequest = gson.fromJson(payLoad, FileIORequest.class);
         mIsDownload = isDownload;
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
     }

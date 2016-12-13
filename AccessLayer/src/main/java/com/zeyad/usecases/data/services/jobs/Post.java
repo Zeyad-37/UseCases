@@ -1,16 +1,12 @@
 package com.zeyad.usecases.data.services.jobs;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
@@ -19,9 +15,6 @@ import com.zeyad.usecases.data.utils.Utils;
 
 import org.json.JSONObject;
 
-import io.realm.RealmList;
-import io.realm.RealmModel;
-import io.realm.RealmObject;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import rx.Subscriber;
@@ -29,8 +22,6 @@ import rx.Subscription;
 import rx.subscriptions.Subscriptions;
 
 import static com.zeyad.usecases.data.repository.stores.CloudDataStore.APPLICATION_JSON;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.PAYLOAD;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.TRIAL_COUNT;
 
 /**
  * @author Zeyad on 6/05/16.
@@ -62,29 +53,17 @@ public class Post {
         }
     };
 
-    public Post(@NonNull Intent intent, @NonNull Context context) {
+    public Post(int trailCount, @NonNull String payLoad, @NonNull Context context) {
         gson = Config.getGson();
         mRestApi = new RestApiImpl();
         mContext = context;
-        mTrailCount = intent.getIntExtra(TRIAL_COUNT, 0);
-        mPostRequest = gson.fromJson(intent.getStringExtra(PAYLOAD), PostRequest.class);
+        mTrailCount = trailCount;
+        mPostRequest = gson.fromJson(payLoad, PostRequest.class);
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
     }
 
     Post(Context context, PostRequest postRequest, RestApi restApi, int trailCount) {
-        gson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(FieldAttributes f) {
-                return f.getDeclaringClass().equals(RealmObject.class)
-                        && f.getDeclaredClass().equals(RealmModel.class)
-                        && f.getDeclaringClass().equals(RealmList.class);
-            }
-
-            @Override
-            public boolean shouldSkipClass(Class<?> clazz) {
-                return false;
-            }
-        }).create();
+        gson = Config.getGson();
         mContext = context;
         mPostRequest = postRequest;
         mRestApi = restApi;

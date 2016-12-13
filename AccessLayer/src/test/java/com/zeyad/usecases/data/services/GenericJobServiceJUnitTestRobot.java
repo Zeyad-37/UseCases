@@ -11,11 +11,11 @@ import com.firebase.jobdispatcher.Job;
 
 import org.mockito.Mockito;
 
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.JOB_TYPE;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.PAYLOAD;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.POST;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.UPLOAD_FILE;
+import static com.zeyad.usecases.data.services.GenericJobService.DOWNLOAD_FILE;
+import static com.zeyad.usecases.data.services.GenericJobService.JOB_TYPE;
+import static com.zeyad.usecases.data.services.GenericJobService.PAYLOAD;
+import static com.zeyad.usecases.data.services.GenericJobService.POST;
+import static com.zeyad.usecases.data.services.GenericJobService.UPLOAD_FILE;
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
 public class GenericJobServiceJUnitTestRobot {
@@ -55,21 +55,18 @@ public class GenericJobServiceJUnitTestRobot {
     static boolean runForDownloadFile() {
         final GenericJobService service = new GenericJobService();
         service.setContext(getMockedContext());
-        service.setApplicationContext(getMockedContext());
         return service.onStartJob(createJobParam(DOWNLOAD_FILE));
     }
 
     static boolean runForUploadFile() {
         final GenericJobService service = new GenericJobService();
         service.setContext(getMockedContext());
-        service.setApplicationContext(getMockedContext());
         return service.onStartJob(createJobParam(UPLOAD_FILE));
     }
 
     static boolean runForPost() {
         final GenericJobService service = new GenericJobService();
         service.setContext(getMockedContext());
-        service.setApplicationContext(getMockedContext());
         return service.onStartJob(createJobParam(POST));
     }
 
@@ -81,7 +78,6 @@ public class GenericJobServiceJUnitTestRobot {
         final Job mockedJobInfo = Mockito.mock(Job.class);
         final GenericJobService genericJobService = new GenericJobService();
         genericJobService.setContext(GenericJobServiceJUnitTestRobot.getMockedContext());
-        genericJobService.setApplicationContext(GenericJobServiceJUnitTestRobot.getMockedContext());
         genericJobService.scheduleJob(mockedJobInfo);
         return mockedJobInfo;
     }

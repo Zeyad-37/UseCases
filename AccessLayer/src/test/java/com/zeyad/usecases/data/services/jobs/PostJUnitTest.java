@@ -31,8 +31,8 @@ import okhttp3.RequestBody;
 import rx.observers.TestSubscriber;
 
 import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.JOB_TYPE;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.POST;
+import static com.zeyad.usecases.data.services.GenericJobService.JOB_TYPE;
+import static com.zeyad.usecases.data.services.GenericJobService.POST;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;

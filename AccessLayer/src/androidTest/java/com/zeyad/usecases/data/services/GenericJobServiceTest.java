@@ -14,12 +14,12 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.DOWNLOAD_FILE;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.JOB_TYPE;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.PAYLOAD;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.POST;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.TRIAL_COUNT;
-import static com.zeyad.usecases.data.services.GenericNetworkQueueIntentService.UPLOAD_FILE;
+import static com.zeyad.usecases.data.services.GenericJobService.DOWNLOAD_FILE;
+import static com.zeyad.usecases.data.services.GenericJobService.JOB_TYPE;
+import static com.zeyad.usecases.data.services.GenericJobService.PAYLOAD;
+import static com.zeyad.usecases.data.services.GenericJobService.POST;
+import static com.zeyad.usecases.data.services.GenericJobService.TRIAL_COUNT;
+import static com.zeyad.usecases.data.services.GenericJobService.UPLOAD_FILE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -50,7 +50,7 @@ public class GenericJobServiceTest {
         GenericJobServiceTestRobot.runForDownloadFile();
         ArgumentCaptor<Intent> argCapture = ArgumentCaptor.forClass(Intent.class);
         Mockito.verify(GenericJobServiceTestRobot.getMockedContext()).startService(argCapture.capture());
-        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericNetworkQueueIntentService.class.getName())));
+        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericJobService.class.getName())));
         assertThat(argCapture.getValue().getStringExtra(JOB_TYPE), is(equalTo(DOWNLOAD_FILE)));
     }
 
@@ -59,7 +59,7 @@ public class GenericJobServiceTest {
         GenericJobServiceTestRobot.runForDownloadFile();
         ArgumentCaptor<Intent> argCapture = ArgumentCaptor.forClass(Intent.class);
         Mockito.verify(GenericJobServiceTestRobot.getMockedContext()).startService(argCapture.capture());
-        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericNetworkQueueIntentService.class.getName())));
+        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericJobService.class.getName())));
         assertThat(argCapture.getValue().getIntExtra(TRIAL_COUNT, -1), is(equalTo(0)));
     }
 
@@ -68,7 +68,7 @@ public class GenericJobServiceTest {
         GenericJobServiceTestRobot.runForDownloadFile();
         ArgumentCaptor<Intent> argCapture = ArgumentCaptor.forClass(Intent.class);
         Mockito.verify(GenericJobServiceTestRobot.getMockedContext()).startService(argCapture.capture());
-        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericNetworkQueueIntentService.class.getName())));
+        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericJobService.class.getName())));
         assertThat(argCapture.getValue().getStringExtra(PAYLOAD), is(equalTo(GenericJobServiceTestRobot.getTaskParamPayload())));
     }
 
@@ -89,7 +89,7 @@ public class GenericJobServiceTest {
         GenericJobServiceTestRobot.runForUploadFile();
         ArgumentCaptor<Intent> argCapture = ArgumentCaptor.forClass(Intent.class);
         Mockito.verify(GenericJobServiceTestRobot.getMockedContext()).startService(argCapture.capture());
-        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericNetworkQueueIntentService.class.getName())));
+        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericJobService.class.getName())));
         assertThat(argCapture.getValue().getStringExtra(JOB_TYPE), is(equalTo(UPLOAD_FILE)));
     }
 
@@ -98,7 +98,7 @@ public class GenericJobServiceTest {
         GenericJobServiceTestRobot.runForUploadFile();
         ArgumentCaptor<Intent> argCapture = ArgumentCaptor.forClass(Intent.class);
         Mockito.verify(GenericJobServiceTestRobot.getMockedContext()).startService(argCapture.capture());
-        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericNetworkQueueIntentService.class.getName())));
+        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericJobService.class.getName())));
         assertThat(argCapture.getValue().getIntExtra(TRIAL_COUNT, -1), is(equalTo(0)));
     }
 
@@ -107,7 +107,7 @@ public class GenericJobServiceTest {
         GenericJobServiceTestRobot.runForUploadFile();
         ArgumentCaptor<Intent> argCapture = ArgumentCaptor.forClass(Intent.class);
         Mockito.verify(GenericJobServiceTestRobot.getMockedContext()).startService(argCapture.capture());
-        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericNetworkQueueIntentService.class.getName())));
+        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericJobService.class.getName())));
         assertThat(argCapture.getValue().getStringExtra(PAYLOAD), is(equalTo(GenericJobServiceTestRobot.getTaskParamPayload())));
     }
 
@@ -128,7 +128,7 @@ public class GenericJobServiceTest {
         GenericJobServiceTestRobot.runForPost();
         ArgumentCaptor<Intent> argCapture = ArgumentCaptor.forClass(Intent.class);
         Mockito.verify(GenericJobServiceTestRobot.getMockedContext()).startService(argCapture.capture());
-        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericNetworkQueueIntentService.class.getName())));
+        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericJobService.class.getName())));
         assertThat(argCapture.getValue().getStringExtra(JOB_TYPE), is(equalTo(POST)));
     }
 
@@ -137,7 +137,7 @@ public class GenericJobServiceTest {
         GenericJobServiceTestRobot.runForPost();
         ArgumentCaptor<Intent> argCapture = ArgumentCaptor.forClass(Intent.class);
         Mockito.verify(GenericJobServiceTestRobot.getMockedContext()).startService(argCapture.capture());
-        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericNetworkQueueIntentService.class.getName())));
+        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericJobService.class.getName())));
         assertThat(argCapture.getValue().getIntExtra(TRIAL_COUNT, -1), is(equalTo(0)));
     }
 
@@ -146,7 +146,7 @@ public class GenericJobServiceTest {
         GenericJobServiceTestRobot.runForPost();
         ArgumentCaptor<Intent> argCapture = ArgumentCaptor.forClass(Intent.class);
         Mockito.verify(GenericJobServiceTestRobot.getMockedContext()).startService(argCapture.capture());
-        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericNetworkQueueIntentService.class.getName())));
+        assertThat(argCapture.getValue().getComponent().getClassName(), is(equalTo(GenericJobService.class.getName())));
         assertThat(argCapture.getValue().getStringExtra(PAYLOAD), is(equalTo(GenericJobServiceTestRobot.getTaskParamPayload())));
     }
 

@@ -10,15 +10,11 @@
         android:supportsRtl="true">
 
         <service
-            android:exported="false"
-            android:name=".data.services.GenericJobService">
+            android:name=".data.services.GenericJobService"
+            android:exported="false">
             <intent-filter>
-                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE"/>"
+                <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />"
             </intent-filter>
         </service>
-        <service
-            android:name="com.zeyad.usecases.data.services.GenericNetworkQueueIntentService"
-            android:enabled="true"
-            android:exported="false" />
     </application>
 </manifest>
