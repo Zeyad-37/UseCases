@@ -1,1 +1,1 @@
-include ':sampleApp', ':accessLayer', ':compiler', ':mapAnnotations'
+include ':sampleApp', ':accessLayer', ':annotationProcessor', ':mapAnnotations'
