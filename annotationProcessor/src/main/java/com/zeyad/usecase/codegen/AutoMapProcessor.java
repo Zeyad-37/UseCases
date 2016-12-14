@@ -6,6 +6,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
+import com.google.gson.annotations.SerializedName;
+import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
@@ -15,6 +17,8 @@ import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.zeyad.usecases.annotations.AutoMap;
+import com.zeyad.usecases.annotations.IgnoreInRealm;
+import com.zeyad.usecases.annotations.RealmPrimaryKey;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -41,6 +45,9 @@ import javax.lang.model.util.ElementFilter;
 import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
+
+import io.realm.RealmObject;
+import io.realm.annotations.PrimaryKey;
 
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;
@@ -271,11 +278,88 @@ public class AutoMapProcessor extends AbstractProcessor {
         // return such classes we won't see them here.
     }
 
-    public void generateDataClassFile() {
+    public TypeSpec generateDataClassFile(TypeElement type, String className) {
+        List<VariableElement> allFields = ElementFilter.fieldsIn(type.getEnclosedElements());
+        String parameterName = type.asType().getClass().getSimpleName();
+        MethodSpec.Builder isEmptyBuilder = MethodSpec.methodBuilder("isEmpty")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(boolean.class)
+                .addParameter(type.asType().getClass(), parameterName);
+        String isEmptyImplementation = "return ";
+        // constructor
+        MethodSpec constructor = MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PUBLIC)
+                .build();
 
+        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className)
+                .superclass(RealmObject.class)
+                .addModifiers(Modifier.PUBLIC)
+                .addMethod(constructor);
+
+        for (int i = 0, allFieldsSize = allFields.size(); i < allFieldsSize; i++) {
+            VariableElement variableElement = allFields.get(i);
+            if (variableElement.getAnnotation(IgnoreInRealm.class) != null) {
+                TypeName typeName = TypeName.get(type.asType().getClass());
+
+                String variableName = variableElement.getSimpleName().toString();
+                FieldSpec.Builder builder = FieldSpec.builder(typeName, variableName);
+                // add field
+                for (Modifier modifier : variableElement.getModifiers())
+                    builder.addModifiers(modifier);
+
+                if (variableElement.getAnnotation(RealmPrimaryKey.class) != null)
+                    builder = builder.addAnnotation(PrimaryKey.class);
+                if (variableElement.getAnnotation(SerializedName.class) != null)
+                    builder = builder.addAnnotation(AnnotationSpec.builder(SerializedName.class)
+                            .addMember("value", "$S", variableElement.getAnnotation(SerializedName.class).value())
+                            .build());
+                classBuilder.addField(builder.build());
+                // add setter
+                classBuilder.addMethod(MethodSpec.methodBuilder("set" + variableName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(void.class)
+                        .addParameter(type.asType().getClass(), type.asType().getClass().getSimpleName())
+                        .addCode("this.$S = $S", variableName)
+                        .build());
+                // add getter
+                classBuilder.addMethod(MethodSpec.methodBuilder("get" + variableName)
+                        .addModifiers(Modifier.PUBLIC)
+                        .returns(typeName)
+                        .addCode("return $S", variableName)
+                        .build());
+                // isEmpty implementation
+                if (!variableElement.asType().getKind().isPrimitive()) {
+                    isEmptyImplementation += parameterName + "." + variableName + " == null";
+                    if (i == allFieldsSize - 1) {
+                        isEmptyImplementation += ";";
+                    } else {
+                        isEmptyImplementation += " && ";
+                    }
+                }
+            }
+        }
+
+        MethodSpec isEmpty = isEmptyBuilder.addCode(isEmptyImplementation).build();
+
+        classBuilder.addMethod(isEmpty);
+
+        return classBuilder.build();
     }
 
-    public TypeSpec generateDAOMapper(String className) {
+    public TypeSpec generateDAOMapper(TypeElement type, String className) {
+        List<VariableElement> allFields = ElementFilter.fieldsIn(type.getEnclosedElements());
+//        VariableElement variableElement = nonPrivateFields.get(0);
+//        variableElement.getEnclosingElement().asType().getKind();
+        String checkIfEmptyStub = "if (" + className + ".isEmpty())\nreturn new " + className + "();\n";
+        String instanceVariables = "";
+        for (VariableElement variableElement : allFields) {
+            instanceVariables += variableElement.getModifiers().toArray().toString() + " ";
+            instanceVariables += variableElement.asType().getKind().getClass() + " ";
+            instanceVariables += variableElement.getSimpleName() + ";\n";
+
+        }
+        String code = checkIfEmptyStub + className + "generatedC";
+
         MethodSpec mapToDomainManual = MethodSpec.methodBuilder("main")
                 .addModifiers(Modifier.PUBLIC)
                 .returns(Object.class)
