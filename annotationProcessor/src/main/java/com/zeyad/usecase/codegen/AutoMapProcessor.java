@@ -278,7 +278,8 @@ public class AutoMapProcessor extends AbstractProcessor {
         // return such classes we won't see them here.
     }
 
-    public TypeSpec generateDataClassFile(TypeElement type, String className) {
+    // TODO: 12/14/16 Test With Realm Annotations
+    public String generateDataClassFile(TypeElement type, String className) {
         List<VariableElement> allFields = ElementFilter.fieldsIn(type.getEnclosedElements());
         String parameterName = type.asType().getClass().getSimpleName();
         MethodSpec.Builder isEmptyBuilder = MethodSpec.methodBuilder("isEmpty")
@@ -343,7 +344,9 @@ public class AutoMapProcessor extends AbstractProcessor {
 
         classBuilder.addMethod(isEmpty);
 
-        return classBuilder.build();
+        String pkg = TypeUtil.packageNameOf(type);
+
+        return JavaFile.builder(pkg, classBuilder.build()).build().toString();
     }
 
     public TypeSpec generateDAOMapper(TypeElement type, String className) {

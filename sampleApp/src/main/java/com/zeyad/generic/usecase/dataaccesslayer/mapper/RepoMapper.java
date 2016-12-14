@@ -7,15 +7,14 @@ import com.zeyad.usecases.data.mappers.DAOMapper;
 /**
  * @author zeyad on 11/29/16.
  */
-public class RepoMapper extends DAOMapper {
+public class RepoMapper extends DAOMapper<RepoModel, RepoRealm> {
 
     public RepoMapper() {
         super();
     }
 
     @Override
-    public Object mapToDomainManual(Object object) {
-        RepoRealm repoRealm = (RepoRealm) object;
+    public RepoModel mapToDomainManual(RepoRealm repoRealm) {
         RepoModel repoModel = new RepoModel();
         repoModel.setName(repoRealm.getName());
         repoModel.setUrl(repoRealm.getUrl());

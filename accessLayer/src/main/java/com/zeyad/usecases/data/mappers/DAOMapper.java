@@ -9,7 +9,7 @@ import com.zeyad.usecases.Config;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class DAOMapper implements IDAOMapper {
+public abstract class DAOMapper<VM, DM> implements IDAOMapper {
     public Gson gson;
     private Class dataClass;
 
@@ -17,7 +17,7 @@ public abstract class DAOMapper implements IDAOMapper {
         gson = Config.getGson();
     }
 
-    public abstract Object mapToDomainManual(Object object);
+    public abstract VM mapToDomainManual(DM object);
 
     // TODO: 12/13/16 Try both Options!
     @Override
@@ -113,7 +113,7 @@ public abstract class DAOMapper implements IDAOMapper {
         } catch (Exception e1) {
             e1.printStackTrace();
             try {
-                return mapToDomainManual(object);
+                return mapToDomainManual((DM) object);
             } catch (Exception e) {
                 e.printStackTrace();
             }
