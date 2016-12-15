@@ -1,10 +1,12 @@
 package com.zeyad.usecases.app.models.ui;
 
 import com.google.gson.annotations.SerializedName;
+import com.zeyad.usecases.annotations.AutoMap;
 
 /**
  * @author zeyad on 12/1/16.
  */
+@AutoMap
 public class UserModel {
 
     public static final String ID = "id", COVER_URL = "coverUrl", FULL_NAME = "fullName",

@@ -18,7 +18,6 @@ import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.zeyad.usecases.annotations.AutoMap;
 import com.zeyad.usecases.annotations.IgnoreInRealm;
-import com.zeyad.usecases.annotations.RealmPrimaryKey;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -48,9 +47,6 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
-import io.realm.RealmObject;
-import io.realm.annotations.PrimaryKey;
-
 import static javax.lang.model.element.Modifier.FINAL;
 import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.STATIC;
@@ -58,7 +54,7 @@ import static javax.lang.model.element.Modifier.STATIC;
 /**
  * @author zeyad on 12/12/16.
  */
-@SupportedAnnotationTypes("com.zeyad.usecases.codegen.annotations.AutoMap")
+@SupportedAnnotationTypes("com.zeyad.usecases.annotations.AutoMap")
 @SupportedSourceVersion(SourceVersion.RELEASE_7)
 public class AutoMapProcessor extends AbstractProcessor {
     private ErrorReporter mErrorReporter;
@@ -109,7 +105,7 @@ public class AutoMapProcessor extends AbstractProcessor {
 //        String source = generateClass(type, className, type.getSimpleName().toString(), false);
         String source = generateDataClassFile(type, className);
         source = Reformatter.fixup(source);
-        writeSourceFile(fqClassName, source, type);
+        writeSourceFile(className, source, type);
     }
 
     private void writeSourceFile(String className, String text, TypeElement originatingType) {
@@ -285,7 +281,6 @@ public class AutoMapProcessor extends AbstractProcessor {
 
     // TODO: 12/14/16 Test With Realm Annotations
     private String generateDataClassFile(TypeElement type, String className) {
-        List<VariableElement> allFields = ElementFilter.fieldsIn(type.getEnclosedElements());
         String parameterName = type.asType().getClass().getSimpleName();
         MethodSpec.Builder isEmptyBuilder = MethodSpec.methodBuilder("isEmpty")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
@@ -298,10 +293,47 @@ public class AutoMapProcessor extends AbstractProcessor {
                 .build();
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className)
-                .superclass(RealmObject.class)
+                .superclass(ClassName.get("io.realm", "RealmObject"))
                 .addModifiers(Modifier.PUBLIC)
                 .addMethod(constructor);
 
+        // get the properties
+        List<VariableElement> allFields = ElementFilter.fieldsIn(type.getEnclosedElements());
+        ImmutableList<Property> properties = buildProperties(allFields);
+        // get the type adapters
+        ImmutableMap<TypeMirror, FieldSpec> typeAdapters = getTypeAdapters(properties);
+
+        typeAdapters.values().forEach(fieldSpec -> {
+//            if (fieldSpec.annotations.contains(IgnoreInRealm.class)) {
+            TypeName typeName = TypeName.get(type.asType().getClass());
+
+            String variableName = fieldSpec.name;
+            FieldSpec.Builder builder = FieldSpec.builder(typeName, variableName);
+            // add field
+            for (Modifier modifier : fieldSpec.modifiers)
+                builder.addModifiers(modifier);
+//                if (fieldSpec.getAnnotation(RealmPrimaryKey.class) != null)
+//                    builder = builder.addAnnotation(PrimaryKey.class);
+//                if (fieldSpec.getAnnotation(SerializedName.class) != null)
+//                    builder = builder.addAnnotation(AnnotationSpec.builder(SerializedName.class)
+//                            .addMember("value", "$S", fieldSpec.getAnnotation(SerializedName.class).value())
+//                            .build());
+            classBuilder.addField(builder.build());
+            // add setter
+            classBuilder.addMethod(MethodSpec.methodBuilder("set" + variableName)
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(void.class)
+                    .addParameter(type.asType().getClass(), type.asType().getClass().getSimpleName())
+                    .addCode("this.$S = $S", variableName)
+                    .build());
+            // add getter
+            classBuilder.addMethod(MethodSpec.methodBuilder("get" + variableName)
+                    .addModifiers(Modifier.PUBLIC)
+                    .returns(typeName)
+                    .addCode("return $S", variableName)
+                    .build());
+//            }
+        });
         for (int i = 0, allFieldsSize = allFields.size(); i < allFieldsSize; i++) {
             VariableElement variableElement = allFields.get(i);
             if (variableElement.getAnnotation(IgnoreInRealm.class) != null) {
@@ -313,8 +345,8 @@ public class AutoMapProcessor extends AbstractProcessor {
                 for (Modifier modifier : variableElement.getModifiers())
                     builder.addModifiers(modifier);
 
-                if (variableElement.getAnnotation(RealmPrimaryKey.class) != null)
-                    builder = builder.addAnnotation(PrimaryKey.class);
+//                if (variableElement.getAnnotation(RealmPrimaryKey.class) != null)
+//                    builder = builder.addAnnotation(PrimaryKey.class);
                 if (variableElement.getAnnotation(SerializedName.class) != null)
                     builder = builder.addAnnotation(AnnotationSpec.builder(SerializedName.class)
                             .addMember("value", "$S", variableElement.getAnnotation(SerializedName.class).value())
@@ -347,7 +379,7 @@ public class AutoMapProcessor extends AbstractProcessor {
 
         MethodSpec isEmpty = isEmptyBuilder.addCode(isEmptyImplementation).build();
 
-        classBuilder.addMethod(isEmpty);
+//        classBuilder.addMethod(isEmpty);
 
         String pkg = TypeUtil.packageNameOf(type);
 
