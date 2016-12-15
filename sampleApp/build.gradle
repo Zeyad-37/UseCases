@@ -85,6 +85,7 @@ ext {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile files('libs/processor.jar')
     compile project(':accessLayer')
     // Support
     compile "com.android.support:appcompat-v7:$supportLibraryVersion"
@@ -124,3 +125,11 @@ dependencies {
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
 }
+
+task processorTask(type: Exec) {
+    commandLine 'cp', '../processor/build/libs/processor.jar', 'libs/'
+}
+
+//processorTask.dependsOn(':processor:build')
+//preBuild.dependsOn(processorTask)
+

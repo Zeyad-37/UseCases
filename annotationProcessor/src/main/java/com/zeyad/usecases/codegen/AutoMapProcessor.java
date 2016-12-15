@@ -16,9 +16,9 @@ import com.squareup.javapoet.NameAllocator;
 import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
-import com.zeyad.usecases.codegen.annotations.AutoMap;
-import com.zeyad.usecases.codegen.annotations.IgnoreInRealm;
-import com.zeyad.usecases.codegen.annotations.RealmPrimaryKey;
+import com.zeyad.usecases.annotations.AutoMap;
+import com.zeyad.usecases.annotations.IgnoreInRealm;
+import com.zeyad.usecases.annotations.RealmPrimaryKey;
 
 import java.io.IOException;
 import java.io.Writer;

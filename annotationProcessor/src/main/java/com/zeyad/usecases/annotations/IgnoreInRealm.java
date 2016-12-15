@@ -1,4 +1,4 @@
-package com.zeyad.usecases.codegen.annotations;
+package com.zeyad.usecases.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -10,5 +10,5 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE) // on class level
 @Retention(RetentionPolicy.SOURCE) // not needed at runtime
-public @interface RealmPrimaryKey {
+public @interface IgnoreInRealm {
 }

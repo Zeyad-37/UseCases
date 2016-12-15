@@ -9,15 +9,15 @@ import io.realm.RealmObject;
  */
 public class UserRealm extends RealmObject {
 
-    public static final String ID = "id", COVER_URL = "cover_url", FULL_NAME = "full_name",
+    public static final String ID = "id", COVER_URL = "coverUrl", FULL_NAME = "fullName",
             DESCRIPTION = "description", FOLLOWERS = "followers", EMAIL = "email";
 
     @SerializedName(ID)
     private int id;
     @SerializedName(COVER_URL)
-    private String cover_url;
+    private String coverUrl;
     @SerializedName(FULL_NAME)
-    private String full_name;
+    private String fullName;
     @SerializedName(DESCRIPTION)
     private String description;
     @SerializedName(FOLLOWERS)
@@ -36,20 +36,20 @@ public class UserRealm extends RealmObject {
         this.id = id;
     }
 
-    public String getCover_url() {
-        return this.cover_url;
+    public String getCoverUrl() {
+        return this.coverUrl;
     }
 
-    public void setCover_url(String cover_url) {
-        this.cover_url = cover_url;
+    public void setCoverUrl(String coverUrl) {
+        this.coverUrl = coverUrl;
     }
 
-    public String getFull_name() {
-        return this.full_name;
+    public String getFullName() {
+        return this.fullName;
     }
 
-    public void setFull_name(String full_name) {
-        this.full_name = full_name;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
     public String getDescription() {
