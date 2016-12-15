@@ -7,7 +7,6 @@
       <module fileurl="file://$PROJECT_DIR$/GenericUseCases.iml" filepath="$PROJECT_DIR$/GenericUseCases.iml" />
       <module fileurl="file://$PROJECT_DIR$/accessLayer/accessLayer.iml" filepath="$PROJECT_DIR$/accessLayer/accessLayer.iml" />
       <module fileurl="file://$PROJECT_DIR$/annotationProcessor/annotationProcessor.iml" filepath="$PROJECT_DIR$/annotationProcessor/annotationProcessor.iml" />
-      <module fileurl="file://$PROJECT_DIR$/mapAnnotations/mapAnnotations.iml" filepath="$PROJECT_DIR$/mapAnnotations/mapAnnotations.iml" />
       <module fileurl="file://$PROJECT_DIR$/sampleApp/sampleApp.iml" filepath="$PROJECT_DIR$/sampleApp/sampleApp.iml" />
     </modules>
   </component>

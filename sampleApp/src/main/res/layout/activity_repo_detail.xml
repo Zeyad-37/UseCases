@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_detail.RepoDetailActivity"
+    tools:context="com.zeyad.usecases.app.presentation.repo_detail.RepoDetailActivity"
     tools:ignore="MergeRootFrame">
 
     <android.support.design.widget.AppBarLayout

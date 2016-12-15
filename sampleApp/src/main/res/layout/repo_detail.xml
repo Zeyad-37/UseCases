@@ -6,4 +6,4 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:textIsSelectable="true"
-    tools:context="com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_detail.RepoDetailFragment" />
+    tools:context="com.zeyad.usecases.app.presentation.repo_detail.RepoDetailFragment" />

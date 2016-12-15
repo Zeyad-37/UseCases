@@ -10,7 +10,6 @@
             <option value="$PROJECT_DIR$" />
             <option value="$PROJECT_DIR$/accessLayer" />
             <option value="$PROJECT_DIR$/annotationProcessor" />
-            <option value="$PROJECT_DIR$/mapAnnotations" />
             <option value="$PROJECT_DIR$/sampleApp" />
           </set>
         </option>

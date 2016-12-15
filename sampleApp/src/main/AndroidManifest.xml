@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.zeyad.generic.usecase.dataaccesslayer">
+    package="com.zeyad.usecases.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <application
@@ -27,7 +27,7 @@
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.zeyad.generic.usecase.dataaccesslayer.presentation.repo_list.RepoListActivity" />
+                android:value="com.zeyad.usecases.app.presentation.repo_list.RepoListActivity" />
         </activity>
     </application>
 
