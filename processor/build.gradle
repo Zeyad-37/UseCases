@@ -7,6 +7,7 @@ dependencies {
     compile 'com.google.code.gson:gson:2.8.0'
     compile 'com.squareup:javapoet:1.7.0'
     compile 'com.google.guava:guava:19.0'
+    compile 'io.realm:realm-annotations:2.2.1'
 }
 
 sourceCompatibility = "1.8"

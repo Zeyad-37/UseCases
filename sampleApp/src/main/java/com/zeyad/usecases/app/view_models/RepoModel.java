@@ -1,22 +1,29 @@
-package com.zeyad.usecases.app.models.data;
+package com.zeyad.usecases.app.view_models;
 
 import com.google.gson.annotations.SerializedName;
+import com.zeyad.usecases.annotations.AutoMap;
 
-import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
  * @author zeyad on 11/29/16.
  */
+@AutoMap
+public class RepoModel {
 
-public class RepoRealm extends RealmObject {
-
+    private String name;
     @PrimaryKey
     @SerializedName("html_url")
     private String url;
-    private String name;
 
-    public RepoRealm() {
+    public RepoModel() {
+        this.name = "";
+        this.url = "";
+    }
+
+    public RepoModel(String name, String url) {
+        this.name = name;
+        this.url = url;
     }
 
     public String getName() {

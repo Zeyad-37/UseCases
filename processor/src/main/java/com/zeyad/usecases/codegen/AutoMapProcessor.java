@@ -3,29 +3,20 @@ package com.zeyad.usecases.codegen;
 import com.google.common.base.CaseFormat;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
 import com.google.gson.annotations.SerializedName;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.NameAllocator;
-import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.zeyad.usecases.annotations.AutoMap;
-import com.zeyad.usecases.annotations.IgnoreInRealm;
 
 import java.io.IOException;
 import java.io.Writer;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.processing.AbstractProcessor;
@@ -34,7 +25,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
@@ -47,8 +37,9 @@ import javax.lang.model.util.Types;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 
-import static javax.lang.model.element.Modifier.FINAL;
-import static javax.lang.model.element.Modifier.PRIVATE;
+import io.realm.annotations.Ignore;
+import io.realm.annotations.PrimaryKey;
+
 import static javax.lang.model.element.Modifier.STATIC;
 
 /**
@@ -94,15 +85,14 @@ public class AutoMapProcessor extends AbstractProcessor {
         if (type.getKind() != ElementKind.CLASS) {
             mErrorReporter.abortWithError("@" + AutoMap.class.getName() + " only applies to classes", type);
         }
-//        if (ancestorIsAutoMap(type)) {
-//            mErrorReporter.abortWithError("One @AutoMap class shall not extend another", type);
-//        }
+        if (ancestorIsAutoMap(type)) {
+            mErrorReporter.abortWithError("One @AutoMap class shall not extend another", type);
+        }
         checkModifiersIfNested(type);
         // get the fully-qualified class name
         String fqClassName = generatedSubclassName(type, 0);
         // class name
         String className = TypeUtil.simpleNameOf(fqClassName);
-//        String source = generateClass(type, className, type.getSimpleName().toString(), false);
         String source = generateDataClassFile(type, className);
         source = Reformatter.fixup(source);
         writeSourceFile(className, source, type);
@@ -129,6 +119,20 @@ public class AutoMapProcessor extends AbstractProcessor {
         }
     }
 
+    private boolean ancestorIsAutoMap(TypeElement type) {
+        while (true) {
+            TypeMirror parentMirror = type.getSuperclass();
+            if (parentMirror.getKind() == TypeKind.NONE) {
+                return false;
+            }
+            TypeElement parentElement = (TypeElement) mTypeUtils.asElement(parentMirror);
+            if (MoreElements.isAnnotationPresent(parentElement, AutoMap.class)) {
+                return true;
+            }
+            type = parentElement;
+        }
+    }
+
     private String generatedSubclassName(TypeElement type, int depth) {
         return generatedClassName(type, Strings.repeat("$", depth) + "AutoMap_");
     }
@@ -144,132 +148,12 @@ public class AutoMapProcessor extends AbstractProcessor {
         return pkg + dot + prefix + name;
     }
 
-    private String generateClass(TypeElement type, String className, String classToExtend, boolean isFinal) {
-        if (type == null) {
-            mErrorReporter.abortWithError("generateClass was invoked with null type", type);
-        }
-        if (className == null) {
-            mErrorReporter.abortWithError("generateClass was invoked with null class name", type);
-        }
-        if (classToExtend == null) {
-            mErrorReporter.abortWithError("generateClass was invoked with null parent class", type);
-        }
-        List<VariableElement> nonPrivateFields = getAutoMapFieldsOrError(type);
-        if (nonPrivateFields.isEmpty()) {
-            mErrorReporter.abortWithError("generateClass error, all fields are declared PRIVATE", type);
-        }
-        // get the properties
-        ImmutableList<Property> properties = buildProperties(nonPrivateFields);
-        // get the type adapters
-        ImmutableMap<TypeMirror, FieldSpec> typeAdapters = getTypeAdapters(properties);
-        // get the automap version
-        // Generate the AutoMap_??? class
-        String pkg = TypeUtil.packageNameOf(type);
-        TypeSpec.Builder subClass = TypeSpec.classBuilder(className)
-                // Add the version
-                .addField(TypeName.INT, "version", PRIVATE)
-                // Class must be always final
-                .addModifiers(FINAL)
-                // extends from original abstract class
-                .superclass(ClassName.get(pkg, classToExtend))
-                // Add the DEFAULT constructor
-                .addMethod(generateConstructor(properties)); // generate writeToParcel()
-        if (!ancestorIsAutoMap(processingEnv, type)) {
-            // Implement android.os.Parcelable if the ancestor does not do it.
-            subClass.addSuperinterface(ClassName.get("android.os", "Parcelable"));
-        }
-        if (!typeAdapters.isEmpty()) {
-            typeAdapters.values().forEach(subClass::addField);
-        }
-        return JavaFile.builder(pkg, subClass.build()).build().toString();
-    }
-
-    private MethodSpec generateConstructor(ImmutableList<Property> properties) {
-        List<ParameterSpec> params = Lists.newArrayListWithCapacity(properties.size());
-        for (Property property : properties) {
-            params.add(ParameterSpec.builder(property.typeName, property.fieldName).build());
-        }
-        MethodSpec.Builder builder = MethodSpec.constructorBuilder()
-                .addParameters(params);
-        for (ParameterSpec param : params) {
-            builder.addStatement("this.$N = $N", param.name, param.name);
-        }
-        return builder.build();
-    }
-
-    /**
-     * This method returns a list of all non private fields. If any <code>private</code> fields is
-     * found, the method errors out
-     *
-     * @param type element
-     * @return list of all non-<code>private</code> fields
-     */
-    private List<VariableElement> getAutoMapFieldsOrError(TypeElement type) {
-        List<VariableElement> allFields = ElementFilter.fieldsIn(type.getEnclosedElements());
-        List<VariableElement> nonPrivateFields = new ArrayList<>();
-        for (VariableElement field : allFields) {
-            if (!field.getModifiers().contains(PRIVATE)) {
-                nonPrivateFields.add(field);
-            } else {
-                // return error, PRIVATE fields are not allowed
-                mErrorReporter.abortWithError("getFieldsError error, PRIVATE fields not allowed", type);
-            }
-        }
-        return nonPrivateFields;
-    }
-
-    private ImmutableMap<TypeMirror, FieldSpec> getTypeAdapters(ImmutableList<Property> properties) {
-        Map<TypeMirror, FieldSpec> typeAdapters = new LinkedHashMap<>();
-        NameAllocator nameAllocator = new NameAllocator();
-        nameAllocator.newName("CREATOR");
-        for (Property property : properties) {
-            if (property.typeAdapter != null && !typeAdapters.containsKey(property.typeAdapter)) {
-                ClassName typeName = (ClassName) TypeName.get(property.typeAdapter);
-                String name = CaseFormat.LOWER_CAMEL.to(CaseFormat.UPPER_UNDERSCORE, typeName.simpleName());
-                name = nameAllocator.newName(name, typeName);
-                typeAdapters.put(property.typeAdapter, FieldSpec.builder(
-                        typeName, NameAllocator.toJavaIdentifier(name), PRIVATE, STATIC, FINAL)
-                        .initializer("new $T()", typeName).build());
-            }
-        }
-        return ImmutableMap.copyOf(typeAdapters);
-    }
-
-    private ImmutableList<Property> buildProperties(List<VariableElement> elements) {
-        ImmutableList.Builder<Property> builder = ImmutableList.builder();
-        for (VariableElement element : elements) {
-            builder.add(new Property(element.getSimpleName().toString(), element));
-        }
-        return builder.build();
-    }
-
-    private boolean ancestorIsAutoMap(TypeElement type) {
-        while (true) {
-            TypeMirror parentMirror = type.getSuperclass();
-            if (parentMirror.getKind() == TypeKind.NONE) {
-                return false;
-            }
-            TypeElement parentElement = (TypeElement) mTypeUtils.asElement(parentMirror);
-            if (MoreElements.isAnnotationPresent(parentElement, AutoMap.class)) {
-                return true;
-            }
-            type = parentElement;
-        }
-    }
-
-    private boolean ancestorIsAutoMap(ProcessingEnvironment env, TypeElement type) {
-        // TODO: 15/07/16 check recursively
-        TypeMirror classType = type.asType();
-        TypeMirror parcelable = env.getElementUtils().getTypeElement("android.os.Parcelable").asType();
-        return TypeUtil.isClassOfType(env.getTypeUtils(), parcelable, classType);
-    }
-
     private void checkModifiersIfNested(TypeElement type) {
         ElementKind enclosingKind = type.getEnclosingElement().getKind();
         if (enclosingKind.isClass() || enclosingKind.isInterface()) {
-            if (type.getModifiers().contains(PRIVATE)) {
-                mErrorReporter.abortWithError("@AutoMap class must not be private", type);
-            }
+//            if (type.getModifiers().contains(PRIVATE)) {
+//                mErrorReporter.abortWithError("@AutoMap class must not be private", type);
+//            }
             if (!type.getModifiers().contains(STATIC)) {
                 mErrorReporter.abortWithError("Nested @AutoMap class must be static", type);
             }
@@ -279,14 +163,18 @@ public class AutoMapProcessor extends AbstractProcessor {
         // return such classes we won't see them here.
     }
 
-    // TODO: 12/14/16 Test With Realm Annotations
     private String generateDataClassFile(TypeElement type, String className) {
-        String parameterName = type.asType().getClass().getSimpleName();
+        String pkg = TypeUtil.packageNameOf(type);
+
+        String isEmptyParameterName = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, className)
+                .substring(0, 1).toLowerCase() + CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL,
+                className).substring(1);
+
         MethodSpec.Builder isEmptyBuilder = MethodSpec.methodBuilder("isEmpty")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
-                .returns(boolean.class)
-                .addParameter(type.asType().getClass(), parameterName);
-        String isEmptyImplementation = "return ";
+                .returns(boolean.class);
+        String isEmptyImplementation = "return " + isEmptyParameterName + " == null ||(\n";
+
         // constructor
         MethodSpec constructor = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
@@ -298,90 +186,60 @@ public class AutoMapProcessor extends AbstractProcessor {
                 .addMethod(constructor);
 
         // get the properties
-        List<VariableElement> allFields = ElementFilter.fieldsIn(type.getEnclosedElements());
-        ImmutableList<Property> properties = buildProperties(allFields);
-        // get the type adapters
-        ImmutableMap<TypeMirror, FieldSpec> typeAdapters = getTypeAdapters(properties);
-
-        typeAdapters.values().forEach(fieldSpec -> {
-//            if (fieldSpec.annotations.contains(IgnoreInRealm.class)) {
-            TypeName typeName = TypeName.get(type.asType().getClass());
-
-            String variableName = fieldSpec.name;
-            FieldSpec.Builder builder = FieldSpec.builder(typeName, variableName);
-            // add field
-            for (Modifier modifier : fieldSpec.modifiers)
-                builder.addModifiers(modifier);
-//                if (fieldSpec.getAnnotation(RealmPrimaryKey.class) != null)
-//                    builder = builder.addAnnotation(PrimaryKey.class);
-//                if (fieldSpec.getAnnotation(SerializedName.class) != null)
-//                    builder = builder.addAnnotation(AnnotationSpec.builder(SerializedName.class)
-//                            .addMember("value", "$S", fieldSpec.getAnnotation(SerializedName.class).value())
-//                            .build());
-            classBuilder.addField(builder.build());
-            // add setter
-            classBuilder.addMethod(MethodSpec.methodBuilder("set" + variableName)
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(void.class)
-                    .addParameter(type.asType().getClass(), type.asType().getClass().getSimpleName())
-                    .addCode("this.$S = $S", variableName)
-                    .build());
-            // add getter
-            classBuilder.addMethod(MethodSpec.methodBuilder("get" + variableName)
-                    .addModifiers(Modifier.PUBLIC)
-                    .returns(typeName)
-                    .addCode("return $S", variableName)
-                    .build());
-//            }
-        });
-        for (int i = 0, allFieldsSize = allFields.size(); i < allFieldsSize; i++) {
-            VariableElement variableElement = allFields.get(i);
-            if (variableElement.getAnnotation(IgnoreInRealm.class) != null) {
-                TypeName typeName = TypeName.get(type.asType().getClass());
-
-                String variableName = variableElement.getSimpleName().toString();
-                FieldSpec.Builder builder = FieldSpec.builder(typeName, variableName);
-                // add field
-                for (Modifier modifier : variableElement.getModifiers())
-                    builder.addModifiers(modifier);
-
-//                if (variableElement.getAnnotation(RealmPrimaryKey.class) != null)
-//                    builder = builder.addAnnotation(PrimaryKey.class);
-                if (variableElement.getAnnotation(SerializedName.class) != null)
-                    builder = builder.addAnnotation(AnnotationSpec.builder(SerializedName.class)
-                            .addMember("value", "$S", variableElement.getAnnotation(SerializedName.class).value())
-                            .build());
-                classBuilder.addField(builder.build());
-                // add setter
-                classBuilder.addMethod(MethodSpec.methodBuilder("set" + variableName)
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(void.class)
-                        .addParameter(type.asType().getClass(), type.asType().getClass().getSimpleName())
-                        .addCode("this.$S = $S", variableName)
-                        .build());
-                // add getter
-                classBuilder.addMethod(MethodSpec.methodBuilder("get" + variableName)
-                        .addModifiers(Modifier.PUBLIC)
-                        .returns(typeName)
-                        .addCode("return $S", variableName)
-                        .build());
-                // isEmpty implementation
-                if (!variableElement.asType().getKind().isPrimitive()) {
-                    isEmptyImplementation += parameterName + "." + variableName + " == null";
-                    if (i == allFieldsSize - 1) {
-                        isEmptyImplementation += ";";
-                    } else {
-                        isEmptyImplementation += " && ";
+        List<? extends Element> allElements = type.getEnclosedElements();
+        for (int i = 0, allElementsSize = allElements.size(); i < allElementsSize; i++) {
+            Element element = allElements.get(i);
+            if (element.getKind().isField()) {
+                if (element.getAnnotation(Ignore.class) == null) {
+                    TypeName typeName = TypeName.get(element.asType());
+                    String variableName = element.getSimpleName().toString();
+                    FieldSpec.Builder builder;
+//                    if (element.asType().getAnnotation(AutoMap.class) == null)
+                    builder = FieldSpec.builder(typeName, variableName);
+//                    else
+//                        builder = FieldSpec.builder(ClassName.get(pkg, " AutoMap_" + variableName), variableName);
+                    // add field
+                    for (Modifier modifier : element.getModifiers()) {
+                        builder.addModifiers(modifier);
                     }
+                    if (element.getAnnotation(PrimaryKey.class) != null)
+                        builder = builder.addAnnotation(PrimaryKey.class);
+                    if (element.getAnnotation(SerializedName.class) != null)
+                        builder = builder.addAnnotation(AnnotationSpec.builder(SerializedName.class)
+                                .addMember("value", "$S", element.getAnnotation(SerializedName.class).value())
+                                .build());
+                    String variableNameCamelCase = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, variableName);
+                    if (!(element.getModifiers().contains(Modifier.FINAL) && element.getModifiers().contains(Modifier.STATIC))) {
+                        // add setter
+                        classBuilder.addMethod(MethodSpec.methodBuilder("set" + variableNameCamelCase)
+                                .addModifiers(Modifier.PUBLIC)
+                                .returns(void.class)
+                                .addParameter(typeName, variableName)
+                                .addCode("this.$N = $N;", variableName, variableName)
+                                .build());
+                        // add getter
+                        classBuilder.addMethod(MethodSpec.methodBuilder("get" + variableNameCamelCase)
+                                .addModifiers(Modifier.PUBLIC)
+                                .returns(typeName)
+                                .addCode("return $N;", variableName)
+                                .build());
+                        if (!element.asType().getKind().isPrimitive()) {
+                            isEmptyImplementation += isEmptyParameterName + "." + variableName + " == null &&\n";
+                        }
+                    } else {
+                        builder.initializer("$S", variableNameCamelCase.substring(0, 1).toLowerCase()
+                                + variableNameCamelCase.substring(1));
+                    }
+                    classBuilder.addField(builder.build());
                 }
             }
         }
 
+        isEmptyBuilder.addParameter(ClassName.get(pkg, className), isEmptyParameterName);
+        isEmptyImplementation = isEmptyImplementation.substring(0, isEmptyImplementation.length() - 4) + ");";
         MethodSpec isEmpty = isEmptyBuilder.addCode(isEmptyImplementation).build();
 
-//        classBuilder.addMethod(isEmpty);
-
-        String pkg = TypeUtil.packageNameOf(type);
+        classBuilder.addMethod(isEmpty);
 
         return JavaFile.builder(pkg, classBuilder.build()).build().toString();
     }
@@ -417,49 +275,5 @@ public class AutoMapProcessor extends AbstractProcessor {
                 .addMethod(constructor)
                 .addMethod(mapToDomainManual)
                 .build();
-    }
-
-    static final class Property {
-        final String fieldName;
-        final VariableElement element;
-        final TypeName typeName;
-        final ImmutableSet<String> annotations;
-        //        final int version;
-        TypeMirror typeAdapter;
-
-        Property(String fieldName, VariableElement element) {
-            this.fieldName = fieldName;
-            this.element = element;
-            this.typeName = TypeName.get(element.asType());
-            this.annotations = getAnnotations(element);
-            // get the parcel adapter if any
-//            ParcelAdapter parcelAdapter = element.getAnnotation(ParcelAdapter.class);
-//            if (parcelAdapter != null) {
-//                try {
-//                    parcelAdapter.value();
-//                } catch (MirroredTypeException e) {
-//                    this.typeAdapter = e.getTypeMirror();
-//                }
-//            }
-            // get the element version, default 0
-//            ParcelVersion parcelVersion = element.getAnnotation(ParcelVersion.class);
-//            this.version = parcelVersion == null ? 0 : parcelVersion.from();
-        }
-
-        public boolean isNullable() {
-            return this.annotations.contains("Nullable");
-        }
-
-//        public int version() {
-//            return this.version;
-//        }
-
-        private ImmutableSet<String> getAnnotations(VariableElement element) {
-            ImmutableSet.Builder<String> builder = ImmutableSet.builder();
-            for (AnnotationMirror annotation : element.getAnnotationMirrors()) {
-                builder.add(annotation.getAnnotationType().asElement().getSimpleName().toString());
-            }
-            return builder.build();
-        }
     }
 }

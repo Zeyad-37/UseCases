@@ -1,17 +1,22 @@
-package com.zeyad.usecases.app.models.data;
+package com.zeyad.usecases.app.view_models;
 
 import com.google.gson.annotations.SerializedName;
+import com.zeyad.usecases.annotations.AutoMap;
 
-import io.realm.RealmObject;
+import java.util.List;
+
+import io.realm.annotations.Ignore;
+import io.realm.annotations.PrimaryKey;
 
 /**
  * @author zeyad on 12/1/16.
  */
-public class UserRealm extends RealmObject {
+@AutoMap
+public class UserModel {
 
     public static final String ID = "id", COVER_URL = "coverUrl", FULL_NAME = "fullName",
-            DESCRIPTION = "description", FOLLOWERS = "followers", EMAIL = "email";
-
+            DESCRIPTION = "description", FOLLOWERS = "followers", EMAIL = "email", REPOS = "repos";
+    @PrimaryKey
     @SerializedName(ID)
     private int id;
     @SerializedName(COVER_URL)
@@ -23,9 +28,12 @@ public class UserRealm extends RealmObject {
     @SerializedName(FOLLOWERS)
     private int followers;
     @SerializedName(EMAIL)
+    @Ignore
     private String email;
+    @SerializedName(REPOS)
+    private List<RepoModel> repos;
 
-    public UserRealm() {
+    public UserModel() {
     }
 
     public int getId() {
@@ -74,5 +82,13 @@ public class UserRealm extends RealmObject {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public List<RepoModel> getRepos() {
+        return repos;
+    }
+
+    public void setRepos(List<RepoModel> repos) {
+        this.repos = repos;
     }
 }

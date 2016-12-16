@@ -15,12 +15,12 @@ import com.zeyad.usecases.app.components.mvvm.BaseActivity;
 import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
-import com.zeyad.usecases.app.models.ui.UserModel;
 import com.zeyad.usecases.app.presentation.repo_detail.RepoDetailActivity;
 import com.zeyad.usecases.app.presentation.repo_detail.RepoDetailFragment;
 import com.zeyad.usecases.app.presentation.repo_list.view_holders.EmptyViewHolder;
 import com.zeyad.usecases.app.presentation.repo_list.view_holders.RepoViewHolder;
 import com.zeyad.usecases.app.utils.Utils;
+import com.zeyad.usecases.app.view_models.UserModel;
 
 import java.util.ArrayList;
 import java.util.List;

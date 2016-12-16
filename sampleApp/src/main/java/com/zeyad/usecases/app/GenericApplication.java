@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.zeyad.usecases.app.mapper.RepoMapper;
-import com.zeyad.usecases.app.models.data.RepoRealm;
+import com.zeyad.usecases.app.view_models.AutoMap_RepoModel;
 import com.zeyad.usecases.data.mappers.DAOMapperUtil;
 import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
@@ -52,7 +52,7 @@ public class GenericApplication extends Application {
                 .entityMapper(new DAOMapperUtil() {
                     @Override
                     public IDAOMapper getDataMapper(Class dataClass) {
-                        if (dataClass == RepoRealm.class)
+                        if (dataClass == AutoMap_RepoModel.class)
                             return new RepoMapper();
                         return new DefaultDAOMapper();
                     }
