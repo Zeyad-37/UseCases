@@ -29,7 +29,6 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.lang.model.util.ElementFilter;
@@ -163,6 +162,7 @@ public class AutoMapProcessor extends AbstractProcessor {
         // return such classes we won't see them here.
     }
 
+    // TODO: 12/16/16 Get generated class for annotated fields
     private String generateDataClassFile(TypeElement type, String className) {
         String pkg = TypeUtil.packageNameOf(type);
 
@@ -194,7 +194,7 @@ public class AutoMapProcessor extends AbstractProcessor {
                     TypeName typeName = TypeName.get(element.asType());
                     String variableName = element.getSimpleName().toString();
                     FieldSpec.Builder builder;
-//                    if (element.asType().getAnnotation(AutoMap.class) == null)
+//                    if (element.getAnnotation(FindMapped.class) == null)
                     builder = FieldSpec.builder(typeName, variableName);
 //                    else
 //                        builder = FieldSpec.builder(ClassName.get(pkg, " AutoMap_" + variableName), variableName);
@@ -227,6 +227,7 @@ public class AutoMapProcessor extends AbstractProcessor {
                             isEmptyImplementation += isEmptyParameterName + "." + variableName + " == null &&\n";
                         }
                     } else {
+                        // TODO: 12/16/16 Get value
                         builder.initializer("$S", variableNameCamelCase.substring(0, 1).toLowerCase()
                                 + variableNameCamelCase.substring(1));
                     }
@@ -245,15 +246,14 @@ public class AutoMapProcessor extends AbstractProcessor {
     }
 
     public TypeSpec generateDAOMapper(TypeElement type, String className) {
-        List<VariableElement> allFields = ElementFilter.fieldsIn(type.getEnclosedElements());
+        List<? extends Element> allElements = type.getEnclosedElements();
 //        VariableElement variableElement = nonPrivateFields.get(0);
 //        variableElement.getEnclosingElement().asType().getKind();
         String checkIfEmptyStub = "if (" + className + ".isEmpty())\nreturn new " + className + "();\n";
-        String instanceVariables = "";
-        for (VariableElement variableElement : allFields) {
-            instanceVariables += variableElement.getModifiers().toArray().toString() + " ";
-            instanceVariables += variableElement.asType().getKind().getClass() + " ";
-            instanceVariables += variableElement.getSimpleName() + ";\n";
+
+        for (int i = 0, allElementsSize = allElements.size(); i < allElementsSize; i++) {
+            Element element = allElements.get(i);
+
         }
         String code = checkIfEmptyStub + className + "generatedC";
 
@@ -267,7 +267,10 @@ public class AutoMapProcessor extends AbstractProcessor {
 
         MethodSpec constructor = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
+                .addCode("super();")
                 .build();
+
+        TypeName superClass = ClassName.get("com.zeyad.usecases.data.mappers", "DAOMapper");
 
         return TypeSpec.classBuilder(className)
 //                .superclass()

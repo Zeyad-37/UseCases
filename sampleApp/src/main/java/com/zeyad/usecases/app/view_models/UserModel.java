@@ -2,6 +2,7 @@ package com.zeyad.usecases.app.view_models;
 
 import com.google.gson.annotations.SerializedName;
 import com.zeyad.usecases.annotations.AutoMap;
+import com.zeyad.usecases.annotations.FindMapped;
 
 import java.util.List;
 
@@ -27,9 +28,10 @@ public class UserModel {
     private String description;
     @SerializedName(FOLLOWERS)
     private int followers;
-    @SerializedName(EMAIL)
     @Ignore
+    @SerializedName(EMAIL)
     private String email;
+    @FindMapped
     @SerializedName(REPOS)
     private List<RepoModel> repos;
 
