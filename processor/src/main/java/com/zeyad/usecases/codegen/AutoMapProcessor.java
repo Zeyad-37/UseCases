@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.gson.annotations.SerializedName;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ClassName;
+import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
@@ -41,6 +42,7 @@ import javax.tools.JavaFileObject;
 import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 
+import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
 /**
@@ -97,6 +99,8 @@ public class AutoMapProcessor extends AbstractProcessor {
         String source = generateDataClassFile(type, className);
         source = Reformatter.fixup(source);
         writeSourceFile(className, source, type);
+//        source = Reformatter.fixup(generateDAOMapper(type, className));
+//        writeSourceFile(className, source, type);
     }
 
     private void writeSourceFile(String className, String text, TypeElement originatingType) {
@@ -251,7 +255,6 @@ public class AutoMapProcessor extends AbstractProcessor {
                 }
             }
         }
-
         isEmptyBuilder.addParameter(ClassName.get(pkg, className), isEmptyParameterName);
         isEmptyImplementation = isEmptyImplementation.substring(0, isEmptyImplementation.length() - 4) + ");";
         MethodSpec isEmpty = isEmptyBuilder.addCode(isEmptyImplementation).build();
@@ -261,39 +264,53 @@ public class AutoMapProcessor extends AbstractProcessor {
         return JavaFile.builder(pkg, classBuilder.build()).build().toString();
     }
 
-    public TypeSpec generateDAOMapper(TypeElement type, String className) {
+    private String generateDAOMapper(TypeElement type, String className) {
         List<? extends Element> allElements = type.getEnclosedElements();
-//        VariableElement variableElement = nonPrivateFields.get(0);
-//        variableElement.getEnclosingElement().asType().getKind();
+        String pkg = TypeUtil.packageNameOf(type);
         String checkIfEmptyStub = "if (" + className + ".isEmpty())\nreturn new " + className + "();\n";
+        String parameterName = type.getSimpleName().toString();
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("mapToDomainManual")
+                .addAnnotation(Override.class)
+                .addModifiers(PUBLIC)
+                .addParameter(ClassName.get(pkg, "AutoMap_" + parameterName), "")
+                .returns(TypeName.get(type.asType()));
+
+        String code = checkIfEmptyStub;
+
+        CodeBlock.Builder implementation = CodeBlock.builder();
+        implementation.add(checkIfEmptyStub);
+        implementation.add(parameterName + " " + parameterName + " = new " + parameterName + " ();");
 
         for (int i = 0, allElementsSize = allElements.size(); i < allElementsSize; i++) {
             Element element = allElements.get(i);
-
+            if (element.getAnnotation(Ignore.class) == null) {
+                String variableName = element.getSimpleName().toString();
+                if (element.getAnnotation(FindMapped.class) == null)
+                    implementation.addStatement("$N.set$S($N.get$S())", parameterName, variableName, parameterName, variableName);
+                else {
+                    code += "";
+                }
+            }
         }
-        String code = checkIfEmptyStub + className + "generatedC";
-
-        MethodSpec mapToDomainManual = MethodSpec.methodBuilder("main")
-                .addModifiers(Modifier.PUBLIC)
-                .returns(Object.class)
-                .addAnnotation(Override.class)
-                .addParameter(Object.class, "object")
-//                .addStatement("$T.out.println($S)", System.class, "Hello, JavaPoet!")
-                .build();
+        code += "return " + parameterName + ";";
+        builder.addCode(code);
+        MethodSpec mapToDomainManual = builder.build();
 
         MethodSpec constructor = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
                 .addCode("super();")
                 .build();
 
-        TypeName superClass = ClassName.get("com.zeyad.usecases.data.mappers", "DAOMapper");
+        TypeName superClass = ParameterizedTypeName.get(ClassName.get("com.zeyad.usecases.data.mappers", "DAOMapper"),
+                ClassName.get(pkg, className),
+                ClassName.get(pkg, "AutoMap_" + className));
 
-        return TypeSpec.classBuilder(className)
-//                .superclass()
+        return JavaFile.builder(pkg, TypeSpec.classBuilder(className)
+                .superclass(superClass)
                 .addModifiers(Modifier.PUBLIC)
                 .addMethod(constructor)
                 .addMethod(mapToDomainManual)
-                .build();
+                .build()).build().toString();
     }
 
     private boolean isCollection(String className) {
