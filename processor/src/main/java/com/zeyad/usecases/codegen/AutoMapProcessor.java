@@ -9,9 +9,11 @@ import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 import com.zeyad.usecases.annotations.AutoMap;
+import com.zeyad.usecases.annotations.FindMapped;
 
 import java.io.IOException;
 import java.io.Writer;
@@ -162,7 +164,6 @@ public class AutoMapProcessor extends AbstractProcessor {
         // return such classes we won't see them here.
     }
 
-    // TODO: 12/16/16 Get generated class for annotated fields
     private String generateDataClassFile(TypeElement type, String className) {
         String pkg = TypeUtil.packageNameOf(type);
 
@@ -173,7 +174,7 @@ public class AutoMapProcessor extends AbstractProcessor {
         MethodSpec.Builder isEmptyBuilder = MethodSpec.methodBuilder("isEmpty")
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(boolean.class);
-        String isEmptyImplementation = "return " + isEmptyParameterName + " == null ||(\n";
+        String isEmptyImplementation = "return " + isEmptyParameterName + " == null ||\n(";
 
         // constructor
         MethodSpec constructor = MethodSpec.constructorBuilder()
@@ -194,10 +195,25 @@ public class AutoMapProcessor extends AbstractProcessor {
                     TypeName typeName = TypeName.get(element.asType());
                     String variableName = element.getSimpleName().toString();
                     FieldSpec.Builder builder;
-//                    if (element.getAnnotation(FindMapped.class) == null)
-                    builder = FieldSpec.builder(typeName, variableName);
-//                    else
-//                        builder = FieldSpec.builder(ClassName.get(pkg, " AutoMap_" + variableName), variableName);
+                    // TODO: 12/18/16 Try to remove!
+                    if (element.getAnnotation(FindMapped.class) == null)
+                        builder = FieldSpec.builder(typeName, variableName);
+                    else {
+                        if (isCollection(typeName.toString())) {
+                            String name = typeName.toString().split("<")[1];
+                            String[] split = name.split("\\.");
+                            String vName = split[split.length - 1];
+                            vName = "AutoMap_" + vName.split(">")[0];
+                            typeName = ParameterizedTypeName.get(ClassName.get("io.realm", "RealmList"),
+                                    ClassName.get(pkg, vName));
+                            builder = FieldSpec.builder(typeName, variableName);
+                        } else {
+                            String[] split = typeName.toString().split("\\.");
+                            String vName = "AutoMap_" + split[split.length - 1];
+                            typeName = ClassName.get(pkg, vName);
+                            builder = FieldSpec.builder(typeName, variableName);
+                        }
+                    }
                     // add field
                     for (Modifier modifier : element.getModifiers()) {
                         builder.addModifiers(modifier);
@@ -278,5 +294,10 @@ public class AutoMapProcessor extends AbstractProcessor {
                 .addMethod(constructor)
                 .addMethod(mapToDomainManual)
                 .build();
+    }
+
+    private boolean isCollection(String className) {
+        return className.contains("List") || className.contains("Set") || className.contains("Queue")
+                || className.contains("Collection") || className.contains("Interface");
     }
 }
