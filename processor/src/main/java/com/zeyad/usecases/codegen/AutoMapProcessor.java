@@ -199,7 +199,7 @@ public class AutoMapProcessor extends AbstractProcessor {
                     TypeName typeName = TypeName.get(element.asType());
                     String variableName = element.getSimpleName().toString();
                     FieldSpec.Builder builder;
-                    // TODO: 12/18/16 Try to remove!
+                    // TODO: 12/18/16 Try to remove annotation!
                     if (element.getAnnotation(FindMapped.class) == null)
                         builder = FieldSpec.builder(typeName, variableName);
                     else {
@@ -275,8 +275,6 @@ public class AutoMapProcessor extends AbstractProcessor {
                 .addParameter(ClassName.get(pkg, "AutoMap_" + parameterName), "")
                 .returns(TypeName.get(type.asType()));
 
-        String code = checkIfEmptyStub;
-
         CodeBlock.Builder implementation = CodeBlock.builder();
         implementation.add(checkIfEmptyStub);
         implementation.add(parameterName + " " + parameterName + " = new " + parameterName + " ();");
@@ -286,14 +284,17 @@ public class AutoMapProcessor extends AbstractProcessor {
             if (element.getAnnotation(Ignore.class) == null) {
                 String variableName = element.getSimpleName().toString();
                 if (element.getAnnotation(FindMapped.class) == null)
-                    implementation.addStatement("$N.set$S($N.get$S())", parameterName, variableName, parameterName, variableName);
+                    implementation.addStatement("$N.set$S($N.get$S())", parameterName, variableName,
+                            parameterName, variableName);
                 else {
-                    code += "";
+                    implementation.addStatement("$N.set$S($N.get$S())", parameterName, variableName,
+                            parameterName, variableName);
                 }
             }
         }
-        code += "return " + parameterName + ";";
-        builder.addCode(code);
+
+        implementation.addStatement("return $S;", parameterName);
+        builder.addCode(implementation.build());
         MethodSpec mapToDomainManual = builder.build();
 
         MethodSpec constructor = MethodSpec.constructorBuilder()
@@ -315,6 +316,6 @@ public class AutoMapProcessor extends AbstractProcessor {
 
     private boolean isCollection(String className) {
         return className.contains("List") || className.contains("Set") || className.contains("Queue")
-                || className.contains("Collection") || className.contains("Interface");
+                || className.contains("Collection");
     }
 }
