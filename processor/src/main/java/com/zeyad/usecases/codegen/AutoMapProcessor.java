@@ -10,6 +10,7 @@ import com.squareup.javapoet.CodeBlock;
 import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
+import com.squareup.javapoet.ParameterSpec;
 import com.squareup.javapoet.ParameterizedTypeName;
 import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
@@ -80,8 +81,7 @@ public class AutoMapProcessor extends AbstractProcessor {
     }
 
     private void processType(TypeElement type) {
-        AutoMap AutoMap = type.getAnnotation(AutoMap.class);
-        if (AutoMap == null) {
+        if (type.getAnnotation(AutoMap.class) == null) {
             mErrorReporter.abortWithError("annotation processor for @AutoMap was invoked with a" +
                     "type annotated differently; compiler bug? O_o", type);
         }
@@ -99,8 +99,8 @@ public class AutoMapProcessor extends AbstractProcessor {
         String source = generateDataClassFile(type, className);
         source = Reformatter.fixup(source);
         writeSourceFile(className, source, type);
-//        source = Reformatter.fixup(generateDAOMapper(type, className));
-//        writeSourceFile(className, source, type);
+//        writeSourceFile(className, Reformatter.fixup(generateDAOMapper(type, className)), type);
+        writeSourceFile(className, Reformatter.fixup(generateDAOUtilMapper(type)), type);
     }
 
     private void writeSourceFile(String className, String text, TypeElement originatingType) {
@@ -312,6 +312,43 @@ public class AutoMapProcessor extends AbstractProcessor {
                 .addMethod(constructor)
                 .addMethod(mapToDomainManual)
                 .build()).build().toString();
+    }
+
+    private String generateDAOUtilMapper(TypeElement type) {
+        String pkg = "com.zeyad.usecases.data.mappers";
+        MethodSpec.Builder getDataMapperBuilder = MethodSpec.methodBuilder("getDataMapper")
+                .addModifiers(Modifier.PUBLIC)
+                .addAnnotation(Override.class)
+                .addParameter(ParameterSpec.builder(ClassName.get(Class.class), "dataClass").build())
+                .returns(ClassName.get(pkg, "IDAOMapper"));
+        CodeBlock.Builder getDataMapperCode = CodeBlock.builder();
+        // get the properties
+        List<? extends Element> allElements = type.getEnclosedElements();
+        for (int i = 0, allElementsSize = allElements.size(); i < allElementsSize; i++) {
+            Element element = allElements.get(i);
+            if (element.getKind().isField()) {
+                if (element.getAnnotation(Ignore.class) == null) {
+                    TypeName typeName = TypeName.get(element.asType());
+                    if (i == 0) {
+                        getDataMapperCode.beginControlFlow("if dataClass == $T", typeName);
+                        getDataMapperCode.addStatement("return new $T();", typeName);
+                    } else if (i == allElementsSize - 1) {
+                        getDataMapperCode.beginControlFlow("else if dataClass == $T", typeName);
+                        getDataMapperCode.addStatement("return new $T();", typeName);
+                    } else {
+                        getDataMapperCode.beginControlFlow("else");
+                        getDataMapperCode.addStatement("return new $T();", ClassName.get(pkg,
+                                "DefaultDAOMapper"));
+                    }
+                    getDataMapperCode.endControlFlow();
+                }
+            }
+        }
+        TypeSpec.Builder classBuilder = TypeSpec.classBuilder("AutoMap_DAOMapperUtil")
+                .superclass(ClassName.get(pkg, "DAOMapperUtil"))
+                .addModifiers(Modifier.PUBLIC);
+        classBuilder.addMethod(getDataMapperBuilder.build());
+        return JavaFile.builder(pkg, classBuilder.build()).build().toString();
     }
 
     private boolean isCollection(String className) {
