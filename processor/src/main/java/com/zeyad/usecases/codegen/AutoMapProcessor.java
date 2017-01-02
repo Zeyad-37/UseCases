@@ -96,11 +96,9 @@ public class AutoMapProcessor extends AbstractProcessor {
         String fqClassName = generatedSubclassName(type, 0);
         // class name
         String className = TypeUtil.simpleNameOf(fqClassName);
-        String source = generateDataClassFile(type, className);
-        source = Reformatter.fixup(source);
-        writeSourceFile(className, source, type);
-//        writeSourceFile(className, Reformatter.fixup(generateDAOMapper(type, className)), type);
-        writeSourceFile(className, Reformatter.fixup(generateDAOUtilMapper(type)), type);
+        writeSourceFile(className, Reformatter.fixup(generateDataClassFile(type, className)), type);
+        writeSourceFile(className + "Mapper", Reformatter.fixup(generateDAOMapper(type, className)), type);
+//        writeSourceFile("DAOMapperUtil", Reformatter.fixup(generateDAOUtilMapper(type)), type);
     }
 
     private void writeSourceFile(String className, String text, TypeElement originatingType) {
@@ -226,10 +224,12 @@ public class AutoMapProcessor extends AbstractProcessor {
                         builder = builder.addAnnotation(PrimaryKey.class);
                     if (element.getAnnotation(SerializedName.class) != null)
                         builder = builder.addAnnotation(AnnotationSpec.builder(SerializedName.class)
-                                .addMember("value", "$S", element.getAnnotation(SerializedName.class).value())
+                                .addMember("value", "$S", element.getAnnotation(SerializedName.class)
+                                        .value())
                                 .build());
-                    String variableNameCamelCase = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, variableName);
-                    if (!(element.getModifiers().contains(Modifier.FINAL) && element.getModifiers().contains(Modifier.STATIC))) {
+                    String variableNameCamelCase = variableName.substring(0, 1).toUpperCase() + variableName.substring(1);
+                    if (!(element.getModifiers().contains(Modifier.FINAL) && element.getModifiers()
+                            .contains(Modifier.STATIC))) {
                         // add setter
                         classBuilder.addMethod(MethodSpec.methodBuilder("set" + variableNameCamelCase)
                                 .addModifiers(Modifier.PUBLIC)
@@ -267,33 +267,44 @@ public class AutoMapProcessor extends AbstractProcessor {
     private String generateDAOMapper(TypeElement type, String className) {
         List<? extends Element> allElements = type.getEnclosedElements();
         String pkg = TypeUtil.packageNameOf(type);
-        String checkIfEmptyStub = "if (" + className + ".isEmpty())\nreturn new " + className + "();\n";
         String parameterName = type.getSimpleName().toString();
+
+        String paramName = "autoMap_" + CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL,
+                parameterName);
         MethodSpec.Builder builder = MethodSpec.methodBuilder("mapToDomainManual")
                 .addAnnotation(Override.class)
                 .addModifiers(PUBLIC)
-                .addParameter(ClassName.get(pkg, "AutoMap_" + parameterName), "")
+                .addParameter(ClassName.get(pkg, "AutoMap_" + parameterName), paramName)
                 .returns(TypeName.get(type.asType()));
 
+//        parameterName = parameterName.substring(0, 1).toLowerCase() + parameterName.substring(1);
+
+        String checkIfEmptyStub = "if (" + "AutoMap_" + parameterName + ".isEmpty(" + paramName + "))\n    return new "
+                + className.split("_")[1] + "();\n";
         CodeBlock.Builder implementation = CodeBlock.builder();
         implementation.add(checkIfEmptyStub);
-        implementation.add(parameterName + " " + parameterName + " = new " + parameterName + " ();");
+        String resultVariableName = parameterName.substring(0, 1).toLowerCase()
+                + parameterName.substring(1);
+        implementation.add(parameterName + " " + resultVariableName + " = new " + parameterName + "();\n");
 
         for (int i = 0, allElementsSize = allElements.size(); i < allElementsSize; i++) {
             Element element = allElements.get(i);
-            if (element.getAnnotation(Ignore.class) == null) {
+            if (element.getAnnotation(Ignore.class) == null && element.getKind().isField()
+                    && !(element.getModifiers().contains(Modifier.FINAL) && element.getModifiers()
+                    .contains(Modifier.STATIC))) {
                 String variableName = element.getSimpleName().toString();
+                variableName = variableName.substring(0, 1).toUpperCase() + variableName.substring(1);
                 if (element.getAnnotation(FindMapped.class) == null)
-                    implementation.addStatement("$N.set$S($N.get$S())", parameterName, variableName,
-                            parameterName, variableName);
+                    implementation.addStatement("$N.set$N($N.get$N())", resultVariableName, variableName,
+                            paramName, variableName);
                 else {
-                    implementation.addStatement("$N.set$S($N.get$S())", parameterName, variableName,
-                            parameterName, variableName);
+                    implementation.addStatement("$N.set$N($N.get$N())", resultVariableName, variableName,
+                            paramName, variableName);
                 }
             }
         }
 
-        implementation.addStatement("return $S;", parameterName);
+        implementation.addStatement("return $N", resultVariableName);
         builder.addCode(implementation.build());
         MethodSpec mapToDomainManual = builder.build();
 
@@ -302,11 +313,12 @@ public class AutoMapProcessor extends AbstractProcessor {
                 .addCode("super();")
                 .build();
 
-        TypeName superClass = ParameterizedTypeName.get(ClassName.get("com.zeyad.usecases.data.mappers", "DAOMapper"),
-                ClassName.get(pkg, className),
-                ClassName.get(pkg, "AutoMap_" + className));
+        TypeName superClass = ParameterizedTypeName.get(ClassName.get("com.zeyad.usecases.data.mappers",
+                "DAOMapper"),
+                ClassName.get(pkg, className.split("_")[1]),
+                ClassName.get(pkg, className));
 
-        return JavaFile.builder(pkg, TypeSpec.classBuilder(className)
+        return JavaFile.builder(pkg, TypeSpec.classBuilder(className + "Mapper")
                 .superclass(superClass)
                 .addModifiers(Modifier.PUBLIC)
                 .addMethod(constructor)

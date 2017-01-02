@@ -13,8 +13,8 @@ import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.mvvm.BaseActivity;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
+import com.zeyad.usecases.app.models.UserModel;
 import com.zeyad.usecases.app.presentation.repo_list.RepoListActivity;
-import com.zeyad.usecases.app.view_models.UserModel;
 
 import org.parceler.Parcels;
 

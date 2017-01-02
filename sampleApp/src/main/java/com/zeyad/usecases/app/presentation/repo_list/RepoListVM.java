@@ -3,8 +3,8 @@ package com.zeyad.usecases.app.presentation.repo_list;
 import android.os.Bundle;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
-import com.zeyad.usecases.app.view_models.AutoMap_UserModel;
-import com.zeyad.usecases.app.view_models.UserModel;
+import com.zeyad.usecases.app.models.AutoMap_UserModel;
+import com.zeyad.usecases.app.models.UserModel;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;

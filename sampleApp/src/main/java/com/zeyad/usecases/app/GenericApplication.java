@@ -5,7 +5,7 @@ import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.zeyad.usecases.app.mapper.RepoMapper;
-import com.zeyad.usecases.app.view_models.AutoMap_RepoModel;
+import com.zeyad.usecases.app.models.AutoMap_RepoModel;
 import com.zeyad.usecases.data.mappers.DAOMapperUtil;
 import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;

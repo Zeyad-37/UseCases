@@ -1,7 +1,7 @@
 package com.zeyad.usecases.app.mapper;
 
-import com.zeyad.usecases.app.view_models.AutoMap_RepoModel;
-import com.zeyad.usecases.app.view_models.RepoModel;
+import com.zeyad.usecases.app.models.AutoMap_RepoModel;
+import com.zeyad.usecases.app.models.RepoModel;
 import com.zeyad.usecases.data.mappers.DAOMapper;
 
 /**
