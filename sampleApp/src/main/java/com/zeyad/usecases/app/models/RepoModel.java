@@ -2,6 +2,7 @@ package com.zeyad.usecases.app.models;
 
 import com.google.gson.annotations.SerializedName;
 import com.zeyad.usecases.annotations.AutoMap;
+import com.zeyad.usecases.annotations.FindMapped;
 
 import io.realm.annotations.PrimaryKey;
 
@@ -15,6 +16,9 @@ public class RepoModel {
     @PrimaryKey
     @SerializedName("html_url")
     private String url;
+    @FindMapped
+    @SerializedName("user")
+    private UserModel userModel;
 
     public RepoModel() {
         this.name = "";
@@ -40,5 +44,13 @@ public class RepoModel {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public UserModel getUserModel() {
+        return userModel;
+    }
+
+    public void setUserModel(UserModel userModel) {
+        this.userModel = userModel;
     }
 }

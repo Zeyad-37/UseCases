@@ -4,11 +4,6 @@ import android.app.Application;
 import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.zeyad.usecases.app.mapper.RepoMapper;
-import com.zeyad.usecases.app.models.AutoMap_RepoModel;
-import com.zeyad.usecases.data.mappers.DAOMapperUtil;
-import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
-import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
@@ -49,14 +44,7 @@ public class GenericApplication extends Application {
                 .baseUrl(API_BASE_URL)
                 .withCache(true)
                 .withRealm(true)
-                .entityMapper(new DAOMapperUtil() {
-                    @Override
-                    public IDAOMapper getDataMapper(Class dataClass) {
-                        if (dataClass == AutoMap_RepoModel.class)
-                            return new RepoMapper();
-                        return new DefaultDAOMapper();
-                    }
-                })
+                .entityMapper(new com.zeyad.usecases.app.AutoMap_DAOMapperUtil())
                 .okHttpBuilder(provideOkHttpClientBuilder())
                 .build());
         Fresco.initialize(this);
