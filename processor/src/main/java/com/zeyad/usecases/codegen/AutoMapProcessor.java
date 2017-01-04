@@ -43,6 +43,7 @@ import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
 
 import static com.squareup.javapoet.ParameterizedTypeName.get;
+import static javax.lang.model.element.Modifier.PRIVATE;
 import static javax.lang.model.element.Modifier.PUBLIC;
 import static javax.lang.model.element.Modifier.STATIC;
 
@@ -208,12 +209,12 @@ public class AutoMapProcessor extends AbstractProcessor {
                             String vName = split[split.length - 1];
                             vName = "AutoMap_" + vName.split(">")[0];
                             typeName = get(ClassName.get("io.realm", "RealmList"),
-                                    ClassName.get(pkg, vName));
+                                    ClassName.get(pkg, pkg + "." + vName));
                             builder = FieldSpec.builder(typeName, variableName);
                         } else {
                             String[] split = typeName.toString().split("\\.");
                             String vName = "AutoMap_" + split[split.length - 1];
-                            typeName = ClassName.get(pkg, vName);
+                            typeName = ClassName.get(pkg, pkg + "." + vName);
                             builder = FieldSpec.builder(typeName, variableName);
                         }
                     }
@@ -276,18 +277,20 @@ public class AutoMapProcessor extends AbstractProcessor {
         MethodSpec.Builder builder = MethodSpec.methodBuilder("mapToDomainManual")
                 .addAnnotation(Override.class)
                 .addModifiers(PUBLIC)
-                .addParameter(ClassName.get(pkg, "AutoMap_" + parameterName), paramName)
+                .addParameter(ClassName.get(pkg, pkg + "." + "AutoMap_" + parameterName), paramName)
                 .returns(TypeName.get(type.asType()));
 
         MethodSpec.Builder staticBuilder = MethodSpec.methodBuilder("staticMapToDomainManual")
                 .addModifiers(PUBLIC, STATIC)
-                .addParameter(ClassName.get(pkg, "AutoMap_" + parameterName), paramName)
+                .addParameter(ClassName.get(pkg, pkg + "." + "AutoMap_" + parameterName), paramName)
                 .returns(TypeName.get(type.asType()));
 
-        String checkIfEmptyStub = "if (" + "AutoMap_" + parameterName + ".isEmpty(" + paramName
-                + "))\n    return new " + className.split("_")[1] + "();\n";
         CodeBlock.Builder implementation = CodeBlock.builder();
-        implementation.add(checkIfEmptyStub);
+        implementation.beginControlFlow("if ($N.isEmpty($N))", ClassName.get("",
+                pkg + "." + "AutoMap_" + parameterName).simpleName(), paramName);
+        implementation.addStatement("return new $N()", className.split("_")[1]);
+        implementation.endControlFlow();
+
         String resultVariableName = parameterName.substring(0, 1).toLowerCase()
                 + parameterName.substring(1);
         implementation.add(parameterName + " " + resultVariableName + " = new " + parameterName + "();\n");
@@ -308,12 +311,14 @@ public class AutoMapProcessor extends AbstractProcessor {
                     if (isCollection(typeName.toString())) {
                         boolean isPrimitive = !element.asType().getKind().isPrimitive();
 
-                        String listName = variableName.substring(0, 1).toLowerCase() + variableName.substring(1);
+                        String listName = variableName.substring(0, 1).toLowerCase() + variableName
+                                .substring(1);
                         implementation.addStatement("$N $N = new $L<>()", typeName.toString(), listName,
                                 ClassName.get("java.util", "ArrayList"));
 
                         if (isPrimitive)
-                            implementation.beginControlFlow("if ($N.get$N() != null)", paramName, variableName);
+                            implementation.beginControlFlow("if ($N.get$N() != null)", paramName,
+                                    variableName);
 
                         String name = typeName.toString().split("<")[1];
                         String[] split = name.split("\\.");
@@ -321,10 +326,10 @@ public class AutoMapProcessor extends AbstractProcessor {
                         currentItemType = "AutoMap_" + currentItemType.split(">")[0];
                         String currentItemName = listName.substring(0, listName.length() - 1);
 
-                        implementation.beginControlFlow("for ($N $N : $N.get$N())", currentItemType,
+                        implementation.beginControlFlow("for ($N $N : $N.get$N())", pkg + "." + currentItemType,
                                 currentItemName, paramName, variableName);
                         implementation.addStatement("$N.add($NMapper.staticMapToDomainManual($N))",
-                                listName, currentItemType, currentItemName);
+                                listName, pkg + "." + currentItemType, currentItemName);
                         implementation.endControlFlow();
                         if (isPrimitive)
                             implementation.endControlFlow();
@@ -355,15 +360,35 @@ public class AutoMapProcessor extends AbstractProcessor {
                 .addCode("super();")
                 .build();
 
+        String singletonName = "s" + className + "Mapper";
+
+        MethodSpec getInstance = MethodSpec.methodBuilder("getInstance")
+                .addModifiers(PUBLIC, STATIC)
+                .addCode(CodeBlock.builder()
+                        .beginControlFlow("if ($N == null)", singletonName)
+                        .addStatement("$N =  new $N()", singletonName, ClassName.get(pkg,
+                                className + "Mapper").simpleName())
+                        .endControlFlow()
+                        .addStatement("return $N", singletonName)
+                        .build())
+                .returns(ClassName.get(pkg, className + "Mapper"))
+                .build();
+
         TypeName superClass = get(ClassName.get("com.zeyad.usecases.data.mappers",
-                "DAOMapper"), ClassName.get(pkg, className.split("_")[1]), ClassName.get(pkg, className));
+                "DAOMapper"), ClassName.get(pkg, className.split("_")[1]), ClassName.get(pkg,
+                pkg + "." + className));
 
         return JavaFile.builder(pkg, TypeSpec.classBuilder(className + "Mapper")
                 .superclass(superClass)
                 .addModifiers(Modifier.PUBLIC)
+                .addField(FieldSpec.builder(ClassName.get(pkg, className + "Mapper"),
+                        singletonName)
+                        .addModifiers(PRIVATE, STATIC)
+                        .build())
                 .addMethod(constructor)
                 .addMethod(mapToDomainManual)
                 .addMethod(staticMapToDomainManual)
+                .addMethod(getInstance)
                 .build()).build().toString();
     }
 
@@ -388,13 +413,13 @@ public class AutoMapProcessor extends AbstractProcessor {
             String[] fullPath = typeName.toString().split("\\.");
             String staticMapper = typeName.toString().replace(fullPath[fullPath.length - 1],
                     "AutoMap_" + fullPath[fullPath.length - 1] + "Mapper");
-            getDataMapperCode.addStatement("return new $T()", ClassName
+            getDataMapperCode.addStatement("return $T.getInstance()", ClassName
                     .get("", staticMapper));
 
             getDataMapperCode.endControlFlow();
         }
 
-        getDataMapperCode.addStatement("return new $T()", ClassName.get(mappersPkg, "DefaultDAOMapper"));
+        getDataMapperCode.addStatement("return $T.getInstance()", ClassName.get(mappersPkg, "DefaultDAOMapper"));
         getDataMapperBuilder.addCode(getDataMapperCode.build());
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder("AutoMap_DAOMapperUtil")

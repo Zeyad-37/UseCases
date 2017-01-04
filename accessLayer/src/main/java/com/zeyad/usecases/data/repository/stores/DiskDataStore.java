@@ -57,12 +57,7 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<List> dynamicGetList(String url, Class domainClass, Class dataClass, boolean persist,
                                            boolean shouldCache) {
-//        if (DataUseCaseFactory.isWithCache() && Storo.contains(dataClass.getSimpleName()))
-//            return Storo.get(dataClass.getSimpleName(), dataClass).async()
-//                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel));
-//        else
-        return mDataBaseManager.getAll(dataClass)
-                .map(realmModels -> mEntityDataMapper.mapAllToDomain(realmModels));
+        return mDataBaseManager.getAll(dataClass).map(realmModels -> mEntityDataMapper.mapAllToDomain(realmModels));
     }
 
     @NonNull
@@ -115,11 +110,7 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<?> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
                                          Class domainClass, Class dataClass, boolean persist, boolean queuable) {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
-                .doOnNext(o -> {
-                    if (DataUseCaseFactory.isWithCache())
-                        cacheList(idColumnName, jsonArray, dataClass);
-                });
+        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass);
     }
 
     @NonNull
@@ -137,11 +128,7 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<?> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
                                         Class domainClass, Class dataClass, boolean persist, boolean queuable) {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
-                .doOnNext(o -> {
-                    if (DataUseCaseFactory.isWithCache())
-                        cacheList(idColumnName, jsonArray, dataClass);
-                });
+        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass);
     }
 
     private void cacheObject(String idColumnName, JSONObject jsonObject, Class dataClass) {
