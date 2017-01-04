@@ -132,12 +132,6 @@ public abstract class BaseFragment extends Fragment {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        Utils.unsubscribeIfNotNull(compositeSubscription);
-    }
-
-    @Override
     public void onDestroyView() {
         Utils.unsubscribeIfNotNull(compositeSubscription);
         if (viewModel != null)

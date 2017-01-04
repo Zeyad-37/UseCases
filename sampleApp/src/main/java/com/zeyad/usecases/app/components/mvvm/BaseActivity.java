@@ -105,12 +105,6 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        Utils.unsubscribeIfNotNull(mCompositeSubscription);
-    }
-
-    @Override
     public void onStop() {
         super.onStop();
         if (viewModel != null)
