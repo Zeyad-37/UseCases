@@ -47,6 +47,7 @@ public class GenericApplication extends Application {
                 .entityMapper(new com.zeyad.usecases.app.AutoMap_DAOMapperUtil())
                 .okHttpBuilder(provideOkHttpClientBuilder())
                 .build());
+//        PrefsUseCaseFactory.init(this, "com.usecase.zeyad.PREFS");
         Fresco.initialize(this);
         initializeFlowUp();
     }

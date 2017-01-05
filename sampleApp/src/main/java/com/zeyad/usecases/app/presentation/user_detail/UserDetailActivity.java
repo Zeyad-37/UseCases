@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.repo_detail;
+package com.zeyad.usecases.app.presentation.user_detail;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +14,7 @@ import com.zeyad.usecases.app.components.mvvm.BaseActivity;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.models.UserModel;
-import com.zeyad.usecases.app.presentation.repo_list.RepoListActivity;
+import com.zeyad.usecases.app.presentation.user_list.UserListActivity;
 
 import org.parceler.Parcels;
 
@@ -25,19 +25,19 @@ import rx.Subscription;
  * An activity representing a single RepoRealm detail screen. This
  * activity is only used narrow width devices. On tablet-size devices,
  * item details are presented side-by-side with a list of items
- * in a {@link RepoListActivity}.
+ * in a {@link UserListActivity}.
  */
-public class RepoDetailActivity extends BaseActivity implements LoadDataView {
-    public static final String ARG_ITEM = "item";
+public class UserDetailActivity extends BaseActivity implements LoadDataView {
+    public static final String ARG_USER = "user";
     @BindView(R.id.detail_toolbar)
     Toolbar toolbar;
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
 
     public static Intent getCallingIntent(Context context, UserModel userModel) {
-        return new Intent(context, RepoDetailActivity.class)
+        return new Intent(context, UserDetailActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra(ARG_ITEM, Parcels.wrap(userModel));
+                .putExtra(ARG_USER, Parcels.wrap(userModel));
     }
 
     @Override
@@ -51,15 +51,15 @@ public class RepoDetailActivity extends BaseActivity implements LoadDataView {
 
     @Override
     public void setupUI() {
-        setContentView(R.layout.activity_repo_detail);
+        setContentView(R.layout.activity_user_detail);
         setSupportActionBar(toolbar);
         // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
         if (isNewActivity) {
-            addFragment(R.id.repo_detail_container, RepoDetailFragment.newInstance(getIntent()
-                    .getParcelableExtra(RepoDetailFragment.ARG_ITEM)), null, "");
+            addFragment(R.id.user_detail_container, UserDetailFragment.newInstance(getIntent()
+                    .getParcelableExtra(UserDetailFragment.ARG_USER)), null, "");
         }
     }
 
@@ -72,7 +72,7 @@ public class RepoDetailActivity extends BaseActivity implements LoadDataView {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            navigateUpTo(new Intent(this, RepoListActivity.class));
+            navigateUpTo(new Intent(this, UserListActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -88,7 +88,7 @@ public class RepoDetailActivity extends BaseActivity implements LoadDataView {
 
     @Override
     public void showErrorWithRetry(String message) {
-        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, toolbar, message, "RETRY", view -> onResume());
+        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, toolbar, message, R.string.retry, view -> onResume());
     }
 
     @Override

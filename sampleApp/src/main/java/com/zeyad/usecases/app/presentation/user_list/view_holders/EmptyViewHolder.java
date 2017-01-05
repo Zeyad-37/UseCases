@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.repo_list.view_holders;
+package com.zeyad.usecases.app.presentation.user_list.view_holders;
 
 import android.view.View;
 

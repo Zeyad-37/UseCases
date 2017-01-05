@@ -3,8 +3,7 @@
     <string name="exception_message_no_connection">Please check your internet connection</string>
     <string name="title_repo_list">Repos</string>
     <string name="title_repo_detail">Repo Detail</string>
-    <string name="empty_show_repos_message">No repos found :(\nPlease tap on + button to start adding repos.</string>
-
+    <string name="empty_show_repos_message">No Users found :(\nPlease tap on + button to start adding Users.</string>
 
     <string name="transition_text">Photo Text</string>
     <string name="transition_photo">Photo Transition</string>
@@ -23,4 +22,5 @@
     <string name="invalid_number_msg">Invalid Number</string>
     <string name="string_content_description">Non accessible view</string>
     <string name="flow_up_api_key">2d50433de1d540e993114e6ce6161447</string>
+    <string name="retry">RETRY</string>
 </resources>

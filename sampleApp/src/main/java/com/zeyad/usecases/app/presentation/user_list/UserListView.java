@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.repo_list;
+package com.zeyad.usecases.app.presentation.user_list;
 
 import rx.Observable;
 
@@ -6,7 +6,7 @@ import rx.Observable;
  * @author zeyad on 11/1/16.
  */
 
-interface RepoListView {
+interface UserListView {
 
     Observable getUserList();
 }

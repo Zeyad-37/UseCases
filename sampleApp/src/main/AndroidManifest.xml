@@ -11,7 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".presentation.repo_list.RepoListActivity"
+            android:name=".presentation.user_list.UserListActivity"
             android:label="@string/title_repo_list"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
@@ -21,13 +21,13 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.repo_detail.RepoDetailActivity"
+            android:name=".presentation.user_detail.UserDetailActivity"
             android:label="@string/title_repo_detail"
-            android:parentActivityName=".presentation.repo_list.RepoListActivity"
+            android:parentActivityName=".presentation.user_list.UserListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.zeyad.usecases.app.presentation.repo_list.RepoListActivity" />
+                android:value="com.zeyad.usecases.app.presentation.user_list.UserListActivity" />
         </activity>
     </application>
 

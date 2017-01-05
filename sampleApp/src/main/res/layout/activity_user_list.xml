@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context="com.zeyad.usecases.app.presentation.repo_list.RepoListActivity">
+    tools:context="com.zeyad.usecases.app.presentation.user_list.UserListActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
@@ -29,7 +29,7 @@
 
         <include layout="@layout/view_progress" />
 
-        <include layout="@layout/repo_list" />
+        <include layout="@layout/user_list" />
     </FrameLayout>
 
     <android.support.design.widget.FloatingActionButton
@@ -39,5 +39,4 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="@dimen/fab_margin"
         app:srcCompat="@android:drawable/ic_dialog_email" />
-
 </android.support.design.widget.CoordinatorLayout>

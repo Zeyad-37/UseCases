@@ -148,6 +148,11 @@ public abstract class BaseActivity extends AppCompatActivity {
         });
     }
 
+    public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view, String message,
+                                       int actionText, View.OnClickListener onClickListener) {
+        showSnackBarWithAction(typeSnackBar, view, message, getString(actionText), onClickListener);
+    }
+
     /**
      * Shows a {@link android.support.design.widget.Snackbar} error message.
      *

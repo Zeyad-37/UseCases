@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.repo_list;
+package com.zeyad.usecases.app.presentation.user_list;
 
 import android.os.Bundle;
 
@@ -14,11 +14,12 @@ import rx.Observable;
 /**
  * @author zeyad on 11/1/16.
  */
-class RepoListVM extends BaseViewModel implements RepoListView {
+class UserListVM extends BaseViewModel implements UserListView {
 
     private final IDataUseCase genericUseCase;
+    private int currentPage;
 
-    RepoListVM() {
+    UserListVM() {
         genericUseCase = DataUseCaseFactory.getInstance();
     }
 
@@ -27,8 +28,12 @@ class RepoListVM extends BaseViewModel implements RepoListView {
         return genericUseCase.getList(new GetRequest
                 .GetRequestBuilder(AutoMap_UserModel.class, true)
                 .presentationClass(UserModel.class)
-                .url("users/users.json")
+                .url("users/?page=" + currentPage)
                 .build());
+    }
+
+    void incrementPage() {
+        currentPage++;
     }
 
     @Override
