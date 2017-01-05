@@ -95,4 +95,9 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
     public void showError(String message) {
         showErrorSnackBar(message, toolbar, Snackbar.LENGTH_LONG);
     }
+
+    @Override
+    public Context getViewContext() {
+        return this;
+    }
 }

@@ -33,39 +33,39 @@ public class UserModel {
     public static final String SITE_ADMIN = "site_admin";
     @PrimaryKey
     @SerializedName(LOGIN)
-    private String login;
+    String login;
     @SerializedName(ID)
-    private int id;
+    int id;
     @SerializedName(AVATAR_URL)
-    private String avatarUrl;
+    String avatarUrl;
     @SerializedName(GRAVATAR_ID)
-    private String gravatarId;
+    String gravatarId;
     @SerializedName(URL)
-    private String url;
+    String url;
     @SerializedName(HTML_URL)
-    private String htmlUrl;
+    String htmlUrl;
     @SerializedName(FOLLOWERS_URL)
-    private String followersUrl;
+    String followersUrl;
     @SerializedName(FOLLOWING_URL)
-    private String followingUrl;
+    String followingUrl;
     @SerializedName(GISTS_URL)
-    private String gistsUrl;
+    String gistsUrl;
     @SerializedName(STARRED_URL)
-    private String starredUrl;
+    String starredUrl;
     @SerializedName(SUBSCRIPTIONS_URL)
-    private String subscriptionsUrl;
+    String subscriptionsUrl;
     @SerializedName(ORGANIZATIONS_URL)
-    private String organizationsUrl;
+    String organizationsUrl;
     @SerializedName(REPOS_URL)
-    private String reposUrl;
+    String reposUrl;
     @SerializedName(EVENTS_URL)
-    private String eventsUrl;
+    String eventsUrl;
     @SerializedName(RECEIVED_EVENTS_URL)
-    private String receivedEventsUrl;
+    String receivedEventsUrl;
     @SerializedName(TYPE)
-    private String type;
+    String type;
     @SerializedName(SITE_ADMIN)
-    private boolean siteAdmin;
+    boolean siteAdmin;
 
     public UserModel() {
     }

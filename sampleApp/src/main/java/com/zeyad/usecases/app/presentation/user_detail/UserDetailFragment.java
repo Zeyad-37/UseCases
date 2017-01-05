@@ -1,6 +1,7 @@
 package com.zeyad.usecases.app.presentation.user_detail;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
@@ -11,6 +12,7 @@ import android.widget.LinearLayout;
 
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.mvvm.BaseFragment;
+import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.models.UserModel;
@@ -20,6 +22,7 @@ import org.parceler.Parcels;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observable;
 import rx.Subscription;
 
 /**
@@ -30,8 +33,7 @@ import rx.Subscription;
  */
 public class UserDetailFragment extends BaseFragment implements LoadDataView {
     /**
-     * The fragment argument representing the item ID that this fragment
-     * represents.
+     * The fragment argument representing the item that this fragment represents.
      */
     public static final String ARG_USER = "user";
     @BindView(R.id.linear_layout_loader)
@@ -57,20 +59,6 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments().containsKey(ARG_USER)) {
-            Activity activity = getActivity();
-            if (activity != null) {
-                CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-                if (appBarLayout != null) {
-                    appBarLayout.setTitle(userModel.getLogin());
-                }
-            }
-        }
-    }
-
-    @Override
     public void initialize() {
         if (getArguments() != null) {
             userModel = Parcels.unwrap(getArguments().getParcelable(ARG_USER));
@@ -79,7 +67,19 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
 
     @Override
     public Subscription loadData() {
-        return null;
+        return Observable.just(userModel).subscribe(new BaseSubscriber<UserDetailFragment, UserModel>
+                (this, BaseSubscriber.ERROR_WITH_RETRY) {
+            @Override
+            public void onNext(UserModel userModel) {
+                Activity activity = getActivity();
+                if (activity != null) {
+                    CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+                    if (appBarLayout != null) {
+                        appBarLayout.setTitle(userModel.getLogin());
+                    }
+                }
+            }
+        });
     }
 
     @Override
@@ -110,5 +110,14 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     @Override
     public void showError(String message) {
         showErrorSnackBar(message, loaderLayout, Snackbar.LENGTH_LONG);
+    }
+
+    @Override
+    public Context getViewContext() {
+        return getContext();
+    }
+
+    public void setUserModel(UserModel userModel) {
+        this.userModel = userModel;
     }
 }

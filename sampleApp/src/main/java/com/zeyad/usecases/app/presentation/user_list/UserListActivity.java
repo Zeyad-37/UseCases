@@ -1,5 +1,6 @@
 package com.zeyad.usecases.app.presentation.user_list;
 
+import android.content.Context;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -134,6 +135,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
                     userListVM.incrementPage();
                     mCompositeSubscription.add(loadData());
+                    userListVM.setYScroll(dy);
                 }
             }
         });
@@ -158,5 +160,10 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     @Override
     public void showError(String message) {
         showErrorSnackBar(message, userRecycler, Snackbar.LENGTH_LONG);
+    }
+
+    @Override
+    public Context getViewContext() {
+        return this;
     }
 }

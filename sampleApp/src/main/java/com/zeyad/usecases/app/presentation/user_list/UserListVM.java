@@ -16,8 +16,9 @@ import rx.Observable;
  */
 class UserListVM extends BaseViewModel implements UserListView {
 
+    private static final String CURRENT_PAGE = "currentPage", Y_SCROLL = "yScroll";
     private final IDataUseCase genericUseCase;
-    private int currentPage;
+    private int currentPage, yScroll;
 
     UserListVM() {
         genericUseCase = DataUseCaseFactory.getInstance();
@@ -36,12 +37,25 @@ class UserListVM extends BaseViewModel implements UserListView {
         currentPage++;
     }
 
+    void setYScroll(int yScroll) {
+        this.yScroll = yScroll;
+    }
+
     @Override
     public Bundle getState() {
-        return null;
+        Bundle outState = new Bundle(2);
+        outState.putInt(CURRENT_PAGE, currentPage);
+        outState.putInt(Y_SCROLL, yScroll);
+        return outState;
     }
 
     @Override
     public void restoreState(Bundle state) {
+        if (state != null) {
+            UserListActivity userListActivity = ((UserListActivity) getView());
+            currentPage = state.getInt(CURRENT_PAGE, 0);
+            yScroll = state.getInt(Y_SCROLL, 0);
+            userListActivity.userRecycler.scrollToPosition(yScroll);
+        }
     }
 }

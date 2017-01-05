@@ -1,5 +1,7 @@
 package com.zeyad.usecases.app.components.mvvm;
 
+import android.content.Context;
+
 /**
  * Interface representing a View that will use to load data.
  */
@@ -27,4 +29,9 @@ public interface LoadDataView {
      * @param message A string representing an error.
      */
     void showError(String message);
+
+    /**
+     * Returns the context of the view if exists.
+     */
+    Context getViewContext();
 }

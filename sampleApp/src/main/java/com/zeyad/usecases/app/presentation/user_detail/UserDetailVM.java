@@ -9,6 +9,8 @@ import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
+import org.parceler.Parcels;
+
 import rx.Observable;
 
 /**
@@ -34,10 +36,13 @@ public class UserDetailVM extends BaseViewModel implements UserDetailView {
 
     @Override
     public Bundle getState() {
-        return null;
+        Bundle outState = new Bundle(1);
+        outState.putParcelable(UserDetailFragment.ARG_USER, Parcels.wrap(null));
+        return outState;
     }
 
     @Override
     public void restoreState(Bundle state) {
+        ((UserDetailFragment) getView()).setUserModel(state.getParcelable(UserDetailFragment.ARG_USER));
     }
 }
