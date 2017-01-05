@@ -134,7 +134,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                 if ((layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
                     userListVM.incrementPage();
-                    mCompositeSubscription.add(loadData());
+                    compositeSubscription.add(loadData());
                     userListVM.setYScroll(dy);
                 }
             }

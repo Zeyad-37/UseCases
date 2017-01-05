@@ -17,6 +17,7 @@ public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
 
     @Override
     public void onViewDetached() {
+        view = null;
     }
 
     @Override

@@ -29,7 +29,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public INavigator navigator;
     public IRxEventBus rxEventBus;
     public IBaseViewModel viewModel;
-    public CompositeSubscription mCompositeSubscription;
+    public CompositeSubscription compositeSubscription;
     public boolean isNewActivity;
 
     @Override
@@ -39,7 +39,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         navigator = NavigatorFactory.getInstance();
         rxEventBus = RxEventBusFactory.getInstance();
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-        mCompositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(mCompositeSubscription);
+        compositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(compositeSubscription);
         initialize();
         if (!isNewActivity && viewModel != null)
             viewModel.restoreState(savedInstanceState);
@@ -101,7 +101,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        mCompositeSubscription.add(loadData());
+        compositeSubscription.add(loadData());
     }
 
     @Override
@@ -115,6 +115,7 @@ public abstract class BaseActivity extends AppCompatActivity {
     public void onDestroy() {
         if (viewModel != null)
             viewModel.onViewDetached();
+        viewModel = null;
         super.onDestroy();
     }
 
