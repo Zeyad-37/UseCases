@@ -12,7 +12,7 @@
         android:theme="@style/AppTheme">
         <activity
             android:name=".presentation.screens.user_list.UserListActivity"
-            android:label="@string/title_repo_list"
+            android:label="@string/title_user_list"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -22,7 +22,7 @@
         </activity>
         <activity
             android:name=".presentation.screens.user_detail.UserDetailActivity"
-            android:label="@string/title_repo_detail"
+            android:label="@string/title_user_detail"
             android:parentActivityName=".presentation.screens.user_list.UserListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -30,5 +30,4 @@
                 android:value=".presentation.screens.user_list.UserListActivity" />
         </activity>
     </application>
-
 </manifest>

@@ -8,12 +8,16 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.zeyad.usecases.data.LibraryModule;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.utils.Utils;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
+import io.realm.rx.RealmObservableFactory;
 
 public class Config {
     private static Config sInstance;
@@ -26,10 +30,12 @@ public class Config {
     private Config(@NonNull Context context) {
         mContext = context;
         mGson = createGson();
+        setupRealm();
     }
 
     private Config() {
         mGson = createGson();
+        setupRealm();
     }
 
     private static Gson createGson() {
@@ -63,13 +69,6 @@ public class Config {
         sInstance = new Config();
     }
 
-//    private void setupRealm() {
-//        RealmConfiguration realmConfiguration = new RealmConfiguration.Builder()
-//                .name("library.realm")
-//                .modules(new LibraryModule())
-//                .build();
-//    }
-
     public static String getBaseURL() {
         if (Utils.isNotEmpty(mBaseURL))
             return mBaseURL;
@@ -85,6 +84,15 @@ public class Config {
         if (mGson == null)
             mGson = createGson();
         return mGson;
+    }
+
+    private void setupRealm() {
+        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
+                .name("library.realm")
+                .modules(new LibraryModule())
+                .rxFactory(new RealmObservableFactory())
+                .deleteRealmIfMigrationNeeded()
+                .build());
     }
 
     @Nullable

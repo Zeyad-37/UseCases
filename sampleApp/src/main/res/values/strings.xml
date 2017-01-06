@@ -1,8 +1,8 @@
 <resources>
     <string name="app_name">Generic App</string>
     <string name="exception_message_no_connection">Please check your internet connection</string>
-    <string name="title_repo_list">Repos</string>
-    <string name="title_repo_detail">Repo Detail</string>
+    <string name="title_user_list">Github Users</string>
+    <string name="title_user_detail">User Detail</string>
     <string name="empty_show_repos_message">No Users found :(\nPlease tap on + button to start adding Users.</string>
 
     <string name="transition_text">Photo Text</string>
