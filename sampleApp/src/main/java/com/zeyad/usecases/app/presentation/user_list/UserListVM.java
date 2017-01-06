@@ -17,19 +17,19 @@ import rx.Observable;
 class UserListVM extends BaseViewModel implements UserListView {
 
     private static final String CURRENT_PAGE = "currentPage", Y_SCROLL = "yScroll";
-    private final IDataUseCase genericUseCase;
+    private final IDataUseCase dataUseCase;
     private int currentPage, yScroll;
 
     UserListVM() {
-        genericUseCase = DataUseCaseFactory.getInstance();
+        dataUseCase = DataUseCaseFactory.getInstance();
     }
 
     @Override
     public Observable getUserList() {
-        return genericUseCase.getList(new GetRequest
+        return dataUseCase.getList(new GetRequest
                 .GetRequestBuilder(AutoMap_UserModel.class, true)
                 .presentationClass(UserModel.class)
-                .url("users/?page=" + currentPage)
+                .url("users?page=" + currentPage)
                 .build());
     }
 

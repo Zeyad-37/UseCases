@@ -25,7 +25,6 @@ import static com.zeyad.usecases.app.utils.Constants.API_BASE_URL;
 /**
  * @author by ZIaDo on 9/24/16.
  */
-
 public class GenericApplication extends Application {
 
     private static final int TIME_OUT = 15;

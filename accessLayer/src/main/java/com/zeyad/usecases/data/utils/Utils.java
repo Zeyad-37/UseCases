@@ -65,6 +65,10 @@ public class Utils {
         return false;
     }
 
+    public static boolean isNotEmpty(String text) {
+        return text != null && !text.isEmpty() && !text.equalsIgnoreCase("null");
+    }
+
     public static boolean isNetworkDecent() {
         return ConnectionClassManager.getInstance().getCurrentBandwidthQuality()
                 .compareTo(ConnectionQuality.MODERATE) >= 0;

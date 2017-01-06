@@ -59,7 +59,16 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     }
 
     @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (outState != null) {
+            outState.putParcelable(UserDetailFragment.ARG_USER, Parcels.wrap(userModel));
+        }
+        super.onSaveInstanceState(outState);
+    }
+
+    @Override
     public void initialize() {
+        viewModel = null;
         if (getArguments() != null) {
             userModel = Parcels.unwrap(getArguments().getParcelable(ARG_USER));
         }
@@ -83,8 +92,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.user_detail, container, false);
         ButterKnife.bind(this, rootView);
         return rootView;
@@ -115,9 +123,5 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     @Override
     public Context getViewContext() {
         return getContext();
-    }
-
-    public void setUserModel(UserModel userModel) {
-        this.userModel = userModel;
     }
 }

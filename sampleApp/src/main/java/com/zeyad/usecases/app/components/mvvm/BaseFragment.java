@@ -19,14 +19,13 @@ import rx.subscriptions.CompositeSubscription;
 /**
  * @author zeyad on 11/28/16.
  */
-
 public abstract class BaseFragment extends Fragment {
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
     public CompositeSubscription compositeSubscription;
-    boolean isNewActivity;
-    IBaseViewModel viewModel;
+    public IBaseViewModel viewModel;
+    public boolean isNewActivity;
 
     public BaseFragment() {
     }
@@ -47,7 +46,7 @@ public abstract class BaseFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initialize();
-        if (savedInstanceState != null)
+        if (savedInstanceState != null && viewModel != null)
             viewModel.restoreState(savedInstanceState);
     }
 

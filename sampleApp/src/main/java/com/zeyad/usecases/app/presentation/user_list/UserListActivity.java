@@ -43,7 +43,7 @@ import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_R
  */
 public class UserListActivity extends BaseActivity implements LoadDataView {
 
-    public static final int PAGE_SIZE = 4;
+    public static final int PAGE_SIZE = 3;
     UserListVM userListVM;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -92,14 +92,16 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     }
 
     private void setupRecyclerView() {
-        usersAdapter = new GenericRecyclerViewAdapter(getApplicationContext(), new ArrayList<>()) {
+        usersAdapter = new GenericRecyclerViewAdapter(getViewContext(), new ArrayList<>()) {
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 switch (viewType) {
                     case R.layout.empty_view:
-                        return new EmptyViewHolder(mLayoutInflater.inflate(R.layout.empty_view, parent, false));
+                        return new EmptyViewHolder(mLayoutInflater.inflate(R.layout.empty_view, parent,
+                                false));
                     case R.layout.user_item_layout:
-                        return new UserViewHolder(mLayoutInflater.inflate(R.layout.user_item_layout, parent, false));
+                        return new UserViewHolder(mLayoutInflater.inflate(R.layout.user_item_layout,
+                                parent, false));
                     default:
                         return null;
                 }
@@ -119,11 +121,11 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                     addFragment(R.id.user_detail_container, orderDetailFragment, null, currentFragTag);
                 }
             } else {
-                navigator.navigateTo(getApplicationContext(), UserDetailActivity.getCallingIntent(getApplicationContext(),
-                        (UserModel) itemInfo.getData()));
+                navigator.navigateTo(getViewContext(), UserDetailActivity
+                        .getCallingIntent(getViewContext(), (UserModel) itemInfo.getData()));
             }
         });
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getViewContext());
         userRecycler.setLayoutManager(layoutManager);
         userRecycler.setAdapter(usersAdapter);
         userRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {

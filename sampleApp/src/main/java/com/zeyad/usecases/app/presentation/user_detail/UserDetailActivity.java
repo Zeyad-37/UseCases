@@ -2,7 +2,6 @@ package com.zeyad.usecases.app.presentation.user_detail;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +19,7 @@ import org.parceler.Parcels;
 
 import butterknife.BindView;
 import rx.Subscription;
+import rx.subscriptions.Subscriptions;
 
 /**
  * An activity representing a single RepoRealm detail screen. This
@@ -41,11 +41,6 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
     public void initialize() {
     }
 
@@ -53,7 +48,6 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
     public void setupUI() {
         setContentView(R.layout.activity_user_detail);
         setSupportActionBar(toolbar);
-        // Show the Up button in the action bar.
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -65,7 +59,7 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
 
     @Override
     public Subscription loadData() {
-        return null;
+        return Subscriptions.empty();
     }
 
     @Override
