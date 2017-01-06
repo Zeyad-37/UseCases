@@ -394,7 +394,7 @@ public class AutoMapProcessor extends AbstractProcessor {
 
     // TODO: 1/4/17 Clean up!
     private String generateDAOUtilMapper(List<TypeElement> types) {
-        String pkg = "com.zeyad.usecases.app";
+        String pkg = "";
         String mappersPkg = "com.zeyad.usecases.data.mappers";
 
         MethodSpec.Builder getDataMapperBuilder = MethodSpec.methodBuilder("getDataMapper")
@@ -407,6 +407,7 @@ public class AutoMapProcessor extends AbstractProcessor {
 
         for (int i = 0, typesSize = types.size(); i < typesSize; i++) {
             TypeName typeName = TypeName.get(types.get(i).asType());
+            pkg = TypeUtil.packageNameOf(types.get(i));
 
             getDataMapperCode.beginControlFlow("if (dataClass == $T.class)", typeName);
 

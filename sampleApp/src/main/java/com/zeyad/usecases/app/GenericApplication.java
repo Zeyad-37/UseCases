@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.zeyad.usecases.app.models.AutoMap_DAOMapperUtil;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
@@ -43,7 +44,7 @@ public class GenericApplication extends Application {
                 .baseUrl(API_BASE_URL)
                 .withCache(true)
                 .withRealm(true)
-                .entityMapper(new com.zeyad.usecases.app.AutoMap_DAOMapperUtil())
+                .entityMapper(new AutoMap_DAOMapperUtil())
                 .okHttpBuilder(provideOkHttpClientBuilder())
                 .build());
 //        PrefsUseCaseFactory.init(this, "com.usecase.zeyad.PREFS");
