@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.user_detail;
+package com.zeyad.usecases.app.presentation.screens.user_detail;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,8 +12,8 @@ import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.mvvm.BaseActivity;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
-import com.zeyad.usecases.app.models.UserModel;
-import com.zeyad.usecases.app.presentation.user_list.UserListActivity;
+import com.zeyad.usecases.app.presentation.models.UserModel;
+import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
 
 import org.parceler.Parcels;
 

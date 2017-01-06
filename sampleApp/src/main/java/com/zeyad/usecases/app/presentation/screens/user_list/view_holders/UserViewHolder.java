@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.user_list.view_holders;
+package com.zeyad.usecases.app.presentation.screens.user_list.view_holders;
 
 import android.net.Uri;
 import android.view.View;
@@ -9,7 +9,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.DraweeView;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
-import com.zeyad.usecases.app.models.UserModel;
+import com.zeyad.usecases.app.presentation.models.UserModel;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

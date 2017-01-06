@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.models;
+package com.zeyad.usecases.app.presentation.models;
 
 import com.google.gson.annotations.SerializedName;
 import com.zeyad.usecases.annotations.AutoMap;

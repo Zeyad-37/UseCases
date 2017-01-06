@@ -1,10 +1,10 @@
-package com.zeyad.usecases.app.presentation.user_list;
+package com.zeyad.usecases.app.presentation.screens.user_list;
 
 import android.os.Bundle;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
-import com.zeyad.usecases.app.models.AutoMap_UserModel;
-import com.zeyad.usecases.app.models.UserModel;
+import com.zeyad.usecases.app.presentation.models.AutoMap_UserModel;
+import com.zeyad.usecases.app.presentation.models.UserModel;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;

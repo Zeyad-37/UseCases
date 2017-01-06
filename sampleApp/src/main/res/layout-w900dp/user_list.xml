@@ -9,7 +9,7 @@
     android:divider="?android:attr/dividerHorizontal"
     android:orientation="horizontal"
     android:showDividers="middle"
-    tools:context="com.zeyad.usecases.app.presentation.user_list.UserListActivity">
+    tools:context=".presentation.screens.user_list.UserListActivity">
 
     <!-- This layout is a two-pane layout for the Users master/detail flow. -->
 
@@ -22,7 +22,7 @@
         android:layout_marginLeft="16dp"
         android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
-        tools:context="com.zeyad.usecases.app.presentation.user_list.UserListActivity"
+        tools:context=".presentation.screens.user_list.UserListActivity"
         tools:listitem="@layout/user_list_content" />
 
     <FrameLayout

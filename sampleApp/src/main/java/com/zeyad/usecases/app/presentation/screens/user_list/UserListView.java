@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.user_list;
+package com.zeyad.usecases.app.presentation.screens.user_list;
 
 import rx.Observable;
 

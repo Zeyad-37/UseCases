@@ -4,7 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.zeyad.usecases.app.models.AutoMap_DAOMapperUtil;
+import com.zeyad.usecases.app.presentation.models.AutoMap_DAOMapperUtil;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
