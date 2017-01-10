@@ -25,6 +25,8 @@ import butterknife.ButterKnife;
 import rx.Observable;
 import rx.Subscription;
 
+import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
+
 /**
  * A fragment representing a single RepoRealm detail screen.
  * This fragment is either contained in a {@link UserListActivity}
@@ -36,6 +38,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
      * The fragment argument representing the item that this fragment represents.
      */
     public static final String ARG_USER = "user";
+    UserDetailVM userDetailVM;
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
     /**
@@ -68,7 +71,8 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
 
     @Override
     public void initialize() {
-        viewModel = null;
+        viewModel = new UserDetailVM();
+        userDetailVM = ((UserDetailVM) viewModel);
         if (getArguments() != null) {
             userModel = Parcels.unwrap(getArguments().getParcelable(ARG_USER));
         }
@@ -76,19 +80,24 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
 
     @Override
     public Subscription loadData() {
-        return Observable.just(userModel).subscribe(new BaseSubscriber<UserDetailFragment, UserModel>
-                (this, BaseSubscriber.ERROR_WITH_RETRY) {
-            @Override
-            public void onNext(UserModel userModel) {
-                Activity activity = getActivity();
-                if (activity != null) {
-                    CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-                    if (appBarLayout != null) {
-                        appBarLayout.setTitle(userModel.getLogin());
+        return userDetailVM.getRepositories(userModel.getLogin())
+                .doOnSubscribe(this::showLoading)
+                .flatMap(o -> {
+                    Activity activity = getActivity();
+                    if (activity != null) {
+                        CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+                        if (appBarLayout != null) {
+                            appBarLayout.setTitle(userModel.getLogin());
+                        }
                     }
-                }
-            }
-        });
+                    return Observable.just(o);
+                })
+                .subscribe(new BaseSubscriber<UserDetailFragment, UserModel>(this, ERROR_WITH_RETRY) {
+                    @Override
+                    public void onNext(UserModel userModel) {
+
+                    }
+                });
     }
 
     @Override

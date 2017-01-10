@@ -22,6 +22,8 @@ import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.services.GenericJobService;
 
+import java.util.List;
+
 import io.realm.Realm;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
@@ -67,6 +69,10 @@ public class Utils {
 
     public static boolean isNotEmpty(String text) {
         return text != null && !text.isEmpty() && !text.equalsIgnoreCase("null");
+    }
+
+    public static boolean isNotEmpty(List list) {
+        return list != null && !list.isEmpty();
     }
 
     public static boolean isNetworkDecent() {

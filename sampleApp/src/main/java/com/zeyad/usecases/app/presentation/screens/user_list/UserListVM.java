@@ -4,7 +4,9 @@ import android.os.Bundle;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
 import com.zeyad.usecases.app.presentation.models.UserModel;
+import com.zeyad.usecases.app.presentation.models.UserRealm;
 import com.zeyad.usecases.data.requests.GetRequest;
+import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
@@ -27,11 +29,20 @@ class UserListVM extends BaseViewModel implements UserListView {
     public Observable getUserList() {
         return dataUseCase.getList(new GetRequest
 //                .GetRequestBuilder(AutoMap_UserModel.class, true)
-//                .GetRequestBuilder(UserRealm.class, true)
-                .GetRequestBuilder(UserModel.class, true)
+                .GetRequestBuilder(UserRealm.class, true)
                 .presentationClass(UserModel.class)
-                .url("users?page=" + currentPage)
-                .build());
+                .build())
+                .flatMap(list -> {
+                    if (Utils.isNotEmpty(list))
+                        return Observable.just(list);
+                    else return dataUseCase.getList(new GetRequest
+//                .GetRequestBuilder(AutoMap_UserModel.class, true)
+//                .GetRequestBuilder(UserRealm.class, true)
+                            .GetRequestBuilder(UserModel.class, true)
+                            .presentationClass(UserModel.class)
+                            .url("users?page=" + currentPage)
+                            .build());
+                });
     }
 
     void incrementPage() {
