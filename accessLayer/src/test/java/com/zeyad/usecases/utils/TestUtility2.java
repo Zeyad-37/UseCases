@@ -8,7 +8,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
-import com.zeyad.usecases.data.LibraryModule;
 import com.zeyad.usecases.data.mappers.DAOMapperUtil;
 import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
@@ -25,9 +24,6 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import io.realm.Realm;
-import io.realm.RealmConfiguration;
-import io.realm.rx.RealmObservableFactory;
 import rx.exceptions.CompositeException;
 import rx.observers.TestSubscriber;
 
@@ -178,12 +174,12 @@ public class TestUtility2 {
     }
 
     public static void performInitialSetupOfDb() {
-        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
-                .name("app.realm")
-                .modules(Realm.getDefaultModule(), new LibraryModule())
-                .rxFactory(new RealmObservableFactory())
-                .deleteRealmIfMigrationNeeded()
-                .build());
+//        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
+//                .name("app.realm")
+//                .modules(Realm.getDefaultModule(), new LibraryModule())
+//                .rxFactory(new RealmObservableFactory())
+//                .deleteRealmIfMigrationNeeded()
+//                .build());
     }
 
 //    @TargetApi(Build.VERSION_CODES.LOLLIPOP)

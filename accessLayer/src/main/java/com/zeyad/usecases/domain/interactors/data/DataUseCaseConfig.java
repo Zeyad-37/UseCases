@@ -149,14 +149,14 @@ public class DataUseCaseConfig {
         }
 
         @NonNull
-        public Builder withRealm(boolean withRealm) {
-            this.withRealm = withRealm;
+        public Builder withRealm() {
+            this.withRealm = true;
             return this;
         }
 
         @NonNull
-        public Builder withCache(boolean withCache) {
-            this.withCache = withCache;
+        public Builder withCache() {
+            this.withCache = true;
             return this;
         }
 

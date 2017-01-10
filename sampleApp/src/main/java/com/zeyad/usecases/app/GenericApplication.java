@@ -4,7 +4,11 @@ import android.app.Application;
 import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.zeyad.usecases.app.presentation.models.AutoMap_DAOMapperUtil;
+import com.zeyad.usecases.app.presentation.models.UserModelMapper;
+import com.zeyad.usecases.app.presentation.models.UserRealm;
+import com.zeyad.usecases.data.mappers.DAOMapperUtil;
+import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
@@ -12,6 +16,8 @@ import java.util.concurrent.TimeUnit;
 
 import io.flowup.FlowUp;
 import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.rx.RealmObservableFactory;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 
@@ -36,13 +42,23 @@ public class GenericApplication extends Application {
         initializeRealm();
         DataUseCaseFactory.init(new DataUseCaseConfig.Builder(this)
                 .baseUrl(API_BASE_URL)
-                .withCache(true)
-                .withRealm(true)
-                .entityMapper(new AutoMap_DAOMapperUtil())
+//                .withCache()
+                .withRealm()
+//                .entityMapper(new AutoMap_DAOMapperUtil())
+                .entityMapper(new DAOMapperUtil() {
+                    @Override
+                    public IDAOMapper getDataMapper(Class dataClass) {
+                        if (dataClass == UserRealm.class) {
+                            return UserModelMapper.getInstance();
+                        }
+                        return DefaultDAOMapper.getInstance();
+                    }
+                })
                 .okHttpBuilder(provideOkHttpClientBuilder())
                 .build());
 //        PrefsUseCaseFactory.init(this, "com.usecase.zeyad.PREFS");
         Fresco.initialize(this);
+        initializeStetho();
         initializeFlowUp();
     }
 
@@ -61,12 +77,27 @@ public class GenericApplication extends Application {
 
     private void initializeRealm() {
         Realm.init(this);
-//        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
-//                .name("app.realm")
-//                .modules(Realm.getDefaultModule(), new LibraryModule())
-//                .rxFactory(new RealmObservableFactory())
-//                .deleteRealmIfMigrationNeeded()
+        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
+                .name("app.realm")
+                .modules(Realm.getDefaultModule(), new LibraryModule())
+                .rxFactory(new RealmObservableFactory())
+                .deleteRealmIfMigrationNeeded()
+                .build());
+    }
+
+    private void initializeStetho() {
+//        Stetho.initialize(Stetho.newInitializerBuilder(this)
+//                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+//                .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
 //                .build());
+//        RealmInspectorModulesProvider.builder(this)
+//                .withFolder(getCacheDir())
+////                .withEncryptionKey("encrypted.realm", key)
+//                .withMetaTables()
+//                .withDescendingOrder()
+//                .withLimit(1000)
+//                .databaseNamePattern(Pattern.compile(".+\\.realm"))
+//                .build();
     }
 
     private void initializeFlowUp() {

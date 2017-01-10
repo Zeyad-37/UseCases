@@ -3,8 +3,8 @@ package com.zeyad.usecases.app.presentation.screens.user_list;
 import android.os.Bundle;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
-import com.zeyad.usecases.app.presentation.models.AutoMap_UserModel;
 import com.zeyad.usecases.app.presentation.models.UserModel;
+import com.zeyad.usecases.app.presentation.models.UserRealm;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
@@ -27,9 +27,10 @@ class UserListVM extends BaseViewModel implements UserListView {
     @Override
     public Observable getUserList() {
         return dataUseCase.getList(new GetRequest
-                .GetRequestBuilder(AutoMap_UserModel.class, true)
+//                .GetRequestBuilder(AutoMap_UserModel.class, true)
+                .GetRequestBuilder(UserRealm.class, true)
                 .presentationClass(UserModel.class)
-                .url("users?page=" + currentPage)
+//                .url("users?page=" + currentPage)
                 .build());
     }
 

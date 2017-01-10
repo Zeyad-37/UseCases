@@ -409,13 +409,14 @@ public class AutoMapProcessor extends AbstractProcessor {
             TypeName typeName = TypeName.get(types.get(i).asType());
             pkg = TypeUtil.packageNameOf(types.get(i));
 
-            getDataMapperCode.beginControlFlow("if (dataClass == $T.class)", typeName);
-
             String[] fullPath = typeName.toString().split("\\.");
-            String staticMapper = typeName.toString().replace(fullPath[fullPath.length - 1],
-                    "AutoMap_" + fullPath[fullPath.length - 1] + "Mapper");
-            getDataMapperCode.addStatement("return $T.getInstance()", ClassName
-                    .get("", staticMapper));
+            String generatedFileFullPath = typeName.toString().replace(fullPath[fullPath.length - 1],
+                    "AutoMap_" + fullPath[fullPath.length - 1]);
+            String staticMapper = generatedFileFullPath + "Mapper";
+
+            getDataMapperCode.beginControlFlow("if (dataClass == $T.class)", ClassName.get("", generatedFileFullPath));
+
+            getDataMapperCode.addStatement("return $T.getInstance()", ClassName.get("", staticMapper));
 
             getDataMapperCode.endControlFlow();
         }

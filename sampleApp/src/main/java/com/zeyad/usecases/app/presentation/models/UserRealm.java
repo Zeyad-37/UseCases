@@ -1,18 +1,14 @@
 package com.zeyad.usecases.app.presentation.models;
 
 import com.google.gson.annotations.SerializedName;
-import com.zeyad.usecases.annotations.AutoMap;
 
-import org.parceler.Parcel;
-
+import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
- * @author zeyad on 12/1/16.
+ * @author zeyad on 1/10/17.
  */
-@Parcel
-@AutoMap
-public class UserModel {
+public class UserRealm extends RealmObject {
 
     public static final String LOGIN = "login", ID = "id", AVATAR_URL = "avatarUrl", GRAVATAR_ID = "gravatarId",
             URL = "url", HTML_URL = "htmlUrl", FOLLOWERS_URL = "followersUrl", FOLLOWING_URL = "following_url",
@@ -55,7 +51,26 @@ public class UserModel {
     @SerializedName(SITE_ADMIN)
     boolean siteAdmin;
 
-    public UserModel() {
+    public UserRealm() {
+    }
+
+    public static boolean isEmpty(UserRealm automapUsermodel) {
+        return automapUsermodel == null ||
+                (automapUsermodel.login == null &&
+                        automapUsermodel.avatarUrl == null &&
+                        automapUsermodel.gravatarId == null &&
+                        automapUsermodel.url == null &&
+                        automapUsermodel.htmlUrl == null &&
+                        automapUsermodel.followersUrl == null &&
+                        automapUsermodel.followingUrl == null &&
+                        automapUsermodel.gistsUrl == null &&
+                        automapUsermodel.starredUrl == null &&
+                        automapUsermodel.subscriptionsUrl == null &&
+                        automapUsermodel.organizationsUrl == null &&
+                        automapUsermodel.reposUrl == null &&
+                        automapUsermodel.eventsUrl == null &&
+                        automapUsermodel.receivedEventsUrl == null &&
+                        automapUsermodel.type == null);
     }
 
     public String getLogin() {

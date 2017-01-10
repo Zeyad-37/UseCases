@@ -19,8 +19,6 @@
         android:name="com.zeyad.usecases.app.presentation.RepoListFragment"
         android:layout_width="@dimen/item_width"
         android:layout_height="match_parent"
-        android:layout_marginLeft="16dp"
-        android:layout_marginRight="16dp"
         app:layoutManager="LinearLayoutManager"
         tools:context=".presentation.screens.user_list.UserListActivity"
         tools:listitem="@layout/user_list_content" />

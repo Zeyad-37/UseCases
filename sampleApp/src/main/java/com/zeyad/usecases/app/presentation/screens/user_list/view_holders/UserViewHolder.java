@@ -10,6 +10,7 @@ import com.facebook.drawee.view.DraweeView;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.presentation.models.UserModel;
+import com.zeyad.usecases.data.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -32,14 +33,18 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
 
     @Override
     public void bindData(Object data, boolean isItemSelected, int position, boolean isEnabled) {
-        UserModel userModel = (UserModel) data;
+        if (data != null) {
+            UserModel userModel = (UserModel) data;
 //        avatar.setImageURI(Uri.parse(userModel.getAvatarUrl()));
-        avatar.setController(Fresco.newDraweeControllerBuilder()
-                .setUri(Uri.parse(userModel.getAvatarUrl()))
-                .setTapToRetryEnabled(true)
-                .setOldController(avatar.getController())
+            if (Utils.isNotEmpty(userModel.getAvatarUrl()))
+                avatar.setController(Fresco.newDraweeControllerBuilder()
+                        .setUri(Uri.parse(userModel.getAvatarUrl()))
+                        .setTapToRetryEnabled(true)
+                        .setOldController(avatar.getController())
 //                .setControllerListener(new BaseControllerListener())
-                .build());
-        textViewTitle.setText(userModel.getLogin());
+                        .build());
+            if (Utils.isNotEmpty(userModel.getLogin()))
+                textViewTitle.setText(userModel.getLogin());
+        }
     }
 }
