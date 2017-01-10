@@ -6,4 +6,7 @@
     android:layout_height="match_parent"
     android:padding="16dp"
     android:textIsSelectable="true"
-    tools:context=".presentation.screens.user_detail.UserDetailFragment" />
+    tools:context=".presentation.screens.user_detail.UserDetailFragment">
+
+    <include layout="@layout/view_progress" />
+</RelativeLayout>

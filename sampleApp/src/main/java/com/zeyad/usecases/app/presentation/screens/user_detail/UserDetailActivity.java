@@ -52,8 +52,8 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
         if (actionBar != null)
             actionBar.setDisplayHomeAsUpEnabled(true);
         if (isNewActivity) {
-            addFragment(R.id.user_detail_container, UserDetailFragment.newInstance(getIntent()
-                    .getParcelableExtra(UserDetailFragment.ARG_USER)), null, "");
+            addFragment(R.id.user_detail_container, UserDetailFragment.newInstance(Parcels.unwrap(getIntent()
+                    .getParcelableExtra(UserDetailFragment.ARG_USER))), null, "");
         }
     }
 
