@@ -41,6 +41,7 @@ import javax.tools.JavaFileObject;
 
 import io.realm.annotations.Ignore;
 import io.realm.annotations.PrimaryKey;
+import io.realm.annotations.RealmClass;
 
 import static com.squareup.javapoet.ParameterizedTypeName.get;
 import static javax.lang.model.element.Modifier.PRIVATE;
@@ -98,7 +99,8 @@ public class AutoMapProcessor extends AbstractProcessor {
         String fqClassName = generatedSubclassName(type, 0);
         // class name
         String className = TypeUtil.simpleNameOf(fqClassName);
-        writeSourceFile(className, Reformatter.fixup(generateDataClassFile(type, className)), type);
+//        writeSourceFile(className, Reformatter.fixup(generateDataClassFile(type, className)), type);
+        writeSourceFile(className, Reformatter.fixup(generateModuleDataClassFile(type, className)), type);
         writeSourceFile(className + "Mapper", Reformatter.fixup(generateDAOMapper(type, className)), type);
     }
 
@@ -187,6 +189,105 @@ public class AutoMapProcessor extends AbstractProcessor {
 
         TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className)
                 .superclass(ClassName.get("io.realm", "RealmObject"))
+                .addModifiers(Modifier.PUBLIC)
+                .addMethod(constructor);
+
+        // get the properties
+        List<? extends Element> allElements = type.getEnclosedElements();
+        for (int i = 0, allElementsSize = allElements.size(); i < allElementsSize; i++) {
+            Element element = allElements.get(i);
+            if (element.getKind().isField()) {
+                if (element.getAnnotation(Ignore.class) == null) {
+                    TypeName typeName = TypeName.get(element.asType());
+                    String variableName = element.getSimpleName().toString();
+                    FieldSpec.Builder builder;
+                    // TODO: 12/18/16 Try to remove annotation!
+                    if (element.getAnnotation(FindMapped.class) == null)
+                        builder = FieldSpec.builder(typeName, variableName);
+                    else {
+                        if (isCollection(typeName.toString())) {
+                            String name = typeName.toString().split("<")[1];
+                            String[] split = name.split("\\.");
+                            String vName = split[split.length - 1];
+                            vName = "AutoMap_" + vName.split(">")[0];
+                            typeName = get(ClassName.get("io.realm", "RealmList"),
+                                    ClassName.get(pkg, pkg + "." + vName));
+                            builder = FieldSpec.builder(typeName, variableName);
+                        } else {
+                            String[] split = typeName.toString().split("\\.");
+                            String vName = "AutoMap_" + split[split.length - 1];
+                            typeName = ClassName.get(pkg, pkg + "." + vName);
+                            builder = FieldSpec.builder(typeName, variableName);
+                        }
+                    }
+                    // add field
+                    for (Modifier modifier : element.getModifiers()) {
+                        builder.addModifiers(modifier);
+                    }
+                    if (element.getAnnotation(PrimaryKey.class) != null)
+                        builder = builder.addAnnotation(PrimaryKey.class);
+                    if (element.getAnnotation(SerializedName.class) != null)
+                        builder = builder.addAnnotation(AnnotationSpec.builder(SerializedName.class)
+                                .addMember("value", "$S", element.getAnnotation(SerializedName.class)
+                                        .value())
+                                .build());
+                    String variableNameCamelCase = variableName.substring(0, 1).toUpperCase() + variableName.substring(1);
+                    if (!(element.getModifiers().contains(Modifier.FINAL) && element.getModifiers()
+                            .contains(Modifier.STATIC))) {
+                        // add setter
+                        classBuilder.addMethod(MethodSpec.methodBuilder("set" + variableNameCamelCase)
+                                .addModifiers(Modifier.PUBLIC)
+                                .returns(void.class)
+                                .addParameter(typeName, variableName)
+                                .addCode("this.$N = $N;", variableName, variableName)
+                                .build());
+                        // add getter
+                        classBuilder.addMethod(MethodSpec.methodBuilder("get" + variableNameCamelCase)
+                                .addModifiers(Modifier.PUBLIC)
+                                .returns(typeName)
+                                .addCode("return $N;", variableName)
+                                .build());
+                        if (!element.asType().getKind().isPrimitive()) {
+                            isEmptyImplementation += isEmptyParameterName + "." + variableName + " == null &&\n";
+                        }
+                    } else {
+                        // TODO: 12/16/16 Get value
+                        builder.initializer("$S", variableNameCamelCase.substring(0, 1).toLowerCase()
+                                + variableNameCamelCase.substring(1));
+                    }
+                    classBuilder.addField(builder.build());
+                }
+            }
+        }
+        isEmptyBuilder.addParameter(ClassName.get(pkg, className), isEmptyParameterName);
+        isEmptyImplementation = isEmptyImplementation.substring(0, isEmptyImplementation.length() - 4) + ");";
+        MethodSpec isEmpty = isEmptyBuilder.addCode(isEmptyImplementation).build();
+
+        classBuilder.addMethod(isEmpty);
+
+        return JavaFile.builder(pkg, classBuilder.build()).build().toString();
+    }
+
+    private String generateModuleDataClassFile(TypeElement type, String className) {
+        String pkg = TypeUtil.packageNameOf(type);
+
+        String isEmptyParameterName = CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, className)
+                .substring(0, 1).toLowerCase() + CaseFormat.UPPER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL,
+                className).substring(1);
+
+        MethodSpec.Builder isEmptyBuilder = MethodSpec.methodBuilder("isEmpty")
+                .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
+                .returns(boolean.class);
+        String isEmptyImplementation = "return " + isEmptyParameterName + " == null ||\n(";
+
+        // constructor
+        MethodSpec constructor = MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PUBLIC)
+                .build();
+
+        TypeSpec.Builder classBuilder = TypeSpec.classBuilder(className)
+                .addSuperinterface(ClassName.get("io.realm", "RealmModel"))
+                .addAnnotation(AnnotationSpec.builder(RealmClass.class).build())
                 .addModifiers(Modifier.PUBLIC)
                 .addMethod(constructor);
 

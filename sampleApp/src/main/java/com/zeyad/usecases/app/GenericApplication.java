@@ -4,11 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.zeyad.usecases.app.presentation.models.UserModelMapper;
-import com.zeyad.usecases.app.presentation.models.UserRealm;
-import com.zeyad.usecases.data.mappers.DAOMapperUtil;
-import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
-import com.zeyad.usecases.data.mappers.IDAOMapper;
+import com.zeyad.usecases.app.presentation.models.AutoMap_DAOMapperUtil;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
@@ -44,16 +40,16 @@ public class GenericApplication extends Application {
                 .baseUrl(API_BASE_URL)
 //                .withCache()
                 .withRealm()
-//                .entityMapper(new AutoMap_DAOMapperUtil())
-                .entityMapper(new DAOMapperUtil() {
-                    @Override
-                    public IDAOMapper getDataMapper(Class dataClass) {
-                        if (dataClass == UserRealm.class) {
-                            return UserModelMapper.getInstance();
-                        }
-                        return DefaultDAOMapper.getInstance();
-                    }
-                })
+                .entityMapper(new AutoMap_DAOMapperUtil())
+//                .entityMapper(new DAOMapperUtil() {
+//                    @Override
+//                    public IDAOMapper getDataMapper(Class dataClass) {
+//                        if (dataClass == UserRealm.class) {
+//                            return UserModelMapper.getInstance();
+//                        }
+//                        return DefaultDAOMapper.getInstance();
+//                    }
+//                })
                 .okHttpBuilder(provideOkHttpClientBuilder())
                 .build());
 //        PrefsUseCaseFactory.init(this, "com.usecase.zeyad.PREFS");

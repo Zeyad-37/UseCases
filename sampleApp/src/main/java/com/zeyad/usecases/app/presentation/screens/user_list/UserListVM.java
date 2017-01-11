@@ -27,21 +27,23 @@ class UserListVM extends BaseViewModel implements UserListView {
 
     @Override
     public Observable getUserList() {
+        Observable networkObservable = dataUseCase.getList(new GetRequest
+//                .GetRequestBuilder(AutoMap_UserModel.class, true)
+                .GetRequestBuilder(UserRealm.class, true)
+//                .GetRequestBuilder(UserModel.class, true)
+                .presentationClass(UserModel.class)
+                .url("users?page=" + currentPage)
+                .build());
         return dataUseCase.getList(new GetRequest
 //                .GetRequestBuilder(AutoMap_UserModel.class, true)
                 .GetRequestBuilder(UserRealm.class, true)
                 .presentationClass(UserModel.class)
                 .build())
+                .onErrorResumeNext(throwable -> networkObservable)
                 .flatMap(list -> {
                     if (Utils.isNotEmpty(list))
                         return Observable.just(list);
-                    else return dataUseCase.getList(new GetRequest
-//                .GetRequestBuilder(AutoMap_UserModel.class, true)
-//                .GetRequestBuilder(UserRealm.class, true)
-                            .GetRequestBuilder(UserModel.class, true)
-                            .presentationClass(UserModel.class)
-                            .url("users?page=" + currentPage)
-                            .build());
+                    else return networkObservable;
                 });
     }
 
