@@ -24,7 +24,7 @@ public class DataUseCaseConfig {
     private Context context;
     private IDAOMapperUtil entityMapper;
     private OkHttpClient.Builder okHttpBuilder;
-    private Cache cache;
+    private Cache okHttpCache;
     private String baseUrl;
     private boolean withCache, withRealm;
     private int cacheSize;
@@ -35,7 +35,7 @@ public class DataUseCaseConfig {
         context = dataUseCaseConfigBuilder.getContext();
         entityMapper = dataUseCaseConfigBuilder.getEntityMapper();
         okHttpBuilder = dataUseCaseConfigBuilder.getOkHttpBuilder();
-        cache = dataUseCaseConfigBuilder.getCache();
+        okHttpCache = dataUseCaseConfigBuilder.getOkHttpCache();
         baseUrl = dataUseCaseConfigBuilder.getBaseUrl();
         withCache = dataUseCaseConfigBuilder.isWithCache();
         withRealm = dataUseCaseConfigBuilder.isWithRealm();
@@ -65,11 +65,11 @@ public class DataUseCaseConfig {
         return entityMapper;
     }
 
-    public ThreadExecutor getThreadExecutor() {
+    ThreadExecutor getThreadExecutor() {
         return threadExecutor == null ? new JobExecutor() : threadExecutor;
     }
 
-    public PostExecutionThread getPostExecutionThread() {
+    PostExecutionThread getPostExecutionThread() {
         return postExecutionThread == null ? new UIThread() : postExecutionThread;
     }
 
@@ -77,8 +77,8 @@ public class DataUseCaseConfig {
         return okHttpBuilder;
     }
 
-    public Cache getCache() {
-        return cache;
+    Cache getOkHttpCache() {
+        return okHttpCache;
     }
 
     String getBaseUrl() {
@@ -94,14 +94,14 @@ public class DataUseCaseConfig {
     }
 
     int getCacheSize() {
-        return cacheSize == 0 ? 8192 : cacheSize;
+        return cacheSize == 0 || cacheSize > 8192 ? 8192 : cacheSize;
     }
 
     public static class Builder {
         private Context context;
         private IDAOMapperUtil entityMapper;
         private OkHttpClient.Builder okHttpBuilder;
-        private Cache cache;
+        private Cache okHttpCache;
         private String baseUrl;
         private boolean withCache, withRealm;
         private int cacheSize;
@@ -144,7 +144,7 @@ public class DataUseCaseConfig {
 
         @NonNull
         public Builder okhttpCache(Cache cache) {
-            this.cache = cache;
+            this.okHttpCache = cache;
             return this;
         }
 
@@ -170,11 +170,11 @@ public class DataUseCaseConfig {
             return context;
         }
 
-        public ThreadExecutor getThreadExecutor() {
+        ThreadExecutor getThreadExecutor() {
             return threadExecutor;
         }
 
-        public PostExecutionThread getPostExecutionThread() {
+        PostExecutionThread getPostExecutionThread() {
             return postExecutionThread;
         }
 
@@ -186,12 +186,12 @@ public class DataUseCaseConfig {
             return okHttpBuilder;
         }
 
-        Cache getCache() {
-            return cache;
+        Cache getOkHttpCache() {
+            return okHttpCache;
         }
 
-        void setCache(Cache cache) {
-            this.cache = cache;
+        void setOkHttpCache(Cache okHttpCache) {
+            this.okHttpCache = okHttpCache;
         }
 
         String getBaseUrl() {

@@ -32,7 +32,7 @@ android:
 
 before_cache:
   - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
-cache:
+okHttpCache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/

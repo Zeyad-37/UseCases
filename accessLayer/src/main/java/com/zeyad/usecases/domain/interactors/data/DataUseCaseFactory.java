@@ -34,7 +34,7 @@ public class DataUseCaseFactory {
         if (config.getOkHttpBuilder() == null) {
             ApiConnectionFactory.init();
         } else {
-            ApiConnectionFactory.init(config.getOkHttpBuilder(), config.getCache());
+            ApiConnectionFactory.init(config.getOkHttpBuilder(), config.getOkHttpCache());
         }
         if (config.isWithRealm()) {
             mDBType = REALM;

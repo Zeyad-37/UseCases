@@ -8,13 +8,18 @@ import com.zeyad.usecases.app.presentation.models.AutoMap_DAOMapperUtil;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
+import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import io.flowup.FlowUp;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.rx.RealmObservableFactory;
+import okhttp3.Cache;
+import okhttp3.CacheControl;
+import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 import static com.zeyad.usecases.app.utils.Constants.API_BASE_URL;
@@ -39,6 +44,7 @@ public class GenericApplication extends Application {
         DataUseCaseFactory.init(new DataUseCaseConfig.Builder(this)
                 .baseUrl(API_BASE_URL)
 //                .withCache()
+//                .cacheSize(8192)  // maximum size to allocate in bytes
                 .withRealm()
                 .entityMapper(new AutoMap_DAOMapperUtil())
 //                .entityMapper(new DAOMapperUtil() {
@@ -51,6 +57,7 @@ public class GenericApplication extends Application {
 //                    }
 //                })
                 .okHttpBuilder(provideOkHttpClientBuilder())
+                .okhttpCache(provideCache())
                 .build());
 //        PrefsUseCaseFactory.init(this, "com.usecase.zeyad.PREFS");
         Fresco.initialize(this);
@@ -69,6 +76,29 @@ public class GenericApplication extends Application {
     private HttpLoggingInterceptor provideHttpLoggingInterceptor() {
         return new HttpLoggingInterceptor(message -> Log.d("NetworkInfo", message))
                 .setLevel(HttpLoggingInterceptor.Level.BODY);
+    }
+
+    private Cache provideCache() {
+        Cache cache = null;
+        try {
+            cache = new Cache(new File(getCacheDir(), "http-cache"), 10 * 1024 * 1024); // 10 MB
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return cache;
+    }
+
+    private Interceptor provideCacheInterceptor() {
+        return chain -> {
+            Response response = chain.proceed(chain.request());
+            // re-write response header to force use of cache
+            CacheControl cacheControl = new CacheControl.Builder()
+                    .maxAge(2, TimeUnit.MINUTES)
+                    .build();
+            return response.newBuilder()
+                    .header("Cache-Control", cacheControl.toString())
+                    .build();
+        };
     }
 
     private void initializeRealm() {
