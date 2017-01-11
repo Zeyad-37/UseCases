@@ -1,30 +1,31 @@
 package com.zeyad.usecases.app.presentation.models;
 
 import com.google.gson.annotations.SerializedName;
-
-import java.security.acl.Owner;
+import com.zeyad.usecases.annotations.AutoMap;
+import com.zeyad.usecases.annotations.FindMapped;
 
 /**
  * @author zeyad on 1/10/17.
  */
-
+@AutoMap
 public class RepoModel {
     @SerializedName("id")
-    private Integer id;
+    private int id;
     @SerializedName("name")
     private String name;
     @SerializedName("full_name")
     private String fullName;
+    @FindMapped
     @SerializedName("owner")
-    private Owner owner;
+    private UserModel owner;
     @SerializedName("private")
-    private Boolean _private;
+    private boolean _private;
     @SerializedName("html_url")
     private String htmlUrl;
     @SerializedName("description")
-    private Object description;
+    private String description;
     @SerializedName("fork")
-    private Boolean fork;
+    private boolean fork;
     @SerializedName("url")
     private String url;
     @SerializedName("forks_url")
@@ -114,43 +115,46 @@ public class RepoModel {
     @SerializedName("svn_url")
     private String svnUrl;
     @SerializedName("homepage")
-    private Object homepage;
+    private String homepage;
     @SerializedName("size")
-    private Integer size;
+    private int size;
     @SerializedName("stargazers_count")
-    private Integer stargazersCount;
+    private int stargazersCount;
     @SerializedName("watchers_count")
-    private Integer watchersCount;
+    private int watchersCount;
     @SerializedName("language")
     private String language;
     @SerializedName("has_issues")
-    private Boolean hasIssues;
+    private boolean hasIssues;
     @SerializedName("has_downloads")
-    private Boolean hasDownloads;
+    private boolean hasDownloads;
     @SerializedName("has_wiki")
-    private Boolean hasWiki;
+    private boolean hasWiki;
     @SerializedName("has_pages")
-    private Boolean hasPages;
+    private boolean hasPages;
     @SerializedName("forks_count")
-    private Integer forksCount;
+    private int forksCount;
     @SerializedName("mirror_url")
-    private Object mirrorUrl;
+    private String mirrorUrl;
     @SerializedName("open_issues_count")
-    private Integer openIssuesCount;
+    private int openIssuesCount;
     @SerializedName("forks")
-    private Integer forks;
+    private int forks;
     @SerializedName("open_issues")
-    private Integer openIssues;
+    private int openIssues;
     @SerializedName("watchers")
-    private Integer watchers;
+    private int watchers;
     @SerializedName("default_branch")
     private String defaultBranch;
 
-    public Integer getId() {
+    public RepoModel() {
+    }
+
+    public int getId() {
         return id;
     }
 
-    public void setId(Integer id) {
+    public void setId(int id) {
         this.id = id;
     }
 
@@ -170,19 +174,19 @@ public class RepoModel {
         this.fullName = fullName;
     }
 
-    public Owner getOwner() {
+    public UserModel getOwner() {
         return owner;
     }
 
-    public void setOwner(Owner owner) {
+    public void setOwner(UserModel owner) {
         this.owner = owner;
     }
 
-    public Boolean getPrivate() {
+    public boolean getPrivate() {
         return _private;
     }
 
-    public void setPrivate(Boolean _private) {
+    public void setPrivate(boolean _private) {
         this._private = _private;
     }
 
@@ -194,19 +198,19 @@ public class RepoModel {
         this.htmlUrl = htmlUrl;
     }
 
-    public Object getDescription() {
+    public String getDescription() {
         return description;
     }
 
-    public void setDescription(Object description) {
+    public void setDescription(String description) {
         this.description = description;
     }
 
-    public Boolean getFork() {
+    public boolean getFork() {
         return fork;
     }
 
-    public void setFork(Boolean fork) {
+    public void setFork(boolean fork) {
         this.fork = fork;
     }
 
@@ -562,35 +566,35 @@ public class RepoModel {
         this.svnUrl = svnUrl;
     }
 
-    public Object getHomepage() {
+    public String getHomepage() {
         return homepage;
     }
 
-    public void setHomepage(Object homepage) {
+    public void setHomepage(String homepage) {
         this.homepage = homepage;
     }
 
-    public Integer getSize() {
+    public int getSize() {
         return size;
     }
 
-    public void setSize(Integer size) {
+    public void setSize(int size) {
         this.size = size;
     }
 
-    public Integer getStargazersCount() {
+    public int getStargazersCount() {
         return stargazersCount;
     }
 
-    public void setStargazersCount(Integer stargazersCount) {
+    public void setStargazersCount(int stargazersCount) {
         this.stargazersCount = stargazersCount;
     }
 
-    public Integer getWatchersCount() {
+    public int getWatchersCount() {
         return watchersCount;
     }
 
-    public void setWatchersCount(Integer watchersCount) {
+    public void setWatchersCount(int watchersCount) {
         this.watchersCount = watchersCount;
     }
 
@@ -602,83 +606,83 @@ public class RepoModel {
         this.language = language;
     }
 
-    public Boolean getHasIssues() {
+    public boolean getHasIssues() {
         return hasIssues;
     }
 
-    public void setHasIssues(Boolean hasIssues) {
+    public void setHasIssues(boolean hasIssues) {
         this.hasIssues = hasIssues;
     }
 
-    public Boolean getHasDownloads() {
+    public boolean getHasDownloads() {
         return hasDownloads;
     }
 
-    public void setHasDownloads(Boolean hasDownloads) {
+    public void setHasDownloads(boolean hasDownloads) {
         this.hasDownloads = hasDownloads;
     }
 
-    public Boolean getHasWiki() {
+    public boolean getHasWiki() {
         return hasWiki;
     }
 
-    public void setHasWiki(Boolean hasWiki) {
+    public void setHasWiki(boolean hasWiki) {
         this.hasWiki = hasWiki;
     }
 
-    public Boolean getHasPages() {
+    public boolean getHasPages() {
         return hasPages;
     }
 
-    public void setHasPages(Boolean hasPages) {
+    public void setHasPages(boolean hasPages) {
         this.hasPages = hasPages;
     }
 
-    public Integer getForksCount() {
+    public int getForksCount() {
         return forksCount;
     }
 
-    public void setForksCount(Integer forksCount) {
+    public void setForksCount(int forksCount) {
         this.forksCount = forksCount;
     }
 
-    public Object getMirrorUrl() {
+    public String getMirrorUrl() {
         return mirrorUrl;
     }
 
-    public void setMirrorUrl(Object mirrorUrl) {
+    public void setMirrorUrl(String mirrorUrl) {
         this.mirrorUrl = mirrorUrl;
     }
 
-    public Integer getOpenIssuesCount() {
+    public int getOpenIssuesCount() {
         return openIssuesCount;
     }
 
-    public void setOpenIssuesCount(Integer openIssuesCount) {
+    public void setOpenIssuesCount(int openIssuesCount) {
         this.openIssuesCount = openIssuesCount;
     }
 
-    public Integer getForks() {
+    public int getForks() {
         return forks;
     }
 
-    public void setForks(Integer forks) {
+    public void setForks(int forks) {
         this.forks = forks;
     }
 
-    public Integer getOpenIssues() {
+    public int getOpenIssues() {
         return openIssues;
     }
 
-    public void setOpenIssues(Integer openIssues) {
+    public void setOpenIssues(int openIssues) {
         this.openIssues = openIssues;
     }
 
-    public Integer getWatchers() {
+    public int getWatchers() {
         return watchers;
     }
 
-    public void setWatchers(Integer watchers) {
+    public void setWatchers(int watchers) {
         this.watchers = watchers;
     }
 

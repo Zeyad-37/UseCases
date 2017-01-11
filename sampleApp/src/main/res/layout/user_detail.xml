@@ -9,4 +9,14 @@
     tools:context=".presentation.screens.user_detail.UserDetailFragment">
 
     <include layout="@layout/view_progress" />
+
+    <TextView
+        android:id="@+id/textView_"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <!--<android.support.v7.widget.RecyclerView-->
+    <!--android:id="@+id/recyclerView_repositories"-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"/>-->
 </RelativeLayout>

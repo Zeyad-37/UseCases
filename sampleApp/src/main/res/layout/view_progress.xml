@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     android:background="@color/gray_even_lighter"
     android:gravity="center"
-    android:visibility="visible">
+    android:visibility="gone">
 
     <ProgressBar
         android:layout_width="@dimen/forty_eight_dp"

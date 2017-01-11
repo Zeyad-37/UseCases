@@ -15,14 +15,16 @@ import com.zeyad.usecases.app.components.mvvm.BaseFragment;
 import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
+import com.zeyad.usecases.app.presentation.models.RepoModel;
 import com.zeyad.usecases.app.presentation.models.UserModel;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
 
 import org.parceler.Parcels;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Observable;
 import rx.Subscription;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
@@ -79,10 +81,17 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     }
 
     @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.user_detail, container, false);
+        ButterKnife.bind(this, rootView);
+        return rootView;
+    }
+
+    @Override
     public Subscription loadData() {
         return userDetailVM.getRepositories(userModel.getLogin())
-                .doOnSubscribe(this::showLoading)
-                .flatMap(o -> {
+                .doOnSubscribe(() -> {
+                    showLoading();
                     Activity activity = getActivity();
                     if (activity != null) {
                         CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
@@ -90,21 +99,13 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
                             appBarLayout.setTitle(userModel.getLogin());
                         }
                     }
-                    return Observable.just(o);
                 })
-                .subscribe(new BaseSubscriber<UserDetailFragment, UserModel>(this, ERROR_WITH_RETRY) {
+                .subscribe(new BaseSubscriber<UserDetailFragment, List<RepoModel>>(this, ERROR_WITH_RETRY) {
                     @Override
-                    public void onNext(UserModel userModel) {
+                    public void onNext(List<RepoModel> repoModels) {
 
                     }
                 });
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.user_detail, container, false);
-        ButterKnife.bind(this, rootView);
-        return rootView;
     }
 
     @Override
