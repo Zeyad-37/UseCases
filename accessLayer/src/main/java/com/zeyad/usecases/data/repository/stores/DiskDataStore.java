@@ -2,7 +2,6 @@ package com.zeyad.usecases.data.repository.stores;
 
 import android.support.annotation.NonNull;
 
-import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.utils.ModelConverters;
@@ -18,9 +17,6 @@ import java.util.List;
 import io.realm.RealmQuery;
 import rx.Observable;
 import st.lowlevel.storo.Storo;
-import st.lowlevel.storo.StoroBuilder;
-
-import static com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory.CACHE_SIZE;
 
 public class DiskDataStore implements DataStore {
     private static final String IO_DB_ERROR = "Can not IO file to local DB";
@@ -35,10 +31,6 @@ public class DiskDataStore implements DataStore {
     DiskDataStore(DataBaseManager realmManager, IDAOMapper entityDataMapper) {
         mDataBaseManager = realmManager;
         mEntityDataMapper = entityDataMapper;
-        if (DataUseCaseFactory.isWithCache())
-            StoroBuilder.configure(CACHE_SIZE)
-                    .setDefaultCacheDirectory(Config.getInstance().getContext())
-                    .initialize();
     }
 
     @NonNull

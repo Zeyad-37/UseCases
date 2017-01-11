@@ -6,6 +6,8 @@ import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.network.ApiConnectionFactory;
 import com.zeyad.usecases.data.utils.Utils;
 
+import st.lowlevel.storo.StoroBuilder;
+
 public class DataUseCaseFactory {
     public static final int NONE = 0, REALM = 1;
     public static int CACHE_SIZE;
@@ -43,6 +45,10 @@ public class DataUseCaseFactory {
             mDBType = NONE;
             DataUseCase.initWithoutDB(config.getEntityMapper(), config.getThreadExecutor(), config.getPostExecutionThread());
         }
+        if (config.isWithCache())
+            StoroBuilder.configure(CACHE_SIZE)
+                    .setDefaultCacheDirectory(config.getContext())
+                    .initialize();
         sDataUseCase = DataUseCase.getInstance();
         CACHE_SIZE = config.getCacheSize();
         withCache = config.isWithCache();
