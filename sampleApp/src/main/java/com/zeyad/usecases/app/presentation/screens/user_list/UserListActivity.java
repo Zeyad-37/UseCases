@@ -78,10 +78,10 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                 .doOnSubscribe(this::showLoading)
                 .subscribe(new BaseSubscriber<UserListActivity, List<UserModel>>(this, ERROR_WITH_RETRY) {
                     @Override
-                    public void onNext(List<UserModel> repoModels) {
-                        List<ItemInfo> infoList = new ArrayList<>(repoModels.size());
-                        for (int i = 0, repoModelsSize = repoModels.size(); i < repoModelsSize; i++)
-                            infoList.add(new ItemInfo<>(repoModels.get(i), R.layout.user_item_layout));
+                    public void onNext(List<UserModel> userModels) {
+                        List<ItemInfo> infoList = new ArrayList<>(userModels.size());
+                        for (int i = 0, repoModelsSize = userModels.size(); i < repoModelsSize; i++)
+                            infoList.add(new ItemInfo<>(userModels.get(i), R.layout.user_item_layout));
                         usersAdapter.animateTo(infoList);
                     }
                 });

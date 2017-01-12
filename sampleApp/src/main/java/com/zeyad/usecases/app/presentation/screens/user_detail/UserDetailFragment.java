@@ -1,16 +1,21 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
-import android.app.Activity;
 import android.content.Context;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.zeyad.usecases.app.R;
+import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
+import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.mvvm.BaseFragment;
 import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
@@ -21,6 +26,7 @@ import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
 
 import org.parceler.Parcels;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -43,9 +49,11 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     UserDetailVM userDetailVM;
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
-    /**
-     * The content this fragment is presenting.
-     */
+    @BindView(R.id.textView_type)
+    TextView textViewType;
+    @BindView(R.id.recyclerView_repositories)
+    RecyclerView recyclerViewRepositories;
+    private GenericRecyclerViewAdapter repositoriesAdapter;
     private UserModel userModel;
 
     /**
@@ -84,7 +92,19 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.user_detail, container, false);
         ButterKnife.bind(this, rootView);
+        setupRecyclerView();
         return rootView;
+    }
+
+    void setupRecyclerView() {
+        recyclerViewRepositories.setLayoutManager(new LinearLayoutManager(getViewContext()));
+        repositoriesAdapter = new GenericRecyclerViewAdapter(getViewContext(), new ArrayList<>()) {
+            @Override
+            public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new RepositoryViewHolder(mLayoutInflater.inflate(viewType, parent, false));
+            }
+        };
+        recyclerViewRepositories.setAdapter(repositoriesAdapter);
     }
 
     @Override
@@ -92,18 +112,24 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
         return userDetailVM.getRepositories(userModel.getLogin())
                 .doOnSubscribe(() -> {
                     showLoading();
-                    Activity activity = getActivity();
+                    textViewType.setText(userModel.getType());
+                    UserDetailActivity activity = (UserDetailActivity) getActivity();
                     if (activity != null) {
                         CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
                         if (appBarLayout != null) {
                             appBarLayout.setTitle(userModel.getLogin());
                         }
+                        activity.imageViewAvatar.setImageURI(Uri.parse(userModel.getAvatarUrl()));
                     }
                 })
                 .subscribe(new BaseSubscriber<UserDetailFragment, List<RepoModel>>(this, ERROR_WITH_RETRY) {
                     @Override
                     public void onNext(List<RepoModel> repoModels) {
-
+                        List<ItemInfo> infoList = new ArrayList<>(repoModels.size());
+                        for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++) {
+                            infoList.add(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
+                        }
+                        repositoriesAdapter.animateTo(infoList);
                     }
                 });
     }

@@ -6,7 +6,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.view.DraweeView;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.presentation.models.UserModel;
@@ -22,7 +22,7 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     @BindView(R.id.title)
     TextView textViewTitle;
     @BindView(R.id.avatar)
-    DraweeView avatar;
+    SimpleDraweeView avatar;
     @BindView(R.id.rl_row_user)
     RelativeLayout rowUser;
 

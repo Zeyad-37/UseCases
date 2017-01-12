@@ -8,6 +8,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.LinearLayout;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.mvvm.BaseActivity;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
@@ -33,6 +34,8 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
     Toolbar toolbar;
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
+    @BindView(R.id.imageView_avatar)
+    SimpleDraweeView imageViewAvatar;
 
     public static Intent getCallingIntent(Context context, UserModel userModel) {
         return new Intent(context, UserDetailActivity.class)

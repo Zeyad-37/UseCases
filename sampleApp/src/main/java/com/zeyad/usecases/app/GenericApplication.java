@@ -72,6 +72,7 @@ public class GenericApplication extends Application {
     private OkHttpClient.Builder provideOkHttpClientBuilder() {
         return new OkHttpClient.Builder()
                 .addInterceptor(provideHttpLoggingInterceptor())
+                .addInterceptor(provideCacheInterceptor())
                 .connectTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .readTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .writeTimeout(TIME_OUT, TimeUnit.SECONDS);
