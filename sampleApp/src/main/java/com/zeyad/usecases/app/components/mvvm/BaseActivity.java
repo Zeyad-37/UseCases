@@ -107,8 +107,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-        if (viewModel != null)
-            viewModel.onViewDetached();
+//        if (viewModel != null)
+//            viewModel.onViewDetached();
     }
 
     @Override

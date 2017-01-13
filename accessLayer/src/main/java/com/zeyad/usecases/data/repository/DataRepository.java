@@ -51,7 +51,7 @@ public class DataRepository implements Data {
         try {
             return mDataStoreFactory.dynamically(url, true, mEntityMapperUtil.getDataMapper(dataClass))
                     .dynamicGetList(url, domainClass, dataClass, persist, shouldCache);
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             return Observable.error(e);
         }
     }
@@ -65,7 +65,7 @@ public class DataRepository implements Data {
             return mDataStoreFactory.dynamically(url, true, mEntityMapperUtil.getDataMapper(dataClass))
                     .dynamicGetObject(url, idColumnName, itemId, domainClass, dataClass, persist,
                             shouldCache);
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             return Observable.error(e);
         }
     }
@@ -78,7 +78,7 @@ public class DataRepository implements Data {
         try {
             return mDataStoreFactory.dynamically(url, false, mEntityMapperUtil.getDataMapper(dataClass))
                     .dynamicPostObject(url, idColumnName, keyValuePairs, domainClass, dataClass, persist, queuable);
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             return Observable.error(e);
         }
     }
@@ -90,7 +90,7 @@ public class DataRepository implements Data {
         try {
             return mDataStoreFactory.dynamically(url, false, mEntityMapperUtil.getDataMapper(dataClass))
                     .dynamicPostList(url, idColumnName, jsonArray, domainClass, dataClass, persist, queuable);
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             return Observable.error(e);
         }
     }
@@ -103,7 +103,7 @@ public class DataRepository implements Data {
             return mDataStoreFactory.dynamically(url, false, mEntityMapperUtil.getDataMapper(dataClass))
                     .dynamicDeleteCollection(url, DataRepository.DEFAULT_ID_KEY, jsonArray,
                             dataClass, persist, queuable);
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             return Observable.error(e);
         }
     }
@@ -139,7 +139,7 @@ public class DataRepository implements Data {
             return mDataStoreFactory.dynamically(url, false, mEntityMapperUtil.getDataMapper(dataClass))
                     .dynamicPutObject(url, idColumnName, keyValuePairs, domainClass, dataClass, persist,
                             queuable);
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             return Observable.error(e);
         }
     }
@@ -152,7 +152,7 @@ public class DataRepository implements Data {
         try {
             return mDataStoreFactory.dynamically(url, false, mEntityMapperUtil.getDataMapper(dataClass))
                     .dynamicPutList(url, idColumnName, jsonArray, domainClass, dataClass, persist, queuable);
-        } catch (IllegalAccessException e) {
+        } catch (Exception e) {
             return Observable.error(e);
         }
     }

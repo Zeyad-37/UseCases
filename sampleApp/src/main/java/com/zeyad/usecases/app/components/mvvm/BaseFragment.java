@@ -28,6 +28,7 @@ public abstract class BaseFragment extends Fragment {
     public boolean isNewActivity;
 
     public BaseFragment() {
+        super();
     }
 
     @Override

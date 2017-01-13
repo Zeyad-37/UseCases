@@ -1,6 +1,7 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -54,6 +55,10 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     private String currentFragTag;
     private boolean twoPane;
     private int userId;
+
+    public static Intent getCallingIntent(Context context) {
+        return new Intent(context, UserListActivity.class);
+    }
 
     @Override
     public void initialize() {

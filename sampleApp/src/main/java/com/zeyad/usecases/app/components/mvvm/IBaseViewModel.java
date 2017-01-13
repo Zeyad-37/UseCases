@@ -13,8 +13,4 @@ public interface IBaseViewModel<V> {
     void onViewAttached(V view, boolean isNew);
 
     void onViewDetached();
-
-    int getItemId();
-
-    void setItemId(int itemId);
 }
