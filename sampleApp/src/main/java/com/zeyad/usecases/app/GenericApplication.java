@@ -4,10 +4,10 @@ import android.app.Application;
 import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.zeyad.usecases.app.presentation.models.AutoMap_DAOMapperUtil;
+import com.zeyad.usecases.app.presentation.models.AutoMap_DAOMapperFactory;
 import com.zeyad.usecases.app.presentation.models.UserModelMapper;
 import com.zeyad.usecases.app.presentation.models.UserRealm;
-import com.zeyad.usecases.data.mappers.DAOMapperUtil;
+import com.zeyad.usecases.data.mappers.DAOMapperFactory;
 import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
@@ -50,8 +50,8 @@ public class GenericApplication extends Application {
                 .baseUrl(API_BASE_URL)
                 .withCache()
                 .withRealm()
-                .entityMapper(new AutoMap_DAOMapperUtil())
-                .entityMapper(new DAOMapperUtil() {
+                .entityMapper(new AutoMap_DAOMapperFactory())
+                .entityMapper(new DAOMapperFactory() {
                     @Override
                     public IDAOMapper getDataMapper(Class dataClass) {
                         if (dataClass == UserRealm.class) {

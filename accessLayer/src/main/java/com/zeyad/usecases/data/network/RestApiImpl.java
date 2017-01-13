@@ -17,17 +17,28 @@ import rx.Observable;
  */
 public class RestApiImpl implements RestApi {
 
+    private static RestApiImpl sRestAPI;
     private final IApiConnection mApiConnection;
 
     /**
      * Creates a new instance.
      */
-    public RestApiImpl() {
+    private RestApiImpl() {
         mApiConnection = ApiConnectionFactory.getInstance();
     }
 
     RestApiImpl(IApiConnection apiConnection) {
         mApiConnection = apiConnection;
+    }
+
+    public static void init() {
+        sRestAPI = new RestApiImpl();
+    }
+
+    public static RestApiImpl getInstance() {
+        if (sRestAPI == null)
+            init();
+        return sRestAPI;
     }
 
     /**

@@ -53,7 +53,7 @@ public class DataStoreFactoryJUnitTest {
     }
 
     @Test
-    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValid() throws IllegalAccessException {
+    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValid() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItems(mDataBaseManager);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
                 mIDAOMapper), is(instanceOf(DiskDataStore.class)));
@@ -61,7 +61,7 @@ public class DataStoreFactoryJUnitTest {
 
 
     @Test
-    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidAndNetWorkNotAvailable() throws IllegalAccessException {
+    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidAndNetWorkNotAvailable() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItems(mDataBaseManager);
         TestUtility2.changeStateOfNetwork(mMockedContext, false);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
@@ -69,7 +69,7 @@ public class DataStoreFactoryJUnitTest {
     }
 
     @Test
-    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkNotAvailable() throws IllegalAccessException {
+    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkNotAvailable() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItems(mDataBaseManager);
         TestUtility2.changeStateOfNetwork(mMockedContext, false);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
@@ -77,7 +77,7 @@ public class DataStoreFactoryJUnitTest {
     }
 
     @Test
-    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkIsAvailable() throws IllegalAccessException {
+    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkIsAvailable() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItems(mDataBaseManager);
         TestUtility2.changeStateOfNetwork(mMockedContext, true);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
@@ -85,7 +85,7 @@ public class DataStoreFactoryJUnitTest {
     }
 
     @Test
-    public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmpty() throws IllegalAccessException {
+    public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmpty() throws Exception {
         Mockito.when(Utils.isNetworkAvailable(InstrumentationRegistry.getContext())).thenReturn(true);
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getSomeValidUrl(), Mockito.anyBoolean(),
@@ -93,7 +93,7 @@ public class DataStoreFactoryJUnitTest {
     }
 
     @Test
-    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItem() throws IllegalAccessException {
+    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItem() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
                 mIDAOMapper), is(instanceOf(DiskDataStore.class)));
@@ -101,7 +101,7 @@ public class DataStoreFactoryJUnitTest {
 
 
     @Test
-    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItemAndNetWorkNotAvailable() throws IllegalAccessException {
+    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItemAndNetWorkNotAvailable() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
         TestUtility2.changeStateOfNetwork(mMockedContext, false);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
@@ -109,7 +109,7 @@ public class DataStoreFactoryJUnitTest {
     }
 
     @Test
-    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkNotAvailable() throws IllegalAccessException {
+    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkNotAvailable() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItem(mDataBaseManager);
         TestUtility2.changeStateOfNetwork(mMockedContext, false);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
@@ -117,7 +117,7 @@ public class DataStoreFactoryJUnitTest {
     }
 
     @Test
-    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkIsAvailable() throws IllegalAccessException {
+    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkIsAvailable() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItem(mDataBaseManager);
         TestUtility2.changeStateOfNetwork(mMockedContext, true);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(), Mockito.anyBoolean(),
@@ -125,7 +125,7 @@ public class DataStoreFactoryJUnitTest {
     }
 
     @Test
-    public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmptyForSingleItem() throws IllegalAccessException {
+    public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmptyForSingleItem() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getSomeValidUrl(), Mockito.anyBoolean(),
                 mIDAOMapper), is(instanceOf(CloudDataStore.class)));

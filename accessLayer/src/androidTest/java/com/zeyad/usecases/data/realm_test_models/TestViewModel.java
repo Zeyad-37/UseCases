@@ -1,4 +1,4 @@
-package com.zeyad.usecases.data.services.realm_test_models;
+package com.zeyad.usecases.data.realm_test_models;
 
 public class TestViewModel {
 

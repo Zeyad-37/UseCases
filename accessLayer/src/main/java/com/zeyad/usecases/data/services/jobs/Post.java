@@ -55,7 +55,7 @@ public class Post {
 
     public Post(int trailCount, @NonNull String payLoad, @NonNull Context context) {
         gson = Config.getGson();
-        mRestApi = new RestApiImpl();
+        mRestApi = RestApiImpl.getInstance();
         mContext = context;
         mTrailCount = trailCount;
         mPostRequest = gson.fromJson(payLoad, PostRequest.class);

@@ -40,7 +40,7 @@ public class DataRepositoryJUnitRobot {
         return dataStoreFactory;
     }
 
-    static void addMockForDiskStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedDataStore) throws IllegalAccessException {
+    static void addMockForDiskStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedDataStore) throws Exception {
         Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
                 .thenReturn(mockedDataStore);
         Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
@@ -48,7 +48,7 @@ public class DataRepositoryJUnitRobot {
         Mockito.when(mockedDataStoreFactory.disk(Mockito.any())).thenReturn(mockedDataStore);
     }
 
-    static void addMockForCloudStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedCloudStore) throws IllegalAccessException {
+    static void addMockForCloudStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedCloudStore) throws Exception {
         Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
                 .thenReturn(mockedCloudStore);
         Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
@@ -90,7 +90,7 @@ public class DataRepositoryJUnitRobot {
         return 1;
     }
 
-    static void mockDataStore(boolean isDiskType, DataStore dataStore, @NonNull DataStoreFactory dataStoreFactory) throws IllegalAccessException {
+    static void mockDataStore(boolean isDiskType, DataStore dataStore, @NonNull DataStoreFactory dataStoreFactory) throws Exception {
         if (isDiskType) {
             DataRepositoryJUnitRobot.addMockForDiskStore(dataStoreFactory, dataStore);
         } else {

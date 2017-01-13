@@ -2,12 +2,12 @@ package com.zeyad.usecases.data.repository;
 
 import android.support.annotation.NonNull;
 
+import com.zeyad.usecases.data.realm_test_models.TestModel;
+import com.zeyad.usecases.data.realm_test_models.TestViewModel;
 import com.zeyad.usecases.data.repository.stores.CloudDataStore;
 import com.zeyad.usecases.data.repository.stores.DataStore;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.repository.stores.DiskDataStore;
-import com.zeyad.usecases.data.services.realm_test_models.TestModel;
-import com.zeyad.usecases.data.services.realm_test_models.TestViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,7 +40,7 @@ public class DataRepositoryRobot {
         return dataStoreFactory;
     }
 
-    static void addMockForDiskStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedDataStore) throws IllegalAccessException {
+    static void addMockForDiskStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedDataStore) throws Exception {
         Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
                 .thenReturn(mockedDataStore);
         Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
@@ -48,7 +48,7 @@ public class DataRepositoryRobot {
         Mockito.when(mockedDataStoreFactory.disk(Mockito.any())).thenReturn(mockedDataStore);
     }
 
-    static void addMockForCloudStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedCloudStore) throws IllegalAccessException {
+    static void addMockForCloudStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedCloudStore) throws Exception {
         Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
                 .thenReturn(mockedCloudStore);
         Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
@@ -90,7 +90,7 @@ public class DataRepositoryRobot {
         return 1;
     }
 
-    static void mockDataStore(boolean isDiskType, DataStore dataStore, @NonNull DataStoreFactory dataStoreFactory) throws IllegalAccessException {
+    static void mockDataStore(boolean isDiskType, DataStore dataStore, @NonNull DataStoreFactory dataStoreFactory) throws Exception {
         if (isDiskType) {
             DataRepositoryRobot.addMockForDiskStore(dataStoreFactory, dataStore);
         } else {

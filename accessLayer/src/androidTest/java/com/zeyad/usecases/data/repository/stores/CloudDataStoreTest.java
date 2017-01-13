@@ -7,7 +7,7 @@ import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
-import com.zeyad.usecases.data.services.realm_test_models.TestModel;
+import com.zeyad.usecases.data.realm_test_models.TestModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

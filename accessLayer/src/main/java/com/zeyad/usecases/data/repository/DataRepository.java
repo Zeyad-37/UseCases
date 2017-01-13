@@ -3,7 +3,7 @@ package com.zeyad.usecases.data.repository;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.data.mappers.IDAOMapperUtil;
+import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.domain.repositories.Data;
 
@@ -19,14 +19,14 @@ public class DataRepository implements Data {
 
     public static final String DEFAULT_ID_KEY = "id";
     private final DataStoreFactory mDataStoreFactory;
-    private final IDAOMapperUtil mEntityMapperUtil;
+    private final IDAOMapperFactory mEntityMapperUtil;
 
     /**
      * Constructs a {@link Data}.
      *
      * @param dataStoreFactory A factory to construct different data source implementations.
      */
-    public DataRepository(DataStoreFactory dataStoreFactory, IDAOMapperUtil entityMapperUtil) {
+    public DataRepository(DataStoreFactory dataStoreFactory, IDAOMapperFactory entityMapperUtil) {
         mDataStoreFactory = dataStoreFactory;
         mEntityMapperUtil = entityMapperUtil;
         Config.getInstance().setDataStoreFactory(dataStoreFactory);

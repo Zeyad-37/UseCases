@@ -5,7 +5,7 @@ import android.os.Bundle;
 /**
  * @author zeyad on 11/28/16.
  */
-public interface IBaseViewModel<V> {
+interface IBaseViewModel<V> {
     Bundle getState();
 
     void restoreState(Bundle state);

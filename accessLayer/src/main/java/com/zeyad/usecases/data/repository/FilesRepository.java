@@ -5,16 +5,16 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.data.mappers.DAOMapperUtil;
+import com.zeyad.usecases.data.mappers.DAOMapperFactory;
 import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
-import com.zeyad.usecases.data.mappers.IDAOMapperUtil;
+import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.domain.repositories.Files;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,12 +25,11 @@ import rx.Observable;
 /**
  * @author by ZIaDo on 11/12/16.
  */
-
 public class FilesRepository implements Files {
     private static Gson mGson;
     private static Files sInstance;
     private final DataStoreFactory mDataStoreFactory;
-    private final IDAOMapperUtil mEntityMapperUtil;
+    private final IDAOMapperFactory mEntityMapperUtil;
 
     private FilesRepository(Context context) {
         if (Config.getInstance().getDataStoreFactory() == null) {
@@ -39,7 +38,7 @@ public class FilesRepository implements Files {
             Config.getInstance().setDataStoreFactory(mDataStoreFactory);
         } else
             mDataStoreFactory = Config.getInstance().getDataStoreFactory();
-        mEntityMapperUtil = new DAOMapperUtil() {
+        mEntityMapperUtil = new DAOMapperFactory() {
             @Override
             public IDAOMapper getDataMapper(Class dataClass) {
                 return new DefaultDAOMapper();
@@ -119,34 +118,19 @@ public class FilesRepository implements Files {
     @Override
     public Observable<Boolean> saveToFile(String fullFilePath, String data) {
         return Observable.defer(() -> {
-            FileOutputStream outputStream;
-            try {
-                outputStream = Config.getInstance().getContext().openFileOutput(new File(fullFilePath)
-                        .getName(), Context.MODE_PRIVATE);
-                outputStream.write(data.getBytes());
-                outputStream.close();
-                return Observable.just(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return Observable.error(e);
+            File file = new File(fullFilePath);
+            if (!file.exists()) {
+                try {
+                    final FileWriter writer = new FileWriter(file);
+                    writer.write(data);
+                    writer.close();
+                    return Observable.just(true);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return Observable.error(e);
+                }
             }
-        });
-    }
-
-    @Override
-    public Observable<Boolean> saveToFile(String fullFilePath, byte[] data) {
-        return Observable.defer(() -> {
-            FileOutputStream outputStream;
-            try {
-                outputStream = Config.getInstance().getContext().openFileOutput(new File(fullFilePath)
-                        .getName(), Context.MODE_PRIVATE);
-                outputStream.write(data);
-                outputStream.close();
-                return Observable.just(true);
-            } catch (Exception e) {
-                e.printStackTrace();
-                return Observable.error(e);
-            }
+            return Observable.just(true);
         });
     }
 

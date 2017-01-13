@@ -7,8 +7,8 @@ import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.TestUtility;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.DatabaseManagerFactory;
-import com.zeyad.usecases.data.services.realm_test_models.TestModelViewModelMapper;
-import com.zeyad.usecases.data.services.realm_test_models.TestViewModel;
+import com.zeyad.usecases.data.realm_test_models.TestModelViewModelMapper;
+import com.zeyad.usecases.data.realm_test_models.TestViewModel;
 
 import org.hamcrest.Matchers;
 import org.junit.After;

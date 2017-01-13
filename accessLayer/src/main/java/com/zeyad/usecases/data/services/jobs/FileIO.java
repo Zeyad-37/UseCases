@@ -42,7 +42,7 @@ public class FileIO {
 
     public FileIO(int trailCount, @NonNull String payLoad, @NonNull Context context, boolean isDownload) {
         gson = Config.getGson();
-        mRestApi = new RestApiImpl();
+        mRestApi = RestApiImpl.getInstance();
         mContext = context;
         mTrailCount = trailCount;
         mFileIORequest = gson.fromJson(payLoad, FileIORequest.class);

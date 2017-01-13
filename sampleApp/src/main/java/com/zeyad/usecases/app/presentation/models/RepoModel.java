@@ -4,6 +4,8 @@ import com.google.gson.annotations.SerializedName;
 import com.zeyad.usecases.annotations.AutoMap;
 import com.zeyad.usecases.annotations.FindMapped;
 
+import io.realm.annotations.Ignore;
+
 /**
  * @author zeyad on 1/10/17.
  */
@@ -19,6 +21,7 @@ public class RepoModel {
     @SerializedName("owner")
     private UserModel owner;
     @SerializedName("private")
+    @Ignore
     private boolean _private;
     @SerializedName("html_url")
     private String htmlUrl;

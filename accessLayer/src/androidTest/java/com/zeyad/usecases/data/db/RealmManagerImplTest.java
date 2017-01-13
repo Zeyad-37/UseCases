@@ -9,9 +9,9 @@ import android.support.test.runner.AndroidJUnit4;
 import com.google.gson.Gson;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.TestUtility;
-import com.zeyad.usecases.data.services.realm_test_models.ModelWithStringPrimaryKey;
-import com.zeyad.usecases.data.services.realm_test_models.RealmModelClass;
-import com.zeyad.usecases.data.services.realm_test_models.TestModel;
+import com.zeyad.usecases.data.realm_test_models.ModelWithStringPrimaryKey;
+import com.zeyad.usecases.data.realm_test_models.RealmModelClass;
+import com.zeyad.usecases.data.realm_test_models.TestModel;
 import com.zeyad.usecases.data.utils.Utils;
 
 import org.hamcrest.MatcherAssert;

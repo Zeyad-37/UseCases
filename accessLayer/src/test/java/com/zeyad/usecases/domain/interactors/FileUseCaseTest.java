@@ -40,8 +40,6 @@ public class FileUseCaseTest {
                 .thenReturn(readResponse());
         Mockito.when(files.saveToFile(Mockito.anyString(), Mockito.anyString()))
                 .thenReturn(saveResponse());
-        Mockito.when(files.saveToFile(Mockito.anyString(), new byte[]{}))
-                .thenReturn(saveResponse());
         return files;
     }
 
@@ -81,10 +79,5 @@ public class FileUseCaseTest {
     @Test
     public void saveToFile() {
         assertThat(mFilesUseCase.saveToFile("", ""), is(equalTo(readResponse())));
-    }
-
-    @Test
-    public void saveToFile2() {
-        assertThat(mFilesUseCase.saveToFile("", new byte[]{}), is(equalTo(readResponse())));
     }
 }

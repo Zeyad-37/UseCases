@@ -504,11 +504,13 @@ public class RealmManager implements DataBaseManager {
 
         @Override
         public void onCompleted() {
+            unsubscribe();
         }
 
         @Override
         public void onError(@NonNull Throwable e) {
             e.printStackTrace();
+            unsubscribe();
         }
 
         @Override

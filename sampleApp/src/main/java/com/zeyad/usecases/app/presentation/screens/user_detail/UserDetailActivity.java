@@ -34,7 +34,7 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
     Toolbar toolbar;
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
-    @BindView(R.id.imageView_avatar)
+    //    @BindView(R.id.imageView_avatar)
     SimpleDraweeView imageViewAvatar;
 
     public static Intent getCallingIntent(Context context, UserModel userModel) {

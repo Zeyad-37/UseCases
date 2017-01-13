@@ -36,14 +36,6 @@ public interface IFileUseCase {
     Observable<Boolean> saveToFile(String fullFilePath, String data);
 
     /**
-     * Saves a byte array of data to a file.
-     *
-     * @param fullFilePath path of the file to read.
-     * @return Observable with the boolean of success.
-     */
-    Observable<Boolean> saveToFile(String fullFilePath, byte[] data);
-
-    /**
      * Uploads a file to a url.
      *
      * @param fileIORequest contains the attributes of the request,

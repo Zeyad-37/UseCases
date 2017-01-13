@@ -8,10 +8,10 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
-import com.zeyad.usecases.data.mappers.DAOMapperUtil;
+import com.zeyad.usecases.data.mappers.DAOMapperFactory;
 import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
-import com.zeyad.usecases.data.mappers.IDAOMapperUtil;
+import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.utils.Utils;
 
 import org.hamcrest.Matchers;
@@ -153,8 +153,8 @@ public class TestUtility2 {
     }
 
     @NonNull
-    public static IDAOMapperUtil createEntityMapper() {
-        return new DAOMapperUtil() {
+    public static IDAOMapperFactory createEntityMapper() {
+        return new DAOMapperFactory() {
             @NonNull
             @Override
             public IDAOMapper getDataMapper(Class dataClass) {

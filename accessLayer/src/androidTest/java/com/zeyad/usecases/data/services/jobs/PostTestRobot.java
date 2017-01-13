@@ -10,9 +10,9 @@ import android.support.annotation.Nullable;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
+import com.zeyad.usecases.data.realm_test_models.TestModel;
+import com.zeyad.usecases.data.realm_test_models.TestViewModel;
 import com.zeyad.usecases.data.requests.PostRequest;
-import com.zeyad.usecases.data.services.realm_test_models.TestModel;
-import com.zeyad.usecases.data.services.realm_test_models.TestViewModel;
 import com.zeyad.usecases.data.utils.Utils;
 
 import org.json.JSONArray;

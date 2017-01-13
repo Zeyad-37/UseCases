@@ -3,7 +3,7 @@ package com.zeyad.usecases.domain.interactors.data;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DatabaseManagerFactory;
 import com.zeyad.usecases.data.executor.JobExecutor;
-import com.zeyad.usecases.data.mappers.IDAOMapperUtil;
+import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.repository.DataRepository;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.requests.GetRequest;
@@ -41,7 +41,7 @@ public class DataUseCase implements IDataUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    static void initWithoutDB(IDAOMapperUtil entityMapper, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+    static void initWithoutDB(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(Config.getInstance()
                 .getContext()), entityMapper), threadExecutor, postExecutionThread);
     }
@@ -52,7 +52,7 @@ public class DataUseCase implements IDataUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    static void initWithRealm(IDAOMapperUtil entityMapper, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+    static void initWithRealm(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
         DatabaseManagerFactory.initRealm();
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
                 .getInstance(), Config.getInstance().getContext()), entityMapper), threadExecutor,

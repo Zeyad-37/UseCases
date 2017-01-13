@@ -2,7 +2,7 @@ package com.zeyad.usecases.data.repository.stores;
 
 import android.support.annotation.NonNull;
 
-import com.zeyad.usecases.data.services.realm_test_models.TestModel;
+import com.zeyad.usecases.data.realm_test_models.TestModel;
 
 import org.json.JSONException;
 import org.json.JSONObject;

@@ -18,6 +18,6 @@ public class DefaultDAOMapper extends DAOMapper {
 
     @Override
     public Object mapToDomainManual(Object object) {
-        return null;
+        return object;
     }
 }

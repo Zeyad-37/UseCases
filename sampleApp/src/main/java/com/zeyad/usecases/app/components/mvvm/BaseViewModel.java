@@ -69,6 +69,11 @@ public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
         isNewView = newView;
     }
 
+    /**
+     * Returns context from view or null if view is null.
+     *
+     * @return {@link Context}.
+     */
     public Context getContext() {
         Context context = null;
         if (view instanceof LoadDataView) {
@@ -86,6 +91,10 @@ public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
         return context;
     }
 
+    /**
+     * Returns current compositeSubscription or creates a new one, if null or un-subscribed.
+     * @return {@link CompositeSubscription}.
+     */
     public CompositeSubscription getCompositeSubscription() {
         if (compositeSubscription == null || compositeSubscription.isUnsubscribed()) {
             compositeSubscription = new CompositeSubscription();

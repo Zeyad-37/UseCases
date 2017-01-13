@@ -9,11 +9,11 @@ import android.support.annotation.Nullable;
 import android.support.test.InstrumentationRegistry;
 
 import com.google.gson.Gson;
-import com.zeyad.usecases.data.mappers.DAOMapperUtil;
+import com.zeyad.usecases.data.mappers.DAOMapperFactory;
 import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
-import com.zeyad.usecases.data.mappers.IDAOMapperUtil;
-import com.zeyad.usecases.data.services.realm_test_models.TestModel;
+import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
+import com.zeyad.usecases.data.realm_test_models.TestModel;
 import com.zeyad.usecases.data.utils.Utils;
 
 import org.hamcrest.Matchers;
@@ -162,8 +162,8 @@ public class TestUtility {
     }
 
     @NonNull
-    public static IDAOMapperUtil createEntityMapper() {
-        return new DAOMapperUtil() {
+    public static IDAOMapperFactory createEntityMapper() {
+        return new DAOMapperFactory() {
             @NonNull
             @Override
             public IDAOMapper getDataMapper(Class dataClass) {

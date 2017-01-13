@@ -498,6 +498,7 @@ public class CloudDataStore implements DataStore {
         @Override
         public void onError(@NonNull Throwable e) {
             e.printStackTrace();
+            unsubscribe();
         }
 
         @Override

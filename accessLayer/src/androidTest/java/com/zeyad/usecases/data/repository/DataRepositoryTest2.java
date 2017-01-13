@@ -4,10 +4,10 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.zeyad.usecases.data.mappers.DAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
-import com.zeyad.usecases.data.mappers.IDAOMapperUtil;
+import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
+import com.zeyad.usecases.data.realm_test_models.TestModel;
 import com.zeyad.usecases.data.repository.stores.DataStore;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
-import com.zeyad.usecases.data.services.realm_test_models.TestModel;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -44,7 +44,7 @@ public class DataRepositoryTest2 {
     @Before
     public void setUp() {
         mockDataStoreFactory = Mockito.mock(DataStoreFactory.class);
-        IDAOMapperUtil mockEntityDataMapper = Mockito.mock(IDAOMapperUtil.class);
+        IDAOMapperFactory mockEntityDataMapper = Mockito.mock(IDAOMapperFactory.class);
         mockDataStore = Mockito.mock(DataStore.class);
         mockIDAOMapper = Mockito.mock(DAOMapper.class);
         dataRepository = new DataRepository(mockDataStoreFactory, mockEntityDataMapper);
@@ -77,7 +77,7 @@ public class DataRepositoryTest2 {
     }
 
     @Test
-    public void testGetItemHappyCase() throws IllegalAccessException {
+    public void testGetItemHappyCase() throws Exception {
         Observable observable = Observable.just(new TestModel());
         given(mockDataStore.dynamicGetObject(anyString(), anyString(), anyInt(), any(), any(),
                 anyBoolean(), anyBoolean())).willReturn(observable);

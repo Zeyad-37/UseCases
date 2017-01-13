@@ -61,11 +61,6 @@ class FileUseCase implements IFileUseCase {
     }
 
     @Override
-    public Observable<Boolean> saveToFile(String fullFilePath, byte[] data) {
-        return mFiles.saveToFile(fullFilePath, data).compose(applySchedulers());
-    }
-
-    @Override
     public Observable uploadFile(FileIORequest fileIORequest) {
         return mFiles.uploadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
                 fileIORequest.getKey(), fileIORequest.getParameters(), fileIORequest.onWifi(),

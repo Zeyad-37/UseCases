@@ -78,7 +78,7 @@ public class AutoMapProcessor extends AbstractProcessor {
         for (TypeElement type : types) {
             processType(type);
         }
-        writeSourceFile("AutoMap_DAOMapperUtil", Reformatter.fixup(generateDAOUtilMapper(types)), null);
+        writeSourceFile("AutoMap_DAOMapperFactory", Reformatter.fixup(generateDAOFactoryMapper(types)), null);
         // We are the only ones handling AutoMap annotations
         return true;
     }
@@ -494,7 +494,7 @@ public class AutoMapProcessor extends AbstractProcessor {
     }
 
     // TODO: 1/4/17 Clean up!
-    private String generateDAOUtilMapper(List<TypeElement> types) {
+    private String generateDAOFactoryMapper(List<TypeElement> types) {
         String pkg = "";
         String mappersPkg = "com.zeyad.usecases.data.mappers";
 
@@ -525,8 +525,8 @@ public class AutoMapProcessor extends AbstractProcessor {
         getDataMapperCode.addStatement("return $T.getInstance()", ClassName.get(mappersPkg, "DefaultDAOMapper"));
         getDataMapperBuilder.addCode(getDataMapperCode.build());
 
-        TypeSpec.Builder classBuilder = TypeSpec.classBuilder("AutoMap_DAOMapperUtil")
-                .superclass(ClassName.get(mappersPkg, "DAOMapperUtil"))
+        TypeSpec.Builder classBuilder = TypeSpec.classBuilder("AutoMap_DAOMapperFactory")
+                .superclass(ClassName.get(mappersPkg, "DAOMapperFactory"))
                 .addModifiers(Modifier.PUBLIC);
         classBuilder.addMethod(getDataMapperBuilder.build());
         return JavaFile.builder(pkg, classBuilder.build()).build().toString();

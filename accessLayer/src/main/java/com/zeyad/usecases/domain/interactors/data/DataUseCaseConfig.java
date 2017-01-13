@@ -4,10 +4,10 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.data.executor.JobExecutor;
-import com.zeyad.usecases.data.mappers.DAOMapperUtil;
+import com.zeyad.usecases.data.mappers.DAOMapperFactory;
 import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
-import com.zeyad.usecases.data.mappers.IDAOMapperUtil;
+import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.executors.ThreadExecutor;
 import com.zeyad.usecases.domain.executors.UIThread;
@@ -22,7 +22,7 @@ import okhttp3.OkHttpClient;
 public class DataUseCaseConfig {
 
     private Context context;
-    private IDAOMapperUtil entityMapper;
+    private IDAOMapperFactory entityMapper;
     private OkHttpClient.Builder okHttpBuilder;
     private Cache okHttpCache;
     private String baseUrl;
@@ -52,9 +52,9 @@ public class DataUseCaseConfig {
         this.context = context;
     }
 
-    IDAOMapperUtil getEntityMapper() {
+    IDAOMapperFactory getEntityMapper() {
         if (entityMapper == null) {
-            return new DAOMapperUtil() {
+            return new DAOMapperFactory() {
                 @NonNull
                 @Override
                 public IDAOMapper getDataMapper(Class dataClass) {
@@ -99,7 +99,7 @@ public class DataUseCaseConfig {
 
     public static class Builder {
         private Context context;
-        private IDAOMapperUtil entityMapper;
+        private IDAOMapperFactory entityMapper;
         private OkHttpClient.Builder okHttpBuilder;
         private Cache okHttpCache;
         private String baseUrl;
@@ -131,7 +131,7 @@ public class DataUseCaseConfig {
         }
 
         @NonNull
-        public Builder entityMapper(IDAOMapperUtil entityMapper) {
+        public Builder entityMapper(IDAOMapperFactory entityMapper) {
             this.entityMapper = entityMapper;
             return this;
         }
@@ -178,7 +178,7 @@ public class DataUseCaseConfig {
             return postExecutionThread;
         }
 
-        IDAOMapperUtil getEntityMapper() {
+        IDAOMapperFactory getEntityMapper() {
             return entityMapper;
         }
 

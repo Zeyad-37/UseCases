@@ -40,7 +40,7 @@ public class DataStoreFactory {
     public DataStore dynamically(@NonNull String url, boolean isGet, IDAOMapper entityDataMapper) throws Exception {
         if (!(url.isEmpty() && isGet))
             if (Utils.isNetworkAvailable(mContext))
-                return new CloudDataStore(new RestApiImpl(), mDataBaseManager, entityDataMapper);
+                return new CloudDataStore(RestApiImpl.getInstance(), mDataBaseManager, entityDataMapper);
             else throw new NetworkConnectionException("Please Check your internet connection!");
         else if (mDataBaseManager == null)
             throw new IllegalAccessException(getInstance().getContext().getString(R.string.no_db));
@@ -63,6 +63,6 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore cloud(IDAOMapper entityDataMapper) {
-        return new CloudDataStore(new RestApiImpl(), mDataBaseManager, entityDataMapper);
+        return new CloudDataStore(RestApiImpl.getInstance(), mDataBaseManager, entityDataMapper);
     }
 }
