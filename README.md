@@ -25,11 +25,25 @@ UseCases Library can be included in any Android application that supports Androi
 
 Easiest way to start
 ```
+// Create Class LibraryModule to expose your realm models to the lib configuration
+
+@RealmModule(library = true, allClasses = true)
+class LibraryModule {
+}
+
 // This should be in the application class
 
 // For Data Access
+Realm.init(this); // First initialize realm
+Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
+            .name("app.realm")
+            .modules(Realm.getDefaultModule(), new LibraryModule())
+            .rxFactory(new RealmObservableFactory())
+            .deleteRealmIfMigrationNeeded()
+            .build());
+
 // Fastest start
-DataUseCaseFactory.init(new DataUseCaseConfig.Builder(applicationContext).build()); // all extra features are 
+DataUseCaseFactory.init(new DataUseCaseConfig.Builder(applicationContext).build()); // all extra features are disabled
                 
 // Advanced init
 DataUseCaseFactory.init(new DataUseCaseConfig.Builder(applicationContext)
