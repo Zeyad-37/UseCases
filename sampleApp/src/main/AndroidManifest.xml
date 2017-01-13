@@ -3,6 +3,7 @@
     package="com.zeyad.usecases.app">
 
     <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:name=".GenericApplication"
         android:allowBackup="true"
@@ -10,16 +11,21 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
         <activity
-            android:name=".presentation.screens.user_list.UserListActivity"
+            android:name=".presentation.screens.splash.SplashActivity"
             android:label="@string/title_user_list"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".presentation.screens.user_list.UserListActivity"
+            android:label="@string/title_user_list"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".presentation.screens.user_detail.UserDetailActivity"
             android:label="@string/title_user_detail"
