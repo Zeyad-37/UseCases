@@ -4,9 +4,9 @@ import android.annotation.TargetApi;
 import android.app.job.JobScheduler;
 import android.content.Intent;
 import android.os.Build;
-import android.support.test.rule.BuildConfig;
 
 import com.firebase.jobdispatcher.Job;
+import com.zeyad.usecases.BuildConfig;
 
 import org.junit.After;
 import org.junit.Before;

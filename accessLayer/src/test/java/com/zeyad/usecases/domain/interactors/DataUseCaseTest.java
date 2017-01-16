@@ -244,7 +244,12 @@ public class DataUseCaseTest {
     public void setUp() throws Exception {
         mDataUseCase = getGenericUseImplementation((DataRepository) mDataData, mJobExecutor, mUIThread);
         PowerMockito.mockStatic(DataUseCaseFactory.class);
-        when(Config.getBaseURL()).thenReturn("www.google.com");
+//        Mockito.when(Utils.isNotEmpty(getUrl())).thenReturn(true);
+        try {
+            when(Config.getBaseURL()).thenReturn("www.google.com");
+        } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

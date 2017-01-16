@@ -50,24 +50,27 @@ import static org.mockito.Mockito.times;
 @PrepareForTest({Realm.class})
 public class CloudDataStoreJUnitTest {
 
-    private final boolean mToPersist;
-    private final boolean mToCache;
-    private final boolean mCallRealMethodsOfEntityMapper;
     @NonNull
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
     @NonNull
     @Rule
     public Timeout mTimeout = new Timeout(TestUtility2.TIMEOUT_TIME_VALUE, TestUtility2.TIMEOUT_TIME_UNIT);
+    private boolean mToPersist;
+    private boolean mToCache;
+    private boolean mCallRealMethodsOfEntityMapper;
     private CloudDataStore mCloudDataStore;
     private RestApi mMockedRestApi;
     private DataBaseManager mMockedDBManager;
     private IDAOMapper mIDAOMapper;
 
-    public CloudDataStoreJUnitTest(boolean callRealMethodsOfEntityMapper, boolean toPersist, boolean toCache) {
-        mCallRealMethodsOfEntityMapper = callRealMethodsOfEntityMapper;
-        mToPersist = toPersist;
-        mToCache = toCache;
+//    public CloudDataStoreJUnitTest(boolean callRealMethodsOfEntityMapper, boolean toPersist, boolean toCache) {
+//        mCallRealMethodsOfEntityMapper = callRealMethodsOfEntityMapper;
+//        mToPersist = toPersist;
+//        mToCache = toCache;
+//    }
+
+    public CloudDataStoreJUnitTest() {
     }
 
     @Parameterized.Parameters
@@ -86,6 +89,9 @@ public class CloudDataStoreJUnitTest {
 
     @Before
     public void setUp() throws Exception {
+        mCallRealMethodsOfEntityMapper = Mockito.anyBoolean();
+        mToPersist = Mockito.anyBoolean();
+        mToCache = Mockito.anyBoolean();
 //        TestUtility2.performInitialSetupOfConfig(Mockito.mock(Context.class));
         mMockedRestApi = CloudDataStoreTestJUnitRobot.createMockedRestApi(mToCache);
         mMockedDBManager = CloudDataStoreTestJUnitRobot.createDBManagerWithMockedContext();

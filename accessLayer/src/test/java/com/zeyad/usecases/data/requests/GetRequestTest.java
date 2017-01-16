@@ -3,6 +3,7 @@ package com.zeyad.usecases.data.requests;
 import android.support.annotation.Nullable;
 
 import com.zeyad.usecases.Config;
+import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
 import org.junit.After;
@@ -17,11 +18,10 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest({Config.class})
+@PrepareForTest({Config.class, Utils.class})
 public class GetRequestTest {
 
     @Nullable
@@ -30,8 +30,9 @@ public class GetRequestTest {
     @Before
     public void setUp() throws Exception {
         PowerMockito.mockStatic(DataUseCaseFactory.class);
-        when(Config.getBaseURL()).thenReturn("www.google.com");
         mGetRequest = GetRequestTestRobot.createGetObjectRequest();
+//        when(Utils.isNotEmpty(mGetRequest.getUrl())).thenReturn(true);
+//        when(Config.getBaseURL()).thenReturn("www.google.com");
     }
 
     @After

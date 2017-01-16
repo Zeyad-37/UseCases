@@ -17,7 +17,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
@@ -30,7 +29,7 @@ public class PostRequestTest {
     @Before
     public void setUp() throws Exception {
         PowerMockito.mockStatic(DataUseCaseFactory.class);
-        when(Config.getBaseURL()).thenReturn("www.google.com");
+//        when(Config.getBaseURL()).thenReturn("www.google.com");
         mPostRequest = PostRequestTestRobot.buildPostRequest();
     }
 

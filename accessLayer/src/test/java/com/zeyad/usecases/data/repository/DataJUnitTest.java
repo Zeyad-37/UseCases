@@ -36,14 +36,17 @@ import static org.junit.Assume.assumeThat;
 @PrepareForTest({Realm.class})
 public class DataJUnitTest {
 
-    private final boolean mIsDiskType;
-    private final boolean mToCache;
+    private boolean mIsDiskType;
+    private boolean mToCache;
     private DataStore mDataStore;
     private DataRepository mDataRepository;
 
-    public DataJUnitTest(boolean isDiskType, boolean toCache) {
-        mIsDiskType = isDiskType;
-        mToCache = toCache;
+//    public DataJUnitTest(boolean isDiskType, boolean toCache) {
+//        mIsDiskType = isDiskType;
+//        mToCache = toCache;
+//    }
+
+    public DataJUnitTest() {
     }
 
     @NonNull
@@ -60,6 +63,8 @@ public class DataJUnitTest {
 
     @Before
     public void setUp() throws Exception {
+        mIsDiskType = Mockito.anyBoolean();
+        mToCache = Mockito.anyBoolean();
         TestUtility2.performInitialSetupOfDb();
         mDataStore = mIsDiskType ? DataRepositoryJUnitRobot.createMockedDiskStore()
                 : DataRepositoryJUnitRobot.createMockedCloudStore();
