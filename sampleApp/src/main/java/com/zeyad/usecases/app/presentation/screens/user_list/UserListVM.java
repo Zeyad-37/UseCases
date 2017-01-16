@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
 import com.zeyad.usecases.app.presentation.models.UserModel;
 import com.zeyad.usecases.app.presentation.models.UserRealm;
+import com.zeyad.usecases.app.utils.Constants;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
@@ -32,7 +33,8 @@ class UserListVM extends BaseViewModel implements UserListView {
                 .GetRequestBuilder(UserRealm.class, true)
 //                .GetRequestBuilder(UserModel.class, true)
                 .presentationClass(UserModel.class)
-                .url("users?page=" + currentPage)
+//                .url("users?page=" + currentPage)
+                .url(String.format(Constants.URLS.USERS, currentPage))
                 .build());
         return dataUseCase.getList(new GetRequest
 //                .GetRequestBuilder(AutoMap_UserModel.class, true)

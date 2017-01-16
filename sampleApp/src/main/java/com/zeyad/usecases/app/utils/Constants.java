@@ -6,5 +6,9 @@ package com.zeyad.usecases.app.utils;
 
 public class Constants {
 
-    public static String API_BASE_URL = "https://api.github.com/";
+    public static class URLS {
+        public static String API_BASE_URL = "https://api.github.com/";
+        public static String USERS = "users?page=%s";
+        public static String REPOSITORIES = "users/%s/repos";
+    }
 }

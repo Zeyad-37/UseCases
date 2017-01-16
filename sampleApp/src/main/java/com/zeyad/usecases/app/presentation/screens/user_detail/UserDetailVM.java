@@ -5,6 +5,7 @@ import android.os.Bundle;
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
 import com.zeyad.usecases.app.presentation.models.RepoModel;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
+import com.zeyad.usecases.app.utils.Constants;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
@@ -41,7 +42,8 @@ class UserDetailVM extends BaseViewModel implements UserDetailView {
 //                .GetRequestBuilder(RepoRealm.class, true)
                                 .GetRequestBuilder(RepoModel.class, true)
                                 .presentationClass(RepoModel.class)
-                                .url("users/" + user + "/repos")
+//                                .url("users/" + user + "/repos")
+                                .url(String.format(Constants.URLS.REPOSITORIES, user))
                                 .build());
                     });
         } else return Observable.error(new IllegalArgumentException("User name can not be empty"));

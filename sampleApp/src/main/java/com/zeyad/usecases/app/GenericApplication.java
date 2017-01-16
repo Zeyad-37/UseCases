@@ -27,7 +27,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
-import static com.zeyad.usecases.app.utils.Constants.API_BASE_URL;
+import static com.zeyad.usecases.app.utils.Constants.URLS.API_BASE_URL;
 
 /**
  * @author by ZIaDo on 9/24/16.
