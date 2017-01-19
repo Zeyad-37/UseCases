@@ -15,6 +15,7 @@ public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
     private V view;
     private int itemId;
     private boolean isNewView;
+    private Context applicationContext;
     private CompositeSubscription compositeSubscription;
 
     @Override
@@ -86,7 +87,14 @@ public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
                 if (activity != null) {
                     context = activity;
                 }
-            } else context = ((Fragment) view).getContext();
+            } else {
+                context = ((Fragment) view).getContext();
+            }
+        }
+        if (context == null) {
+            context = applicationContext;
+        } else if (applicationContext == null) {
+            applicationContext = context.getApplicationContext();
         }
         return context;
     }
@@ -100,5 +108,9 @@ public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
             compositeSubscription = new CompositeSubscription();
         }
         return compositeSubscription;
+    }
+
+    public void setApplicationContext(Context applicationContext) {
+        this.applicationContext = applicationContext.getApplicationContext();
     }
 }
