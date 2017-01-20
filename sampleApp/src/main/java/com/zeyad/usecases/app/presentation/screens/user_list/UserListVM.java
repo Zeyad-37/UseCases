@@ -11,7 +11,10 @@ import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
+import java.util.List;
+
 import rx.Observable;
+import rx.functions.Func1;
 
 /**
  * @author zeyad on 11/1/16.
@@ -43,7 +46,7 @@ class UserListVM extends BaseViewModel implements UserListView {
                     throwable.printStackTrace();
                     return networkObservable;
                 })
-                .flatMap(list -> {
+                .flatMap((Func1<List, Observable<?>>) list -> {
                     if (Utils.isNotEmpty(list))
                         return Observable.just(list);
                     else return networkObservable;
