@@ -48,7 +48,7 @@ public class GenericApplication extends Application {
         initializeRealm();
         DataUseCaseFactory.init(new DataUseCaseConfig.Builder(this)
                 .baseUrl(API_BASE_URL)
-                .withCache()
+//                .withCache()
                 .withRealm()
                 .entityMapper(new AutoMap_DAOMapperFactory())
                 .entityMapper(new DAOMapperFactory() {

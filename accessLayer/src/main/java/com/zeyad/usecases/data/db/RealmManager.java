@@ -15,12 +15,16 @@ import java.util.List;
 
 import io.realm.Case;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
+import io.realm.RealmResults;
 import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
+import rx.subjects.SerializedSubject;
 
 /**
  * {@link DataBaseManager} implementation.
@@ -69,20 +73,32 @@ public class RealmManager implements DataBaseManager {
             int finalItemId = itemId;
             if (finalItemId <= 0)
                 finalItemId = Utils.getMaxId(dataClass, idColumnName);
-            if (hasKitKat())
-                try (Realm realm = Realm.getDefaultInstance()) {
-                    return Observable.just(realm.copyFromRealm(realm.where(dataClass)
-                            .equalTo(idColumnName, finalItemId).findFirst()));
-                }
-            else {
-                Realm realm = Realm.getDefaultInstance();
-                try {
-                    return Observable.just(realm.copyFromRealm(realm.where(dataClass)
-                            .equalTo(idColumnName, finalItemId).findFirst()));
-                } finally {
-                    closeRealm(realm);
-                }
+//            if (hasKitKat())
+//                try (Realm realm = Realm.getDefaultInstance()) {
+//                    return Observable.just(realm.copyFromRealm(realm.where(dataClass)
+//                            .equalTo(idColumnName, finalItemId).findFirst()));
+////                    return Observable.just(realm.where(dataClass)
+////                            .equalTo(idColumnName, finalItemId).findFirstAsync();
+//                }
+//            else {
+            Realm realm = Realm.getDefaultInstance();
+            SerializedSubject relay = new SerializedSubject<>(PublishSubject.create());
+            try {
+//                    return Observable.just(realm.copyFromRealm(realm.where(dataClass)
+//                            .equalTo(idColumnName, finalItemId).findFirst()));
+                realm.where(dataClass).equalTo(idColumnName, finalItemId).findAllAsync()
+                        .addChangeListener(new RealmChangeListener<RealmResults>() {
+                            @Override
+                            public void onChange(RealmResults element) {
+                                relay.onNext(realm.copyFromRealm(element));
+                            }
+                        });
+                return relay.asObservable();
+            } finally {
+                relay.onCompleted();
+                closeRealm(realm);
             }
+//            }
         });
     }
 
@@ -95,18 +111,30 @@ public class RealmManager implements DataBaseManager {
     @Override
     public Observable<List> getAll(Class clazz) {
         return Observable.defer(() -> {
-            if (hasKitKat())
-                try (Realm realm = Realm.getDefaultInstance()) {
-                    return Observable.just(realm.copyFromRealm(realm.where(clazz).findAll()));
-                }
-            else {
-                Realm realm = Realm.getDefaultInstance();
-                try {
-                    return Observable.just(realm.copyFromRealm(realm.where(clazz).findAll()));
-                } finally {
-                    closeRealm(realm);
-                }
+//            if (hasKitKat())
+//                try (Realm realm = Realm.getDefaultInstance()) {
+//                    return Observable.just(realm.copyFromRealm(realm.where(clazz).findAll()));
+////                    return realm.where(clazz).findAllAsync().asObservable();
+//                }
+//            else {
+            Realm realm = Realm.getDefaultInstance();
+            SerializedSubject relay = new SerializedSubject<>(PublishSubject.create());
+            try {
+//                    return Observable.just(realm.copyFromRealm(realm.where(clazz).findAll()));
+//                    return realm.where(clazz).findAllAsync().asObservable();
+                realm.where(clazz).findAll()
+                        .addChangeListener(new RealmChangeListener<RealmResults>() {
+                            @Override
+                            public void onChange(RealmResults element) {
+                                relay.onNext(realm.copyFromRealm(element));
+                            }
+                        });
+                return relay.asObservable();
+            } finally {
+                relay.onCompleted();
+                closeRealm(realm);
             }
+//            }
         });
     }
 
@@ -125,6 +153,8 @@ public class RealmManager implements DataBaseManager {
                 try (Realm realm = Realm.getDefaultInstance()) {
                     return Observable.just(realm.copyFromRealm(realm.where(clazz)
                             .beginsWith(filterKey, query, Case.INSENSITIVE).findAll()));
+//                    return realm.where(clazz).beginsWith(filterKey, query, Case.INSENSITIVE)
+//                            .findAllAsync().asObservable();
                 }
             else {
                 Realm realm = Realm.getDefaultInstance();
@@ -150,11 +180,13 @@ public class RealmManager implements DataBaseManager {
             if (hasKitKat())
                 try (Realm realm = Realm.getDefaultInstance()) {
                     return Observable.just(realm.copyFromRealm(realmQuery.findAll()));
+//                    return realm.copyFromRealm(realmQuery.findAllAsync().asObservable();
                 }
             else {
                 Realm realm = Realm.getDefaultInstance();
                 try {
                     return Observable.just(realm.copyFromRealm(realmQuery.findAll()));
+//                    return realm.copyFromRealm(realmQuery.findAllAsync().asObservable();
                 } finally {
                     closeRealm(realm);
                 }

@@ -31,9 +31,7 @@ class UserListVM extends BaseViewModel implements UserListView {
         Observable networkObservable = dataUseCase.getList(new GetRequest
 //                .GetRequestBuilder(AutoMap_UserModel.class, true)
                 .GetRequestBuilder(UserRealm.class, true)
-//                .GetRequestBuilder(UserModel.class, true)
                 .presentationClass(UserModel.class)
-//                .url("users?page=" + currentPage)
                 .url(String.format(Constants.URLS.USERS, currentPage))
                 .build());
         return dataUseCase.getList(new GetRequest
@@ -41,7 +39,10 @@ class UserListVM extends BaseViewModel implements UserListView {
                 .GetRequestBuilder(UserRealm.class, true)
                 .presentationClass(UserModel.class)
                 .build())
-                .onErrorResumeNext(throwable -> networkObservable)
+                .onErrorResumeNext(throwable -> {
+                    throwable.printStackTrace();
+                    return networkObservable;
+                })
                 .flatMap(list -> {
                     if (Utils.isNotEmpty(list))
                         return Observable.just(list);
