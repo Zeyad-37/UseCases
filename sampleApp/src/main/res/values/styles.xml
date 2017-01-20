@@ -9,7 +9,7 @@
     </style>
 
     <style name="SplashTheme" parent="Theme.AppCompat.NoActionBar">
-        <item name="android:windowBackground">@drawable/background</item>
+        <item name="android:windowBackground">@mipmap/ic_launcher</item>
     </style>
 
     <style name="AppTheme.NoActionBar">
