@@ -23,6 +23,7 @@ import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.presentation.models.RepoModel;
 import com.zeyad.usecases.app.presentation.models.UserModel;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
+import com.zeyad.usecases.app.utils.Utils;
 
 import org.parceler.Parcels;
 
@@ -116,19 +117,18 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
                     UserDetailActivity activity = (UserDetailActivity) getActivity();
                     if (activity != null) {
                         CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-                        if (appBarLayout != null) {
+                        if (appBarLayout != null)
                             appBarLayout.setTitle(userModel.getLogin());
-                        }
-                        activity.imageViewAvatar.setImageURI(Uri.parse(userModel.getAvatarUrl()));
+                        if (Utils.isNotEmpty(userModel.getAvatarUrl()))
+                            activity.imageViewAvatar.setImageURI(Uri.parse(userModel.getAvatarUrl()));
                     }
                 })
                 .subscribe(new BaseSubscriber<UserDetailFragment, List<RepoModel>>(this, ERROR_WITH_RETRY) {
                     @Override
                     public void onNext(List<RepoModel> repoModels) {
                         List<ItemInfo> infoList = new ArrayList<>(repoModels.size());
-                        for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++) {
+                        for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
                             infoList.add(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
-                        }
                         repositoriesAdapter.animateTo(infoList);
                     }
                 });

@@ -1,5 +1,7 @@
 package com.zeyad.usecases.domain.interactors.data;
 
+import android.os.HandlerThread;
+
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DatabaseManagerFactory;
 import com.zeyad.usecases.data.executor.JobExecutor;
@@ -17,7 +19,7 @@ import java.util.List;
 
 import io.realm.RealmQuery;
 import rx.Observable;
-import rx.schedulers.Schedulers;
+import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * This class is a general implementation that represents a use case for retrieving data.
@@ -25,6 +27,7 @@ import rx.schedulers.Schedulers;
 public class DataUseCase implements IDataUseCase {
 
     private static DataUseCase sDataUseCase;
+    private static HandlerThread handlerThread = new HandlerThread("");
     private final Data mData;
     private final ThreadExecutor mThreadExecutor;
     private final PostExecutionThread mPostExecutionThread;
@@ -191,7 +194,16 @@ public class DataUseCase implements IDataUseCase {
      * @return the transformed observable
      */
     private <T> Observable.Transformer<T, T> applySchedulers() {
-        return observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor))
+        if (handlerThread == null)
+            handlerThread = new HandlerThread("");
+        if (!handlerThread.isAlive()) {
+            handlerThread.start();
+//            handlerThread.run();
+//            handlerThread.getLooper().prepare();
+//            handlerThread.getLooper().loop();
+        }
+        return observable -> observable.subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
+//        return observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor))
                 .observeOn(mPostExecutionThread.getScheduler());
     }
 }

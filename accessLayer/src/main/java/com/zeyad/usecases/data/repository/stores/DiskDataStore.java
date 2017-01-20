@@ -39,31 +39,32 @@ public class DiskDataStore implements DataStore {
                                           Class dataClass, boolean persist, boolean shouldCache) {
         if (DataUseCaseFactory.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
             return Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
-                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel));
+                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         else
             return mDataBaseManager.getById(idColumnName, itemId, dataClass)
-                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel));
+                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
     }
 
     @NonNull
     @Override
     public Observable<List> dynamicGetList(String url, Class domainClass, Class dataClass, boolean persist,
                                            boolean shouldCache) {
-        return mDataBaseManager.getAll(dataClass).map(realmModels -> mEntityDataMapper.mapAllToDomain(realmModels));
+        return mDataBaseManager.getAll(dataClass)
+                .map(realmModels -> mEntityDataMapper.mapAllToDomain(realmModels, domainClass));
     }
 
     @NonNull
     @Override
     public Observable<?> searchDisk(String query, String column, Class domainClass, Class dataClass) {
         return mDataBaseManager.getWhere(dataClass, query, column)
-                .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel));
+                .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
     }
 
     @NonNull
     @Override
     public Observable<?> searchDisk(RealmQuery query, Class domainClass) {
         return mDataBaseManager.getWhere(query)
-                .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel));
+                .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
     }
 
     @NonNull

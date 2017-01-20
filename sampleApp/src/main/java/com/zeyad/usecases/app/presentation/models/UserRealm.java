@@ -2,12 +2,15 @@ package com.zeyad.usecases.app.presentation.models;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.parceler.Parcel;
+
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
 /**
  * @author zeyad on 1/10/17.
  */
+@Parcel
 public class UserRealm extends RealmObject {
 
     public static final String LOGIN = "login", ID = "id", AVATAR_URL = "avatarUrl", GRAVATAR_ID = "gravatarId",

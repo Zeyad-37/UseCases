@@ -1,7 +1,6 @@
 package com.zeyad.usecases.utils;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
@@ -22,7 +21,7 @@ public class TestModelViewModelMapper implements IDAOMapper, AbstractAwareMethod
 
     @NonNull
     @Override
-    public List<Object> mapAllToRealm(@NonNull List<Object> list, @NonNull Class dataClass) {
+    public List mapAllToRealm(@NonNull List list, @NonNull Class dataClass) {
         List<Object> objects = new ArrayList<>();
         Object o;
         for (Object object : list) {
@@ -34,44 +33,21 @@ public class TestModelViewModelMapper implements IDAOMapper, AbstractAwareMethod
     }
 
     @Override
-    public Object mapToDomain(@Nullable Object tenderoRealmModel) {
-        if (tenderoRealmModel == null) {
-            throw new IllegalArgumentException("object to convert is null");
+    public Object mapToDomain(Object realmModels, @NonNull Class domainClass) {
+        if (realmModels instanceof TestModel) {
+            return mapToDomain(realmModels, domainClass);
         }
-        if (!(tenderoRealmModel instanceof TestModel)) {
-            throw new IllegalArgumentException("only test realm models can be converted to domain, trying to convert:" + tenderoRealmModel);
-        }
-        TestModel testModel = (TestModel) tenderoRealmModel;
-        TestViewModel testViewModel = new TestViewModel();
-        testViewModel.setTestInfo(testModel.getId() + ":" + testModel.getValue());
-        return testViewModel;
-    }
-
-    @Override
-    public List<Object> mapAllToDomain(@NonNull List<Object> tenderoRealmModels) {
-        List<Object> domainList = new ArrayList<>();
-        for (Object object : tenderoRealmModels) {
-            domainList.add(mapToDomain(object));
-        }
-        return domainList;
-    }
-
-    @Override
-    public Object mapToDomain(Object userRealmModel, @NonNull Class domainClass) {
-        if (userRealmModel instanceof TestModel) {
-            return mapToDomain(userRealmModel);
-        }
-        if (domainClass.isInstance(userRealmModel)) {
-            return userRealmModel;
+        if (domainClass.isInstance(realmModels)) {
+            return realmModels;
         }
         return null;
     }
 
     @NonNull
     @Override
-    public List<Object> mapAllToDomain(@NonNull List<Object> tenderoRealmModels, @NonNull Class domainClass) {
+    public List mapAllToDomain(@NonNull List realmModels, @NonNull Class domainClass) {
         List<Object> list = new ArrayList<>();
-        for (Object object : tenderoRealmModels) {
+        for (Object object : realmModels) {
             final Object domainObject = mapToDomain(object, domainClass);
             if (domainObject != null) {
                 list.add(domainObject);

@@ -56,7 +56,7 @@ class CloudDataStoreTestJUnitRobot {
     static IDAOMapper createMockedEntityMapper() {
         final TestModelViewModelMapper viewModelMapper
                 = Mockito.mock(TestModelViewModelMapper.class);
-        Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList()))
+        Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList(), Mockito.any()))
                 .thenReturn(new ArrayList<>());
         Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList(), Mockito.any()))
                 .thenReturn(new ArrayList<>());
@@ -64,7 +64,7 @@ class CloudDataStoreTestJUnitRobot {
                 .thenReturn(new ArrayList<>());
         Mockito.when(viewModelMapper.mapToRealm(Mockito.any(), Mockito.any()))
                 .thenReturn("");
-        Mockito.when(viewModelMapper.mapToDomain(Mockito.any()))
+        Mockito.when(viewModelMapper.mapToDomain(Mockito.any(), Mockito.any()))
                 .thenReturn("");
         Mockito.when(viewModelMapper.mapToDomain(Mockito.any(), Mockito.any()))
                 .thenReturn("");
@@ -74,9 +74,9 @@ class CloudDataStoreTestJUnitRobot {
     static IDAOMapper createMockedEntityMapperWithActualMethodCalls() {
         final TestModelViewModelMapper viewModelMapper
                 = Mockito.mock(TestModelViewModelMapper.class);
-        Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList()))
+        Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList(), Mockito.any()))
                 .thenAnswer(invocation -> new TestModelViewModelMapper()
-                        .mapAllToDomain((List<Object>) invocation.getArguments()[0]));
+                        .mapAllToDomain((List<Object>) invocation.getArguments()[0], Mockito.any()));
         Mockito.when(viewModelMapper.mapAllToDomain(Mockito.anyList(), Mockito.any()))
                 .thenAnswer(invocation -> new TestModelViewModelMapper()
                         .mapAllToDomain((List<Object>) invocation.getArguments()[0], (Class) invocation.getArguments()[1]));
@@ -86,9 +86,9 @@ class CloudDataStoreTestJUnitRobot {
         Mockito.when(viewModelMapper.mapToRealm(Mockito.any(), Mockito.any()))
                 .thenAnswer(invocation -> new TestModelViewModelMapper()
                         .mapToRealm(invocation.getArguments()[0], (Class) invocation.getArguments()[1]));
-        Mockito.when(viewModelMapper.mapToDomain(Mockito.any()))
+        Mockito.when(viewModelMapper.mapToDomain(Mockito.any(), Mockito.any()))
                 .thenAnswer(invocation -> new TestModelViewModelMapper()
-                        .mapToDomain(invocation.getArguments()[0]));
+                        .mapToDomain(invocation.getArguments()[0], Mockito.any()));
         Mockito.when(viewModelMapper.mapToDomain(Mockito.any(), Mockito.any()))
                 .thenAnswer(invocation -> new TestModelViewModelMapper()
                         .mapToDomain(invocation.getArguments()[0], (Class) invocation.getArguments()[1]))
