@@ -26,8 +26,8 @@ import rx.android.schedulers.AndroidSchedulers;
  */
 public class DataUseCase implements IDataUseCase {
 
+    public static HandlerThread handlerThread = new HandlerThread("");
     private static DataUseCase sDataUseCase;
-    private static HandlerThread handlerThread = new HandlerThread("");
     private final Data mData;
     private final ThreadExecutor mThreadExecutor;
     private final PostExecutionThread mPostExecutionThread;
@@ -195,12 +195,9 @@ public class DataUseCase implements IDataUseCase {
      */
     private <T> Observable.Transformer<T, T> applySchedulers() {
         if (handlerThread == null)
-            handlerThread = new HandlerThread("");
+            handlerThread = new HandlerThread("backgroundThread");
         if (!handlerThread.isAlive()) {
             handlerThread.start();
-//            handlerThread.run();
-//            handlerThread.getLooper().prepare();
-//            handlerThread.getLooper().loop();
         }
         return observable -> observable.subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
 //        return observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor))

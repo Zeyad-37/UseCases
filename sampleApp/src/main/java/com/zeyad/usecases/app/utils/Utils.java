@@ -21,7 +21,7 @@ public class Utils {
     }
 
     public static void unsubscribeIfNotNull(@Nullable Subscription subscription) {
-        if (subscription != null)
+        if (subscription != null && !subscription.isUnsubscribed())
             subscription.unsubscribe();
     }
 

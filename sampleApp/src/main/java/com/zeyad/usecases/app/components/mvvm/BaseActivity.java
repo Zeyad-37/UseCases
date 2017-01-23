@@ -107,16 +107,12 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public void onStop() {
         super.onStop();
-//        if (viewModel != null)
-//            viewModel.onViewDetached();
-    }
-
-    @Override
-    public void onDestroy() {
-        if (viewModel != null)
+        if (viewModel != null) {
             viewModel.onViewDetached();
-        viewModel = null;
-        super.onDestroy();
+            viewModel = null;
+        }
+        Utils.unsubscribeIfNotNull(compositeSubscription);
+        compositeSubscription = null;
     }
 
     public void showToastMessage(String message) {

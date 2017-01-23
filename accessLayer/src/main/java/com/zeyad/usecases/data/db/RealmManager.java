@@ -1,11 +1,13 @@
 package com.zeyad.usecases.data.db;
 
 import android.os.Build;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.zeyad.usecases.data.utils.Utils;
+import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -15,7 +17,6 @@ import java.util.List;
 
 import io.realm.Case;
 import io.realm.Realm;
-import io.realm.RealmChangeListener;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmQuery;
@@ -23,7 +24,6 @@ import io.realm.RealmResults;
 import rx.Observable;
 import rx.Subscriber;
 import rx.schedulers.Schedulers;
-import rx.subjects.BehaviorSubject;
 
 /**
  * {@link DataBaseManager} implementation.
@@ -98,27 +98,10 @@ public class RealmManager implements DataBaseManager {
     @Override
     public Observable<List> getAll(Class clazz) {
         return Observable.defer(() -> {
-//            if (hasKitKat())
-//                try (Realm realm = Realm.getDefaultInstance()) {
-//                    return Observable.just(realm.copyFromRealm(realm.where(clazz).findAll()));
-//                }
-//            else {
             Realm realm = Realm.getDefaultInstance();
-            BehaviorSubject behaviorSubject = BehaviorSubject.create();
-            try {
-                realm.where(clazz).findAll().addChangeListener(new RealmChangeListener<RealmResults>() {
-                    @Override
-                    public void onChange(RealmResults element) {
-                        // TODO: 1/20/17 Test!
-                        behaviorSubject.onNext(realm.copyFromRealm(element));
-                    }
-                });
-                behaviorSubject.onNext(realm.copyFromRealm(realm.where(clazz).findAll()));
-                return behaviorSubject.asObservable();
-            } finally {
-                closeRealm(realm);
-            }
-//            }
+            return realm.where(clazz).findAll().asObservable()
+                    .map(o -> realm.copyFromRealm((RealmResults) o))
+                    .doOnUnsubscribe(() -> closeRealm(realm));
         });
     }
 
@@ -451,9 +434,13 @@ public class RealmManager implements DataBaseManager {
 
     private void closeRealm(Realm realm) {
         try {
-            if (!realm.isClosed())
-                realm.close();
-        } catch (IllegalStateException e) {
+            new Handler(DataUseCase.handlerThread.getLooper()).post(() -> {
+                if (!realm.isClosed()) {
+                    realm.close();
+                    Log.d(RealmManager.class.getSimpleName(), "realm instance closed!");
+                }
+            });
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

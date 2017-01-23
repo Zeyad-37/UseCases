@@ -3,14 +3,12 @@ package com.zeyad.usecases.app.presentation.models;
 import com.google.gson.annotations.SerializedName;
 import com.zeyad.usecases.annotations.AutoMap;
 
-import org.parceler.Parcel;
-
 import io.realm.annotations.PrimaryKey;
 
 /**
  * @author zeyad on 12/1/16.
  */
-@Parcel
+//@Parcel
 @AutoMap
 public class UserModel {
 

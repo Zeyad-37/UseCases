@@ -9,7 +9,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
-import com.zeyad.usecases.app.presentation.models.UserModel;
+import com.zeyad.usecases.app.presentation.models.UserRealm;
 import com.zeyad.usecases.data.utils.Utils;
 
 import butterknife.BindView;
@@ -34,7 +34,8 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     @Override
     public void bindData(Object data, boolean isItemSelected, int position, boolean isEnabled) {
         if (data != null) {
-            UserModel userModel = (UserModel) data;
+//            UserModel userModel = (UserModel) data;
+            UserRealm userModel = (UserRealm) data;
 //        avatar.setImageURI(Uri.parse(userModel.getAvatarUrl()));
             if (Utils.isNotEmpty(userModel.getAvatarUrl()))
                 avatar.setController(Fresco.newDraweeControllerBuilder()

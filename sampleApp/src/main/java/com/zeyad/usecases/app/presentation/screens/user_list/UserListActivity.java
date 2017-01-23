@@ -17,7 +17,7 @@ import com.zeyad.usecases.app.components.mvvm.BaseActivity;
 import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
-import com.zeyad.usecases.app.presentation.models.UserModel;
+import com.zeyad.usecases.app.presentation.models.UserRealm;
 import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailActivity;
 import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailFragment;
 import com.zeyad.usecases.app.presentation.screens.user_list.view_holders.EmptyViewHolder;
@@ -64,6 +64,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     public void initialize() {
         viewModel = new UserListVM();
         userListVM = ((UserListVM) viewModel);
+        compositeSubscription.add(userListVM.writePeriodic());
     }
 
     @Override
@@ -81,9 +82,9 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     public Subscription loadData() {
         return userListVM.getUserList()
                 .doOnSubscribe(this::showLoading)
-                .subscribe(new BaseSubscriber<UserListActivity, List<UserModel>>(this, ERROR_WITH_RETRY) {
+                .subscribe(new BaseSubscriber<UserListActivity, List<UserRealm>>(this, ERROR_WITH_RETRY) {
                     @Override
-                    public void onNext(List<UserModel> userModels) {
+                    public void onNext(List<UserRealm> userModels) {
                         List<ItemInfo> infoList = new ArrayList<>(userModels.size());
                         for (int i = 0, repoModelsSize = userModels.size(); i < repoModelsSize; i++)
                             infoList.add(new ItemInfo<>(userModels.get(i), R.layout.user_item_layout));
@@ -111,11 +112,11 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
         usersAdapter.setAreItemsClickable(true);
         usersAdapter.setOnItemClickListener((position, itemInfo, holder) -> {
             if (twoPane) {
-                if (itemInfo.getData() instanceof UserModel) {
+                if (itemInfo.getData() instanceof UserRealm) {
                     if (Utils.isNotEmpty(currentFragTag)) {
                         removeFragment(currentFragTag);
                     }
-                    UserModel userModel = (UserModel) itemInfo.getData();
+                    UserRealm userModel = (UserRealm) itemInfo.getData();
                     UserDetailFragment orderDetailFragment = UserDetailFragment.newInstance(userModel);
                     userId = userModel.getId();
                     currentFragTag = orderDetailFragment.getClass().getSimpleName() + userId;
@@ -123,7 +124,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                 }
             } else {
                 navigator.navigateTo(getViewContext(), UserDetailActivity
-                        .getCallingIntent(getViewContext(), (UserModel) itemInfo.getData()));
+                        .getCallingIntent(getViewContext(), (UserRealm) itemInfo.getData()));
             }
         });
         LinearLayoutManager layoutManager = new LinearLayoutManager(getViewContext());

@@ -1,9 +1,7 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
 import android.content.Context;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,26 +13,20 @@ import android.widget.TextView;
 
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
-import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.mvvm.BaseFragment;
-import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
-import com.zeyad.usecases.app.presentation.models.RepoModel;
-import com.zeyad.usecases.app.presentation.models.UserModel;
+import com.zeyad.usecases.app.presentation.models.UserRealm;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
-import com.zeyad.usecases.app.utils.Utils;
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Subscription;
-
-import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
+import rx.subscriptions.Subscriptions;
 
 /**
  * A fragment representing a single RepoRealm detail screen.
@@ -55,7 +47,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     @BindView(R.id.recyclerView_repositories)
     RecyclerView recyclerViewRepositories;
     private GenericRecyclerViewAdapter repositoriesAdapter;
-    private UserModel userModel;
+    private UserRealm userModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -64,7 +56,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     public UserDetailFragment() {
     }
 
-    public static UserDetailFragment newInstance(UserModel userModel) {
+    public static UserDetailFragment newInstance(UserRealm userModel) {
         UserDetailFragment userDetailFragment = new UserDetailFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(ARG_USER, Parcels.wrap(userModel));
@@ -110,28 +102,29 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
 
     @Override
     public Subscription loadData() {
-        return userDetailVM.getRepositories(userModel.getLogin())
-                .doOnSubscribe(() -> {
-                    showLoading();
-                    textViewType.setText(userModel.getType());
-                    UserDetailActivity activity = (UserDetailActivity) getActivity();
-                    if (activity != null) {
-                        CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-                        if (appBarLayout != null)
-                            appBarLayout.setTitle(userModel.getLogin());
-                        if (Utils.isNotEmpty(userModel.getAvatarUrl()))
-                            activity.imageViewAvatar.setImageURI(Uri.parse(userModel.getAvatarUrl()));
-                    }
-                })
-                .subscribe(new BaseSubscriber<UserDetailFragment, List<RepoModel>>(this, ERROR_WITH_RETRY) {
-                    @Override
-                    public void onNext(List<RepoModel> repoModels) {
-                        List<ItemInfo> infoList = new ArrayList<>(repoModels.size());
-                        for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
-                            infoList.add(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
-                        repositoriesAdapter.animateTo(infoList);
-                    }
-                });
+        return Subscriptions.empty();
+//        return userDetailVM.getRepositories(userModel.getLogin())
+//                .doOnSubscribe(() -> {
+//                    showLoading();
+//                    textViewType.setText(userModel.getType());
+//                    UserDetailActivity activity = (UserDetailActivity) getActivity();
+//                    if (activity != null) {
+//                        CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+//                        if (appBarLayout != null)
+//                            appBarLayout.setTitle(userModel.getLogin());
+//                        if (Utils.isNotEmpty(userModel.getAvatarUrl()))
+//                            activity.imageViewAvatar.setImageURI(Uri.parse(userModel.getAvatarUrl()));
+//                    }
+//                })
+//                .subscribe(new BaseSubscriber<UserDetailFragment, List<RepoModel>>(this, ERROR_WITH_RETRY) {
+//                    @Override
+//                    public void onNext(List<RepoModel> repoModels) {
+//                        List<ItemInfo> infoList = new ArrayList<>(repoModels.size());
+//                        for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
+//                            infoList.add(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
+//                        repositoriesAdapter.animateTo(infoList);
+//                    }
+//                });
     }
 
     @Override

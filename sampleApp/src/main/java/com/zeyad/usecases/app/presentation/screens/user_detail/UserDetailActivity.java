@@ -13,7 +13,7 @@ import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.mvvm.BaseActivity;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
-import com.zeyad.usecases.app.presentation.models.UserModel;
+import com.zeyad.usecases.app.presentation.models.UserRealm;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
 
 import org.parceler.Parcels;
@@ -37,7 +37,7 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
     //    @BindView(R.id.imageView_avatar)
     SimpleDraweeView imageViewAvatar;
 
-    public static Intent getCallingIntent(Context context, UserModel userModel) {
+    public static Intent getCallingIntent(Context context, UserRealm userModel) {
         return new Intent(context, UserDetailActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .putExtra(ARG_USER, Parcels.wrap(userModel));

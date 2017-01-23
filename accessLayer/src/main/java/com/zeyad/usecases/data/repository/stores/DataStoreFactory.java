@@ -38,7 +38,7 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore dynamically(@NonNull String url, boolean isGet, IDAOMapper entityDataMapper) throws Exception {
-        if (!(url.isEmpty() && isGet))
+        if (!(url.isEmpty() || isGet))
             if (Utils.isNetworkAvailable(mContext))
                 return new CloudDataStore(RestApiImpl.getInstance(), mDataBaseManager, entityDataMapper);
             else throw new NetworkConnectionException("Please Check your internet connection!");

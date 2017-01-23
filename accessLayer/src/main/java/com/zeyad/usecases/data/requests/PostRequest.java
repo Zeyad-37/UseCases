@@ -6,6 +6,7 @@ import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.repository.DataRepository;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
@@ -24,6 +25,7 @@ public class PostRequest {
     private JSONObject jsonObject;
     private JSONArray jsonArray;
     private HashMap<String, Object> keyValuePairs;
+    private Object object;
 
     public PostRequest(@NonNull PostRequestBuilder postRequestBuilder) {
         url = postRequestBuilder.url;
@@ -37,6 +39,7 @@ public class PostRequest {
         jsonArray = postRequestBuilder.jsonArray;
         idColumnName = postRequestBuilder.idColumnName;
         method = postRequestBuilder.method;
+        object = postRequestBuilder.object;
     }
 
     public PostRequest(Subscriber subscriber, String idColumnName, String url, JSONObject keyValuePairs,
@@ -74,11 +77,18 @@ public class PostRequest {
     }
 
     public JSONObject getObjectBundle() {
-        if (jsonObject != null)
-            return jsonObject;
+        JSONObject jsonObject = new JSONObject();
+        if (object != null)
+            try {
+                return new JSONObject(Config.getGson().toJson(object));
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        else if (this.jsonObject != null)
+            jsonObject = this.jsonObject;
         else if (keyValuePairs != null)
-            return new JSONObject(keyValuePairs);
-        else return new JSONObject();
+            jsonObject = new JSONObject(keyValuePairs);
+        return jsonObject;
     }
 
     public JSONArray getArrayBundle() {
@@ -128,6 +138,10 @@ public class PostRequest {
         return keyValuePairs;
     }
 
+    public Object getObject() {
+        return object;
+    }
+
     public String getIdColumnName() {
         return idColumnName != null ? idColumnName : DataRepository.DEFAULT_ID_KEY;
     }
@@ -137,6 +151,7 @@ public class PostRequest {
     }
 
     public static class PostRequestBuilder {
+        Object object;
         JSONArray jsonArray;
         JSONObject jsonObject;
         HashMap<String, Object> keyValuePairs;
@@ -183,6 +198,12 @@ public class PostRequest {
         @NonNull
         public PostRequestBuilder idColumnName(String idColumnName) {
             this.idColumnName = idColumnName;
+            return this;
+        }
+
+        @NonNull
+        public PostRequestBuilder payLoad(Object object) {
+            this.object = object;
             return this;
         }
 

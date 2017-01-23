@@ -442,7 +442,7 @@ public class CloudDataStore implements DataStore {
                                     return Observable.just(true);
                                 });
                     } else if (object instanceof List) {
-                        observable = mDataBaseManager.putAll((List) mEntityDataMapper
+                        observable = mDataBaseManager.putAll(mEntityDataMapper
                                 .mapAllToRealm((List) object, dataClass), dataClass);
                     } else {
                         JSONObject jsonObject;
@@ -470,7 +470,7 @@ public class CloudDataStore implements DataStore {
     }
 
     private void persistAllGenerics(List collection, Class dataClass) {
-        mDataBaseManager.putAll((List) mEntityDataMapper.mapAllToRealm(collection, dataClass), dataClass)
+        mDataBaseManager.putAll(mEntityDataMapper.mapAllToRealm(collection, dataClass), dataClass)
                 .subscribeOn(Schedulers.io())
                 .subscribe(new SimpleSubscriber(collection));
     }
