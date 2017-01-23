@@ -18,6 +18,7 @@ import io.realm.RealmQuery;
 import rx.Observable;
 import st.lowlevel.storo.Storo;
 
+// TODO: 1/23/17 Remove Mapping
 public class DiskDataStore implements DataStore {
     private static final String IO_DB_ERROR = "Can not IO file to local DB";
     private DataBaseManager mDataBaseManager;

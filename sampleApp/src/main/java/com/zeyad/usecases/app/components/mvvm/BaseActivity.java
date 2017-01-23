@@ -3,33 +3,31 @@ package com.zeyad.usecases.app.components.mvvm;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.util.Pair;
 import android.view.View;
 import android.widget.Toast;
 
+import com.trello.rxlifecycle.components.support.RxAppCompatActivity;
 import com.zeyad.usecases.app.components.eventbus.IRxEventBus;
 import com.zeyad.usecases.app.components.eventbus.RxEventBusFactory;
 import com.zeyad.usecases.app.components.navigation.INavigator;
 import com.zeyad.usecases.app.components.navigation.NavigatorFactory;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
-import com.zeyad.usecases.app.utils.Utils;
 
 import java.util.List;
 
 import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
 
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends RxAppCompatActivity {
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
     public IBaseViewModel viewModel;
-    public CompositeSubscription compositeSubscription;
+    //    public CompositeSubscription compositeSubscription;
     public boolean isNewActivity;
 
     @Override
@@ -39,7 +37,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         navigator = NavigatorFactory.getInstance();
         rxEventBus = RxEventBusFactory.getInstance();
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
-        compositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(compositeSubscription);
+//        compositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(compositeSubscription);
         initialize();
         if (!isNewActivity && viewModel != null)
             viewModel.restoreState(savedInstanceState);
@@ -101,18 +99,19 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        compositeSubscription.add(loadData());
+//        compositeSubscription.add(loadData());
+        loadData();
     }
 
     @Override
     public void onStop() {
-        super.onStop();
         if (viewModel != null) {
             viewModel.onViewDetached();
             viewModel = null;
         }
-        Utils.unsubscribeIfNotNull(compositeSubscription);
-        compositeSubscription = null;
+//        Utils.unsubscribeIfNotNull(compositeSubscription);
+//        compositeSubscription = null;
+        super.onStop();
     }
 
     public void showToastMessage(String message) {

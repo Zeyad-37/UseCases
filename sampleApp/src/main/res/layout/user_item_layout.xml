@@ -9,7 +9,8 @@
     android:padding="@dimen/sixteen_dp"
     tools:ignore="UseCompoundDrawables">
 
-    <com.facebook.drawee.view.SimpleDraweeView
+    <!--<com.facebook.drawee.view.SimpleDraweeView-->
+    <ImageView
         android:id="@+id/avatar"
         android:layout_width="@dimen/lv_row_icon_width"
         android:layout_height="@dimen/lv_row_icon_width"

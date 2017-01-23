@@ -6,6 +6,7 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
@@ -29,6 +30,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Subscriber;
 import rx.Subscription;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
@@ -43,7 +45,7 @@ import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_R
  */
 public class UserListActivity extends BaseActivity implements LoadDataView {
 
-    public static final int PAGE_SIZE = 3;
+    public static final int PAGE_SIZE = 6;
     UserListVM userListVM;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -64,7 +66,6 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     public void initialize() {
         viewModel = new UserListVM();
         userListVM = ((UserListVM) viewModel);
-        compositeSubscription.add(userListVM.writePeriodic());
     }
 
     @Override
@@ -78,19 +79,63 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
             twoPane = true;
     }
 
-    @Override
-    public Subscription loadData() {
+    private Subscription writePeriodic() {
+        return userListVM.writePeriodic()
+                .compose(bindToLifecycle())
+                .doOnUnsubscribe(() -> Log.d("doOnUnsubscribe", "Unsubscribing subscription from writePeriodic"))
+                .subscribe(new Subscriber<Long>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(Long aLong) {
+                        Log.d("OnNext", String.valueOf(aLong));
+                    }
+                });
+    }
+
+    private Subscription itemByItem() {
+        return userListVM.updateItemByItem()
+                .doOnSubscribe(this::showLoading)
+                .compose(bindToLifecycle())
+                .doOnUnsubscribe(() -> Log.d("doOnUnsubscribe", "Unsubscribing subscription from loadData"))
+                .subscribe(new BaseSubscriber<UserListActivity, UserRealm>(this, ERROR_WITH_RETRY) {
+                    @Override
+                    public void onNext(UserRealm userModel) {
+                        hideLoading();
+                        usersAdapter.appendItem(new ItemInfo<>(userModel, R.layout.user_item_layout));
+                    }
+                });
+    }
+
+    private Subscription getList() {
         return userListVM.getUserList()
                 .doOnSubscribe(this::showLoading)
+                .compose(bindToLifecycle())
+                .doOnUnsubscribe(() -> Log.d("doOnUnsubscribe", "Unsubscribing subscription from loadData"))
                 .subscribe(new BaseSubscriber<UserListActivity, List<UserRealm>>(this, ERROR_WITH_RETRY) {
                     @Override
                     public void onNext(List<UserRealm> userModels) {
+                        hideLoading();
                         List<ItemInfo> infoList = new ArrayList<>(userModels.size());
                         for (int i = 0, repoModelsSize = userModels.size(); i < repoModelsSize; i++)
                             infoList.add(new ItemInfo<>(userModels.get(i), R.layout.user_item_layout));
-                        usersAdapter.animateTo(infoList);
+                        usersAdapter.setDataList(infoList);
                     }
                 });
+    }
+
+    @Override
+    public Subscription loadData() {
+        return getList();
+//        return itemByItem();
     }
 
     private void setupRecyclerView() {
@@ -138,7 +183,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                 if ((layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
                     userListVM.incrementPage();
-                    compositeSubscription.add(loadData());
+                    loadData();
                     userListVM.setYScroll(dy);
                 }
             }

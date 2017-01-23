@@ -1,12 +1,10 @@
 package com.zeyad.usecases.app.presentation.screens.user_list.view_holders;
 
-import android.net.Uri;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
-import com.facebook.drawee.view.SimpleDraweeView;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.presentation.models.UserRealm;
@@ -22,7 +20,7 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     @BindView(R.id.title)
     TextView textViewTitle;
     @BindView(R.id.avatar)
-    SimpleDraweeView avatar;
+    ImageView avatar;
     @BindView(R.id.rl_row_user)
     RelativeLayout rowUser;
 
@@ -37,13 +35,13 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
 //            UserModel userModel = (UserModel) data;
             UserRealm userModel = (UserRealm) data;
 //        avatar.setImageURI(Uri.parse(userModel.getAvatarUrl()));
-            if (Utils.isNotEmpty(userModel.getAvatarUrl()))
-                avatar.setController(Fresco.newDraweeControllerBuilder()
-                        .setUri(Uri.parse(userModel.getAvatarUrl()))
-                        .setTapToRetryEnabled(true)
-                        .setOldController(avatar.getController())
+//            if (Utils.isNotEmpty(userModel.getAvatarUrl()))
+//                avatar.setController(Fresco.newDraweeControllerBuilder()
+//                        .setUri(Uri.parse(userModel.getAvatarUrl()))
+//                        .setTapToRetryEnabled(true)
+//                        .setOldController(avatar.getController())
 //                .setControllerListener(new BaseControllerListener())
-                        .build());
+//                        .build());
             if (Utils.isNotEmpty(userModel.getLogin()))
                 textViewTitle.setText(userModel.getLogin());
         }

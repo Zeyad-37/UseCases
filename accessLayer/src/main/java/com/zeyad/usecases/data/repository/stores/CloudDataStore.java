@@ -455,9 +455,14 @@ public class CloudDataStore implements DataStore {
                         } else
                             jsonObject = new JSONObject(gson.toJson(object, dataClass));
                         observable = mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                                .flatMap(o -> Observable.just(Storo.put(dataClass.getSimpleName()
-                                                + jsonObject.optString(idColumnName),
-                                        gson.fromJson(jsonObject.toString(), dataClass)).execute()));
+                                .flatMap(o -> {
+                                    if (DataUseCaseFactory.isWithCache())
+                                        return Observable.just(Storo.put(dataClass.getSimpleName()
+                                                        + jsonObject.optString(idColumnName),
+                                                gson.fromJson(jsonObject.toString(), dataClass)).execute()
+                                        );
+                                    else return Observable.just(o);
+                                });
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

@@ -5,9 +5,6 @@ import android.support.annotation.Nullable;
 import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
-import com.google.gson.ExclusionStrategy;
-import com.google.gson.FieldAttributes;
-import com.google.gson.GsonBuilder;
 import com.zeyad.usecases.BuildConfig;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.executor.JobExecutor;
@@ -21,7 +18,6 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
-import io.realm.RealmObject;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.CertificatePinner;
@@ -297,21 +293,10 @@ class ApiConnection implements IApiConnection {
 
     private Retrofit createRetro2Client(@NonNull OkHttpClient okHttpClient) {
         return new Retrofit.Builder()
-                .baseUrl("http://www.google.com")
+                .baseUrl(Config.getBaseURL())
                 .client(okHttpClient)
                 .callbackExecutor(new JobExecutor())
-                .addConverterFactory(GsonConverterFactory.create(new GsonBuilder()
-                        .setExclusionStrategies(new ExclusionStrategy() {
-                            @Override
-                            public boolean shouldSkipField(@NonNull FieldAttributes f) {
-                                return f.getDeclaringClass().equals(RealmObject.class);
-                            }
-
-                            @Override
-                            public boolean shouldSkipClass(Class<?> clazz) {
-                                return false;
-                            }
-                        }).create()))
+                .addConverterFactory(GsonConverterFactory.create(Config.getGson()))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();
     }

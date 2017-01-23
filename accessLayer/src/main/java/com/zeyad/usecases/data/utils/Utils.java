@@ -85,10 +85,15 @@ public class Utils {
     }
 
     public static int getMaxId(Class clazz, String column) {
-        Number currentMax = Realm.getDefaultInstance().where(clazz).max(column);
-        if (currentMax != null)
-            return currentMax.intValue();
-        else return 0;
+        Realm realm = Realm.getDefaultInstance();
+        try {
+            Number currentMax = realm.where(clazz).max(column);
+            if (currentMax != null)
+                return currentMax.intValue();
+            else return 0;
+        } finally {
+            realm.close();
+        }
     }
 
     public static RequestBody createPartFromString(Object descriptionString) {

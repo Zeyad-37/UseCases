@@ -509,6 +509,10 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         notifyItemChanged(position, mDataList.size());
     }
 
+    public void appendItem(ItemInfo model) {
+        addItem(getItemCount(), model);
+    }
+
     public void moveItem(int fromPosition, int toPosition) {
         mDataList.add(toPosition, mDataList.remove(fromPosition));
         notifyItemMoved(fromPosition, toPosition);

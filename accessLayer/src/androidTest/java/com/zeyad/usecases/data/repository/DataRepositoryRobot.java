@@ -41,17 +41,17 @@ public class DataRepositoryRobot {
     }
 
     static void addMockForDiskStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedDataStore) throws Exception {
-        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
+        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any()))
                 .thenReturn(mockedDataStore);
-        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
+        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any()))
                 .thenReturn(mockedDataStore);
         Mockito.when(mockedDataStoreFactory.disk(Mockito.any())).thenReturn(mockedDataStore);
     }
 
     static void addMockForCloudStore(@NonNull DataStoreFactory mockedDataStoreFactory, DataStore mockedCloudStore) throws Exception {
-        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
+        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any()))
                 .thenReturn(mockedCloudStore);
-        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.anyBoolean(), Mockito.any()))
+        Mockito.when(mockedDataStoreFactory.dynamically(Mockito.anyString(), Mockito.any()))
                 .thenReturn(mockedCloudStore);
         Mockito.when(mockedDataStoreFactory.cloud(Mockito.any())).thenReturn(mockedCloudStore);
     }

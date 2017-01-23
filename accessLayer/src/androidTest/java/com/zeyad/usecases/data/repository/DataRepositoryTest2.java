@@ -85,7 +85,7 @@ public class DataRepositoryTest2 {
         dataRepository.getObjectDynamicallyById(anyString(), anyString(), anyInt(), any(), any(),
                 anyBoolean(), anyBoolean());
 
-        verify(mockDataStoreFactory).dynamically(eq(anyString()), eq(anyBoolean()), eq(mockIDAOMapper));
+        verify(mockDataStoreFactory).dynamically(eq(anyString()), eq(mockIDAOMapper));
         verify(mockDataStore).dynamicGetObject(eq(anyString()), eq(anyString()), eq(anyInt()), eq(any()),
                 eq(any()), eq(anyBoolean()), eq(anyBoolean()));
     }

@@ -70,10 +70,14 @@ android {
         abortOnError true
         disable 'InvalidPackage'
     }
+
+    configurations.all {
+        resolutionStrategy.force 'com.google.code.findbugs:jsr305:3.0.1'
+    }
 }
 
 ext {
-    supportLibraryVersion = '25.0.1'
+    supportLibraryVersion = '25.1.0'
     retrofitVersion = '2.1.0'
     okhttpVersion = '3.3.1'
     googlePlayVersion = '10.0.1'
@@ -98,13 +102,16 @@ dependencies {
     compile "com.android.support:design:$supportLibraryVersion"
     compile "com.android.support:cardview-v7:$supportLibraryVersion"
     // Network
-    compile 'com.facebook.fresco:fresco:0.14.1'
+//    compile 'com.facebook.fresco:fresco:0.14.1'
     // Rx
     compile "com.jakewharton.rxbinding:rxbinding:$rxbindingVersion"
     compile "com.jakewharton.rxbinding:rxbinding-appcompat-v7:$rxbindingVersion"
     compile "com.jakewharton.rxbinding:rxbinding-design:$rxbindingVersion"
     compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$rxbindingVersion"
     compile 'com.jakewharton.rxrelay:rxrelay:1.2.0'
+    compile 'com.trello:rxlifecycle:1.0'
+//    compile 'com.trello:rxlifecycle-android:1.0'
+    compile 'com.trello:rxlifecycle-components:1.0'
     // Injection
     compile "com.jakewharton:butterknife:$butterKnifeVersion"
     apt "com.jakewharton:butterknife-compiler:$butterKnifeVersion"

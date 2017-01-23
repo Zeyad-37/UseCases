@@ -2,28 +2,26 @@ package com.zeyad.usecases.app.components.mvvm;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.v4.app.Fragment;
 import android.view.View;
 import android.widget.Toast;
 
+import com.trello.rxlifecycle.components.support.RxFragment;
 import com.zeyad.usecases.app.components.eventbus.IRxEventBus;
 import com.zeyad.usecases.app.components.eventbus.RxEventBusFactory;
 import com.zeyad.usecases.app.components.navigation.INavigator;
 import com.zeyad.usecases.app.components.navigation.NavigatorFactory;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
-import com.zeyad.usecases.app.utils.Utils;
 
 import rx.Subscription;
-import rx.subscriptions.CompositeSubscription;
 
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseFragment extends Fragment {
+public abstract class BaseFragment extends RxFragment {
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
-    public CompositeSubscription compositeSubscription;
+    //    public CompositeSubscription compositeSubscription;
     public IBaseViewModel viewModel;
     public boolean isNewActivity;
 
@@ -40,7 +38,7 @@ public abstract class BaseFragment extends Fragment {
         isNewActivity = savedInstanceState == null;
         if (!isNewActivity && viewModel != null)
             viewModel.restoreState(savedInstanceState);
-        compositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(compositeSubscription);
+//        compositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(compositeSubscription);
     }
 
     @Override
@@ -133,12 +131,13 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        compositeSubscription.add(loadData());
+//        compositeSubscription.add(loadData());
+        loadData();
     }
 
     @Override
     public void onDestroyView() {
-        Utils.unsubscribeIfNotNull(compositeSubscription);
+//        Utils.unsubscribeIfNotNull(compositeSubscription);
         if (viewModel != null)
             viewModel.onViewDetached();
         super.onDestroyView();

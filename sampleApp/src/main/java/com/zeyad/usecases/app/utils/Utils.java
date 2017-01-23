@@ -1,6 +1,7 @@
 package com.zeyad.usecases.app.utils;
 
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 import java.util.List;
 
@@ -21,8 +22,10 @@ public class Utils {
     }
 
     public static void unsubscribeIfNotNull(@Nullable Subscription subscription) {
-        if (subscription != null && !subscription.isUnsubscribed())
+        if (subscription != null && !subscription.isUnsubscribed()) {
             subscription.unsubscribe();
+            Log.d("Subscription", "unsubscribing");
+        }
     }
 
     public static boolean isNotEmpty(String text) {

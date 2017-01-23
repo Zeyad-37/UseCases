@@ -72,20 +72,11 @@ public class RealmManager implements DataBaseManager {
             int finalItemId = itemId;
             if (finalItemId <= 0)
                 finalItemId = Utils.getMaxId(dataClass, idColumnName);
-            if (hasKitKat())
-                try (Realm realm = Realm.getDefaultInstance()) {
-                    return Observable.just(realm.copyFromRealm(realm.where(dataClass)
-                            .equalTo(idColumnName, finalItemId).findFirst()));
-                }
-            else {
-                Realm realm = Realm.getDefaultInstance();
-                try {
-                    return Observable.just(realm.copyFromRealm(realm.where(dataClass)
-                            .equalTo(idColumnName, finalItemId).findFirst()));
-                } finally {
-                    closeRealm(realm);
-                }
-            }
+            Realm realm = Realm.getDefaultInstance();
+            return realm.where(dataClass).equalTo(idColumnName, finalItemId).findAll().asObservable()
+                    .filter(results -> ((RealmResults) results).isLoaded())
+                    .map(o -> realm.copyFromRealm((RealmResults) o))
+                    .doOnUnsubscribe(() -> closeRealm(realm));
         });
     }
 
@@ -100,6 +91,7 @@ public class RealmManager implements DataBaseManager {
         return Observable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
             return realm.where(clazz).findAll().asObservable()
+                    .filter(results -> ((RealmResults) results).isLoaded())
                     .map(o -> realm.copyFromRealm((RealmResults) o))
                     .doOnUnsubscribe(() -> closeRealm(realm));
         });
@@ -116,20 +108,11 @@ public class RealmManager implements DataBaseManager {
     @Override
     public Observable<List> getWhere(Class clazz, String query, @NonNull String filterKey) {
         return Observable.defer(() -> {
-            if (hasKitKat())
-                try (Realm realm = Realm.getDefaultInstance()) {
-                    return Observable.just(realm.copyFromRealm(realm.where(clazz)
-                            .beginsWith(filterKey, query, Case.INSENSITIVE).findAll()));
-                }
-            else {
-                Realm realm = Realm.getDefaultInstance();
-                try {
-                    return Observable.just(realm.copyFromRealm(realm.where(clazz)
-                            .beginsWith(filterKey, query, Case.INSENSITIVE).findAll()));
-                } finally {
-                    closeRealm(realm);
-                }
-            }
+            Realm realm = Realm.getDefaultInstance();
+            return realm.where(clazz).beginsWith(filterKey, query, Case.INSENSITIVE).findAll().asObservable()
+                    .filter(results -> ((RealmResults) results).isLoaded())
+                    .map(o -> realm.copyFromRealm((RealmResults) o))
+                    .doOnUnsubscribe(() -> closeRealm(realm));
         });
     }
 
@@ -142,18 +125,11 @@ public class RealmManager implements DataBaseManager {
     @Override
     public Observable<List> getWhere(@NonNull RealmQuery realmQuery) {
         return Observable.defer(() -> {
-            if (hasKitKat())
-                try (Realm realm = Realm.getDefaultInstance()) {
-                    return Observable.just(realm.copyFromRealm(realmQuery.findAll()));
-                }
-            else {
-                Realm realm = Realm.getDefaultInstance();
-                try {
-                    return Observable.just(realm.copyFromRealm(realmQuery.findAll()));
-                } finally {
-                    closeRealm(realm);
-                }
-            }
+            Realm realm = Realm.getDefaultInstance();
+            return realmQuery.findAll().asObservable()
+                    .filter(results -> ((RealmResults) results).isLoaded())
+                    .map(o -> realm.copyFromRealm((RealmResults) o))
+                    .doOnUnsubscribe(() -> closeRealm(realm));
         });
     }
 

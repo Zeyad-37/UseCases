@@ -33,6 +33,7 @@ public class DataUseCaseFactory {
         if (!Utils.doesContextBelongsToApplication(config.getContext()))
             throw new IllegalArgumentException("Context should be application context only.");
         Config.init(config.getContext());
+        Config.setBaseURL(config.getBaseUrl());
         if (config.getOkHttpBuilder() == null) {
             ApiConnectionFactory.init();
         } else {
@@ -52,7 +53,6 @@ public class DataUseCaseFactory {
         sDataUseCase = DataUseCase.getInstance();
         CACHE_SIZE = config.getCacheSize();
         withCache = config.isWithCache();
-        Config.setBaseURL(config.getBaseUrl());
     }
 
     /**

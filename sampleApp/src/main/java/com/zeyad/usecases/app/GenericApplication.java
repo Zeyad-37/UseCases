@@ -3,7 +3,6 @@ package com.zeyad.usecases.app;
 import android.app.Application;
 import android.util.Log;
 
-import com.facebook.drawee.backends.pipeline.Fresco;
 import com.zeyad.usecases.app.presentation.models.AutoMap_DAOMapperFactory;
 import com.zeyad.usecases.data.mappers.DAOMapperFactory;
 import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
@@ -62,7 +61,7 @@ public class GenericApplication extends Application {
                 .okhttpCache(provideCache())
                 .build());
 //        PrefsUseCaseFactory.init(this, "com.usecase.zeyad.PREFS");
-        Fresco.initialize(this);
+//        Fresco.initialize(this);
         initializeStetho();
         initializeFlowUp();
     }
