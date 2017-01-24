@@ -15,5 +15,7 @@ interface UserListView {
 
     void incrementPage();
 
-    void setYScroll(int yScroll);
+    int getCurrentPage();
+
+    void setCurrentPage(int currentPage);
 }

@@ -2,6 +2,7 @@ package com.zeyad.usecases.app.presentation.screens.user_list;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -25,6 +26,8 @@ import com.zeyad.usecases.app.presentation.screens.user_list.view_holders.EmptyV
 import com.zeyad.usecases.app.presentation.screens.user_list.view_holders.UserViewHolder;
 import com.zeyad.usecases.app.utils.Utils;
 
+import org.parceler.Parcels;
+
 import java.util.ArrayList;
 
 import butterknife.BindView;
@@ -43,8 +46,8 @@ import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_R
  * item details side-by-side using two vertical panes.
  */
 public class UserListActivity extends BaseActivity implements LoadDataView {
-
     public static final int PAGE_SIZE = 6;
+    private static final String CURRENT_PAGE = "currentPage", Y_SCROLL = "yScroll", USER_LIST_MODEL = "userListModel";
     UserListView userListVM;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -55,10 +58,32 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     GenericRecyclerViewAdapter usersAdapter;
     private String currentFragTag;
     private boolean twoPane;
-    private int userId;
+    private int userId, yScroll;
+    private UserListModel userListModel;
 
     public static Intent getCallingIntent(Context context) {
         return new Intent(context, UserListActivity.class);
+    }
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (savedInstanceState != null) {
+            userListVM.setCurrentPage(savedInstanceState.getInt(CURRENT_PAGE, 0));
+            yScroll = savedInstanceState.getInt(Y_SCROLL, 0);
+            userListModel = Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL));
+//            userListActivity.userRecycler.scrollToPosition(yScroll);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        if (outState != null) {
+            outState.putInt(CURRENT_PAGE, userListVM.getCurrentPage());
+            outState.putInt(Y_SCROLL, yScroll);
+            outState.putParcelable(USER_LIST_MODEL, Parcels.wrap(userListModel));
+        }
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -183,7 +208,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
                     userListVM.incrementPage();
                     loadData();
-                    userListVM.setYScroll(dy);
+                    yScroll = dy;
                 }
             }
         });

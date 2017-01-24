@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.content.Context;
 import android.os.Build;
-import android.os.Bundle;
 
 import rx.subscriptions.CompositeSubscription;
 
@@ -31,15 +30,6 @@ public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
             compositeSubscription.unsubscribe();
             compositeSubscription = null;
         }
-    }
-
-    @Override
-    public Bundle getState() {
-        return new Bundle(0);
-    }
-
-    @Override
-    public void restoreState(Bundle state) {
     }
 
     public int getItemId() {

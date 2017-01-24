@@ -1,6 +1,5 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
-import android.os.Bundle;
 import android.util.Log;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
@@ -11,8 +10,6 @@ import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
-
-import org.parceler.Parcels;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -28,11 +25,10 @@ import rx.schedulers.Schedulers;
  */
 class UserListVM extends BaseViewModel implements UserListView {
 
-    private static final String CURRENT_PAGE = "currentPage", Y_SCROLL = "yScroll", USER_LIST_MODEL = "userListModel";
     private final IDataUseCase dataUseCase;
-    private int currentPage, yScroll;
+    private int currentPage;
     private int counter = 0;
-    private UserListModel userListModel;
+
 
     UserListVM() {
         dataUseCase = DataUseCaseFactory.getInstance();
@@ -60,11 +56,7 @@ class UserListVM extends BaseViewModel implements UserListView {
                 })
                 .flatMap(list -> Observable.just(UserListModel.onNext((List<UserRealm>) list)))
                 .onErrorReturn(throwable -> UserListModel.error(throwable))
-                .startWith(UserListModel.loading())
-                .flatMap(userListModel1 -> {
-                    userListModel = userListModel1;
-                    return Observable.just(userListModel);
-                });
+                .startWith(UserListModel.loading());
     }
 
     @Override
@@ -119,28 +111,12 @@ class UserListVM extends BaseViewModel implements UserListView {
     }
 
     @Override
-    public void setYScroll(int yScroll) {
-        this.yScroll = yScroll;
+    public int getCurrentPage() {
+        return currentPage;
     }
 
     @Override
-    public Bundle getState() {
-        Bundle outState = new Bundle(2);
-        outState.putInt(CURRENT_PAGE, currentPage);
-        outState.putInt(Y_SCROLL, yScroll);
-        outState.putParcelable(USER_LIST_MODEL, Parcels.wrap(userListModel));
-        return outState;
-    }
-
-    @Override
-    public void restoreState(Bundle state) {
-        if (state != null) {
-            UserListActivity userListActivity = ((UserListActivity) getView());
-            currentPage = state.getInt(CURRENT_PAGE, 0);
-            yScroll = state.getInt(Y_SCROLL, 0);
-            userListModel = Parcels.unwrap(state.getParcelable(USER_LIST_MODEL));
-            Log.d(USER_LIST_MODEL, userListModel.toString());
-//            userListActivity.userRecycler.scrollToPosition(yScroll);
-        }
+    public void setCurrentPage(int currentPage) {
+        this.currentPage = currentPage;
     }
 }
