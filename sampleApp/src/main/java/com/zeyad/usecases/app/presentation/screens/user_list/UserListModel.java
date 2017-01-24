@@ -3,15 +3,22 @@ package com.zeyad.usecases.app.presentation.screens.user_list;
 import com.zeyad.usecases.app.components.mvvm.BaseModel;
 import com.zeyad.usecases.app.presentation.models.UserRealm;
 
+import org.parceler.Parcel;
+
 import java.util.List;
 
 /**
  * @author zeyad on 1/24/17.
  */
+@Parcel
+public class UserListModel extends BaseModel {
 
-class UserListModel extends BaseModel {
+    final List<UserRealm> users;
 
-    private final List<UserRealm> users;
+    public UserListModel() {
+        super(false, null);
+        users = null;
+    }
 
     UserListModel(List<UserRealm> users, boolean isLoading, Throwable error) {
         super(isLoading, error);

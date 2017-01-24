@@ -119,7 +119,6 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
         return userListVM.getUserList()
                 .doOnSubscribe(this::showLoading)
                 .compose(bindToLifecycle())
-                .doOnUnsubscribe(() -> Log.d("doOnUnsubscribe", "Unsubscribing subscription from loadData"))
                 .subscribe(new BaseSubscriber<UserListActivity, UserListModel>(this, ERROR_WITH_RETRY) {
                     @Override
                     public void onNext(UserListModel userListModel) {

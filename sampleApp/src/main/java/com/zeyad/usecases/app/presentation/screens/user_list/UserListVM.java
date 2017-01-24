@@ -12,6 +12,8 @@ import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
+import org.parceler.Parcels;
+
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -26,10 +28,11 @@ import rx.schedulers.Schedulers;
  */
 class UserListVM extends BaseViewModel implements UserListView {
 
-    private static final String CURRENT_PAGE = "currentPage", Y_SCROLL = "yScroll";
+    private static final String CURRENT_PAGE = "currentPage", Y_SCROLL = "yScroll", USER_LIST_MODEL = "userListModel";
     private final IDataUseCase dataUseCase;
     private int currentPage, yScroll;
     private int counter = 0;
+    private UserListModel userListModel;
 
     UserListVM() {
         dataUseCase = DataUseCaseFactory.getInstance();
@@ -41,27 +44,27 @@ class UserListVM extends BaseViewModel implements UserListView {
         if (Utils.isNotEmpty(lastList) && lastList.get(0) instanceof UserRealm)
             return dataUseCase.getLastList()
                     .flatMap(list -> Observable.just(UserListModel.onNext((List<UserRealm>) list)));
-        else return fromIO();
+        else return fresherData();
     }
 
-    private Observable<UserListModel> fromIO() {
+    private Observable<UserListModel> fresherData() {
         Observable networkObservable = Observable.defer(() -> dataUseCase.getList(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(Constants.URLS.USERS, currentPage))
                 .build()));
         return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true).build())
-                .flatMap((Func1<List, Observable<?>>) list -> {
-                    if (Utils.isNotEmpty(list))
-                        return Observable.just(list);
-                    else return networkObservable;
-                })
+                .flatMap((Func1<List, Observable<?>>) list -> Utils.isNotEmpty(list) ? Observable.just(list) : networkObservable)
                 .onErrorResumeNext(throwable -> {
                     throwable.printStackTrace();
                     return networkObservable;
                 })
                 .flatMap(list -> Observable.just(UserListModel.onNext((List<UserRealm>) list)))
                 .onErrorReturn(throwable -> UserListModel.error(throwable))
-                .startWith(UserListModel.loading());
+                .startWith(UserListModel.loading())
+                .flatMap(userListModel1 -> {
+                    userListModel = userListModel1;
+                    return Observable.just(userListModel);
+                });
     }
 
     @Override
@@ -125,15 +128,18 @@ class UserListVM extends BaseViewModel implements UserListView {
         Bundle outState = new Bundle(2);
         outState.putInt(CURRENT_PAGE, currentPage);
         outState.putInt(Y_SCROLL, yScroll);
+        outState.putParcelable(USER_LIST_MODEL, Parcels.wrap(userListModel));
         return outState;
     }
 
     @Override
     public void restoreState(Bundle state) {
         if (state != null) {
-//            UserListActivity userListActivity = ((UserListActivity) getView());
-//            currentPage = state.getInt(CURRENT_PAGE, 0);
-//            yScroll = state.getInt(Y_SCROLL, 0);
+            UserListActivity userListActivity = ((UserListActivity) getView());
+            currentPage = state.getInt(CURRENT_PAGE, 0);
+            yScroll = state.getInt(Y_SCROLL, 0);
+            userListModel = Parcels.unwrap(state.getParcelable(USER_LIST_MODEL));
+            Log.d(USER_LIST_MODEL, userListModel.toString());
 //            userListActivity.userRecycler.scrollToPosition(yScroll);
         }
     }
