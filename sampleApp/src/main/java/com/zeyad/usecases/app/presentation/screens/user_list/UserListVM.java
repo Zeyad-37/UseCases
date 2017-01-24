@@ -28,8 +28,8 @@ class UserListVM extends BaseViewModel implements UserListView {
 
     private static final String CURRENT_PAGE = "currentPage", Y_SCROLL = "yScroll";
     private final IDataUseCase dataUseCase;
-    int counter = 0;
     private int currentPage, yScroll;
+    private int counter = 0;
 
     UserListVM() {
         dataUseCase = DataUseCaseFactory.getInstance();
@@ -41,9 +41,7 @@ class UserListVM extends BaseViewModel implements UserListView {
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(Constants.URLS.USERS, currentPage))
                 .build()));
-        return dataUseCase.getList(new GetRequest
-                .GetRequestBuilder(UserRealm.class, true)
-                .build())
+        return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true).build())
                 .flatMap((Func1<List, Observable<?>>) list -> {
                     if (Utils.isNotEmpty(list))
                         return Observable.just(list);
@@ -52,7 +50,10 @@ class UserListVM extends BaseViewModel implements UserListView {
                 .onErrorResumeNext(throwable -> {
                     throwable.printStackTrace();
                     return networkObservable;
-                });
+                })
+                .flatMap(list -> Observable.just(UserListModel.onNext((List<UserRealm>) list)))
+                .onErrorReturn(throwable -> UserListModel.error(throwable))
+                .startWith(UserListModel.loading());
     }
 
     @Override
@@ -61,13 +62,12 @@ class UserListVM extends BaseViewModel implements UserListView {
                 .GetRequestBuilder(UserRealm.class, true)
                 .build())
                 .flatMap((Func1<List, Observable<?>>) Observable::from)
-                .flatMap((Func1<Object, Observable<?>>) o -> dataUseCase.getObject(new GetRequest
+                .flatMap((Func1<Object, Observable<?>>) userRealm -> dataUseCase.getObject(new GetRequest
                         .GetRequestBuilder(UserRealm.class, true)
-                        .url(String.format(Constants.URLS.USER, ((UserRealm) o).getLogin()))
+                        .url(String.format(Constants.URLS.USER, ((UserRealm) userRealm).getLogin()))
                         .build()));
     }
 
-    @SuppressWarnings("unused")
     @Override
     public Observable<Long> writePeriodic() {
         return Observable.interval(2000, TimeUnit.MILLISECONDS, AndroidSchedulers.mainThread())
@@ -102,11 +102,13 @@ class UserListVM extends BaseViewModel implements UserListView {
                 });
     }
 
-    void incrementPage() {
+    @Override
+    public void incrementPage() {
         currentPage++;
     }
 
-    void setYScroll(int yScroll) {
+    @Override
+    public void setYScroll(int yScroll) {
         this.yScroll = yScroll;
     }
 

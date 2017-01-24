@@ -12,4 +12,8 @@ interface UserListView {
     Observable updateItemByItem();
 
     Observable writePeriodic();
+
+    void incrementPage();
+
+    void setYScroll(int yScroll);
 }

@@ -101,6 +101,7 @@ public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
 
     /**
      * Returns current compositeSubscription or creates a new one, if null or un-subscribed.
+     *
      * @return {@link CompositeSubscription}.
      */
     public CompositeSubscription getCompositeSubscription() {

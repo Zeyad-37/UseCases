@@ -26,7 +26,6 @@ import com.zeyad.usecases.app.presentation.screens.user_list.view_holders.UserVi
 import com.zeyad.usecases.app.utils.Utils;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -46,7 +45,7 @@ import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_R
 public class UserListActivity extends BaseActivity implements LoadDataView {
 
     public static final int PAGE_SIZE = 6;
-    UserListVM userListVM;
+    UserListView userListVM;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.linear_layout_loader)
@@ -106,13 +105,14 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                 .doOnSubscribe(this::showLoading)
                 .compose(bindToLifecycle())
                 .doOnUnsubscribe(() -> Log.d("doOnUnsubscribe", "Unsubscribing subscription from loadData"))
-                .subscribe(new BaseSubscriber<UserListActivity, UserRealm>(this, ERROR_WITH_RETRY) {
-                    @Override
-                    public void onNext(UserRealm userModel) {
-                        hideLoading();
-                        usersAdapter.appendItem(new ItemInfo<>(userModel, R.layout.user_item_layout));
-                    }
-                });
+                .subscribe();
+//                .subscribe(new BaseSubscriber<UserListActivity, UserRealm>(this, ERROR_WITH_RETRY) {
+//                    @Override
+//                    public void onNext(UserRealm userModel) {
+//                        hideLoading();
+//                        usersAdapter.appendItem(new ItemInfo<>(userModel, R.layout.user_item_layout));
+//                    }
+//                });
     }
 
     private Subscription getList() {
@@ -120,14 +120,14 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                 .doOnSubscribe(this::showLoading)
                 .compose(bindToLifecycle())
                 .doOnUnsubscribe(() -> Log.d("doOnUnsubscribe", "Unsubscribing subscription from loadData"))
-                .subscribe(new BaseSubscriber<UserListActivity, List<UserRealm>>(this, ERROR_WITH_RETRY) {
+                .subscribe(new BaseSubscriber<UserListActivity, UserListModel>(this, ERROR_WITH_RETRY) {
                     @Override
-                    public void onNext(List<UserRealm> userModels) {
-                        hideLoading();
-                        List<ItemInfo> infoList = new ArrayList<>(userModels.size());
-                        for (int i = 0, repoModelsSize = userModels.size(); i < repoModelsSize; i++)
-                            infoList.add(new ItemInfo<>(userModels.get(i), R.layout.user_item_layout));
-                        usersAdapter.setDataList(infoList);
+                    public void onNext(UserListModel userListModel) {
+                        super.onNext(userListModel);
+                        if (Utils.isNotEmpty(userListModel.getUsers()))
+                            for (int i = 0, repoModelsSize = userListModel.getUsers().size(); i < repoModelsSize; i++)
+                                usersAdapter.appendItem(new ItemInfo<>(userListModel.getUsers().get(i),
+                                        R.layout.user_item_layout));
                     }
                 });
     }

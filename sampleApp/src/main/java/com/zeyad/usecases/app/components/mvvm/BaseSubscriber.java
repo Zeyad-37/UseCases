@@ -8,7 +8,7 @@ import rx.Subscriber;
  * @author zeyad on 11/28/16.
  */
 
-public class BaseSubscriber<V extends LoadDataView, M> extends Subscriber<M> {
+public class BaseSubscriber<V extends LoadDataView, M extends BaseModel> extends Subscriber<M> {
     public final static int NO_ERROR = 0, ERROR = 1, ERROR_WITH_RETRY = 2;
     private V view;
     private int errorPolicy;
@@ -48,5 +48,10 @@ public class BaseSubscriber<V extends LoadDataView, M> extends Subscriber<M> {
 
     @Override
     public void onNext(M m) {
+        if (m.isLoading())
+            view.showLoading();
+        else view.hideLoading();
+        if (m.getError() != null)
+            onError(m.getError());
     }
 }
