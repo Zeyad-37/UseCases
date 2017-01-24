@@ -7,7 +7,7 @@ import rx.Observable;
  */
 interface UserListView {
 
-    Observable getUserList();
+    Observable<UserListModel> getUserList();
 
     Observable updateItemByItem();
 

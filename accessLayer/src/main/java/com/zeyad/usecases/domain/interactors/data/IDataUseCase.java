@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.realm.RealmQuery;
 import rx.Observable;
+import rx.subjects.BehaviorSubject;
 
 public interface IDataUseCase {
     /**
@@ -92,4 +93,8 @@ public interface IDataUseCase {
      * @return
      */
     Observable searchDisk(RealmQuery realmQuery, Class presentationClass);
+
+    BehaviorSubject getLastObject();
+
+    BehaviorSubject<List> getLastList();
 }

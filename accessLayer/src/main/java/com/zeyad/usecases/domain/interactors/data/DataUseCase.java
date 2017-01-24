@@ -20,12 +20,15 @@ import java.util.List;
 import io.realm.RealmQuery;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.subjects.BehaviorSubject;
 
 /**
  * This class is a general implementation that represents a use case for retrieving data.
  */
 public class DataUseCase implements IDataUseCase {
 
+    private final static BehaviorSubject lastObject = BehaviorSubject.create();
+    private final static BehaviorSubject<List> lastList = BehaviorSubject.create();
     public static HandlerThread handlerThread = new HandlerThread("");
     private static DataUseCase sDataUseCase;
     private final Data mData;
@@ -93,7 +96,12 @@ public class DataUseCase implements IDataUseCase {
     public Observable<List> getList(GetRequest genericUseCaseRequest) {
         return mData.getListDynamically(genericUseCaseRequest.getUrl(), genericUseCaseRequest
                 .getPresentationClass(), genericUseCaseRequest.getDataClass(), genericUseCaseRequest
-                .isPersist(), genericUseCaseRequest.isShouldCache()).compose(applySchedulers());
+                .isPersist(), genericUseCaseRequest.isShouldCache())
+                .compose(applySchedulers())
+                .flatMap(list -> {
+                    lastList.onNext(list);
+                    return Observable.just(list);
+                });
     }
 
     /**
@@ -107,7 +115,11 @@ public class DataUseCase implements IDataUseCase {
         return mData.getObjectDynamicallyById(getRequest.getUrl(), getRequest
                         .getIdColumnName(), getRequest.getItemId(), getRequest.getPresentationClass(),
                 getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
-                .compose(applySchedulers());
+                .compose(applySchedulers())
+                .flatMap(list -> {
+                    lastObject.onNext(list);
+                    return Observable.just(list);
+                });
     }
 
     @Override
@@ -174,7 +186,11 @@ public class DataUseCase implements IDataUseCase {
     public Observable searchDisk(String query, String column, Class presentationClass,
                                  Class dataClass) {
         return mData.searchDisk(query, column, presentationClass, dataClass)
-                .compose(applySchedulers());
+                .compose(applySchedulers())
+                .flatMap(list -> {
+                    lastObject.onNext(list);
+                    return Observable.just(list);
+                });
     }
 
     /**
@@ -184,7 +200,11 @@ public class DataUseCase implements IDataUseCase {
     @SuppressWarnings("unchecked")
     public Observable searchDisk(RealmQuery realmQuery, Class presentationClass) {
         return mData.searchDisk(realmQuery, presentationClass)
-                .compose(applySchedulers());
+                .compose(applySchedulers())
+                .flatMap(list -> {
+                    lastObject.onNext(list);
+                    return Observable.just(list);
+                });
     }
 
     /**
@@ -199,8 +219,18 @@ public class DataUseCase implements IDataUseCase {
         if (!handlerThread.isAlive()) {
             handlerThread.start();
         }
-        return observable -> observable.subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
 //        return observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor))
+        return observable -> observable.subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
                 .observeOn(mPostExecutionThread.getScheduler());
+    }
+
+    @Override
+    public BehaviorSubject getLastObject() {
+        return lastObject;
+    }
+
+    @Override
+    public BehaviorSubject<List> getLastList() {
+        return lastList;
     }
 }

@@ -36,7 +36,15 @@ class UserListVM extends BaseViewModel implements UserListView {
     }
 
     @Override
-    public Observable getUserList() {
+    public Observable<UserListModel> getUserList() {
+        List lastList = dataUseCase.getLastList().getValue();
+        if (Utils.isNotEmpty(lastList) && lastList.get(0) instanceof UserRealm)
+            return dataUseCase.getLastList()
+                    .flatMap(list -> Observable.just(UserListModel.onNext((List<UserRealm>) list)));
+        else return fromIO();
+    }
+
+    private Observable<UserListModel> fromIO() {
         Observable networkObservable = Observable.defer(() -> dataUseCase.getList(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(Constants.URLS.USERS, currentPage))
@@ -123,10 +131,10 @@ class UserListVM extends BaseViewModel implements UserListView {
     @Override
     public void restoreState(Bundle state) {
         if (state != null) {
-            UserListActivity userListActivity = ((UserListActivity) getView());
-            currentPage = state.getInt(CURRENT_PAGE, 0);
-            yScroll = state.getInt(Y_SCROLL, 0);
-            userListActivity.userRecycler.scrollToPosition(yScroll);
+//            UserListActivity userListActivity = ((UserListActivity) getView());
+//            currentPage = state.getInt(CURRENT_PAGE, 0);
+//            yScroll = state.getInt(Y_SCROLL, 0);
+//            userListActivity.userRecycler.scrollToPosition(yScroll);
         }
     }
 }
