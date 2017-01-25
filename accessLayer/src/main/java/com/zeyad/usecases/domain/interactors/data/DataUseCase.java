@@ -29,13 +29,15 @@ public class DataUseCase implements IDataUseCase {
 
     private final static BehaviorSubject lastObject = BehaviorSubject.create();
     private final static BehaviorSubject<List> lastList = BehaviorSubject.create();
-    private static HandlerThread handlerThread = new HandlerThread("backgroundThread");
+    private static HandlerThread handlerThread;
     private static DataUseCase sDataUseCase;
     private final Data mData;
     private final ThreadExecutor mThreadExecutor;
     private final PostExecutionThread mPostExecutionThread;
 
     private DataUseCase(Data data, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+        if (handlerThread == null)
+            handlerThread = new HandlerThread("backgroundThread");
         mThreadExecutor = threadExecutor;
         mPostExecutionThread = postExecutionThread;
         mData = data;
@@ -87,6 +89,8 @@ public class DataUseCase implements IDataUseCase {
     }
 
     public static HandlerThread getHandlerThread() {
+        if (handlerThread == null)
+            handlerThread = new HandlerThread("backgroundThread");
         return handlerThread;
     }
 

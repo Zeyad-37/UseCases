@@ -11,6 +11,8 @@ import com.google.gson.GsonBuilder;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.utils.Utils;
 
+import java.util.concurrent.TimeUnit;
+
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -20,6 +22,9 @@ public class Config {
     private static DataStoreFactory mDataStoreFactory;
     private static Gson mGson;
     private static String mBaseURL;
+    private static boolean withCache;
+    private static int cacheAmount;
+    private static TimeUnit cacheTimeUnit;
     private Context mContext;
     private boolean mUseApiWithCache;
 
@@ -80,6 +85,30 @@ public class Config {
         if (mGson == null)
             mGson = createGson();
         return mGson;
+    }
+
+    /**
+     * @return withCache, whether DataUseCase is using caching or not.
+     */
+    public static boolean isWithCache() {
+        return withCache;
+    }
+
+    public static void setWithCache(boolean withCache) {
+        Config.withCache = withCache;
+    }
+
+    public static void setCacheExpiry(int cacheAmount, TimeUnit timeUnit) {
+        Config.cacheAmount = cacheAmount;
+        Config.cacheTimeUnit = timeUnit;
+    }
+
+    public static int getCacheAmount() {
+        return cacheAmount;
+    }
+
+    public static TimeUnit getCacheTimeUnit() {
+        return cacheTimeUnit;
     }
 
     private void setupRealm() {

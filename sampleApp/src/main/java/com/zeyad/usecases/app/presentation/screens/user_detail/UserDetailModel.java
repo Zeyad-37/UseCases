@@ -3,18 +3,21 @@ package com.zeyad.usecases.app.presentation.screens.user_detail;
 import com.zeyad.usecases.app.components.mvvm.BaseModel;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
 
+import org.parceler.Parcel;
+
 import java.util.List;
 
 /**
  * @author zeyad on 1/25/17.
  */
+@Parcel
 public class UserDetailModel extends BaseModel {
 
     UserRealm userRealm;
     List<RepoRealm> repoModels;
     boolean isTwoPane;
 
-    public UserDetailModel(UserRealm userRealm, List<RepoRealm> repoModels, boolean isLoading, Throwable error) {
+    UserDetailModel(UserRealm userRealm, List<RepoRealm> repoModels, boolean isLoading, Throwable error) {
         super(isLoading, error);
         this.userRealm = userRealm;
         this.repoModels = repoModels;
@@ -30,11 +33,11 @@ public class UserDetailModel extends BaseModel {
         return new UserDetailModel(null, null, false, error);
     }
 
-    public static UserDetailModel loading() {
+    static UserDetailModel loading() {
         return new UserDetailModel(null, null, true, null);
     }
 
-    public UserRealm getUserRealm() {
+    UserRealm getUserRealm() {
         return userRealm;
     }
 
@@ -43,7 +46,7 @@ public class UserDetailModel extends BaseModel {
         return this;
     }
 
-    public List<RepoRealm> getRepoModels() {
+    List<RepoRealm> getRepoModels() {
         return repoModels;
     }
 

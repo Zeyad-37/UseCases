@@ -82,7 +82,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
 
     @Override
     public void restoreState(Bundle outState) {
-        userDetailModel = outState.getParcelable(ARG_USER_DETAIL_MODEL);
+        userDetailModel = Parcels.unwrap(outState.getParcelable(ARG_USER_DETAIL_MODEL));
     }
 
     @Override
@@ -136,8 +136,9 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
                     public void onNext(UserDetailModel userDetailModel) {
                         super.onNext(userDetailModel);
                         List<RepoRealm> repoModels = userDetailModel.getRepoModels();
-                        for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
-                            repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
+                        if (Utils.isNotEmpty(repoModels))
+                            for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
+                                repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
                     }
                 });
     }

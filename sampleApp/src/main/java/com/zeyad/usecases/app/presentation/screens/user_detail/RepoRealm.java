@@ -3,14 +3,15 @@ package com.zeyad.usecases.app.presentation.screens.user_detail;
 import com.google.gson.annotations.SerializedName;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
 
-import io.realm.RealmModel;
-import io.realm.annotations.RealmClass;
+import org.parceler.Parcel;
+
+import io.realm.RealmObject;
 
 /**
  * @author zeyad on 1/25/17.
  */
-@RealmClass
-public class RepoRealm implements RealmModel {
+@Parcel
+public class RepoRealm extends RealmObject {
     @SerializedName("id")
     private int id;
     @SerializedName("name")

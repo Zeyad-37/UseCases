@@ -28,7 +28,7 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.API_BASE_URL;
  */
 public class GenericApplication extends Application {
 
-    private static final int TIME_OUT = 15;
+    private static final int TIME_OUT = 15, CACHE_EXPIRY = 3;
     private static GenericApplication sInstance;
 
     public static GenericApplication getInstance() {
@@ -42,13 +42,12 @@ public class GenericApplication extends Application {
         initializeRealm();
         DataUseCaseFactory.init(new DataUseCaseConfig.Builder(this)
                 .baseUrl(API_BASE_URL)
-//                .withCache()
+                .withCache(CACHE_EXPIRY, TimeUnit.MINUTES)
                 .withRealm()
                 .entityMapper(new AutoMap_DAOMapperFactory())
                 .okHttpBuilder(provideOkHttpClientBuilder())
                 .okhttpCache(provideCache())
                 .build());
-//        PrefsUseCaseFactory.init(this, "com.usecase.zeyad.PREFS");
         initializeStetho();
         initializeFlowUp();
     }
@@ -82,7 +81,7 @@ public class GenericApplication extends Application {
             Response response = chain.proceed(chain.request());
             // re-write response header to force use of cache
             CacheControl cacheControl = new CacheControl.Builder()
-                    .maxAge(2, TimeUnit.MINUTES)
+                    .maxAge(CACHE_EXPIRY, TimeUnit.MINUTES)
                     .build();
             return response.newBuilder()
                     .header("Cache-Control", cacheControl.toString())

@@ -12,13 +12,14 @@ import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.executors.ThreadExecutor;
 import com.zeyad.usecases.domain.executors.UIThread;
 
+import java.util.concurrent.TimeUnit;
+
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 
 /**
  * @author by ZIaDo on 12/9/16.
  */
-
 public class DataUseCaseConfig {
 
     private Context context;
@@ -27,7 +28,8 @@ public class DataUseCaseConfig {
     private Cache okHttpCache;
     private String baseUrl;
     private boolean withCache, withRealm;
-    private int cacheSize;
+    private int cacheSize, cacheAmount;
+    private TimeUnit timeUnit;
     private ThreadExecutor threadExecutor;
     private PostExecutionThread postExecutionThread;
 
@@ -40,6 +42,8 @@ public class DataUseCaseConfig {
         withCache = dataUseCaseConfigBuilder.isWithCache();
         withRealm = dataUseCaseConfigBuilder.isWithRealm();
         cacheSize = dataUseCaseConfigBuilder.getCacheSize();
+        cacheAmount = dataUseCaseConfigBuilder.getCacheAmount();
+        timeUnit = dataUseCaseConfigBuilder.getTimeUnit();
         threadExecutor = dataUseCaseConfigBuilder.getThreadExecutor();
         postExecutionThread = dataUseCaseConfigBuilder.getPostExecutionThread();
     }
@@ -97,6 +101,14 @@ public class DataUseCaseConfig {
         return cacheSize == 0 || cacheSize > 8192 ? 8192 : cacheSize;
     }
 
+    int getCacheAmount() {
+        return cacheAmount;
+    }
+
+    TimeUnit getTimeUnit() {
+        return timeUnit;
+    }
+
     public static class Builder {
         private Context context;
         private IDAOMapperFactory entityMapper;
@@ -104,7 +116,8 @@ public class DataUseCaseConfig {
         private Cache okHttpCache;
         private String baseUrl;
         private boolean withCache, withRealm;
-        private int cacheSize;
+        private int cacheSize, cacheAmount;
+        private TimeUnit timeUnit;
         private ThreadExecutor threadExecutor;
         private PostExecutionThread postExecutionThread;
 
@@ -155,8 +168,10 @@ public class DataUseCaseConfig {
         }
 
         @NonNull
-        public Builder withCache() {
+        public Builder withCache(int expiryAmount, TimeUnit timeUnit) {
             this.withCache = true;
+            this.cacheAmount = expiryAmount;
+            this.timeUnit = timeUnit;
             return this;
         }
 
@@ -208,6 +223,14 @@ public class DataUseCaseConfig {
 
         int getCacheSize() {
             return cacheSize;
+        }
+
+        int getCacheAmount() {
+            return cacheAmount;
+        }
+
+        TimeUnit getTimeUnit() {
+            return timeUnit;
         }
 
         @NonNull

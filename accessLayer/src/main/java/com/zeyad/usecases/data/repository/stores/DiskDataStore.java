@@ -2,10 +2,10 @@ package com.zeyad.usecases.data.repository.stores;
 
 import android.support.annotation.NonNull;
 
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.utils.ModelConverters;
-import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -37,7 +37,7 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<?> dynamicGetObject(String url, String idColumnName, int itemId, Class domainClass,
                                           Class dataClass, boolean persist, boolean shouldCache) {
-        if (DataUseCaseFactory.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
+        if (Config.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
             return Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
                     .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         else
@@ -90,7 +90,7 @@ public class DiskDataStore implements DataStore {
         List<Long> convertToListOfId = ModelConverters.convertToListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
                 .doOnNext(o -> {
-                    if (DataUseCaseFactory.isWithCache()) {
+                    if (Config.isWithCache()) {
                         for (int i = 0, convertToListOfIdSize = convertToListOfId != null ? convertToListOfId.size() : 0;
                              i < convertToListOfIdSize; i++)
                             Storo.delete(dataClass.getSimpleName() + convertToListOfId.get(i));
@@ -110,7 +110,7 @@ public class DiskDataStore implements DataStore {
                                            Class domainClass, Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnNext(o -> {
-                    if (DataUseCaseFactory.isWithCache())
+                    if (Config.isWithCache())
                         cacheObject(idColumnName, jsonObject, dataClass);
                 });
     }
@@ -128,7 +128,7 @@ public class DiskDataStore implements DataStore {
                                           Class domainClass, Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnNext(o -> {
-                    if (DataUseCaseFactory.isWithCache())
+                    if (Config.isWithCache())
                         cacheObject(idColumnName, jsonObject, dataClass);
                 });
     }
@@ -141,8 +141,10 @@ public class DiskDataStore implements DataStore {
     }
 
     private void cacheObject(String idColumnName, JSONObject jsonObject, Class dataClass) {
-        Storo.put(dataClass.getSimpleName() + jsonObject.optString(idColumnName),
-                gson.fromJson(jsonObject.toString(), dataClass)).execute();
+        Storo.put(dataClass.getSimpleName() + jsonObject.optString(idColumnName), gson
+                .fromJson(jsonObject.toString(), dataClass))
+                .setExpiry(Config.getCacheAmount(), Config.getCacheTimeUnit())
+                .execute();
     }
 
     private void cacheList(String idColumnName, JSONArray jsonArray, Class dataClass) {

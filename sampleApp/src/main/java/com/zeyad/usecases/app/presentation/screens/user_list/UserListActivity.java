@@ -57,7 +57,6 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     GenericRecyclerViewAdapter usersAdapter;
     private String currentFragTag;
     private boolean twoPane;
-    private int yScroll;
     private UserListModel userListModel;
 
     public static Intent getCallingIntent(Context context) {
@@ -68,7 +67,6 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     public Bundle saveState() {
         Bundle bundle = new Bundle(3);
         bundle.putInt(CURRENT_PAGE, userListVM.getCurrentPage());
-        bundle.putInt(Y_SCROLL, yScroll);
         bundle.putParcelable(USER_LIST_MODEL, Parcels.wrap(userListModel));
         return bundle;
     }
@@ -77,9 +75,8 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     public void restoreState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             userListVM.setCurrentPage(savedInstanceState.getInt(CURRENT_PAGE, 0));
-            yScroll = savedInstanceState.getInt(Y_SCROLL, 0);
             userListModel = Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL));
-//            userListActivity.userRecycler.scrollToPosition(yScroll);
+            userRecycler.scrollToPosition(userListModel.getyScroll());
         }
     }
 
@@ -187,7 +184,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                 if ((layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
                     userListVM.incrementPage();
-                    yScroll = dy;
+                    userListModel.setyScroll(firstVisibleItemPosition);
                 }
             }
         });

@@ -75,6 +75,11 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
     }
 
     @Override
+    public void onBackPressed() {
+        navigateUpTo(new Intent(this, UserListActivity.class));
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {

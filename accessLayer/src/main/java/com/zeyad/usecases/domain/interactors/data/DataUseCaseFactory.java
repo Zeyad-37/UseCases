@@ -10,8 +10,6 @@ import st.lowlevel.storo.StoroBuilder;
 
 public class DataUseCaseFactory {
     public static final int NONE = 0, REALM = 1;
-    public static int CACHE_SIZE;
-    private static boolean withCache;
     private static int mDBType;
     private static IDataUseCase sDataUseCase;
 
@@ -34,6 +32,8 @@ public class DataUseCaseFactory {
             throw new IllegalArgumentException("Context should be application context only.");
         Config.init(config.getContext());
         Config.setBaseURL(config.getBaseUrl());
+        Config.setWithCache(config.isWithCache());
+        Config.setCacheExpiry(config.getCacheAmount(), config.getTimeUnit());
         if (config.getOkHttpBuilder() == null) {
             ApiConnectionFactory.init();
         } else {
@@ -47,12 +47,11 @@ public class DataUseCaseFactory {
             DataUseCase.initWithoutDB(config.getEntityMapper(), config.getThreadExecutor(), config.getPostExecutionThread());
         }
         if (config.isWithCache())
-            StoroBuilder.configure(CACHE_SIZE)
-                    .setDefaultCacheDirectory(config.getContext())
+            StoroBuilder.configure(config.getCacheSize())
+                    .setDefaultCacheDirectory(config.getContext().getApplicationContext())
+                    .setGsonInstance(Config.getGson())
                     .initialize();
         sDataUseCase = DataUseCase.getInstance();
-        CACHE_SIZE = config.getCacheSize();
-        withCache = config.isWithCache();
     }
 
     /**
@@ -60,13 +59,6 @@ public class DataUseCaseFactory {
      */
     public static void destoryInstance() {
         sDataUseCase = null;
-    }
-
-    /**
-     * @return withCache, whether DataUseCase is using caching or not.
-     */
-    public static boolean isWithCache() {
-        return withCache;
     }
 
     /**

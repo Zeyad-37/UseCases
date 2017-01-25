@@ -456,11 +456,12 @@ public class CloudDataStore implements DataStore {
                             jsonObject = new JSONObject(gson.toJson(object, dataClass));
                         observable = mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                                 .flatMap(o -> {
-                                    if (DataUseCaseFactory.isWithCache())
+                                    if (Config.isWithCache())
                                         return Observable.just(Storo.put(dataClass.getSimpleName()
                                                         + jsonObject.optString(idColumnName),
-                                                gson.fromJson(jsonObject.toString(), dataClass)).execute()
-                                        );
+                                                gson.fromJson(jsonObject.toString(), dataClass))
+                                                .setExpiry(Config.getCacheAmount(), Config.getCacheTimeUnit())
+                                                .execute());
                                     else return Observable.just(o);
                                 });
                     }

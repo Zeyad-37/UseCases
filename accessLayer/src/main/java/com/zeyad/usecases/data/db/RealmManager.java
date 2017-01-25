@@ -36,7 +36,6 @@ public class RealmManager implements DataBaseManager {
     private static Handler backgroundHandler;
 
     private RealmManager() {
-        backgroundHandler = provideBackgroundHandler();
     }
 
     /**
