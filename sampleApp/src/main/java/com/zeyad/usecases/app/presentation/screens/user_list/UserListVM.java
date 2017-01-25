@@ -3,7 +3,6 @@ package com.zeyad.usecases.app.presentation.screens.user_list;
 import android.util.Log;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
-import com.zeyad.usecases.app.presentation.models.UserRealm;
 import com.zeyad.usecases.app.utils.Constants;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
@@ -19,6 +18,8 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
+
+import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
 
 /**
  * @author zeyad on 11/1/16.
@@ -44,10 +45,9 @@ class UserListVM extends BaseViewModel implements UserListView {
     }
 
     private Observable<UserListModel> fresherData() {
-        Observable networkObservable = Observable.defer(() -> dataUseCase.getList(new GetRequest
-                .GetRequestBuilder(UserRealm.class, true)
-                .url(String.format(Constants.URLS.USERS, currentPage))
-                .build()));
+        Observable networkObservable = dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
+                .url(String.format(USERS, currentPage))
+                .build());
         return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true).build())
                 .flatMap((Func1<List, Observable<?>>) list -> Utils.isNotEmpty(list) ? Observable.just(list) : networkObservable)
                 .onErrorResumeNext(throwable -> {

@@ -7,7 +7,7 @@ import android.widget.TextView;
 
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
-import com.zeyad.usecases.app.presentation.models.UserRealm;
+import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
 import com.zeyad.usecases.data.utils.Utils;
 
 import butterknife.BindView;

@@ -19,9 +19,9 @@ import com.zeyad.usecases.app.components.mvvm.BaseActivity;
 import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
-import com.zeyad.usecases.app.presentation.models.UserRealm;
 import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailActivity;
 import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailFragment;
+import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailModel;
 import com.zeyad.usecases.app.presentation.screens.user_list.view_holders.EmptyViewHolder;
 import com.zeyad.usecases.app.presentation.screens.user_list.view_holders.UserViewHolder;
 import com.zeyad.usecases.app.utils.Utils;
@@ -166,13 +166,14 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                     if (Utils.isNotEmpty(currentFragTag))
                         removeFragment(currentFragTag);
                     UserRealm userModel = (UserRealm) itemInfo.getData();
-                    UserDetailFragment orderDetailFragment = UserDetailFragment.newInstance(userModel);
+                    UserDetailFragment orderDetailFragment = UserDetailFragment
+                            .newInstance(new UserDetailModel().setUserRealm((UserRealm) itemInfo.getData()));
                     currentFragTag = orderDetailFragment.getClass().getSimpleName() + userModel.getId();
                     addFragment(R.id.user_detail_container, orderDetailFragment, null, currentFragTag);
                 }
             } else {
-                navigator.navigateTo(getViewContext(), UserDetailActivity
-                        .getCallingIntent(getViewContext(), (UserRealm) itemInfo.getData()));
+                navigator.navigateTo(getViewContext(), UserDetailActivity.getCallingIntent(getViewContext(),
+                        new UserDetailModel().setUserRealm((UserRealm) itemInfo.getData())));
             }
         });
         LinearLayoutManager layoutManager = new LinearLayoutManager(getViewContext());

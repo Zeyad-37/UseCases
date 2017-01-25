@@ -1,7 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
 import com.zeyad.usecases.app.components.mvvm.BaseModel;
-import com.zeyad.usecases.app.presentation.models.UserRealm;
 
 import org.parceler.Parcel;
 
@@ -13,7 +12,7 @@ import java.util.List;
 @Parcel
 public class UserListModel extends BaseModel {
 
-    final List<UserRealm> users;
+    List<UserRealm> users;
 
     public UserListModel() {
         super(false, null);

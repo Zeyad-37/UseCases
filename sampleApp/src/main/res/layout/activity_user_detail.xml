@@ -30,11 +30,11 @@
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-                <!--<com.facebook.drawee.view.SimpleDraweeView-->
-                <!--android:id="@+id/imageView_avatar"-->
-                <!--android:layout_width="match_parent"-->
-                <!--android:layout_height="match_parent"-->
-                <!--fresco:placeholderImag="@drawable/ic_error" />-->
+                <ImageView
+                    android:id="@+id/imageView_avatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_error" />
             </android.support.v7.widget.Toolbar>
 
         </android.support.design.widget.CollapsingToolbarLayout>

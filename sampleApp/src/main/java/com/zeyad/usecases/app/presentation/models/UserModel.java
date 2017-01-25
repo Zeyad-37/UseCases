@@ -8,7 +8,6 @@ import io.realm.annotations.PrimaryKey;
 /**
  * @author zeyad on 12/1/16.
  */
-//@Parcel
 @AutoMap
 public class UserModel {
 

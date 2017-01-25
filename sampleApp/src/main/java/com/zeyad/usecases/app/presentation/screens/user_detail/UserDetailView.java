@@ -6,5 +6,5 @@ import rx.Observable;
  * @author zeyad on 1/10/17.
  */
 interface UserDetailView {
-    Observable getRepositories(String user);
+    Observable<UserDetailModel> getRepositories(String user);
 }

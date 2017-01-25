@@ -1,48 +1,55 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
-import com.zeyad.usecases.app.presentation.models.RepoModel;
-import com.zeyad.usecases.app.utils.Constants;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
+import java.util.List;
+
 import rx.Observable;
+import rx.functions.Func1;
+
+import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
 
 /**
  * @author zeyad on 1/10/17.
  */
 class UserDetailVM extends BaseViewModel implements UserDetailView {
-    private static final String CURRENT_USER = "currentUser";
     private final IDataUseCase dataUseCase;
-    private String user;
 
     UserDetailVM() {
         dataUseCase = DataUseCaseFactory.getInstance();
     }
 
     @Override
-    public Observable getRepositories(String user) {
-        if (Utils.isNotEmpty(user)) {
-            this.user = user;
+    public Observable<UserDetailModel> getRepositories(String user) {
+        List lastList = dataUseCase.getLastList().getValue();
+        if (Utils.isNotEmpty(lastList) && lastList.get(0) instanceof RepoRealm)
+            return dataUseCase.getLastList()
+                    .flatMap(list -> Observable.just(new UserDetailModel(null, (List<RepoRealm>) list, false, null)));
+        else
+            return getUserDetailModelObservable(user);
+    }
+
+    private Observable<UserDetailModel> getUserDetailModelObservable(String user) {
+        Observable networkObservable = dataUseCase.getList(new GetRequest.GetRequestBuilder(RepoRealm.class, true)
+                .url(String.format(REPOSITORIES, user))
+                .build());
+        if (Utils.isNotEmpty(user))
             return dataUseCase.getList(new GetRequest
-//                .GetRequestBuilder(AutoMap_RepoModel.class, true)
-                    .GetRequestBuilder(RepoModel.class, true)
-                    .presentationClass(RepoModel.class)
+                    .GetRequestBuilder(RepoRealm.class, true)
                     .build())
-                    .flatMap(list -> {
-                        if (Utils.isNotEmpty(list))
-                            return Observable.just(list);
-                        else return dataUseCase.getList(new GetRequest
-//                .GetRequestBuilder(AutoMap_RepoModel.class, true)
-//                .GetRequestBuilder(RepoRealm.class, true)
-                                .GetRequestBuilder(RepoModel.class, true)
-                                .presentationClass(RepoModel.class)
-//                                .url("users/" + user + "/repos")
-                                .url(String.format(Constants.URLS.REPOSITORIES, user))
-                                .build());
-                    });
-        } else return Observable.error(new IllegalArgumentException("User name can not be empty"));
+                    .flatMap((Func1<List, Observable<?>>) list -> Utils.isNotEmpty(list) ? Observable.just(list) : networkObservable)
+                    .onErrorResumeNext(throwable -> {
+                        throwable.printStackTrace();
+                        return networkObservable;
+                    })
+                    .flatMap(list -> Observable.just(new UserDetailModel(null, (List<RepoRealm>) list, false, null)))
+                    .onErrorReturn(throwable -> UserDetailModel.error(throwable))
+                    .startWith(UserDetailModel.loading());
+        else
+            return Observable.just(UserDetailModel.error(new IllegalArgumentException("User name can not be empty")));
     }
 }

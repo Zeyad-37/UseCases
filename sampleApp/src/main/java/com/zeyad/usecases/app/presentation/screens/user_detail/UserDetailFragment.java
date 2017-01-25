@@ -1,7 +1,9 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -11,22 +13,29 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
+import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.mvvm.BaseFragment;
+import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
-import com.zeyad.usecases.app.presentation.models.UserRealm;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
+import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
+import com.zeyad.usecases.app.utils.Utils;
 
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observable;
 import rx.Subscription;
-import rx.subscriptions.Subscriptions;
+
+import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 
 /**
  * A fragment representing a single RepoRealm detail screen.
@@ -38,7 +47,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     /**
      * The fragment argument representing the item that this fragment represents.
      */
-    public static final String ARG_USER = "user";
+    public static final String ARG_USER_DETAIL_MODEL = "userDetailModel";
     UserDetailVM userDetailVM;
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
@@ -47,7 +56,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     @BindView(R.id.recyclerView_repositories)
     RecyclerView recyclerViewRepositories;
     private GenericRecyclerViewAdapter repositoriesAdapter;
-    private UserRealm userModel;
+    private UserDetailModel userDetailModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -56,10 +65,10 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     public UserDetailFragment() {
     }
 
-    public static UserDetailFragment newInstance(UserRealm userModel) {
+    public static UserDetailFragment newInstance(UserDetailModel userDetailModel) {
         UserDetailFragment userDetailFragment = new UserDetailFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(ARG_USER, Parcels.wrap(userModel));
+        bundle.putParcelable(ARG_USER_DETAIL_MODEL, Parcels.wrap(userDetailModel));
         userDetailFragment.setArguments(bundle);
         return userDetailFragment;
     }
@@ -67,22 +76,21 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     @Override
     public Bundle saveState() {
         Bundle bundle = new Bundle(1);
-        bundle.putParcelable(ARG_USER, Parcels.wrap(userModel));
+        bundle.putParcelable(ARG_USER_DETAIL_MODEL, Parcels.wrap(userDetailModel));
         return bundle;
     }
 
     @Override
     public void restoreState(Bundle outState) {
-        userModel = outState.getParcelable(ARG_USER);
+        userDetailModel = outState.getParcelable(ARG_USER_DETAIL_MODEL);
     }
 
     @Override
     public void initialize() {
         viewModel = new UserDetailVM();
         userDetailVM = ((UserDetailVM) viewModel);
-        if (getArguments() != null) {
-            userModel = Parcels.unwrap(getArguments().getParcelable(ARG_USER));
-        }
+        if (getArguments() != null)
+            userDetailModel = Parcels.unwrap(getArguments().getParcelable(ARG_USER_DETAIL_MODEL));
     }
 
     @Override
@@ -106,41 +114,46 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
 
     @Override
     public Subscription loadData() {
-        return Subscriptions.empty();
-//        return userDetailVM.getRepositories(userModel.getLogin())
-//                .doOnSubscribe(() -> {
-//                    showLoading();
-//                    textViewType.setText(userModel.getType());
-//                    UserDetailActivity activity = (UserDetailActivity) getActivity();
-//                    if (activity != null) {
-//                        CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-//                        if (appBarLayout != null)
-//                            appBarLayout.setTitle(userModel.getLogin());
-//                        if (Utils.isNotEmpty(userModel.getAvatarUrl()))
-//                            activity.imageViewAvatar.setImageURI(Uri.parse(userModel.getAvatarUrl()));
-//                    }
-//                })
-//                .subscribe(new BaseSubscriber<UserDetailFragment, List<RepoModel>>(this, ERROR_WITH_RETRY) {
-//                    @Override
-//                    public void onNext(List<RepoModel> repoModels) {
-//                        List<ItemInfo> infoList = new ArrayList<>(repoModels.size());
-//                        for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
-//                            infoList.add(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
-//                        repositoriesAdapter.animateTo(infoList);
-//                    }
-//                });
+        UserRealm userRealm = userDetailModel.getUserRealm();
+        return userDetailVM.getRepositories(userRealm.getLogin())
+                .flatMap(userDetailModel -> Observable.just(userDetailModel.setUserRealm(userDetailModel.getUserRealm())))
+                .doOnSubscribe(() -> {
+                    showLoading();
+                    textViewType.setText(userRealm.getType());
+                    UserDetailActivity activity = (UserDetailActivity) getActivity();
+                    if (activity != null) {
+                        CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
+                        if (appBarLayout != null)
+                            appBarLayout.setTitle(userRealm.getLogin());
+                        if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
+                            Glide.with(getViewContext())
+                                    .load(userRealm.getAvatarUrl())
+                                    .into(activity.imageViewAvatar);
+                    }
+                })
+                .subscribe(new BaseSubscriber<UserDetailFragment, UserDetailModel>(this, ERROR_WITH_RETRY) {
+                    @Override
+                    public void onNext(UserDetailModel userDetailModel) {
+                        super.onNext(userDetailModel);
+                        List<RepoRealm> repoModels = userDetailModel.getRepoModels();
+                        for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
+                            repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
+                    }
+                });
     }
 
     @Override
     public void showLoading() {
-        if (getActivity() != null)
-            getActivity().runOnUiThread(() -> loaderLayout.setVisibility(View.VISIBLE));
+        Activity activity = getActivity();
+        if (activity != null)
+            activity.runOnUiThread(() -> loaderLayout.setVisibility(View.VISIBLE));
     }
 
     @Override
     public void hideLoading() {
-        if (getActivity() != null)
-            getActivity().runOnUiThread(() -> loaderLayout.setVisibility(View.GONE));
+        Activity activity = getActivity();
+        if (activity != null)
+            activity.runOnUiThread(() -> loaderLayout.setVisibility(View.GONE));
     }
 
     @Override

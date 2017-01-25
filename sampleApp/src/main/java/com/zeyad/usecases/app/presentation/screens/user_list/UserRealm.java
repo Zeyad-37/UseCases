@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.models;
+package com.zeyad.usecases.app.presentation.screens.user_list;
 
 import com.google.gson.annotations.SerializedName;
 

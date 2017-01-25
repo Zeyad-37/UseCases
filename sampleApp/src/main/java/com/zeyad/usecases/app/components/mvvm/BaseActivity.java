@@ -51,7 +51,7 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     }
 
     /**
-     * To implement! Saves the state of the current view
+     * To implement! Saves the state of the current view. Do not return null!
      *
      * @return {@link Bundle}
      */

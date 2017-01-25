@@ -5,8 +5,8 @@ package com.zeyad.usecases.app.components.mvvm;
  */
 public class BaseModel {
 
-    private final boolean isLoading;
-    private final Throwable error;
+    final boolean isLoading;
+    final Throwable error;
 
     public BaseModel(boolean isLoading, Throwable error) {
         this.isLoading = isLoading;
