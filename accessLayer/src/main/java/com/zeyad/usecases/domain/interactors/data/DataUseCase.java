@@ -29,7 +29,7 @@ public class DataUseCase implements IDataUseCase {
 
     private final static BehaviorSubject lastObject = BehaviorSubject.create();
     private final static BehaviorSubject<List> lastList = BehaviorSubject.create();
-    public static HandlerThread handlerThread = new HandlerThread("");
+    public static HandlerThread handlerThread = new HandlerThread("backgroundThread");
     private static DataUseCase sDataUseCase;
     private final Data mData;
     private final ThreadExecutor mThreadExecutor;

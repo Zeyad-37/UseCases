@@ -32,7 +32,6 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Subscriber;
 import rx.Subscription;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
@@ -106,30 +105,13 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     private Subscription writePeriodic() {
         return userListVM.writePeriodic()
                 .compose(bindToLifecycle())
-                .doOnUnsubscribe(() -> Log.d("doOnUnsubscribe", "Unsubscribing subscription from writePeriodic"))
-                .subscribe(new Subscriber<Long>() {
-                    @Override
-                    public void onCompleted() {
-
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-
-                    }
-
-                    @Override
-                    public void onNext(Long aLong) {
-                        Log.d("OnNext", String.valueOf(aLong));
-                    }
-                });
+                .subscribe(o -> Log.d("OnNext", String.valueOf(o)));
     }
 
     private Subscription itemByItem() {
         return userListVM.updateItemByItem()
                 .doOnSubscribe(this::showLoading)
                 .compose(bindToLifecycle())
-                .doOnUnsubscribe(() -> Log.d("doOnUnsubscribe", "Unsubscribing subscription from loadData"))
                 .subscribe();
 //                .subscribe(new BaseSubscriber<UserListActivity, UserRealm>(this, ERROR_WITH_RETRY) {
 //                    @Override

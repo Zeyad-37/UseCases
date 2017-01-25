@@ -33,8 +33,10 @@ public class RealmManager implements DataBaseManager {
     private static final String REALM_OBJECT_INVALID = "RealmObject is invalid",
             JSON_INVALID = "JSONObject is invalid", NO_ID = "Could not find id!";
     private static DataBaseManager sInstance;
+    private static Handler backgroundHandler;
 
     private RealmManager() {
+        backgroundHandler = provideBackgroundHandler();
     }
 
     /**
@@ -56,6 +58,10 @@ public class RealmManager implements DataBaseManager {
 
     private static boolean hasKitKat() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
+    }
+
+    private Handler provideBackgroundHandler() {
+        return new Handler(DataUseCase.handlerThread.getLooper());
     }
 
     /**
@@ -410,7 +416,9 @@ public class RealmManager implements DataBaseManager {
 
     private void closeRealm(Realm realm) {
         try {
-            new Handler(DataUseCase.handlerThread.getLooper()).post(() -> {
+            if (backgroundHandler == null)
+                backgroundHandler = provideBackgroundHandler();
+            backgroundHandler.post(() -> {
                 if (!realm.isClosed()) {
                     realm.close();
                     Log.d(RealmManager.class.getSimpleName(), "realm instance closed!");
