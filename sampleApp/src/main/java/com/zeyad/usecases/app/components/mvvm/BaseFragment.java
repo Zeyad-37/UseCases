@@ -142,13 +142,11 @@ public abstract class BaseFragment extends RxFragment {
     @Override
     public void onResume() {
         super.onResume();
-//        compositeSubscription.add(loadData());
         loadData();
     }
 
     @Override
     public void onDestroyView() {
-//        Utils.unsubscribeIfNotNull(compositeSubscription);
         if (viewModel != null)
             viewModel.onViewDetached();
         super.onDestroyView();

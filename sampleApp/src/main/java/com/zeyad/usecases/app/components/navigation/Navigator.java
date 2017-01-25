@@ -12,7 +12,6 @@ class Navigator implements INavigator {
     private static INavigator mInstance;
 
     private Navigator() {
-        // empty
     }
 
     protected static INavigator getInstance() {

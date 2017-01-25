@@ -4,9 +4,6 @@ import android.app.Application;
 import android.util.Log;
 
 import com.zeyad.usecases.app.presentation.models.AutoMap_DAOMapperFactory;
-import com.zeyad.usecases.data.mappers.DAOMapperFactory;
-import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
-import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
@@ -48,20 +45,10 @@ public class GenericApplication extends Application {
 //                .withCache()
                 .withRealm()
                 .entityMapper(new AutoMap_DAOMapperFactory())
-                .entityMapper(new DAOMapperFactory() {
-                    @Override
-                    public IDAOMapper getDataMapper(Class dataClass) {
-//                        if (dataClass == UserRealm.class) {
-//                            return UserModelMapper.getInstance();
-//                        }
-                        return DefaultDAOMapper.getInstance();
-                    }
-                })
                 .okHttpBuilder(provideOkHttpClientBuilder())
                 .okhttpCache(provideCache())
                 .build());
 //        PrefsUseCaseFactory.init(this, "com.usecase.zeyad.PREFS");
-//        Fresco.initialize(this);
         initializeStetho();
         initializeFlowUp();
     }

@@ -111,7 +111,6 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-//        compositeSubscription.add(loadData());
         loadData();
     }
 
@@ -121,8 +120,6 @@ public abstract class BaseActivity extends RxAppCompatActivity {
             viewModel.onViewDetached();
             viewModel = null;
         }
-//        Utils.unsubscribeIfNotNull(compositeSubscription);
-//        compositeSubscription = null;
         super.onStop();
     }
 
