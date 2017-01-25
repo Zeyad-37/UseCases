@@ -42,7 +42,11 @@ public class DiskDataStore implements DataStore {
                     .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         else
             return mDataBaseManager.getById(idColumnName, itemId, dataClass)
-                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
+                    .map(realmModel -> {
+                        if (domainClass == dataClass)
+                            return realmModel;
+                        else return mEntityDataMapper.mapToDomain(realmModel, domainClass);
+                    });
     }
 
     @NonNull
@@ -50,21 +54,33 @@ public class DiskDataStore implements DataStore {
     public Observable<List> dynamicGetList(String url, Class domainClass, Class dataClass, boolean persist,
                                            boolean shouldCache) {
         return mDataBaseManager.getAll(dataClass)
-                .map(realmModels -> mEntityDataMapper.mapAllToDomain(realmModels, domainClass));
+                .map(realmModels -> {
+                    if (domainClass == dataClass)
+                        return realmModels;
+                    else return mEntityDataMapper.mapAllToDomain(realmModels, domainClass);
+                });
     }
 
     @NonNull
     @Override
     public Observable<?> searchDisk(String query, String column, Class domainClass, Class dataClass) {
         return mDataBaseManager.getWhere(dataClass, query, column)
-                .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
+                .map(realmModel -> {
+                    if (domainClass == dataClass)
+                        return realmModel;
+                    else return mEntityDataMapper.mapToDomain(realmModel, domainClass);
+                });
     }
 
     @NonNull
     @Override
     public Observable<?> searchDisk(RealmQuery query, Class domainClass) {
         return mDataBaseManager.getWhere(query)
-                .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
+                .map(realmModel -> {
+                    if (domainClass == realmModel.getClass())
+                        return realmModel;
+                    else return mEntityDataMapper.mapToDomain(realmModel, domainClass);
+                });
     }
 
     @NonNull
