@@ -107,7 +107,7 @@ class UserListVM extends BaseViewModel implements UserListView {
 
     @Override
     public void incrementPage() {
-        currentPage++;
+        setCurrentPage(getCurrentPage() + 1);
     }
 
     @Override
@@ -118,5 +118,6 @@ class UserListVM extends BaseViewModel implements UserListView {
     @Override
     public void setCurrentPage(int currentPage) {
         this.currentPage = currentPage;
+        ((UserListActivity) getView()).loadData();
     }
 }

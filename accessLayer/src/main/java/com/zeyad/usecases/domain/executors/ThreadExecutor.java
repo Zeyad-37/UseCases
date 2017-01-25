@@ -1,5 +1,7 @@
 package com.zeyad.usecases.domain.executors;
 
+import android.os.Looper;
+
 import java.util.concurrent.Executor;
 
 /**
@@ -7,4 +9,5 @@ import java.util.concurrent.Executor;
  * execution, but every implementation will executeGetObject the DataUseCase out of the UI thread.
  */
 public interface ThreadExecutor extends Executor {
+    Looper getLooper();
 }

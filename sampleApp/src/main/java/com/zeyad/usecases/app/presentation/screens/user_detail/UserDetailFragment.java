@@ -65,11 +65,15 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     }
 
     @Override
-    public void onSaveInstanceState(Bundle outState) {
-        if (outState != null) {
-            outState.putParcelable(UserDetailFragment.ARG_USER, Parcels.wrap(userModel));
-        }
-        super.onSaveInstanceState(outState);
+    public Bundle saveState() {
+        Bundle bundle = new Bundle(1);
+        bundle.putParcelable(ARG_USER, Parcels.wrap(userModel));
+        return bundle;
+    }
+
+    @Override
+    public void restoreState(Bundle outState) {
+        userModel = outState.getParcelable(ARG_USER);
     }
 
     @Override

@@ -61,7 +61,7 @@ public class RealmManager implements DataBaseManager {
     }
 
     private Handler provideBackgroundHandler() {
-        return new Handler(DataUseCase.handlerThread.getLooper());
+        return new Handler(DataUseCase.getHandlerThread().getLooper());
     }
 
     /**

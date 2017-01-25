@@ -21,7 +21,6 @@ public abstract class BaseFragment extends RxFragment {
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
-    //    public CompositeSubscription compositeSubscription;
     public IBaseViewModel viewModel;
     public boolean isNewActivity;
 
@@ -36,26 +35,38 @@ public abstract class BaseFragment extends RxFragment {
         navigator = NavigatorFactory.getInstance();
         rxEventBus = RxEventBusFactory.getInstance();
         isNewActivity = savedInstanceState == null;
-        if (!isNewActivity && viewModel != null)
-            viewModel.restoreState(savedInstanceState);
-//        compositeSubscription = Utils.getNewCompositeSubIfUnsubscribed(compositeSubscription);
+        if (!isNewActivity)
+            restoreState(savedInstanceState);
     }
 
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initialize();
-        if (savedInstanceState != null && viewModel != null)
-            viewModel.restoreState(savedInstanceState);
+        if (!isNewActivity)
+            restoreState(savedInstanceState);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (outState != null && viewModel != null) {
-            outState.putAll(viewModel.getState());
-        }
+        if (outState != null)
+            outState.putAll(saveState());
         super.onSaveInstanceState(outState);
     }
+
+    /**
+     * To implement! Saves the state of the current view
+     *
+     * @return {@link Bundle}
+     */
+    public abstract Bundle saveState();
+
+    /**
+     * To implement! Restores the state of the view.
+     *
+     * @param outState a {@link Bundle} with saved state
+     */
+    public abstract void restoreState(Bundle outState);
 
     /**
      * Initialize any objects or any required dependencies.

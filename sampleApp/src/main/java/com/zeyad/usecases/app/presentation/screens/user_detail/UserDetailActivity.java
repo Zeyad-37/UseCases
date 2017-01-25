@@ -2,6 +2,7 @@ package com.zeyad.usecases.app.presentation.screens.user_detail;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
@@ -40,6 +41,16 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
         return new Intent(context, UserDetailActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .putExtra(ARG_USER, Parcels.wrap(userModel));
+    }
+
+    @Override
+    public Bundle saveState() {
+        return null;
+    }
+
+    @Override
+    public void restoreState(Bundle outState) {
+
     }
 
     @Override

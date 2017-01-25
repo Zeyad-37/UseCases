@@ -57,7 +57,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     GenericRecyclerViewAdapter usersAdapter;
     private String currentFragTag;
     private boolean twoPane;
-    private int userId, yScroll;
+    private int yScroll;
     private UserListModel userListModel;
 
     public static Intent getCallingIntent(Context context) {
@@ -65,24 +65,22 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public Bundle saveState() {
+        Bundle bundle = new Bundle(3);
+        bundle.putInt(CURRENT_PAGE, userListVM.getCurrentPage());
+        bundle.putInt(Y_SCROLL, yScroll);
+        bundle.putParcelable(USER_LIST_MODEL, Parcels.wrap(userListModel));
+        return bundle;
+    }
+
+    @Override
+    public void restoreState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             userListVM.setCurrentPage(savedInstanceState.getInt(CURRENT_PAGE, 0));
             yScroll = savedInstanceState.getInt(Y_SCROLL, 0);
             userListModel = Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL));
 //            userListActivity.userRecycler.scrollToPosition(yScroll);
         }
-    }
-
-    @Override
-    protected void onSaveInstanceState(Bundle outState) {
-        if (outState != null) {
-            outState.putInt(CURRENT_PAGE, userListVM.getCurrentPage());
-            outState.putInt(Y_SCROLL, yScroll);
-            outState.putParcelable(USER_LIST_MODEL, Parcels.wrap(userListModel));
-        }
-        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -94,8 +92,8 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     @Override
     public void setupUI() {
         setContentView(R.layout.activity_user_list);
-        setSupportActionBar(toolbar);
         ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
         setupRecyclerView();
         if (findViewById(R.id.user_detail_container) != null)
@@ -130,6 +128,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                     @Override
                     public void onNext(UserListModel userListModel) {
                         super.onNext(userListModel);
+                        UserListActivity.this.userListModel = userListModel;
                         if (Utils.isNotEmpty(userListModel.getUsers()))
                             for (int i = 0, repoModelsSize = userListModel.getUsers().size(); i < repoModelsSize; i++)
                                 usersAdapter.appendItem(new ItemInfo<>(userListModel.getUsers().get(i),
@@ -164,13 +163,11 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
         usersAdapter.setOnItemClickListener((position, itemInfo, holder) -> {
             if (twoPane) {
                 if (itemInfo.getData() instanceof UserRealm) {
-                    if (Utils.isNotEmpty(currentFragTag)) {
+                    if (Utils.isNotEmpty(currentFragTag))
                         removeFragment(currentFragTag);
-                    }
                     UserRealm userModel = (UserRealm) itemInfo.getData();
                     UserDetailFragment orderDetailFragment = UserDetailFragment.newInstance(userModel);
-                    userId = userModel.getId();
-                    currentFragTag = orderDetailFragment.getClass().getSimpleName() + userId;
+                    currentFragTag = orderDetailFragment.getClass().getSimpleName() + userModel.getId();
                     addFragment(R.id.user_detail_container, orderDetailFragment, null, currentFragTag);
                 }
             } else {
@@ -189,7 +186,6 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                 if ((layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
                     userListVM.incrementPage();
-                    loadData();
                     yScroll = dy;
                 }
             }

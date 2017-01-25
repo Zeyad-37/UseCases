@@ -1,10 +1,7 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
-import android.os.Bundle;
-
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
 import com.zeyad.usecases.app.presentation.models.RepoModel;
-import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
 import com.zeyad.usecases.app.utils.Constants;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.utils.Utils;
@@ -47,20 +44,5 @@ class UserDetailVM extends BaseViewModel implements UserDetailView {
                                 .build());
                     });
         } else return Observable.error(new IllegalArgumentException("User name can not be empty"));
-    }
-
-    @Override
-    public Bundle getState() {
-        Bundle outState = new Bundle(2);
-        outState.putString(CURRENT_USER, user);
-        return outState;
-    }
-
-    @Override
-    public void restoreState(Bundle state) {
-        if (state != null) {
-            UserListActivity userListActivity = ((UserListActivity) getView());
-            user = state.getString(CURRENT_USER, "");
-        }
     }
 }
