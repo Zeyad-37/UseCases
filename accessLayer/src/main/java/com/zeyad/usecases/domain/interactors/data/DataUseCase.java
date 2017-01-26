@@ -224,10 +224,9 @@ public class DataUseCase implements IDataUseCase {
     private <T> Observable.Transformer<T, T> applySchedulers() {
         if (handlerThread == null)
             handlerThread = new HandlerThread("backgroundThread");
-        if (!handlerThread.isAlive()) {
+        if (!handlerThread.isAlive())
             handlerThread.start();
-        }
-//        return observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor))
+//        return observable -> observable.subscribeOn(AndroidSchedulers.from(mThreadExecutor.getLooper()))
         return observable -> observable.subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
                 .observeOn(mPostExecutionThread.getScheduler());
     }
