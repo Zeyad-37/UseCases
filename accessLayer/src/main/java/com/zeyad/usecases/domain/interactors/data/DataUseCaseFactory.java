@@ -9,8 +9,6 @@ import com.zeyad.usecases.data.utils.Utils;
 import st.lowlevel.storo.StoroBuilder;
 
 public class DataUseCaseFactory {
-    public static final int NONE = 0, REALM = 1;
-    private static int mDBType;
     private static IDataUseCase sDataUseCase;
 
     /**
@@ -40,10 +38,8 @@ public class DataUseCaseFactory {
             ApiConnectionFactory.init(config.getOkHttpBuilder(), config.getOkHttpCache());
         }
         if (config.isWithRealm()) {
-            mDBType = REALM;
             DataUseCase.initWithRealm(config.getEntityMapper(), config.getThreadExecutor(), config.getPostExecutionThread());
         } else {
-            mDBType = NONE;
             DataUseCase.initWithoutDB(config.getEntityMapper(), config.getThreadExecutor(), config.getPostExecutionThread());
         }
         if (config.isWithCache())
@@ -59,13 +55,6 @@ public class DataUseCaseFactory {
      */
     public static void destoryInstance() {
         sDataUseCase = null;
-    }
-
-    /**
-     * @return returns database type, whether realm or none.
-     */
-    public static int getDBType() {
-        return mDBType;
     }
 
     /**

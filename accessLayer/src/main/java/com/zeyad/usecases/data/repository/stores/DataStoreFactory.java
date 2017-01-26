@@ -10,10 +10,10 @@ import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.utils.Utils;
-import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
+import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 
 import static com.zeyad.usecases.Config.getInstance;
-import static com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory.NONE;
+import static com.zeyad.usecases.domain.interactors.data.DataUseCase.NONE;
 
 public class DataStoreFactory {
 
@@ -53,7 +53,7 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore disk(IDAOMapper entityDataMapper) throws IllegalAccessException {
-        if (DataUseCaseFactory.getDBType() == NONE || mDataBaseManager == null)
+        if (DataUseCase.getDBType() == NONE || mDataBaseManager == null)
             throw new IllegalAccessException(getInstance().getContext().getString(R.string.no_db));
         return new DiskDataStore(mDataBaseManager, entityDataMapper);
     }

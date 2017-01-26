@@ -37,9 +37,9 @@ public abstract class BaseActivity extends RxAppCompatActivity {
         rxEventBus = RxEventBusFactory.getInstance();
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         initialize();
+        setupUI();
         if (!isNewActivity)
             restoreState(savedInstanceState);
-        setupUI();
     }
 
     @Override

@@ -2,7 +2,6 @@
     android:id="@+id/linear_layout_loader"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/gray_even_lighter"
     android:gravity="center"
     android:visibility="gone">
 

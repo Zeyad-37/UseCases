@@ -38,6 +38,10 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
                 Glide.with(itemView.getContext())
                         .load(userModel.getAvatarUrl())
                         .into(avatar);
+            else Glide.with(itemView.getContext())
+                    .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
+                            "https://help.github.com/assets/images/help/profile/identicon.png")
+                    .into(avatar);
             if (Utils.isNotEmpty(userModel.getLogin()))
                 textViewTitle.setText(userModel.getLogin());
         }
