@@ -19,8 +19,6 @@ import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
 import org.parceler.Parcels;
 
 import butterknife.BindView;
-import rx.Subscription;
-import rx.subscriptions.Subscriptions;
 
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailFragment.ARG_USER_DETAIL_MODEL;
 
@@ -70,8 +68,7 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
     }
 
     @Override
-    public Subscription loadData() {
-        return Subscriptions.empty();
+    public void loadData() {
     }
 
     @Override

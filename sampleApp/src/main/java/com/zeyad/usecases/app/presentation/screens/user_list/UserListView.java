@@ -15,7 +15,7 @@ interface UserListView {
 
     Observable writePeriodic();
 
-    void incrementPage();
+    void incrementPage(long lastId);
 
     int getCurrentPage();
 

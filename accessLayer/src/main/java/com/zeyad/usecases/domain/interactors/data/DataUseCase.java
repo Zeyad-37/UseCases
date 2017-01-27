@@ -10,6 +10,7 @@ import com.zeyad.usecases.data.repository.DataRepository;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
+import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.executors.ThreadExecutor;
 import com.zeyad.usecases.domain.executors.UIThread;
@@ -20,6 +21,7 @@ import java.util.List;
 import io.realm.RealmQuery;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 
 /**
@@ -28,6 +30,8 @@ import rx.subjects.BehaviorSubject;
 public class DataUseCase implements IDataUseCase {
 
     public static final int NONE = 0, REALM = 1;
+    private final static BehaviorSubject ObjectOffLineFirst = BehaviorSubject.create();
+    private final static BehaviorSubject<List> listOffLineFirst = BehaviorSubject.create();
     private final static BehaviorSubject lastObject = BehaviorSubject.create();
     private final static BehaviorSubject<List> lastList = BehaviorSubject.create();
     private static int mDBType;
@@ -135,9 +139,9 @@ public class DataUseCase implements IDataUseCase {
                         .getIdColumnName(), getRequest.getItemId(), getRequest.getPresentationClass(),
                 getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
                 .compose(applySchedulers())
-                .flatMap(list -> {
-                    lastObject.onNext(list);
-                    return Observable.just(list);
+                .flatMap(object -> {
+                    lastObject.onNext(object);
+                    return Observable.just(object);
                 });
     }
 
@@ -250,5 +254,51 @@ public class DataUseCase implements IDataUseCase {
     @Override
     public BehaviorSubject<List> getLastList() {
         return lastList;
+    }
+
+    @Override
+    public Observable<List> getListFromOffLineFirst(GetRequest getRequest) {
+        Observable<List> online = mData.getListDynamically(getRequest.getUrl(), getRequest.getPresentationClass(),
+                getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache());
+        List lastList = listOffLineFirst.getValue();
+        if (Utils.isNotEmpty(lastList) && lastList.get(0).getClass() == getRequest.getPresentationClass())
+            listOffLineFirst.onNext(lastList);
+        else
+            mData.getListDynamically("", getRequest.getPresentationClass(), getRequest.getDataClass(),
+                    getRequest.isPersist(), getRequest.isShouldCache())
+                    .flatMap(new Func1<List, Observable<?>>() {
+                        @Override
+                        public Observable<List> call(List list) {
+                            if (Utils.isNotEmpty(list))
+                                return Observable.just(list);
+                            else return online;
+                        }
+                    })
+                    .onErrorResumeNext(throwable -> online)
+                    .doOnNext(list -> listOffLineFirst.onNext((List) list))
+                    .doOnError(listOffLineFirst::onError)
+                    .compose(applySchedulers())
+                    .subscribe();
+        return listOffLineFirst.subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
+                .observeOn(mPostExecutionThread.getScheduler());
+    }
+
+    @Override
+    public BehaviorSubject getObjectFromOffLineFirst(GetRequest getRequest) {
+        Observable<?> online = mData.getObjectDynamicallyById(getRequest.getUrl(), getRequest
+                        .getIdColumnName(), getRequest.getItemId(), getRequest.getPresentationClass(),
+                getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache());
+        mData.getObjectDynamicallyById("", getRequest.getIdColumnName(), getRequest.getItemId(),
+                getRequest.getPresentationClass(), getRequest.getDataClass(), getRequest.isPersist(),
+                getRequest.isShouldCache())
+                .flatMap(object -> object == null ? Observable.just(object) : online)
+                .onErrorResumeNext(throwable -> online)
+                .doOnNext(ObjectOffLineFirst::onNext)
+                .doOnError(ObjectOffLineFirst::onError)
+                .compose(applySchedulers())
+                .subscribe(o -> {
+                }, throwable -> {
+                });
+        return ObjectOffLineFirst;
     }
 }

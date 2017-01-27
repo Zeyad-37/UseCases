@@ -3,7 +3,6 @@ package com.zeyad.usecases.app.presentation.screens.user_list;
 import android.util.Log;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
-import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
@@ -26,6 +25,7 @@ class UserListVM extends BaseViewModel implements UserListView {
 
     private final IDataUseCase dataUseCase;
     private int currentPage;
+    private long lastId;
     private int counter = 0;
 
     UserListVM() {
@@ -34,31 +34,34 @@ class UserListVM extends BaseViewModel implements UserListView {
 
     @Override
     public Observable<UserListModel> getUserListFromDB() {
-        Observable<List> result;
-        List lastList = dataUseCase.getLastList().getValue();
-        if (Utils.isNotEmpty(lastList) && lastList.get(0) instanceof UserRealm)
-            result = dataUseCase.getLastList().doOnRequest(aLong -> Log.d("getUserListFromDB", "Subject"));
-        else {
-            result = dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true).build())
-                    .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) : getUserListFromServer()
-                            .doOnRequest(aLong -> Log.d("getUserListFromDB", "DB Empty, FromServer")))
-                    .onErrorResumeNext(throwable -> {
-                        throwable.printStackTrace();
-                        return getUserListFromServer().doOnRequest(aLong -> Log.d("getUserListFromDB", "DB Error, FromServer"));
-                    }).doOnRequest(aLong -> Log.d("getUserListFromDB", "fresherData"));
-        }
-        return result.compose(applyStates());
+//        Observable<List> result;
+//        List lastList = dataUseCase.getLastList().getValue();
+//        if (Utils.isNotEmpty(lastList) && lastList.get(0) instanceof UserRealm)
+//            result = dataUseCase.getLastList().doOnRequest(aLong -> Log.d("getUserListFromDB", "Subject"));
+//        else {
+//            result = dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true).build())
+//                    .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) : getUserListFromServer()
+//                            .doOnRequest(aLong -> Log.d("getUserListFromDB", "DB Empty, FromServer")))
+//                    .onErrorResumeNext(throwable -> {
+//                        throwable.printStackTrace();
+//                        return getUserListFromServer().doOnRequest(aLong -> Log.d("getUserListFromDB", "DB Error, FromServer"));
+//                    }).doOnRequest(aLong -> Log.d("getUserListFromDB", "fresherData"));
+//        }
+//        return result.compose(applyStates()).doOnNext(aLong -> Log.d("getUserListFromDB", "OnNextCalled"));
+        return dataUseCase.getListFromOffLineFirst(new GetRequest.GetRequestBuilder(UserRealm.class, true)
+                .url(String.format(USERS, currentPage, lastId)).build())
+                .compose(applyStates());
     }
 
     @Override
     public Observable<List> getUserListFromServer() {
         return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
-                .url(String.format(USERS, currentPage))
+                .url(String.format(USERS, currentPage, lastId))
                 .build());
     }
 
-    private Observable.Transformer<List<UserRealm>, UserListModel> applyStates() {
-        return listObservable -> listObservable.flatMap(list -> Observable.just(UserListModel.onNext(list)))
+    private Observable.Transformer<List, UserListModel> applyStates() {
+        return listObservable -> listObservable.flatMap(list -> Observable.just(UserListModel.onNext((List<UserRealm>) list)))
                 .onErrorReturn(UserListModel::error)
                 .startWith(UserListModel.loading());
     }
@@ -98,7 +101,8 @@ class UserListVM extends BaseViewModel implements UserListView {
     }
 
     @Override
-    public void incrementPage() {
+    public void incrementPage(long lastId) {
+        this.lastId = lastId;
         currentPage++;
         getUserListFromServer().subscribe(list -> {
         }, Throwable::printStackTrace);

@@ -33,6 +33,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.android.schedulers.AndroidSchedulers;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 
@@ -103,19 +104,22 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     public void loadData() {
         userListVM.getUserListFromDB()
                 .compose(bindToLifecycle())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new BaseSubscriber<UserListActivity, UserListModel>(this, ERROR_WITH_RETRY) {
                     @Override
                     public void onNext(UserListModel userListModel) {
                         super.onNext(userListModel);
-                        if (Utils.isNotEmpty(userListModel.getUsers())) {
-                            List<ItemInfo> itemInfos = new ArrayList<>(userListModel.getUsers().size());
-                            for (int i = 0, repoModelsSize = userListModel.getUsers().size(); i < repoModelsSize; i++)
-                                itemInfos.add(new ItemInfo<>(userListModel.getUsers().get(i),
-                                        R.layout.user_item_layout));
-                            if (usersAdapter.getItemCount() > 0) {
-                                usersAdapter.animateTo(itemInfos);
-                                userRecycler.scrollToPosition(UserListModel.getyScroll());
-                            } else usersAdapter.animateTo(itemInfos);
+                        List<UserRealm> users = userListModel.getUsers();
+                        if (Utils.isNotEmpty(users)) {
+                            List<ItemInfo> itemInfos = new ArrayList<>(users.size());
+                            UserRealm userRealm;
+                            for (int i = 0, repoModelsSize = users.size(); i < repoModelsSize; i++) {
+                                userRealm = users.get(i);
+                                itemInfos.add(new ItemInfo<>(userRealm, R.layout.user_item_layout)
+                                        .setId(userRealm.getId()));
+                            }
+                            usersAdapter.setDataList(itemInfos);
+                            userRecycler.scrollToPosition(UserListModel.getyScroll());
                         }
                         UserListActivity.this.userListModel = userListModel;
                     }
@@ -165,7 +169,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                 int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                 if ((layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
-                    userListVM.incrementPage();
+                    userListVM.incrementPage(usersAdapter.getItem(usersAdapter.getItemCount() - 1).getId());
                     UserListModel.setyScroll(firstVisibleItemPosition);
                 }
             }
