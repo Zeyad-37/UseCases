@@ -9,11 +9,9 @@ import rx.Observable;
  */
 interface UserListView {
 
-    Observable<UserListModel> getUserList();
+    Observable<UserListModel> getUserListFromDB();
 
     Observable<List> getUserListFromServer();
-
-    Observable updateItemByItem();
 
     Observable writePeriodic();
 
@@ -22,6 +20,4 @@ interface UserListView {
     int getCurrentPage();
 
     void setCurrentPage(int currentPage);
-
-    void setView(UserListActivity userListActivity);
 }

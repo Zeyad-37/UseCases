@@ -76,7 +76,6 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     @Override
     public void restoreState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            userListVM.setView(this);
             userListVM.setCurrentPage(savedInstanceState.getInt(CURRENT_PAGE, 0));
             userListModel = Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL));
             userRecycler.scrollToPosition(UserListModel.getyScroll());
@@ -102,7 +101,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
 
     @Override
     public void loadData() {
-        userListVM.getUserList()
+        userListVM.getUserListFromDB()
                 .compose(bindToLifecycle())
                 .subscribe(new BaseSubscriber<UserListActivity, UserListModel>(this, ERROR_WITH_RETRY) {
                     @Override

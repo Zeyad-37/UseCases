@@ -3,7 +3,6 @@ package com.zeyad.usecases.app.presentation.screens.user_list;
 import android.util.Log;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
-import com.zeyad.usecases.app.utils.Constants;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
@@ -16,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
 import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
@@ -35,20 +33,19 @@ class UserListVM extends BaseViewModel implements UserListView {
     }
 
     @Override
-    public Observable<UserListModel> getUserList() {
-        Observable result;
+    public Observable<UserListModel> getUserListFromDB() {
+        Observable<List> result;
         List lastList = dataUseCase.getLastList().getValue();
         if (Utils.isNotEmpty(lastList) && lastList.get(0) instanceof UserRealm)
-            result = dataUseCase.getLastList().doOnRequest(aLong -> Log.d("getUserList", "Subject"));
+            result = dataUseCase.getLastList().doOnRequest(aLong -> Log.d("getUserListFromDB", "Subject"));
         else {
-            Observable<List> networkObservable = getUserListFromServer();
             result = dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true).build())
-                    .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) : networkObservable
-                            .doOnRequest(aLong -> Log.d("getUserList", "DB Empty, FromServer")))
+                    .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) : getUserListFromServer()
+                            .doOnRequest(aLong -> Log.d("getUserListFromDB", "DB Empty, FromServer")))
                     .onErrorResumeNext(throwable -> {
                         throwable.printStackTrace();
-                        return networkObservable.doOnRequest(aLong -> Log.d("getUserList", "DB Error, FromServer"));
-                    }).doOnRequest(aLong -> Log.d("getUserList", "fresherData"));
+                        return getUserListFromServer().doOnRequest(aLong -> Log.d("getUserListFromDB", "DB Error, FromServer"));
+                    }).doOnRequest(aLong -> Log.d("getUserListFromDB", "fresherData"));
         }
         return result.compose(applyStates());
     }
@@ -60,27 +57,10 @@ class UserListVM extends BaseViewModel implements UserListView {
                 .build());
     }
 
-    private Observable.Transformer applyStates() {
-        return new Observable.Transformer<List<UserRealm>, UserListModel>() {
-            @Override
-            public Observable<UserListModel> call(Observable<List<UserRealm>> listObservable) {
-                return listObservable.flatMap(list -> Observable.just(UserListModel.onNext(list)))
-                        .onErrorReturn(UserListModel::error)
-                        .startWith(UserListModel.loading());
-            }
-        };
-    }
-
-    @Override
-    public Observable updateItemByItem() {
-        return dataUseCase.getList(new GetRequest
-                .GetRequestBuilder(UserRealm.class, true)
-                .build())
-                .flatMap((Func1<List, Observable<?>>) Observable::from)
-                .flatMap((Func1<Object, Observable<?>>) userRealm -> dataUseCase.getObject(new GetRequest
-                        .GetRequestBuilder(UserRealm.class, true)
-                        .url(String.format(Constants.URLS.USER, ((UserRealm) userRealm).getLogin()))
-                        .build()));
+    private Observable.Transformer<List<UserRealm>, UserListModel> applyStates() {
+        return listObservable -> listObservable.flatMap(list -> Observable.just(UserListModel.onNext(list)))
+                .onErrorReturn(UserListModel::error)
+                .startWith(UserListModel.loading());
     }
 
     @Override
@@ -97,7 +77,7 @@ class UserListVM extends BaseViewModel implements UserListView {
                             .idColumnName(UserRealm.ID)
                             .payLoad(userRealm)
                             .build())
-                            .subscribe(new Subscriber() {
+                            .subscribe(new Subscriber<Object>() {
                                 @Override
                                 public void onCompleted() {
                                 }
@@ -120,7 +100,8 @@ class UserListVM extends BaseViewModel implements UserListView {
     @Override
     public void incrementPage() {
         currentPage++;
-        getUserListFromServer().subscribe();
+        getUserListFromServer().subscribe(list -> {
+        }, Throwable::printStackTrace);
     }
 
     @Override
@@ -131,10 +112,5 @@ class UserListVM extends BaseViewModel implements UserListView {
     @Override
     public void setCurrentPage(int currentPage) {
         this.currentPage = currentPage;
-    }
-
-    @Override
-    public void setView(UserListActivity userListActivity) {
-        setView(userListActivity);
     }
 }
