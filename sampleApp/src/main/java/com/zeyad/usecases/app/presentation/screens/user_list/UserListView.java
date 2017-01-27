@@ -1,5 +1,7 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
+import java.util.List;
+
 import rx.Observable;
 
 /**
@@ -8,6 +10,8 @@ import rx.Observable;
 interface UserListView {
 
     Observable<UserListModel> getUserList();
+
+    Observable<List> getUserListFromServer();
 
     Observable updateItemByItem();
 
@@ -18,4 +22,6 @@ interface UserListView {
     int getCurrentPage();
 
     void setCurrentPage(int currentPage);
+
+    void setView(UserListActivity userListActivity);
 }

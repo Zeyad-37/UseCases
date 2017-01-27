@@ -27,8 +27,10 @@ import rx.subjects.BehaviorSubject;
  */
 public class DataUseCase implements IDataUseCase {
 
+    public static final int NONE = 0, REALM = 1;
     private final static BehaviorSubject lastObject = BehaviorSubject.create();
     private final static BehaviorSubject<List> lastList = BehaviorSubject.create();
+    private static int mDBType;
     private static HandlerThread handlerThread;
     private static DataUseCase sDataUseCase;
     private final Data mData;
@@ -50,6 +52,7 @@ public class DataUseCase implements IDataUseCase {
      * This function may be called n number of times if required, during mocking and testing.
      */
     static void initWithoutDB(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+        mDBType = NONE;
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(Config.getInstance()
                 .getContext()), entityMapper), threadExecutor, postExecutionThread);
     }
@@ -61,6 +64,7 @@ public class DataUseCase implements IDataUseCase {
      * This function may be called n number of times if required, during mocking and testing.
      */
     static void initWithRealm(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+        mDBType = REALM;
         DatabaseManagerFactory.initRealm();
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
                 .getInstance(), Config.getInstance().getContext()), entityMapper), threadExecutor,
@@ -92,6 +96,13 @@ public class DataUseCase implements IDataUseCase {
         if (handlerThread == null)
             handlerThread = new HandlerThread("backgroundThread");
         return handlerThread;
+    }
+
+    /**
+     * @return returns database type, whether realm or none.
+     */
+    public static int getDBType() {
+        return mDBType;
     }
 
     /**

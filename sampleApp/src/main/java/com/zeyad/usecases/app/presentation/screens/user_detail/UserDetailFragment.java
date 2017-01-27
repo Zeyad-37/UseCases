@@ -7,6 +7,7 @@ import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,7 +34,6 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
-import rx.Subscription;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 
@@ -113,22 +113,36 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     }
 
     @Override
-    public Subscription loadData() {
+    public void loadData() {
         UserRealm userRealm = userDetailModel.getUserRealm();
-        return userDetailVM.getRepositories(userRealm.getLogin())
+        userDetailVM.getRepositories(userRealm.getLogin())
                 .flatMap(userDetailModel -> Observable.just(userDetailModel.setUserRealm(userDetailModel.getUserRealm())))
                 .doOnSubscribe(() -> {
                     showLoading();
-                    textViewType.setText(userRealm.getType());
-                    UserDetailActivity activity = (UserDetailActivity) getActivity();
-                    if (activity != null) {
-                        CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity.findViewById(R.id.toolbar_layout);
-                        if (appBarLayout != null)
-                            appBarLayout.setTitle(userRealm.getLogin());
-                        if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
-                            Glide.with(getViewContext())
-                                    .load(userRealm.getAvatarUrl())
-                                    .into(activity.imageViewAvatar);
+                    textViewType.setText(String.format("User: %s", userRealm.getLogin()));
+                    if (userDetailModel.isTwoPane()) {
+                        UserListActivity activity = (UserListActivity) getActivity();
+                        if (activity != null) {
+                            Toolbar appBarLayout = (Toolbar) activity.findViewById(R.id.toolbar);
+                            if (appBarLayout != null)
+                                appBarLayout.setTitle(userRealm.getLogin());
+                            if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
+                                Glide.with(getViewContext())
+                                        .load(userRealm.getAvatarUrl())
+                                        .into(activity.imageViewAvatar);
+                        }
+                    } else {
+                        UserDetailActivity activity = (UserDetailActivity) getActivity();
+                        if (activity != null) {
+                            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity
+                                    .findViewById(R.id.toolbar_layout);
+                            if (appBarLayout != null)
+                                appBarLayout.setTitle(userRealm.getLogin());
+                            if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
+                                Glide.with(getViewContext())
+                                        .load(userRealm.getAvatarUrl())
+                                        .into(activity.imageViewAvatar);
+                        }
                     }
                 })
                 .subscribe(new BaseSubscriber<UserDetailFragment, UserDetailModel>(this, ERROR_WITH_RETRY) {

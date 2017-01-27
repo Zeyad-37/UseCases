@@ -12,8 +12,8 @@ import java.util.List;
 @Parcel
 public class UserListModel extends BaseModel {
 
+    static int yScroll;
     List<UserRealm> users;
-    int yScroll;
 
     public UserListModel() {
         super(false, null);
@@ -37,19 +37,19 @@ public class UserListModel extends BaseModel {
         return new UserListModel(null, true, null);
     }
 
+    public static int getyScroll() {
+        return yScroll;
+    }
+
+    public static void setyScroll(int yScroll) {
+        UserListModel.yScroll = yScroll;
+    }
+
     List<UserRealm> getUsers() {
         return users;
     }
 
     public void setUsers(List<UserRealm> users) {
         this.users = users;
-    }
-
-    public int getyScroll() {
-        return yScroll;
-    }
-
-    public void setyScroll(int yScroll) {
-        this.yScroll = yScroll;
     }
 }

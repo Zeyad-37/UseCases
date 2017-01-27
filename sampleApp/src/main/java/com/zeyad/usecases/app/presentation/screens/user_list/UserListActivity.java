@@ -7,9 +7,9 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 
 import com.zeyad.usecases.app.R;
@@ -29,10 +29,10 @@ import com.zeyad.usecases.app.utils.Utils;
 import org.parceler.Parcels;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Subscription;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 
@@ -46,7 +46,9 @@ import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_R
  */
 public class UserListActivity extends BaseActivity implements LoadDataView {
     public static final int PAGE_SIZE = 6;
-    private static final String CURRENT_PAGE = "currentPage", Y_SCROLL = "yScroll", USER_LIST_MODEL = "userListModel";
+    private static final String CURRENT_PAGE = "currentPage", USER_LIST_MODEL = "userListModel";
+    @BindView(R.id.imageView_avatar)
+    public ImageView imageViewAvatar;
     UserListView userListVM;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
@@ -74,9 +76,10 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     @Override
     public void restoreState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
+            userListVM.setView(this);
             userListVM.setCurrentPage(savedInstanceState.getInt(CURRENT_PAGE, 0));
             userListModel = Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL));
-            userRecycler.scrollToPosition(userListModel.getyScroll());
+            userRecycler.scrollToPosition(UserListModel.getyScroll());
         }
     }
 
@@ -97,47 +100,27 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
             twoPane = true;
     }
 
-    private Subscription writePeriodic() {
-        return userListVM.writePeriodic()
-                .compose(bindToLifecycle())
-                .subscribe(o -> Log.d("OnNext", String.valueOf(o)));
-    }
-
-    private Subscription itemByItem() {
-        return userListVM.updateItemByItem()
-                .doOnSubscribe(this::showLoading)
-                .compose(bindToLifecycle())
-                .subscribe();
-//                .subscribe(new BaseSubscriber<UserListActivity, UserRealm>(this, ERROR_WITH_RETRY) {
-//                    @Override
-//                    public void onNext(UserRealm userModel) {
-//                        hideLoading();
-//                        usersAdapter.appendItem(new ItemInfo<>(userModel, R.layout.user_item_layout));
-//                    }
-//                });
-    }
-
-    private Subscription getList() {
-        return userListVM.getUserList()
-                .doOnSubscribe(this::showLoading)
+    @Override
+    public void loadData() {
+        userListVM.getUserList()
                 .compose(bindToLifecycle())
                 .subscribe(new BaseSubscriber<UserListActivity, UserListModel>(this, ERROR_WITH_RETRY) {
                     @Override
                     public void onNext(UserListModel userListModel) {
                         super.onNext(userListModel);
-                        UserListActivity.this.userListModel = userListModel;
-                        if (Utils.isNotEmpty(userListModel.getUsers()))
+                        if (Utils.isNotEmpty(userListModel.getUsers())) {
+                            List<ItemInfo> itemInfos = new ArrayList<>(userListModel.getUsers().size());
                             for (int i = 0, repoModelsSize = userListModel.getUsers().size(); i < repoModelsSize; i++)
-                                usersAdapter.appendItem(new ItemInfo<>(userListModel.getUsers().get(i),
+                                itemInfos.add(new ItemInfo<>(userListModel.getUsers().get(i),
                                         R.layout.user_item_layout));
+                            if (usersAdapter.getItemCount() > 0) {
+                                usersAdapter.animateTo(itemInfos);
+                                userRecycler.scrollToPosition(UserListModel.getyScroll());
+                            } else usersAdapter.animateTo(itemInfos);
+                        }
+                        UserListActivity.this.userListModel = userListModel;
                     }
                 });
-    }
-
-    @Override
-    public Subscription loadData() {
-        return getList();
-//        return itemByItem();
     }
 
     private void setupRecyclerView() {
@@ -184,7 +167,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                 if ((layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
                     userListVM.incrementPage();
-                    userListModel.setyScroll(firstVisibleItemPosition);
+                    UserListModel.setyScroll(firstVisibleItemPosition);
                 }
             }
         });
@@ -192,7 +175,10 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
 
     @Override
     public void showLoading() {
-        runOnUiThread(() -> loaderLayout.setVisibility(View.VISIBLE));
+        runOnUiThread(() -> {
+            loaderLayout.setVisibility(View.VISIBLE);
+            loaderLayout.bringToFront();
+        });
     }
 
     @Override

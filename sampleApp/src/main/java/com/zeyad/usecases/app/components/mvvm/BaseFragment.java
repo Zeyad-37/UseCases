@@ -12,8 +12,6 @@ import com.zeyad.usecases.app.components.navigation.INavigator;
 import com.zeyad.usecases.app.components.navigation.NavigatorFactory;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
-import rx.Subscription;
-
 /**
  * @author zeyad on 11/28/16.
  */
@@ -73,7 +71,7 @@ public abstract class BaseFragment extends RxFragment {
      */
     public abstract void initialize();
 
-    public abstract Subscription loadData();
+    public abstract void loadData();
 
     public void showToastMessage(String message) {
         showToastMessage(message, Toast.LENGTH_LONG);

@@ -13,139 +13,139 @@ import io.realm.RealmObject;
 @Parcel
 public class RepoRealm extends RealmObject {
     @SerializedName("id")
-    private int id;
+    int id;
     @SerializedName("name")
-    private String name;
+    String name;
     @SerializedName("full_name")
-    private String fullName;
+    String fullName;
     @SerializedName("owner")
-    private UserRealm owner;
+    UserRealm owner;
     @SerializedName("html_url")
-    private String htmlUrl;
+    String htmlUrl;
     @SerializedName("description")
-    private String description;
+    String description;
     @SerializedName("fork")
-    private boolean fork;
+    boolean fork;
     @SerializedName("url")
-    private String url;
+    String url;
     @SerializedName("forks_url")
-    private String forksUrl;
+    String forksUrl;
     @SerializedName("keys_url")
-    private String keysUrl;
+    String keysUrl;
     @SerializedName("collaborators_url")
-    private String collaboratorsUrl;
+    String collaboratorsUrl;
     @SerializedName("teams_url")
-    private String teamsUrl;
+    String teamsUrl;
     @SerializedName("hooks_url")
-    private String hooksUrl;
+    String hooksUrl;
     @SerializedName("issue_events_url")
-    private String issueEventsUrl;
+    String issueEventsUrl;
     @SerializedName("events_url")
-    private String eventsUrl;
+    String eventsUrl;
     @SerializedName("assignees_url")
-    private String assigneesUrl;
+    String assigneesUrl;
     @SerializedName("branches_url")
-    private String branchesUrl;
+    String branchesUrl;
     @SerializedName("tags_url")
-    private String tagsUrl;
+    String tagsUrl;
     @SerializedName("blobs_url")
-    private String blobsUrl;
+    String blobsUrl;
     @SerializedName("git_tags_url")
-    private String gitTagsUrl;
+    String gitTagsUrl;
     @SerializedName("git_refs_url")
-    private String gitRefsUrl;
+    String gitRefsUrl;
     @SerializedName("trees_url")
-    private String treesUrl;
+    String treesUrl;
     @SerializedName("statuses_url")
-    private String statusesUrl;
+    String statusesUrl;
     @SerializedName("languages_url")
-    private String languagesUrl;
+    String languagesUrl;
     @SerializedName("stargazers_url")
-    private String stargazersUrl;
+    String stargazersUrl;
     @SerializedName("contributors_url")
-    private String contributorsUrl;
+    String contributorsUrl;
     @SerializedName("subscribers_url")
-    private String subscribersUrl;
+    String subscribersUrl;
     @SerializedName("subscription_url")
-    private String subscriptionUrl;
+    String subscriptionUrl;
     @SerializedName("commits_url")
-    private String commitsUrl;
+    String commitsUrl;
     @SerializedName("git_commits_url")
-    private String gitCommitsUrl;
+    String gitCommitsUrl;
     @SerializedName("comments_url")
-    private String commentsUrl;
+    String commentsUrl;
     @SerializedName("issue_comment_url")
-    private String issueCommentUrl;
+    String issueCommentUrl;
     @SerializedName("contents_url")
-    private String contentsUrl;
+    String contentsUrl;
     @SerializedName("compare_url")
-    private String compareUrl;
+    String compareUrl;
     @SerializedName("merges_url")
-    private String mergesUrl;
+    String mergesUrl;
     @SerializedName("archive_url")
-    private String archiveUrl;
+    String archiveUrl;
     @SerializedName("downloads_url")
-    private String downloadsUrl;
+    String downloadsUrl;
     @SerializedName("issues_url")
-    private String issuesUrl;
+    String issuesUrl;
     @SerializedName("pulls_url")
-    private String pullsUrl;
+    String pullsUrl;
     @SerializedName("milestones_url")
-    private String milestonesUrl;
+    String milestonesUrl;
     @SerializedName("notifications_url")
-    private String notificationsUrl;
+    String notificationsUrl;
     @SerializedName("labels_url")
-    private String labelsUrl;
+    String labelsUrl;
     @SerializedName("releases_url")
-    private String releasesUrl;
+    String releasesUrl;
     @SerializedName("deployments_url")
-    private String deploymentsUrl;
+    String deploymentsUrl;
     @SerializedName("created_at")
-    private String createdAt;
+    String createdAt;
     @SerializedName("updated_at")
-    private String updatedAt;
+    String updatedAt;
     @SerializedName("pushed_at")
-    private String pushedAt;
+    String pushedAt;
     @SerializedName("git_url")
-    private String gitUrl;
+    String gitUrl;
     @SerializedName("ssh_url")
-    private String sshUrl;
+    String sshUrl;
     @SerializedName("clone_url")
-    private String cloneUrl;
+    String cloneUrl;
     @SerializedName("svn_url")
-    private String svnUrl;
+    String svnUrl;
     @SerializedName("homepage")
-    private String homepage;
+    String homepage;
     @SerializedName("size")
-    private int size;
+    int size;
     @SerializedName("stargazers_count")
-    private int stargazersCount;
+    int stargazersCount;
     @SerializedName("watchers_count")
-    private int watchersCount;
+    int watchersCount;
     @SerializedName("language")
-    private String language;
+    String language;
     @SerializedName("has_issues")
-    private boolean hasIssues;
+    boolean hasIssues;
     @SerializedName("has_downloads")
-    private boolean hasDownloads;
+    boolean hasDownloads;
     @SerializedName("has_wiki")
-    private boolean hasWiki;
+    boolean hasWiki;
     @SerializedName("has_pages")
-    private boolean hasPages;
+    boolean hasPages;
     @SerializedName("forks_count")
-    private int forksCount;
+    int forksCount;
     @SerializedName("mirror_url")
-    private String mirrorUrl;
+    String mirrorUrl;
     @SerializedName("open_issues_count")
-    private int openIssuesCount;
+    int openIssuesCount;
     @SerializedName("forks")
-    private int forks;
+    int forks;
     @SerializedName("open_issues")
-    private int openIssues;
+    int openIssues;
     @SerializedName("watchers")
-    private int watchers;
+    int watchers;
     @SerializedName("default_branch")
-    private String defaultBranch;
+    String defaultBranch;
 
     public RepoRealm() {
     }

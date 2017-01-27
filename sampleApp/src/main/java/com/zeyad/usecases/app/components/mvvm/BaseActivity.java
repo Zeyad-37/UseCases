@@ -17,8 +17,6 @@ import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
 import java.util.List;
 
-import rx.Subscription;
-
 /**
  * @author zeyad on 11/28/16.
  */
@@ -37,9 +35,9 @@ public abstract class BaseActivity extends RxAppCompatActivity {
         rxEventBus = RxEventBusFactory.getInstance();
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         initialize();
+        setupUI();
         if (!isNewActivity)
             restoreState(savedInstanceState);
-        setupUI();
     }
 
     @Override
@@ -74,7 +72,7 @@ public abstract class BaseActivity extends RxAppCompatActivity {
      */
     public abstract void setupUI();
 
-    public abstract Subscription loadData();
+    public abstract void loadData();
 
     /**
      * Adds a {@link Fragment} to this activity's layout.

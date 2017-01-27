@@ -30,33 +30,45 @@ class UserListVM extends BaseViewModel implements UserListView {
     private int currentPage;
     private int counter = 0;
 
-
     UserListVM() {
         dataUseCase = DataUseCaseFactory.getInstance();
     }
 
     @Override
     public Observable<UserListModel> getUserList() {
+        Observable result;
         List lastList = dataUseCase.getLastList().getValue();
         if (Utils.isNotEmpty(lastList) && lastList.get(0) instanceof UserRealm)
-            return dataUseCase.getLastList()
-                    .flatMap(list -> Observable.just(UserListModel.onNext((List<UserRealm>) list)));
-        else return fresherData();
+            result = dataUseCase.getLastList().doOnRequest(aLong -> Log.d("getUserList", "Subject"));
+        else {
+            Observable<List> networkObservable = getUserListFromServer();
+            result = dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true).build())
+                    .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) : networkObservable
+                            .doOnRequest(aLong -> Log.d("getUserList", "DB Empty, FromServer")))
+                    .onErrorResumeNext(throwable -> {
+                        throwable.printStackTrace();
+                        return networkObservable.doOnRequest(aLong -> Log.d("getUserList", "DB Error, FromServer"));
+                    }).doOnRequest(aLong -> Log.d("getUserList", "fresherData"));
+        }
+        return result.compose(applyStates());
     }
 
-    private Observable<UserListModel> fresherData() {
-        Observable networkObservable = dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
+    @Override
+    public Observable<List> getUserListFromServer() {
+        return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, currentPage))
                 .build());
-        return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true).build())
-                .flatMap((Func1<List, Observable<?>>) list -> Utils.isNotEmpty(list) ? Observable.just(list) : networkObservable)
-                .onErrorResumeNext(throwable -> {
-                    throwable.printStackTrace();
-                    return networkObservable;
-                })
-                .flatMap(list -> Observable.just(UserListModel.onNext((List<UserRealm>) list)))
-                .onErrorReturn(throwable -> UserListModel.error(throwable))
-                .startWith(UserListModel.loading());
+    }
+
+    private Observable.Transformer applyStates() {
+        return new Observable.Transformer<List<UserRealm>, UserListModel>() {
+            @Override
+            public Observable<UserListModel> call(Observable<List<UserRealm>> listObservable) {
+                return listObservable.flatMap(list -> Observable.just(UserListModel.onNext(list)))
+                        .onErrorReturn(UserListModel::error)
+                        .startWith(UserListModel.loading());
+            }
+        };
     }
 
     @Override
@@ -107,7 +119,8 @@ class UserListVM extends BaseViewModel implements UserListView {
 
     @Override
     public void incrementPage() {
-        setCurrentPage(getCurrentPage() + 1);
+        currentPage++;
+        getUserListFromServer().subscribe();
     }
 
     @Override
@@ -118,6 +131,10 @@ class UserListVM extends BaseViewModel implements UserListView {
     @Override
     public void setCurrentPage(int currentPage) {
         this.currentPage = currentPage;
-        ((UserListActivity) getView()).loadData();
+    }
+
+    @Override
+    public void setView(UserListActivity userListActivity) {
+        setView(userListActivity);
     }
 }
