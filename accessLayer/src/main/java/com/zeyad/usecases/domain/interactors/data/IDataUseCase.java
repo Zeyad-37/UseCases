@@ -98,7 +98,7 @@ public interface IDataUseCase {
 
     BehaviorSubject<List> getLastList();
 
-    Observable<List> getListFromOffLineFirst(GetRequest getRequest);
+    Observable<List> getListOffLineFirst(GetRequest getRequest);
 
-    Observable getObjectFromOffLineFirst(GetRequest getRequest);
+    Observable getObjectOffLineFirst(GetRequest getRequest);
 }

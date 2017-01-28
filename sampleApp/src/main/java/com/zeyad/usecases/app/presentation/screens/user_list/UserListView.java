@@ -9,11 +9,9 @@ import rx.Observable;
  */
 interface UserListView {
 
-    Observable<UserListModel> getUserListFromDB();
+    Observable<UserListModel> getUsers();
 
     Observable<List> getUserListFromServer();
-
-    Observable writePeriodic();
 
     void incrementPage(long lastId);
 

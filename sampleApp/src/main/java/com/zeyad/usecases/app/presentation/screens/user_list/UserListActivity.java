@@ -102,7 +102,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
 
     @Override
     public void loadData() {
-        userListVM.getUserListFromDB()
+        userListVM.getUsers()
                 .compose(bindToLifecycle())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new BaseSubscriber<UserListActivity, UserListModel>(this, ERROR_WITH_RETRY) {

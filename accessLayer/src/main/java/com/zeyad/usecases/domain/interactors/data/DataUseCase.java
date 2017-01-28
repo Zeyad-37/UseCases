@@ -55,7 +55,8 @@ public class DataUseCase implements IDataUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    static void initWithoutDB(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+    static void initWithoutDB(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor,
+                              PostExecutionThread postExecutionThread) {
         mDBType = NONE;
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(Config.getInstance()
                 .getContext()), entityMapper), threadExecutor, postExecutionThread);
@@ -67,7 +68,8 @@ public class DataUseCase implements IDataUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    static void initWithRealm(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+    static void initWithRealm(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor,
+                              PostExecutionThread postExecutionThread) {
         mDBType = REALM;
         DatabaseManagerFactory.initRealm();
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
@@ -135,9 +137,9 @@ public class DataUseCase implements IDataUseCase {
     @Override
     @SuppressWarnings("unchecked")
     public Observable getObject(GetRequest getRequest) {
-        return mData.getObjectDynamicallyById(getRequest.getUrl(), getRequest
-                        .getIdColumnName(), getRequest.getItemId(), getRequest.getPresentationClass(),
-                getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
+        return mData.getObjectDynamicallyById(getRequest.getUrl(), getRequest.getIdColumnName(),
+                getRequest.getItemId(), getRequest.getPresentationClass(), getRequest.getDataClass(),
+                getRequest.isPersist(), getRequest.isShouldCache())
                 .compose(applySchedulers())
                 .flatMap(object -> {
                     lastObject.onNext(object);
@@ -149,14 +151,16 @@ public class DataUseCase implements IDataUseCase {
     public Observable postObject(PostRequest postRequest) {
         return mData.postObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
                 postRequest.getObjectBundle(), postRequest.getPresentationClass(), postRequest
-                        .getDataClass(), postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
+                        .getDataClass(), postRequest.isPersist(), postRequest.isQueuable())
+                .compose(applySchedulers());
     }
 
     @Override
     public Observable postList(PostRequest postRequest) {
         return mData.postListDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),
                 postRequest.getArrayBundle(), postRequest.getPresentationClass(), postRequest.getDataClass(),
-                postRequest.isPersist(), postRequest.isQueuable()).compose(applySchedulers());
+                postRequest.isPersist(), postRequest.isQueuable())
+                .compose(applySchedulers());
     }
 
     /**
@@ -209,11 +213,11 @@ public class DataUseCase implements IDataUseCase {
     public Observable searchDisk(String query, String column, Class presentationClass,
                                  Class dataClass) {
         return mData.searchDisk(query, column, presentationClass, dataClass)
-                .compose(applySchedulers())
                 .flatMap(list -> {
                     lastObject.onNext(list);
                     return Observable.just(list);
-                });
+                })
+                .compose(applySchedulers());
     }
 
     /**
@@ -257,7 +261,7 @@ public class DataUseCase implements IDataUseCase {
     }
 
     @Override
-    public Observable<List> getListFromOffLineFirst(GetRequest getRequest) {
+    public Observable<List> getListOffLineFirst(GetRequest getRequest) {
         Observable<List> online = mData.getListDynamically(getRequest.getUrl(), getRequest.getPresentationClass(),
                 getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache());
         List lastList = listOffLineFirst.getValue();
@@ -284,7 +288,7 @@ public class DataUseCase implements IDataUseCase {
     }
 
     @Override
-    public BehaviorSubject getObjectFromOffLineFirst(GetRequest getRequest) {
+    public BehaviorSubject getObjectOffLineFirst(GetRequest getRequest) {
         Observable<?> online = mData.getObjectDynamicallyById(getRequest.getUrl(), getRequest
                         .getIdColumnName(), getRequest.getItemId(), getRequest.getPresentationClass(),
                 getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache());

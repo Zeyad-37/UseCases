@@ -35,4 +35,9 @@ public class Utils {
     public static boolean isNotEmpty(List list) {
         return list != null && !list.isEmpty();
     }
+
+    public static List union(List first, List last) {
+        first.addAll(last);
+        return first;
+    }
 }
