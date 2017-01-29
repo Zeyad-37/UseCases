@@ -5,22 +5,33 @@ import android.app.Fragment;
 import android.content.Context;
 import android.os.Build;
 
+import rx.Observable;
 import rx.subscriptions.CompositeSubscription;
+
+import static android.os.Build.VERSION_CODES.M;
 
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
+public abstract class BaseViewModel<V extends LoadDataView, M extends BaseModel> implements IBaseViewModel<V> {
     private V view;
     private int itemId;
     private boolean isNewView;
     private Context applicationContext;
     private CompositeSubscription compositeSubscription;
 
+    public abstract M reduce(M previous, M changes);
+
+    public abstract Observable.Transformer<?, M> applyStatesImmutable();
+
     @Override
     public void onViewAttached(V view, boolean isNew) {
         this.view = view;
         isNewView = isNew;
+        setApplicationContext();
+        if (compositeSubscription == null || compositeSubscription.isUnsubscribed()) {
+            compositeSubscription = new CompositeSubscription();
+        }
     }
 
     @Override
@@ -38,10 +49,6 @@ public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
 
     public void setItemId(int itemId) {
         this.itemId = itemId;
-    }
-
-    public LoadDataView getLoadDataView() {
-        return (LoadDataView) view;
     }
 
     public V getView() {
@@ -66,42 +73,32 @@ public abstract class BaseViewModel<V> implements IBaseViewModel<V> {
      * @return {@link Context}.
      */
     public Context getContext() {
+        Context context = getContextFromView();
+        if (context == null)
+            context = applicationContext;
+        return context;
+    }
+
+    private void setApplicationContext() {
+        Context context = getContextFromView();
+        if (applicationContext == null && context != null)
+            applicationContext = context.getApplicationContext();
+    }
+
+    private Context getContextFromView() {
         Context context = null;
         if (view instanceof LoadDataView) {
-            context = ((LoadDataView) view).getViewContext();
+            context = view.getViewContext();
         } else if (view instanceof Context) {
             context = (Context) view;
         } else if (view instanceof Fragment) {
-            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            if (Build.VERSION.SDK_INT < M) {
                 Activity activity = ((Fragment) view).getActivity();
                 if (activity != null) {
                     context = activity;
                 }
-            } else {
-                context = ((Fragment) view).getContext();
-            }
-        }
-        if (context == null) {
-            context = applicationContext;
-        } else if (applicationContext == null) {
-            applicationContext = context.getApplicationContext();
+            } else context = ((Fragment) view).getContext();
         }
         return context;
-    }
-
-    /**
-     * Returns current compositeSubscription or creates a new one, if null or un-subscribed.
-     *
-     * @return {@link CompositeSubscription}.
-     */
-    public CompositeSubscription getCompositeSubscription() {
-        if (compositeSubscription == null || compositeSubscription.isUnsubscribed()) {
-            compositeSubscription = new CompositeSubscription();
-        }
-        return compositeSubscription;
-    }
-
-    public void setApplicationContext(Context applicationContext) {
-        this.applicationContext = applicationContext.getApplicationContext();
     }
 }

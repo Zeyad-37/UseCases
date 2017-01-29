@@ -43,7 +43,7 @@ import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_R
  * in two-pane mode (on tablets) or a {@link UserDetailActivity}
  * on handsets.
  */
-public class UserDetailFragment extends BaseFragment implements LoadDataView {
+public class UserDetailFragment extends BaseFragment implements LoadDataView<UserDetailModel> {
     /**
      * The fragment argument representing the item that this fragment represents.
      */
@@ -158,6 +158,11 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     }
 
     @Override
+    public void renderViewState(UserDetailModel userDetailModel) {
+
+    }
+
+    @Override
     public void showLoading() {
         Activity activity = getActivity();
         if (activity != null)
@@ -184,5 +189,10 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView {
     @Override
     public Context getViewContext() {
         return getContext();
+    }
+
+    @Override
+    public UserDetailModel getModel() {
+        return null;
     }
 }

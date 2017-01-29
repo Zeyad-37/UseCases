@@ -41,10 +41,16 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     }
 
     @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        if (savedInstanceState != null)
+            restoreState(savedInstanceState);
+    }
+
+    @Override
     protected void onSaveInstanceState(Bundle outState) {
-        if (outState != null) {
+        if (outState != null)
             outState.putAll(saveState());
-        }
         super.onSaveInstanceState(outState);
     }
 
@@ -103,7 +109,7 @@ public abstract class BaseActivity extends RxAppCompatActivity {
         super.onStart();
         if (viewModel != null)
             viewModel.onViewAttached(this, isNewActivity);
-        isNewActivity = false;
+        isNewActivity = false; // TODO: 1/28/17 double check!
     }
 
     @Override

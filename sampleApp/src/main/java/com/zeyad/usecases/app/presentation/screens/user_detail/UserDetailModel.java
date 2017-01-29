@@ -13,35 +13,36 @@ import java.util.List;
 @Parcel
 public class UserDetailModel extends BaseModel {
 
-    static boolean isTwoPane;
+    boolean isTwoPane;
     UserRealm userRealm;
     List<RepoRealm> repoModels;
 
-    UserDetailModel(UserRealm userRealm, List<RepoRealm> repoModels, boolean isLoading, Throwable error) {
-        super(isLoading, error);
+    UserDetailModel(UserRealm userRealm, List<RepoRealm> repoModels, boolean isLoading, Throwable error,
+                    String state) {
+        super(isLoading, error, state);
         this.userRealm = userRealm;
         this.repoModels = repoModels;
     }
 
     public UserDetailModel() {
-        super(false, null);
+        super(false, null, null);
         userRealm = null;
         repoModels = null;
     }
 
     public static UserDetailModel error(Throwable error) {
-        return new UserDetailModel(null, null, false, error);
+        return new UserDetailModel(null, null, false, error, null);
     }
 
     static UserDetailModel loading() {
-        return new UserDetailModel(null, null, true, null);
+        return new UserDetailModel(null, null, true, null, null);
     }
 
-    public static boolean isTwoPane() {
+    public boolean isTwoPane() {
         return isTwoPane;
     }
 
-    public static void setTwoPane(boolean twoPane) {
+    public void setTwoPane(boolean twoPane) {
         isTwoPane = twoPane;
     }
 

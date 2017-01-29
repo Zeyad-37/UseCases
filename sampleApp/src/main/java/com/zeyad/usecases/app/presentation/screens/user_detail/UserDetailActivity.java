@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.mvvm.BaseActivity;
+import com.zeyad.usecases.app.components.mvvm.BaseModel;
 import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
@@ -72,6 +73,10 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
     }
 
     @Override
+    public void renderViewState(BaseModel baseModel) {
+    }
+
+    @Override
     public void onBackPressed() {
         navigateUpTo(new Intent(this, UserListActivity.class));
     }
@@ -107,5 +112,10 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
     @Override
     public Context getViewContext() {
         return this;
+    }
+
+    @Override
+    public BaseModel getModel() {
+        return null;
     }
 }

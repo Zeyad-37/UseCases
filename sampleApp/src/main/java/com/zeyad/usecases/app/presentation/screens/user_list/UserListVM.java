@@ -1,6 +1,7 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
+import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
@@ -9,15 +10,17 @@ import java.util.List;
 
 import rx.Observable;
 
+import static com.zeyad.usecases.app.components.mvvm.BaseModel.ERROR;
+import static com.zeyad.usecases.app.components.mvvm.BaseModel.LOADING;
+import static com.zeyad.usecases.app.components.mvvm.BaseModel.NEXT;
 import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
 
 /**
  * @author zeyad on 11/1/16.
  */
-class UserListVM extends BaseViewModel implements UserListView {
+class UserListVM extends BaseViewModel<UserListActivity, UserListModel> implements UserListView {
 
     private final IDataUseCase dataUseCase;
-    UserListModelImmutable currentState;
     private int currentPage;
     private long lastId;
 
@@ -27,65 +30,67 @@ class UserListVM extends BaseViewModel implements UserListView {
 
     @Override
     public Observable<UserListModel> getUsers() {
-//        Observable<List> result;
-//        List lastList = dataUseCase.getLastList().getValue();
-//        if (Utils.isNotEmpty(lastList) && lastList.get(0) instanceof UserRealm)
-//            result = dataUseCase.getLastList().doOnRequest(aLong -> Log.d("getUsers", "Subject"));
-//        else {
-//            result = dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true).build())
-//                    .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) : getUserListFromServer()
-//                            .doOnRequest(aLong -> Log.d("getUsers", "DB Empty, FromServer")))
-//                    .onErrorResumeNext(throwable -> {
-//                        throwable.printStackTrace();
-//                        return getUserListFromServer().doOnRequest(aLong -> Log.d("getUsers", "DB Error, FromServer"));
-//                    }).doOnRequest(aLong -> Log.d("getUsers", "fresherData"));
-//        }
-//        return result.compose(applyStates()).doOnNext(aLong -> Log.d("getUsers", "OnNextCalled"));
         return dataUseCase.getListOffLineFirst(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, currentPage, lastId)).build())
-                .compose(applyStates());
+                .compose(applyStatesImmutable());
     }
 
     @Override
-    public Observable<List> getUserListFromServer() {
-        return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
-                .url(String.format(USERS, currentPage, lastId))
-                .build());
+    public Observable.Transformer<List, UserListModel> applyStatesImmutable() {
+        UserListModel currentState = getView().getModel();
+        return listObservable -> listObservable
+                .flatMap(list -> Observable.just(reduce(currentState,
+                        UserListModel.onNext((List<UserRealm>) list))))
+                .onErrorReturn(throwable -> reduce(currentState,
+                        UserListModel.error(throwable)))
+                .startWith(reduce(currentState, UserListModel.loading()));
     }
 
-    private Observable.Transformer<List, UserListModel> applyStates() {
-        return listObservable -> listObservable
-                .flatMap(list -> Observable.just(UserListModel.onNext((List<UserRealm>) list)))
-                .onErrorReturn(UserListModel::error)
-                .startWith(UserListModel.loading());
-    }
-
-    private Observable.Transformer<List, UserListModelImmutable> applyStatesImmutable() {
-        return listObservable -> listObservable
-                .flatMap(list -> Observable.just(UserListModelImmutable.reduce(currentState,
-                        UserListModelImmutable.onNext((List<UserRealm>) list))))
-                .onErrorReturn(throwable -> UserListModelImmutable.reduce(currentState,
-                        UserListModelImmutable.error(throwable)))
-                .startWith(currentState = UserListModelImmutable.reduce(currentState,
-                        UserListModelImmutable.loading()))
-                .flatMap(userListModelImmutable -> {
-                    currentState = userListModelImmutable;
-                    return Observable.just(currentState);
-                });
+    @Override
+    public UserListModel reduce(UserListModel previous, UserListModel changes) {
+        if (previous == null)
+            return changes;
+        UserListModel.Builder onNextBuilder = UserListModel.builder();
+        if ((previous.getState().equals(LOADING) && changes.getState().equals(NEXT)) ||
+                (previous.getState().equals(NEXT) && changes.getState().equals(NEXT))) {
+            onNextBuilder.setIsLoading(false)
+                    .setError(null)
+                    .setyScroll(!Utils.isNotEmpty(previous.getUsers()) ? 0 : changes.getyScroll() == 0 ?
+                            previous.getyScroll() : changes.getyScroll())
+                    .setUsers(Utils.isNotEmpty(changes.getUsers()) ? Utils.union(previous.getUsers(),
+                            changes.getUsers()) : previous.getUsers())
+                    .setState(NEXT);
+        } else if (previous.getState().equals(LOADING) && changes.getState().equals(ERROR)) {
+            onNextBuilder.setIsLoading(false)
+                    .setError(changes.getError())
+                    .setyScroll(!Utils.isNotEmpty(previous.getUsers()) ? 0 : changes.getyScroll() == 0 ?
+                            previous.getyScroll() : changes.getyScroll())
+                    .setUsers(Utils.isNotEmpty(changes.getUsers()) ? Utils.union(previous.getUsers(),
+                            changes.getUsers()) : previous.getUsers())
+                    .setState(ERROR);
+        } else if ((previous.getState().equals(ERROR) && changes.getState().equals(LOADING)) ||
+                (previous.getState().equals(NEXT) && changes.getState().equals(LOADING))) {
+            onNextBuilder.setError(null)
+                    .setIsLoading(true)
+                    .setState(LOADING)
+                    .setyScroll(!Utils.isNotEmpty(previous.getUsers()) ? 0 : changes.getyScroll() == 0 ?
+                            previous.getyScroll() : changes.getyScroll())
+                    .setUsers(Utils.isNotEmpty(changes.getUsers()) ? Utils.union(previous.getUsers(),
+                            changes.getUsers()) : previous.getUsers());
+        } else
+            throw new IllegalStateException("Don't know how to reduce the partial state " + changes.toString());
+        return onNextBuilder.build();
     }
 
     @Override
     public void incrementPage(long lastId) {
         this.lastId = lastId;
         currentPage++;
-        getUserListFromServer().subscribe(list -> {
+        dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
+                .url(String.format(USERS, currentPage, lastId))
+                .build()).subscribe(list -> {
         }, Throwable::printStackTrace);
-    }
-
-    @Override
-    public int getCurrentPage() {
-        return currentPage;
     }
 
     @Override

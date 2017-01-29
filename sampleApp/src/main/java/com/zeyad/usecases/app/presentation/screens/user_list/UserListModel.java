@@ -7,49 +7,119 @@ import org.parceler.Parcel;
 import java.util.List;
 
 /**
- * @author zeyad on 1/24/17.
+ * @author by ZIaDo on 1/28/17.
  */
 @Parcel
 public class UserListModel extends BaseModel {
 
-    static int yScroll;
-    List<UserRealm> users;
+    private final List<UserRealm> users;
+    private final int yScroll;
+    private final int currentPage;
 
     public UserListModel() {
-        super(false, null);
+        super(false, null, null);
         users = null;
+        yScroll = 0;
+        currentPage = 0;
     }
 
-    UserListModel(List<UserRealm> users, boolean isLoading, Throwable error) {
-        super(isLoading, error);
+    public UserListModel(List<UserRealm> users, int yScroll, int currentPage, boolean isLoading,
+                         Throwable error, String state) {
+        super(isLoading, error, state);
         this.users = users;
+        this.yScroll = yScroll;
+        this.currentPage = currentPage;
     }
 
-    public static UserListModel onNext(List<UserRealm> users) {
-        return new UserListModel(users, false, null);
-    }
-
-    public static UserListModel error(Throwable error) {
-        return new UserListModel(null, false, error);
+    public UserListModel(Builder builder) {
+        super(builder.isLoading, builder.error, builder.state);
+        users = builder.users;
+        yScroll = builder.yScroll;
+        currentPage = builder.currentPage;
     }
 
     public static UserListModel loading() {
-        return new UserListModel(null, true, null);
+        return UserListModel.builder()
+                .setUsers(null)
+                .setError(null)
+                .setIsLoading(true)
+                .setState(LOADING)
+                .build();
     }
 
-    public static int getyScroll() {
-        return yScroll;
+    public static UserListModel onNext(List<UserRealm> users) {
+        return UserListModel.builder()
+                .setUsers(users)
+                .setError(null)
+                .setIsLoading(false)
+                .setState(NEXT)
+                .build();
     }
 
-    public static void setyScroll(int yScroll) {
-        UserListModel.yScroll = yScroll;
+    public static UserListModel error(Throwable error) {
+        return UserListModel.builder()
+                .setUsers(null)
+                .setIsLoading(false)
+                .setError(error)
+                .setState(ERROR)
+                .build();
     }
 
-    List<UserRealm> getUsers() {
+    static Builder builder() {
+        return new Builder();
+    }
+
+    public List<UserRealm> getUsers() {
         return users;
     }
 
-    public void setUsers(List<UserRealm> users) {
-        this.users = users;
+    public int getyScroll() {
+        return yScroll;
+    }
+
+    public int getCurrentPage() {
+        return currentPage;
+    }
+
+    static class Builder {
+        List<UserRealm> users;
+        int yScroll, currentPage;
+        boolean isLoading;
+        Throwable error;
+        String state;
+
+        Builder setUsers(List<UserRealm> value) {
+            users = value;
+            return this;
+        }
+
+        Builder setyScroll(int value) {
+            yScroll = value;
+            return this;
+        }
+
+        Builder setCurrentPage(int value) {
+            currentPage = value;
+            return this;
+        }
+
+        Builder setIsLoading(boolean value) {
+            isLoading = value;
+            return this;
+        }
+
+        Builder setError(Throwable value) {
+            error = value;
+            return this;
+        }
+
+        Builder setState(String value) {
+            state = value;
+            return this;
+        }
+
+        UserListModel build() {
+            return new UserListModel(this);
+        }
     }
 }

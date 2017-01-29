@@ -33,7 +33,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.android.schedulers.AndroidSchedulers;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 
@@ -45,9 +44,9 @@ import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_R
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class UserListActivity extends BaseActivity implements LoadDataView {
+public class UserListActivity extends BaseActivity implements LoadDataView<UserListModel> {
     public static final int PAGE_SIZE = 6;
-    private static final String CURRENT_PAGE = "currentPage", USER_LIST_MODEL = "userListModel";
+    private static final String USER_LIST_MODEL = "userListModel";
     @BindView(R.id.imageView_avatar)
     public ImageView imageViewAvatar;
     UserListView userListVM;
@@ -58,8 +57,8 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
     GenericRecyclerViewAdapter usersAdapter;
-    private String currentFragTag;
     private boolean twoPane;
+    private String currentFragTag;
     private UserListModel userListModel;
 
     public static Intent getCallingIntent(Context context) {
@@ -68,8 +67,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
 
     @Override
     public Bundle saveState() {
-        Bundle bundle = new Bundle(3);
-        bundle.putInt(CURRENT_PAGE, userListVM.getCurrentPage());
+        Bundle bundle = new Bundle(1);
         bundle.putParcelable(USER_LIST_MODEL, Parcels.wrap(userListModel));
         return bundle;
     }
@@ -77,9 +75,8 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     @Override
     public void restoreState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            userListVM.setCurrentPage(savedInstanceState.getInt(CURRENT_PAGE, 0));
-            userListModel = Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL));
-            userRecycler.scrollToPosition(UserListModel.getyScroll());
+            userListVM.setCurrentPage(userListModel.getCurrentPage());
+            renderViewState(Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL)));
         }
     }
 
@@ -98,32 +95,6 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
         setupRecyclerView();
         if (findViewById(R.id.user_detail_container) != null)
             twoPane = true;
-    }
-
-    @Override
-    public void loadData() {
-        userListVM.getUsers()
-                .compose(bindToLifecycle())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new BaseSubscriber<UserListActivity, UserListModel>(this, ERROR_WITH_RETRY) {
-                    @Override
-                    public void onNext(UserListModel userListModel) {
-                        super.onNext(userListModel);
-                        List<UserRealm> users = userListModel.getUsers();
-                        if (Utils.isNotEmpty(users)) {
-                            List<ItemInfo> itemInfos = new ArrayList<>(users.size());
-                            UserRealm userRealm;
-                            for (int i = 0, repoModelsSize = users.size(); i < repoModelsSize; i++) {
-                                userRealm = users.get(i);
-                                itemInfos.add(new ItemInfo<>(userRealm, R.layout.user_item_layout)
-                                        .setId(userRealm.getId()));
-                            }
-                            usersAdapter.setDataList(itemInfos);
-                            userRecycler.scrollToPosition(UserListModel.getyScroll());
-                        }
-                        UserListActivity.this.userListModel = userListModel;
-                    }
-                });
     }
 
     private void setupRecyclerView() {
@@ -169,11 +140,40 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
                 int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                 if ((layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
+                    userListModel = new UserListModel.Builder()
+                            .setUsers(userListModel.getUsers())
+                            .setState(userListModel.getState())
+                            .setError(userListModel.getError())
+                            .setIsLoading(userListModel.isLoading())
+                            .setCurrentPage(userListModel.getCurrentPage() + 1)
+                            .setyScroll(firstVisibleItemPosition)
+                            .build();
                     userListVM.incrementPage(usersAdapter.getItem(usersAdapter.getItemCount() - 1).getId());
-                    UserListModel.setyScroll(firstVisibleItemPosition);
                 }
             }
         });
+    }
+
+    @Override
+    public void loadData() {
+        userListVM.getUsers().compose(bindToLifecycle()).subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
+    }
+
+    @Override
+    public void renderViewState(UserListModel userListModel) {
+        this.userListModel = userListModel;
+        List<UserRealm> users = userListModel.getUsers();
+        if (Utils.isNotEmpty(users)) {
+            List<ItemInfo> itemInfos = new ArrayList<>(users.size());
+            UserRealm userRealm;
+            for (int i = 0, repoModelsSize = users.size(); i < repoModelsSize; i++) {
+                userRealm = users.get(i);
+                itemInfos.add(new ItemInfo<>(userRealm, R.layout.user_item_layout)
+                        .setId(userRealm.getId()));
+            }
+            usersAdapter.animateTo(itemInfos);
+            userRecycler.smoothScrollToPosition(userListModel.getyScroll());
+        }
     }
 
     @Override
@@ -203,5 +203,10 @@ public class UserListActivity extends BaseActivity implements LoadDataView {
     @Override
     public Context getViewContext() {
         return this;
+    }
+
+    @Override
+    public UserListModel getModel() {
+        return userListModel;
     }
 }

@@ -53,5 +53,6 @@ public class BaseSubscriber<V extends LoadDataView, M extends BaseModel> extends
         else view.hideLoading();
         if (m.getError() != null)
             onError(m.getError());
+        view.renderViewState(m);
     }
 }

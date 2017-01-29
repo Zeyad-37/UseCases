@@ -5,12 +5,15 @@ package com.zeyad.usecases.app.components.mvvm;
  */
 public class BaseModel {
 
-    boolean isLoading;
-    Throwable error;
+    public static final String LOADING = "loading", ERROR = "error", NEXT = "next";
+    final boolean isLoading;
+    final Throwable error;
+    final String state;
 
-    public BaseModel(boolean isLoading, Throwable error) {
+    public BaseModel(boolean isLoading, Throwable error, String state) {
         this.isLoading = isLoading;
         this.error = error;
+        this.state = state;
     }
 
     public boolean isLoading() {
@@ -19,5 +22,9 @@ public class BaseModel {
 
     public Throwable getError() {
         return error;
+    }
+
+    public String getState() {
+        return state;
     }
 }
