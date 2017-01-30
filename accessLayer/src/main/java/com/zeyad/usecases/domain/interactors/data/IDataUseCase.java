@@ -5,7 +5,6 @@ import com.zeyad.usecases.data.requests.PostRequest;
 
 import java.util.List;
 
-import io.realm.RealmQuery;
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
@@ -88,11 +87,10 @@ public interface IDataUseCase {
     /**
      * Get list of items according to the query passed.
      *
-     * @param realmQuery        The query used to look for inside the DB.
-     * @param presentationClass Class type of the items to be returned.
+     * @param getRequest contains the attributes of the request.
      * @return
      */
-    Observable searchDisk(RealmQuery realmQuery, Class presentationClass);
+    Observable searchDisk(GetRequest getRequest);
 
     BehaviorSubject getLastObject();
 

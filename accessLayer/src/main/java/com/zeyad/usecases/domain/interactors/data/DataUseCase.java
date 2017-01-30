@@ -18,6 +18,7 @@ import com.zeyad.usecases.domain.repositories.Data;
 
 import java.util.List;
 
+import io.realm.Realm;
 import io.realm.RealmQuery;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
@@ -109,6 +110,14 @@ public class DataUseCase implements IDataUseCase {
      */
     public static int getDBType() {
         return mDBType;
+    }
+
+    public static RealmQuery getRealmQuery(Class clazz) {
+        return Observable.just(RealmQuery.createQuery(Realm.getDefaultInstance(), clazz))
+                .subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
+                .observeOn(AndroidSchedulers.from(handlerThread.getLooper()))
+                .toBlocking()
+                .first();
     }
 
     /**
@@ -225,8 +234,8 @@ public class DataUseCase implements IDataUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable searchDisk(RealmQuery realmQuery, Class presentationClass) {
-        return mData.searchDisk(realmQuery, presentationClass)
+    public Observable searchDisk(GetRequest getRequest) {
+        return mData.searchDisk(getRequest.getRealmQuery(), getRequest.getPresentationClass())
                 .compose(applySchedulers())
                 .flatMap(list -> {
                     lastObject.onNext(list);

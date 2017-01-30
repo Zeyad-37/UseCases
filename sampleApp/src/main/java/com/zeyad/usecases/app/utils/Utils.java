@@ -37,7 +37,12 @@ public class Utils {
     }
 
     public static List union(List first, List last) {
-        first.addAll(last);
-        return first;
+        if (isNotEmpty(first) && isNotEmpty(last)) {
+            first.addAll(last);
+            return first;
+        } else if (isNotEmpty(first) && !isNotEmpty(last)) {
+            return first;
+        }
+        return last;
     }
 }

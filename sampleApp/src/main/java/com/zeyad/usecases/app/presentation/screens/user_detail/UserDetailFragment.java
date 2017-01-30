@@ -114,11 +114,11 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
 
     @Override
     public void loadData() {
-        UserRealm userRealm = userDetailModel.getUserRealm();
+        UserRealm userRealm = userDetailModel.getUser();
         userDetailVM.getRepositories(userRealm.getLogin())
-                .flatMap(userDetailModel -> Observable.just(userDetailModel.setUserRealm(userDetailModel.getUserRealm())))
+//                .flatMap(userDetailModel -> Observable.just(userDetailModel.setUserRealm(userDetailModel.getUser())))
+                .flatMap(userDetailModel -> Observable.just(userDetailVM.reduce(this.userDetailModel, userDetailModel)))
                 .doOnSubscribe(() -> {
-                    showLoading();
                     textViewType.setText(String.format("User: %s", userRealm.getLogin()));
                     if (userDetailModel.isTwoPane()) {
                         UserListActivity activity = (UserListActivity) getActivity();
@@ -145,21 +145,16 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
                         }
                     }
                 })
-                .subscribe(new BaseSubscriber<UserDetailFragment, UserDetailModel>(this, ERROR_WITH_RETRY) {
-                    @Override
-                    public void onNext(UserDetailModel userDetailModel) {
-                        super.onNext(userDetailModel);
-                        List<RepoRealm> repoModels = userDetailModel.getRepoModels();
-                        if (Utils.isNotEmpty(repoModels))
-                            for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
-                                repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
-                    }
-                });
+                .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }
 
     @Override
-    public void renderViewState(UserDetailModel userDetailModel) {
-
+    public void renderModel(UserDetailModel userDetailModel) {
+        this.userDetailModel = userDetailModel;
+        List<RepoRealm> repoModels = userDetailModel.getRepos();
+        if (Utils.isNotEmpty(repoModels))
+            for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
+                repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
     }
 
     @Override

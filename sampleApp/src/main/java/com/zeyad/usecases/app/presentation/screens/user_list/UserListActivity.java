@@ -35,6 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
+import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailModel.INITIAL;
 
 /**
  * An activity representing a list of Repos. This activity
@@ -76,7 +77,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
     public void restoreState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             userListVM.setCurrentPage(userListModel.getCurrentPage());
-            renderViewState(Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL)));
+            renderModel(Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL)));
         }
     }
 
@@ -115,19 +116,22 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
         };
         usersAdapter.setAreItemsClickable(true);
         usersAdapter.setOnItemClickListener((position, itemInfo, holder) -> {
-            if (twoPane) {
-                if (itemInfo.getData() instanceof UserRealm) {
+            if (itemInfo.getData() instanceof UserRealm) {
+                UserRealm userModel = (UserRealm) itemInfo.getData();
+                UserDetailModel userDetailModel = UserDetailModel.builder()
+                        .setUser(userModel)
+                        .setIsTwoPane(twoPane)
+                        .setState(INITIAL)
+                        .build();
+                if (twoPane) {
                     if (Utils.isNotEmpty(currentFragTag))
                         removeFragment(currentFragTag);
-                    UserRealm userModel = (UserRealm) itemInfo.getData();
-                    UserDetailFragment orderDetailFragment = UserDetailFragment
-                            .newInstance(new UserDetailModel().setUserRealm((UserRealm) itemInfo.getData()));
+                    UserDetailFragment orderDetailFragment = UserDetailFragment.newInstance(userDetailModel);
                     currentFragTag = orderDetailFragment.getClass().getSimpleName() + userModel.getId();
                     addFragment(R.id.user_detail_container, orderDetailFragment, null, currentFragTag);
-                }
-            } else {
-                navigator.navigateTo(getViewContext(), UserDetailActivity.getCallingIntent(getViewContext(),
-                        new UserDetailModel().setUserRealm((UserRealm) itemInfo.getData())));
+                } else
+                    navigator.navigateTo(getViewContext(), UserDetailActivity.getCallingIntent(getViewContext(),
+                            userDetailModel));
             }
         });
         LinearLayoutManager layoutManager = new LinearLayoutManager(getViewContext());
@@ -160,7 +164,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
     }
 
     @Override
-    public void renderViewState(UserListModel userListModel) {
+    public void renderModel(UserListModel userListModel) {
         this.userListModel = userListModel;
         List<UserRealm> users = userListModel.getUsers();
         if (Utils.isNotEmpty(users)) {

@@ -4,8 +4,12 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.repository.DataRepository;
+import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 
+import io.realm.RealmQuery;
+import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * @author zeyad on 7/29/16.
@@ -19,6 +23,7 @@ public class GetRequest {
     private String idColumnName;
     private int itemId;
     private boolean shouldCache;
+    private RealmQuery realmQuery;
 
     public GetRequest(@NonNull GetRequestBuilder getRequestBuilder) {
         url = getRequestBuilder.getUrl();
@@ -29,6 +34,7 @@ public class GetRequest {
         idColumnName = getRequestBuilder.getIdColumnName();
         itemId = getRequestBuilder.getItemId();
         shouldCache = getRequestBuilder.isShouldCache();
+        realmQuery = getRequestBuilder.getRealmQuery();
     }
 
     public GetRequest(@NonNull Subscriber subscriber, String url, String idColumnName,
@@ -76,6 +82,10 @@ public class GetRequest {
         return itemId;
     }
 
+    public RealmQuery getRealmQuery() {
+        return realmQuery;
+    }
+
     public static class GetRequestBuilder {
         private boolean mShouldCache;
         private String mIdColumnName;
@@ -84,10 +94,25 @@ public class GetRequest {
         private Subscriber mSubscriber;
         private Class mDataClass, mPresentationClass;
         private boolean mPersist;
+        private RealmQuery mRealmQuery;
 
         public GetRequestBuilder(Class dataClass, boolean persist) {
             mDataClass = dataClass;
             mPersist = persist;
+        }
+
+        @NonNull
+        public GetRequestBuilder realmQuery(RealmQuery realmQuery) {
+            Observable.just(realmQuery)
+                    .flatMap(realmQuery1 -> {
+                        mRealmQuery = realmQuery1;
+                        return Observable.just(mRealmQuery);
+                    })
+                    .subscribeOn(AndroidSchedulers.from(DataUseCase.getHandlerThread().getLooper()))
+                    .observeOn(AndroidSchedulers.from(DataUseCase.getHandlerThread().getLooper()))
+                    .subscribe(realmQuery1 -> mRealmQuery = realmQuery1);
+//            mRealmQuery = realmQuery;
+            return this;
         }
 
         @NonNull
@@ -114,6 +139,29 @@ public class GetRequest {
             return this;
         }
 
+        @NonNull
+        public GetRequestBuilder shouldCache(boolean shouldCache) {
+            mShouldCache = shouldCache;
+            return this;
+        }
+
+        @NonNull
+        public GetRequestBuilder idColumnName(String idColumnName) {
+            mIdColumnName = idColumnName;
+            return this;
+        }
+
+        @NonNull
+        public GetRequestBuilder id(int id) {
+            mItemId = id;
+            return this;
+        }
+
+        @NonNull
+        public GetRequest build() {
+            return new GetRequest(this);
+        }
+
         public String getUrl() {
             return mUrl;
         }
@@ -134,11 +182,6 @@ public class GetRequest {
             return mPersist;
         }
 
-        @NonNull
-        public GetRequest build() {
-            return new GetRequest(this);
-        }
-
         public boolean isShouldCache() {
             return mShouldCache;
         }
@@ -151,22 +194,8 @@ public class GetRequest {
             return mItemId;
         }
 
-        @NonNull
-        public GetRequestBuilder shouldCache(boolean shouldCache) {
-            mShouldCache = shouldCache;
-            return this;
-        }
-
-        @NonNull
-        public GetRequestBuilder idColumnName(String idColumnName) {
-            mIdColumnName = idColumnName;
-            return this;
-        }
-
-        @NonNull
-        public GetRequestBuilder id(int id) {
-            mItemId = id;
-            return this;
+        public RealmQuery getRealmQuery() {
+            return mRealmQuery;
         }
     }
 }

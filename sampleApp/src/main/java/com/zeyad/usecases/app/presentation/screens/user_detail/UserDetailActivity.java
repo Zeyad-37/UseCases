@@ -3,7 +3,6 @@ package com.zeyad.usecases.app.presentation.screens.user_detail;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -12,9 +11,6 @@ import android.widget.LinearLayout;
 
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.mvvm.BaseActivity;
-import com.zeyad.usecases.app.components.mvvm.BaseModel;
-import com.zeyad.usecases.app.components.mvvm.LoadDataView;
-import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
 
 import org.parceler.Parcels;
@@ -29,7 +25,7 @@ import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetail
  * item details are presented side-by-side with a list of items
  * in a {@link UserListActivity}.
  */
-public class UserDetailActivity extends BaseActivity implements LoadDataView {
+public class UserDetailActivity extends BaseActivity {
     @BindView(R.id.detail_toolbar)
     Toolbar toolbar;
     @BindView(R.id.linear_layout_loader)
@@ -73,10 +69,6 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
     }
 
     @Override
-    public void renderViewState(BaseModel baseModel) {
-    }
-
-    @Override
     public void onBackPressed() {
         navigateUpTo(new Intent(this, UserListActivity.class));
     }
@@ -89,33 +81,5 @@ public class UserDetailActivity extends BaseActivity implements LoadDataView {
             return true;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void showLoading() {
-    }
-
-    @Override
-    public void hideLoading() {
-    }
-
-    @Override
-    public void showErrorWithRetry(String message) {
-        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, toolbar, message, R.string.retry, view -> onResume());
-    }
-
-    @Override
-    public void showError(String message) {
-        showErrorSnackBar(message, toolbar, Snackbar.LENGTH_LONG);
-    }
-
-    @Override
-    public Context getViewContext() {
-        return this;
-    }
-
-    @Override
-    public BaseModel getModel() {
-        return null;
     }
 }

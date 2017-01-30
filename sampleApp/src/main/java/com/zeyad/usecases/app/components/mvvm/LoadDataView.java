@@ -45,5 +45,5 @@ public interface LoadDataView<M extends BaseModel> {
      *
      * @param m the model to be rendered.
      */
-    void renderViewState(M m);
+    void renderModel(M m);
 }

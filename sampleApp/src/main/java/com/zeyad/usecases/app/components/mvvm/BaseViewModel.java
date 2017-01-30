@@ -22,7 +22,7 @@ public abstract class BaseViewModel<V extends LoadDataView, M extends BaseModel>
 
     public abstract M reduce(M previous, M changes);
 
-    public abstract Observable.Transformer<?, M> applyStatesImmutable();
+    public abstract Observable.Transformer<?, M> applyStates();
 
     @Override
     public void onViewAttached(V view, boolean isNew) {

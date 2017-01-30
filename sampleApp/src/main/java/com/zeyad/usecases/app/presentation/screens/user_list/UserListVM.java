@@ -33,11 +33,11 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListModel> implemen
         return dataUseCase.getListOffLineFirst(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, currentPage, lastId)).build())
-                .compose(applyStatesImmutable());
+                .compose(applyStates());
     }
 
     @Override
-    public Observable.Transformer<List, UserListModel> applyStatesImmutable() {
+    public Observable.Transformer<List, UserListModel> applyStates() {
         UserListModel currentState = getView().getModel();
         return listObservable -> listObservable
                 .flatMap(list -> Observable.just(reduce(currentState,
@@ -51,10 +51,10 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListModel> implemen
     public UserListModel reduce(UserListModel previous, UserListModel changes) {
         if (previous == null)
             return changes;
-        UserListModel.Builder onNextBuilder = UserListModel.builder();
+        UserListModel.Builder builder = UserListModel.builder();
         if ((previous.getState().equals(LOADING) && changes.getState().equals(NEXT)) ||
                 (previous.getState().equals(NEXT) && changes.getState().equals(NEXT))) {
-            onNextBuilder.setIsLoading(false)
+            builder.setIsLoading(false)
                     .setError(null)
                     .setyScroll(!Utils.isNotEmpty(previous.getUsers()) ? 0 : changes.getyScroll() == 0 ?
                             previous.getyScroll() : changes.getyScroll())
@@ -62,7 +62,7 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListModel> implemen
                             changes.getUsers()) : previous.getUsers())
                     .setState(NEXT);
         } else if (previous.getState().equals(LOADING) && changes.getState().equals(ERROR)) {
-            onNextBuilder.setIsLoading(false)
+            builder.setIsLoading(false)
                     .setError(changes.getError())
                     .setyScroll(!Utils.isNotEmpty(previous.getUsers()) ? 0 : changes.getyScroll() == 0 ?
                             previous.getyScroll() : changes.getyScroll())
@@ -71,7 +71,7 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListModel> implemen
                     .setState(ERROR);
         } else if ((previous.getState().equals(ERROR) && changes.getState().equals(LOADING)) ||
                 (previous.getState().equals(NEXT) && changes.getState().equals(LOADING))) {
-            onNextBuilder.setError(null)
+            builder.setError(null)
                     .setIsLoading(true)
                     .setState(LOADING)
                     .setyScroll(!Utils.isNotEmpty(previous.getUsers()) ? 0 : changes.getyScroll() == 0 ?
@@ -80,7 +80,7 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListModel> implemen
                             changes.getUsers()) : previous.getUsers());
         } else
             throw new IllegalStateException("Don't know how to reduce the partial state " + changes.toString());
-        return onNextBuilder.build();
+        return builder.build();
     }
 
     @Override
