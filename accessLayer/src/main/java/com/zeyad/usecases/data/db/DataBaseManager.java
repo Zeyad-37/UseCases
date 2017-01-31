@@ -9,7 +9,6 @@ import java.util.List;
 
 import io.realm.RealmModel;
 import io.realm.RealmObject;
-import io.realm.RealmQuery;
 import rx.Observable;
 
 /**
@@ -118,8 +117,8 @@ public interface DataBaseManager {
     /**
      * Get list of items according to the query passed.
      *
-     * @param realmQuery The query used to look for inside the DB.
+     * @param queryFactory The query used to look for inside the DB.
      */
     @NonNull
-    Observable<List> getWhere(RealmQuery realmQuery);
+    <T extends RealmModel> Observable<List<T>> getWhere(RealmManager.RealmQueryProvider<T> queryFactory);
 }

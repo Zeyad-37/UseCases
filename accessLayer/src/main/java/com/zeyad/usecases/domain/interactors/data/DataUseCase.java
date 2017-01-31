@@ -1,10 +1,10 @@
 package com.zeyad.usecases.domain.interactors.data;
 
-import android.os.Handler;
 import android.os.HandlerThread;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DatabaseManagerFactory;
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.repository.DataRepository;
@@ -19,8 +19,6 @@ import com.zeyad.usecases.domain.repositories.Data;
 
 import java.util.List;
 
-import io.realm.Realm;
-import io.realm.RealmQuery;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
@@ -38,9 +36,7 @@ public class DataUseCase implements IDataUseCase {
     private final static BehaviorSubject<List> lastList = BehaviorSubject.create();
     private static int mDBType;
     private static HandlerThread handlerThread;
-    private static Handler handler;
     private static DataUseCase sDataUseCase;
-    private static RealmQuery realmQuery;
     private final Data mData;
     private final ThreadExecutor mThreadExecutor;
     private final PostExecutionThread mPostExecutionThread;
@@ -112,14 +108,6 @@ public class DataUseCase implements IDataUseCase {
      */
     public static int getDBType() {
         return mDBType;
-    }
-
-    public static RealmQuery getRealmQuery(Class clazz) {
-        if (handler == null)
-            handler = new Handler(getHandlerThread().getLooper());
-        handler.postAtFrontOfQueue(() -> realmQuery = RealmQuery.createQuery(Realm.getDefaultInstance(), clazz));
-        while (true) if (realmQuery != null) break;
-        return realmQuery;
     }
 
     /**
@@ -221,13 +209,13 @@ public class DataUseCase implements IDataUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable<List> searchDisk(RealmQuery realmQuery, Class presentationClass) {
-        return mData.searchDisk(realmQuery, presentationClass)
-                .compose(applySchedulers())
+    public Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class presentationClass) {
+        return mData.searchDisk(queryFactory, presentationClass)
                 .flatMap(list -> {
                     lastObject.onNext(list);
                     return Observable.just(list);
-                });
+                })
+                .compose(applySchedulers());
     }
 
     @Override

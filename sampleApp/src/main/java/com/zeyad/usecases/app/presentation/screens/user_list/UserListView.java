@@ -7,7 +7,7 @@ import rx.Observable;
  */
 interface UserListView {
 
-    Observable<UserListModel> getUsers();
+    Observable<UserListState> getUsers();
 
     void incrementPage(long lastId);
 

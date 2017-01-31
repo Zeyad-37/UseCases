@@ -33,7 +33,7 @@ public class UserDetailActivity extends BaseActivity {
     @BindView(R.id.imageView_avatar)
     ImageView imageViewAvatar;
 
-    public static Intent getCallingIntent(Context context, UserDetailModel userDetailModel) {
+    public static Intent getCallingIntent(Context context, UserDetailState userDetailModel) {
         return new Intent(context, UserDetailActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 .putExtra(ARG_USER_DETAIL_MODEL, Parcels.wrap(userDetailModel));

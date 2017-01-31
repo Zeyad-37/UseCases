@@ -101,19 +101,12 @@ public class RealmManager implements DataBaseManager {
         });
     }
 
-    /**
-     * Get list of items according to the query passed.
-     *
-     * @param realmQuery The query used to look for inside the DB.
-     */
-    @NonNull
-    @Override
-    public Observable<List> getWhere(@NonNull RealmQuery realmQuery) {
+    public <T extends RealmModel> Observable<List<T>> getWhere(RealmQueryProvider<T> queryFactory) {
         return Observable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
-            return realmQuery.findAll().asObservable()
-                    .filter(results -> ((RealmResults) results).isLoaded())
-                    .map(o -> realm.copyFromRealm((RealmResults) o))
+            return queryFactory.create(realm).findAll().asObservable()
+                    .filter(RealmResults::isLoaded)
+                    .map(realm::copyFromRealm)
                     .doOnUnsubscribe(() -> closeRealm(realm));
         });
     }
@@ -445,6 +438,10 @@ public class RealmManager implements DataBaseManager {
         if (jsonObject.optInt(idColumnName) == 0)
             jsonObject.put(idColumnName, Utils.getNextId(dataClass, idColumnName));
         return jsonObject;
+    }
+
+    public interface RealmQueryProvider<T extends RealmModel> {
+        RealmQuery<T> create(Realm realm);
     }
 
     private interface Executor {

@@ -21,7 +21,7 @@ import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailActivity;
 import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailFragment;
-import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailModel;
+import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState;
 import com.zeyad.usecases.app.presentation.screens.user_list.view_holders.EmptyViewHolder;
 import com.zeyad.usecases.app.presentation.screens.user_list.view_holders.UserViewHolder;
 import com.zeyad.usecases.app.utils.Utils;
@@ -35,7 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
-import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailModel.INITIAL;
+import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.INITIAL;
 
 /**
  * An activity representing a list of Repos. This activity
@@ -45,9 +45,9 @@ import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetail
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class UserListActivity extends BaseActivity implements LoadDataView<UserListModel> {
+public class UserListActivity extends BaseActivity implements LoadDataView<UserListState> {
     public static final int PAGE_SIZE = 6;
-    private static final String USER_LIST_MODEL = "userListModel";
+    private static final String USER_LIST_MODEL = "userListState";
     @BindView(R.id.imageView_avatar)
     public ImageView imageViewAvatar;
     UserListView userListVM;
@@ -60,7 +60,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
     GenericRecyclerViewAdapter usersAdapter;
     private boolean twoPane;
     private String currentFragTag;
-    private UserListModel userListModel;
+    private UserListState userListState;
 
     public static Intent getCallingIntent(Context context) {
         return new Intent(context, UserListActivity.class);
@@ -69,15 +69,16 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
     @Override
     public Bundle saveState() {
         Bundle bundle = new Bundle(1);
-        bundle.putParcelable(USER_LIST_MODEL, Parcels.wrap(userListModel));
+        bundle.putParcelable(USER_LIST_MODEL, Parcels.wrap(userListState));
         return bundle;
     }
 
     @Override
     public void restoreState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            userListVM.setCurrentPage(userListModel.getCurrentPage());
-            renderModel(Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL)));
+            if (userListVM != null)
+                userListVM.setCurrentPage(userListState.getCurrentPage());
+            renderState(Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL)));
         }
     }
 
@@ -118,7 +119,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
         usersAdapter.setOnItemClickListener((position, itemInfo, holder) -> {
             if (itemInfo.getData() instanceof UserRealm) {
                 UserRealm userModel = (UserRealm) itemInfo.getData();
-                UserDetailModel userDetailModel = UserDetailModel.builder()
+                UserDetailState userDetailModel = UserDetailState.builder()
                         .setUser(userModel)
                         .setIsTwoPane(twoPane)
                         .setState(INITIAL)
@@ -144,12 +145,12 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
                 int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                 if ((layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
-                    userListModel = new UserListModel.Builder()
-                            .setUsers(userListModel.getUsers())
-                            .setState(userListModel.getState())
-                            .setError(userListModel.getError())
-                            .setIsLoading(userListModel.isLoading())
-                            .setCurrentPage(userListModel.getCurrentPage() + 1)
+                    userListState = new UserListState.Builder()
+                            .setUsers(userListState.getUsers())
+                            .setState(userListState.getState())
+                            .setError(userListState.getError())
+                            .setIsLoading(userListState.isLoading())
+                            .setCurrentPage(userListState.getCurrentPage() + 1)
                             .setyScroll(firstVisibleItemPosition)
                             .build();
                     userListVM.incrementPage(usersAdapter.getItem(usersAdapter.getItemCount() - 1).getId());
@@ -164,8 +165,8 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
     }
 
     @Override
-    public void renderModel(UserListModel userListModel) {
-        this.userListModel = userListModel;
+    public void renderState(UserListState userListModel) {
+        this.userListState = userListModel;
         List<UserRealm> users = userListModel.getUsers();
         if (Utils.isNotEmpty(users)) {
             List<ItemInfo> itemInfos = new ArrayList<>(users.size());
@@ -210,7 +211,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
     }
 
     @Override
-    public UserListModel getModel() {
-        return userListModel;
+    public UserListState getState() {
+        return userListState;
     }
 }

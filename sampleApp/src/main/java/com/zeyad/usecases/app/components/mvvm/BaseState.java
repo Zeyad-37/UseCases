@@ -3,14 +3,14 @@ package com.zeyad.usecases.app.components.mvvm;
 /**
  * @author zeyad on 1/24/17.
  */
-public class BaseModel {
+public class BaseState {
 
     public static final String LOADING = "loading", ERROR = "error", NEXT = "next";
-    final boolean isLoading;
-    final Throwable error;
-    final String state;
+    private final boolean isLoading;
+    private final Throwable error;
+    private final String state;
 
-    public BaseModel(boolean isLoading, Throwable error, String state) {
+    public BaseState(boolean isLoading, Throwable error, String state) {
         this.isLoading = isLoading;
         this.error = error;
         this.state = state;

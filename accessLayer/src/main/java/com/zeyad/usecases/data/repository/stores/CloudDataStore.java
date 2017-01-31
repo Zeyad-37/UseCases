@@ -42,7 +42,6 @@ import java.util.concurrent.TimeUnit;
 
 import io.realm.RealmModel;
 import io.realm.RealmObject;
-import io.realm.RealmQuery;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -315,9 +314,8 @@ public class CloudDataStore implements DataStore {
         });
     }
 
-    @NonNull
     @Override
-    public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
+    public Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass) {
         return Observable.error(new IllegalAccessException(mContext.getString(R.string.search_disk_error_cloud)));
     }
 

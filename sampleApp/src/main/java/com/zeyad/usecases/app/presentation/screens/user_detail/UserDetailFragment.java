@@ -43,7 +43,7 @@ import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_R
  * in two-pane mode (on tablets) or a {@link UserDetailActivity}
  * on handsets.
  */
-public class UserDetailFragment extends BaseFragment implements LoadDataView<UserDetailModel> {
+public class UserDetailFragment extends BaseFragment implements LoadDataView<UserDetailState> {
     /**
      * The fragment argument representing the item that this fragment represents.
      */
@@ -56,7 +56,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     @BindView(R.id.recyclerView_repositories)
     RecyclerView recyclerViewRepositories;
     private GenericRecyclerViewAdapter repositoriesAdapter;
-    private UserDetailModel userDetailModel;
+    private UserDetailState userDetailModel;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -65,7 +65,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     public UserDetailFragment() {
     }
 
-    public static UserDetailFragment newInstance(UserDetailModel userDetailModel) {
+    public static UserDetailFragment newInstance(UserDetailState userDetailModel) {
         UserDetailFragment userDetailFragment = new UserDetailFragment();
         Bundle bundle = new Bundle();
         bundle.putParcelable(ARG_USER_DETAIL_MODEL, Parcels.wrap(userDetailModel));
@@ -149,7 +149,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     }
 
     @Override
-    public void renderModel(UserDetailModel userDetailModel) {
+    public void renderState(UserDetailState userDetailModel) {
         this.userDetailModel = userDetailModel;
         List<RepoRealm> repoModels = userDetailModel.getRepos();
         if (Utils.isNotEmpty(repoModels))
@@ -187,7 +187,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     }
 
     @Override
-    public UserDetailModel getModel() {
+    public UserDetailState getState() {
         return null;
     }
 }

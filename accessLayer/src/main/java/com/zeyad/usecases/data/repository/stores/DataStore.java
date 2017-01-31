@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
 import com.zeyad.usecases.Config;
+import com.zeyad.usecases.data.db.RealmManager;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -12,7 +13,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-import io.realm.RealmQuery;
 import rx.Observable;
 
 /**
@@ -80,7 +80,7 @@ public interface DataStore {
      * Search disk with a RealmQuery which returns an {@link Observable} that will emit a list of ?.
      */
     @NonNull
-    Observable<List> searchDisk(RealmQuery query, Class domainClass);
+    Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass);
 
     @NonNull
     Observable<?> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,

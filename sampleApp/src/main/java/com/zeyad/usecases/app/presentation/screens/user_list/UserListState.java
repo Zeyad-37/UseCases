@@ -1,6 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
-import com.zeyad.usecases.app.components.mvvm.BaseModel;
+import com.zeyad.usecases.app.components.mvvm.BaseState;
 
 import org.parceler.Parcel;
 
@@ -10,20 +10,20 @@ import java.util.List;
  * @author by ZIaDo on 1/28/17.
  */
 @Parcel
-public class UserListModel extends BaseModel {
+public class UserListState extends BaseState {
 
     private final List<UserRealm> users;
     private final int yScroll;
     private final int currentPage;
 
-    public UserListModel() {
+    public UserListState() {
         super(false, null, null);
         users = null;
         yScroll = 0;
         currentPage = 0;
     }
 
-    public UserListModel(List<UserRealm> users, int yScroll, int currentPage, boolean isLoading,
+    public UserListState(List<UserRealm> users, int yScroll, int currentPage, boolean isLoading,
                          Throwable error, String state) {
         super(isLoading, error, state);
         this.users = users;
@@ -31,15 +31,15 @@ public class UserListModel extends BaseModel {
         this.currentPage = currentPage;
     }
 
-    public UserListModel(Builder builder) {
+    public UserListState(Builder builder) {
         super(builder.isLoading, builder.error, builder.state);
         users = builder.users;
         yScroll = builder.yScroll;
         currentPage = builder.currentPage;
     }
 
-    public static UserListModel loading() {
-        return UserListModel.builder()
+    public static UserListState loading() {
+        return UserListState.builder()
                 .setUsers(null)
                 .setError(null)
                 .setIsLoading(true)
@@ -47,8 +47,8 @@ public class UserListModel extends BaseModel {
                 .build();
     }
 
-    public static UserListModel onNext(List<UserRealm> users) {
-        return UserListModel.builder()
+    public static UserListState onNext(List<UserRealm> users) {
+        return UserListState.builder()
                 .setUsers(users)
                 .setError(null)
                 .setIsLoading(false)
@@ -56,8 +56,8 @@ public class UserListModel extends BaseModel {
                 .build();
     }
 
-    public static UserListModel error(Throwable error) {
-        return UserListModel.builder()
+    public static UserListState error(Throwable error) {
+        return UserListState.builder()
                 .setUsers(null)
                 .setIsLoading(false)
                 .setError(error)
@@ -118,8 +118,8 @@ public class UserListModel extends BaseModel {
             return this;
         }
 
-        UserListModel build() {
-            return new UserListModel(this);
+        UserListState build() {
+            return new UserListState(this);
         }
     }
 }

@@ -10,15 +10,15 @@ import java.util.List;
 
 import rx.Observable;
 
-import static com.zeyad.usecases.app.components.mvvm.BaseModel.ERROR;
-import static com.zeyad.usecases.app.components.mvvm.BaseModel.LOADING;
-import static com.zeyad.usecases.app.components.mvvm.BaseModel.NEXT;
+import static com.zeyad.usecases.app.components.mvvm.BaseState.ERROR;
+import static com.zeyad.usecases.app.components.mvvm.BaseState.LOADING;
+import static com.zeyad.usecases.app.components.mvvm.BaseState.NEXT;
 import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
 
 /**
  * @author zeyad on 11/1/16.
  */
-class UserListVM extends BaseViewModel<UserListActivity, UserListModel> implements UserListView {
+class UserListVM extends BaseViewModel<UserListActivity, UserListState> implements UserListView {
 
     private final IDataUseCase dataUseCase;
     private int currentPage;
@@ -29,7 +29,7 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListModel> implemen
     }
 
     @Override
-    public Observable<UserListModel> getUsers() {
+    public Observable<UserListState> getUsers() {
         return dataUseCase.getListOffLineFirst(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, currentPage, lastId)).build())
@@ -37,21 +37,21 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListModel> implemen
     }
 
     @Override
-    public Observable.Transformer<List, UserListModel> applyStates() {
-        UserListModel currentState = getView().getModel();
+    public Observable.Transformer<List, UserListState> applyStates() {
+        UserListState currentState = getView().getState();
         return listObservable -> listObservable
                 .flatMap(list -> Observable.just(reduce(currentState,
-                        UserListModel.onNext((List<UserRealm>) list))))
+                        UserListState.onNext((List<UserRealm>) list))))
                 .onErrorReturn(throwable -> reduce(currentState,
-                        UserListModel.error(throwable)))
-                .startWith(reduce(currentState, UserListModel.loading()));
+                        UserListState.error(throwable)))
+                .startWith(reduce(currentState, UserListState.loading()));
     }
 
     @Override
-    public UserListModel reduce(UserListModel previous, UserListModel changes) {
+    public UserListState reduce(UserListState previous, UserListState changes) {
         if (previous == null)
             return changes;
-        UserListModel.Builder builder = UserListModel.builder();
+        UserListState.Builder builder = UserListState.builder();
         if ((previous.getState().equals(LOADING) && changes.getState().equals(NEXT)) ||
                 (previous.getState().equals(NEXT) && changes.getState().equals(NEXT))) {
             builder.setIsLoading(false)

@@ -13,16 +13,16 @@ import static android.os.Build.VERSION_CODES.M;
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseViewModel<V extends LoadDataView, M extends BaseModel> implements IBaseViewModel<V> {
+public abstract class BaseViewModel<V extends LoadDataView, S extends BaseState> implements IBaseViewModel<V> {
     private V view;
     private int itemId;
     private boolean isNewView;
     private Context applicationContext;
     private CompositeSubscription compositeSubscription;
 
-    public abstract M reduce(M previous, M changes);
+    public abstract S reduce(S previous, S changes);
 
-    public abstract Observable.Transformer<?, M> applyStates();
+    public abstract Observable.Transformer<?, S> applyStates();
 
     @Override
     public void onViewAttached(V view, boolean isNew) {
@@ -65,6 +65,10 @@ public abstract class BaseViewModel<V extends LoadDataView, M extends BaseModel>
 
     public void setNewView(boolean newView) {
         isNewView = newView;
+    }
+
+    public S getViewState() {
+        return (S) getView().getState();
     }
 
     /**

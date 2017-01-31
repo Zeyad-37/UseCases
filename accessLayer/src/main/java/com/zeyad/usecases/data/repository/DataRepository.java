@@ -3,6 +3,7 @@ package com.zeyad.usecases.data.repository;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.domain.repositories.Data;
@@ -12,7 +13,6 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-import io.realm.RealmQuery;
 import rx.Observable;
 
 public class DataRepository implements Data {
@@ -108,12 +108,11 @@ public class DataRepository implements Data {
         }
     }
 
-    @NonNull
     @Override
-    public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
+    public Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass) {
         try {
             return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(domainClass))
-                    .searchDisk(query, domainClass);
+                    .searchDisk(queryFactory, domainClass);
         } catch (IllegalAccessException e) {
             return Observable.error(e);
         }

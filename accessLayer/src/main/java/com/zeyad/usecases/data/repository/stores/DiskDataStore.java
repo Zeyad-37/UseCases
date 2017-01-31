@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.utils.ModelConverters;
 
@@ -14,7 +15,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-import io.realm.RealmQuery;
 import rx.Observable;
 import st.lowlevel.storo.Storo;
 
@@ -63,12 +63,12 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
-        return mDataBaseManager.getWhere(query)
+    public Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass) {
+        return mDataBaseManager.getWhere(queryFactory)
                 .map(realmModel -> {
                     if (domainClass == realmModel.getClass())
                         return realmModel;
-                    else return mEntityDataMapper.mapAllToDomain(realmModel, domainClass);
+                    else return mEntityDataMapper.mapToDomain(realmModel, domainClass);
                 });
     }
 

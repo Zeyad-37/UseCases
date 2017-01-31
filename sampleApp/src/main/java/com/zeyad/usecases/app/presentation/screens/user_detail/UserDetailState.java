@@ -1,6 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
-import com.zeyad.usecases.app.components.mvvm.BaseModel;
+import com.zeyad.usecases.app.components.mvvm.BaseState;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
 
 import org.parceler.Parcel;
@@ -11,13 +11,13 @@ import java.util.List;
  * @author zeyad on 1/25/17.
  */
 @Parcel
-public class UserDetailModel extends BaseModel {
+public class UserDetailState extends BaseState {
     public static final String INITIAL = "initial";
     private final boolean isTwoPane;
     private final UserRealm user;
     private final List<RepoRealm> repos;
 
-    UserDetailModel(UserRealm user, List<RepoRealm> repos, boolean isTwoPane, boolean isLoading,
+    UserDetailState(UserRealm user, List<RepoRealm> repos, boolean isTwoPane, boolean isLoading,
                     Throwable error, String state) {
         super(isLoading, error, state);
         this.user = user;
@@ -25,22 +25,22 @@ public class UserDetailModel extends BaseModel {
         this.isTwoPane = isTwoPane;
     }
 
-    public UserDetailModel() {
+    public UserDetailState() {
         super(false, null, null);
         user = null;
         repos = null;
         isTwoPane = false;
     }
 
-    public UserDetailModel(Builder builder) {
+    public UserDetailState(Builder builder) {
         super(builder.isLoading, builder.error, builder.state);
         isTwoPane = builder.isTwoPane;
         user = builder.user;
         repos = builder.repos;
     }
 
-    public static UserDetailModel error(Throwable error) {
-        return UserDetailModel.builder()
+    public static UserDetailState error(Throwable error) {
+        return UserDetailState.builder()
                 .setUser(null)
                 .setRepos(null)
                 .setIsTwoPane(false)
@@ -50,8 +50,8 @@ public class UserDetailModel extends BaseModel {
                 .build();
     }
 
-    static UserDetailModel loading() {
-        return UserDetailModel.builder()
+    static UserDetailState loading() {
+        return UserDetailState.builder()
                 .setUser(null)
                 .setRepos(null)
                 .setIsTwoPane(false)
@@ -61,8 +61,8 @@ public class UserDetailModel extends BaseModel {
                 .build();
     }
 
-    public static UserDetailModel onNext(UserRealm user, List<RepoRealm> repos, boolean isTwoPane) {
-        return UserDetailModel.builder()
+    public static UserDetailState onNext(UserRealm user, List<RepoRealm> repos, boolean isTwoPane) {
+        return UserDetailState.builder()
                 .setUser(user)
                 .setRepos(repos)
                 .setIsTwoPane(isTwoPane)
@@ -125,8 +125,8 @@ public class UserDetailModel extends BaseModel {
             return this;
         }
 
-        public UserDetailModel build() {
-            return new UserDetailModel(this);
+        public UserDetailState build() {
+            return new UserDetailState(this);
         }
     }
 }

@@ -1,11 +1,11 @@
 package com.zeyad.usecases.domain.interactors.data;
 
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 
 import java.util.List;
 
-import io.realm.RealmQuery;
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
@@ -78,11 +78,11 @@ public interface IDataUseCase {
     /**
      * Get list of items according to the query passed.
      *
-     * @param realmQuery        query to be exectuted.
+     * @param queryFactory      query to be executed.
      * @param presentationClass return type of query.
      * @return Observable with the list.
      */
-    Observable<List> searchDisk(RealmQuery realmQuery, Class presentationClass);
+    Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class presentationClass);
 
     BehaviorSubject getLastObject();
 

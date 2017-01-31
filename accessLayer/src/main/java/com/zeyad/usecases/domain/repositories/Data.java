@@ -2,12 +2,13 @@ package com.zeyad.usecases.domain.repositories;
 
 import android.support.annotation.NonNull;
 
+import com.zeyad.usecases.data.db.RealmManager;
+
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
 
-import io.realm.RealmQuery;
 import rx.Observable;
 
 /**
@@ -55,5 +56,5 @@ public interface Data {
     Observable<Boolean> deleteAllDynamically(String url, Class dataClass, boolean persist);
 
     @NonNull
-    Observable<List> searchDisk(RealmQuery query, Class domainClass);
+    Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass);
 }

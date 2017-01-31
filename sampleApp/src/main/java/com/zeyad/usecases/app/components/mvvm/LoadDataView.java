@@ -5,7 +5,7 @@ import android.content.Context;
 /**
  * Interface representing a View that will use to load data.
  */
-public interface LoadDataView<M extends BaseModel> {
+public interface LoadDataView<S extends BaseState> {
     /**
      * Show a view with a progress bar indicating a loading process.
      */
@@ -38,12 +38,12 @@ public interface LoadDataView<M extends BaseModel> {
     /**
      * @return the model of the view
      */
-    M getModel();
+    S getState();
 
     /**
      * Renders the model of the view
      *
      * @param m the model to be rendered.
      */
-    void renderModel(M m);
+    void renderState(S m);
 }
