@@ -188,8 +188,6 @@ class CloudDataStoreTestJUnitRobot {
         Mockito.when(dbManagerWithMockedContext.evictById(Mockito.any(), Mockito.anyString(), Mockito.anyLong()))
                 .thenReturn(true);
         Mockito.doReturn(TRUE_OBSERVABLE).when(dbManagerWithMockedContext).evictCollection(Mockito.anyString(), Mockito.anyListOf(Long.class), Mockito.any());
-        Mockito.when(dbManagerWithMockedContext.getWhere(Mockito.any(), Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(LIST_OBSERVABLE);
         Mockito.when(dbManagerWithMockedContext.getWhere(Mockito.any(RealmQuery.class)))
                 .thenReturn(LIST_OBSERVABLE);
         return dbManagerWithMockedContext;

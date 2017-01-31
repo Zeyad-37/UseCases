@@ -160,20 +160,6 @@ public class DataTest {
     }
 
     @Test
-    public void testSearchDisk_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenColumnNameAndValueArePassed() {
-        assumeThat(mIsDiskType, Matchers.is(true));
-        mDataRepository.searchDisk(DataRepositoryRobot.getValidQuery()
-                , DataRepositoryRobot.getColumnName()
-                , DataRepositoryRobot.getValidPresentationClass()
-                , DataRepositoryRobot.getValidDataClass());
-        Mockito.verify(mDataStore, Mockito.times(1))
-                .searchDisk(DataRepositoryRobot.getValidQuery()
-                        , DataRepositoryRobot.getColumnName()
-                        , DataRepositoryRobot.getValidPresentationClass()
-                        , DataRepositoryRobot.getValidDataClass());
-    }
-
-    @Test
     public void testSearchDisk_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenRealmQueryIsPassed() {
         assumeThat(mIsDiskType, Matchers.is(true));
         mDataRepository.searchDisk(DataRepositoryRobot.getValidRealmQuery()

@@ -190,43 +190,6 @@ public class DiskDataStoreTest {
         assertThat(((TestViewModel) subscriber.getOnNextEvents().get(0)).getTestInfo(), is(equalTo(mDiskDataStoreRobot.getTestInfo(testModelId))));
     }
 
-    @Test(expected = java.lang.AssertionError.class)
-    public void testSearchDisk_ifNoErrorIsThrown_whenDiskIsSearchedUsingId() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        int idToLookFor = mDiskDataStoreRobot.getPrimaryIdForAnyInsertedTestModel();
-        final TestSubscriber subscriber = new TestSubscriber<>();
-        mDiskDataStore.searchDisk(String.valueOf(idToLookFor), "id", null, mDiskDataStoreRobot.getDataClass())
-                .subscribe(subscriber);
-        TestUtility.assertNoErrors(subscriber);
-    }
-
-    @Test
-    public void testSearchDisk_ifNoErrorIsThrown_whenDiskIsSearchedUsingValue() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber subscriber = new TestSubscriber<>();
-        mDiskDataStore.searchDisk(mDiskDataStoreRobot.getPrefixForTestModel(), "value", null, mDiskDataStoreRobot.getDataClass())
-                .subscribe(subscriber);
-        TestUtility.assertNoErrors(subscriber);
-    }
-
-    @Test
-    public void testSearchDisk_ifCorrectNumberOfItemsAreReturned_whenDiskIsSearchedUsingValue() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber subscriber = new TestSubscriber<>();
-        mDiskDataStore.searchDisk(mDiskDataStoreRobot.getPrefixForTestModel(), "value", null, mDiskDataStoreRobot.getDataClass())
-                .subscribe(subscriber);
-        assertThat(((List<Object>) subscriber.getOnNextEvents().get(0)), is(iterableWithSize(10)));
-    }
-
-    @Test
-    public void testSearchDisk_ifCorrectItemsTypeIsReturned_whenDiskIsSearchedUsingValue() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber subscriber = new TestSubscriber<>();
-        mDiskDataStore.searchDisk(mDiskDataStoreRobot.getPrefixForTestModel(), "value", null, mDiskDataStoreRobot.getDataClass())
-                .subscribe(subscriber);
-        assertThat(((List<Object>) subscriber.getOnNextEvents().get(0)).get(0), is(instanceOf(mDiskDataStoreRobot.getDomainClass())));
-    }
-
     @Test
     public void testSearchDiskRealmQuery_ifNoErrorIsThrown_whenDiskIsSearchedUsingValue() {
         mDiskDataStoreRobot.insertTestModels(10);

@@ -128,9 +128,6 @@ public class DataUseCaseTest {
                 .searchDisk(Mockito.any(RealmQuery.class), Mockito.any());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .searchDisk(Mockito.anyString(), Mockito.anyString(), Mockito.any(), Mockito.any());
-        Mockito.doReturn(getObjectObservable())
-                .when(dataRepository)
                 .postListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class),
                         Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
@@ -339,17 +336,6 @@ public class DataUseCaseTest {
     public void testExecuteSearch_ifDataRepoCorrectMethodIsCalled_whenRealmQueryIsPassed() {
         mDataUseCase.searchDisk(getRealmQuery(), getPresentationClass()).subscribe(new TestSubscriber<>());
         Mockito.verify(mDataData).searchDisk(eq(getRealmQuery()), eq(getPresentationClass()));
-    }
-
-    @Test
-    public void testExecuteSearch_ifDataRepoCorrectMethodIsCalled_whenRealmQueryIsNotPassed() {
-        mDataUseCase.searchDisk(getStringQuery(), getColumnQueryValue(), getPresentationClass(), getDataClass()).subscribe(new TestSubscriber());
-
-        Mockito.verify(mDataData)
-                .searchDisk(eq(getStringQuery()),
-                        eq(getColumnQueryValue()),
-                        eq(getPresentationClass()),
-                        eq(getDataClass()));
     }
 
     @Test
