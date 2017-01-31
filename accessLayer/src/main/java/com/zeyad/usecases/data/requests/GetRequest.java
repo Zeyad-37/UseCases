@@ -4,12 +4,9 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.repository.DataRepository;
-import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 
 import io.realm.RealmQuery;
-import rx.Observable;
 import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
 
 /**
  * @author zeyad on 7/29/16.
@@ -103,15 +100,7 @@ public class GetRequest {
 
         @NonNull
         public GetRequestBuilder realmQuery(RealmQuery realmQuery) {
-            Observable.just(realmQuery)
-                    .flatMap(realmQuery1 -> {
-                        mRealmQuery = realmQuery1;
-                        return Observable.just(mRealmQuery);
-                    })
-                    .subscribeOn(AndroidSchedulers.from(DataUseCase.getHandlerThread().getLooper()))
-                    .observeOn(AndroidSchedulers.from(DataUseCase.getHandlerThread().getLooper()))
-                    .subscribe(realmQuery1 -> mRealmQuery = realmQuery1);
-//            mRealmQuery = realmQuery;
+            mRealmQuery = realmQuery;
             return this;
         }
 

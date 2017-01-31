@@ -12,11 +12,13 @@ import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 import java.util.List;
 
 import rx.Observable;
+import rx.functions.Func1;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseModel.ERROR;
 import static com.zeyad.usecases.app.components.mvvm.BaseModel.LOADING;
 import static com.zeyad.usecases.app.components.mvvm.BaseModel.NEXT;
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailModel.INITIAL;
+import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
 
 /**
  * @author zeyad on 1/10/17.
@@ -29,25 +31,39 @@ class UserDetailVM extends BaseViewModel<UserDetailFragment, UserDetailModel> im
     }
 
     @Override
-    public Observable<UserDetailModel> getRepositories(String user) {
-        List lastList = dataUseCase.getLastList().getValue();
+    public Observable<UserDetailModel> getRepositories(String userLogin) {
         Observable<UserDetailModel> userDetailModelObservable;
-        if (Utils.isNotEmpty(lastList) && lastList.get(0) instanceof RepoRealm)
-            userDetailModelObservable = dataUseCase.getLastList()
-                    .flatMap(list -> Observable.just(UserDetailModel.onNext(null, (List<RepoRealm>) list, false)));
-        else if (Utils.isNotEmpty(user))
-            userDetailModelObservable = dataUseCase.searchDisk(new GetRequest
-                    .GetRequestBuilder(RepoRealm.class, true)
-                    .realmQuery(DataUseCase.getRealmQuery(RepoRealm.class).equalTo("owner.login", user))
-                    .build()).compose(applyStates());
-//            userDetailModelObservable = dataUseCase.getListOffLineFirst(new GetRequest
-//                    .GetRequestBuilder(RepoRealm.class, true)
-//                    .url(String.format(REPOSITORIES, user))
-//                    .build()).compose(applyStates());
+        if (Utils.isNotEmpty(userLogin))
+            userDetailModelObservable = dataUseCase.searchDisk(DataUseCase.getRealmQuery(RepoRealm.class)
+                    .equalTo("owner.login", userLogin), RepoRealm.class)
+                    .flatMap(new Func1<List, Observable<List>>() {
+                        @Override
+                        public Observable<List> call(List list) {
+                            if (Utils.isNotEmpty(list))
+                                return Observable.just(list);
+                            else return dataUseCase.getList(new GetRequest
+                                    .GetRequestBuilder(RepoRealm.class, true)
+                                    .url(String.format(REPOSITORIES, userLogin))
+                                    .build());
+                        }
+                    })
+                    .compose(applyStates());
         else
             userDetailModelObservable = Observable.just(UserDetailModel
                     .error(new IllegalArgumentException("User name can not be empty")));
         return userDetailModelObservable;
+    }
+
+    @Override
+    public Observable.Transformer<List, UserDetailModel> applyStates() {
+        UserDetailModel currentState = getView().getModel();
+        return listObservable -> listObservable
+                .flatMap(list -> Observable.just(reduce(currentState, UserDetailModel.onNext(null,
+                        (List<RepoRealm>) list, false))))
+                .onErrorReturn(throwable -> reduce(currentState,
+                        UserDetailModel.error(throwable)))
+                .startWith(reduce(currentState, UserDetailModel.loading()));
+
     }
 
     @Override
@@ -86,17 +102,5 @@ class UserDetailVM extends BaseViewModel<UserDetailFragment, UserDetailModel> im
         } else
             throw new IllegalStateException("Don't know how to reduce the partial state " + changes.toString());
         return builder.build();
-    }
-
-    @Override
-    public Observable.Transformer<List, UserDetailModel> applyStates() {
-        UserDetailModel currentState = getView().getModel();
-        return listObservable -> listObservable
-                .flatMap(list -> Observable.just(reduce(currentState, UserDetailModel.onNext(null,
-                        (List<RepoRealm>) list, false))))
-                .onErrorReturn(throwable -> reduce(currentState,
-                        UserDetailModel.error(throwable)))
-                .startWith(reduce(currentState, UserDetailModel.loading()));
-
     }
 }

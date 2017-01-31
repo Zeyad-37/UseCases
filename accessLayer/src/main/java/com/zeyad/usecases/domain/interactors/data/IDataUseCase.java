@@ -5,6 +5,7 @@ import com.zeyad.usecases.data.requests.PostRequest;
 
 import java.util.List;
 
+import io.realm.RealmQuery;
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
@@ -73,24 +74,15 @@ public interface IDataUseCase {
      */
     Observable<Boolean> deleteAll(PostRequest deleteRequest);
 
-    /**
-     * Get list of items according to the query passed.
-     *
-     * @param column            The key used to look for inside the DB.
-     * @param query             The query used to look for inside the DB.
-     * @param dataClass         Class type of the items to be deleted.
-     * @param presentationClass Class type of the items to be returned.
-     * @return
-     */
-    Observable searchDisk(String query, String column, Class presentationClass, Class dataClass);
 
     /**
      * Get list of items according to the query passed.
      *
-     * @param getRequest contains the attributes of the request.
-     * @return
+     * @param realmQuery        query to be exectuted.
+     * @param presentationClass return type of query.
+     * @return Observable with the list.
      */
-    Observable searchDisk(GetRequest getRequest);
+    Observable<List> searchDisk(RealmQuery realmQuery, Class presentationClass);
 
     BehaviorSubject getLastObject();
 

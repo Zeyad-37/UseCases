@@ -15,7 +15,6 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -96,25 +95,6 @@ public class RealmManager implements DataBaseManager {
         return Observable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
             return realm.where(clazz).findAll().asObservable()
-                    .filter(results -> ((RealmResults) results).isLoaded())
-                    .map(o -> realm.copyFromRealm((RealmResults) o))
-                    .doOnUnsubscribe(() -> closeRealm(realm));
-        });
-    }
-
-    /**
-     * Get list of items according to the query passed.
-     *
-     * @param filterKey The key used to look for inside the DB.
-     * @param query     The query used to look for inside the DB.
-     * @param clazz     Class type of the items to be deleted.
-     */
-    @NonNull
-    @Override
-    public Observable<List> getWhere(Class clazz, String query, @NonNull String filterKey) {
-        return Observable.defer(() -> {
-            Realm realm = Realm.getDefaultInstance();
-            return realm.where(clazz).beginsWith(filterKey, query, Case.INSENSITIVE).findAll().asObservable()
                     .filter(results -> ((RealmResults) results).isLoaded())
                     .map(o -> realm.copyFromRealm((RealmResults) o))
                     .doOnUnsubscribe(() -> closeRealm(realm));

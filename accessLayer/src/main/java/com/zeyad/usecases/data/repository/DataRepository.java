@@ -110,21 +110,10 @@ public class DataRepository implements Data {
 
     @NonNull
     @Override
-    public Observable<?> searchDisk(String query, String column, Class domainClass, Class dataClass) {
+    public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
         try {
-            return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(dataClass)).searchDisk(query,
-                    column, domainClass, dataClass);
-        } catch (IllegalAccessException e) {
-            return Observable.error(e);
-        }
-    }
-
-    @NonNull
-    @Override
-    public Observable<?> searchDisk(RealmQuery query, Class domainClass) {
-        try {
-            return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(domainClass)).searchDisk(query
-                    , domainClass);
+            return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(domainClass))
+                    .searchDisk(query, domainClass);
         } catch (IllegalAccessException e) {
             return Observable.error(e);
         }

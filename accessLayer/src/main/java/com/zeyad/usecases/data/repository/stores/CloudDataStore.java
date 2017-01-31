@@ -317,12 +317,6 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<List> searchDisk(String query, String column, Class domainClass, Class dataClass) {
-        return Observable.error(new IllegalAccessException(mContext.getString(R.string.search_disk_error_cloud)));
-    }
-
-    @NonNull
-    @Override
     public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
         return Observable.error(new IllegalAccessException(mContext.getString(R.string.search_disk_error_cloud)));
     }

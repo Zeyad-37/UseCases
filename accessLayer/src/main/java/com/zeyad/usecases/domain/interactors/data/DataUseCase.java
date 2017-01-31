@@ -1,5 +1,6 @@
 package com.zeyad.usecases.domain.interactors.data;
 
+import android.os.Handler;
 import android.os.HandlerThread;
 
 import com.zeyad.usecases.Config;
@@ -37,14 +38,15 @@ public class DataUseCase implements IDataUseCase {
     private final static BehaviorSubject<List> lastList = BehaviorSubject.create();
     private static int mDBType;
     private static HandlerThread handlerThread;
+    private static Handler handler;
     private static DataUseCase sDataUseCase;
+    private static RealmQuery realmQuery;
     private final Data mData;
     private final ThreadExecutor mThreadExecutor;
     private final PostExecutionThread mPostExecutionThread;
 
     private DataUseCase(Data data, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
-        if (handlerThread == null)
-            handlerThread = new HandlerThread("backgroundThread");
+        handlerThread = getHandlerThread();
         mThreadExecutor = threadExecutor;
         mPostExecutionThread = postExecutionThread;
         mData = data;
@@ -113,11 +115,11 @@ public class DataUseCase implements IDataUseCase {
     }
 
     public static RealmQuery getRealmQuery(Class clazz) {
-        return Observable.just(RealmQuery.createQuery(Realm.getDefaultInstance(), clazz))
-                .subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
-                .observeOn(AndroidSchedulers.from(handlerThread.getLooper()))
-                .toBlocking()
-                .first();
+        if (handler == null)
+            handler = new Handler(getHandlerThread().getLooper());
+        handler.postAtFrontOfQueue(() -> realmQuery = RealmQuery.createQuery(Realm.getDefaultInstance(), clazz));
+        while (true) if (realmQuery != null) break;
+        return realmQuery;
     }
 
     /**
@@ -219,44 +221,13 @@ public class DataUseCase implements IDataUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable searchDisk(String query, String column, Class presentationClass,
-                                 Class dataClass) {
-        return mData.searchDisk(query, column, presentationClass, dataClass)
-                .flatMap(list -> {
-                    lastObject.onNext(list);
-                    return Observable.just(list);
-                })
-                .compose(applySchedulers());
-    }
-
-    /**
-     * Executes the current use case.
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public Observable searchDisk(GetRequest getRequest) {
-        return mData.searchDisk(getRequest.getRealmQuery(), getRequest.getPresentationClass())
+    public Observable<List> searchDisk(RealmQuery realmQuery, Class presentationClass) {
+        return mData.searchDisk(realmQuery, presentationClass)
                 .compose(applySchedulers())
                 .flatMap(list -> {
                     lastObject.onNext(list);
                     return Observable.just(list);
                 });
-    }
-
-    /**
-     * Apply the default android schedulers to a observable
-     *
-     * @param <T> the current observable
-     * @return the transformed observable
-     */
-    private <T> Observable.Transformer<T, T> applySchedulers() {
-        if (handlerThread == null)
-            handlerThread = new HandlerThread("backgroundThread");
-        if (!handlerThread.isAlive())
-            handlerThread.start();
-//        return observable -> observable.subscribeOn(AndroidSchedulers.from(mThreadExecutor.getLooper()))
-        return observable -> observable.subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
-                .observeOn(mPostExecutionThread.getScheduler());
     }
 
     @Override
@@ -313,5 +284,20 @@ public class DataUseCase implements IDataUseCase {
                 }, throwable -> {
                 });
         return ObjectOffLineFirst;
+    }
+
+    /**
+     * Apply the default android schedulers to a observable
+     *
+     * @param <T> the current observable
+     * @return the transformed observable
+     */
+    private <T> Observable.Transformer<T, T> applySchedulers() {
+        handlerThread = getHandlerThread();
+        if (!handlerThread.isAlive())
+            handlerThread.start();
+//        return observable -> observable.subscribeOn(AndroidSchedulers.from(mThreadExecutor.getLooper()))
+        return observable -> observable.subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
+                .observeOn(mPostExecutionThread.getScheduler());
     }
 }

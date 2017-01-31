@@ -63,23 +63,12 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> searchDisk(String query, String column, Class domainClass, Class dataClass) {
-        return mDataBaseManager.getWhere(dataClass, query, column)
-                .map(realmModel -> {
-                    if (domainClass == dataClass)
-                        return realmModel;
-                    else return mEntityDataMapper.mapToDomain(realmModel, domainClass);
-                });
-    }
-
-    @NonNull
-    @Override
-    public Observable<?> searchDisk(RealmQuery query, Class domainClass) {
+    public Observable<List> searchDisk(RealmQuery query, Class domainClass) {
         return mDataBaseManager.getWhere(query)
                 .map(realmModel -> {
                     if (domainClass == realmModel.getClass())
                         return realmModel;
-                    else return mEntityDataMapper.mapToDomain(realmModel, domainClass);
+                    else return mEntityDataMapper.mapAllToDomain(realmModel, domainClass);
                 });
     }
 

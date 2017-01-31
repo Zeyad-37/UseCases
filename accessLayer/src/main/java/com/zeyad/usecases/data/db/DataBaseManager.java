@@ -118,18 +118,8 @@ public interface DataBaseManager {
     /**
      * Get list of items according to the query passed.
      *
-     * @param filterKey The key used to look for inside the DB.
-     * @param query     The query used to look for inside the DB.
-     * @param clazz     Class type of the items to be deleted.
-     */
-    @NonNull
-    Observable<?> getWhere(Class clazz, String query, String filterKey);
-
-    /**
-     * Get list of items according to the query passed.
-     *
      * @param realmQuery The query used to look for inside the DB.
      */
     @NonNull
-    Observable<?> getWhere(RealmQuery realmQuery);
+    Observable<List> getWhere(RealmQuery realmQuery);
 }

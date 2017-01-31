@@ -77,16 +77,10 @@ public interface DataStore {
     Observable<Boolean> dynamicDeleteAll(String url, Class dataClass, boolean persist);
 
     /**
-     * Search disk with a query which returns an {@link Observable} that will emit a list of ?.
-     */
-    @NonNull
-    Observable<?> searchDisk(String query, String column, Class domainClass, Class dataClass);
-
-    /**
      * Search disk with a RealmQuery which returns an {@link Observable} that will emit a list of ?.
      */
     @NonNull
-    Observable<?> searchDisk(RealmQuery query, Class domainClass);
+    Observable<List> searchDisk(RealmQuery query, Class domainClass);
 
     @NonNull
     Observable<?> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,
