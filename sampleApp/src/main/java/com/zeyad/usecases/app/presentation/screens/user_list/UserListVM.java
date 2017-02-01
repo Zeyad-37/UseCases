@@ -38,7 +38,7 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListState> implemen
 
     @Override
     public Observable.Transformer<List, UserListState> applyStates() {
-        UserListState currentState = getView().getState();
+        UserListState currentState = getViewState();
         return listObservable -> listObservable
                 .flatMap(list -> Observable.just(reduce(currentState,
                         UserListState.onNext((List<UserRealm>) list))))

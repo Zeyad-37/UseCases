@@ -7,7 +7,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.mvvm.BaseActivity;
@@ -16,6 +15,7 @@ import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
 import org.parceler.Parcels;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailFragment.ARG_USER_DETAIL_MODEL;
 
@@ -28,8 +28,6 @@ import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetail
 public class UserDetailActivity extends BaseActivity {
     @BindView(R.id.detail_toolbar)
     Toolbar toolbar;
-    @BindView(R.id.linear_layout_loader)
-    LinearLayout loaderLayout;
     @BindView(R.id.imageView_avatar)
     ImageView imageViewAvatar;
 
@@ -55,6 +53,7 @@ public class UserDetailActivity extends BaseActivity {
     @Override
     public void setupUI() {
         setContentView(R.layout.activity_user_detail);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null)
@@ -77,6 +76,7 @@ public class UserDetailActivity extends BaseActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
+            supportFinishAfterTransition(); // exit animation
             navigateUpTo(new Intent(this, UserListActivity.class));
             return true;
         }

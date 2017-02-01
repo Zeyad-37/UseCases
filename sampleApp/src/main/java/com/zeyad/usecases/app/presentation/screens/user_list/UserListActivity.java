@@ -1,5 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
+import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,10 +8,12 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
@@ -124,15 +127,34 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
                         .setIsTwoPane(twoPane)
                         .setState(INITIAL)
                         .build();
+                Pair<View, String> pair = null;
+                Pair<View, String> secondPair = null;
+                if (Utils.hasLollipop()) {
+                    UserViewHolder userViewHolder = (UserViewHolder) holder;
+                    ImageView avatar = userViewHolder.getAvatar();
+                    pair = Pair.create(avatar, avatar.getTransitionName());
+                    TextView textViewTitle = userViewHolder.getTextViewTitle();
+                    secondPair = Pair.create(textViewTitle, textViewTitle.getTransitionName());
+                }
                 if (twoPane) {
+                    List<Pair<View, String>> pairs = new ArrayList<>();
+                    pairs.add(pair);
+                    pairs.add(secondPair);
                     if (Utils.isNotEmpty(currentFragTag))
                         removeFragment(currentFragTag);
                     UserDetailFragment orderDetailFragment = UserDetailFragment.newInstance(userDetailModel);
                     currentFragTag = orderDetailFragment.getClass().getSimpleName() + userModel.getId();
-                    addFragment(R.id.user_detail_container, orderDetailFragment, null, currentFragTag);
-                } else
-                    navigator.navigateTo(getViewContext(), UserDetailActivity.getCallingIntent(getViewContext(),
-                            userDetailModel));
+                    addFragment(R.id.user_detail_container, orderDetailFragment, pairs, currentFragTag);
+                } else {
+                    if (Utils.hasLollipop()) {
+                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
+                                pair, secondPair);
+                        navigator.navigateTo(getViewContext(), UserDetailActivity.getCallingIntent(getViewContext(),
+                                userDetailModel), options);
+                    } else
+                        navigator.navigateTo(getViewContext(), UserDetailActivity.getCallingIntent(getViewContext(),
+                                userDetailModel));
+                }
             }
         });
         LinearLayoutManager layoutManager = new LinearLayoutManager(getViewContext());

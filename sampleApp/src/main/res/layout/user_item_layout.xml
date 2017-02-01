@@ -18,7 +18,7 @@
         android:contentDescription="@string/string_content_description"
         android:paddingLeft="@dimen/lv_row_icon_padding"
         android:paddingRight="@dimen/lv_row_icon_padding"
-        android:transitionName="@string/transition_photo" />
+        android:transitionName="@string/transition_text" />
 
     <TextView
         android:id="@+id/title"

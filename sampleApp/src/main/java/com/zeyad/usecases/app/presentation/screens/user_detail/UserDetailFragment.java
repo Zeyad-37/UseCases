@@ -35,6 +35,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
 
+import static com.zeyad.usecases.app.components.mvvm.BaseState.NEXT;
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 
 /**
@@ -116,20 +117,19 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     public void loadData() {
         UserRealm userRealm = userDetailModel.getUser();
         userDetailVM.getRepositories(userRealm.getLogin())
-//                .flatMap(userDetailModel -> Observable.just(userDetailModel.setUserRealm(userDetailModel.getUser())))
                 .flatMap(userDetailModel -> Observable.just(userDetailVM.reduce(this.userDetailModel, userDetailModel)))
                 .doOnSubscribe(() -> {
-                    textViewType.setText(String.format("User: %s", userRealm.getLogin()));
+                    textViewType.setText(String.format("User: %s", userRealm.getType()));
                     if (userDetailModel.isTwoPane()) {
                         UserListActivity activity = (UserListActivity) getActivity();
                         if (activity != null) {
                             Toolbar appBarLayout = (Toolbar) activity.findViewById(R.id.toolbar);
                             if (appBarLayout != null)
                                 appBarLayout.setTitle(userRealm.getLogin());
-                            if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
-                                Glide.with(getViewContext())
-                                        .load(userRealm.getAvatarUrl())
-                                        .into(activity.imageViewAvatar);
+                            Glide.with(getViewContext())
+                                    .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
+                                            "https://help.github.com/assets/images/help/profile/identicon.png")
+                                    .into(activity.imageViewAvatar);
                         }
                     } else {
                         UserDetailActivity activity = (UserDetailActivity) getActivity();
@@ -138,10 +138,10 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
                                     .findViewById(R.id.toolbar_layout);
                             if (appBarLayout != null)
                                 appBarLayout.setTitle(userRealm.getLogin());
-                            if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
-                                Glide.with(getViewContext())
-                                        .load(userRealm.getAvatarUrl())
-                                        .into(activity.imageViewAvatar);
+                            Glide.with(getViewContext())
+                                    .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
+                                            "https://help.github.com/assets/images/help/profile/identicon.png")
+                                    .into(activity.imageViewAvatar);
                         }
                     }
                 })
@@ -151,10 +151,12 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     @Override
     public void renderState(UserDetailState userDetailModel) {
         this.userDetailModel = userDetailModel;
-        List<RepoRealm> repoModels = userDetailModel.getRepos();
-        if (Utils.isNotEmpty(repoModels))
-            for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
-                repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
+        if (userDetailModel.getState().equals(NEXT)) {
+            List<RepoRealm> repoModels = userDetailModel.getRepos();
+            if (Utils.isNotEmpty(repoModels))
+                for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
+                    repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
+        }
     }
 
     @Override

@@ -2,7 +2,6 @@ package com.zeyad.usecases.app.presentation.screens.user_list.view_holders;
 
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
@@ -22,8 +21,6 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     TextView textViewTitle;
     @BindView(R.id.avatar)
     ImageView avatar;
-    @BindView(R.id.rl_row_user)
-    RelativeLayout rowUser;
 
     public UserViewHolder(View itemView) {
         super(itemView);
@@ -45,5 +42,13 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
             if (Utils.isNotEmpty(userModel.getLogin()))
                 textViewTitle.setText(userModel.getLogin());
         }
+    }
+
+    public TextView getTextViewTitle() {
+        return textViewTitle;
+    }
+
+    public ImageView getAvatar() {
+        return avatar;
     }
 }

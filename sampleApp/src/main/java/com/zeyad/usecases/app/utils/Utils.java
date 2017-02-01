@@ -1,5 +1,6 @@
 package com.zeyad.usecases.app.utils;
 
+import android.os.Build;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
@@ -44,5 +45,9 @@ public class Utils {
             return first;
         }
         return last;
+    }
+
+    public static boolean hasLollipop() {
+        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 }

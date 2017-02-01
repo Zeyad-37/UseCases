@@ -77,7 +77,7 @@ android {
 }
 
 ext {
-    supportLibraryVersion = '25.1.0'
+    supportLibraryVersion = '25.1.1'
     retrofitVersion = '2.1.0'
     okhttpVersion = '3.3.1'
     googlePlayVersion = '10.0.1'
