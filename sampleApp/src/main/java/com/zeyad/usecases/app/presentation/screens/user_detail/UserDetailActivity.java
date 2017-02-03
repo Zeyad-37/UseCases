@@ -77,7 +77,7 @@ public class UserDetailActivity extends BaseActivity {
         int id = item.getItemId();
         if (id == android.R.id.home) {
             supportFinishAfterTransition(); // exit animation
-            navigateUpTo(new Intent(this, UserListActivity.class));
+//            navigateUpTo(new Intent(this, UserListActivity.class));
             return true;
         }
         return super.onOptionsItemSelected(item);

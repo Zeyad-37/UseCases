@@ -6,9 +6,9 @@ package com.zeyad.usecases.app.components.mvvm;
 public class BaseState {
 
     public static final String LOADING = "loading", ERROR = "error", NEXT = "next";
-    private final boolean isLoading;
-    private final Throwable error;
-    private final String state;
+    final boolean isLoading;
+    final Throwable error;
+    final String state;
 
     public BaseState(boolean isLoading, Throwable error, String state) {
         this.isLoading = isLoading;

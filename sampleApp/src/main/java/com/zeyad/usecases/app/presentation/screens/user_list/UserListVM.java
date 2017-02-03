@@ -13,6 +13,11 @@ import rx.Observable;
 import static com.zeyad.usecases.app.components.mvvm.BaseState.ERROR;
 import static com.zeyad.usecases.app.components.mvvm.BaseState.LOADING;
 import static com.zeyad.usecases.app.components.mvvm.BaseState.NEXT;
+import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.Builder;
+import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.builder;
+import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.error;
+import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.loading;
+import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.onNext;
 import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
 
 /**
@@ -38,20 +43,17 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListState> implemen
 
     @Override
     public Observable.Transformer<List, UserListState> applyStates() {
-        UserListState currentState = getViewState();
         return listObservable -> listObservable
-                .flatMap(list -> Observable.just(reduce(currentState,
-                        UserListState.onNext((List<UserRealm>) list))))
-                .onErrorReturn(throwable -> reduce(currentState,
-                        UserListState.error(throwable)))
-                .startWith(reduce(currentState, UserListState.loading()));
+                .flatMap(list -> Observable.just(reduce(getViewState(), onNext((List<UserRealm>) list))))
+                .onErrorReturn(throwable -> reduce(getViewState(), error(throwable)))
+                .startWith(reduce(getViewState(), loading()));
     }
 
     @Override
     public UserListState reduce(UserListState previous, UserListState changes) {
         if (previous == null)
             return changes;
-        UserListState.Builder builder = UserListState.builder();
+        Builder builder = builder();
         if ((previous.getState().equals(LOADING) && changes.getState().equals(NEXT)) ||
                 (previous.getState().equals(NEXT) && changes.getState().equals(NEXT))) {
             builder.setIsLoading(false)

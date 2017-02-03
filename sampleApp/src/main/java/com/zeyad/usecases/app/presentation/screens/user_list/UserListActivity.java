@@ -9,6 +9,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -79,9 +80,8 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
     @Override
     public void restoreState(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
-            if (userListVM != null)
-                userListVM.setCurrentPage(userListState.getCurrentPage());
             renderState(Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL)));
+            if (userListVM != null) userListVM.setCurrentPage(userListState.getCurrentPage());
         }
     }
 
@@ -236,4 +236,121 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
     public UserListState getState() {
         return userListState;
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+//        getMenuInflater().inflate(R.menu.list_menu, menu);
+//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        SearchView mSearchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+//        mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+//        RxSearchView.queryTextChanges(mSearchView)
+//                .filter(charSequence -> !TextUtils.isEmpty(charSequence))
+//                .throttleLast(100, TimeUnit.MILLISECONDS)
+//                .debounce(200, TimeUnit.MILLISECONDS)
+//                .onBackpressureLatest()
+////                .doOnNext(query -> mUserListPresenter.search(query.toString()))
+//                .subscribeOn(Schedulers.io())
+//                .observeOn(AndroidSchedulers.mainThread())
+//                .onErrorResumeNext(Observable.empty())
+//                .subscribe(new DefaultSubscriber<CharSequence>() {
+//                    @Override
+//                    public void onCompleted() {
+//
+//                    }
+//
+//                    @Override
+//                    public void onError(Throwable e) {
+//
+//                    }
+//
+//                    @Override
+//                    public void onNext(CharSequence newText) {
+//                        mUserListPresenter.search(newText.toString());
+//                    }
+//                });
+//        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+//            @Override
+//            public boolean onQueryTextSubmit(String query) {
+//                mUserListPresenter.search(query);
+//                return true;
+//            }
+//
+//            // TODO: 5/28/16 use animate to!
+//            @Override
+//            public boolean onQueryTextChange(String newText) {
+//                if (newText.isEmpty())
+//                    mUserListPresenter.showItemsListInView(mUserListPresenter.getItemsViewModels());
+//                else
+//                    mUserListPresenter.search(newText);
+//                Bundle bundle = new Bundle();
+//                bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, newText);
+//                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
+//                return true;
+//            }
+//        });
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    /**
+     * Toggle the selection state of an item.
+     * <p>
+     * If the item was the last one in the selection and is unselected, the selection is stopped.
+     * Note that the selection must already be started (actionMode must not be null).
+     *
+     * @param position Position of the item to toggle the selection state
+     */
+    private boolean toggleSelection(int position) {
+//        try {
+//            if (mUsersAdapter.isSelectionAllowed()) {
+//                mUsersAdapter.toggleSelection(position);
+//                int count = mUsersAdapter.getSelectedItemCount();
+//                if (count == 0) {
+//                    actionMode.finish();
+//                } else {
+//                    actionMode.setTitle(String.valueOf(count));
+//                    actionMode.invalidate();
+//                }
+//                return true;
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+        return false;
+    }
+
+//    @Override
+//    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+//        mode.getMenuInflater().inflate(R.menu.selected_list_menu, menu);
+//        return true;
+//    }
+
+//    @Override
+//    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+//        menu.findItem(R.id.delete_item).setVisible(true).setEnabled(true);
+//        mToolbar.setVisibility(View.GONE);
+//        return true;
+//    }
+
+//    @Override
+//    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+//        switch (item.getItemId()) {
+//            case R.id.delete_item:
+//                mUserListPresenter.deleteCollection(mUsersAdapter.getSelectedItemsIds());
+//                mode.finish();
+//                return true;
+//            default:
+//                return false;
+//        }
+//    }
+
+//    @Override
+//    public void onDestroyActionMode(ActionMode mode) {
+//        try {
+//            mUsersAdapter.clearSelection();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//        actionMode = null;
+//        mToolbar.setVisibility(View.VISIBLE);
+//    }
 }

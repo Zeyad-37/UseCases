@@ -115,6 +115,9 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
+        if (viewModel != null)
+            viewModel.onViewAttached(this, isNewActivity);
+        isNewActivity = false; // TODO: 1/28/17 double check!
         loadData();
     }
 

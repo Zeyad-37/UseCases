@@ -12,9 +12,9 @@ import java.util.List;
 @Parcel
 public class UserListState extends BaseState {
 
-    private final List<UserRealm> users;
-    private final int yScroll;
-    private final int currentPage;
+    final List<UserRealm> users;
+    final int yScroll;
+    final int currentPage;
 
     public UserListState() {
         super(false, null, null);

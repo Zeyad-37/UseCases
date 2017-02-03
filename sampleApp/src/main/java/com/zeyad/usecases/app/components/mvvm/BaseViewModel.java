@@ -36,7 +36,7 @@ public abstract class BaseViewModel<V extends LoadDataView, S extends BaseState>
 
     @Override
     public void onViewDetached() {
-        view = null;
+//        view = null;
         if (compositeSubscription != null && !compositeSubscription.isUnsubscribed()) {
             compositeSubscription.unsubscribe();
             compositeSubscription = null;
@@ -68,7 +68,7 @@ public abstract class BaseViewModel<V extends LoadDataView, S extends BaseState>
     }
 
     public S getViewState() {
-        return (S) getView().getState();
+        return (S) view.getState();
     }
 
     /**

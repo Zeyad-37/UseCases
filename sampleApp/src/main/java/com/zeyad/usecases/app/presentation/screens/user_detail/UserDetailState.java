@@ -13,26 +13,26 @@ import java.util.List;
 @Parcel
 public class UserDetailState extends BaseState {
     public static final String INITIAL = "initial";
-    private final boolean isTwoPane;
-    private final UserRealm user;
-    private final List<RepoRealm> repos;
+    final boolean isTwoPane;
+    final UserRealm user;
+    final List<RepoRealm> repos;
 
-    UserDetailState(UserRealm user, List<RepoRealm> repos, boolean isTwoPane, boolean isLoading,
-                    Throwable error, String state) {
+    public UserDetailState(UserRealm user, List<RepoRealm> repos, boolean isTwoPane, boolean isLoading,
+                           Throwable error, String state) {
         super(isLoading, error, state);
         this.user = user;
         this.repos = repos;
         this.isTwoPane = isTwoPane;
     }
 
-    public UserDetailState() {
+    UserDetailState() {
         super(false, null, null);
         user = null;
         repos = null;
         isTwoPane = false;
     }
 
-    public UserDetailState(Builder builder) {
+    private UserDetailState(Builder builder) {
         super(builder.isLoading, builder.error, builder.state);
         isTwoPane = builder.isTwoPane;
         user = builder.user;
@@ -61,7 +61,7 @@ public class UserDetailState extends BaseState {
                 .build();
     }
 
-    public static UserDetailState onNext(UserRealm user, List<RepoRealm> repos, boolean isTwoPane) {
+    static UserDetailState onNext(UserRealm user, List<RepoRealm> repos, boolean isTwoPane) {
         return UserDetailState.builder()
                 .setUser(user)
                 .setRepos(repos)
@@ -76,7 +76,7 @@ public class UserDetailState extends BaseState {
         return new Builder();
     }
 
-    public boolean isTwoPane() {
+    boolean isTwoPane() {
         return isTwoPane;
     }
 
@@ -95,7 +95,7 @@ public class UserDetailState extends BaseState {
         Throwable error;
         String state;
 
-        public Builder setRepos(List<RepoRealm> value) {
+        Builder setRepos(List<RepoRealm> value) {
             repos = value;
             return this;
         }

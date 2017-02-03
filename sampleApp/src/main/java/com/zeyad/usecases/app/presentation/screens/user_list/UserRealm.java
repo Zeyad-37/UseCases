@@ -13,8 +13,8 @@ import io.realm.annotations.PrimaryKey;
 @Parcel
 public class UserRealm extends RealmObject {
 
-    public static final String LOGIN = "login", ID = "id", AVATAR_URL = "avatarUrl", GRAVATAR_ID = "gravatarId",
-            URL = "url", HTML_URL = "htmlUrl", FOLLOWERS_URL = "followersUrl", FOLLOWING_URL = "following_url",
+    public static final String LOGIN = "login", ID = "id", AVATAR_URL = "avatar_url", GRAVATAR_ID = "gravatar_id",
+            URL = "url", HTML_URL = "html_url", FOLLOWERS_URL = "followers_url", FOLLOWING_URL = "following_url",
             GISTS_URL = "gists_url", STARRED_URL = "starred_url", SUBSCRIPTIONS_URL = "subscriptions_url",
             ORGANIZATIONS_URL = "organizations_url", REPOS_URL = "repos_url", EVENTS_URL = "events_url",
             RECEIVED_EVENTS_URL = "received_events_url", TYPE = "type", SITE_ADMIN = "site_admin";

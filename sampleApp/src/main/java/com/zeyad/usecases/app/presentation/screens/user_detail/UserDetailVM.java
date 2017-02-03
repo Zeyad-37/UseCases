@@ -3,20 +3,28 @@ package com.zeyad.usecases.app.presentation.screens.user_detail;
 import android.util.Log;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
+import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
+import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
 import java.util.List;
 
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseState.ERROR;
 import static com.zeyad.usecases.app.components.mvvm.BaseState.LOADING;
 import static com.zeyad.usecases.app.components.mvvm.BaseState.NEXT;
+import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.Builder;
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.INITIAL;
+import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.builder;
+import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.error;
+import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.loading;
 import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
+import static com.zeyad.usecases.app.utils.Constants.URLS.USER;
 
 /**
  * @author zeyad on 1/10/17.
@@ -32,28 +40,32 @@ class UserDetailVM extends BaseViewModel<UserDetailFragment, UserDetailState> im
     public Observable<UserDetailState> getRepositories(String userLogin) {
         Observable<UserDetailState> userDetailModelObservable;
         if (Utils.isNotEmpty(userLogin)) {
-            return dataUseCase.searchDisk(realm -> realm.where(RepoRealm.class)
-                    .equalTo("owner.login", userLogin), RepoRealm.class)
-                    .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
-                            dataUseCase.getList(new GetRequest.GetRequestBuilder(RepoRealm.class, true)
-                                    .url(String.format(REPOSITORIES, userLogin))
-                                    .build()).doOnSubscribe(() -> Log.d("DB empty", "Calling Server")))
+            return Observable.zip(dataUseCase.getObject(new GetRequest
+                            .GetRequestBuilder(UserRealm.class, true)
+                            .url(String.format(USER, userLogin)).build()),
+                    dataUseCase.searchDisk(realm -> realm.where(RepoRealm.class)
+                            .equalTo("owner.login", userLogin), RepoRealm.class)
+                            .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
+                                    dataUseCase.getList(new GetRequest
+                                            .GetRequestBuilder(RepoRealm.class, true)
+                                            .url(String.format(REPOSITORIES, userLogin))
+                                            .build())
+                                            .doOnSubscribe(() -> Log.d("DB empty", "Calling Server")))
+                            .unsubscribeOn(AndroidSchedulers.from(DataUseCase.getHandlerThread().getLooper())),
+                    (userRealm, repos) -> reduce(getViewState(), new UserDetailState((UserRealm) userRealm,
+                            (List) repos, false, false, null, INITIAL)))
                     .compose(applyStates());
         } else
-            userDetailModelObservable = Observable.just(UserDetailState
-                    .error(new IllegalArgumentException("User name can not be empty")));
+            userDetailModelObservable = Observable.just(error(new IllegalArgumentException("User name can not be empty")));
         return userDetailModelObservable;
     }
 
     @Override
-    public Observable.Transformer<List, UserDetailState> applyStates() {
-        UserDetailState currentState = getViewState();
+    public Observable.Transformer<UserDetailState, UserDetailState> applyStates() {
         return listObservable -> listObservable
-                .flatMap(list -> Observable.just(reduce(currentState, UserDetailState.onNext(null,
-                        (List<RepoRealm>) list, false))))
-                .onErrorReturn(throwable -> reduce(currentState,
-                        UserDetailState.error(throwable)))
-                .startWith(reduce(currentState, UserDetailState.loading()));
+                .flatMap(userDetailState -> Observable.just(reduce(getViewState(), userDetailState))
+                        .onErrorReturn(throwable -> reduce(getViewState(), error(throwable)))
+                        .startWith(reduce(getViewState(), loading())));
     }
 
     @Override
@@ -61,7 +73,7 @@ class UserDetailVM extends BaseViewModel<UserDetailFragment, UserDetailState> im
         if (previous == null)
             return changes;
         Log.d("reduce states:", previous.getState() + " -> " + changes.getState());
-        UserDetailState.Builder builder = UserDetailState.builder();
+        Builder builder = builder();
         if ((previous.getState().equals(LOADING) && changes.getState().equals(NEXT)) ||
                 (previous.getState().equals(NEXT) && changes.getState().equals(NEXT))) {
             builder.setIsLoading(false)
@@ -69,7 +81,7 @@ class UserDetailVM extends BaseViewModel<UserDetailFragment, UserDetailState> im
                     .setIsTwoPane(previous.isTwoPane())
                     .setRepos(Utils.isNotEmpty(changes.getRepos()) ? Utils.union(previous.getRepos(),
                             changes.getRepos()) : previous.getRepos())
-                    .setUser(previous.getUser())
+                    .setUser(changes.getUser())
                     .setState(NEXT);
         } else if (previous.getState().equals(LOADING) && changes.getState().equals(ERROR)) {
             builder.setIsLoading(false)
@@ -77,7 +89,7 @@ class UserDetailVM extends BaseViewModel<UserDetailFragment, UserDetailState> im
                     .setIsTwoPane(previous.isTwoPane())
                     .setRepos(Utils.isNotEmpty(changes.getRepos()) ? Utils.union(previous.getRepos(),
                             changes.getRepos()) : previous.getRepos())
-                    .setUser(previous.getUser())
+                    .setUser(changes.getUser())
                     .setState(ERROR);
         } else if (previous.getState().equals(INITIAL) || (previous.getState().equals(ERROR)
                 && changes.getState().equals(LOADING)) || (previous.getState().equals(NEXT)
@@ -88,9 +100,8 @@ class UserDetailVM extends BaseViewModel<UserDetailFragment, UserDetailState> im
                     .setIsTwoPane(previous.isTwoPane())
                     .setRepos(Utils.isNotEmpty(changes.getRepos()) ? Utils.union(previous.getRepos(),
                             changes.getRepos()) : previous.getRepos())
-                    .setUser(previous.getUser());
-        } else
-            throw new IllegalStateException("Don't know how to reduce the partial state " + changes.toString());
+                    .setUser(changes.getUser());
+        } else return changes;
         return builder.build();
     }
 }

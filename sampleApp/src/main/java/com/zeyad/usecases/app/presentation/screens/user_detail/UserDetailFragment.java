@@ -35,7 +35,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
 
-import static com.zeyad.usecases.app.components.mvvm.BaseState.NEXT;
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 
 /**
@@ -48,7 +47,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     /**
      * The fragment argument representing the item that this fragment represents.
      */
-    public static final String ARG_USER_DETAIL_MODEL = "userDetailModel";
+    public static final String ARG_USER_DETAIL_MODEL = "userDetailState";
     UserDetailVM userDetailVM;
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
@@ -57,7 +56,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     @BindView(R.id.recyclerView_repositories)
     RecyclerView recyclerViewRepositories;
     private GenericRecyclerViewAdapter repositoriesAdapter;
-    private UserDetailState userDetailModel;
+    private UserDetailState userDetailState;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -77,13 +76,13 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     @Override
     public Bundle saveState() {
         Bundle bundle = new Bundle(1);
-        bundle.putParcelable(ARG_USER_DETAIL_MODEL, Parcels.wrap(userDetailModel));
+        bundle.putParcelable(ARG_USER_DETAIL_MODEL, Parcels.wrap(userDetailState));
         return bundle;
     }
 
     @Override
     public void restoreState(Bundle outState) {
-        userDetailModel = Parcels.unwrap(outState.getParcelable(ARG_USER_DETAIL_MODEL));
+        userDetailState = Parcels.unwrap(outState.getParcelable(ARG_USER_DETAIL_MODEL));
     }
 
     @Override
@@ -91,7 +90,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
         viewModel = new UserDetailVM();
         userDetailVM = ((UserDetailVM) viewModel);
         if (getArguments() != null)
-            userDetailModel = Parcels.unwrap(getArguments().getParcelable(ARG_USER_DETAIL_MODEL));
+            userDetailState = Parcels.unwrap(getArguments().getParcelable(ARG_USER_DETAIL_MODEL));
     }
 
     @Override
@@ -115,12 +114,12 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
 
     @Override
     public void loadData() {
-        UserRealm userRealm = userDetailModel.getUser();
+        UserRealm userRealm = userDetailState.getUser();
         userDetailVM.getRepositories(userRealm.getLogin())
-                .flatMap(userDetailModel -> Observable.just(userDetailVM.reduce(this.userDetailModel, userDetailModel)))
+                .flatMap(userDetailModel -> Observable.just(userDetailVM.reduce(this.userDetailState, userDetailModel)))
                 .doOnSubscribe(() -> {
-                    textViewType.setText(String.format("User: %s", userRealm.getType()));
-                    if (userDetailModel.isTwoPane()) {
+//                    textViewType.setText(String.format("User: %s", userRealm.getType()));
+                    if (userDetailState.isTwoPane()) {
                         UserListActivity activity = (UserListActivity) getActivity();
                         if (activity != null) {
                             Toolbar appBarLayout = (Toolbar) activity.findViewById(R.id.toolbar);
@@ -150,13 +149,40 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
 
     @Override
     public void renderState(UserDetailState userDetailModel) {
-        this.userDetailModel = userDetailModel;
-        if (userDetailModel.getState().equals(NEXT)) {
-            List<RepoRealm> repoModels = userDetailModel.getRepos();
-            if (Utils.isNotEmpty(repoModels))
-                for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
-                    repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
-        }
+        this.userDetailState = userDetailModel;
+        UserRealm userRealm = userDetailModel.getUser();
+        List<RepoRealm> repoModels = userDetailModel.getRepos();
+        if (Utils.isNotEmpty(repoModels))
+            for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
+                repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
+        if (userRealm != null)
+            if (userDetailState.isTwoPane()) {
+                UserListActivity activity = (UserListActivity) getActivity();
+                if (activity != null) {
+                    if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
+                        Glide.with(getViewContext())
+                                .load(userRealm.getAvatarUrl())
+                                .into(activity.imageViewAvatar);
+                    else
+                        Glide.with(getViewContext())
+                                .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
+                                        "https://help.github.com/assets/images/help/profile/identicon.png")
+                                .into(activity.imageViewAvatar);
+                }
+            } else {
+                UserDetailActivity activity = (UserDetailActivity) getActivity();
+                if (activity != null) {
+                    if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
+                        Glide.with(getViewContext())
+                                .load(userRealm.getAvatarUrl())
+                                .into(activity.imageViewAvatar);
+                    else
+                        Glide.with(getViewContext())
+                                .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
+                                        "https://help.github.com/assets/images/help/profile/identicon.png")
+                                .into(activity.imageViewAvatar);
+                }
+            }
     }
 
     @Override
@@ -190,6 +216,24 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
 
     @Override
     public UserDetailState getState() {
-        return null;
+        return userDetailState;
+    }
+
+    private void applyPalette() {
+//        if (Utils.hasM())
+//            Palette.from(((UserDetailsActivity) getActivity()).mDetailImage.getBitmap()).
+//                    generate(palette -> ((UserDetailsActivity) getActivity()).mCoordinatorLayout
+//                            .setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+//                                if (v.getHeight() == scrollX) {
+//                                    ((UserDetailsActivity) getActivity()).mToolbar
+//                                            .setTitleTextColor(palette.getLightVibrantColor(Color.TRANSPARENT));
+//                                    ((UserDetailsActivity) getActivity()).mToolbar.
+//                                            setBackground(new ColorDrawable(palette
+//                                                    .getLightVibrantColor(Color.TRANSPARENT)));
+//                                } else if (scrollY == 0) {
+//                                    ((UserDetailsActivity) getActivity()).mToolbar.setTitleTextColor(0);
+//                                    ((UserDetailsActivity) getActivity()).mToolbar.setBackground(null);
+//                                }
+//                            }));
     }
 }
