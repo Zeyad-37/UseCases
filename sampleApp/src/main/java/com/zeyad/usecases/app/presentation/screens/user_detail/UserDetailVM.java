@@ -39,24 +39,21 @@ class UserDetailVM extends BaseViewModel<UserDetailFragment, UserDetailState> im
     @Override
     public Observable<UserDetailState> getRepositories(String userLogin) {
         Observable<UserDetailState> userDetailModelObservable;
-        if (Utils.isNotEmpty(userLogin)) {
-            return Observable.zip(dataUseCase.getObject(new GetRequest
-                            .GetRequestBuilder(UserRealm.class, true)
-                            .url(String.format(USER, userLogin)).build()),
-                    dataUseCase.searchDisk(realm -> realm.where(RepoRealm.class)
-                            .equalTo("owner.login", userLogin), RepoRealm.class)
-                            .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
-                                    dataUseCase.getList(new GetRequest
-                                            .GetRequestBuilder(RepoRealm.class, true)
-                                            .url(String.format(REPOSITORIES, userLogin))
-                                            .build())
-                                            .doOnSubscribe(() -> Log.d("DB empty", "Calling Server")))
-                            .unsubscribeOn(AndroidSchedulers.from(DataUseCase.getHandlerThread().getLooper())),
-                    (userRealm, repos) -> reduce(getViewState(), new UserDetailState((UserRealm) userRealm,
-                            (List) repos, false, false, null, INITIAL)))
-                    .compose(applyStates());
-        } else
-            userDetailModelObservable = Observable.just(error(new IllegalArgumentException("User name can not be empty")));
+        userDetailModelObservable = Utils.isNotEmpty(userLogin) ? Observable.zip(dataUseCase.getObject(new GetRequest
+                        .GetRequestBuilder(UserRealm.class, true)
+                        .url(String.format(USER, userLogin)).build()),
+                dataUseCase.searchDisk(realm -> realm.where(RepoRealm.class)
+                        .equalTo("owner.login", userLogin), RepoRealm.class)
+                        .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
+                                dataUseCase.getList(new GetRequest
+                                        .GetRequestBuilder(RepoRealm.class, true)
+                                        .url(String.format(REPOSITORIES, userLogin))
+                                        .build())
+                                        .doOnSubscribe(() -> Log.d("DB empty", "Calling Server")))
+                        .unsubscribeOn(AndroidSchedulers.from(DataUseCase.getHandlerThread().getLooper())),
+                (userRealm, repos) -> reduce(getViewState(), new UserDetailState((UserRealm) userRealm,
+                        (List) repos, false, false, null, INITIAL)))
+                .compose(applyStates()) : Observable.just(error(new IllegalArgumentException("User name can not be empty")));
         return userDetailModelObservable;
     }
 
@@ -78,30 +75,22 @@ class UserDetailVM extends BaseViewModel<UserDetailFragment, UserDetailState> im
                 (previous.getState().equals(NEXT) && changes.getState().equals(NEXT))) {
             builder.setIsLoading(false)
                     .setError(null)
-                    .setIsTwoPane(previous.isTwoPane())
-                    .setRepos(Utils.isNotEmpty(changes.getRepos()) ? Utils.union(previous.getRepos(),
-                            changes.getRepos()) : previous.getRepos())
-                    .setUser(changes.getUser())
                     .setState(NEXT);
         } else if (previous.getState().equals(LOADING) && changes.getState().equals(ERROR)) {
             builder.setIsLoading(false)
                     .setError(changes.getError())
-                    .setIsTwoPane(previous.isTwoPane())
-                    .setRepos(Utils.isNotEmpty(changes.getRepos()) ? Utils.union(previous.getRepos(),
-                            changes.getRepos()) : previous.getRepos())
-                    .setUser(changes.getUser())
                     .setState(ERROR);
         } else if (previous.getState().equals(INITIAL) || (previous.getState().equals(ERROR)
                 && changes.getState().equals(LOADING)) || (previous.getState().equals(NEXT)
                 && changes.getState().equals(LOADING))) {
             builder.setError(null)
                     .setIsLoading(true)
-                    .setState(LOADING)
-                    .setIsTwoPane(previous.isTwoPane())
-                    .setRepos(Utils.isNotEmpty(changes.getRepos()) ? Utils.union(previous.getRepos(),
-                            changes.getRepos()) : previous.getRepos())
-                    .setUser(changes.getUser());
+                    .setState(LOADING);
         } else return changes;
+        builder.setIsTwoPane(previous.isTwoPane())
+                .setRepos(Utils.isNotEmpty(changes.getRepos()) ? Utils.union(previous.getRepos(),
+                        changes.getRepos()) : previous.getRepos())
+                .setUser(changes.getUser());
         return builder.build();
     }
 }

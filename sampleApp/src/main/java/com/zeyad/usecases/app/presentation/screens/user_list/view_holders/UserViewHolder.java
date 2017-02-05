@@ -1,5 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_list.view_holders;
 
+import android.graphics.Color;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,6 +43,7 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
             if (Utils.isNotEmpty(userModel.getLogin()))
                 textViewTitle.setText(userModel.getLogin());
         }
+        itemView.setBackgroundColor(isItemSelected ? Color.GRAY : Color.WHITE);
     }
 
     public TextView getTextViewTitle() {

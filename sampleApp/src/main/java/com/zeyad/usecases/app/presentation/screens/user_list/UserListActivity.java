@@ -1,21 +1,26 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
 import android.app.ActivityOptions;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.jakewharton.rxbinding.support.v7.widget.RxSearchView;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
@@ -34,9 +39,11 @@ import org.parceler.Parcels;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observable;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.INITIAL;
@@ -49,7 +56,7 @@ import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetail
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class UserListActivity extends BaseActivity implements LoadDataView<UserListState> {
+public class UserListActivity extends BaseActivity implements ActionMode.Callback, LoadDataView<UserListState> {
     public static final int PAGE_SIZE = 6;
     private static final String USER_LIST_MODEL = "userListState";
     @BindView(R.id.imageView_avatar)
@@ -62,9 +69,11 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
     GenericRecyclerViewAdapter usersAdapter;
+    private ActionMode actionMode;
     private boolean twoPane;
     private String currentFragTag;
     private UserListState userListState;
+    private List<ItemInfo<UserRealm>> itemInfos;
 
     public static Intent getCallingIntent(Context context) {
         return new Intent(context, UserListActivity.class);
@@ -120,7 +129,9 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
         };
         usersAdapter.setAreItemsClickable(true);
         usersAdapter.setOnItemClickListener((position, itemInfo, holder) -> {
-            if (itemInfo.getData() instanceof UserRealm) {
+            if (actionMode != null) {
+                toggleSelection(position);
+            } else if (itemInfo.getData() instanceof UserRealm) {
                 UserRealm userModel = (UserRealm) itemInfo.getData();
                 UserDetailState userDetailModel = UserDetailState.builder()
                         .setUser(userModel)
@@ -157,9 +168,17 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
                 }
             }
         });
+        usersAdapter.setOnItemLongClickListener((position, itemInfo, holder) -> {
+            if (usersAdapter.isSelectionAllowed()) {
+                actionMode = startSupportActionMode(UserListActivity.this);
+                toggleSelection(position);
+            }
+            return true;
+        });
         LinearLayoutManager layoutManager = new LinearLayoutManager(getViewContext());
         userRecycler.setLayoutManager(layoutManager);
         userRecycler.setAdapter(usersAdapter);
+        usersAdapter.setAllowSelection(true);
         userRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
             @Override
             public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
@@ -183,7 +202,8 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
 
     @Override
     public void loadData() {
-        userListVM.getUsers().compose(bindToLifecycle()).subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
+        userListVM.getUsers().compose(bindToLifecycle()).subscribe(new BaseSubscriber<>(this,
+                ERROR_WITH_RETRY));
     }
 
     @Override
@@ -191,7 +211,7 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
         this.userListState = userListModel;
         List<UserRealm> users = userListModel.getUsers();
         if (Utils.isNotEmpty(users)) {
-            List<ItemInfo> itemInfos = new ArrayList<>(users.size());
+            itemInfos = new ArrayList<>(users.size());
             UserRealm userRealm;
             for (int i = 0, repoModelsSize = users.size(); i < repoModelsSize; i++) {
                 userRealm = users.get(i);
@@ -239,52 +259,32 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.list_menu, menu);
-//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//        SearchView mSearchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-//        mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-//        RxSearchView.queryTextChanges(mSearchView)
-//                .filter(charSequence -> !TextUtils.isEmpty(charSequence))
-//                .throttleLast(100, TimeUnit.MILLISECONDS)
-//                .debounce(200, TimeUnit.MILLISECONDS)
-//                .onBackpressureLatest()
-////                .doOnNext(query -> mUserListPresenter.search(query.toString()))
-//                .subscribeOn(Schedulers.io())
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .onErrorResumeNext(Observable.empty())
-//                .subscribe(new DefaultSubscriber<CharSequence>() {
-//                    @Override
-//                    public void onCompleted() {
-//
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onNext(CharSequence newText) {
-//                        mUserListPresenter.search(newText.toString());
-//                    }
-//                });
+        getMenuInflater().inflate(R.menu.list_menu, menu);
+        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+        SearchView mSearchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        RxSearchView.queryTextChanges(mSearchView)
+                .filter(charSequence -> Utils.isNotEmpty(charSequence.toString()))
+                .throttleLast(100, TimeUnit.MILLISECONDS)
+                .debounce(200, TimeUnit.MILLISECONDS)
+                .onBackpressureLatest()
+                .flatMap(query -> userListVM.search(query.toString()))
+                .onErrorResumeNext(Observable.empty())
+                .subscribe(list -> usersAdapter.animateTo(Utils.isNotEmpty(list) ? list : itemInfos),
+                        Throwable::printStackTrace);
 //        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
 //            @Override
 //            public boolean onQueryTextSubmit(String query) {
-//                mUserListPresenter.search(query);
+//                userListVM.search(query);
 //                return true;
 //            }
 //
-//            // TODO: 5/28/16 use animate to!
 //            @Override
 //            public boolean onQueryTextChange(String newText) {
 //                if (newText.isEmpty())
-//                    mUserListPresenter.showItemsListInView(mUserListPresenter.getItemsViewModels());
+//                    userListVM.showItemsListInView(userListVM.getItemsViewModels());
 //                else
-//                    mUserListPresenter.search(newText);
-//                Bundle bundle = new Bundle();
-//                bundle.putString(FirebaseAnalytics.Param.SEARCH_TERM, newText);
-//                mFirebaseAnalytics.logEvent(FirebaseAnalytics.Event.SEARCH, bundle);
+//                    userListVM.search(newText);
 //                return true;
 //            }
 //        });
@@ -300,57 +300,57 @@ public class UserListActivity extends BaseActivity implements LoadDataView<UserL
      * @param position Position of the item to toggle the selection state
      */
     private boolean toggleSelection(int position) {
-//        try {
-//            if (mUsersAdapter.isSelectionAllowed()) {
-//                mUsersAdapter.toggleSelection(position);
-//                int count = mUsersAdapter.getSelectedItemCount();
-//                if (count == 0) {
-//                    actionMode.finish();
-//                } else {
-//                    actionMode.setTitle(String.valueOf(count));
-//                    actionMode.invalidate();
-//                }
-//                return true;
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
+        try {
+            if (usersAdapter.isSelectionAllowed()) {
+                usersAdapter.toggleSelection(position);
+                int count = usersAdapter.getSelectedItemCount();
+                if (count == 0) {
+                    actionMode.finish();
+                } else {
+                    actionMode.setTitle(String.valueOf(count));
+                    actionMode.invalidate();
+                }
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return false;
     }
 
-//    @Override
-//    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-//        mode.getMenuInflater().inflate(R.menu.selected_list_menu, menu);
-//        return true;
-//    }
+    @Override
+    public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+        mode.getMenuInflater().inflate(R.menu.selected_list_menu, menu);
+        return true;
+    }
 
-//    @Override
-//    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
-//        menu.findItem(R.id.delete_item).setVisible(true).setEnabled(true);
-//        mToolbar.setVisibility(View.GONE);
-//        return true;
-//    }
+    @Override
+    public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+        menu.findItem(R.id.delete_item).setVisible(true).setEnabled(true);
+        toolbar.setVisibility(View.GONE);
+        return true;
+    }
 
-//    @Override
-//    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-//        switch (item.getItemId()) {
-//            case R.id.delete_item:
-//                mUserListPresenter.deleteCollection(mUsersAdapter.getSelectedItemsIds());
-//                mode.finish();
-//                return true;
-//            default:
-//                return false;
-//        }
-//    }
+    @Override
+    public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.delete_item:
+                userListVM.deleteCollection(usersAdapter.getSelectedItemsIds());
+                mode.finish();
+                return true;
+            default:
+                return false;
+        }
+    }
 
-//    @Override
-//    public void onDestroyActionMode(ActionMode mode) {
-//        try {
-//            mUsersAdapter.clearSelection();
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        }
-//        actionMode = null;
-//        mToolbar.setVisibility(View.VISIBLE);
-//    }
+    @Override
+    public void onDestroyActionMode(ActionMode mode) {
+        try {
+            usersAdapter.clearSelection();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        actionMode = null;
+        toolbar.setVisibility(View.VISIBLE);
+    }
 }

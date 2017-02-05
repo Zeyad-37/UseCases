@@ -1,5 +1,9 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
+import com.zeyad.usecases.app.components.adapter.ItemInfo;
+
+import java.util.List;
+
 import rx.Observable;
 
 /**
@@ -12,4 +16,8 @@ interface UserListView {
     void incrementPage(long lastId);
 
     void setCurrentPage(int currentPage);
+
+    void deleteCollection(List<Long> selectedItemsIds);
+
+    Observable<List<ItemInfo<UserRealm>>> search(String s);
 }

@@ -2,9 +2,14 @@ package com.zeyad.usecases.app.presentation.screens.user_detail;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -12,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
-import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.zeyad.usecases.app.R;
@@ -51,8 +55,6 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     UserDetailVM userDetailVM;
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
-    @BindView(R.id.textView_type)
-    TextView textViewType;
     @BindView(R.id.recyclerView_repositories)
     RecyclerView recyclerViewRepositories;
     private GenericRecyclerViewAdapter repositoriesAdapter;
@@ -116,34 +118,8 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     public void loadData() {
         UserRealm userRealm = userDetailState.getUser();
         userDetailVM.getRepositories(userRealm.getLogin())
-                .flatMap(userDetailModel -> Observable.just(userDetailVM.reduce(this.userDetailState, userDetailModel)))
-                .doOnSubscribe(() -> {
-//                    textViewType.setText(String.format("User: %s", userRealm.getType()));
-                    if (userDetailState.isTwoPane()) {
-                        UserListActivity activity = (UserListActivity) getActivity();
-                        if (activity != null) {
-                            Toolbar appBarLayout = (Toolbar) activity.findViewById(R.id.toolbar);
-                            if (appBarLayout != null)
-                                appBarLayout.setTitle(userRealm.getLogin());
-                            Glide.with(getViewContext())
-                                    .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
-                                            "https://help.github.com/assets/images/help/profile/identicon.png")
-                                    .into(activity.imageViewAvatar);
-                        }
-                    } else {
-                        UserDetailActivity activity = (UserDetailActivity) getActivity();
-                        if (activity != null) {
-                            CollapsingToolbarLayout appBarLayout = (CollapsingToolbarLayout) activity
-                                    .findViewById(R.id.toolbar_layout);
-                            if (appBarLayout != null)
-                                appBarLayout.setTitle(userRealm.getLogin());
-                            Glide.with(getViewContext())
-                                    .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
-                                            "https://help.github.com/assets/images/help/profile/identicon.png")
-                                    .into(activity.imageViewAvatar);
-                        }
-                    }
-                })
+                .flatMap(userDetailModel -> Observable.just(userDetailVM.reduce(this.userDetailState,
+                        userDetailModel)))
                 .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }
 
@@ -159,6 +135,9 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
             if (userDetailState.isTwoPane()) {
                 UserListActivity activity = (UserListActivity) getActivity();
                 if (activity != null) {
+                    Toolbar appBarLayout = (Toolbar) activity.findViewById(R.id.toolbar);
+                    if (appBarLayout != null)
+                        appBarLayout.setTitle(userRealm.getLogin());
                     if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
                         Glide.with(getViewContext())
                                 .load(userRealm.getAvatarUrl())
@@ -172,6 +151,9 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
             } else {
                 UserDetailActivity activity = (UserDetailActivity) getActivity();
                 if (activity != null) {
+                    CollapsingToolbarLayout appBarLayout = activity.collapsingToolbarLayout;
+                    if (appBarLayout != null)
+                        appBarLayout.setTitle(userRealm.getLogin());
                     if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
                         Glide.with(getViewContext())
                                 .load(userRealm.getAvatarUrl())
@@ -183,6 +165,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
                                 .into(activity.imageViewAvatar);
                 }
             }
+//        applyPalette();
     }
 
     @Override
@@ -220,20 +203,23 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     }
 
     private void applyPalette() {
-//        if (Utils.hasM())
-//            Palette.from(((UserDetailsActivity) getActivity()).mDetailImage.getBitmap()).
-//                    generate(palette -> ((UserDetailsActivity) getActivity()).mCoordinatorLayout
-//                            .setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-//                                if (v.getHeight() == scrollX) {
-//                                    ((UserDetailsActivity) getActivity()).mToolbar
-//                                            .setTitleTextColor(palette.getLightVibrantColor(Color.TRANSPARENT));
-//                                    ((UserDetailsActivity) getActivity()).mToolbar.
-//                                            setBackground(new ColorDrawable(palette
-//                                                    .getLightVibrantColor(Color.TRANSPARENT)));
-//                                } else if (scrollY == 0) {
-//                                    ((UserDetailsActivity) getActivity()).mToolbar.setTitleTextColor(0);
-//                                    ((UserDetailsActivity) getActivity()).mToolbar.setBackground(null);
-//                                }
-//                            }));
+        if (Utils.hasM()) {
+            UserDetailActivity activity = (UserDetailActivity) getActivity();
+            BitmapDrawable drawable = (BitmapDrawable) activity.imageViewAvatar.getDrawable();
+            Bitmap bitmap = drawable.getBitmap();
+            Palette.from(bitmap).generate(palette -> activity.findViewById(R.id.coordinator_detail)
+                    .setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                        if (v.getHeight() == scrollX) {
+                            activity.toolbar
+                                    .setTitleTextColor(palette.getLightVibrantColor(Color.TRANSPARENT));
+                            activity.toolbar.
+                                    setBackground(new ColorDrawable(palette
+                                            .getLightVibrantColor(Color.TRANSPARENT)));
+                        } else if (scrollY == 0) {
+                            activity.toolbar.setTitleTextColor(0);
+                            activity.toolbar.setBackground(null);
+                        }
+                    }));
+        }
     }
 }

@@ -482,7 +482,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         notifyItemRangeRemoved(positionStart, itemCount);
     }
 
-    public void animateTo(List<ItemInfo> models) {
+    public <M> void animateTo(List<ItemInfo<M>> models) {
         applyAndAnimateRemovals(models);
         applyAndAnimateAdditions(models);
         applyAndAnimateMovedItems(models);
@@ -518,7 +518,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         notifyItemMoved(fromPosition, toPosition);
     }
 
-    private void applyAndAnimateRemovals(List<ItemInfo> newModels) {
+    private <M> void applyAndAnimateRemovals(List<ItemInfo<M>> newModels) {
         ItemInfo model;
         for (int i = mDataList.size() - 1; i >= 0; i--) {
             model = mDataList.get(i);
@@ -527,7 +527,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         }
     }
 
-    private void applyAndAnimateAdditions(List<ItemInfo> newModels) {
+    private <M> void applyAndAnimateAdditions(List<ItemInfo<M>> newModels) {
         ItemInfo model;
         for (int i = 0, count = newModels.size(); i < count; i++) {
             model = newModels.get(i);
@@ -536,7 +536,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         }
     }
 
-    private void applyAndAnimateMovedItems(List<ItemInfo> newModels) {
+    private <M> void applyAndAnimateMovedItems(List<ItemInfo<M>> newModels) {
         ItemInfo model;
         int fromPosition;
         for (int toPosition = newModels.size() - 1; toPosition >= 0; toPosition--) {

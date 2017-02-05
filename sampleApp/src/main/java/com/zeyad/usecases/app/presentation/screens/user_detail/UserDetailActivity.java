@@ -3,6 +3,7 @@ package com.zeyad.usecases.app.presentation.screens.user_detail;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
@@ -30,6 +31,8 @@ public class UserDetailActivity extends BaseActivity {
     Toolbar toolbar;
     @BindView(R.id.imageView_avatar)
     ImageView imageViewAvatar;
+    @BindView(R.id.toolbar_layout)
+    CollapsingToolbarLayout collapsingToolbarLayout;
 
     public static Intent getCallingIntent(Context context, UserDetailState userDetailModel) {
         return new Intent(context, UserDetailActivity.class)
@@ -56,8 +59,10 @@ public class UserDetailActivity extends BaseActivity {
         ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null)
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setTitle("");
+        }
         if (isNewActivity)
             addFragment(R.id.user_detail_container, UserDetailFragment.newInstance(Parcels.unwrap(getIntent()
                     .getParcelableExtra(ARG_USER_DETAIL_MODEL))), null, "");

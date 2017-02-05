@@ -5,7 +5,7 @@
     <string name="title_user_detail">User Detail</string>
     <string name="empty_show_repos_message">No Users found :(\nPlease tap on + button to start adding Users.</string>
 
-    <string name="transition_text">Photo Text</string>
+    <string name="transition_text">Text Transition</string>
     <string name="transition_photo">Photo Transition</string>
     <string name="delete">Delete</string>
     <string name="search_list">search list</string>

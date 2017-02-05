@@ -1,8 +1,12 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
+import com.zeyad.usecases.app.R;
+import com.zeyad.usecases.app.components.adapter.ItemInfo;
+import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
+import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
@@ -42,6 +46,25 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListState> implemen
     }
 
     @Override
+    public void deleteCollection(List<Long> selectedItemsIds) {
+        dataUseCase.deleteCollection(new PostRequest
+                .PostRequestBuilder(UserRealm.class, true)
+                .payLoad(selectedItemsIds)
+                .build())
+                .compose(applyStates())
+                .subscribe(new BaseSubscriber<UserListActivity, UserListState>(getView(), BaseSubscriber.ERROR));
+    }
+
+    @Override
+    public Observable<List<ItemInfo<UserRealm>>> search(String query) {
+        return dataUseCase.searchDisk(realm -> realm.where(UserRealm.class)
+                .beginsWith(UserRealm.LOGIN, query), UserRealm.class)
+                .flatMap(list -> Observable.from(list))
+                .map(o -> new ItemInfo<>((UserRealm) o, R.layout.user_item_layout))
+                .toList();
+    }
+
+    @Override
     public Observable.Transformer<List, UserListState> applyStates() {
         return listObservable -> listObservable
                 .flatMap(list -> Observable.just(reduce(getViewState(), onNext((List<UserRealm>) list))))
@@ -58,30 +81,21 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListState> implemen
                 (previous.getState().equals(NEXT) && changes.getState().equals(NEXT))) {
             builder.setIsLoading(false)
                     .setError(null)
-                    .setyScroll(!Utils.isNotEmpty(previous.getUsers()) ? 0 : changes.getyScroll() == 0 ?
-                            previous.getyScroll() : changes.getyScroll())
-                    .setUsers(Utils.isNotEmpty(changes.getUsers()) ? Utils.union(previous.getUsers(),
-                            changes.getUsers()) : previous.getUsers())
                     .setState(NEXT);
         } else if (previous.getState().equals(LOADING) && changes.getState().equals(ERROR)) {
             builder.setIsLoading(false)
                     .setError(changes.getError())
-                    .setyScroll(!Utils.isNotEmpty(previous.getUsers()) ? 0 : changes.getyScroll() == 0 ?
-                            previous.getyScroll() : changes.getyScroll())
-                    .setUsers(Utils.isNotEmpty(changes.getUsers()) ? Utils.union(previous.getUsers(),
-                            changes.getUsers()) : previous.getUsers())
                     .setState(ERROR);
         } else if ((previous.getState().equals(ERROR) && changes.getState().equals(LOADING)) ||
                 (previous.getState().equals(NEXT) && changes.getState().equals(LOADING))) {
             builder.setError(null)
                     .setIsLoading(true)
-                    .setState(LOADING)
-                    .setyScroll(!Utils.isNotEmpty(previous.getUsers()) ? 0 : changes.getyScroll() == 0 ?
-                            previous.getyScroll() : changes.getyScroll())
-                    .setUsers(Utils.isNotEmpty(changes.getUsers()) ? Utils.union(previous.getUsers(),
-                            changes.getUsers()) : previous.getUsers());
-        } else
-            throw new IllegalStateException("Don't know how to reduce the partial state " + changes.toString());
+                    .setState(LOADING);
+        } else return changes;
+        builder.setyScroll(!Utils.isNotEmpty(previous.getUsers()) ? 0 : changes.getyScroll() == 0 ?
+                previous.getyScroll() : changes.getyScroll())
+                .setUsers(Utils.isNotEmpty(changes.getUsers()) ? Utils.union(previous.getUsers(),
+                        changes.getUsers()) : previous.getUsers());
         return builder.build();
     }
 

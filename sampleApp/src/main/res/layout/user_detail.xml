@@ -4,22 +4,15 @@
     style="?android:attr/textAppearanceLarge"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
+    android:padding="@dimen/sixteen_dp"
     android:textIsSelectable="true"
     tools:context=".presentation.screens.user_detail.UserDetailFragment">
 
     <include layout="@layout/view_progress" />
 
-    <TextView
-        android:id="@+id/textView_type"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        tools:text="137 followers" />
-
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView_repositories"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@+id/textView_type"
         android:layout_marginTop="@dimen/eight_dp" />
 </RelativeLayout>

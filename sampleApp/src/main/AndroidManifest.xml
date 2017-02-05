@@ -14,7 +14,6 @@
 
         <activity
             android:name=".presentation.screens.splash.SplashActivity"
-            android:label="@string/title_user_list"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -28,7 +27,6 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".presentation.screens.user_detail.UserDetailActivity"
-            android:label="@string/title_user_detail"
             android:parentActivityName=".presentation.screens.user_list.UserListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
