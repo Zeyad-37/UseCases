@@ -17,7 +17,7 @@ apply from: '../config/quality/quality.gradle'
 
 android {
     compileSdkVersion 25
-    buildToolsVersion '25.0.1'
+    buildToolsVersion '25.0.2'
 
     defaultConfig {
         applicationId "com.zeyad.usecase.accesslayer"
@@ -122,8 +122,8 @@ dependencies {
     compile("io.flowup:android-sdk:0.2.4") {
         exclude group: 'com.google.android.gms'
     }
-    // Testing
     testCompile 'io.flowup:android-sdk-no-op:0.2.4'
+    // Testing
     androidTestCompile "com.android.support.test:runner:$androidSupportTest"
     androidTestCompile "com.android.support.test:rules:$androidSupportTest"
     androidTestCompile "com.android.support:support-annotations:$supportLibraryVersion"

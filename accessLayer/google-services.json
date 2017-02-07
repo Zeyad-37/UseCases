@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "496897207472",
+    "firebase_url": "https://fir-usecases.firebaseio.com",
+    "project_id": "firebase-usecases",
+    "storage_bucket": "firebase-usecases.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:496897207472:android:429b2664cf51acea",
+        "android_client_info": {
+          "package_name": "com.zeyad.usecases"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "496897207472-2kt4j29csonj3stdsi9qs6t5f9hjuu9p.apps.googleusercontent.com",
+          "client_type": 3
+        },
+        {
+          "client_id": "496897207472-t6659io68sgp9sos4i9if7i0hk9or8la.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC-ALlx0PianMa6uNt6LffGuZJ8ycpmmMI"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
