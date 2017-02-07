@@ -80,7 +80,7 @@ public interface DataStore {
      * Search disk with a RealmQuery which returns an {@link Observable} that will emit a list of ?.
      */
     @NonNull
-    Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass);
+    Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass);
 
     @NonNull
     Observable<?> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,

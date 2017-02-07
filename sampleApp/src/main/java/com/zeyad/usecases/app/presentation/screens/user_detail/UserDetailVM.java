@@ -29,7 +29,7 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.USER;
 /**
  * @author zeyad on 1/10/17.
  */
-class UserDetailVM extends BaseViewModel<UserDetailFragment, UserDetailState> implements UserDetailView {
+class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailView {
     private final IDataUseCase dataUseCase;
 
     UserDetailVM() {
@@ -42,7 +42,7 @@ class UserDetailVM extends BaseViewModel<UserDetailFragment, UserDetailState> im
         userDetailModelObservable = Utils.isNotEmpty(userLogin) ? Observable.zip(dataUseCase.getObject(new GetRequest
                         .GetRequestBuilder(UserRealm.class, true)
                         .url(String.format(USER, userLogin)).build()),
-                dataUseCase.searchDisk(realm -> realm.where(RepoRealm.class)
+                dataUseCase.queryDisk(realm -> realm.where(RepoRealm.class)
                         .equalTo("owner.login", userLogin), RepoRealm.class)
                         .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
                                 dataUseCase.getList(new GetRequest

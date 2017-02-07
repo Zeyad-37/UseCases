@@ -12,6 +12,7 @@ import com.google.gson.Gson;
 import com.zeyad.usecases.data.TestUtility;
 import com.zeyad.usecases.data.ToStringArgumentMatcher;
 import com.zeyad.usecases.data.db.DataBaseManager;
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.db.RealmManagerImplUtils;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.mockable.ResponseBodyObservable;
@@ -37,7 +38,6 @@ import java.util.Map;
 
 import io.realm.RealmModel;
 import io.realm.RealmObject;
-import io.realm.RealmQuery;
 import okhttp3.MultipartBody;
 import rx.Observable;
 import rx.Subscriber;
@@ -187,7 +187,7 @@ class CloudDataStoreTestRobot {
         Mockito.when(dbManagerWithMockedContext.evictById(Mockito.any(), Mockito.anyString(), Mockito.anyLong()))
                 .thenReturn(true);
         Mockito.doReturn(TRUE_OBSERVABLE).when(dbManagerWithMockedContext).evictCollection(Mockito.anyString(), Mockito.anyListOf(Long.class), Mockito.any());
-        Mockito.when(dbManagerWithMockedContext.getWhere(Mockito.any(RealmQuery.class)))
+        Mockito.when(dbManagerWithMockedContext.getQuery(Mockito.any(RealmManager.RealmQueryProvider.class)))
                 .thenReturn(LIST_OBSERVABLE);
         return dbManagerWithMockedContext;
     }

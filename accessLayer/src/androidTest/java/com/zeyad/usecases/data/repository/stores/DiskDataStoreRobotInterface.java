@@ -2,6 +2,7 @@ package com.zeyad.usecases.data.repository.stores;
 
 import android.support.annotation.NonNull;
 
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.realm_test_models.TestModel;
 
 import org.json.JSONException;
@@ -9,7 +10,6 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-import io.realm.RealmQuery;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
@@ -50,13 +50,13 @@ public interface DiskDataStoreRobotInterface {
     String getTestInfo(int testModelId);
 
     @NonNull
-    RealmQuery getRealmQueryForValue(String query);
+    RealmManager.RealmQueryProvider getRealmQueryForValue(String query);
 
     @NonNull
-    RealmQuery getRealmQueryForId(int query);
+    RealmManager.RealmQueryProvider getRealmQueryForId(int query);
 
     @NonNull
-    RealmQuery getRealmQueryForAnyId();
+    RealmManager.RealmQueryProvider getRealmQueryForAnyId();
 
     @NonNull
     List<Long> getListOfAllIds();

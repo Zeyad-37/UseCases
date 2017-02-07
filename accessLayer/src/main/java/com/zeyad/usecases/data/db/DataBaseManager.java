@@ -120,5 +120,5 @@ public interface DataBaseManager {
      * @param queryFactory The query used to look for inside the DB.
      */
     @NonNull
-    <T extends RealmModel> Observable<List<T>> getWhere(RealmManager.RealmQueryProvider<T> queryFactory);
+    <T extends RealmModel> Observable<List<T>> getQuery(RealmManager.RealmQueryProvider<T> queryFactory);
 }

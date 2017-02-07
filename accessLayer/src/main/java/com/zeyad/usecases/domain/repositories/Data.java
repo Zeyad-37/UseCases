@@ -56,5 +56,5 @@ public interface Data {
     Observable<Boolean> deleteAllDynamically(String url, Class dataClass, boolean persist);
 
     @NonNull
-    Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass);
+    Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass);
 }

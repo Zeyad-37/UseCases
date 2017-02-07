@@ -24,7 +24,6 @@ public abstract class BaseActivity extends RxAppCompatActivity {
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
-    public IBaseViewModel viewModel;
     public boolean isNewActivity;
 
     @Override
@@ -107,27 +106,14 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        if (viewModel != null)
-            viewModel.onViewAttached(this, isNewActivity);
         isNewActivity = false; // TODO: 1/28/17 double check!
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (viewModel != null)
-            viewModel.onViewAttached(this, isNewActivity);
         isNewActivity = false; // TODO: 1/28/17 double check!
         loadData();
-    }
-
-    @Override
-    public void onStop() {
-        if (viewModel != null) {
-            viewModel.onViewDetached();
-            viewModel = null;
-        }
-        super.onStop();
     }
 
     public void showToastMessage(String message) {

@@ -175,10 +175,10 @@ public class DataJUnitTest {
     @Test
     public void testSearchDisk_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenRealmQueryIsPassed() {
         assumeThat(mIsDiskType, Matchers.is(true));
-        mDataRepository.searchDisk(DataRepositoryJUnitRobot.getValidRealmQuery()
+        mDataRepository.queryDisk(DataRepositoryJUnitRobot.getValidRealmQuery()
                 , DataRepositoryJUnitRobot.getValidPresentationClass());
         Mockito.verify(mDataStore, Mockito.times(1))
-                .searchDisk(DataRepositoryJUnitRobot.getValidRealmQuery()
+                .queryDisk(DataRepositoryJUnitRobot.getValidRealmQuery()
                         , DataRepositoryJUnitRobot.getValidPresentationClass());
     }
 

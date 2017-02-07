@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.zeyad.usecases.Config;
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.repository.DataRepository;
 import com.zeyad.usecases.data.requests.FileIORequest;
@@ -31,7 +32,6 @@ import org.powermock.modules.junit4.PowerMockRunner;
 import java.io.File;
 import java.util.HashMap;
 
-import io.realm.RealmQuery;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
@@ -53,7 +53,7 @@ public class DataUseCaseTest {
     //    private  final RealmQuery<TestModel> REALM_QUERY = Realm.getDefaultInstance().where(TestModel.class);
     @Nullable
     private
-    RealmQuery<TestModel> REALM_QUERY = null;
+    RealmManager.RealmQueryProvider REALM_QUERY = null;
     @Nullable
     private
     Data mDataData = getMockedDataRepo();
@@ -125,7 +125,7 @@ public class DataUseCaseTest {
                         Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
-                .searchDisk(Mockito.any(RealmQuery.class), Mockito.any());
+                .queryDisk(Mockito.any(RealmManager.RealmQueryProvider.class), Mockito.any());
         Mockito.doReturn(getObjectObservable())
                 .when(dataRepository)
                 .postListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class),
@@ -233,7 +233,7 @@ public class DataUseCaseTest {
     }
 
     @Nullable
-    public RealmQuery getRealmQuery() {
+    public RealmManager.RealmQueryProvider getRealmQuery() {
         return REALM_QUERY;
     }
 
@@ -334,8 +334,8 @@ public class DataUseCaseTest {
 
     @Test
     public void testExecuteSearch_ifDataRepoCorrectMethodIsCalled_whenRealmQueryIsPassed() {
-        mDataUseCase.searchDisk(getRealmQuery(), getPresentationClass()).subscribe(new TestSubscriber<>());
-        Mockito.verify(mDataData).searchDisk(eq(getRealmQuery()), eq(getPresentationClass()));
+        mDataUseCase.queryDisk(getRealmQuery(), getPresentationClass()).subscribe(new TestSubscriber<>());
+        Mockito.verify(mDataData).queryDisk(eq(getRealmQuery()), eq(getPresentationClass()));
     }
 
     @Test

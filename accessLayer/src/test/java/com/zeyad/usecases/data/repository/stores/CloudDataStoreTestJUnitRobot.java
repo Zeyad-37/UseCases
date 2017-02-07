@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.google.gson.Gson;
 import com.zeyad.usecases.data.db.DataBaseManager;
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.db.RealmManagerImplJUnitUtils;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
@@ -37,7 +38,6 @@ import java.util.Map;
 
 import io.realm.RealmModel;
 import io.realm.RealmObject;
-import io.realm.RealmQuery;
 import okhttp3.MultipartBody;
 import rx.Observable;
 import rx.Subscriber;
@@ -188,7 +188,7 @@ class CloudDataStoreTestJUnitRobot {
         Mockito.when(dbManagerWithMockedContext.evictById(Mockito.any(), Mockito.anyString(), Mockito.anyLong()))
                 .thenReturn(true);
         Mockito.doReturn(TRUE_OBSERVABLE).when(dbManagerWithMockedContext).evictCollection(Mockito.anyString(), Mockito.anyListOf(Long.class), Mockito.any());
-        Mockito.when(dbManagerWithMockedContext.getWhere(Mockito.any(RealmQuery.class)))
+        Mockito.when(dbManagerWithMockedContext.getQuery(Mockito.any(RealmManager.RealmQueryProvider.class)))
                 .thenReturn(LIST_OBSERVABLE);
         return dbManagerWithMockedContext;
     }

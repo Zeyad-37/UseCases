@@ -27,12 +27,12 @@ public class BaseSubscriber<V extends LoadDataView, M extends BaseState> extends
 
     @Override
     public void onCompleted() {
-        view.hideLoading();
+        view.toggleLoading(false);
     }
 
     @Override
     public void onError(Throwable throwable) {
-        view.hideLoading();
+        view.toggleLoading(false);
         throwable.printStackTrace();
         switch (errorPolicy) {
             case ERROR:
@@ -48,9 +48,7 @@ public class BaseSubscriber<V extends LoadDataView, M extends BaseState> extends
 
     @Override
     public void onNext(M m) {
-        if (m.isLoading())
-            view.showLoading();
-        else view.hideLoading();
+        view.toggleLoading(m.isLoading());
         if (m.getError() != null)
             onError(m.getError());
         view.renderState(m);

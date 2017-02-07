@@ -19,7 +19,6 @@ public abstract class BaseFragment extends RxFragment {
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
-    public IBaseViewModel viewModel;
     public boolean isNewActivity;
 
     public BaseFragment() {
@@ -132,8 +131,6 @@ public abstract class BaseFragment extends RxFragment {
     @Override
     public void onStart() {
         super.onStart();
-        if (viewModel != null)
-            viewModel.onViewAttached(this, isNewActivity);
         isNewActivity = false;
     }
 
@@ -141,12 +138,5 @@ public abstract class BaseFragment extends RxFragment {
     public void onResume() {
         super.onResume();
         loadData();
-    }
-
-    @Override
-    public void onDestroyView() {
-        if (viewModel != null)
-            viewModel.onViewDetached();
-        super.onDestroyView();
     }
 }

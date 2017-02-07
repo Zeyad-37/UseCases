@@ -315,7 +315,7 @@ public class CloudDataStore implements DataStore {
     }
 
     @Override
-    public Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass) {
+    public Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass) {
         return Observable.error(new IllegalAccessException(mContext.getString(R.string.search_disk_error_cloud)));
     }
 

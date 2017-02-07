@@ -9,7 +9,7 @@ import rx.Observable;
 /**
  * @author zeyad on 11/1/16.
  */
-interface UserListView {
+interface UserListViewModel {
 
     Observable<UserListState> getUsers();
 
@@ -17,7 +17,7 @@ interface UserListView {
 
     void setCurrentPage(int currentPage);
 
-    void deleteCollection(List<Long> selectedItemsIds);
+    Observable deleteCollection(List<Long> selectedItemsIds);
 
     Observable<List<ItemInfo<UserRealm>>> search(String s);
 }

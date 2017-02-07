@@ -1,7 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
 import android.app.Activity;
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -89,8 +88,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
 
     @Override
     public void initialize() {
-        viewModel = new UserDetailVM();
-        userDetailVM = ((UserDetailVM) viewModel);
+        userDetailVM = new UserDetailVM();
         if (getArguments() != null)
             userDetailState = Parcels.unwrap(getArguments().getParcelable(ARG_USER_DETAIL_MODEL));
     }
@@ -104,8 +102,8 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     }
 
     void setupRecyclerView() {
-        recyclerViewRepositories.setLayoutManager(new LinearLayoutManager(getViewContext()));
-        repositoriesAdapter = new GenericRecyclerViewAdapter(getViewContext(), new ArrayList<>()) {
+        recyclerViewRepositories.setLayoutManager(new LinearLayoutManager(getContext()));
+        repositoriesAdapter = new GenericRecyclerViewAdapter(getContext(), new ArrayList<>()) {
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 return new RepositoryViewHolder(mLayoutInflater.inflate(viewType, parent, false));
@@ -139,11 +137,11 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
                     if (appBarLayout != null)
                         appBarLayout.setTitle(userRealm.getLogin());
                     if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
-                        Glide.with(getViewContext())
+                        Glide.with(getContext())
                                 .load(userRealm.getAvatarUrl())
                                 .into(activity.imageViewAvatar);
                     else
-                        Glide.with(getViewContext())
+                        Glide.with(getContext())
                                 .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
                                         "https://help.github.com/assets/images/help/profile/identicon.png")
                                 .into(activity.imageViewAvatar);
@@ -155,11 +153,11 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
                     if (appBarLayout != null)
                         appBarLayout.setTitle(userRealm.getLogin());
                     if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
-                        Glide.with(getViewContext())
+                        Glide.with(getContext())
                                 .load(userRealm.getAvatarUrl())
                                 .into(activity.imageViewAvatar);
                     else
-                        Glide.with(getViewContext())
+                        Glide.with(getContext())
                                 .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
                                         "https://help.github.com/assets/images/help/profile/identicon.png")
                                 .into(activity.imageViewAvatar);
@@ -169,17 +167,13 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     }
 
     @Override
-    public void showLoading() {
+    public void toggleLoading(boolean toggle) {
         Activity activity = getActivity();
         if (activity != null)
-            activity.runOnUiThread(() -> loaderLayout.setVisibility(View.VISIBLE));
-    }
-
-    @Override
-    public void hideLoading() {
-        Activity activity = getActivity();
-        if (activity != null)
-            activity.runOnUiThread(() -> loaderLayout.setVisibility(View.GONE));
+            activity.runOnUiThread(() -> {
+                loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
+                loaderLayout.bringToFront();
+            });
     }
 
     @Override
@@ -190,16 +184,6 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     @Override
     public void showError(String message) {
         showErrorSnackBar(message, loaderLayout, Snackbar.LENGTH_LONG);
-    }
-
-    @Override
-    public Context getViewContext() {
-        return getContext();
-    }
-
-    @Override
-    public UserDetailState getState() {
-        return userDetailState;
     }
 
     private void applyPalette() {

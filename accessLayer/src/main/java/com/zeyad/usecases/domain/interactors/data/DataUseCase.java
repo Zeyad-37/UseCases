@@ -209,8 +209,8 @@ public class DataUseCase implements IDataUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class presentationClass) {
-        return mData.searchDisk(queryFactory, presentationClass)
+    public Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class presentationClass) {
+        return mData.queryDisk(queryFactory, presentationClass)
                 .flatMap(list -> {
                     lastObject.onNext(list);
                     return Observable.just(list);

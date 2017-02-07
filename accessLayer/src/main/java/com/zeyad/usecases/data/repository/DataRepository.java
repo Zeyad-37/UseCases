@@ -109,10 +109,10 @@ public class DataRepository implements Data {
     }
 
     @Override
-    public Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass) {
+    public Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass) {
         try {
             return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(domainClass))
-                    .searchDisk(queryFactory, domainClass);
+                    .queryDisk(queryFactory, domainClass);
         } catch (IllegalAccessException e) {
             return Observable.error(e);
         }

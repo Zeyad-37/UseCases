@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.data.TestUtility;
 import com.zeyad.usecases.data.db.DataBaseManager;
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.realm_test_models.TestModel;
 import com.zeyad.usecases.data.realm_test_models.TestViewModel;
@@ -17,8 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-import io.realm.Realm;
-import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import rx.Observable;
 import rx.observers.TestSubscriber;
@@ -128,22 +127,22 @@ class DiskDataStoreRobot implements DiskDataStoreRobotInterface {
 
     @NonNull
     @Override
-    public RealmQuery getRealmQueryForValue(String query) {
-        return Realm.getDefaultInstance().where(TestModel.class)
+    public RealmManager.RealmQueryProvider getRealmQueryForValue(String query) {
+        return realm -> realm.where(TestModel.class)
                 .contains("value", query);
     }
 
     @NonNull
     @Override
-    public RealmQuery getRealmQueryForId(int query) {
-        return Realm.getDefaultInstance().where(TestModel.class)
+    public RealmManager.RealmQueryProvider getRealmQueryForId(int query) {
+        return realm -> realm.where(TestModel.class)
                 .equalTo("id", query);
     }
 
     @NonNull
     @Override
-    public RealmQuery getRealmQueryForAnyId() {
-        return Realm.getDefaultInstance().where(TestModel.class)
+    public RealmManager.RealmQueryProvider getRealmQueryForAnyId() {
+        return realm -> realm.where(TestModel.class)
                 .equalTo("id", getPrimaryIdForAnyInsertedTestModel());
     }
 

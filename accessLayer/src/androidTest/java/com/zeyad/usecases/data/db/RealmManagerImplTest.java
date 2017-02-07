@@ -36,7 +36,6 @@ import io.realm.Case;
 import io.realm.Realm;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
-import io.realm.RealmQuery;
 import io.realm.RealmResults;
 import rx.Observable;
 import rx.observers.TestSubscriber;
@@ -474,8 +473,8 @@ public class RealmManagerImplTest {
     @Test
     public void testGetWhere_ifReturnedObservableIsNotNull_whenRealmQueryIsMadeForSingleItem() {
         TestModel insertedTestModel = createTestModelWithRandomId();
-        RealmQuery<TestModel> realmQuery = getExactTestModelRealmQuery(insertedTestModel);
-        assertThat(mRealmManager.getWhere(realmQuery), is(notNullValue()));
+        RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
+        assertThat(mRealmManager.getQuery(realmQuery), is(notNullValue()));
     }
 
     /**
@@ -486,9 +485,9 @@ public class RealmManagerImplTest {
     public void testGetWhere_ifObservableShouldReturnNoError_whenRealmQueryIsMadeForSingleItem() {
         TestModel insertedTestModel = createTestModelWithRandomId();
         putTestModel(mRealmManager, insertedTestModel);
-        RealmQuery<TestModel> realmQuery = getExactTestModelRealmQuery(insertedTestModel);
+        RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
-        mRealmManager.getWhere(realmQuery)
+        mRealmManager.getQuery(realmQuery)
                 .subscribe(querySubscriber);
         querySubscriber.assertNoErrors();
     }
@@ -502,8 +501,8 @@ public class RealmManagerImplTest {
         TestModel insertedTestModel = createTestModelWithRandomId();
         putTestModel(mRealmManager, insertedTestModel);
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
-        RealmQuery<TestModel> realmQuery = getExactTestModelRealmQuery(insertedTestModel);
-        mRealmManager.getWhere(realmQuery)
+        RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
+        mRealmManager.getQuery(realmQuery)
                 .subscribe(querySubscriber);
         assertThat(querySubscriber.getOnNextEvents(), iterableWithSize(1));
     }
@@ -517,8 +516,8 @@ public class RealmManagerImplTest {
         final TestModel insertedTestModel = createTestModelWithRandomId();
         putTestModel(mRealmManager, insertedTestModel);
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
-        final RealmQuery<TestModel> realmQuery = getExactTestModelRealmQuery(insertedTestModel);
-        mRealmManager.getWhere(realmQuery)
+        final RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
+        mRealmManager.getQuery(realmQuery)
                 .subscribe(querySubscriber);
         assertThat(querySubscriber.getOnNextEvents().get(0), is(instanceOf(RealmResults.class)));
     }
@@ -531,9 +530,9 @@ public class RealmManagerImplTest {
     public void testGetWhere_ifQueryResultsAreNotEmpty_whenRealmQueryIsMadeForSingleItem() {
         TestModel insertedTestModel = createTestModelWithRandomId();
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
-        final RealmQuery<TestModel> realmQuery = getExactTestModelRealmQuery(insertedTestModel);
+        final RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
         putTestModel(mRealmManager, insertedTestModel);
-        mRealmManager.getWhere(realmQuery)
+        mRealmManager.getQuery(realmQuery)
                 .subscribe(querySubscriber);
         RealmResults<TestModel> queryResults = (RealmResults<TestModel>) querySubscriber.getOnNextEvents().get(0);
         MatcherAssert.assertThat(queryResults, is(iterableWithSize(1)));
@@ -547,9 +546,9 @@ public class RealmManagerImplTest {
     public void testGetWhere_ifQueryResultsInstanceOfTestModel_whenRealmQueryIsMadeForSingleItem() {
         final TestModel insertedTestModel = createTestModelWithRandomId();
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
-        final RealmQuery<TestModel> realmQuery = getExactTestModelRealmQuery(insertedTestModel);
+        final RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
         putTestModel(mRealmManager, insertedTestModel);
-        mRealmManager.getWhere(realmQuery)
+        mRealmManager.getQuery(realmQuery)
                 .subscribe(querySubscriber);
         RealmResults<?> queryResults = (RealmResults<?>) querySubscriber.getOnNextEvents().get(0);
         assertThat(queryResults.get(0), is(instanceOf(TestModel.class)));
@@ -563,9 +562,9 @@ public class RealmManagerImplTest {
     public void testGetWhere_ifQueryResultsHasCorrectModel_whenRealmQueryIsMadeForSingleItem() {
         final TestModel insertedTestModel = createTestModelWithRandomId();
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
-        final RealmQuery<TestModel> realmQuery = getExactTestModelRealmQuery(insertedTestModel);
+        final RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
         putTestModel(mRealmManager, insertedTestModel);
-        mRealmManager.getWhere(realmQuery)
+        mRealmManager.getQuery(realmQuery)
                 .subscribe(querySubscriber);
         RealmResults<TestModel> queryResults = (RealmResults<TestModel>) querySubscriber.getOnNextEvents().get(0);
         assertThat(queryResults.get(0), is(equalTo(insertedTestModel)));
@@ -932,9 +931,8 @@ public class RealmManagerImplTest {
     }
 
     @NonNull
-    private RealmQuery<TestModel> getExactTestModelRealmQuery(@NonNull TestModel insertedTestModel) {
-        return Realm.getDefaultInstance()
-                .where(TestModel.class)
+    private RealmManager.RealmQueryProvider getExactTestModelRealmQuery(@NonNull TestModel insertedTestModel) {
+        return realm -> realm.where(TestModel.class)
                 .beginsWith("value", TEST_MODEL_PREFIX, Case.INSENSITIVE)
                 .equalTo("id", insertedTestModel.getId())
                 .equalTo("value", insertedTestModel.getValue(), Case.INSENSITIVE);

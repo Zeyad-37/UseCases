@@ -101,7 +101,7 @@ public class RealmManager implements DataBaseManager {
         });
     }
 
-    public <T extends RealmModel> Observable<List<T>> getWhere(RealmQueryProvider<T> queryFactory) {
+    public <T extends RealmModel> Observable<List<T>> getQuery(RealmQueryProvider<T> queryFactory) {
         return Observable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
             return queryFactory.create(realm).findAll().asObservable()

@@ -7,6 +7,7 @@ import android.support.test.rule.BuildConfig;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.DatabaseManagerFactory;
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.utils.TestModelViewModelMapper;
 import com.zeyad.usecases.utils.TestUtility2;
 import com.zeyad.usecases.utils.TestViewModel;
@@ -26,7 +27,6 @@ import org.robolectric.RobolectricGradleTestRunner;
 import java.util.List;
 
 import io.realm.Realm;
-import io.realm.RealmQuery;
 import rx.observers.TestSubscriber;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -200,10 +200,9 @@ public class DiskDataStoreJUnitTest {
     public void testSearchDiskRealmQuery_ifNoErrorIsThrown_whenDiskIsSearchedUsingValue() {
         mDiskDataStoreRobot.insertTestModels(10);
         final TestSubscriber subscriber = new TestSubscriber<>();
-        RealmQuery realmQuery
-                = mDiskDataStoreRobot
+        RealmManager.RealmQueryProvider realmQuery = mDiskDataStoreRobot
                 .getRealmQueryForValue(mDiskDataStoreRobot.getPrefixForTestModel());
-        mDiskDataStore.searchDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
+        mDiskDataStore.queryDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
                 .subscribe(subscriber);
         TestUtility2.assertNoErrors(subscriber);
     }
@@ -212,10 +211,9 @@ public class DiskDataStoreJUnitTest {
     public void testSearchDiskRealmQuery_ifCorrectNumberOfItemsAreReturned_whenDiskIsSearchedUsingValue() {
         mDiskDataStoreRobot.insertTestModels(10);
         final TestSubscriber subscriber = new TestSubscriber<>();
-        RealmQuery realmQuery
-                = mDiskDataStoreRobot
+        RealmManager.RealmQueryProvider realmQuery = mDiskDataStoreRobot
                 .getRealmQueryForValue(mDiskDataStoreRobot.getPrefixForTestModel());
-        mDiskDataStore.searchDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
+        mDiskDataStore.queryDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
                 .subscribe(subscriber);
         assertThat(((List<Object>) subscriber.getOnNextEvents().get(0)), is(iterableWithSize(10)));
     }
@@ -224,10 +222,10 @@ public class DiskDataStoreJUnitTest {
     public void testSearchDiskRealmQuery_ifCorrectItemsTypeIsReturned_whenDiskIsSearchedUsingValue() {
         mDiskDataStoreRobot.insertTestModels(10);
         final TestSubscriber subscriber = new TestSubscriber<>();
-        RealmQuery realmQuery
+        RealmManager.RealmQueryProvider realmQuery
                 = mDiskDataStoreRobot
                 .getRealmQueryForValue(mDiskDataStoreRobot.getPrefixForTestModel());
-        mDiskDataStore.searchDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
+        mDiskDataStore.queryDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
                 .subscribe(subscriber);
         assertThat(((List<Object>) subscriber.getOnNextEvents().get(0)).get(0), is(instanceOf(mDiskDataStoreRobot.getDomainClass())));
     }
@@ -236,10 +234,8 @@ public class DiskDataStoreJUnitTest {
     public void testSearchDiskRealmQuery_ifNoErrorIsThrown_whenDiskIsSearchedUsingId() {
         mDiskDataStoreRobot.insertTestModels(10);
         final TestSubscriber subscriber = new TestSubscriber<>();
-        RealmQuery realmQuery
-                = mDiskDataStoreRobot
-                .getRealmQueryForAnyId();
-        mDiskDataStore.searchDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
+        RealmManager.RealmQueryProvider realmQuery = mDiskDataStoreRobot.getRealmQueryForAnyId();
+        mDiskDataStore.queryDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
                 .subscribe(subscriber);
         TestUtility2.assertNoErrors(subscriber);
     }
@@ -248,10 +244,8 @@ public class DiskDataStoreJUnitTest {
     public void testSearchDiskRealmQuery_ifCorrectNumberOfItemsAreReturned_whenDiskIsSearchedUsingId() {
         mDiskDataStoreRobot.insertTestModels(10);
         final TestSubscriber subscriber = new TestSubscriber<>();
-        RealmQuery realmQuery
-                = mDiskDataStoreRobot
-                .getRealmQueryForAnyId();
-        mDiskDataStore.searchDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
+        RealmManager.RealmQueryProvider realmQuery = mDiskDataStoreRobot.getRealmQueryForAnyId();
+        mDiskDataStore.queryDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
                 .subscribe(subscriber);
         assertThat(((List<Object>) subscriber.getOnNextEvents().get(0)), is(iterableWithSize(1)));
     }
@@ -260,10 +254,9 @@ public class DiskDataStoreJUnitTest {
     public void testSearchDiskRealmQuery_ifCorrectItemsTypeIsReturned_whenDiskIsSearchedUsingId() {
         mDiskDataStoreRobot.insertTestModels(10);
         final TestSubscriber subscriber = new TestSubscriber<>();
-        RealmQuery realmQuery
-                = mDiskDataStoreRobot
+        RealmManager.RealmQueryProvider realmQuery = mDiskDataStoreRobot
                 .getRealmQueryForAnyId();
-        mDiskDataStore.searchDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
+        mDiskDataStore.queryDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
                 .subscribe(subscriber);
         assertThat(((List<Object>) subscriber.getOnNextEvents().get(0)).get(0), is(instanceOf(mDiskDataStoreRobot.getDomainClass())));
     }

@@ -82,7 +82,7 @@ public interface IDataUseCase {
      * @param presentationClass return type of query.
      * @return Observable with the list.
      */
-    Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class presentationClass);
+    Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class presentationClass);
 
     BehaviorSubject getLastObject();
 

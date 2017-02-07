@@ -62,7 +62,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     private static final String USER_LIST_MODEL = "userListState";
     @BindView(R.id.imageView_avatar)
     public ImageView imageViewAvatar;
-    UserListView userListVM;
+    UserListViewModel userListVM;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.linear_layout_loader)
@@ -97,8 +97,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
 
     @Override
     public void initialize() {
-        viewModel = new UserListVM();
-        userListVM = ((UserListVM) viewModel);
+        userListVM = new UserListVM();
     }
 
     @Override
@@ -113,7 +112,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     }
 
     private void setupRecyclerView() {
-        usersAdapter = new GenericRecyclerViewAdapter(getViewContext(), new ArrayList<>()) {
+        usersAdapter = new GenericRecyclerViewAdapter(this, new ArrayList<>()) {
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 switch (viewType) {
@@ -161,11 +160,10 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                     if (Utils.hasLollipop()) {
                         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
                                 pair, secondPair);
-                        navigator.navigateTo(getViewContext(), UserDetailActivity.getCallingIntent(getViewContext(),
+                        navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this,
                                 userDetailModel), options);
                     } else
-                        navigator.navigateTo(getViewContext(), UserDetailActivity.getCallingIntent(getViewContext(),
-                                userDetailModel));
+                        navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this, userDetailModel));
                 }
             }
         });
@@ -176,7 +174,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
             }
             return true;
         });
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getViewContext());
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         userRecycler.setLayoutManager(layoutManager);
         userRecycler.setAdapter(usersAdapter);
         usersAdapter.setAllowSelection(true);
@@ -229,16 +227,11 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     }
 
     @Override
-    public void showLoading() {
+    public void toggleLoading(boolean toggle) {
         runOnUiThread(() -> {
-            loaderLayout.setVisibility(View.VISIBLE);
+            loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
             loaderLayout.bringToFront();
         });
-    }
-
-    @Override
-    public void hideLoading() {
-        runOnUiThread(() -> loaderLayout.setVisibility(View.GONE));
     }
 
     @Override
@@ -250,16 +243,6 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     @Override
     public void showError(String message) {
         showErrorSnackBar(message, userRecycler, Snackbar.LENGTH_LONG);
-    }
-
-    @Override
-    public Context getViewContext() {
-        return this;
-    }
-
-    @Override
-    public UserListState getState() {
-        return userListState;
     }
 
     @Override

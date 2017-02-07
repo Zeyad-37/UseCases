@@ -2,6 +2,7 @@ package com.zeyad.usecases.data.repository;
 
 import android.support.annotation.NonNull;
 
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.repository.stores.CloudDataStore;
 import com.zeyad.usecases.data.repository.stores.DataStore;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
@@ -18,7 +19,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-import io.realm.RealmQuery;
 import rx.Observable;
 
 public class DataRepositoryJUnitRobot {
@@ -125,7 +125,7 @@ public class DataRepositoryJUnitRobot {
     }
 
     @NonNull
-    public static RealmQuery getValidRealmQuery() {
+    public static RealmManager.RealmQueryProvider getValidRealmQuery() {
 //        return REALM_QUERY;
         return null;
     }

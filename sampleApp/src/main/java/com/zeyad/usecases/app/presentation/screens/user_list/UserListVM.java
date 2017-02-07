@@ -2,7 +2,6 @@ package com.zeyad.usecases.app.presentation.screens.user_list;
 
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
-import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
@@ -13,6 +12,8 @@ import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 import java.util.List;
 
 import rx.Observable;
+import rx.Subscriber;
+import rx.functions.Func1;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseState.ERROR;
 import static com.zeyad.usecases.app.components.mvvm.BaseState.LOADING;
@@ -27,7 +28,7 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
 /**
  * @author zeyad on 11/1/16.
  */
-class UserListVM extends BaseViewModel<UserListActivity, UserListState> implements UserListView {
+class UserListVM extends BaseViewModel<UserListState> implements UserListViewModel {
 
     private final IDataUseCase dataUseCase;
     private int currentPage;
@@ -46,20 +47,17 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListState> implemen
     }
 
     @Override
-    public void deleteCollection(List<Long> selectedItemsIds) {
-        dataUseCase.deleteCollection(new PostRequest
-                .PostRequestBuilder(UserRealm.class, true)
+    public Observable deleteCollection(List<Long> selectedItemsIds) {
+        return dataUseCase.deleteCollection(new PostRequest.PostRequestBuilder(UserRealm.class, true)
                 .payLoad(selectedItemsIds)
-                .build())
-                .compose(applyStates())
-                .subscribe(new BaseSubscriber<UserListActivity, UserListState>(getView(), BaseSubscriber.ERROR));
+                .build());
     }
 
     @Override
     public Observable<List<ItemInfo<UserRealm>>> search(String query) {
-        return dataUseCase.searchDisk(realm -> realm.where(UserRealm.class)
+        return dataUseCase.queryDisk(realm -> realm.where(UserRealm.class)
                 .beginsWith(UserRealm.LOGIN, query), UserRealm.class)
-                .flatMap(list -> Observable.from(list))
+                .flatMap((Func1<List, Observable<?>>) Observable::from)
                 .map(o -> new ItemInfo<>((UserRealm) o, R.layout.user_item_layout))
                 .toList();
     }
@@ -69,7 +67,11 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListState> implemen
         return listObservable -> listObservable
                 .flatMap(list -> Observable.just(reduce(getViewState(), onNext((List<UserRealm>) list))))
                 .onErrorReturn(throwable -> reduce(getViewState(), error(throwable)))
-                .startWith(reduce(getViewState(), loading()));
+                .startWith(reduce(getViewState(), loading()))
+                .flatMap(userListState -> {
+                    setViewState(userListState);
+                    return Observable.just(userListState);
+                });
     }
 
     @Override
@@ -105,8 +107,23 @@ class UserListVM extends BaseViewModel<UserListActivity, UserListState> implemen
         currentPage++;
         dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, currentPage, lastId))
-                .build()).subscribe(list -> {
-        }, Throwable::printStackTrace);
+                .build())
+                .subscribe(new Subscriber<List>() {
+                    @Override
+                    public void onCompleted() {
+                        unsubscribe();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        e.printStackTrace();
+                        unsubscribe();
+                    }
+
+                    @Override
+                    public void onNext(List l) {
+                    }
+                });
     }
 
     @Override

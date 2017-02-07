@@ -63,8 +63,8 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<List> searchDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass) {
-        return mDataBaseManager.getWhere(queryFactory)
+    public Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass) {
+        return mDataBaseManager.getQuery(queryFactory)
                 .map(realmModel -> {
                     if (domainClass == realmModel.getClass())
                         return realmModel;
