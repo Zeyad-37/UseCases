@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v7.util.DiffUtil;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -202,8 +203,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
 
     @Override
     public void loadData() {
-        userListVM.getUsers().compose(bindToLifecycle()).subscribe(new BaseSubscriber<>(this,
-                ERROR_WITH_RETRY));
+        userListVM.getUsers().compose(bindToLifecycle()).subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }
 
     @Override
@@ -218,6 +218,11 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                 itemInfos.add(new ItemInfo<>(userRealm, R.layout.user_item_layout)
                         .setId(userRealm.getId()));
             }
+
+            DiffUtil.DiffResult diffResult = DiffUtil
+                    .calculateDiff(new UserListDiffCallback(usersAdapter.getDataList(), itemInfos));
+            diffResult.dispatchUpdatesTo(usersAdapter);
+
             usersAdapter.animateTo(itemInfos);
             userRecycler.smoothScrollToPosition(userListModel.getyScroll());
         }

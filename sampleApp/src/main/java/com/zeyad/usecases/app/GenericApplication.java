@@ -1,6 +1,7 @@
 package com.zeyad.usecases.app;
 
 import android.app.Application;
+import android.os.StrictMode;
 import android.util.Log;
 
 import com.zeyad.usecases.app.presentation.models.AutoMap_DAOMapperFactory;
@@ -37,6 +38,20 @@ public class GenericApplication extends Application {
 
     @Override
     public void onCreate() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectDiskReads()
+                    .detectDiskWrites()
+                    .detectNetwork()   // or .detectAll() for all detectable problems
+                    .detectCustomSlowCalls()
+                    .penaltyLog()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectLeakedClosableObjects()
+                    .penaltyLog()
+                    .penaltyDeath()
+                    .build());
+        }
         super.onCreate();
         sInstance = this;
         initializeRealm();

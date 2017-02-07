@@ -74,15 +74,15 @@ public class UserDetailActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        navigateUpTo(new Intent(this, UserListActivity.class));
+//        navigateUpTo(new Intent(this, UserListActivity.class));
+        supportFinishAfterTransition(); // exit animation
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == android.R.id.home) {
-            supportFinishAfterTransition(); // exit animation
-//            navigateUpTo(new Intent(this, UserListActivity.class));
+            onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
