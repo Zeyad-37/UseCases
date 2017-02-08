@@ -36,7 +36,6 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Observable;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 
@@ -66,10 +65,10 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     public UserDetailFragment() {
     }
 
-    public static UserDetailFragment newInstance(UserDetailState userDetailModel) {
+    public static UserDetailFragment newInstance(UserDetailState userDetailState) {
         UserDetailFragment userDetailFragment = new UserDetailFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(ARG_USER_DETAIL_MODEL, Parcels.wrap(userDetailModel));
+        bundle.putParcelable(ARG_USER_DETAIL_MODEL, Parcels.wrap(userDetailState));
         userDetailFragment.setArguments(bundle);
         return userDetailFragment;
     }
@@ -114,10 +113,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
 
     @Override
     public void loadData() {
-        UserRealm userRealm = userDetailState.getUser();
-        userDetailVM.getRepositories(userRealm.getLogin())
-                .flatMap(userDetailModel -> Observable.just(userDetailVM.reduce(this.userDetailState,
-                        userDetailModel)))
+        userDetailVM.getRepositories(userDetailState.getUser().getLogin(), userDetailState)
                 .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }
 

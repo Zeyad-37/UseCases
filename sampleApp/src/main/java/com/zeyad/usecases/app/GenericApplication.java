@@ -38,6 +38,23 @@ public class GenericApplication extends Application {
 
     @Override
     public void onCreate() {
+//        initializeStrickMode();
+        super.onCreate();
+        sInstance = this;
+        initializeRealm();
+        DataUseCaseFactory.init(new DataUseCaseConfig.Builder(this)
+                .baseUrl(API_BASE_URL)
+                .withCache(CACHE_EXPIRY, TimeUnit.MINUTES)
+                .withRealm()
+                .entityMapper(new AutoMap_DAOMapperFactory())
+                .okHttpBuilder(provideOkHttpClientBuilder())
+//                .okhttpCache(provideCache())
+                .build());
+        initializeStetho();
+        initializeFlowUp();
+    }
+
+    private void initializeStrickMode() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                     .detectDiskReads()
@@ -52,19 +69,6 @@ public class GenericApplication extends Application {
                     .penaltyDeath()
                     .build());
         }
-        super.onCreate();
-        sInstance = this;
-        initializeRealm();
-        DataUseCaseFactory.init(new DataUseCaseConfig.Builder(this)
-                .baseUrl(API_BASE_URL)
-                .withCache(CACHE_EXPIRY, TimeUnit.MINUTES)
-                .withRealm()
-                .entityMapper(new AutoMap_DAOMapperFactory())
-                .okHttpBuilder(provideOkHttpClientBuilder())
-//                .okhttpCache(provideCache())
-                .build());
-        initializeStetho();
-        initializeFlowUp();
     }
 
     private OkHttpClient.Builder provideOkHttpClientBuilder() {

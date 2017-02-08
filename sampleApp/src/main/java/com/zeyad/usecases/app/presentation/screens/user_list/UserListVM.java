@@ -68,10 +68,7 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
                 .flatMap(list -> Observable.just(reduce(getViewState(), onNext((List<UserRealm>) list))))
                 .onErrorReturn(throwable -> reduce(getViewState(), error(throwable)))
                 .startWith(reduce(getViewState(), loading()))
-                .flatMap(userListState -> {
-                    setViewState(userListState);
-                    return Observable.just(userListState);
-                });
+                .doOnEach(notification -> setViewState((UserListState) notification.getValue()));
     }
 
     @Override

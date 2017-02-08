@@ -13,11 +13,11 @@ interface UserListViewModel {
 
     Observable<UserListState> getUsers();
 
-    void incrementPage(long lastId);
-
-    void setCurrentPage(int currentPage);
-
     Observable deleteCollection(List<Long> selectedItemsIds);
 
     Observable<List<ItemInfo<UserRealm>>> search(String s);
+
+    void incrementPage(long lastId);
+
+    void setCurrentPage(int currentPage);
 }

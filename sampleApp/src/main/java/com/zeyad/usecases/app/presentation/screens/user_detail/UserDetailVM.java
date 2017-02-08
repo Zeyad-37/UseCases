@@ -37,7 +37,7 @@ class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailV
     }
 
     @Override
-    public Observable<UserDetailState> getRepositories(String userLogin) {
+    public Observable<UserDetailState> getRepositories(String userLogin, UserDetailState userDetailState) {
         Observable<UserDetailState> userDetailModelObservable;
         userDetailModelObservable = Utils.isNotEmpty(userLogin) ? Observable.zip(dataUseCase.getObject(new GetRequest
                         .GetRequestBuilder(UserRealm.class, true)
@@ -51,7 +51,7 @@ class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailV
                                         .build())
                                         .doOnSubscribe(() -> Log.d("DB empty", "Calling Server")))
                         .unsubscribeOn(AndroidSchedulers.from(DataUseCase.getHandlerThread().getLooper())),
-                (userRealm, repos) -> reduce(getViewState(), new UserDetailState((UserRealm) userRealm,
+                (userRealm, repos) -> reduce(userDetailState, new UserDetailState((UserRealm) userRealm,
                         (List) repos, false, false, null, INITIAL)))
                 .compose(applyStates()) : Observable.just(error(new IllegalArgumentException("User name can not be empty")));
         return userDetailModelObservable;
@@ -60,9 +60,10 @@ class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailV
     @Override
     public Observable.Transformer<UserDetailState, UserDetailState> applyStates() {
         return listObservable -> listObservable
-                .flatMap(userDetailState -> Observable.just(reduce(getViewState(), userDetailState))
-                        .onErrorReturn(throwable -> reduce(getViewState(), error(throwable)))
-                        .startWith(reduce(getViewState(), loading())));
+                .flatMap(userDetailState -> Observable.just(reduce(getViewState(), userDetailState)))
+                .onErrorReturn(throwable -> reduce(getViewState(), error(throwable)))
+                .startWith(reduce(getViewState(), loading()))
+                .doOnEach(notification -> setViewState((UserDetailState) notification.getValue()));
     }
 
     @Override

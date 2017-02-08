@@ -1,6 +1,5 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
-import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -133,7 +132,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                 toggleSelection(position);
             } else if (itemInfo.getData() instanceof UserRealm) {
                 UserRealm userModel = (UserRealm) itemInfo.getData();
-                UserDetailState userDetailModel = UserDetailState.builder()
+                UserDetailState userDetailState = UserDetailState.builder()
                         .setUser(userModel)
                         .setIsTwoPane(twoPane)
                         .setState(INITIAL)
@@ -153,17 +152,17 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                     pairs.add(secondPair);
                     if (Utils.isNotEmpty(currentFragTag))
                         removeFragment(currentFragTag);
-                    UserDetailFragment orderDetailFragment = UserDetailFragment.newInstance(userDetailModel);
+                    UserDetailFragment orderDetailFragment = UserDetailFragment.newInstance(userDetailState);
                     currentFragTag = orderDetailFragment.getClass().getSimpleName() + userModel.getId();
-                    addFragment(R.id.user_detail_container, orderDetailFragment, pairs, currentFragTag);
+                    addFragment(R.id.user_detail_container, orderDetailFragment, null/*pairs*/, currentFragTag);
                 } else {
-                    if (Utils.hasLollipop()) {
-                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
-                                pair, secondPair);
-                        navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this,
-                                userDetailModel), options);
-                    } else
-                        navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this, userDetailModel));
+//                    if (Utils.hasLollipop()) {
+//                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
+//                                pair, secondPair);
+//                        navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this,
+//                                userDetailState), options);
+//                    } else
+                    navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this, userDetailState));
                 }
             }
         });
@@ -213,8 +212,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
             UserRealm userRealm;
             for (int i = 0, repoModelsSize = users.size(); i < repoModelsSize; i++) {
                 userRealm = users.get(i);
-                itemInfos.add(new ItemInfo<>(userRealm, R.layout.user_item_layout)
-                        .setId(userRealm.getId()));
+                itemInfos.add(new ItemInfo<>(userRealm, R.layout.user_item_layout).setId(userRealm.getId()));
             }
 
             DiffUtil.DiffResult diffResult = DiffUtil
