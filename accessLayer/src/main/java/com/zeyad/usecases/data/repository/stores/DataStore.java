@@ -33,6 +33,12 @@ public interface DataStore {
                                    Class domainClass, Class dataClass, boolean persist, boolean shouldCache);
 
     /**
+     * Patch a JSONObject which returns an {@link Observable} that will emit a ?.
+     */
+    Observable<?> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                     Class domainClass, Class dataClass, boolean persist, boolean queuable);
+
+    /**
      * Post a JSONObject which returns an {@link Observable} that will emit a ?.
      */
     @NonNull

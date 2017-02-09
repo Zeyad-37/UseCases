@@ -65,9 +65,9 @@ class ApiConnection implements IApiConnection {
 
     private ApiConnection() {
         Config.getInstance().setUseApiWithCache(true);
-        mRestApiWithCache = createRetro2Client(provideOkHttpClient(getBuilderForOkhttp()
+        mRestApiWithCache = createRetro2Client(provideOkHttpClient(getBuilderForOkHttp()
                 , provideCache())).create(RestApi.class);
-        mRestApiWithoutCache = createRetro2Client(provideOkHttpClient(getBuilderForOkhttp()
+        mRestApiWithoutCache = createRetro2Client(provideOkHttpClient(getBuilderForOkHttp()
                 , null)).create(RestApi.class);
     }
 
@@ -169,6 +169,11 @@ class ApiConnection implements IApiConnection {
         return getRestApi().dynamicDelete(url, body);
     }
 
+    @Override
+    public Observable<Object> dynamicPatch(String url, RequestBody body) {
+        return getRestApi().dynamicPatch(url, body);
+    }
+
     RestApi getRestApiWithoutCache() {
         return mRestApiWithoutCache;
     }
@@ -196,7 +201,7 @@ class ApiConnection implements IApiConnection {
             if (!Utils.isNetworkAvailable(Config.getInstance().getContext())) {
                 request = request.newBuilder()
                         .cacheControl(new CacheControl.Builder()
-                                .maxStale(1, TimeUnit.HOURS)
+                                .maxStale(1, TimeUnit.DAYS)
                                 .build())
                         .build();
             }
@@ -274,7 +279,7 @@ class ApiConnection implements IApiConnection {
     }
 
     @NonNull
-    private OkHttpClient.Builder getBuilderForOkhttp() {
+    private OkHttpClient.Builder getBuilderForOkHttp() {
         return new OkHttpClient.Builder()
                 .addInterceptor(provideHttpLoggingInterceptor())
                 .addInterceptor(provideOfflineCacheInterceptor())

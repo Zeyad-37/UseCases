@@ -10,6 +10,7 @@ import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
 public interface IDataUseCase {
+
     /**
      * Gets list from full url.
      *
@@ -25,6 +26,14 @@ public interface IDataUseCase {
      * @return Observable with the Object.
      */
     Observable getObject(GetRequest getRequest);
+
+    /**
+     * Gets object from full url.
+     *
+     * @param postRequest contains the attributes of the request.
+     * @return Observable with the Object.
+     */
+//    Observable patchObject(PostRequest postRequest);
 
     /**
      * Post Object to full url.

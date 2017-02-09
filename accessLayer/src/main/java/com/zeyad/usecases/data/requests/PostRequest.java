@@ -17,7 +17,7 @@ import rx.Subscriber;
  * @author zeyad on 7/29/16.
  */
 public class PostRequest {
-    public static final String POST = "post", DELETE = "delete", PUT = "put";
+    public static final String POST = "post", DELETE = "delete", PUT = "put", PATCH = "patch";
     private String url, idColumnName, method;
     private Subscriber subscriber;
     private Class dataClass, presentationClass;

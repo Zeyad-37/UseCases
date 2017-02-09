@@ -118,6 +118,17 @@ public class RestApiImpl implements RestApi {
     }
 
     /**
+     * Post Object to full url.
+     *
+     * @param body payload to send.
+     * @return Observable with the Object.
+     */
+    @Override
+    public Observable<Object> dynamicPatch(@Url String url, RequestBody body) {
+        return mApiConnection.dynamicPatch(url, body);
+    }
+
+    /**
      * Put Object to full url.
      *
      * @param body payload to send.

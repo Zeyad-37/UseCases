@@ -49,6 +49,16 @@ public class DiskDataStore implements DataStore {
                     });
     }
 
+    @Override
+    public Observable<?> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                            Class domainClass, Class dataClass, boolean persist, boolean queuable) {
+        return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+                .doOnNext(o -> {
+                    if (Config.isWithCache())
+                        cacheObject(idColumnName, jsonObject, dataClass);
+                });
+    }
+
     @NonNull
     @Override
     public Observable<List> dynamicGetList(String url, Class domainClass, Class dataClass, boolean persist,

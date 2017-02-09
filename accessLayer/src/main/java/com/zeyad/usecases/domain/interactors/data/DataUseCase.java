@@ -145,6 +145,15 @@ public class DataUseCase implements IDataUseCase {
                 });
     }
 
+    //    @Override
+    @SuppressWarnings("unchecked")
+//    public Observable patchObject(PostRequest postRequest) {
+//        return mData.dynamicPatchObject(postRequest.getUrl(), postRequest.getIdColumnName(),
+//                postRequest.getObjectBundle(), postRequest.getPresentationClass(), postRequest
+//                        .getDataClass(), postRequest.isPersist(), postRequest.isQueuable())
+//                .compose(applySchedulers());
+//    }
+
     @Override
     public Observable postObject(PostRequest postRequest) {
         return mData.postObjectDynamically(postRequest.getUrl(), postRequest.getIdColumnName(),

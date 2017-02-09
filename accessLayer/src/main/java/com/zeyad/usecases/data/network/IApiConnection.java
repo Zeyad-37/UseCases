@@ -33,4 +33,6 @@ interface IApiConnection {
     Observable<Object> upload(String url, Map<String, RequestBody> partMap, MultipartBody.Part file);
 
     Observable<Object> dynamicDelete(String url, RequestBody body);
+
+    Observable<Object> dynamicPatch(String url, RequestBody body);
 }

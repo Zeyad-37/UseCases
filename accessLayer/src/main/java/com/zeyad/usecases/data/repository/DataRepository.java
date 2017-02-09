@@ -97,6 +97,18 @@ public class DataRepository implements Data {
 
     @NonNull
     @Override
+    public Observable<?> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                            Class domainClass, Class dataClass, boolean persist, boolean queuable) {
+        try {
+            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
+                    .dynamicPatchObject(url, idColumnName, jsonObject, domainClass, dataClass, persist, queuable);
+        } catch (Exception e) {
+            return Observable.error(e);
+        }
+    }
+
+    @NonNull
+    @Override
     public Observable<?> deleteListDynamically(@NonNull String url, JSONArray jsonArray, Class domainClass,
                                                @NonNull Class dataClass, boolean persist, boolean queuable) {
         try {

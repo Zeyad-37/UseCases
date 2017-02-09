@@ -45,6 +45,10 @@ public interface Data {
                                         Class dataClass, boolean persist, boolean queuable);
 
     @NonNull
+    Observable<?> dynamicPatchObject(String url, String idColumnName, JSONObject jsonObject,
+                                     Class domainClass, Class dataClass, boolean persist, boolean queuable);
+
+    @NonNull
     Observable<?> putObjectDynamically(String url, String idColumnName, JSONObject keyValuePairs,
                                        Class domainClass, Class dataClass, boolean persist, boolean queuable);
 

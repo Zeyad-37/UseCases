@@ -51,6 +51,7 @@ import rx.schedulers.Schedulers;
 import st.lowlevel.storo.Storo;
 
 import static com.zeyad.usecases.data.requests.PostRequest.DELETE;
+import static com.zeyad.usecases.data.requests.PostRequest.PATCH;
 import static com.zeyad.usecases.data.requests.PostRequest.POST;
 import static com.zeyad.usecases.data.requests.PostRequest.PUT;
 
@@ -110,6 +111,29 @@ public class CloudDataStore implements DataStore {
                         persistAllGenerics(list, dataClass);
                 })
                 .map(entities -> mEntityDataMapper.mapAllToDomain(entities, domainClass));
+    }
+
+    @NonNull
+    @Override
+    public Observable<?> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                            Class domainClass, Class dataClass, boolean persist, boolean queuable) {
+        return Observable.defer(() -> {
+            if (willPersist(persist))
+                persistGeneric(jsonObject, idColumnName, dataClass);
+            if (isQueuableIfOutOfNetwork(queuable)) {
+                queuePost(PATCH, url, idColumnName, jsonObject, persist);
+                return Observable.empty();
+            } else if (!Utils.isNetworkAvailable(mContext))
+                return mErrorObservableNotPersisted;
+            return mRestApi.dynamicPatch(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+                    jsonObject.toString()))
+                    //.compose(applyExponentialBackoff())
+                    .doOnError(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
+                            queuePost(PATCH, url, idColumnName, jsonObject, persist);
+                    })
+                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
+        });
     }
 
     @NonNull

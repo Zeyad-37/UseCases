@@ -83,6 +83,12 @@ public class Post {
                 }
             } else bundle = mPostRequest.getArrayBundle().toString();
             switch (mPostRequest.getMethod()) {
+                case PostRequest.PATCH:
+                    return mRestApi.dynamicPatch(mPostRequest.getUrl(), RequestBody
+                            .create(MediaType.parse(APPLICATION_JSON), bundle))
+                            .doOnSubscribe(() -> Log.d(TAG, "Posting " + mPostRequest.getDataClass()
+                                    .getSimpleName()))
+                            .subscribe(handleError);
                 case PostRequest.POST:
                     if (isObject)
                         return mRestApi.dynamicPost(mPostRequest.getUrl(), RequestBody
