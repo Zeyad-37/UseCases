@@ -1,11 +1,9 @@
 package com.zeyad.usecases.app.components.adapter;
 
-import java.io.Serializable;
-
 /**
  * @author by zeyad on 20/05/16.
  */
-public class ItemInfo<M> implements Serializable {
+public class ItemInfo<M> {
     public static final int HEADER = 1, FOOTER = 2, LOADING = 3, SECTION_HEADER = 4, CARD_SECTION_HEADER = 5;
     private M data;
     private int layoutId;

@@ -14,6 +14,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static android.os.Build.VERSION_CODES.M;
+
 /**
  * @author by zeyad on 19/05/16.
  */
@@ -240,7 +242,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
     // FIXME: 17/06/16 double check!
     public void appendWithoutDuplicateIds(List<ItemInfo> itemInfoList) {
         validateList(itemInfoList);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+        if (android.os.Build.VERSION.SDK_INT >= M) {
             ArraySet<ItemInfo> arraySet = new ArraySet<>();
             arraySet.addAll(itemInfoList);
             itemInfoList.clear();
@@ -482,7 +484,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         notifyItemRangeRemoved(positionStart, itemCount);
     }
 
-    public <M> void animateTo(List<ItemInfo<M>> models) {
+    public void animateTo(List<ItemInfo> models) {
         applyAndAnimateRemovals(models);
         applyAndAnimateAdditions(models);
         applyAndAnimateMovedItems(models);
@@ -518,7 +520,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         notifyItemMoved(fromPosition, toPosition);
     }
 
-    private <M> void applyAndAnimateRemovals(List<ItemInfo<M>> newModels) {
+    private void applyAndAnimateRemovals(List<ItemInfo> newModels) {
         ItemInfo model;
         for (int i = mDataList.size() - 1; i >= 0; i--) {
             model = mDataList.get(i);
@@ -527,7 +529,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         }
     }
 
-    private <M> void applyAndAnimateAdditions(List<ItemInfo<M>> newModels) {
+    private void applyAndAnimateAdditions(List<ItemInfo> newModels) {
         ItemInfo model;
         for (int i = 0, count = newModels.size(); i < count; i++) {
             model = newModels.get(i);
@@ -536,7 +538,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         }
     }
 
-    private <M> void applyAndAnimateMovedItems(List<ItemInfo<M>> newModels) {
+    private void applyAndAnimateMovedItems(List<ItemInfo> newModels) {
         ItemInfo model;
         int fromPosition;
         for (int toPosition = newModels.size() - 1; toPosition >= 0; toPosition--) {
