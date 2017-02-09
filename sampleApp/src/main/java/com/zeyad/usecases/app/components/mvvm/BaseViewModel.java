@@ -9,7 +9,7 @@ import rx.subjects.BehaviorSubject;
 public abstract class BaseViewModel<S extends BaseState> {
     private S viewState;
 
-    public final BehaviorSubject<S> state = BehaviorSubject.create(getViewState());
+    private final BehaviorSubject<S> state = BehaviorSubject.create(getViewState());
 
     public Observable<S> getState(Observable<S> input) {
         return state.concatMap(o -> input);

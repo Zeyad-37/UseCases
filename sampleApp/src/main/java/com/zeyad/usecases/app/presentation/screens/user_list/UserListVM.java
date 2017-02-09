@@ -1,7 +1,5 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
-import android.util.Log;
-
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
@@ -54,7 +52,7 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
     public UserListState reduce(UserListState previous, UserListState changes) {
         if (previous == null)
             return changes;
-        Log.d("List reduce states:", previous.getState() + " -> " + changes.getState());
+//        Log.d("List reduce states:", previous.getState() + " -> " + changes.getState());
         Builder builder = builder();
         if ((previous.getState().equals(LOADING) && changes.getState().equals(NEXT)) ||
                 (previous.getState().equals(NEXT) && changes.getState().equals(NEXT))) {
@@ -77,7 +75,8 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
                 .setUsers(Utils.isNotEmpty(changes.getUsers()) ? Utils.union(previous.getUsers(),
                         changes.getUsers()) : previous.getUsers())
                 .setCurrentPage(changes.getCurrentPage())
-                .setLastId(builder.users.get(builder.users.size() - 1).getId());
+                .setLastId(builder.users != null && builder.users.size() > 0 ?
+                        builder.users.get(builder.users.size() - 1).getId() : 0);
         return builder.build();
     }
 
@@ -93,6 +92,8 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
 
     @Override
     public Observable<UserListState> incrementPage() {
+        if (getViewState() == null)
+            return Observable.error(new IllegalStateException("View State is null!"));
         return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, getViewState().getCurrentPage() + 1, getViewState().getLastId()))
                 .build())

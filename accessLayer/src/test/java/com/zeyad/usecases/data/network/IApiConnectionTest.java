@@ -25,7 +25,6 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.eq;
 
 @RunWith(JUnit4.class)
-//@Config(constants = BuildConfig.class)
 public class IApiConnectionTest {
 
     private final String mValidUrl = ApiConnectionRobot.getValidUrl();
