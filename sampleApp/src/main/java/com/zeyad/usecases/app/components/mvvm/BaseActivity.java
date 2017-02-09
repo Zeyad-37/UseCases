@@ -137,8 +137,8 @@ public abstract class BaseActivity extends RxAppCompatActivity {
         });
     }
 
-    public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view, String message,
-                                       String actionText, View.OnClickListener onClickListener) {
+    public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,
+                                       String message, String actionText, View.OnClickListener onClickListener) {
         runOnUiThread(() -> {
             if (view != null)
                 SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText, onClickListener).show();

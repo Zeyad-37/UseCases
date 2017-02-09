@@ -113,7 +113,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
 
     @Override
     public void loadData() {
-        userDetailVM.getRepositories(userDetailState.getUser().getLogin(), userDetailState)
+        userDetailVM.getState(userDetailVM.getRepositories(userDetailState)).compose(bindToLifecycle())
                 .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }
 
@@ -174,7 +174,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
 
     @Override
     public void showErrorWithRetry(String message) {
-        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, loaderLayout, message, R.string.retry, view -> onResume());
+        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, loaderLayout, message, R.string.retry, view -> loadData());
     }
 
     @Override

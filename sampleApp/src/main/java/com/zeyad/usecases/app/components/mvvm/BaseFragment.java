@@ -94,12 +94,13 @@ public abstract class BaseFragment extends RxFragment {
             });
     }
 
-    public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view, String message,
-                                       String actionText, View.OnClickListener onClickListener) {
+    public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,
+                                       String message, String actionText, View.OnClickListener onClickListener) {
         if (getActivity() != null)
             getActivity().runOnUiThread(() -> {
                 if (view != null)
-                    SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText, onClickListener);
+                    SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText,
+                            onClickListener).show();
                 else throw new NullPointerException("View is null");
             });
     }
@@ -119,7 +120,7 @@ public abstract class BaseFragment extends RxFragment {
         if (getActivity() != null)
             getActivity().runOnUiThread(() -> {
                 if (view != null)
-                    SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_ERROR, view, message, duration);
+                    SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_ERROR, view, message, duration).show();
                 else throw new NullPointerException("View is null");
             });
     }

@@ -8,7 +8,7 @@ import rx.Subscriber;
  * @author zeyad on 11/28/16.
  */
 
-public class BaseSubscriber<V extends LoadDataView, M extends BaseState> extends Subscriber<M> {
+public class BaseSubscriber<V extends LoadDataView, S extends BaseState> extends Subscriber<S> {
     public final static int NO_ERROR = 0, ERROR = 1, ERROR_WITH_RETRY = 2;
     private V view;
     private int errorPolicy;
@@ -34,23 +34,18 @@ public class BaseSubscriber<V extends LoadDataView, M extends BaseState> extends
     public void onError(Throwable throwable) {
         view.toggleLoading(false);
         throwable.printStackTrace();
-        switch (errorPolicy) {
-            case ERROR:
-                view.showError(ErrorMessageFactory.create((Exception) throwable));
-                break;
-            case ERROR_WITH_RETRY:
-                view.showErrorWithRetry(ErrorMessageFactory.create((Exception) throwable));
-                break;
-            default:
-                break;
-        }
+        if (errorPolicy == ERROR)
+            view.showError(ErrorMessageFactory.create((Exception) throwable));
+        else if (errorPolicy == ERROR_WITH_RETRY)
+            view.showErrorWithRetry(ErrorMessageFactory.create((Exception) throwable));
     }
 
     @Override
-    public void onNext(M m) {
-        view.toggleLoading(m.isLoading());
-        if (m.getError() != null)
-            onError(m.getError());
-        view.renderState(m);
+    public void onNext(S s) {
+        view.toggleLoading(s.isLoading());
+        if (s.getState().equals(BaseState.ERROR))
+            onError(s.getError());
+        else
+            view.renderState(s);
     }
 }

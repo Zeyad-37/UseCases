@@ -1,12 +1,19 @@
 package com.zeyad.usecases.app.components.mvvm;
 
 import rx.Observable;
+import rx.subjects.BehaviorSubject;
 
 /**
  * @author zeyad on 11/28/16.
  */
 public abstract class BaseViewModel<S extends BaseState> {
     private S viewState;
+
+    public final BehaviorSubject<S> state = BehaviorSubject.create(getViewState());
+
+    public Observable<S> getState(Observable<S> input) {
+        return state.concatMap(o -> input);
+    }
 
     public abstract S reduce(S previous, S changes);
 

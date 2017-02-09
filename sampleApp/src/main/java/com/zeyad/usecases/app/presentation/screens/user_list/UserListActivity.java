@@ -73,7 +73,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     private boolean twoPane;
     private String currentFragTag;
     private UserListState userListState;
-    private List<ItemInfo<UserRealm>> itemInfos;
+    private List<ItemInfo> itemInfos;
 
     public static Intent getCallingIntent(Context context) {
         return new Intent(context, UserListActivity.class);
@@ -88,10 +88,8 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
 
     @Override
     public void restoreState(Bundle savedInstanceState) {
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null)
             renderState(Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL)));
-            if (userListVM != null) userListVM.setCurrentPage(userListState.getCurrentPage());
-        }
     }
 
     @Override
@@ -192,7 +190,8 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                             .setCurrentPage(userListState.getCurrentPage() + 1)
                             .setyScroll(firstVisibleItemPosition)
                             .build();
-                    userListVM.incrementPage(usersAdapter.getItem(usersAdapter.getItemCount() - 1).getId());
+                    userListVM.getState(userListVM.incrementPage()).compose(bindToLifecycle())
+                            .subscribe(new BaseSubscriber<>(UserListActivity.this, ERROR_WITH_RETRY));
                 }
             }
         });
@@ -200,7 +199,8 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
 
     @Override
     public void loadData() {
-        userListVM.getUsers().compose(bindToLifecycle()).subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
+        userListVM.getState(userListVM.getUsers()).compose(bindToLifecycle())
+                .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }
 
     @Override
@@ -219,7 +219,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                     .calculateDiff(new UserListDiffCallback(usersAdapter.getDataList(), itemInfos));
             diffResult.dispatchUpdatesTo(usersAdapter);
 
-            usersAdapter.animateTo(itemInfos);
+            usersAdapter.setDataList(itemInfos);
             userRecycler.smoothScrollToPosition(userListModel.getyScroll());
         }
     }

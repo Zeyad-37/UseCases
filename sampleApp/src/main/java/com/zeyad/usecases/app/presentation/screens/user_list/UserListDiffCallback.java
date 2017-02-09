@@ -12,9 +12,9 @@ import java.util.List;
 class UserListDiffCallback extends DiffUtil.Callback {
 
     private List<ItemInfo> oldList;
-    private List<ItemInfo<UserRealm>> newList;
+    private List<ItemInfo> newList;
 
-    UserListDiffCallback(List<ItemInfo> oldList, List<ItemInfo<UserRealm>> newList) {
+    UserListDiffCallback(List<ItemInfo> oldList, List<ItemInfo> newList) {
         this.oldList = oldList;
         this.newList = newList;
     }

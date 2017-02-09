@@ -15,20 +15,23 @@ public class UserListState extends BaseState {
     final List<UserRealm> users;
     final int yScroll;
     final int currentPage;
+    final long lastId;
 
     public UserListState() {
         super(false, null, null);
         users = null;
         yScroll = 0;
         currentPage = 0;
+        lastId = 0;
     }
 
-    public UserListState(List<UserRealm> users, int yScroll, int currentPage, boolean isLoading,
+    public UserListState(List<UserRealm> users, int yScroll, int currentPage, long lastId, boolean isLoading,
                          Throwable error, String state) {
         super(isLoading, error, state);
         this.users = users;
         this.yScroll = yScroll;
         this.currentPage = currentPage;
+        this.lastId = lastId;
     }
 
     public UserListState(Builder builder) {
@@ -36,6 +39,7 @@ public class UserListState extends BaseState {
         users = builder.users;
         yScroll = builder.yScroll;
         currentPage = builder.currentPage;
+        lastId = builder.lastId;
     }
 
     public static UserListState loading() {
@@ -81,12 +85,17 @@ public class UserListState extends BaseState {
         return currentPage;
     }
 
+    public long getLastId() {
+        return lastId;
+    }
+
     static class Builder {
         List<UserRealm> users;
         int yScroll, currentPage;
         boolean isLoading;
         Throwable error;
         String state;
+        long lastId;
 
         Builder setUsers(List<UserRealm> value) {
             users = value;
@@ -100,6 +109,11 @@ public class UserListState extends BaseState {
 
         Builder setCurrentPage(int value) {
             currentPage = value;
+            return this;
+        }
+
+        Builder setLastId(int value) {
+            lastId = value;
             return this;
         }
 

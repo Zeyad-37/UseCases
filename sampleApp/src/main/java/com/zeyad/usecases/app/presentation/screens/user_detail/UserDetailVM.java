@@ -10,8 +10,6 @@ import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
-import java.util.List;
-
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 
@@ -23,8 +21,8 @@ import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetail
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.builder;
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.error;
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.loading;
+import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.onNext;
 import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
-import static com.zeyad.usecases.app.utils.Constants.URLS.USER;
 
 /**
  * @author zeyad on 1/10/17.
@@ -37,22 +35,20 @@ class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailV
     }
 
     @Override
-    public Observable<UserDetailState> getRepositories(String userLogin, UserDetailState userDetailState) {
+    public Observable<UserDetailState> getRepositories(UserDetailState userDetailState) {
         Observable<UserDetailState> userDetailModelObservable;
-        userDetailModelObservable = Utils.isNotEmpty(userLogin) ? Observable.zip(dataUseCase.getObject(new GetRequest
-                        .GetRequestBuilder(UserRealm.class, true)
-                        .url(String.format(USER, userLogin)).build()),
+        UserRealm user = userDetailState.getUser();
+        String userLogin = user.getLogin();
+        userDetailModelObservable = Utils.isNotEmpty(userLogin) ? Observable.zip(Observable.just(user),
                 dataUseCase.queryDisk(realm -> realm.where(RepoRealm.class)
                         .equalTo("owner.login", userLogin), RepoRealm.class)
                         .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
                                 dataUseCase.getList(new GetRequest
                                         .GetRequestBuilder(RepoRealm.class, true)
                                         .url(String.format(REPOSITORIES, userLogin))
-                                        .build())
-                                        .doOnSubscribe(() -> Log.d("DB empty", "Calling Server")))
+                                        .build()))
                         .unsubscribeOn(AndroidSchedulers.from(DataUseCase.getHandlerThread().getLooper())),
-                (userRealm, repos) -> reduce(userDetailState, new UserDetailState((UserRealm) userRealm,
-                        (List) repos, false, false, null, INITIAL)))
+                (userRealm, repos) -> reduce(userDetailState, onNext(userRealm, repos, false)))
                 .compose(applyStates()) : Observable.just(error(new IllegalArgumentException("User name can not be empty")));
         return userDetailModelObservable;
     }
@@ -66,11 +62,12 @@ class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailV
                 .doOnEach(notification -> setViewState((UserDetailState) notification.getValue()));
     }
 
+    // FIXME: 2/9/17
     @Override
     public UserDetailState reduce(UserDetailState previous, UserDetailState changes) {
         if (previous == null)
             return changes;
-        Log.d("reduce states:", previous.getState() + " -> " + changes.getState());
+        Log.d("Detail reduce states:", previous.getState() + " -> " + changes.getState());
         Builder builder = builder();
         if ((previous.getState().equals(LOADING) && changes.getState().equals(NEXT)) ||
                 (previous.getState().equals(NEXT) && changes.getState().equals(NEXT))) {
