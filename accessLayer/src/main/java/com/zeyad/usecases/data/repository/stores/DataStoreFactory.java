@@ -13,7 +13,6 @@ import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 
 import static com.zeyad.usecases.Config.getInstance;
-import static com.zeyad.usecases.domain.interactors.data.DataUseCase.NONE;
 
 public class DataStoreFactory {
 
@@ -53,7 +52,7 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore disk(IDAOMapper entityDataMapper) throws IllegalAccessException {
-        if (DataUseCase.getDBType() == NONE || mDataBaseManager == null)
+        if (!DataUseCase.hasRealm() || mDataBaseManager == null)
             throw new IllegalAccessException(getInstance().getContext().getString(R.string.no_db));
         return new DiskDataStore(mDataBaseManager, entityDataMapper);
     }

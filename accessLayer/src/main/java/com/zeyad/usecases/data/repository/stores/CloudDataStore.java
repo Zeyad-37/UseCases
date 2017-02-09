@@ -53,7 +53,6 @@ import st.lowlevel.storo.Storo;
 import static com.zeyad.usecases.data.requests.PostRequest.DELETE;
 import static com.zeyad.usecases.data.requests.PostRequest.POST;
 import static com.zeyad.usecases.data.requests.PostRequest.PUT;
-import static com.zeyad.usecases.domain.interactors.data.DataUseCase.NONE;
 
 public class CloudDataStore implements DataStore {
 
@@ -83,7 +82,7 @@ public class CloudDataStore implements DataStore {
         mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException(mContext
                 .getString(R.string.exception_network_error_not_persisted)));
         mQueueFileIO = Observable.empty();
-        mCanPersist = DataUseCase.getDBType() > NONE;
+        mCanPersist = DataUseCase.hasRealm();
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
     }
 

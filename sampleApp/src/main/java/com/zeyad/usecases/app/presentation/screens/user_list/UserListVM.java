@@ -38,6 +38,11 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
         dataUseCase = DataUseCaseFactory.getInstance();
     }
 
+    UserListVM(IDataUseCase dataUseCase) {
+        this.dataUseCase = dataUseCase;
+    }
+
+
     @Override
     public Observable<UserListState> getUsers() {
         return dataUseCase.getListOffLineFirst(new GetRequest

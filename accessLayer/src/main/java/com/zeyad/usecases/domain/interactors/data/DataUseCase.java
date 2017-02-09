@@ -29,12 +29,11 @@ import rx.subjects.BehaviorSubject;
  */
 public class DataUseCase implements IDataUseCase {
 
-    public static final int NONE = 0, REALM = 1;
     private final static BehaviorSubject ObjectOffLineFirst = BehaviorSubject.create();
     private final static BehaviorSubject<List> listOffLineFirst = BehaviorSubject.create();
     private final static BehaviorSubject lastObject = BehaviorSubject.create();
     private final static BehaviorSubject<List> lastList = BehaviorSubject.create();
-    private static int mDBType;
+    private static boolean hasRealm;
     private static HandlerThread handlerThread;
     private static DataUseCase sDataUseCase;
     private final Data mData;
@@ -56,7 +55,7 @@ public class DataUseCase implements IDataUseCase {
      */
     static void initWithoutDB(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor,
                               PostExecutionThread postExecutionThread) {
-        mDBType = NONE;
+        hasRealm = false;
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(Config.getInstance()
                 .getContext()), entityMapper), threadExecutor, postExecutionThread);
     }
@@ -69,7 +68,7 @@ public class DataUseCase implements IDataUseCase {
      */
     static void initWithRealm(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor,
                               PostExecutionThread postExecutionThread) {
-        mDBType = REALM;
+        hasRealm = true;
         DatabaseManagerFactory.initRealm();
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
                 .getInstance(), Config.getInstance().getContext()), entityMapper), threadExecutor,
@@ -106,8 +105,8 @@ public class DataUseCase implements IDataUseCase {
     /**
      * @return returns database type, whether realm or none.
      */
-    public static int getDBType() {
-        return mDBType;
+    public static boolean hasRealm() {
+        return hasRealm;
     }
 
     /**
