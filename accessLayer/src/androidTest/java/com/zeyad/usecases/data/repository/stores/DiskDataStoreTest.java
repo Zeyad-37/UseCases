@@ -2,6 +2,7 @@ package com.zeyad.usecases.data.repository.stores;
 
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
+import android.support.test.runner.AndroidJUnit4;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.TestUtility;
@@ -19,7 +20,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
 
 import java.util.List;
 
@@ -33,7 +33,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
 
-@RunWith(RobolectricTestRunner.class)
+@RunWith(AndroidJUnit4.class)
 //@Config(constants = BuildConfig.class)
 public class DiskDataStoreTest {
 

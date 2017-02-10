@@ -18,7 +18,7 @@ import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 
 import io.realm.Realm;
 
@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @org.robolectric.annotation.Config(constants = BuildConfig.class, sdk = 21)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @PrepareForTest({Realm.class})
@@ -40,10 +40,11 @@ public class DataStoreFactoryJUnitTest {
 
     @Before
     public void setUp() throws Exception {
-        Config.init(InstrumentationRegistry.getContext());
+        mMockedContext = CloudDataStoreTestJUnitRobot.getMockedContext();
+        Config.init(mMockedContext);
+        Config.setBaseURL("www.google.com");
         ApiConnectionFactory.init();
         mDataBaseManager = DataStoreFactoryJUnitRobot.createMockedDataBaseManager();
-        mMockedContext = CloudDataStoreTestJUnitRobot.getMockedContext();
         mIDAOMapper = DataStoreFactoryJUnitRobot.createMockedEntityMapper();
         mDataStoreFactory = DataStoreFactoryJUnitRobot.createDataStoreFactory(mDataBaseManager, mMockedContext);
     }

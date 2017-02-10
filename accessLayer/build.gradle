@@ -74,7 +74,7 @@ ext {
     hamcrest = '1.3'
     junit = '4.12'
     powerMock = '1.6.2'
-    robolectric = '3.0'
+    robolectric = '3.2.2'
 }
 
 dependencies {

@@ -1,7 +1,7 @@
 package com.zeyad.usecases.data.repository.stores;
 
+import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.BuildConfig;
 
 import com.zeyad.usecases.Config;
@@ -22,7 +22,7 @@ import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.robolectric.RobolectricGradleTestRunner;
+import org.robolectric.RobolectricTestRunner;
 
 import java.util.List;
 
@@ -36,8 +36,9 @@ import static org.hamcrest.Matchers.instanceOf;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.mockito.Mockito.mock;
 
-@RunWith(RobolectricGradleTestRunner.class)
+@RunWith(RobolectricTestRunner.class)
 @org.robolectric.annotation.Config(constants = BuildConfig.class, sdk = 21)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @PrepareForTest({Realm.class})
@@ -54,7 +55,7 @@ public class DiskDataStoreJUnitTest {
 
     @Before
     public void setUp() throws Exception {
-        Config.init(InstrumentationRegistry.getTargetContext());
+        Config.init(mock(Context.class));
         TestUtility2.performInitialSetupOfDb();
         DatabaseManagerFactory.initRealm();
         final DataBaseManager dbManager = DatabaseManagerFactory.getInstance();

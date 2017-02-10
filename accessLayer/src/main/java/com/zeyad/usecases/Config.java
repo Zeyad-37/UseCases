@@ -9,7 +9,6 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
-import com.zeyad.usecases.data.utils.Utils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -71,10 +70,7 @@ public class Config {
     }
 
     public static String getBaseURL() {
-        if (Utils.isNotEmpty(mBaseURL))
-            return mBaseURL;
-        else
-            throw new IllegalArgumentException("Base Url is empty");
+        return mBaseURL;
     }
 
     public static void setBaseURL(String baseURL) {

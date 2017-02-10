@@ -6,12 +6,10 @@ import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
-import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseState.ERROR;
 import static com.zeyad.usecases.app.components.mvvm.BaseState.LOADING;
@@ -27,11 +25,15 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
 /**
  * @author zeyad on 1/10/17.
  */
-class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailView {
+public class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailView {
     private final IDataUseCase dataUseCase;
 
     UserDetailVM() {
         dataUseCase = DataUseCaseFactory.getInstance();
+    }
+
+    public UserDetailVM(IDataUseCase dataUseCase) {
+        this.dataUseCase = dataUseCase;
     }
 
     @Override
@@ -46,8 +48,7 @@ class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailV
                                 dataUseCase.getList(new GetRequest
                                         .GetRequestBuilder(RepoRealm.class, true)
                                         .url(String.format(REPOSITORIES, userLogin))
-                                        .build()))
-                        .unsubscribeOn(AndroidSchedulers.from(DataUseCase.getHandlerThread().getLooper())),
+                                        .build())),
                 (userRealm, repos) -> reduce(userDetailState, onNext(userRealm, repos, false)))
                 .compose(applyStates()) : Observable.just(error(new IllegalArgumentException("User name can not be empty")));
         return userDetailModelObservable;

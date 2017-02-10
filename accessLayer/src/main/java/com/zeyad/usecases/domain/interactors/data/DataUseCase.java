@@ -294,6 +294,7 @@ public class DataUseCase implements IDataUseCase {
             handlerThread.start();
 //        return observable -> observable.subscribeOn(AndroidSchedulers.from(mThreadExecutor.getLooper()))
         return observable -> observable.subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
-                .observeOn(mPostExecutionThread.getScheduler());
+                .observeOn(mPostExecutionThread.getScheduler())
+                .unsubscribeOn(AndroidSchedulers.from(handlerThread.getLooper()));
     }
 }

@@ -50,7 +50,7 @@ public class UserDetailState extends BaseState {
                 .build();
     }
 
-    static UserDetailState loading() {
+    public static UserDetailState loading() {
         return UserDetailState.builder()
                 .setUser(null)
                 .setRepos(null)
@@ -61,7 +61,7 @@ public class UserDetailState extends BaseState {
                 .build();
     }
 
-    static UserDetailState onNext(UserRealm user, List<RepoRealm> repos, boolean isTwoPane) {
+    public static UserDetailState onNext(UserRealm user, List<RepoRealm> repos, boolean isTwoPane) {
         return UserDetailState.builder()
                 .setUser(user)
                 .setRepos(repos)
@@ -95,7 +95,7 @@ public class UserDetailState extends BaseState {
         Throwable error;
         String state;
 
-        Builder setRepos(List<RepoRealm> value) {
+        public Builder setRepos(List<RepoRealm> value) {
             repos = value;
             return this;
         }
