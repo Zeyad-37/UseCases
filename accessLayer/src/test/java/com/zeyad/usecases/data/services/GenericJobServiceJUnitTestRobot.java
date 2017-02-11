@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Job;
 
 import org.mockito.Mockito;
@@ -22,11 +23,14 @@ public class GenericJobServiceJUnitTestRobot {
 
 
     private static final String TASK_PARAM_PAYLOAD = "some_payload";
-    private static final Context MOCKED_CONTEXT = Mockito.mock(Context.class); // InstrumentationRegistry.getContext()
-    private static final FirebaseJobDispatcher JOB_SCHEDULER = Mockito.mock(FirebaseJobDispatcher.class);
+    private static Context MOCKED_CONTEXT = Mockito.mock(Context.class); // InstrumentationRegistry.getContext()
+    private static FirebaseJobDispatcher JOB_SCHEDULER = new FirebaseJobDispatcher(new GooglePlayDriver(MOCKED_CONTEXT));
 
     private static Job createJobParam(String jobType) {
-        Job jobParameters = Mockito.mock(Job.class);
+        Job jobParameters = JOB_SCHEDULER.newJobBuilder()
+//                .setService(GenericJobService.class) // the JobService that will be called
+                .setTag("my-unique-tag")        // uniquely identifies the job
+                .build();
         final Bundle extraBundle = getJobParamsExtraBundle(jobType);
         Mockito.when(jobParameters.getExtras()).thenReturn(extraBundle);
 //        Mockito.when(jobParameters.getTag()).thenReturn(tag);

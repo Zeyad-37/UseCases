@@ -21,21 +21,23 @@ import java.util.List;
 
 import rx.Observable;
 
+import static org.mockito.Mockito.mock;
+
 public class DataRepositoryJUnitRobot {
 
-    //    public static final RealmQuery REALM_QUERY = Realm.getDefaultInstance().where(getValidDataClass());
+    public static final RealmManager.RealmQueryProvider REALM_QUERY = mock(RealmManager.RealmQueryProvider.class);
     //    public static final HashMap<String, Object> OBJECT_HASH_MAP = new HashMap<>();
     public static final JSONObject JSON_OBJECT = new JSONObject();
     public static final JSONArray JSON_ARRAY = new JSONArray();
-    public static final File MOCKED_FILE = Mockito.mock(File.class);
-    public static final HashMap MOCKED_MAP = Mockito.mock(HashMap.class);
+    public static final File MOCKED_FILE = mock(File.class);
+    public static final HashMap MOCKED_MAP = mock(HashMap.class);
     public static final boolean ON_WIFI = true;
     public static final boolean WHILE_CHARGING = true;
     public static final boolean QUEUABLE = true;
 
 
     static DataStoreFactory createMockedDataStoreFactory(DataStore dataStore) {
-        final DataStoreFactory dataStoreFactory = Mockito.mock(DataStoreFactory.class);
+        final DataStoreFactory dataStoreFactory = mock(DataStoreFactory.class);
         Mockito.when(dataStoreFactory.cloud(Mockito.any())).thenReturn(dataStore);
         return dataStoreFactory;
     }
@@ -57,11 +59,11 @@ public class DataRepositoryJUnitRobot {
     }
 
     static DiskDataStore createMockedDiskStore() {
-        return Mockito.mock(DiskDataStore.class);
+        return mock(DiskDataStore.class);
     }
 
     static CloudDataStore createMockedCloudStore() {
-        return Mockito.mock(CloudDataStore.class);
+        return mock(CloudDataStore.class);
     }
 
     static String getValidUrl() {
@@ -126,8 +128,7 @@ public class DataRepositoryJUnitRobot {
 
     @NonNull
     public static RealmManager.RealmQueryProvider getValidRealmQuery() {
-//        return REALM_QUERY;
-        return null;
+        return REALM_QUERY;
     }
 
     public static File getValidFile() {

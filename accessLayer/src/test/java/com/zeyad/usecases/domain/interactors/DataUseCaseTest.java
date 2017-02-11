@@ -36,7 +36,6 @@ import rx.Observable;
 import rx.observers.TestSubscriber;
 
 import static org.mockito.Matchers.eq;
-import static org.powermock.api.mockito.PowerMockito.when;
 
 @RunWith(PowerMockRunner.class)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
@@ -242,11 +241,7 @@ public class DataUseCaseTest {
         mDataUseCase = getGenericUseImplementation((DataRepository) mDataData, mJobExecutor, mUIThread);
         PowerMockito.mockStatic(DataUseCaseFactory.class);
 //        Mockito.when(Utils.isNotEmpty(getUrl())).thenReturn(true);
-        try {
-            when(Config.getBaseURL()).thenReturn("www.google.com");
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
-        }
+        Config.setBaseURL("www.google.com");
     }
 
     @Test
@@ -379,10 +374,9 @@ public class DataUseCaseTest {
                 eq(mQueuable));
     }
 
-    @Test
-    public void testUploadFile_ifDataRepoCorrectMethodIsCalled_whenPutRequestIsPassed() {
+//    @Test
+//    public void testUploadFile_ifDataRepoCorrectMethodIsCalled_whenPutRequestIsPassed() {
 //        mDataUseCase.uploadFile(getUploadRequest(mToPersist, mWhileCharging)).subscribe(new TestSubscriber());
-
 //        Mockito.verify(mDataData).uploadFileDynamically(eq(getUrl()),
 //                eq(getFile()),
 //                eq(getKey()),
@@ -392,7 +386,7 @@ public class DataUseCaseTest {
 //                eq(mQueuable),
 //                eq(PRESENTATION_CLASS),
 //                eq(DATA_CLASS));
-    }
+//    }
 
     @Test
     public void testPutList_ifDataRepoCorrectMethodIsCalled_whenJsonArrayIsPassed() {

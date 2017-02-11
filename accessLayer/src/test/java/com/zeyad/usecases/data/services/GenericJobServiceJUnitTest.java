@@ -1,9 +1,7 @@
 package com.zeyad.usecases.data.services;
 
-import android.annotation.TargetApi;
 import android.app.job.JobScheduler;
 import android.content.Intent;
-import android.os.Build;
 
 import com.firebase.jobdispatcher.Job;
 import com.zeyad.usecases.BuildConfig;
@@ -29,7 +27,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@TargetApi(Build.VERSION_CODES.LOLLIPOP)
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})

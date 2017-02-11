@@ -1,32 +1,25 @@
 package com.zeyad.usecases.data.repository.stores;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.test.rule.BuildConfig;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.DatabaseManagerFactory;
 import com.zeyad.usecases.data.db.RealmManager;
-import com.zeyad.usecases.utils.TestModelViewModelMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.utils.TestUtility2;
 import com.zeyad.usecases.utils.TestViewModel;
 
 import org.hamcrest.Matchers;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.robolectric.RobolectricTestRunner;
 
 import java.util.List;
 
-import io.realm.Realm;
 import rx.observers.TestSubscriber;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -38,18 +31,11 @@ import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.mock;
 
+// FIXME: 2/10/17 Redo!
 @RunWith(RobolectricTestRunner.class)
 @org.robolectric.annotation.Config(constants = BuildConfig.class, sdk = 21)
-@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest({Realm.class})
 public class DiskDataStoreJUnitTest {
 
-    @NonNull
-    @Rule
-    public Timeout mTimeout = new Timeout(TestUtility2.TIMEOUT_TIME_VALUE, TestUtility2.TIMEOUT_TIME_UNIT);
-    @NonNull
-    @Rule
-    public ExpectedException mExpectedException = ExpectedException.none();
     private DiskDataStoreJUnitRobotInterface mDiskDataStoreRobot;
     private DataStore mDiskDataStore;
 
@@ -58,9 +44,8 @@ public class DiskDataStoreJUnitTest {
         Config.init(mock(Context.class));
         TestUtility2.performInitialSetupOfDb();
         DatabaseManagerFactory.initRealm();
-        final DataBaseManager dbManager = DatabaseManagerFactory.getInstance();
-        final TestModelViewModelMapper enitityMapper = new TestModelViewModelMapper();
-        mDiskDataStoreRobot = DiskDataStoreJUnitRobot.newInstance(dbManager, enitityMapper);
+        final DataBaseManager dbManager = mock(DataBaseManager.class);
+        mDiskDataStoreRobot = DiskDataStoreJUnitRobot.newInstance(dbManager, mock(IDAOMapper.class));
         mDiskDataStore = mDiskDataStoreRobot.createDiskDataStore();
     }
 

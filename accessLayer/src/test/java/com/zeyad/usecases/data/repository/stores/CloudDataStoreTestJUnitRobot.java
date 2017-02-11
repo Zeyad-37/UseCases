@@ -10,12 +10,10 @@ import android.support.annotation.Nullable;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.google.gson.Gson;
 import com.zeyad.usecases.data.db.DataBaseManager;
-import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.db.RealmManagerImplJUnitUtils;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
-import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.utils.ResponseBodyObservable;
 import com.zeyad.usecases.utils.TestModel;
 import com.zeyad.usecases.utils.TestModelViewModelMapper;
@@ -43,7 +41,6 @@ import rx.Observable;
 import rx.Subscriber;
 import rx.observers.TestSubscriber;
 
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 
 @SuppressWarnings("WrongConstant")
@@ -169,7 +166,7 @@ class CloudDataStoreTestJUnitRobot {
     }
 
     static DataBaseManager createDBManagerWithMockedContext() {
-        final Observable LIST_OBSERVABLE = getListObservable();
+        final Observable<List> LIST_OBSERVABLE = getListObservable();
         final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
         final Observable<Object> TRUE_OBSERVABLE = Observable.create(subscriber -> subscriber.onNext(true));
         final DataBaseManager dbManagerWithMockedContext
@@ -178,18 +175,18 @@ class CloudDataStoreTestJUnitRobot {
         Mockito.doReturn(OBJECT_OBSERVABLE).when(dbManagerWithMockedContext).put(Mockito.any(RealmObject.class), Mockito.any());
         Mockito.doReturn(OBJECT_OBSERVABLE).when(dbManagerWithMockedContext).put(Mockito.any(RealmModel.class), Mockito.any());
         Mockito.doReturn(TRUE_OBSERVABLE).when(dbManagerWithMockedContext).put(Mockito.any(), Mockito.any(), Mockito.any());
-        Mockito.doNothing().when(dbManagerWithMockedContext)
+        Mockito.doReturn(LIST_OBSERVABLE).when(dbManagerWithMockedContext)
                 .putAll(Mockito.anyListOf(RealmObject.class), Mockito.any());
         Mockito.doReturn(OBJECT_OBSERVABLE).when(dbManagerWithMockedContext)
                 .putAll(Mockito.any(JSONArray.class), eq(CloudDataStoreTestJUnitRobot.getValidColumnName()), Mockito.any());
-        Mockito.when(dbManagerWithMockedContext.evictAll(Mockito.any())).thenReturn(any()); // was TRUE_OBSERVABLE
+//        Mockito.when(dbManagerWithMockedContext.evictAll(Mockito.any())).thenReturn(any()); // was TRUE_OBSERVABLE
         Mockito.doNothing()
                 .when(dbManagerWithMockedContext).evict(Mockito.any(), Mockito.any());
         Mockito.when(dbManagerWithMockedContext.evictById(Mockito.any(), Mockito.anyString(), Mockito.anyLong()))
                 .thenReturn(true);
         Mockito.doReturn(TRUE_OBSERVABLE).when(dbManagerWithMockedContext).evictCollection(Mockito.anyString(), Mockito.anyListOf(Long.class), Mockito.any());
-        Mockito.when(dbManagerWithMockedContext.getQuery(Mockito.any(RealmManager.RealmQueryProvider.class)))
-                .thenReturn(LIST_OBSERVABLE);
+//        Mockito.when(dbManagerWithMockedContext.getQuery(Mockito.any(RealmManager.RealmQueryProvider.class)))
+//                .thenReturn(any(Observable.class));
         return dbManagerWithMockedContext;
     }
 
@@ -320,7 +317,8 @@ class CloudDataStoreTestJUnitRobot {
     }
 
     static boolean isNetworkEnabled() {
-        return Utils.isNetworkAvailable(getMockedContext());
+//        return Utils.isNetworkAvailable(getMockedContext());
+        return true;
     }
 
     static <T> T argThis(T arg) {

@@ -80,8 +80,23 @@ public class CloudDataStore implements DataStore {
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
         mContext = Config.getInstance().getContext();
-        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException(mContext
-                .getString(R.string.exception_network_error_not_persisted)));
+        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException("Could not " +
+                "reach server and could not persist request to queue!\\nGoogle play services not " +
+                "available and android version less than 5.0!"));
+        mQueueFileIO = Observable.empty();
+        mCanPersist = DataUseCase.hasRealm();
+        mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
+    }
+
+    CloudDataStore(RestApi restApi, DataBaseManager dataBaseManager, IDAOMapper entityDataMapper,
+                   Context context) {
+        mRestApi = restApi;
+        mEntityDataMapper = entityDataMapper;
+        mDataBaseManager = dataBaseManager;
+        mContext = context;
+        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException("Could not " +
+                "reach server and could not persist request to queue!\\nGoogle play services not " +
+                "available and android version less than 5.0!"));
         mQueueFileIO = Observable.empty();
         mCanPersist = DataUseCase.hasRealm();
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));

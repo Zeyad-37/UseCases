@@ -4,7 +4,6 @@ import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.BuildConfig;
-import android.support.test.rule.UiThreadTestRule;
 
 import com.google.gson.Gson;
 import com.zeyad.usecases.data.utils.Utils;
@@ -22,11 +21,11 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.rule.PowerMockRule;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -54,7 +53,10 @@ import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static org.powermock.api.mockito.PowerMockito.when;
 
+// FIXME: 2/10/17 Redo!
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
@@ -63,17 +65,25 @@ public class RealmManagerImplTestJUnit {
 
     private static final String TEST_MODEL_PREFIX = "random value:";
 
-    @NonNull
     @Rule
-    public Timeout globalTimeout = new Timeout(TestUtility2.TIMEOUT_TIME_VALUE_LARGE, TestUtility2.TIMEOUT_TIME_UNIT);
-    @NonNull
-    @Rule
-    public UiThreadTestRule mUiThreadTestRule = new UiThreadTestRule();
-    @NonNull
-    @Rule
-    public ExpectedException exception = ExpectedException.none();
+    public PowerMockRule rule = new PowerMockRule();
     private RealmManager mRealmManager;
     private Random mRandom;
+
+    public static Realm mockRealm() {
+        mockStatic(Realm.class);
+
+        Realm mockRealm = PowerMockito.mock(Realm.class);
+
+        when(mockRealm.createObject(TestModel.class)).thenReturn(new TestModel());
+//        when(mockRealm.createObject(Offer.class)).thenReturn(new Offer());
+//        when(mockRealm.createObject(Tasker.class)).thenReturn(new Tasker());
+//        when(mockRealm.createObject(Job.class)).thenReturn(new Job());
+
+        when(Realm.getDefaultInstance()).thenReturn(mockRealm);
+
+        return mockRealm;
+    }
 
     @Before
     public void before() {

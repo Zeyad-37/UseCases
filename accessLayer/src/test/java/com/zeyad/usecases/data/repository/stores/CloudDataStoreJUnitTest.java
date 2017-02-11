@@ -1,29 +1,29 @@
 package com.zeyad.usecases.data.repository.stores;
 
-import android.support.annotation.NonNull;
+import android.content.Context;
 import android.support.test.rule.BuildConfig;
 
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
+import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.utils.TestModel;
 import com.zeyad.usecases.utils.TestUtility2;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-import org.junit.rules.Timeout;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -32,7 +32,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import io.realm.Realm;
 import io.realm.RealmObject;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
@@ -42,20 +41,19 @@ import static com.zeyad.usecases.data.repository.stores.CloudDataStoreTestJUnitR
 import static org.junit.Assume.assumeFalse;
 import static org.junit.Assume.assumeTrue;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
-@RunWith(RobolectricTestRunner.class)
+//@RunWith(RobolectricTestRunner.class)
+@RunWith(PowerMockRunner.class)
+@PowerMockRunnerDelegate(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest({Realm.class})
+@PrepareForTest({Utils.class})
 public class CloudDataStoreJUnitTest {
+//    @Rule
+//    public PowerMockRule rule = new PowerMockRule();
 
-    @NonNull
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
-    @NonNull
-    @Rule
-    public Timeout mTimeout = new Timeout(TestUtility2.TIMEOUT_TIME_VALUE, TestUtility2.TIMEOUT_TIME_UNIT);
     private boolean mToPersist;
     private boolean mToCache;
     private boolean mCallRealMethodsOfEntityMapper;
@@ -63,15 +61,7 @@ public class CloudDataStoreJUnitTest {
     private RestApi mMockedRestApi;
     private DataBaseManager mMockedDBManager;
     private IDAOMapper mIDAOMapper;
-
-//    public CloudDataStoreJUnitTest(boolean callRealMethodsOfEntityMapper, boolean toPersist, boolean toCache) {
-//        mCallRealMethodsOfEntityMapper = callRealMethodsOfEntityMapper;
-//        mToPersist = toPersist;
-//        mToCache = toCache;
-//    }
-
-    public CloudDataStoreJUnitTest() {
-    }
+    private Context mContext;
 
     @Parameterized.Parameters
     public static Collection<Object[]> getParameters() {
@@ -89,22 +79,21 @@ public class CloudDataStoreJUnitTest {
 
     @Before
     public void setUp() throws Exception {
-        mCallRealMethodsOfEntityMapper = Mockito.anyBoolean();
-        mToPersist = Mockito.anyBoolean();
-        mToCache = Mockito.anyBoolean();
+//        mCallRealMethodsOfEntityMapper = Mockito.anyBoolean();
+//        mToPersist = Mockito.anyBoolean();
+//        mToCache = Mockito.anyBoolean();
 //        TestUtility2.performInitialSetupOfConfig(Mockito.mock(Context.class));
+        PowerMockito.mockStatic(Utils.class);
         mMockedRestApi = CloudDataStoreTestJUnitRobot.createMockedRestApi(mToCache);
         mMockedDBManager = CloudDataStoreTestJUnitRobot.createDBManagerWithMockedContext();
         if (mCallRealMethodsOfEntityMapper) {
             mIDAOMapper = CloudDataStoreTestJUnitRobot.createMockedEntityMapperWithActualMethodCalls();
-        } else
+        } else {
             mIDAOMapper = CloudDataStoreTestJUnitRobot.createMockedEntityMapper();
-        mCloudDataStore = new CloudDataStore(mMockedRestApi, mMockedDBManager, mIDAOMapper);
-    }
-
-    @After
-    public void tearDown() throws Exception {
-
+        }
+        mContext = mock(Context.class);
+//        when(Utils.isNetworkAvailable(mContext)).thenReturn(true);
+        mCloudDataStore = new CloudDataStore(mMockedRestApi, mMockedDBManager, mIDAOMapper, mContext);
     }
 
     @Test

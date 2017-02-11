@@ -1,13 +1,10 @@
 package com.zeyad.usecases.data.repository.stores;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.BuildConfig;
 
-import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
-import com.zeyad.usecases.data.network.ApiConnectionFactory;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.utils.TestUtility2;
 
@@ -36,16 +33,17 @@ public class DataStoreFactoryJUnitTest {
     private DataBaseManager mDataBaseManager;
     private Context mMockedContext;
     private IDAOMapper mIDAOMapper;
-    private DataStoreFactory mDataStoreFactory;
+    private DataStoreFactory mDataStoreFactory; // class under test
 
     @Before
     public void setUp() throws Exception {
         mMockedContext = CloudDataStoreTestJUnitRobot.getMockedContext();
-        Config.init(mMockedContext);
-        Config.setBaseURL("www.google.com");
-        ApiConnectionFactory.init();
+//        Config.init(mMockedContext);
+//        Config.setBaseURL("www.google.com");
+//        ApiConnectionFactory.init();
         mDataBaseManager = DataStoreFactoryJUnitRobot.createMockedDataBaseManager();
         mIDAOMapper = DataStoreFactoryJUnitRobot.createMockedEntityMapper();
+
         mDataStoreFactory = DataStoreFactoryJUnitRobot.createDataStoreFactory(mDataBaseManager, mMockedContext);
     }
 
@@ -87,7 +85,7 @@ public class DataStoreFactoryJUnitTest {
 
     @Test
     public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmpty() throws Exception {
-        Mockito.when(Utils.isNetworkAvailable(InstrumentationRegistry.getContext())).thenReturn(true);
+        Mockito.when(Utils.isNetworkAvailable(mMockedContext)).thenReturn(true);
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getSomeValidUrl(),
                 mIDAOMapper), is(instanceOf(CloudDataStore.class)));

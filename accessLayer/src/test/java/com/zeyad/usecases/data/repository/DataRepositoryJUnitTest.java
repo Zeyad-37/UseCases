@@ -3,51 +3,45 @@ package com.zeyad.usecases.data.repository;
 import android.support.annotation.NonNull;
 import android.support.test.rule.BuildConfig;
 
+import com.zeyad.usecases.data.mappers.IDAOMapper;
+import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.repository.stores.DataStore;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
-import com.zeyad.usecases.utils.TestUtility2;
 
-import org.hamcrest.Matchers;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
-import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import io.realm.Realm;
 import rx.Observable;
 
+import static com.zeyad.usecases.data.repository.DataRepositoryJUnitRobot.createMockedDataStoreFactory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assume.assumeThat;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 @org.robolectric.annotation.Config(constants = BuildConfig.class, sdk = 21)
-@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest({Realm.class})
-public class DataJUnitTest {
+public class DataRepositoryJUnitTest {
 
     private boolean mIsDiskType;
     private boolean mToCache;
-    private DataStore mDataStore;
-    private DataRepository mDataRepository;
-
-//    public DataJUnitTest(boolean isDiskType, boolean toCache) {
-//        mIsDiskType = isDiskType;
-//        mToCache = toCache;
-//    }
-
-    public DataJUnitTest() {
-    }
+    private DataStore mockDataStore;
+    private DataRepository mDataRepository; // class under test
+    private DataStoreFactory mockDataStoreFactory;
 
     @NonNull
     @Parameterized.Parameters
@@ -63,39 +57,45 @@ public class DataJUnitTest {
 
     @Before
     public void setUp() throws Exception {
-        mIsDiskType = Mockito.anyBoolean();
-        mToCache = Mockito.anyBoolean();
-        TestUtility2.performInitialSetupOfDb();
-        mDataStore = mIsDiskType ? DataRepositoryJUnitRobot.createMockedDiskStore()
+        // init mocks
+        mockDataStore = mIsDiskType ? DataRepositoryJUnitRobot.createMockedDiskStore()
                 : DataRepositoryJUnitRobot.createMockedCloudStore();
-        DataStoreFactory dataStoreFactory = DataRepositoryJUnitRobot.createMockedDataStoreFactory(mDataStore);
-        mDataRepository = new DataRepository(dataStoreFactory, TestUtility2.createEntityMapper());
-        DataRepositoryJUnitRobot.mockDataStore(mIsDiskType, mDataStore, dataStoreFactory);
-    }
-
-    @After
-    public void tearDown() throws Exception {
+        mockDataStoreFactory = createMockedDataStoreFactory(mockDataStore);
+        // init class under test
+        mDataRepository = new DataRepository(mockDataStoreFactory, mock(IDAOMapperFactory.class));
+        // global stub
+        when(mockDataStoreFactory.dynamically(anyString(), any(IDAOMapper.class))).thenReturn(mockDataStore);
     }
 
     @Test
-    public void testGetListDynamicallyCacheVersion_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
+    public void testGetListDynamicallyCacheVersion_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() throws Exception {
+        // dependency behaviour
+        Observable<List> observable = Observable.just(new ArrayList());
+        when(mockDataStore.dynamicGetList(anyString(), any(Class.class), any(Class.class), anyBoolean(),
+                anyBoolean())).thenReturn(observable);
+        // invoke method under test
         mDataRepository.getListDynamically(DataRepositoryJUnitRobot.getValidUrl()
                 , DataRepositoryJUnitRobot.getValidPresentationClass()
                 , DataRepositoryJUnitRobot.getValidDataClass()
                 , false
                 , mToCache);
-        Mockito.verify(mDataStore, Mockito.times(1))
-                .dynamicGetList(DataRepositoryJUnitRobot.getValidUrl()
-                        , DataRepositoryJUnitRobot.getValidPresentationClass()
-                        , DataRepositoryJUnitRobot.getValidDataClass()
-                        , false
-                        , mToCache);
+        // verify interactions
+        verify(mockDataStoreFactory, times(1)).dynamically(DataRepositoryJUnitRobot.getValidUrl()
+                , null);
+        verify(mockDataStore, times(1)).dynamicGetList(DataRepositoryJUnitRobot.getValidUrl()
+                , DataRepositoryJUnitRobot.getValidPresentationClass()
+                , DataRepositoryJUnitRobot.getValidDataClass()
+                , false
+                , mToCache);
+        // assert values
+        assertEquals(ArrayList.class.getSimpleName(), observable.toBlocking().first().getClass()
+                .getSimpleName());
     }
 
     @Test
     public void testGetListDynamicallyCacheVersion_ifExpectedObservableIsReturned_whenArgumentsArePassed() {
-        final Observable<List> mockedObservable = Mockito.mock(Observable.class);
-        DataRepositoryJUnitRobot.mockDataStoreForDynamicGetList(mDataStore, false, mToCache)
+        final Observable<List> mockedObservable = mock(Observable.class);
+        DataRepositoryJUnitRobot.mockDataStoreForDynamicGetList(mockDataStore, false, mToCache)
                 .thenReturn(mockedObservable);
         Observable<List> observable = mDataRepository
                 .getListDynamically(DataRepositoryJUnitRobot.getValidUrl()
@@ -107,16 +107,23 @@ public class DataJUnitTest {
     }
 
     @Test
-    public void testGetObjectDynamicallyByIdCacheVersion_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
-        mDataRepository
-                .getObjectDynamicallyById(DataRepositoryJUnitRobot.getValidUrl()
-                        , DataRepositoryJUnitRobot.getColumnName()
-                        , DataRepositoryJUnitRobot.getColumnId()
-                        , DataRepositoryJUnitRobot.getValidPresentationClass()
-                        , DataRepositoryJUnitRobot.getValidDataClass()
-                        , false
-                        , mToCache);
-        Mockito.verify(mDataStore, Mockito.times(1))
+    public void testGetObjectDynamicallyByIdCacheVersion_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() throws Exception {
+        // dependency behaviour
+
+        Observable<List> observable = Observable.just(new ArrayList());
+        when(mockDataStore.dynamicGetList(anyString(), any(Class.class), any(Class.class), anyBoolean(),
+                anyBoolean())).thenReturn(observable);
+        // invoke method under test
+        mDataRepository.getObjectDynamicallyById(DataRepositoryJUnitRobot.getValidUrl()
+                , DataRepositoryJUnitRobot.getColumnName()
+                , DataRepositoryJUnitRobot.getColumnId()
+                , DataRepositoryJUnitRobot.getValidPresentationClass()
+                , DataRepositoryJUnitRobot.getValidDataClass()
+                , false
+                , mToCache);
+        // verify interactions
+        verify(mockDataStoreFactory, times(1)).dynamically(DataRepositoryJUnitRobot.getValidUrl(), null);
+        verify(mockDataStore, times(1))
                 .dynamicGetObject(DataRepositoryJUnitRobot.getValidUrl()
                         , DataRepositoryJUnitRobot.getColumnName()
                         , DataRepositoryJUnitRobot.getColumnId()
@@ -124,6 +131,9 @@ public class DataJUnitTest {
                         , DataRepositoryJUnitRobot.getValidDataClass()
                         , false
                         , mToCache);
+        // assert values
+        assertEquals(ArrayList.class.getSimpleName(), observable.toBlocking().first().getClass()
+                .getSimpleName());
     }
 
     @Test
@@ -134,7 +144,7 @@ public class DataJUnitTest {
                 , DataRepositoryJUnitRobot.getValidPresentationClass()
                 , DataRepositoryJUnitRobot.getValidDataClass()
                 , true, true);
-        Mockito.verify(mDataStore, Mockito.times(1))
+        verify(mockDataStore, times(1))
                 .dynamicPostObject(DataRepositoryJUnitRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_KEY, DataRepositoryJUnitRobot.getValidJSONObject()
                         , DataRepositoryJUnitRobot.getValidPresentationClass()
@@ -149,7 +159,7 @@ public class DataJUnitTest {
                 , DataRepositoryJUnitRobot.getValidPresentationClass()
                 , DataRepositoryJUnitRobot.getValidDataClass()
                 , true, true);
-        Mockito.verify(mDataStore, Mockito.times(1))
+        verify(mockDataStore, times(1))
                 .dynamicPostList(DataRepositoryJUnitRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_KEY, DataRepositoryJUnitRobot.getValidJSONArray()
                         , DataRepositoryJUnitRobot.getValidPresentationClass()
@@ -164,7 +174,7 @@ public class DataJUnitTest {
                 , DataRepositoryJUnitRobot.getValidPresentationClass()
                 , DataRepositoryJUnitRobot.getValidDataClass()
                 , true, true);
-        Mockito.verify(mDataStore, Mockito.times(1))
+        verify(mockDataStore, times(1))
                 .dynamicDeleteCollection(DataRepositoryJUnitRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_KEY
                         , DataRepositoryJUnitRobot.getValidJSONArray()
@@ -173,29 +183,30 @@ public class DataJUnitTest {
     }
 
     @Test
-    public void testSearchDisk_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenRealmQueryIsPassed() {
-        assumeThat(mIsDiskType, Matchers.is(true));
+    public void testSearchDisk_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenRealmQueryIsPassed() throws IllegalAccessException {
+        mockDataStore = DataRepositoryJUnitRobot.createMockedDiskStore();
+        when(mockDataStoreFactory.disk(any(IDAOMapper.class))).thenReturn(mockDataStore);
+
         mDataRepository.queryDisk(DataRepositoryJUnitRobot.getValidRealmQuery()
                 , DataRepositoryJUnitRobot.getValidPresentationClass());
-        Mockito.verify(mDataStore, Mockito.times(1))
+        verify(mockDataStore, times(1))
                 .queryDisk(DataRepositoryJUnitRobot.getValidRealmQuery()
                         , DataRepositoryJUnitRobot.getValidPresentationClass());
     }
 
-    @Test
-    public void testUploadFile_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
-//        assumeThat(mIsDiskType, Matchers.is(false));
+//    @Test
+//    public void testUploadFile_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
 //        mDataRepository.uploadFileDynamically(DataRepositoryJUnitRobot.getValidUrl()
 //                , DataRepositoryJUnitRobot.getValidFile(), DataRepositoryJUnitRobot.getKey(),
 //                DataRepositoryJUnitRobot.getValidMap(), DataRepositoryJUnitRobot.ON_WIFI,
 //                DataRepositoryJUnitRobot.WHILE_CHARGING, DataRepositoryJUnitRobot.QUEUABLE,
 //                DataRepositoryJUnitRobot.getValidPresentationClass(), DataRepositoryJUnitRobot.getValidDataClass());
-//        Mockito.verify(mDataStore, Mockito.times(1))
+//        Mockito.verify(mockDataStore, Mockito.times(1))
 //                .dynamicUploadFile(DataRepositoryJUnitRobot.getValidUrl(), DataRepositoryJUnitRobot.getValidFile(),
 //                        DataRepositoryJUnitRobot.getKey(), DataRepositoryJUnitRobot.getValidMap(),
 //                        DataRepositoryJUnitRobot.ON_WIFI, DataRepositoryJUnitRobot.WHILE_CHARGING,
 //                        DataRepositoryJUnitRobot.QUEUABLE, DataRepositoryJUnitRobot.getValidPresentationClass());
-    }
+//    }
 
     @Test
     public void testPutObjectDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
@@ -204,7 +215,7 @@ public class DataJUnitTest {
                 , DataRepositoryJUnitRobot.getValidJSONObject()
                 , DataRepositoryJUnitRobot.getValidPresentationClass()
                 , DataRepositoryJUnitRobot.getValidDataClass(), true, true);
-        Mockito.verify(mDataStore, Mockito.times(1))
+        verify(mockDataStore, times(1))
                 .dynamicPutObject(DataRepositoryJUnitRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_KEY
                         , DataRepositoryJUnitRobot.getValidJSONObject()
@@ -219,7 +230,7 @@ public class DataJUnitTest {
                 , DataRepositoryJUnitRobot.getValidJSONArray()
                 , DataRepositoryJUnitRobot.getValidPresentationClass()
                 , DataRepositoryJUnitRobot.getValidDataClass(), true, true);
-        Mockito.verify(mDataStore, Mockito.times(1))
+        verify(mockDataStore, times(1))
                 .dynamicPutList(DataRepositoryJUnitRobot.getValidUrl()
                         , DataRepository.DEFAULT_ID_KEY
                         , DataRepositoryJUnitRobot.getValidJSONArray()
@@ -228,11 +239,13 @@ public class DataJUnitTest {
     }
 
     @Test
-    public void testDeleteALlDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
+    public void testDeleteALlDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() throws Exception {
+        mockDataStore = DataRepositoryJUnitRobot.createMockedDiskStore();
+        when(mockDataStoreFactory.disk(any(IDAOMapper.class))).thenReturn(mockDataStore);
+
         mDataRepository.deleteAllDynamically(DataRepositoryJUnitRobot.getValidUrl()
                 , DataRepositoryJUnitRobot.getValidDataClass(), true);
-        Mockito.verify(mDataStore, Mockito.times(1))
-                .dynamicDeleteAll(DataRepositoryJUnitRobot.getValidUrl()
-                        , DataRepositoryJUnitRobot.getValidDataClass(), true);
+        verify(mockDataStore, times(1)).dynamicDeleteAll(DataRepositoryJUnitRobot.getValidUrl()
+                , DataRepositoryJUnitRobot.getValidDataClass(), true);
     }
 }
