@@ -1,348 +1,179 @@
 package com.zeyad.usecases.data.repository.stores;
 
-import android.content.Context;
 import android.support.test.rule.BuildConfig;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
-import com.zeyad.usecases.data.db.DatabaseManagerFactory;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
-import com.zeyad.usecases.utils.TestUtility2;
-import com.zeyad.usecases.utils.TestViewModel;
+import com.zeyad.usecases.utils.TestRealmModel;
+import com.zeyad.usecases.utils.TestRealmObject;
 
-import org.hamcrest.Matchers;
-import org.junit.After;
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.robolectric.RobolectricTestRunner;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
-import rx.observers.TestSubscriber;
+import rx.Observable;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.allOf;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.iterableWithSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
-// FIXME: 2/10/17 Redo!
 @RunWith(RobolectricTestRunner.class)
 @org.robolectric.annotation.Config(constants = BuildConfig.class, sdk = 21)
 public class DiskDataStoreJUnitTest {
 
-    private DiskDataStoreJUnitRobotInterface mDiskDataStoreRobot;
-    private DataStore mDiskDataStore;
+    private DiskDataStore mDiskDataStore;
+    private DataBaseManager dbManager;
+    private IDAOMapper mapper;
 
     @Before
     public void setUp() throws Exception {
-        Config.init(mock(Context.class));
-        TestUtility2.performInitialSetupOfDb();
-        DatabaseManagerFactory.initRealm();
-        final DataBaseManager dbManager = mock(DataBaseManager.class);
-        mDiskDataStoreRobot = DiskDataStoreJUnitRobot.newInstance(dbManager, mock(IDAOMapper.class));
-        mDiskDataStore = mDiskDataStoreRobot.createDiskDataStore();
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        if (mDiskDataStoreRobot != null) {
-            mDiskDataStoreRobot.tearDown();
-        }
+        dbManager = mock(DataBaseManager.class);
+        mapper = mock(IDAOMapper.class);
+        when(mapper.mapAllToDomain(any(List.class), any(Class.class))).thenReturn(new ArrayList());
+        Config.setWithCache(false);
+        mDiskDataStore = new DiskDataStore(dbManager, mapper);
     }
 
     @Test
-    public void testGetAll_ifNoErrorIsThrown_whenGetMethodIsCalled() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
-        mDiskDataStore.dynamicGetList(null, null, mDiskDataStoreRobot.getDataClass(), false, false)
-                .subscribe(subscriber);
-        TestUtility2.assertNoErrors(subscriber);
+    public void testGetAll() {
+        List<TestRealmObject> testRealmObjects = new ArrayList<>();
+        testRealmObjects.add(new TestRealmObject());
+        Observable<List> observable = Observable.just(testRealmObjects);
+        when(dbManager.getAll(any(Class.class))).thenReturn(observable);
+
+        mDiskDataStore.dynamicGetList("", Object.class, Object.class, false, false);
+
+        Mockito.verify(dbManager, times(1)).getAll(any(Class.class));
     }
 
     @Test
-    public void testGetAllCache_ifNoErrorIsThrown_whenGetMethodIsCalled() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
-        mDiskDataStore.dynamicGetList(null, null, mDiskDataStoreRobot.getDataClass(), false, true)
-                .subscribe(subscriber);
-        TestUtility2.assertNoErrors(subscriber);
+    public void testGetObject() {
+        Observable observable = Observable.just(new TestRealmObject());
+        when(dbManager.getById(anyString(), anyInt(), any(Class.class))).thenReturn(observable);
+
+        mDiskDataStore.dynamicGetObject("", "", 0, Object.class, Object.class, false, false);
+
+        Mockito.verify(dbManager, times(1)).getById(anyString(), anyInt(), any(Class.class));
     }
 
     @Test
-    public void testGetAll_ifCorrectNumberOfItemsAreReturned_whenGetMethodIsCalled() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
-        mDiskDataStore.dynamicGetList(null, null, mDiskDataStoreRobot.getDataClass(), false, false)
-                .subscribe(subscriber);
-        final List<Object> list = subscriber.getOnNextEvents().get(0);
-        assertThat(list, is(Matchers.iterableWithSize(10)));
+    public void testSearchDiskRealmQuery() {
+        when(dbManager.getQuery(any(RealmManager.RealmQueryProvider.class))).thenReturn(any(Observable.class));
+
+        mDiskDataStore.queryDisk(realm -> realm.where(TestRealmModel.class), TestRealmModel.class);
+
+        Mockito.verify(dbManager, times(1)).getQuery(any(RealmManager.RealmQueryProvider.class));
     }
 
     @Test
-    public void testGetAllCache_ifCorrectNumberOfItemsAreReturned_whenGetMethodIsCalled() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber<List> subscriber = new TestSubscriber<>();
-        mDiskDataStore.dynamicGetList(null, null, mDiskDataStoreRobot.getDataClass(), false, true)
-                .subscribe(subscriber);
-        final List<Object> list = subscriber.getOnNextEvents().get(0);
-        assertThat(list, is(Matchers.iterableWithSize(10)));
+    public void testDynamicDeleteAll() {
+        Observable<Boolean> observable = Observable.just(true);
+        when(dbManager.evictAll(any(Class.class))).thenReturn(observable);
+
+        mDiskDataStore.dynamicDeleteAll(TestRealmModel.class);
+
+        Mockito.verify(dbManager, times(1)).evictAll(any(Class.class));
     }
 
     @Test
-    public void testGetObject_ifNoErrorIsThrown_whenIdColumnIsUsed() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        int testModelId = mDiskDataStoreRobot.getPrimaryIdForAnyInsertedTestModel();
-        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        mDiskDataStore
-                .dynamicGetObject(null, "id", testModelId, null, mDiskDataStoreRobot.getDataClass(), false, false)
-                .subscribe(subscriber);
-        TestUtility2.assertNoErrors(subscriber);
+    public void testDynamicDeleteCollection() {
+        Observable<Boolean> observable = Observable.just(true);
+        when(dbManager.evictCollection(anyString(), anyList(), any(Class.class))).thenReturn(observable);
+
+        mDiskDataStore.dynamicDeleteCollection("", "", new JSONArray(), Object.class, false, false);
+
+        Mockito.verify(dbManager, times(1)).evictCollection(anyString(), anyListOf(Long.class), any(Class.class));
     }
 
     @Test
-    public void testGetObject_ifSubscriberReceivesEvent_whenIdColumnIsUsed() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        int testModelId = mDiskDataStoreRobot.getPrimaryIdForAnyInsertedTestModel();
-        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        mDiskDataStore
-                .dynamicGetObject(null, "id", testModelId, mDiskDataStoreRobot.getDomainClass(), mDiskDataStoreRobot.getDataClass(), false, false)
-                .subscribe(subscriber);
-        assertThat("id searched for:" + testModelId, subscriber.getOnNextEvents(), allOf(notNullValue(), iterableWithSize(1)));
+    public void testDynamicPatchObject() throws Exception {
+        Observable observable = Observable.just(true);
+        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(observable);
+
+        mDiskDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, Object.class, false, false);
+
+        Mockito.verify(dbManager, times(1)).put(any(JSONObject.class), anyString(), any(Class.class));
     }
 
     @Test
-    public void testGetObject_ifTestModelIsReturned_whenIdColumnIsUsed() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        int testModelId = mDiskDataStoreRobot.getPrimaryIdForAnyInsertedTestModel();
-        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        mDiskDataStore
-                .dynamicGetObject(null, "id", testModelId, null, mDiskDataStoreRobot.getDataClass(), false, false)
-                .subscribe(subscriber);
-        assertThat(subscriber.getOnNextEvents().get(0), allOf(notNullValue(), instanceOf(mDiskDataStoreRobot.getDomainClass())));
+    public void testDynamicPostObject() throws Exception {
+        Observable observable = Observable.just(true);
+        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(observable);
+
+        mDiskDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, Object.class, false, false);
+
+        Mockito.verify(dbManager, times(1)).put(any(JSONObject.class), anyString(), any(Class.class));
     }
 
     @Test
-    public void testGetObject_ifTestModelHasIdAsExpected_whenIdColumnIsUsed() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        int testModelId = mDiskDataStoreRobot.getPrimaryIdForAnyInsertedTestModel();
-        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        mDiskDataStore
-                .dynamicGetObject(null, "id", testModelId, null, mDiskDataStoreRobot.getDataClass(), false, false)
-                .subscribe(subscriber);
-        assertThat(((TestViewModel) subscriber.getOnNextEvents().get(0)).getTestInfo(), is(equalTo(mDiskDataStoreRobot.getTestInfo(testModelId))));
+    public void testDynamicPutObject() throws Exception {
+        Observable observable = Observable.just(true);
+        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(observable);
+
+        mDiskDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, Object.class, false, false);
+
+        Mockito.verify(dbManager, times(1)).put(any(JSONObject.class), anyString(), any(Class.class));
     }
 
     @Test
-    public void testGetObjectCache_ifNoErrorIsThrown_whenIdColumnIsUsed() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        int testModelId = mDiskDataStoreRobot.getPrimaryIdForAnyInsertedTestModel();
-        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        mDiskDataStore
-                .dynamicGetObject(null, "id", testModelId, null, mDiskDataStoreRobot.getDataClass(), false, true)
-                .subscribe(subscriber);
-        TestUtility2.assertNoErrors(subscriber);
+    public void testDynamicPostList() throws Exception {
+        Observable observable = Observable.just(true);
+        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(observable);
+
+        mDiskDataStore.dynamicPostList("", "", new JSONArray(), Object.class, Object.class, false, false);
+
+        Mockito.verify(dbManager, times(1)).putAll(any(JSONArray.class), anyString(), any(Class.class));
     }
 
     @Test
-    public void testGetObjectCache_ifSubscriberReceivesEvent_whenIdColumnIsUsed() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        int testModelId = mDiskDataStoreRobot.getPrimaryIdForAnyInsertedTestModel();
-        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        mDiskDataStore
-                .dynamicGetObject(null, "id", testModelId, null, mDiskDataStoreRobot.getDataClass(), false, true)
-                .subscribe(subscriber);
-        assertThat("id searched for:" + testModelId, subscriber.getOnNextEvents(), allOf(notNullValue(), iterableWithSize(1)));
+    public void testDynamicPutList() throws Exception {
+        Observable observable = Observable.just(true);
+        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(observable);
+
+        mDiskDataStore.dynamicPutList("", "", new JSONArray(), Object.class, Object.class, false, false);
+
+        Mockito.verify(dbManager, times(1)).putAll(any(JSONArray.class), anyString(), any(Class.class));
     }
 
-    @Test
-    public void testGetObjectCache_ifTestModelIsReturned_whenIdColumnIsUsed() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        int testModelId = mDiskDataStoreRobot.getPrimaryIdForAnyInsertedTestModel();
-        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        mDiskDataStore
-                .dynamicGetObject(null, "id", testModelId, null, mDiskDataStoreRobot.getDataClass(), false, true)
-                .subscribe(subscriber);
-        assertThat(subscriber.getOnNextEvents().get(0), allOf(notNullValue(), instanceOf(mDiskDataStoreRobot.getDomainClass())));
+    @Test(expected = IllegalStateException.class)
+    public void testDynamicDownloadFile() throws Exception {
+        Observable observable = mDiskDataStore.dynamicDownloadFile("", new File(""), false, false, false);
+
+        // Verify repository interactions
+        verifyZeroInteractions(dbManager);
+
+        // Assert return type
+        assertEquals(new IllegalStateException("Can not IO file to local DB"), observable.toBlocking().first());
     }
 
-    @Test
-    public void testGetObjectCache_ifTestModelHasIdAsExpected_whenIdColumnIsUsed() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        int testModelId = mDiskDataStoreRobot.getPrimaryIdForAnyInsertedTestModel();
-        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        mDiskDataStore
-                .dynamicGetObject(null, "id", testModelId, null, mDiskDataStoreRobot.getDataClass(), false, true)
-                .subscribe(subscriber);
-        assertThat(((TestViewModel) subscriber.getOnNextEvents().get(0)).getTestInfo(), is(equalTo(mDiskDataStoreRobot.getTestInfo(testModelId))));
-    }
+    @Test(expected = IllegalStateException.class)
+    public void testDynamicUploadFile() throws Exception {
+        Observable observable = mDiskDataStore.dynamicUploadFile("", new File(""), "", new HashMap<>(),
+                false, false, false, Object.class);
 
-    @Test
-    public void testSearchDiskRealmQuery_ifNoErrorIsThrown_whenDiskIsSearchedUsingValue() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber subscriber = new TestSubscriber<>();
-        RealmManager.RealmQueryProvider realmQuery = mDiskDataStoreRobot
-                .getRealmQueryForValue(mDiskDataStoreRobot.getPrefixForTestModel());
-        mDiskDataStore.queryDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
-                .subscribe(subscriber);
-        TestUtility2.assertNoErrors(subscriber);
-    }
+        // Verify repository interactions
+        verifyZeroInteractions(dbManager);
 
-    @Test
-    public void testSearchDiskRealmQuery_ifCorrectNumberOfItemsAreReturned_whenDiskIsSearchedUsingValue() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber subscriber = new TestSubscriber<>();
-        RealmManager.RealmQueryProvider realmQuery = mDiskDataStoreRobot
-                .getRealmQueryForValue(mDiskDataStoreRobot.getPrefixForTestModel());
-        mDiskDataStore.queryDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
-                .subscribe(subscriber);
-        assertThat(((List<Object>) subscriber.getOnNextEvents().get(0)), is(iterableWithSize(10)));
-    }
-
-    @Test
-    public void testSearchDiskRealmQuery_ifCorrectItemsTypeIsReturned_whenDiskIsSearchedUsingValue() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber subscriber = new TestSubscriber<>();
-        RealmManager.RealmQueryProvider realmQuery
-                = mDiskDataStoreRobot
-                .getRealmQueryForValue(mDiskDataStoreRobot.getPrefixForTestModel());
-        mDiskDataStore.queryDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
-                .subscribe(subscriber);
-        assertThat(((List<Object>) subscriber.getOnNextEvents().get(0)).get(0), is(instanceOf(mDiskDataStoreRobot.getDomainClass())));
-    }
-
-    @Test
-    public void testSearchDiskRealmQuery_ifNoErrorIsThrown_whenDiskIsSearchedUsingId() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber subscriber = new TestSubscriber<>();
-        RealmManager.RealmQueryProvider realmQuery = mDiskDataStoreRobot.getRealmQueryForAnyId();
-        mDiskDataStore.queryDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
-                .subscribe(subscriber);
-        TestUtility2.assertNoErrors(subscriber);
-    }
-
-    @Test
-    public void testSearchDiskRealmQuery_ifCorrectNumberOfItemsAreReturned_whenDiskIsSearchedUsingId() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber subscriber = new TestSubscriber<>();
-        RealmManager.RealmQueryProvider realmQuery = mDiskDataStoreRobot.getRealmQueryForAnyId();
-        mDiskDataStore.queryDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
-                .subscribe(subscriber);
-        assertThat(((List<Object>) subscriber.getOnNextEvents().get(0)), is(iterableWithSize(1)));
-    }
-
-    @Test
-    public void testSearchDiskRealmQuery_ifCorrectItemsTypeIsReturned_whenDiskIsSearchedUsingId() {
-        mDiskDataStoreRobot.insertTestModels(10);
-        final TestSubscriber subscriber = new TestSubscriber<>();
-        RealmManager.RealmQueryProvider realmQuery = mDiskDataStoreRobot
-                .getRealmQueryForAnyId();
-        mDiskDataStore.queryDisk(realmQuery, mDiskDataStoreRobot.getDataClass())
-                .subscribe(subscriber);
-        assertThat(((List<Object>) subscriber.getOnNextEvents().get(0)).get(0), is(instanceOf(mDiskDataStoreRobot.getDomainClass())));
-    }
-
-    @Test
-    public void testDynamicDeleteCollection_ifNoErrorIsThrown_whenListContainingIdsIsSendToDelete() {
-        final TestSubscriber<Object> subscriber = mDiskDataStoreRobot.deleteAllExceptOneAfterAddingSome(mDiskDataStore);
-        TestUtility2.assertNoErrors(subscriber);
-    }
-
-    @Test
-    public void testDynamicDeleteCollection_ifTrueIsReturned_whenListContainingIdsIsSendToDelete() {
-        final TestSubscriber<Object> subscriber = mDiskDataStoreRobot.deleteAllExceptOneAfterAddingSome(mDiskDataStore);
-        subscriber.assertValue(Boolean.TRUE);
-    }
-
-    @Test
-    public void testDynamicDeleteCollection_ifItemsAreActuallyDeleted_whenListContainingIdsIsSendToDelete() {
-        mDiskDataStoreRobot.deleteAllExceptOneAfterAddingSome(mDiskDataStore);
-        assertThat(mDiskDataStoreRobot.getItemCount(), is(equalTo(1)));
-    }
-
-    @Test
-    public void testDeleteAll_ifNoErrorIsThrown_whenTestModelIsPassed() {
-        final TestSubscriber<Object> subscriber = mDiskDataStoreRobot.deleteAllAfterAddingSome(mDiskDataStore);
-        TestUtility2.assertNoErrors(subscriber);
-    }
-
-    @Test
-    public void testDeleteAll_ifItemsAreDeletedOrNot_whenTestModelIsPassed() {
-        mDiskDataStoreRobot.deleteAllAfterAddingSome(mDiskDataStore);
-        assertThat(mDiskDataStoreRobot.getItemCount(), is(equalTo(0)));
-    }
-
-    @Test
-    public void testDeleteAll_ifTrueIsReturned_whenTestModelIsPassed() {
-        final TestSubscriber<Object> subscriber = mDiskDataStoreRobot.deleteAllAfterAddingSome(mDiskDataStore);
-        subscriber.assertValue(Boolean.TRUE);
-    }
-
-    @Test
-    public void testDynamicPostObject_ifNoErrorIsThrown_whenKeyValuePairIsPosted() throws Exception {
-        TestSubscriber<Object> subscriber = mDiskDataStoreRobot.postTestModelKeyValuePair(mDiskDataStore);
-        TestUtility2.assertNoErrors(subscriber);
-    }
-
-    @Test
-    public void testDynamicPostObject_ifTrueIsReturned_whenKeyValuePairIsPosted() throws Exception {
-        TestSubscriber<Object> subscriber = mDiskDataStoreRobot.postTestModelKeyValuePair(mDiskDataStore);
-        subscriber.assertValue(Boolean.TRUE);
-    }
-
-    @Test
-    public void testDynamicPostObject_ifOneTestModelIsInserted_whenKeyValuePairIsPosted() throws Exception {
-        mDiskDataStoreRobot.postTestModelKeyValuePair(mDiskDataStore);
-        assertThat(mDiskDataStoreRobot.getItemCount(), is(equalTo(1)));
-    }
-
-    @Test
-    public void testDynamicPostObject_ifNoErrorIsThrown_whenJsonObjectIsPosted() throws Exception {
-        TestSubscriber<Object> subscriber = mDiskDataStoreRobot.postTestModelJsonObject(mDiskDataStore);
-        TestUtility2.assertNoErrors(subscriber);
-    }
-
-    @Test
-    public void testDynamicPostObject_ifTrueIsReturned_whenJsonObjectIsPosted() throws Exception {
-        TestSubscriber<Object> subscriber = mDiskDataStoreRobot.postTestModelJsonObject(mDiskDataStore);
-        subscriber.assertValue(Boolean.TRUE);
-    }
-
-    @Test
-    public void testDynamicPostObject_ifOneTestModelIsInserted_whenJsonObjectIsPosted() throws Exception {
-        mDiskDataStoreRobot.postTestModelJsonObject(mDiskDataStore);
-        assertThat(mDiskDataStoreRobot.getItemCount(), is(equalTo(1)));
-    }
-
-    @Test
-    public void testDynamicPutObject_ifNoErrorIsThrown_whenKeyValuePairIsPosted() throws Exception {
-        TestSubscriber<Object> subscriber = mDiskDataStoreRobot.putTestModelKeyValuePair(mDiskDataStore);
-        TestUtility2.assertNoErrors(subscriber);
-    }
-
-    @Test
-    public void testDynamicPutObject_ifTrueIsReturned_whenKeyValuePairIsPosted() throws Exception {
-        TestSubscriber<Object> subscriber = mDiskDataStoreRobot.putTestModelKeyValuePair(mDiskDataStore);
-        subscriber.assertValue(Boolean.TRUE);
-    }
-
-    @Test
-    public void testDynamicPutObject_ifOneTestModelIsInserted_whenKeyValuePairIsPosted() throws Exception {
-        mDiskDataStoreRobot.putTestModelKeyValuePair(mDiskDataStore);
-        assertThat(mDiskDataStoreRobot.getItemCount(), is(equalTo(1)));
-    }
-
-    @Test
-    public void testDynamicDownloadFile_ifErrorIsThrown() throws Exception {
-        final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        mDiskDataStoreRobot.dynamicDownloadFile(mDiskDataStore)
-                .subscribe(subscriber);
-        subscriber.assertError(IllegalStateException.class);
+        // Assert return type
+        assertEquals(new IllegalStateException("Can not IO file to local DB"), observable.toBlocking().first());
     }
 
 }

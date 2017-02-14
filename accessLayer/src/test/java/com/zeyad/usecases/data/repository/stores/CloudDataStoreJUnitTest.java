@@ -8,7 +8,7 @@ import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.utils.Utils;
-import com.zeyad.usecases.utils.TestModel;
+import com.zeyad.usecases.utils.TestRealmObject;
 import com.zeyad.usecases.utils.TestUtility2;
 
 import org.json.JSONArray;
@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -83,7 +82,7 @@ public class CloudDataStoreJUnitTest {
 //        mToPersist = Mockito.anyBoolean();
 //        mToCache = Mockito.anyBoolean();
 //        TestUtility2.performInitialSetupOfConfig(Mockito.mock(Context.class));
-        PowerMockito.mockStatic(Utils.class);
+//        PowerMockito.mockStatic(Utils.class);
         mMockedRestApi = CloudDataStoreTestJUnitRobot.createMockedRestApi(mToCache);
         mMockedDBManager = CloudDataStoreTestJUnitRobot.createDBManagerWithMockedContext();
         if (mCallRealMethodsOfEntityMapper) {
@@ -577,7 +576,7 @@ public class CloudDataStoreJUnitTest {
         CloudDataStoreTestJUnitRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
         if (mCallRealMethodsOfEntityMapper) {
-            verify.put(Mockito.any(TestModel.class), Mockito.eq(CloudDataStoreTestJUnitRobot.getValidDataClass()));
+            verify.put(Mockito.any(TestRealmObject.class), Mockito.eq(CloudDataStoreTestJUnitRobot.getValidDataClass()));
         } else {
             verify.put(Mockito.any(JSONObject.class), Mockito.eq("id"), Mockito.eq(CloudDataStoreTestJUnitRobot.getValidDataClass()));
         }
@@ -598,7 +597,7 @@ public class CloudDataStoreJUnitTest {
         CloudDataStoreTestJUnitRobot.dynamicPutHashmapObject(mCloudDataStore, mToPersist);
         final DataBaseManager verify = Mockito.verify(mMockedDBManager, times(mToPersist ? 1 : 0));
         if (mCallRealMethodsOfEntityMapper) {
-            verify.put(Mockito.any(TestModel.class), Mockito.eq(CloudDataStoreTestJUnitRobot.getValidDataClass()));
+            verify.put(Mockito.any(TestRealmObject.class), Mockito.eq(CloudDataStoreTestJUnitRobot.getValidDataClass()));
         } else {
             verify.put(Mockito.any(JSONObject.class), Mockito.eq("id"), Mockito.eq(CloudDataStoreTestJUnitRobot.getValidDataClass()));
         }
@@ -623,7 +622,7 @@ public class CloudDataStoreJUnitTest {
                     , Mockito.eq(CloudDataStoreTestJUnitRobot.getValidColumnName())
                     , Mockito.eq(CloudDataStoreTestJUnitRobot.getValidDataClass()));
         } else {
-            verify.put(Mockito.any(TestModel.class)
+            verify.put(Mockito.any(TestRealmObject.class)
                     , Mockito.eq(CloudDataStoreTestJUnitRobot.getValidDataClass()));
         }
     }

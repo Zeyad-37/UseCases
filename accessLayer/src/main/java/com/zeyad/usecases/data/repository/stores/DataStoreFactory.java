@@ -1,35 +1,29 @@
 package com.zeyad.usecases.data.repository.stores;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
-import com.zeyad.usecases.R;
 import com.zeyad.usecases.data.db.DataBaseManager;
-import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApiImpl;
-import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 
-import static com.zeyad.usecases.Config.getInstance;
-
 public class DataStoreFactory {
-
-    private final Context mContext;
+    private final static String DB_NOT_ENABLED = "Database not enabled!", DB_MANAGER_NULL = "DataBaseManager cannot be null!";
     @Nullable
     private DataBaseManager mDataBaseManager;
+    private RestApiImpl mRestApi;
 
-    public DataStoreFactory(Context context) {
-        mContext = context;
+    public DataStoreFactory(RestApiImpl restApi) {
         mDataBaseManager = null;
+        mRestApi = restApi;
     }
 
-    public DataStoreFactory(@Nullable DataBaseManager dataBaseManager, Context context) {
+    public DataStoreFactory(@Nullable DataBaseManager dataBaseManager, RestApiImpl restApi) {
         if (dataBaseManager == null)
-            throw new IllegalArgumentException(context.getString(R.string.dbmanager_null_error));
-        mContext = context;
+            throw new IllegalArgumentException(DB_MANAGER_NULL);
         mDataBaseManager = dataBaseManager;
+        mRestApi = restApi;
     }
 
     /**
@@ -38,11 +32,9 @@ public class DataStoreFactory {
     @NonNull
     public DataStore dynamically(@NonNull String url, IDAOMapper entityDataMapper) throws Exception {
         if (!url.isEmpty())
-            if (Utils.isNetworkAvailable(mContext))
-                return new CloudDataStore(RestApiImpl.getInstance(), mDataBaseManager, entityDataMapper);
-            else throw new NetworkConnectionException("Please Check your internet connection!");
+            return new CloudDataStore(mRestApi, mDataBaseManager, entityDataMapper);
         else if (mDataBaseManager == null)
-            throw new IllegalAccessException(getInstance().getContext().getString(R.string.no_db));
+            throw new IllegalAccessException(DB_NOT_ENABLED);
         else
             return new DiskDataStore(mDataBaseManager, entityDataMapper);
     }
@@ -52,8 +44,9 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore disk(IDAOMapper entityDataMapper) throws IllegalAccessException {
-        if (!DataUseCase.hasRealm() || mDataBaseManager == null)
-            throw new IllegalAccessException(getInstance().getContext().getString(R.string.no_db));
+        if (!DataUseCase.hasRealm() || mDataBaseManager == null) {
+            throw new IllegalAccessException(DB_NOT_ENABLED);
+        }
         return new DiskDataStore(mDataBaseManager, entityDataMapper);
     }
 
@@ -62,6 +55,6 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore cloud(IDAOMapper entityDataMapper) {
-        return new CloudDataStore(RestApiImpl.getInstance(), mDataBaseManager, entityDataMapper);
+        return new CloudDataStore(mRestApi, mDataBaseManager, entityDataMapper);
     }
 }

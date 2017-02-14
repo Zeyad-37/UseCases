@@ -12,6 +12,10 @@
         <property name="eachLine" value="true" />
     </module>
 
+    <module name="FileLength">
+        <property name="max" value="1000" />
+    </module>
+
     <module name="TreeWalker">
 
         <!-- Imports -->
@@ -164,6 +168,18 @@
                 value="Method type name ''{0}'' must match pattern ''{1}''." />
         </module>
 
+    </module>
+
+    <!-- Space after 'for' and 'if' -->
+    <module name="RegexpSingleline">
+        <property name="format" value="^\s*(for|if)[^ ]\(" />
+        <property name="message" value="Space needed before opening parenthesis." />
+    </module>
+
+    <module name="RegexpMultiline">
+        <property name="format" value="\r?\n[ \t\x0B\f]*\r?\n[ \t\x0B\f]*\r?\n" />
+        <property name="fileExtensions" value="java" />
+        <property name="message" value="Two consecutive empty lines" />
     </module>
 
 </module>

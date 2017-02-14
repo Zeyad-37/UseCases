@@ -245,7 +245,6 @@ public class DataRepositoryJUnitTest {
 
         mDataRepository.deleteAllDynamically(DataRepositoryJUnitRobot.getValidUrl()
                 , DataRepositoryJUnitRobot.getValidDataClass(), true);
-        verify(mockDataStore, times(1)).dynamicDeleteAll(DataRepositoryJUnitRobot.getValidUrl()
-                , DataRepositoryJUnitRobot.getValidDataClass(), true);
+        verify(mockDataStore, times(1)).dynamicDeleteAll(DataRepositoryJUnitRobot.getValidDataClass());
     }
 }

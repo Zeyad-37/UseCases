@@ -3,6 +3,7 @@ package com.zeyad.usecases.data.services.jobs;
 import android.annotation.TargetApi;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.test.rule.BuildConfig;
@@ -35,6 +36,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
 @RunWith(RobolectricTestRunner.class)
@@ -43,9 +45,10 @@ import static org.mockito.Mockito.times;
 @PrepareForTest({JobScheduler.class})
 public class FileIOJUnitTest {
     // TODO: 9/25/16 Mock Job Scheduler
+    Context context;
     @Before
     public void setUp() throws Exception {
-
+        context = mock(Context.class);
     }
 
     @After
@@ -86,7 +89,7 @@ public class FileIOJUnitTest {
         FileIORequest fileIOReq =
                 FileIOJUnitTestRobot.createFileIoReq(true, true, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
         final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
-        final FirebaseJobDispatcher gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager();
+        final FirebaseJobDispatcher gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager(context);
         FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 1
@@ -101,7 +104,7 @@ public class FileIOJUnitTest {
         FileIORequest fileIOReq =
                 FileIOJUnitTestRobot.createFileIoReq(true, false, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
         final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
-        final FirebaseJobDispatcher gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager();
+        final FirebaseJobDispatcher gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager(context);
         FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 1
@@ -161,7 +164,7 @@ public class FileIOJUnitTest {
         FileIORequest fileIOReq =
                 FileIOJUnitTestRobot.createFileIoReq(true, true, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
         final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
-        final FirebaseJobDispatcher gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager();
+        final FirebaseJobDispatcher gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager(context);
         FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 2

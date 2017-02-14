@@ -56,19 +56,11 @@ class ApiConnection implements IApiConnection {
 
     private ApiConnection(@Nullable OkHttpClient.Builder okhttpBuilder, @Nullable Cache cache) {
         if (okhttpBuilder == null)
-            throw new NullPointerException(BUILDER_NULL);
+            okhttpBuilder = getBuilderForOkHttp();
         mRestApiWithCache = createRetro2Client(provideOkHttpClient(okhttpBuilder, cache))
                 .create(RestApi.class);
         mRestApiWithoutCache = createRetro2Client(provideOkHttpClient(okhttpBuilder, null))
                 .create(RestApi.class);
-    }
-
-    private ApiConnection() {
-        Config.getInstance().setUseApiWithCache(true);
-        mRestApiWithCache = createRetro2Client(provideOkHttpClient(getBuilderForOkHttp()
-                , provideCache())).create(RestApi.class);
-        mRestApiWithoutCache = createRetro2Client(provideOkHttpClient(getBuilderForOkHttp()
-                , null)).create(RestApi.class);
     }
 
     /**
@@ -78,34 +70,30 @@ class ApiConnection implements IApiConnection {
      * @param restApiWithCache
      */
     @VisibleForTesting
-    private ApiConnection(RestApi restApiWithoutCache, RestApi restApiWithCache) {
+    ApiConnection(RestApi restApiWithoutCache, RestApi restApiWithCache) {
         mRestApiWithoutCache = restApiWithoutCache;
         mRestApiWithCache = restApiWithCache;
     }
 
     static IApiConnection getInstance() {
         if (sInstance == null)
-            init();
+            init(null, null);
         return sInstance;
-    }
-
-    static void init() {
-        sInstance = new ApiConnection();
     }
 
     static void init(OkHttpClient.Builder okhttpBuilder, Cache cache) {
         sInstance = new ApiConnection(okhttpBuilder, cache);
     }
 
-    /**
-     * Meant only for mocking and testing purposed.
-     *
-     * @param restApiWithoutCache
-     * @param restApiWithCache
-     */
-    static void init(RestApi restApiWithoutCache, RestApi restApiWithCache) {
-        sInstance = new ApiConnection(restApiWithoutCache, restApiWithCache);
-    }
+//    /**
+//     * Meant only for mocking and testing purposed.
+//     *
+//     * @param restApiWithoutCache
+//     * @param restApiWithCache
+//     */
+//    static void init(RestApi restApiWithoutCache, RestApi restApiWithCache) {
+//        sInstance = new ApiConnection(restApiWithoutCache, restApiWithCache);
+//    }
 
     @NonNull
     @Override

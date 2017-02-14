@@ -34,7 +34,7 @@ public class TestModelViewModelMapper implements IDAOMapper, AbstractAwareMethod
 
     @Override
     public Object mapToDomain(Object realmModels, @NonNull Class domainClass) {
-        if (realmModels instanceof TestModel) {
+        if (realmModels instanceof TestRealmObject) {
             return mapToDomain(realmModels, domainClass);
         }
         if (domainClass.isInstance(realmModels)) {

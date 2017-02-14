@@ -80,7 +80,7 @@ public interface DataStore {
      * that will emit a list of ?.
      */
     @NonNull
-    Observable<Boolean> dynamicDeleteAll(String url, Class dataClass, boolean persist);
+    Observable<Boolean> dynamicDeleteAll(Class dataClass);
 
     /**
      * Search disk with a RealmQuery which returns an {@link Observable} that will emit a list of ?.

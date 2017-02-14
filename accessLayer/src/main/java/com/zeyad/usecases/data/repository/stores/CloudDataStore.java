@@ -269,7 +269,7 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Boolean> dynamicDeleteAll(String url, Class dataClass, boolean persist) {
+    public Observable<Boolean> dynamicDeleteAll(Class dataClass) {
         return Observable.error(new Exception(mContext.getString(R.string.delete_all_error_cloud)));
     }
 

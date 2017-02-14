@@ -7,7 +7,7 @@ import com.zeyad.usecases.data.repository.stores.CloudDataStore;
 import com.zeyad.usecases.data.repository.stores.DataStore;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.repository.stores.DiskDataStore;
-import com.zeyad.usecases.utils.TestModel;
+import com.zeyad.usecases.utils.TestRealmObject;
 import com.zeyad.usecases.utils.TestViewModel;
 
 import org.json.JSONArray;
@@ -77,7 +77,7 @@ public class DataRepositoryJUnitRobot {
 
     @NonNull
     static Class getValidDataClass() {
-        return TestModel.class;
+        return TestRealmObject.class;
     }
 
     static String getColumnName() {

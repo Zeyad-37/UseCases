@@ -9,11 +9,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.utils.Utils;
-import com.zeyad.usecases.utils.TestModel;
+import com.zeyad.usecases.utils.TestRealmObject;
 import com.zeyad.usecases.utils.TestViewModel;
 
 import org.mockito.Mockito;
@@ -58,7 +59,7 @@ class FileIOJUnitTestRobot {
 
     @NonNull
     static Class getPresentationClass() {
-        return TestModel.class;
+        return TestRealmObject.class;
     }
 
     static String getValidColumnName() {
@@ -67,7 +68,7 @@ class FileIOJUnitTestRobot {
 
     @NonNull
     static Class getValidDataClass() {
-        return TestModel.class;
+        return TestRealmObject.class;
     }
 
     static FileIORequest createFileIoReq(boolean wifi, boolean isCharging, File file) {
@@ -86,8 +87,8 @@ class FileIOJUnitTestRobot {
         return new File(Environment.getExternalStorageDirectory(), "someFile.txt");
     }
 
-    static FirebaseJobDispatcher getGcmNetworkManager() {
-        return Mockito.mock(FirebaseJobDispatcher.class);
+    static FirebaseJobDispatcher getGcmNetworkManager(Context context) {
+        return new FirebaseJobDispatcher(new GooglePlayDriver(context));
     }
 
     @NonNull

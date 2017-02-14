@@ -1,6 +1,6 @@
 package com.zeyad.usecases.data.requests;
 
-import com.zeyad.usecases.utils.TestModel;
+import com.zeyad.usecases.utils.TestRealmObject;
 import com.zeyad.usecases.utils.TestViewModel;
 
 import rx.Subscriber;
@@ -8,7 +8,7 @@ import rx.observers.TestSubscriber;
 
 class GetRequestTestRobot {
 
-    static final Class DATA_CLASS = TestModel.class;
+    static final Class DATA_CLASS = TestRealmObject.class;
     static final boolean TO_PERSIST = false;
     static final String ID_COLUMN_NAME = "id";
     static final Class PRESENTATION_CLASS = TestViewModel.class;

@@ -4,13 +4,11 @@ import android.support.annotation.Nullable;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.utils.Utils;
-import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -29,7 +27,7 @@ public class GetRequestTest {
 
     @Before
     public void setUp() throws Exception {
-        PowerMockito.mockStatic(DataUseCaseFactory.class);
+//        PowerMockito.mockStatic(DataUseCaseFactory.class);
         mGetRequest = GetRequestTestRobot.createGetObjectRequest();
 //        when(Utils.isNotEmpty(mGetRequest.getUrl())).thenReturn(true);
 //        when(Config.getBaseURL()).thenReturn("www.google.com");

@@ -14,9 +14,10 @@ import com.zeyad.usecases.data.db.RealmManagerImplJUnitUtils;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
+import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.utils.ResponseBodyObservable;
-import com.zeyad.usecases.utils.TestModel;
 import com.zeyad.usecases.utils.TestModelViewModelMapper;
+import com.zeyad.usecases.utils.TestRealmObject;
 import com.zeyad.usecases.utils.TestUtility2;
 import com.zeyad.usecases.utils.TestViewModel;
 import com.zeyad.usecases.utils.ToStringArgumentMatcher;
@@ -46,7 +47,7 @@ import static org.mockito.Matchers.eq;
 @SuppressWarnings("WrongConstant")
 class CloudDataStoreTestJUnitRobot {
 
-    private static final TestModel TEST_MODEL = new TestModel(1, "123");
+    private static final TestRealmObject TEST_MODEL = new TestRealmObject(1, "123");
     private static final File MOCKED_FILE = Mockito.mock(File.class);
     private static final JobScheduler JOB_SCHEDULER = Mockito.mock(JobScheduler.class);
 
@@ -121,7 +122,7 @@ class CloudDataStoreTestJUnitRobot {
 
     @NonNull
     static Class getValidDataClass() {
-        return TestModel.class;
+        return TestRealmObject.class;
     }
 
     static RestApi createMockedRestApi(boolean toCache) {
@@ -298,7 +299,7 @@ class CloudDataStoreTestJUnitRobot {
     }
 
     @NonNull
-    public static TestModel createTestModel() {
+    public static TestRealmObject createTestModel() {
         return TEST_MODEL;
     }
 
@@ -317,8 +318,8 @@ class CloudDataStoreTestJUnitRobot {
     }
 
     static boolean isNetworkEnabled() {
-//        return Utils.isNetworkAvailable(getMockedContext());
-        return true;
+        return Utils.isNetworkAvailable(getMockedContext());
+//        return true;
     }
 
     static <T> T argThis(T arg) {

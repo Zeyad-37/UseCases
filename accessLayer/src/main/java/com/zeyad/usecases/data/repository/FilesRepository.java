@@ -9,6 +9,7 @@ import com.zeyad.usecases.data.mappers.DAOMapperFactory;
 import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
+import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.domain.repositories.Files;
 
@@ -33,8 +34,7 @@ public class FilesRepository implements Files {
 
     private FilesRepository(Context context) {
         if (Config.getInstance().getDataStoreFactory() == null) {
-            mDataStoreFactory = new DataStoreFactory(Config.getInstance().getContext() == null ?
-                    context : Config.getInstance().getContext());
+            mDataStoreFactory = new DataStoreFactory(RestApiImpl.getInstance());
             Config.getInstance().setDataStoreFactory(mDataStoreFactory);
         } else
             mDataStoreFactory = Config.getInstance().getDataStoreFactory();

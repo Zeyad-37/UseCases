@@ -7,9 +7,10 @@ import android.support.test.rule.BuildConfig;
 
 import com.google.gson.Gson;
 import com.zeyad.usecases.data.utils.Utils;
+import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 import com.zeyad.usecases.utils.ModelWithStringPrimaryKey;
 import com.zeyad.usecases.utils.RealmModelClass;
-import com.zeyad.usecases.utils.TestModel;
+import com.zeyad.usecases.utils.TestRealmObject;
 import com.zeyad.usecases.utils.TestUtility2;
 
 import org.hamcrest.MatcherAssert;
@@ -75,7 +76,7 @@ public class RealmManagerImplTestJUnit {
 
         Realm mockRealm = PowerMockito.mock(Realm.class);
 
-        when(mockRealm.createObject(TestModel.class)).thenReturn(new TestModel());
+        when(mockRealm.createObject(TestRealmObject.class)).thenReturn(new TestRealmObject());
 //        when(mockRealm.createObject(Offer.class)).thenReturn(new Offer());
 //        when(mockRealm.createObject(Tasker.class)).thenReturn(new Tasker());
 //        when(mockRealm.createObject(Job.class)).thenReturn(new Job());
@@ -91,7 +92,7 @@ public class RealmManagerImplTestJUnit {
         TestUtility2.performInitialSetupOfDb();
         mRandom = new Random();
         mRealmManager = getGeneralRealmManager();
-        mRealmManager.evictAll(TestModel.class).subscribe(new TestSubscriber<>());
+        mRealmManager.evictAll(TestRealmObject.class).subscribe(new TestSubscriber<>());
         mRealmManager.evictAll(RealmModelClass.class).subscribe(new TestSubscriber<>());
         mRealmManager.evictAll(ModelWithStringPrimaryKey.class).subscribe(new TestSubscriber<>());
     }
@@ -115,7 +116,7 @@ public class RealmManagerImplTestJUnit {
             throws InterruptedException {
         RealmManager realmManager = getGeneralRealmManager();
         runOnMainThread(() -> putTestModel(realmManager));
-        realmManager.getAll(TestModel.class);
+        realmManager.getAll(TestRealmObject.class);
     }
 
     @Test
@@ -136,27 +137,27 @@ public class RealmManagerImplTestJUnit {
 
     @Test
     public void testPutJsonMethod_ifNoExceptionIsThrown_whenOperationIsPerformed() throws Throwable {
-        int previousTestModelCount = getQueryList(TestModel.class).size();
+        int previousTestModelCount = getQueryList(TestRealmObject.class).size();
         insertJsonObject();
-        assertGetAllForSize(TestModel.class, previousTestModelCount + 1);
+        assertGetAllForSize(TestRealmObject.class, previousTestModelCount + 1);
     }
 
     @Test
     public void testPutJsonMethod_ifTrueIsReturnedInSubscriber_whenOperationIsPerformed() throws Throwable {
-        TestModel testModel = createTestModelWithRandomId();
-        String json = new Gson().toJson(testModel);
+        TestRealmObject testRealmObject = createTestModelWithRandomId();
+        String json = new Gson().toJson(testRealmObject);
         JSONObject jsonObject = new JSONObject(json);
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        mRealmManager.put(jsonObject, "id", TestModel.class)
+        mRealmManager.put(jsonObject, "id", TestRealmObject.class)
                 .subscribe(subscriber);
         subscriber.assertValue(Boolean.TRUE);
     }
 
     @Test
     public void testPutRealmObject_ifNoExceptionIsThrown_whenOperationIsPerformed() throws Throwable {
-        int previousTestModelCount = getQueryList(TestModel.class).size();
+        int previousTestModelCount = getQueryList(TestRealmObject.class).size();
         putTestModel(mRealmManager);
-        assertGetAllForSize(TestModel.class, previousTestModelCount + 1);
+        assertGetAllForSize(TestRealmObject.class, previousTestModelCount + 1);
     }
 
     @Test
@@ -170,14 +171,14 @@ public class RealmManagerImplTestJUnit {
     @Test
     public void testPutJsonMethod_ifNoExceptionIsRaised_whenJsonObjectCreatedInBackgroundAndInsertedInUiThread()
             throws Throwable {
-        TestModel testModel = createTestModelWithRandomId();
-        String json = new Gson().toJson(testModel);
+        TestRealmObject testRealmObject = createTestModelWithRandomId();
+        String json = new Gson().toJson(testRealmObject);
         JSONObject jsonObject = new JSONObject(json);
         runOnMainThread(() -> {
             final TestSubscriber<Object> subscriber = new TestSubscriber<>();
             RealmManager realmManager
                     = getGeneralRealmManager();
-            realmManager.put(jsonObject, "id", TestModel.class)
+            realmManager.put(jsonObject, "id", TestRealmObject.class)
                     .subscribe(subscriber);
             subscriber.assertNoErrors();
         });
@@ -193,7 +194,7 @@ public class RealmManagerImplTestJUnit {
         RealmManager realmManager
                 = getGeneralRealmManager();
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        realmManager.put(jsonObject[0], "id", TestModel.class)
+        realmManager.put(jsonObject[0], "id", TestRealmObject.class)
                 .subscribe(subscriber);
         subscriber.assertNoErrors();
     }
@@ -207,7 +208,7 @@ public class RealmManagerImplTestJUnit {
                 , createTestModelWithRandomId());
         TestUtility2.assertConvertedJsonArray(jsonObject);
         Observable<?> observable
-                = realmManager.put(jsonObject[0], "id", TestModel.class);
+                = realmManager.put(jsonObject[0], "id", TestRealmObject.class);
         assertPutOperationObservable(observable);
     }
 
@@ -236,7 +237,7 @@ public class RealmManagerImplTestJUnit {
             TestUtility2.getJsonObjectFrom(jsonObject, createTestModelWithRandomId());
             TestUtility2.assertConvertedJsonArray(jsonObject);
         });
-        Observable<?> observable = realmManager.put(jsonObject[0], "id", TestModel.class);
+        Observable<?> observable = realmManager.put(jsonObject[0], "id", TestRealmObject.class);
         assertPutOperationObservable(observable);
     }
 
@@ -244,36 +245,36 @@ public class RealmManagerImplTestJUnit {
     public void testEvictAllMethod_IfDeletesAllModels_whenSinglePut() {
         putTestModel(mRealmManager);
         Observable<Boolean> evictObservable
-                = mRealmManager.evictAll(TestModel.class);
+                = mRealmManager.evictAll(TestRealmObject.class);
         final TestSubscriber<Boolean> evictAllSubscriber = new TestSubscriber<>();
         evictObservable.subscribe(evictAllSubscriber);
         evictAllSubscriber.assertValue(Boolean.TRUE);
-        assertGetAllForSize(TestModel.class, 0);
+        assertGetAllForSize(TestRealmObject.class, 0);
     }
 
     @Test
     public void testEvictAllMethod_ifNoExceptionIsThrown_IfIncorrectClassnameIsPassed() {
-        mRealmManager.evictAll(TestModel.class).subscribe(new TestSubscriber<>());
+        mRealmManager.evictAll(TestRealmObject.class).subscribe(new TestSubscriber<>());
     }
 
     @Test
     public void testEvictAllMethod_IfDeletesAllModels_whenMultiplePut() {
         TestUtility2.executeMultipleTimes(TestUtility2.EXECUTION_COUNT_SMALL, () -> putTestModel(mRealmManager));
-        assertGetAllForSize(TestModel.class, TestUtility2.EXECUTION_COUNT_SMALL);
+        assertGetAllForSize(TestRealmObject.class, TestUtility2.EXECUTION_COUNT_SMALL);
         Observable<Boolean> evictObservable
-                = mRealmManager.evictAll(TestModel.class);
+                = mRealmManager.evictAll(TestRealmObject.class);
         final TestSubscriber<Boolean> evictAllSubscriber = new TestSubscriber<>();
         evictObservable.subscribe(evictAllSubscriber);
         evictAllSubscriber.assertValue(Boolean.TRUE);
-        assertGetAllForSize(TestModel.class, 0);
+        assertGetAllForSize(TestRealmObject.class, 0);
     }
 
 
     @Test
     public void testEvictBySingleModel_ifManagedModelIsInsertedAndEvicted_thenWouldBeDeleted() {
-        TestModel insertedTestModel = putTestModel(mRealmManager);
-        mRealmManager.evict(getManagedObject(insertedTestModel, mRealmManager), TestModel.class);
-        assertGetAllForSize(TestModel.class, 0);
+        TestRealmObject insertedTestRealmObject = putTestModel(mRealmManager);
+        mRealmManager.evict(getManagedObject(insertedTestRealmObject, mRealmManager), TestRealmObject.class);
+        assertGetAllForSize(TestRealmObject.class, 0);
     }
 
 
@@ -319,29 +320,29 @@ public class RealmManagerImplTestJUnit {
 
     @Test
     public void testEvictBySingleModel_ifMultipleModelsAreInsertedAndEvictedSequentially() {
-        List<TestModel> insertedTestModelList = new ArrayList<>();
+        List<TestRealmObject> insertedTestRealmObjectList = new ArrayList<>();
         for (int i = 0; i < TestUtility2.EXECUTION_COUNT_SMALL; i++) {
-            insertedTestModelList.add(putTestModel(mRealmManager));
+            insertedTestRealmObjectList.add(putTestModel(mRealmManager));
         }
-        assertGetAllForSize(TestModel.class, TestUtility2.EXECUTION_COUNT_SMALL);
-        for (TestModel testModel : insertedTestModelList) {
-            final TestModel managedObject = getManagedObject(testModel, mRealmManager);
-            mRealmManager.evict(managedObject, TestModel.class);
+        assertGetAllForSize(TestRealmObject.class, TestUtility2.EXECUTION_COUNT_SMALL);
+        for (TestRealmObject testRealmObject : insertedTestRealmObjectList) {
+            final TestRealmObject managedObject = getManagedObject(testRealmObject, mRealmManager);
+            mRealmManager.evict(managedObject, TestRealmObject.class);
         }
-        assertGetAllForSize(TestModel.class, 0);
+        assertGetAllForSize(TestRealmObject.class, 0);
     }
 
     @Test
     public void testGetManagedObject_ifReturnedObjectIsValid_whenNonManagedObjectIsProvided() {
-        TestModel testModel = putTestModel(mRealmManager);
-        TestModel managedTestModel = getManagedObject(testModel, mRealmManager);
-        MatcherAssert.assertThat("managed test model should be valid", managedTestModel.isValid());
+        TestRealmObject testRealmObject = putTestModel(mRealmManager);
+        TestRealmObject managedTestRealmObject = getManagedObject(testRealmObject, mRealmManager);
+        MatcherAssert.assertThat("managed test model should be valid", managedTestRealmObject.isValid());
     }
 
     @Test
     public void testPutRealmObject_ifInsertedObjectIsNotvalid_whenRealmObjectIsInserted() {
-        TestModel testModel = putTestModel(mRealmManager);
-        assertThat("test model should not be valid", !testModel.isValid());
+        TestRealmObject testRealmObject = putTestModel(mRealmManager);
+        assertThat("test model should not be valid", !testRealmObject.isValid());
     }
 
     @Test
@@ -351,38 +352,38 @@ public class RealmManagerImplTestJUnit {
 
     @Test
     public void testPutRealmObject_ifCorrectNumberOfItemsAreInserted_whenSingleItemIsInserted() {
-        Observable<?> observable = mRealmManager.put(createTestModelWithRandomId(), TestModel.class);
+        Observable<?> observable = mRealmManager.put(createTestModelWithRandomId(), TestRealmObject.class);
         observable.subscribe(new TestSubscriber<>());
-        assertGetAllForSize(TestModel.class, 1);
+        assertGetAllForSize(TestRealmObject.class, 1);
     }
 
     @Test
     public void testPutRealmObject_ifCorrectNumberOfItemsAreInserted_whenMultipleItemAreInserted() {
         for (int i = 0; i < TestUtility2.EXECUTION_COUNT_SMALL; i++) {
-            Observable<?> observable = mRealmManager.put(createTestModelWithRandomId(), TestModel.class);
+            Observable<?> observable = mRealmManager.put(createTestModelWithRandomId(), TestRealmObject.class);
             observable.subscribe(new TestSubscriber<>());
         }
-        assertGetAllForSize(TestModel.class, TestUtility2.EXECUTION_COUNT_SMALL);
+        assertGetAllForSize(TestRealmObject.class, TestUtility2.EXECUTION_COUNT_SMALL);
     }
 
     @Test
     public void testPutRealmObject_ifModelIsUpdated_whenUpdatedModelIsInserted() {
-        final TestModel testModelInstance = createTestModelWithRandomId();
-        mRealmManager.put(testModelInstance, TestModel.class)
+        final TestRealmObject testRealmObjectInstance = createTestModelWithRandomId();
+        mRealmManager.put(testRealmObjectInstance, TestRealmObject.class)
                 .subscribe(new TestSubscriber<>());
-        testModelInstance.setValue("test update");
-        mRealmManager.put(testModelInstance, TestModel.class)
+        testRealmObjectInstance.setValue("test update");
+        mRealmManager.put(testRealmObjectInstance, TestRealmObject.class)
                 .subscribe(new TestSubscriber<>());
         //check if no duplicates are added
-        assertGetAllForSize(TestModel.class, 1);
+        assertGetAllForSize(TestRealmObject.class, 1);
         //check if values are updated or not
         final TestSubscriber<Object> getItemByIdSubscriber = new TestSubscriber<>();
-        mRealmManager.getById("id", testModelInstance.getId(), TestModel.class)
+        mRealmManager.getById("id", testRealmObjectInstance.getId(), TestRealmObject.class)
                 .subscribe(getItemByIdSubscriber);
-        TestModel currentModel
+        TestRealmObject currentModel
                 = assertSubscriberGetSingleNextEventWithNoError(getItemByIdSubscriber
-                , TestModel.class);
-        MatcherAssert.assertThat("two instances are not same", currentModel.equals(testModelInstance));
+                , TestRealmObject.class);
+        MatcherAssert.assertThat("two instances are not same", currentModel.equals(testRealmObjectInstance));
     }
 
     /**
@@ -391,10 +392,10 @@ public class RealmManagerImplTestJUnit {
      */
     @Test
     public void testGetById_ifReturnedObservableIsNotNull_whenSingleModelIsInsertedAndQueried() {
-        TestModel insertedTestModel = putTestModel(mRealmManager);
+        TestRealmObject insertedTestRealmObject = putTestModel(mRealmManager);
         assertThat(mRealmManager.getById("id"
-                , insertedTestModel.getId()
-                , TestModel.class), is(notNullValue()));
+                , insertedTestRealmObject.getId()
+                , TestRealmObject.class), is(notNullValue()));
     }
 
     /**
@@ -403,12 +404,12 @@ public class RealmManagerImplTestJUnit {
      */
     @Test
     public void testGetById_ifObservableShouldReturnNoError_whenSingleModelIsInsertedAndQueried() {
-        TestModel insertedTestModel = createTestModelWithRandomId();
-        putTestModel(mRealmManager, insertedTestModel);
+        TestRealmObject insertedTestRealmObject = createTestModelWithRandomId();
+        putTestModel(mRealmManager, insertedTestRealmObject);
         final TestSubscriber<Object> querySubscriber = new TestSubscriber<>();
         mRealmManager.getById("id"
-                , insertedTestModel.getId()
-                , TestModel.class)
+                , insertedTestRealmObject.getId()
+                , TestRealmObject.class)
                 .subscribe(querySubscriber);
         querySubscriber.assertNoErrors();
     }
@@ -419,30 +420,30 @@ public class RealmManagerImplTestJUnit {
      */
     @Test
     public void testGetById_ifOnNextEventListHasAtLeastOneItem_whenSingleModelIsInsertedAndQueried() {
-        TestModel insertedTestModel = createTestModelWithRandomId();
-        putTestModel(mRealmManager, insertedTestModel);
+        TestRealmObject insertedTestRealmObject = createTestModelWithRandomId();
+        putTestModel(mRealmManager, insertedTestRealmObject);
         final TestSubscriber<Object> querySubscriber = new TestSubscriber<>();
         mRealmManager.getById("id"
-                , insertedTestModel.getId()
-                , TestModel.class)
+                , insertedTestRealmObject.getId()
+                , TestRealmObject.class)
                 .subscribe(querySubscriber);
         assertThat(querySubscriber.getOnNextEvents(), iterableWithSize(1));
     }
 
     /**
      * Test if we insert single test model and then make a query on id.
-     * on next event list should contain  TestModel result at item index 1
+     * on next event list should contain  TestRealmObject result at item index 1
      */
     @Test
     public void testGetById_ifQueryResultIsInstanceOfTestModel_whenSingleModelIsInsertedAndQueried() {
-        TestModel insertedTestModel = createTestModelWithRandomId();
-        putTestModel(mRealmManager, insertedTestModel);
+        TestRealmObject insertedTestRealmObject = createTestModelWithRandomId();
+        putTestModel(mRealmManager, insertedTestRealmObject);
         final TestSubscriber<Object> querySubscriber = new TestSubscriber<>();
         mRealmManager.getById("id"
-                , insertedTestModel.getId()
-                , TestModel.class)
+                , insertedTestRealmObject.getId()
+                , TestRealmObject.class)
                 .subscribe(querySubscriber);
-        assertThat(querySubscriber.getOnNextEvents().get(0), is(instanceOf(TestModel.class)));
+        assertThat(querySubscriber.getOnNextEvents().get(0), is(instanceOf(TestRealmObject.class)));
     }
 
     /**
@@ -451,15 +452,15 @@ public class RealmManagerImplTestJUnit {
      */
     @Test
     public void testGetById_ifQueryResultsHasCorrectModel_whenSingleModelIsInsertedAndQueried() {
-        TestModel insertedTestModel = createTestModelWithRandomId();
-        putTestModel(mRealmManager, insertedTestModel);
+        TestRealmObject insertedTestRealmObject = createTestModelWithRandomId();
+        putTestModel(mRealmManager, insertedTestRealmObject);
         final TestSubscriber<Object> querySubscriber = new TestSubscriber<>();
         mRealmManager.getById("id"
-                , insertedTestModel.getId()
-                , TestModel.class)
+                , insertedTestRealmObject.getId()
+                , TestRealmObject.class)
                 .subscribe(querySubscriber);
-        TestModel returnedTestModel = (TestModel) querySubscriber.getOnNextEvents().get(0);
-        assertThat(returnedTestModel, is(equalTo(insertedTestModel)));
+        TestRealmObject returnedTestRealmObject = (TestRealmObject) querySubscriber.getOnNextEvents().get(0);
+        assertThat(returnedTestRealmObject, is(equalTo(insertedTestRealmObject)));
     }
 
     /**
@@ -468,16 +469,16 @@ public class RealmManagerImplTestJUnit {
      */
     @Test
     public void testGetById_ifModelWithMaxIdIsReturned_whenQueriedUsingNegativeId() {
-        TestModel insertedTestModel = createTestModelWithRandomId();
-        putTestModel(mRealmManager, insertedTestModel);
+        TestRealmObject insertedTestRealmObject = createTestModelWithRandomId();
+        putTestModel(mRealmManager, insertedTestRealmObject);
         final TestSubscriber<Object> querySubscriber = new TestSubscriber<>();
         mRealmManager.getById("id"
                 , TestUtility2.INVALID_ITEM_ID
-                , TestModel.class)
+                , TestRealmObject.class)
                 .subscribe(querySubscriber);
-        TestModel returnedTestModel = (TestModel) querySubscriber.getOnNextEvents().get(0);
-        int maxId = Utils.getMaxId(TestModel.class, "id");
-        assertThat(returnedTestModel.getId(), is(equalTo(maxId)));
+        TestRealmObject returnedTestRealmObject = (TestRealmObject) querySubscriber.getOnNextEvents().get(0);
+        int maxId = Utils.getMaxId(TestRealmObject.class, "id");
+        assertThat(returnedTestRealmObject.getId(), is(equalTo(maxId)));
     }
 
     /**
@@ -486,8 +487,8 @@ public class RealmManagerImplTestJUnit {
      */
     @Test
     public void testGetWhere_ifReturnedObservableIsNotNull_whenRealmQueryIsMadeForSingleItem() {
-        TestModel insertedTestModel = createTestModelWithRandomId();
-        RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
+        TestRealmObject insertedTestRealmObject = createTestModelWithRandomId();
+        RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestRealmObject);
         assertThat(mRealmManager.getQuery(realmQuery), is(notNullValue()));
     }
 
@@ -497,9 +498,9 @@ public class RealmManagerImplTestJUnit {
      */
     @Test
     public void testGetWhere_ifObservableShouldReturnNoError_whenRealmQueryIsMadeForSingleItem() {
-        TestModel insertedTestModel = createTestModelWithRandomId();
-        putTestModel(mRealmManager, insertedTestModel);
-        RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
+        TestRealmObject insertedTestRealmObject = createTestModelWithRandomId();
+        putTestModel(mRealmManager, insertedTestRealmObject);
+        RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestRealmObject);
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
         mRealmManager.getQuery(realmQuery)
                 .subscribe(querySubscriber);
@@ -512,10 +513,10 @@ public class RealmManagerImplTestJUnit {
      */
     @Test
     public void testGetWhere_ifOnNextEventListHasAtleastOneItem_whenRealmQueryIsMadeForSingleItem() {
-        TestModel insertedTestModel = createTestModelWithRandomId();
-        putTestModel(mRealmManager, insertedTestModel);
+        TestRealmObject insertedTestRealmObject = createTestModelWithRandomId();
+        putTestModel(mRealmManager, insertedTestRealmObject);
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
-        RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
+        RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestRealmObject);
         mRealmManager.getQuery(realmQuery)
                 .subscribe(querySubscriber);
         assertThat(querySubscriber.getOnNextEvents(), iterableWithSize(1));
@@ -527,10 +528,10 @@ public class RealmManagerImplTestJUnit {
      */
     @Test
     public void testGetWhere_ifNextEventListContainQueryResultAtIndex1_whenRealmQueryIsMadeForSingleItem() {
-        final TestModel insertedTestModel = createTestModelWithRandomId();
-        putTestModel(mRealmManager, insertedTestModel);
+        final TestRealmObject insertedTestRealmObject = createTestModelWithRandomId();
+        putTestModel(mRealmManager, insertedTestRealmObject);
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
-        final RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
+        final RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestRealmObject);
         mRealmManager.getQuery(realmQuery)
                 .subscribe(querySubscriber);
         assertThat(querySubscriber.getOnNextEvents().get(0), is(instanceOf(RealmResults.class)));
@@ -542,13 +543,13 @@ public class RealmManagerImplTestJUnit {
      */
     @Test
     public void testGetWhere_ifQueryResultsAreNotEmpty_whenRealmQueryIsMadeForSingleItem() {
-        TestModel insertedTestModel = createTestModelWithRandomId();
+        TestRealmObject insertedTestRealmObject = createTestModelWithRandomId();
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
-        final RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
-        putTestModel(mRealmManager, insertedTestModel);
+        final RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestRealmObject);
+        putTestModel(mRealmManager, insertedTestRealmObject);
         mRealmManager.getQuery(realmQuery)
                 .subscribe(querySubscriber);
-        RealmResults<TestModel> queryResults = (RealmResults<TestModel>) querySubscriber.getOnNextEvents().get(0);
+        RealmResults<TestRealmObject> queryResults = (RealmResults<TestRealmObject>) querySubscriber.getOnNextEvents().get(0);
         MatcherAssert.assertThat(queryResults, is(iterableWithSize(1)));
     }
 
@@ -558,14 +559,14 @@ public class RealmManagerImplTestJUnit {
      */
     @Test
     public void testGetWhere_ifQueryResultsInstanceOfTestModel_whenRealmQueryIsMadeForSingleItem() {
-        final TestModel insertedTestModel = createTestModelWithRandomId();
+        final TestRealmObject insertedTestRealmObject = createTestModelWithRandomId();
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
-        final RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
-        putTestModel(mRealmManager, insertedTestModel);
+        final RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestRealmObject);
+        putTestModel(mRealmManager, insertedTestRealmObject);
         mRealmManager.getQuery(realmQuery)
                 .subscribe(querySubscriber);
         RealmResults<?> queryResults = (RealmResults<?>) querySubscriber.getOnNextEvents().get(0);
-        assertThat(queryResults.get(0), is(instanceOf(TestModel.class)));
+        assertThat(queryResults.get(0), is(instanceOf(TestRealmObject.class)));
     }
 
     /**
@@ -574,21 +575,21 @@ public class RealmManagerImplTestJUnit {
      */
     @Test
     public void testGetWhere_ifQueryResultsHasCorrectModel_whenRealmQueryIsMadeForSingleItem() {
-        final TestModel insertedTestModel = createTestModelWithRandomId();
+        final TestRealmObject insertedTestRealmObject = createTestModelWithRandomId();
         final TestSubscriber<List> querySubscriber = new TestSubscriber<>();
-        final RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestModel);
-        putTestModel(mRealmManager, insertedTestModel);
+        final RealmManager.RealmQueryProvider realmQuery = getExactTestModelRealmQuery(insertedTestRealmObject);
+        putTestModel(mRealmManager, insertedTestRealmObject);
         mRealmManager.getQuery(realmQuery)
                 .subscribe(querySubscriber);
-        RealmResults<TestModel> queryResults = (RealmResults<TestModel>) querySubscriber.getOnNextEvents().get(0);
-        assertThat(queryResults.get(0), is(equalTo(insertedTestModel)));
+        RealmResults<TestRealmObject> queryResults = (RealmResults<TestRealmObject>) querySubscriber.getOnNextEvents().get(0);
+        assertThat(queryResults.get(0), is(equalTo(insertedTestRealmObject)));
     }
 
     @Test
     public void testGetAll_ifCorrectNumberOfRecordsAreFetched_whenMultipleRecordsAreInserted() {
         TestUtility2.executeMultipleTimes(TestUtility2.EXECUTION_COUNT_VERY_SMALL, () -> putTestModel(mRealmManager));
         final TestSubscriber<List> getAllSubscriber = new TestSubscriber<>();
-        mRealmManager.getAll(TestModel.class).subscribe(getAllSubscriber);
+        mRealmManager.getAll(TestRealmObject.class).subscribe(getAllSubscriber);
         assertThat(getAllSubscriber.getOnNextEvents().get(0).size()
                 , is(equalTo(TestUtility2.EXECUTION_COUNT_VERY_SMALL)));
     }
@@ -597,7 +598,7 @@ public class RealmManagerImplTestJUnit {
     public void testGetAll_ifCorrectNumberOfRecordsAreFetched_whenSingleRecordIsInserted() {
         putTestModel(mRealmManager);
         final TestSubscriber<List> getAllSubscriber = new TestSubscriber<>();
-        mRealmManager.getAll(TestModel.class).subscribe(getAllSubscriber);
+        mRealmManager.getAll(TestRealmObject.class).subscribe(getAllSubscriber);
         assertThat(getAllSubscriber.getOnNextEvents().get(0).size()
                 , is(equalTo(1)));
     }
@@ -605,38 +606,38 @@ public class RealmManagerImplTestJUnit {
     @Test
     public void testGetAll_ifCorrectNumberOfRecordsAreFetched_whenNoRecordsAreInserted() {
         final TestSubscriber<List> getAllSubscriber = new TestSubscriber<>();
-        mRealmManager.getAll(TestModel.class).subscribe(getAllSubscriber);
+        mRealmManager.getAll(TestRealmObject.class).subscribe(getAllSubscriber);
         assertThat(getAllSubscriber.getOnNextEvents().get(0).size()
                 , is(equalTo(0)));
     }
 
     @Test
     public void testGetAll_ifExactlySameObjectsArezReturned_whenMultipleObjectsAreInserted() {
-        List<TestModel> listOfTestModelsInserted = new ArrayList<>();
+        List<TestRealmObject> listOfTestModelsInserted = new ArrayList<>();
         for (int i = 0; i < TestUtility2.EXECUTION_COUNT_VERY_SMALL; i++) {
             listOfTestModelsInserted.add(putTestModel(mRealmManager));
         }
         final TestSubscriber<List> subscriber = new TestSubscriber<>();
-        mRealmManager.getAll(TestModel.class)
+        mRealmManager.getAll(TestRealmObject.class)
                 .subscribe(subscriber);
-        List<TestModel> getModelList = subscriber.getOnNextEvents().get(0);
+        List<TestRealmObject> getModelList = subscriber.getOnNextEvents().get(0);
         assertThatTwoCollectionsContainSameElements(listOfTestModelsInserted, getModelList);
     }
 
     @Test
     public void testEvictById_ifModelIsDeletedSuccessfully_whenSingleModelIsInserted() {
-        TestModel insertedModel = putTestModel(mRealmManager);
+        TestRealmObject insertedModel = putTestModel(mRealmManager);
         boolean isEvictSuccessful
-                = mRealmManager.evictById(TestModel.class, "id", insertedModel.getId());
+                = mRealmManager.evictById(TestRealmObject.class, "id", insertedModel.getId());
         assertThat("", isEvictSuccessful);
     }
 
     @Test
     public void testEvictById_ifModelIsDeletedSuccessfully_whenMultipleModelAreInserted() {
         TestUtility2.executeMultipleTimes(TestUtility2.EXECUTION_COUNT_VERY_SMALL, () -> putTestModel(mRealmManager));
-        TestModel lastTestModelInserted = putTestModel(mRealmManager);
+        TestRealmObject lastTestRealmObjectInserted = putTestModel(mRealmManager);
         boolean isEvictSuccessful
-                = mRealmManager.evictById(TestModel.class, "id", lastTestModelInserted.getId());
+                = mRealmManager.evictById(TestRealmObject.class, "id", lastTestRealmObjectInserted.getId());
         assertThat("", isEvictSuccessful);
     }
 
@@ -644,7 +645,7 @@ public class RealmManagerImplTestJUnit {
     public void testEvictById_ifNoModelIsDeleted_whenIncorrectFieldValueIsMentioned() {
         putTestModel(mRealmManager);
         boolean isEvictSuccessful
-                = mRealmManager.evictById(TestModel.class, "id", TestUtility2.INVALID_ITEM_ID);
+                = mRealmManager.evictById(TestRealmObject.class, "id", TestUtility2.INVALID_ITEM_ID);
         assertThat(isEvictSuccessful, is(false));
     }
 
@@ -652,20 +653,20 @@ public class RealmManagerImplTestJUnit {
     public void testEvictById_ifExceptionIsThrown_whenIncorrectFieldNameIsMentioned() {
         putTestModel(mRealmManager);
         boolean isEvictSuccessful
-                = mRealmManager.evictById(TestModel.class, "value", TestUtility2.INVALID_ITEM_ID);
+                = mRealmManager.evictById(TestRealmObject.class, "value", TestUtility2.INVALID_ITEM_ID);
         assertThat(isEvictSuccessful, is(false));
     }
 
     @Test
     public void testEvict_ifRealmModelIsDeleted_whenManagedRealmObjectIsDeleted() {
-        TestModel testModel = putTestModel(mRealmManager);
+        TestRealmObject testRealmObject = putTestModel(mRealmManager);
         Realm mRealm = Realm.getDefaultInstance();
-        TestModel managedTestModel = getManagedObject(testModel, mRealmManager);
-        boolean originalValidity = managedTestModel.isValid();
+        TestRealmObject managedTestRealmObject = getManagedObject(testRealmObject, mRealmManager);
+        boolean originalValidity = managedTestRealmObject.isValid();
         mRealm.beginTransaction();
-        managedTestModel.deleteFromRealm();
+        managedTestRealmObject.deleteFromRealm();
         mRealm.commitTransaction();
-        boolean newValidity = managedTestModel.isValid();
+        boolean newValidity = managedTestRealmObject.isValid();
         assertThat("original validity should be true," +
                         " and new validity should be false: originalValidity:"
                         + originalValidity + "newValidity:" + newValidity
@@ -690,7 +691,7 @@ public class RealmManagerImplTestJUnit {
     @Test
     public void testBefore_ifEvictDeletesAllModelInstancesFromRealm_whenEvictAllIsInvokedInSetupMethod() {
         assertGetAllForSize(RealmModelClass.class, 0);
-        assertGetAllForSize(TestModel.class, 0);
+        assertGetAllForSize(TestRealmObject.class, 0);
         assertGetAllForSize(ModelWithStringPrimaryKey.class, 0);
     }
 
@@ -750,8 +751,8 @@ public class RealmManagerImplTestJUnit {
         for (int i = 0; i < TestUtility2.EXECUTION_COUNT_VERY_SMALL; i++) {
             testModelList.add(createTestModelWithRandomId());
         }
-        mRealmManager.putAll(testModelList, TestModel.class);
-        assertGetAllForSize(TestModel.class, TestUtility2.EXECUTION_COUNT_VERY_SMALL);
+        mRealmManager.putAll(testModelList, TestRealmObject.class);
+        assertGetAllForSize(TestRealmObject.class, TestUtility2.EXECUTION_COUNT_VERY_SMALL);
     }
 
     @Test
@@ -761,10 +762,10 @@ public class RealmManagerImplTestJUnit {
         for (int i = 0; i < TestUtility2.EXECUTION_COUNT_VERY_SMALL; i++) {
             testModelList.add(createTestModelWithRandomId());
         }
-        mRealmManager.putAll(testModelList, TestModel.class);
+        mRealmManager.putAll(testModelList, TestRealmObject.class);
         final TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         for (RealmObject testModel : testModelList) {
-            mRealmManager.getById("id", ((TestModel) testModel).getId(), TestModel.class)
+            mRealmManager.getById("id", ((TestRealmObject) testModel).getId(), TestRealmObject.class)
                     .subscribe(testSubscriber);
             assertThat(testSubscriber.getOnNextEvents(), allOf(iterableWithSize(1), notNullValue()));
         }
@@ -772,25 +773,25 @@ public class RealmManagerImplTestJUnit {
 
     @Test
     public void testPutAll_ifCorrectItemIsInserted_whenSingleItemIsInserted() {
-        final TestModel testModel = createTestModelWithRandomId();
-        mRealmManager.putAll(Collections.singletonList(testModel)
-                , TestModel.class);
-        getItemForId("id", testModel.getId(), TestModel.class);
+        final TestRealmObject testRealmObject = createTestModelWithRandomId();
+        mRealmManager.putAll(Collections.singletonList(testRealmObject)
+                , TestRealmObject.class);
+        getItemForId("id", testRealmObject.getId(), TestRealmObject.class);
     }
 
     @Test
     public void testPutAll_ifSingleItemIsInserted_whenSingleItemIsInserted() {
-        final TestModel testModel = createTestModelWithRandomId();
-        mRealmManager.putAll(Collections.singletonList(testModel)
-                , TestModel.class);
-        assertGetAllForSize(TestModel.class, 1);
+        final TestRealmObject testRealmObject = createTestModelWithRandomId();
+        mRealmManager.putAll(Collections.singletonList(testRealmObject)
+                , TestRealmObject.class);
+        assertGetAllForSize(TestRealmObject.class, 1);
     }
 
     @Test
     public void testPutAll_ifCorrectNumberOfItemsAreInserted_whenSingleItemIsInserted() {
-        TestModel insertedTestModel = putTestModel(mRealmManager);
+        TestRealmObject insertedTestRealmObject = putTestModel(mRealmManager);
         final TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        mRealmManager.getById("id", (insertedTestModel).getId(), TestModel.class)
+        mRealmManager.getById("id", (insertedTestRealmObject).getId(), TestRealmObject.class)
                 .subscribe(testSubscriber);
         assertThat(testSubscriber.getOnNextEvents(), allOf(iterableWithSize(1), notNullValue()));
     }
@@ -806,22 +807,22 @@ public class RealmManagerImplTestJUnit {
         ArrayList<Object> listOfInsertedTestModels = new ArrayList<>();
         ArrayList<Long> listOfIdToDelete = new ArrayList<>();
         for (int i = 0; i < TestUtility2.EXECUTION_COUNT_VERY_SMALL; i++) {
-            final TestModel testModel = putTestModel(mRealmManager);
-            listOfInsertedTestModels.add(testModel);
+            final TestRealmObject testRealmObject = putTestModel(mRealmManager);
+            listOfInsertedTestModels.add(testRealmObject);
             //but we will send only half of them
             if (i % 2 == 0) {
-                listOfIdToDelete.add((long) testModel.getId());
+                listOfIdToDelete.add((long) testRealmObject.getId());
             }
         }
         //lets try deleting these
         final TestSubscriber<Object> deleteCollectionSubscriber = new TestSubscriber<>();
         mRealmManager.evictCollection("id"
-                , listOfIdToDelete, TestModel.class).subscribe(deleteCollectionSubscriber);
+                , listOfIdToDelete, TestRealmObject.class).subscribe(deleteCollectionSubscriber);
         deleteCollectionSubscriber.assertNoErrors();
         assertThat(deleteCollectionSubscriber.getOnNextEvents().get(0), is(equalTo(Boolean.TRUE)));
-        RealmResults<TestModel> testModelList = getQueryList(TestModel.class);
-        for (TestModel testModel : testModelList) {
-            assertThat(listOfIdToDelete, not(IsCollectionContaining.hasItem((long) testModel.getId())));
+        RealmResults<TestRealmObject> testRealmObjectList = getQueryList(TestRealmObject.class);
+        for (TestRealmObject testRealmObject : testRealmObjectList) {
+            assertThat(listOfIdToDelete, not(IsCollectionContaining.hasItem((long) testRealmObject.getId())));
         }
     }
 
@@ -831,11 +832,11 @@ public class RealmManagerImplTestJUnit {
         ArrayList<Object> listOfInsertedTestModels = new ArrayList<>();
         ArrayList<Long> listOfIdToDelete = new ArrayList<>();
         for (int i = 0; i < TestUtility2.EXECUTION_COUNT_VERY_SMALL; i++) {
-            final TestModel testModel = putTestModel(mRealmManager);
-            listOfInsertedTestModels.add(testModel);
+            final TestRealmObject testRealmObject = putTestModel(mRealmManager);
+            listOfInsertedTestModels.add(testRealmObject);
             //but we will send only half of them
             if (i % 2 == 0) {
-                listOfIdToDelete.add((long) testModel.getId());
+                listOfIdToDelete.add((long) testRealmObject.getId());
             }
             if (i == TestUtility2.EXECUTION_COUNT_VERY_SMALL / 2) {
                 //add invalid id
@@ -845,31 +846,31 @@ public class RealmManagerImplTestJUnit {
         //lets try deleting these
         final TestSubscriber<Object> deleteCollectionSubscriber = new TestSubscriber<>();
         mRealmManager.evictCollection("id"
-                , listOfIdToDelete, TestModel.class).subscribe(deleteCollectionSubscriber);
+                , listOfIdToDelete, TestRealmObject.class).subscribe(deleteCollectionSubscriber);
         deleteCollectionSubscriber.assertNoErrors();
         assertThat(deleteCollectionSubscriber.getOnNextEvents().get(0), is(equalTo(Boolean.FALSE)));
-        RealmResults<TestModel> testModelList = getQueryList(TestModel.class);
+        RealmResults<TestRealmObject> testRealmObjectList = getQueryList(TestRealmObject.class);
         //all ids before INVALID_ITEM_ID should be deleted
         int i = 0;
         while (listOfIdToDelete.get(i) != TestUtility2.INVALID_ITEM_ID) {
-            MatcherAssert.assertThat(getItemForId("id", listOfIdToDelete.get(i), TestModel.class), is(nullValue()));
+            MatcherAssert.assertThat(getItemForId("id", listOfIdToDelete.get(i), TestRealmObject.class), is(nullValue()));
             i++;
         }
         i++;
         //all ids before INVALID_ITEM_ID should not be deleted
         while (i < listOfIdToDelete.size()) {
-            MatcherAssert.assertThat(getItemForId("id", listOfIdToDelete.get(i), TestModel.class), is(notNullValue()));
+            MatcherAssert.assertThat(getItemForId("id", listOfIdToDelete.get(i), TestRealmObject.class), is(notNullValue()));
             i++;
         }
     }
 
     @Test
     public void testEvictCollection_ifItemsAreEvicted_whenSingleItemIdIsProvidedInList() {
-        TestModel insertedTestModel = putTestModel(mRealmManager);
+        TestRealmObject insertedTestRealmObject = putTestModel(mRealmManager);
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
         mRealmManager.evictCollection("id"
-                , Collections.singletonList(Long.valueOf(insertedTestModel.getId()))
-                , TestModel.class)
+                , Collections.singletonList(Long.valueOf(insertedTestRealmObject.getId()))
+                , TestRealmObject.class)
                 .subscribe(subscriber);
         TestUtility2.assertNoErrors(subscriber);
         subscriber.assertValue(Boolean.TRUE);
@@ -883,10 +884,10 @@ public class RealmManagerImplTestJUnit {
     }
 
     @NonNull
-    private TestModel getManagedObject(@NonNull TestModel testModel, @NonNull RealmManager realmManager) {
+    private TestRealmObject getManagedObject(@NonNull TestRealmObject testRealmObject, @NonNull RealmManager realmManager) {
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        realmManager.getById("id", testModel.getId(), TestModel.class).subscribe(subscriber);
-        return (TestModel) subscriber.getOnNextEvents().get(0);
+        realmManager.getById("id", testRealmObject.getId(), TestRealmObject.class).subscribe(subscriber);
+        return (TestRealmObject) subscriber.getOnNextEvents().get(0);
     }
 
     private void createJsonObjectInWorkerThreadAndInsertInUi() {
@@ -899,7 +900,7 @@ public class RealmManagerImplTestJUnit {
         TestUtility2.assertConvertedJsonArray(jsonObject);
         runOnMainThread(() -> {
             Observable<?> observable
-                    = realmManager.put(jsonObject[0], "id", TestModel.class);
+                    = realmManager.put(jsonObject[0], "id", TestRealmObject.class);
             assertPutOperationObservable(observable);
         });
     }
@@ -945,11 +946,11 @@ public class RealmManagerImplTestJUnit {
     }
 
     @NonNull
-    private RealmManager.RealmQueryProvider getExactTestModelRealmQuery(@NonNull TestModel insertedTestModel) {
-        return realm -> realm.where(TestModel.class)
+    private RealmManager.RealmQueryProvider getExactTestModelRealmQuery(@NonNull TestRealmObject insertedTestRealmObject) {
+        return realm -> realm.where(TestRealmObject.class)
                 .beginsWith("value", TEST_MODEL_PREFIX, Case.INSENSITIVE)
-                .equalTo("id", insertedTestModel.getId())
-                .equalTo("value", insertedTestModel.getValue(), Case.INSENSITIVE);
+                .equalTo("id", insertedTestRealmObject.getId())
+                .equalTo("value", insertedTestRealmObject.getValue(), Case.INSENSITIVE);
     }
 
     private int getRandomInt() {
@@ -977,27 +978,27 @@ public class RealmManagerImplTestJUnit {
 
     @NonNull
     private RealmManager getGeneralRealmManager() {
-        DatabaseManagerFactory.initRealm();
+        DatabaseManagerFactory.initRealm(DataUseCase.getHandlerThread().getLooper());
         return (RealmManager) DatabaseManagerFactory.getInstance();
     }
 
     @NonNull
-    private TestModel insertJsonObject() throws JSONException {
-        TestModel testModel = createTestModelWithRandomId();
-        String json = new Gson().toJson(testModel);
+    private TestRealmObject insertJsonObject() throws JSONException {
+        TestRealmObject testRealmObject = createTestModelWithRandomId();
+        String json = new Gson().toJson(testRealmObject);
         JSONObject jsonObject = new JSONObject(json);
         final TestSubscriber<Object> subscriber = new TestSubscriber<>();
-        mRealmManager.put(jsonObject, "id", TestModel.class)
+        mRealmManager.put(jsonObject, "id", TestRealmObject.class)
                 .subscribe(subscriber);
         subscriber.assertNoErrors();
-        return testModel;
+        return testRealmObject;
     }
 
-    private TestModel putTestModel(@NonNull DataBaseManager dataBaseManager) {
+    private TestRealmObject putTestModel(@NonNull DataBaseManager dataBaseManager) {
         return putTestModel(dataBaseManager, createTestModelWithRandomId());
     }
 
-    private TestModel putTestModel(@NonNull DataBaseManager dataBaseManager, TestModel realmModel) {
+    private TestRealmObject putTestModel(@NonNull DataBaseManager dataBaseManager, TestRealmObject realmModel) {
         Observable<?> observable
                 = dataBaseManager.put(realmModel, RealmManagerImplTestJUnit.class);
         TestSubscriber<Object> subscriber = TestSubscriber.create();
@@ -1008,9 +1009,9 @@ public class RealmManagerImplTestJUnit {
     }
 
     @NonNull
-    private TestModel createTestModelWithRandomId() {
+    private TestRealmObject createTestModelWithRandomId() {
         final int randomInt = getRandomInt();
-        return new TestModel(randomInt, getStringValueForTestModel(randomInt));
+        return new TestRealmObject(randomInt, getStringValueForTestModel(randomInt));
     }
 
     @NonNull

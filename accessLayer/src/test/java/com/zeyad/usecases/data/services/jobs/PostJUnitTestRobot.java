@@ -12,7 +12,7 @@ import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
-import com.zeyad.usecases.utils.TestModel;
+import com.zeyad.usecases.utils.TestRealmObject;
 import com.zeyad.usecases.utils.TestViewModel;
 
 import org.json.JSONArray;
@@ -43,7 +43,7 @@ public class PostJUnitTestRobot {
     private static final JobScheduler JOB_SCHEDULER;
     private static final ResponseBody RESPONSE_BODY = mock(ResponseBody.class);
     private static final InputStream INPUT_STREAM = mock(InputStream.class);
-    private static final TestModel TEST_MODEL = new TestModel(1, "123");
+    private static final TestRealmObject TEST_MODEL = new TestRealmObject(1, "123");
 
     static {
         JOB_SCHEDULER = Utils.hasLollipop() ? mock(JobScheduler.class) : null;
@@ -74,7 +74,7 @@ public class PostJUnitTestRobot {
 
     @NonNull
     static Class getPresentationClass() {
-        return TestModel.class;
+        return TestRealmObject.class;
     }
 
     static String getValidColumnName() {
@@ -83,7 +83,7 @@ public class PostJUnitTestRobot {
 
     @NonNull
     static Class getValidDataClass() {
-        return TestModel.class;
+        return TestRealmObject.class;
     }
 
     static Context createMockedContext() throws PackageManager.NameNotFoundException {
@@ -138,7 +138,7 @@ public class PostJUnitTestRobot {
     }
 
     @NonNull
-    public static TestModel createTestModel() {
+    public static TestRealmObject createTestModel() {
         return TEST_MODEL;
     }
 

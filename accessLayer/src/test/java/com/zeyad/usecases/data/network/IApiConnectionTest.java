@@ -3,7 +3,6 @@ package com.zeyad.usecases.data.network;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.BuildConfig;
-import com.zeyad.usecases.Config;
 
 import org.junit.After;
 import org.junit.Before;
@@ -37,8 +36,6 @@ public class IApiConnectionTest {
 
     @Before
     public void setUp() throws Exception {
-//        Config.init(InstrumentationRegistry.getTargetContext());
-        Config.getInstance().setUseApiWithCache(false);
         mRestApiWithCache = ApiConnectionRobot.createMockedRestApi();
         mRestApiWithoutCache = ApiConnectionRobot.createMockedRestApi();
         mApiConnection = getApiImplementation(mRestApiWithoutCache, mRestApiWithCache);
@@ -159,7 +156,6 @@ public class IApiConnectionTest {
     }
 
     private IApiConnection getApiImplementation(RestApi restApiWithoutCache, RestApi restApiWithCache) {
-        ApiConnection.init(restApiWithoutCache, restApiWithCache);
-        return ApiConnection.getInstance();
+        return new ApiConnection(restApiWithoutCache, restApiWithCache);
     }
 }

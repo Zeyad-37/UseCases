@@ -1,5 +1,7 @@
 package com.zeyad.usecases.data.db;
 
+import android.os.Looper;
+
 import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 
 /**
@@ -18,7 +20,7 @@ public class DatabaseManagerFactory {
     /**
      * Creates a RealmManager instance
      */
-    public static void initRealm() {
-        RealmManager.init();
+    public static void initRealm(Looper backgroundLooper) {
+        RealmManager.init(backgroundLooper);
     }
 }

@@ -3,7 +3,7 @@ package com.zeyad.usecases.data.repository.stores;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.data.db.RealmManager;
-import com.zeyad.usecases.utils.TestModel;
+import com.zeyad.usecases.utils.TestRealmObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,15 +18,15 @@ public interface DiskDataStoreJUnitRobotInterface {
     void tearDown();
 
     @NonNull
-    DataStore createDiskDataStore();
+    DiskDataStore createDiskDataStore();
 
     void insertTestModels(int count);
 
     @NonNull
-    TestModel createTestModel();
+    TestRealmObject createTestModel();
 
     @NonNull
-    TestModel createTestModel(int id);
+    TestRealmObject createTestModel(int id);
 
     @NonNull
     String getValueForTestModel(int id);
@@ -42,7 +42,7 @@ public interface DiskDataStoreJUnitRobotInterface {
     @NonNull
     Class getDomainClass();
 
-    void addTestModel(TestModel testModel);
+    void addTestModel(TestRealmObject testRealmObject);
 
     int getPrimaryIdForAnyInsertedTestModel();
 

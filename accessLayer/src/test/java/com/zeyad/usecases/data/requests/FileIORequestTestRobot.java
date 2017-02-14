@@ -1,6 +1,6 @@
 package com.zeyad.usecases.data.requests;
 
-import com.zeyad.usecases.utils.TestModel;
+import com.zeyad.usecases.utils.TestRealmObject;
 
 import org.mockito.Mockito;
 
@@ -8,7 +8,7 @@ import java.io.File;
 
 public class FileIORequestTestRobot {
 
-    static final Class DATA_CLASS = TestModel.class;
+    static final Class DATA_CLASS = TestRealmObject.class;
     static final boolean ON_WIFI = false;
     static final boolean WHILE_CHARGING = false;
     static final String URL = "www.google.com";

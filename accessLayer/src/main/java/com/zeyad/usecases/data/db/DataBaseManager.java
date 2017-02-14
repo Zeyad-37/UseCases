@@ -112,7 +112,7 @@ public interface DataBaseManager {
      * @param dataClass   Class type of the items to be deleted.
      */
     @NonNull
-    Observable<?> evictCollection(String idFieldName, List<Long> list, Class dataClass);
+    Observable<Boolean> evictCollection(String idFieldName, List<Long> list, Class dataClass);
 
     /**
      * Get list of items according to the query passed.

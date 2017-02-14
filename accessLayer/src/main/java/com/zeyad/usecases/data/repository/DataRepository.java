@@ -162,7 +162,7 @@ public class DataRepository implements Data {
     public Observable<Boolean> deleteAllDynamically(@NonNull String url, @NonNull Class dataClass, boolean persist) {
         try {
             return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicDeleteAll(url, dataClass, persist);
+                    .dynamicDeleteAll(dataClass);
         } catch (IllegalAccessException e) {
             return Observable.error(e);
         }

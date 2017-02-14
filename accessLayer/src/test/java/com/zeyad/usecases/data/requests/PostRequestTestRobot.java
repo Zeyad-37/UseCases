@@ -1,6 +1,6 @@
 package com.zeyad.usecases.data.requests;
 
-import com.zeyad.usecases.utils.TestModel;
+import com.zeyad.usecases.utils.TestRealmObject;
 import com.zeyad.usecases.utils.TestViewModel;
 
 import org.json.JSONArray;
@@ -14,7 +14,7 @@ import rx.observers.TestSubscriber;
 class PostRequestTestRobot {
 
 
-    static final Class DATA_CLASS = TestModel.class;
+    static final Class DATA_CLASS = TestRealmObject.class;
     static final boolean TO_PERSIST = false;
     static final HashMap<String, Object> HASH_MAP = new HashMap<>();
     static final String ID_COLUMN_NAME = "id";

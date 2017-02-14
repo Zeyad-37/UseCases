@@ -32,16 +32,13 @@ public class DataUseCaseFactory {
         Config.setBaseURL(config.getBaseUrl());
         Config.setWithCache(config.isWithCache());
         Config.setCacheExpiry(config.getCacheAmount(), config.getTimeUnit());
-        if (config.getOkHttpBuilder() == null) {
-            ApiConnectionFactory.init();
-        } else {
-            ApiConnectionFactory.init(config.getOkHttpBuilder(), config.getOkHttpCache());
-        }
+        ApiConnectionFactory.init(config.getOkHttpBuilder(), config.getOkHttpCache());
         if (config.isWithRealm()) {
-            DataUseCase.initWithRealm(config.getEntityMapper(), config.getThreadExecutor(), config.getPostExecutionThread());
-        } else {
-            DataUseCase.initWithoutDB(config.getEntityMapper(), config.getThreadExecutor(), config.getPostExecutionThread());
-        }
+            DataUseCase.initWithRealm(config.getEntityMapper(), config.getThreadExecutor(), config
+                    .getPostExecutionThread());
+        } else
+            DataUseCase.initWithoutDB(config.getEntityMapper(), config.getThreadExecutor(), config
+                    .getPostExecutionThread());
         if (config.isWithCache())
             StoroBuilder.configure(config.getCacheSize())
                     .setDefaultCacheDirectory(config.getContext().getApplicationContext())
