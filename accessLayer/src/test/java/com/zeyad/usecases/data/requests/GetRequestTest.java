@@ -44,11 +44,6 @@ public class GetRequestTest {
     }
 
     @Test
-    public void testGetSubscriber() throws Exception {
-        assertThat(mGetRequest.getSubscriber(), is(equalTo(GetRequestTestRobot.SUBSCRIBER)));
-    }
-
-    @Test
     public void testGetDataClass() throws Exception {
         assertThat(mGetRequest.getDataClass(), is(equalTo(GetRequestTestRobot.DATA_CLASS)));
     }

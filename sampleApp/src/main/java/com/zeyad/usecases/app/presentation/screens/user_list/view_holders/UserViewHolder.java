@@ -9,7 +9,7 @@ import com.bumptech.glide.Glide;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
-import com.zeyad.usecases.data.utils.Utils;
+import com.zeyad.usecases.app.utils.Utils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;

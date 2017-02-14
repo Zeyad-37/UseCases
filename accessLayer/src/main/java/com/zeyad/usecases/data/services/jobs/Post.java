@@ -6,8 +6,6 @@ import android.util.Log;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
-import com.google.gson.Gson;
-import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.PostRequest;
@@ -33,7 +31,6 @@ public class Post {
     private final PostRequest mPostRequest;
     private final Context mContext;
     private final RestApi mRestApi;
-    private final Gson gson;
     @NonNull
     private Subscriber<Object> handleError = new Subscriber<Object>() {
         @Override
@@ -53,17 +50,15 @@ public class Post {
         }
     };
 
-    public Post(int trailCount, @NonNull String payLoad, @NonNull Context context) {
-        gson = Config.getGson();
+    public Post(int trailCount, @NonNull PostRequest payLoad, @NonNull Context context) {
         mRestApi = RestApiImpl.getInstance();
         mContext = context;
         mTrailCount = trailCount;
-        mPostRequest = gson.fromJson(payLoad, PostRequest.class);
+        mPostRequest = payLoad;
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
     }
 
     Post(Context context, PostRequest postRequest, RestApi restApi, int trailCount) {
-        gson = Config.getGson();
         mContext = context;
         mPostRequest = postRequest;
         mRestApi = restApi;
@@ -134,7 +129,7 @@ public class Post {
     private void reQueue() {
         mTrailCount++;
         if (mTrailCount < 3) { // inject value at initRealm!
-            Utils.queuePostCore(mDispatcher, mPostRequest, gson);
+            Utils.getInstance().queuePostCore(mDispatcher, mPostRequest);
         }
     }
 

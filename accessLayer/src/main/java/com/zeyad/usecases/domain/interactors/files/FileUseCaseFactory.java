@@ -24,14 +24,14 @@ public class FileUseCaseFactory {
     }
 
     public static void init(Context context) {
-        if (!Utils.doesContextBelongsToApplication(context))
+        if (!Utils.getInstance().doesContextBelongsToApplication(context))
             throw new IllegalArgumentException("Context should be application context only.");
         FileUseCase.init(context);
         sFilesUseCase = FileUseCase.getInstance();
     }
 
     public static void init(Context context, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
-        if (!Utils.doesContextBelongsToApplication(context))
+        if (!Utils.getInstance().doesContextBelongsToApplication(context))
             throw new IllegalArgumentException("Context should be application context only.");
         FileUseCase.init(context, threadExecutor, postExecutionThread);
         sFilesUseCase = FileUseCase.getInstance();

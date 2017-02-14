@@ -52,7 +52,7 @@ public class DataStoreFactoryJUnitTest {
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidAndNetWorkNotAvailable() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItems(mDataBaseManager);
-//        TestUtility2.changeStateOfNetwork(mMockedContext, false);
+//        TestUtility.changeStateOfNetwork(mMockedContext, false);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
                 mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
@@ -60,7 +60,7 @@ public class DataStoreFactoryJUnitTest {
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkNotAvailable() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItems(mDataBaseManager);
-//        TestUtility2.changeStateOfNetwork(mMockedContext, false);
+//        TestUtility.changeStateOfNetwork(mMockedContext, false);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
                 mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
@@ -68,7 +68,7 @@ public class DataStoreFactoryJUnitTest {
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkIsAvailable() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItems(mDataBaseManager);
-//        TestUtility2.changeStateOfNetwork(mMockedContext, true);
+//        TestUtility.changeStateOfNetwork(mMockedContext, true);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
                 mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
@@ -99,7 +99,7 @@ public class DataStoreFactoryJUnitTest {
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItemAndNetWorkNotAvailable() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
-//        TestUtility2.changeStateOfNetwork(mMockedContext, false);
+//        TestUtility.changeStateOfNetwork(mMockedContext, false);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
                 mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
@@ -107,7 +107,7 @@ public class DataStoreFactoryJUnitTest {
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkNotAvailable() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItem(mDataBaseManager);
-//        TestUtility2.changeStateOfNetwork(mMockedContext, false);
+//        TestUtility.changeStateOfNetwork(mMockedContext, false);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
                 mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }
@@ -115,7 +115,7 @@ public class DataStoreFactoryJUnitTest {
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkIsAvailable() throws Exception {
         DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItem(mDataBaseManager);
-//        TestUtility2.changeStateOfNetwork(mMockedContext, true);
+//        TestUtility.changeStateOfNetwork(mMockedContext, true);
         assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
                 mIDAOMapper), is(instanceOf(DiskDataStore.class)));
     }

@@ -56,17 +56,17 @@ public class GenericJobService extends JobService {
             switch (params.getExtras().getString(JOB_TYPE, "")) {
                 case POST:
                     mCompositeSubscription.add(new Post(params.getExtras().getInt(TRIAL_COUNT),
-                            params.getExtras().getString(PAYLOAD, ""), this).execute());
+                            params.getExtras().getParcelable(PAYLOAD), this).execute());
                     Log.d(TAG, getString(R.string.job_started, POST));
                     break;
                 case DOWNLOAD_FILE:
                     mCompositeSubscription.add(new FileIO(params.getExtras().getInt(TRIAL_COUNT),
-                            params.getExtras().getString(PAYLOAD, ""), this, true).execute());
+                            params.getExtras().getParcelable(PAYLOAD), this, true).execute());
                     Log.d(TAG, getString(R.string.job_started, DOWNLOAD_FILE));
                     break;
                 case UPLOAD_FILE:
                     mCompositeSubscription.add(new FileIO(params.getExtras().getInt(TRIAL_COUNT),
-                            params.getExtras().getString(PAYLOAD, ""), this, false).execute());
+                            params.getExtras().getParcelable(PAYLOAD), this, false).execute());
                     Log.d(TAG, getString(R.string.job_started, UPLOAD_FILE));
                     break;
                 default:

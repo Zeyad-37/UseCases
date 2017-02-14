@@ -24,7 +24,7 @@ public class PrefsUseCaseFactory {
     }
 
     public static void init(Context context, String prefsFileName) {
-        if (!Utils.doesContextBelongsToApplication(context))
+        if (!Utils.getInstance().doesContextBelongsToApplication(context))
             throw new IllegalArgumentException("Context should be application context only.");
         PrefsUseCase.init(context, prefsFileName);
         sPrefsUseCase = PrefsUseCase.getInstance();
@@ -32,7 +32,7 @@ public class PrefsUseCaseFactory {
 
     public static void init(Context context, String prefsFileName, ThreadExecutor threadExecutor,
                             PostExecutionThread postExecutionThread) {
-        if (!Utils.doesContextBelongsToApplication(context))
+        if (!Utils.getInstance().doesContextBelongsToApplication(context))
             throw new IllegalArgumentException("Context should be application context only.");
         PrefsUseCase.init(context, prefsFileName, threadExecutor, postExecutionThread);
         sPrefsUseCase = PrefsUseCase.getInstance();

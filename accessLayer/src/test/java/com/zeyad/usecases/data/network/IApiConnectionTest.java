@@ -132,7 +132,7 @@ public class IApiConnectionTest {
     @Test
     public void testUploadPartAndRequestBody() throws Exception {
         mApiConnection.upload(mValidUrl, mPartMap, mMultipartBodyPart);
-        Mockito.verify(mRestApiWithoutCache).upload(eq(mValidUrl), eq(mPartMap), eq(mMultipartBodyPart));
+        Mockito.verify(mRestApiWithoutCache).dynamicUpload(eq(mValidUrl), eq(mPartMap), eq(mMultipartBodyPart));
     }
 
     @Test

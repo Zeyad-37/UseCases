@@ -18,7 +18,7 @@ import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.utils.ResponseBodyObservable;
 import com.zeyad.usecases.utils.TestModelViewModelMapper;
 import com.zeyad.usecases.utils.TestRealmObject;
-import com.zeyad.usecases.utils.TestUtility2;
+import com.zeyad.usecases.utils.TestUtility;
 import com.zeyad.usecases.utils.TestViewModel;
 import com.zeyad.usecases.utils.ToStringArgumentMatcher;
 
@@ -142,7 +142,7 @@ class CloudDataStoreTestJUnitRobot {
         Mockito.when(mock.dynamicDelete(Mockito.any(), Mockito.any())).thenReturn(OBJECT_OBSERVABLE);
         Mockito.doReturn(LIST_OBSERVABLE).when(mock).dynamicDelete(Mockito.any(), Mockito.any());
         Mockito.when(mock.dynamicDownload(getFileUrl())).thenReturn(RESPONSE_BODY_OBSERVABLE);
-        Mockito.when(mock.upload(Mockito.any(), Mockito.any(Map.class), Mockito.any(MultipartBody.Part.class)))
+        Mockito.when(mock.dynamicUpload(Mockito.any(), Mockito.any(Map.class), Mockito.any(MultipartBody.Part.class)))
                 .thenReturn(OBJECT_OBSERVABLE);
         return mock;
     }
@@ -314,11 +314,11 @@ class CloudDataStoreTestJUnitRobot {
     }
 
     static Context changeNetworkState(boolean toEnable) {
-        return TestUtility2.changeStateOfNetwork(getMockedContext(), toEnable);
+        return TestUtility.changeStateOfNetwork(getMockedContext(), toEnable);
     }
 
     static boolean isNetworkEnabled() {
-        return Utils.isNetworkAvailable(getMockedContext());
+        return Utils.getInstance().isNetworkAvailable(getMockedContext());
 //        return true;
     }
 

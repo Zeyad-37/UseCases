@@ -1,5 +1,7 @@
 package com.zeyad.usecases.data.requests;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
@@ -10,8 +12,19 @@ import java.util.HashMap;
 /**
  * @author zeyad on 7/29/16.
  */
-public class FileIORequest {
+public class FileIORequest implements Parcelable {
 
+    public static final Parcelable.Creator<FileIORequest> CREATOR = new Parcelable.Creator<FileIORequest>() {
+        @Override
+        public FileIORequest createFromParcel(Parcel source) {
+            return new FileIORequest(source);
+        }
+
+        @Override
+        public FileIORequest[] newArray(int size) {
+            return new FileIORequest[size];
+        }
+    };
     private File file;
     private String url, key;
     private boolean onWifi, whileCharging, queuable;
@@ -44,6 +57,18 @@ public class FileIORequest {
         this.key = key;
         this.parameters = parameters;
         this.file = file;
+    }
+
+    protected FileIORequest(Parcel in) {
+        this.file = (File) in.readSerializable();
+        this.url = in.readString();
+        this.key = in.readString();
+        this.onWifi = in.readByte() != 0;
+        this.whileCharging = in.readByte() != 0;
+        this.queuable = in.readByte() != 0;
+        this.dataClass = (Class) in.readSerializable();
+        this.presentationClass = (Class) in.readSerializable();
+        this.parameters = (HashMap<String, Object>) in.readSerializable();
     }
 
     public String getUrl() {
@@ -80,6 +105,24 @@ public class FileIORequest {
 
     public HashMap<String, Object> getParameters() {
         return parameters != null ? parameters : new HashMap<>();
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeSerializable(this.file);
+        dest.writeString(this.url);
+        dest.writeString(this.key);
+        dest.writeByte(this.onWifi ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.whileCharging ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.queuable ? (byte) 1 : (byte) 0);
+        dest.writeSerializable(this.dataClass);
+        dest.writeSerializable(this.presentationClass);
+        dest.writeSerializable(this.parameters);
     }
 
     public static class FileIORequestBuilder {

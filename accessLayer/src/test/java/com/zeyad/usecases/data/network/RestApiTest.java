@@ -110,7 +110,7 @@ public class RestApiTest {
 
     @Test
     public void testUpload() throws Exception {
-        assertThat(mRestApi.upload(mValidUrl, mMultipartBodyPart, mMultipart),
+        assertThat(mRestApi.dynamicUpload(mValidUrl, mMultipartBodyPart, mMultipart),
                 is(equalTo(mMockedApiConnection.upload(mValidUrl, mMultipartBodyPart, mMultipart))));
     }
 

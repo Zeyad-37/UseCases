@@ -1,21 +1,21 @@
 package com.zeyad.usecases.data.repository.stores;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
-import com.zeyad.usecases.utils.TestModel;
+import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.utils.TestModelViewModelMapper;
+import com.zeyad.usecases.utils.TestRealmObject;
 
 import org.mockito.Mockito;
 
 class DataStoreFactoryJUnitRobot {
 
     @NonNull
-    static DataStoreFactory createDataStoreFactory(DataBaseManager dataBaseManager, Context mockedContext) {
-        return new DataStoreFactory(dataBaseManager, mockedContext);
+    static DataStoreFactory createDataStoreFactory(DataBaseManager dataBaseManager, RestApiImpl restApi) {
+        return new DataStoreFactory(dataBaseManager, restApi);
     }
 
     static DataBaseManager createMockedDataBaseManager() {
@@ -57,8 +57,8 @@ class DataStoreFactoryJUnitRobot {
     }
 
     @NonNull
-    static Class<TestModel> getDataClass() {
-        return TestModel.class;
+    static Class<TestRealmObject> getDataClass() {
+        return TestRealmObject.class;
     }
 
     @NonNull

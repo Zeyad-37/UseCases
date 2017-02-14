@@ -8,9 +8,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-import rx.Subscriber;
-import rx.observers.TestSubscriber;
-
 class PostRequestTestRobot {
 
 
@@ -21,7 +18,6 @@ class PostRequestTestRobot {
     static final JSONArray JSON_ARRAY = new JSONArray();
     static final JSONObject JSON_OBJECT = new JSONObject();
     static final Class PRESENTATION_CLASS = TestViewModel.class;
-    static final Subscriber SUBSCRIBER = new TestSubscriber<>();
     static final String URL = "www.google.com";
 
     public static PostRequest buildPostRequest() {
@@ -31,7 +27,6 @@ class PostRequestTestRobot {
                 .payLoad(JSON_ARRAY)
                 .payLoad(JSON_OBJECT)
                 .presentationClass(PRESENTATION_CLASS)
-                .subscriber(SUBSCRIBER)
                 .fullUrl(URL)
                 .build();
     }

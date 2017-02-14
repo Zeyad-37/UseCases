@@ -1,5 +1,7 @@
 package com.zeyad.usecases.data.requests;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
@@ -16,10 +18,20 @@ import rx.Subscriber;
 /**
  * @author zeyad on 7/29/16.
  */
-public class PostRequest {
+public class PostRequest implements Parcelable {
     public static final String POST = "post", DELETE = "delete", PUT = "put", PATCH = "patch";
+    public static final Parcelable.Creator<PostRequest> CREATOR = new Parcelable.Creator<PostRequest>() {
+        @Override
+        public PostRequest createFromParcel(Parcel source) {
+            return new PostRequest(source);
+        }
+
+        @Override
+        public PostRequest[] newArray(int size) {
+            return new PostRequest[size];
+        }
+    };
     private String url, idColumnName, method;
-    private Subscriber subscriber;
     private Class dataClass, presentationClass;
     private boolean persist, queuable;
     private JSONObject jsonObject;
@@ -33,7 +45,6 @@ public class PostRequest {
         presentationClass = postRequestBuilder.presentationClass;
         persist = postRequestBuilder.persist;
         queuable = postRequestBuilder.queuable;
-        subscriber = postRequestBuilder.subscriber;
         keyValuePairs = postRequestBuilder.keyValuePairs;
         jsonObject = postRequestBuilder.jsonObject;
         jsonArray = postRequestBuilder.jsonArray;
@@ -49,7 +60,6 @@ public class PostRequest {
         this.persist = persist;
         this.presentationClass = presentationClass;
         this.dataClass = dataClass;
-        this.subscriber = subscriber;
         this.url = url;
     }
 
@@ -61,7 +71,6 @@ public class PostRequest {
         this.persist = persist;
         this.presentationClass = presentationClass;
         this.dataClass = dataClass;
-        this.subscriber = subscriber;
         this.url = url;
     }
 
@@ -72,8 +81,21 @@ public class PostRequest {
         this.persist = persist;
         this.presentationClass = presentationClass;
         this.dataClass = dataClass;
-        this.subscriber = subscriber;
         this.url = url;
+    }
+
+    protected PostRequest(Parcel in) {
+        this.url = in.readString();
+        this.idColumnName = in.readString();
+        this.method = in.readString();
+        this.dataClass = (Class) in.readSerializable();
+        this.presentationClass = (Class) in.readSerializable();
+        this.persist = in.readByte() != 0;
+        this.queuable = in.readByte() != 0;
+        this.jsonObject = in.readParcelable(JSONObject.class.getClassLoader());
+        this.jsonArray = in.readParcelable(JSONArray.class.getClassLoader());
+        this.keyValuePairs = (HashMap<String, Object>) in.readSerializable();
+        this.object = in.readParcelable(Object.class.getClassLoader());
     }
 
     public JSONObject getObjectBundle() {
@@ -104,10 +126,6 @@ public class PostRequest {
 
     public String getUrl() {
         return url != null ? url : "";
-    }
-
-    public Subscriber getSubscriber() {
-        return subscriber;
     }
 
     public Class getDataClass() {
@@ -150,13 +168,32 @@ public class PostRequest {
         return method;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.url);
+        dest.writeString(this.idColumnName);
+        dest.writeString(this.method);
+        dest.writeSerializable(this.dataClass);
+        dest.writeSerializable(this.presentationClass);
+        dest.writeByte(this.persist ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.queuable ? (byte) 1 : (byte) 0);
+        dest.writeParcelable((Parcelable) this.jsonObject, flags);
+        dest.writeParcelable((Parcelable) this.jsonArray, flags);
+        dest.writeSerializable(this.keyValuePairs);
+        dest.writeParcelable((Parcelable) this.object, flags);
+    }
+
     public static class PostRequestBuilder {
         Object object;
         JSONArray jsonArray;
         JSONObject jsonObject;
         HashMap<String, Object> keyValuePairs;
         String url, idColumnName, method;
-        Subscriber subscriber;
         Class dataClass, presentationClass;
         boolean persist, queuable;
 
@@ -186,12 +223,6 @@ public class PostRequest {
         @NonNull
         public PostRequestBuilder presentationClass(Class presentationClass) {
             this.presentationClass = presentationClass;
-            return this;
-        }
-
-        @NonNull
-        public PostRequestBuilder subscriber(Subscriber subscriber) {
-            this.subscriber = subscriber;
             return this;
         }
 

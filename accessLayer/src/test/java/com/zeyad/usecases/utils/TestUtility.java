@@ -29,7 +29,7 @@ import rx.observers.TestSubscriber;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
-public class TestUtility2 {
+public class TestUtility {
 
     public static final int TIMEOUT_TIME_VALUE = 10000;
     public static final int TIMEOUT_TIME_VALUE_LARGE = 100000;
@@ -118,10 +118,9 @@ public class TestUtility2 {
 
     @NonNull
     public static Context changeStateOfNetwork(@NonNull Context mockedContext, boolean toEnable) {
-
         ConnectivityManager connectivityManager = Mockito.mock(ConnectivityManager.class);
         Mockito.when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager);
-        if (Utils.hasLollipop()) {
+        if (Utils.getInstance().hasLollipop()) {
             Network network = Mockito.mock(Network.class);
             Network[] networks = new Network[]{network};
             Mockito.when(connectivityManager.getAllNetworks()).thenReturn(networks);

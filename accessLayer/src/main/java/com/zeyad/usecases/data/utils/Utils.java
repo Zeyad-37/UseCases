@@ -17,7 +17,6 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.Lifetime;
 import com.firebase.jobdispatcher.RetryStrategy;
 import com.firebase.jobdispatcher.Trigger;
-import com.google.gson.Gson;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.services.GenericJobService;
@@ -30,17 +29,30 @@ import okhttp3.RequestBody;
 import rx.Observable;
 
 public class Utils {
+
     private static final String MULTIPART_FORM_DATA = "multipart/form-data";
 
-    public static boolean doesContextBelongsToApplication(Context mContext) {
+    private static Utils instance;
+
+    public Utils() {
+        instance = this;
+    }
+
+    public static Utils getInstance() {
+        if (instance == null)
+            instance = new Utils();
+        return instance;
+    }
+
+    public boolean doesContextBelongsToApplication(Context mContext) {
         return !(mContext instanceof Activity || mContext instanceof Service);
     }
 
-    public static int getNextId(Class clazz, String column) {
-        return Utils.getMaxId(clazz, column) + 1;
+    public int getNextId(Class clazz, String column) {
+        return getMaxId(clazz, column) + 1;
     }
 
-    public static Observable.Transformer<?, ?> logSources(final String source) {
+    public Observable.Transformer<?, ?> logSources(final String source) {
         return observable -> observable.doOnNext(entities -> {
             if (entities == null)
                 System.out.println(source + " does not have any data.");
@@ -49,7 +61,7 @@ public class Utils {
         });
     }
 
-    public static boolean isNetworkAvailable(@NonNull Context context) {
+    public boolean isNetworkAvailable(@NonNull Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context
                 .CONNECTIVITY_SERVICE);
         if (hasLollipop()) {
@@ -67,24 +79,24 @@ public class Utils {
         return false;
     }
 
-    public static boolean isNotEmpty(String text) {
+    public boolean isNotEmpty(String text) {
         return text != null && !text.isEmpty() && !text.equalsIgnoreCase("null");
     }
 
-    public static boolean isNotEmpty(List list) {
+    public boolean isNotEmpty(List list) {
         return list != null && !list.isEmpty();
     }
 
-    public static boolean isNetworkDecent() {
+    public boolean isNetworkDecent() {
         return ConnectionClassManager.getInstance().getCurrentBandwidthQuality()
                 .compareTo(ConnectionQuality.MODERATE) >= 0;
     }
 
-    public static boolean hasLollipop() {
+    public boolean hasLollipop() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
     }
 
-    public static int getMaxId(Class clazz, String column) {
+    public int getMaxId(Class clazz, String column) {
         Realm realm = Realm.getDefaultInstance();
         try {
             Number currentMax = realm.where(clazz).max(column);
@@ -96,14 +108,14 @@ public class Utils {
         }
     }
 
-    public static RequestBody createPartFromString(Object descriptionString) {
+    public RequestBody createPartFromString(Object descriptionString) {
         return RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), String.valueOf(descriptionString));
     }
 
-    public static void queuePostCore(FirebaseJobDispatcher dispatcher, PostRequest postRequest, Gson gson) {
+    public void queuePostCore(FirebaseJobDispatcher dispatcher, PostRequest postRequest) {
         Bundle extras = new Bundle(2);
         extras.putString(GenericJobService.JOB_TYPE, GenericJobService.POST);
-        extras.putString(GenericJobService.PAYLOAD, gson.toJson(postRequest));
+        extras.putParcelable(GenericJobService.PAYLOAD, postRequest);
         dispatcher.mustSchedule(dispatcher.newJobBuilder()
                 .setService(GenericJobService.class)
                 .setTag(GenericJobService.POST)
@@ -117,11 +129,11 @@ public class Utils {
                 .build());
     }
 
-    public static void queueFileIOCore(FirebaseJobDispatcher dispatcher, boolean isDownload,
-                                       FileIORequest fileIORequest, Gson gson) {
+    public void queueFileIOCore(FirebaseJobDispatcher dispatcher, boolean isDownload,
+                                FileIORequest fileIORequest) {
         Bundle extras = new Bundle(2);
         extras.putString(GenericJobService.JOB_TYPE, isDownload ? GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE);
-        extras.putString(GenericJobService.PAYLOAD, gson.toJson(fileIORequest));
+        extras.putParcelable(GenericJobService.PAYLOAD, fileIORequest);
         dispatcher.mustSchedule(dispatcher.newJobBuilder()
                 .setService(GenericJobService.class)
                 .setTag(isDownload ? GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE)

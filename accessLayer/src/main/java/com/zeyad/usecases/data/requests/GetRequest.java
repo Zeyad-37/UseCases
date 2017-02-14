@@ -5,7 +5,6 @@ import android.support.annotation.NonNull;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.repository.DataRepository;
 
-import io.realm.RealmQuery;
 import rx.Subscriber;
 
 /**
@@ -14,30 +13,24 @@ import rx.Subscriber;
 public class GetRequest {
 
     private String url;
-    private Subscriber subscriber;
     private Class dataClass, presentationClass;
     private boolean persist;
     private String idColumnName;
     private int itemId;
     private boolean shouldCache;
-    private RealmQuery realmQuery;
 
     public GetRequest(@NonNull GetRequestBuilder getRequestBuilder) {
-        url = getRequestBuilder.getUrl();
-        dataClass = getRequestBuilder.getDataClass();
-        presentationClass = getRequestBuilder.getPresentationClass();
-        persist = getRequestBuilder.isPersist();
-        subscriber = getRequestBuilder.getSubscriber();
-        idColumnName = getRequestBuilder.getIdColumnName();
-        itemId = getRequestBuilder.getItemId();
-        shouldCache = getRequestBuilder.isShouldCache();
-        realmQuery = getRequestBuilder.getRealmQuery();
+        url = getRequestBuilder.mUrl;
+        dataClass = getRequestBuilder.mDataClass;
+        presentationClass = getRequestBuilder.mPresentationClass;
+        persist = getRequestBuilder.mPersist;
+        idColumnName = getRequestBuilder.mIdColumnName;
+        itemId = getRequestBuilder.mItemId;
+        shouldCache = getRequestBuilder.mShouldCache;
     }
 
-    public GetRequest(@NonNull Subscriber subscriber, String url, String idColumnName,
-                      int itemId, @NonNull Class presentationClass, Class dataClass, boolean persist,
-                      boolean shouldCache) {
-        this.subscriber = subscriber;
+    public GetRequest(String url, String idColumnName, int itemId, @NonNull Class presentationClass,
+                      Class dataClass, boolean persist, boolean shouldCache) {
         this.url = url;
         this.idColumnName = idColumnName;
         this.itemId = itemId;
@@ -49,10 +42,6 @@ public class GetRequest {
 
     public String getUrl() {
         return url != null ? url : "";
-    }
-
-    public Subscriber getSubscriber() {
-        return subscriber;
     }
 
     public Class getDataClass() {
@@ -79,10 +68,6 @@ public class GetRequest {
         return itemId;
     }
 
-    public RealmQuery getRealmQuery() {
-        return realmQuery;
-    }
-
     public static class GetRequestBuilder {
         private boolean mShouldCache;
         private String mIdColumnName;
@@ -91,17 +76,10 @@ public class GetRequest {
         private Subscriber mSubscriber;
         private Class mDataClass, mPresentationClass;
         private boolean mPersist;
-        private RealmQuery mRealmQuery;
 
         public GetRequestBuilder(Class dataClass, boolean persist) {
             mDataClass = dataClass;
             mPersist = persist;
-        }
-
-        @NonNull
-        public GetRequestBuilder realmQuery(RealmQuery realmQuery) {
-            mRealmQuery = realmQuery;
-            return this;
         }
 
         @NonNull
@@ -149,42 +127,6 @@ public class GetRequest {
         @NonNull
         public GetRequest build() {
             return new GetRequest(this);
-        }
-
-        public String getUrl() {
-            return mUrl;
-        }
-
-        public Subscriber getSubscriber() {
-            return mSubscriber;
-        }
-
-        public Class getDataClass() {
-            return mDataClass;
-        }
-
-        public Class getPresentationClass() {
-            return mPresentationClass;
-        }
-
-        public boolean isPersist() {
-            return mPersist;
-        }
-
-        public boolean isShouldCache() {
-            return mShouldCache;
-        }
-
-        public String getIdColumnName() {
-            return mIdColumnName;
-        }
-
-        public int getItemId() {
-            return mItemId;
-        }
-
-        public RealmQuery getRealmQuery() {
-            return mRealmQuery;
         }
     }
 }

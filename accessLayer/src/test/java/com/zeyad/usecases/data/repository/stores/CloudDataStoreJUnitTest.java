@@ -9,7 +9,7 @@ import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.utils.TestRealmObject;
-import com.zeyad.usecases.utils.TestUtility2;
+import com.zeyad.usecases.utils.TestUtility;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -81,7 +81,7 @@ public class CloudDataStoreJUnitTest {
 //        mCallRealMethodsOfEntityMapper = Mockito.anyBoolean();
 //        mToPersist = Mockito.anyBoolean();
 //        mToCache = Mockito.anyBoolean();
-//        TestUtility2.performInitialSetupOfConfig(Mockito.mock(Context.class));
+//        TestUtility.performInitialSetupOfConfig(Mockito.mock(Context.class));
 //        PowerMockito.mockStatic(Utils.class);
         mMockedRestApi = CloudDataStoreTestJUnitRobot.createMockedRestApi(mToCache);
         mMockedDBManager = CloudDataStoreTestJUnitRobot.createDBManagerWithMockedContext();
@@ -169,13 +169,13 @@ public class CloudDataStoreJUnitTest {
     @Test
     public void testDynamicGetList_ifNoErrorObservableIsReturned_whenArgumentsArePassed() {
         TestSubscriber<List> subscriber = CloudDataStoreTestJUnitRobot.dynamicGetList(mCloudDataStore, mToPersist);
-        TestUtility2.assertNoErrors(subscriber);
+        TestUtility.assertNoErrors(subscriber);
     }
 
     @Test
     public void testDynamicGetList_ifNoErrorObservableIsReturned_whenArgumentsArePassedCacheVersion() {
         TestSubscriber<List> subscriber = CloudDataStoreTestJUnitRobot.dynamicGetList(mCloudDataStore, mToPersist, mToCache);
-        TestUtility2.assertNoErrors(subscriber);
+        TestUtility.assertNoErrors(subscriber);
     }
 
     @Test
@@ -514,7 +514,7 @@ public class CloudDataStoreJUnitTest {
         CloudDataStoreTestJUnitRobot.changeNetworkState(true);
         assumeTrue(CloudDataStoreTestJUnitRobot.isNetworkEnabled());
         TestSubscriber<List> testSubscriber = CloudDataStoreTestJUnitRobot.dynamicPostList(mCloudDataStore, mToPersist);
-        TestUtility2.assertNoErrors(testSubscriber);
+        TestUtility.assertNoErrors(testSubscriber);
     }
 
     @Test
@@ -539,7 +539,7 @@ public class CloudDataStoreJUnitTest {
     public void testDynamicPostJsonArray_ifNoErrorIsThrown_whenRequiredThingsAreMet() {
         CloudDataStoreTestJUnitRobot.changeNetworkState(true);
         assumeTrue(CloudDataStoreTestJUnitRobot.isNetworkEnabled());
-        TestUtility2.assertNoErrors(CloudDataStoreTestJUnitRobot.dynamicPostList(mCloudDataStore, mToPersist));
+        TestUtility.assertNoErrors(CloudDataStoreTestJUnitRobot.dynamicPostList(mCloudDataStore, mToPersist));
     }
 
     //
@@ -778,7 +778,7 @@ public class CloudDataStoreJUnitTest {
         CloudDataStoreTestJUnitRobot.changeNetworkState(true);
         assumeTrue(CloudDataStoreTestJUnitRobot.isNetworkEnabled());
         TestSubscriber<List> testSubscriber = CloudDataStoreTestJUnitRobot.dynamicPutList(mCloudDataStore, mToPersist);
-        TestUtility2.assertNoErrors(testSubscriber);
+        TestUtility.assertNoErrors(testSubscriber);
     }
 
     @Test
@@ -803,10 +803,10 @@ public class CloudDataStoreJUnitTest {
     public void testDynamicPutList_ifNoErrorIsThrown_whenRequiredThingsAreMet() {
         CloudDataStoreTestJUnitRobot.changeNetworkState(true);
         assumeTrue(CloudDataStoreTestJUnitRobot.isNetworkEnabled());
-        TestUtility2.assertNoErrors(CloudDataStoreTestJUnitRobot.dynamicPutList(mCloudDataStore, mToPersist));
+        TestUtility.assertNoErrors(CloudDataStoreTestJUnitRobot.dynamicPutList(mCloudDataStore, mToPersist));
     }
 
-    //upload file
+    //dynamicUpload file
     @Test
     public void testDynamicUploadFile_ifErrorObservableIsReturned_whenNetworkIsNotAvailableAndPlayServicesAreDisabledAndDeviceDoesNotHaveLollipop() {
         CloudDataStoreTestJUnitRobot.changeNetworkState(false);
@@ -886,7 +886,7 @@ public class CloudDataStoreJUnitTest {
         assumeTrue(CloudDataStoreTestJUnitRobot.isNetworkEnabled());
         CloudDataStoreTestJUnitRobot.dynamicUploadFile(mCloudDataStore, mToPersist);
         Mockito.verify(mMockedRestApi, times(1))
-                .upload(Mockito.anyString(), Mockito.any(Map.class), Mockito.any(MultipartBody.Part.class));
+                .dynamicUpload(Mockito.anyString(), Mockito.any(Map.class), Mockito.any(MultipartBody.Part.class));
     }
 
     @Test

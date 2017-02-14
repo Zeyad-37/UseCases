@@ -2,6 +2,7 @@ package com.zeyad.usecases.data.db;
 
 import android.os.Build;
 import android.os.Handler;
+import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -34,15 +35,21 @@ public class RealmManager implements DataBaseManager {
     private static DataBaseManager sInstance;
     private static Handler backgroundHandler;
 
-    private RealmManager() {
+    private RealmManager(Looper backgroundLooper) {
+        if (backgroundHandler == null)
+            backgroundHandler = new Handler(backgroundLooper);
+    }
+
+    RealmManager(Handler backgroundHandler) {
+        RealmManager.backgroundHandler = backgroundHandler;
     }
 
     /**
      * Use this function to re-instantiate general realm manager or instance for the first time.
      * Previous instances would be deleted and new created
      */
-    static void init() {
-        sInstance = new RealmManager();
+    static void init(Looper backgroundLooper) {
+        sInstance = new RealmManager(backgroundLooper);
     }
 
     /**
@@ -50,16 +57,12 @@ public class RealmManager implements DataBaseManager {
      */
     static DataBaseManager getInstance() {
         if (sInstance == null)
-            init();
+            init(DataUseCase.getHandlerThread().getLooper());
         return sInstance;
     }
 
     private static boolean hasKitKat() {
         return Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
-    }
-
-    private Handler provideBackgroundHandler() {
-        return new Handler(DataUseCase.getHandlerThread().getLooper());
     }
 
     /**
@@ -75,7 +78,7 @@ public class RealmManager implements DataBaseManager {
         return Observable.defer(() -> {
             int finalItemId = itemId;
             if (finalItemId <= 0)
-                finalItemId = Utils.getMaxId(dataClass, idColumnName);
+                finalItemId = Utils.getInstance().getMaxId(dataClass, idColumnName);
             Realm realm = Realm.getDefaultInstance();
             return realm.where(dataClass).equalTo(idColumnName, finalItemId).findAll().asObservable()
                     .filter(results -> ((RealmResults) results).isLoaded())
@@ -101,6 +104,14 @@ public class RealmManager implements DataBaseManager {
         });
     }
 
+    /**
+     * Takes a query to be executed and return a list of containing the result.
+     *
+     * @param queryFactory The query used to look for inside the DB.
+     * @param <T>          the return type from the query
+     * @return {@link List<T>} a result list that matches the given query.
+     */
+    @Override
     public <T extends RealmModel> Observable<List<T>> getQuery(RealmQueryProvider<T> queryFactory) {
         return Observable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
@@ -376,8 +387,8 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public Observable<?> evictCollection(@NonNull String idFieldName, @NonNull List<Long> list,
-                                         @NonNull Class dataClass) {
+    public Observable<Boolean> evictCollection(@NonNull String idFieldName, @NonNull List<Long> list,
+                                               @NonNull Class dataClass) {
         return Observable.defer(() -> {
             boolean isDeleted = true;
             for (int i = 0, size = list.size(); i < size; i++)
@@ -388,8 +399,6 @@ public class RealmManager implements DataBaseManager {
 
     private void closeRealm(Realm realm) {
         try {
-            if (backgroundHandler == null)
-                backgroundHandler = provideBackgroundHandler();
             backgroundHandler.post(() -> {
                 if (!realm.isClosed()) {
                     realm.close();
@@ -436,7 +445,7 @@ public class RealmManager implements DataBaseManager {
         if (idColumnName == null || idColumnName.isEmpty())
             throw new IllegalArgumentException(NO_ID);
         if (jsonObject.optInt(idColumnName) == 0)
-            jsonObject.put(idColumnName, Utils.getNextId(dataClass, idColumnName));
+            jsonObject.put(idColumnName, Utils.getInstance().getNextId(dataClass, idColumnName));
         return jsonObject;
     }
 
@@ -476,6 +485,5 @@ public class RealmManager implements DataBaseManager {
         public void onNext(Object o) {
             Log.d(RealmManager.class.getName(), mClazz.getName() + " deleted!");
         }
-
     }
 }

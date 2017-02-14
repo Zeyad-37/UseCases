@@ -51,7 +51,7 @@ public interface RestApi {
 
     @Multipart
     @POST
-    Observable<Object> upload(@Url String url, @PartMap() Map<String, RequestBody> partMap, @Part MultipartBody.Part file);
+    Observable<Object> dynamicUpload(@Url String url, @PartMap() Map<String, RequestBody> partMap, @Part MultipartBody.Part file);
 
     @PATCH
     Observable<Object> dynamicPatch(String url, RequestBody requestBody);

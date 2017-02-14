@@ -26,7 +26,7 @@ public class DataUseCaseFactory {
      * @param config configuration object to DataUseCase.
      */
     public static void init(DataUseCaseConfig config) {
-        if (!Utils.doesContextBelongsToApplication(config.getContext()))
+        if (!Utils.getInstance().doesContextBelongsToApplication(config.getContext()))
             throw new IllegalArgumentException("Context should be application context only.");
         Config.init(config.getContext());
         Config.setBaseURL(config.getBaseUrl());

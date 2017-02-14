@@ -2,11 +2,11 @@ package com.zeyad.usecases.domain.interactors.data;
 
 import android.os.HandlerThread;
 
-import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DatabaseManagerFactory;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
+import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.repository.DataRepository;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.requests.GetRequest;
@@ -41,7 +41,16 @@ public class DataUseCase implements IDataUseCase {
     private final PostExecutionThread mPostExecutionThread;
 
     private DataUseCase(Data data, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
-        handlerThread = getHandlerThread();
+        if (handlerThread == null)
+            handlerThread = new HandlerThread("backgroundThread");
+        mThreadExecutor = threadExecutor;
+        mPostExecutionThread = postExecutionThread;
+        mData = data;
+    }
+
+    private DataUseCase(Data data, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
+                        HandlerThread handlerThread) {
+        DataUseCase.handlerThread = handlerThread;
         mThreadExecutor = threadExecutor;
         mPostExecutionThread = postExecutionThread;
         mData = data;
@@ -56,8 +65,8 @@ public class DataUseCase implements IDataUseCase {
     static void initWithoutDB(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor,
                               PostExecutionThread postExecutionThread) {
         hasRealm = false;
-        sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(Config.getInstance()
-                .getContext()), entityMapper), threadExecutor, postExecutionThread);
+        sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(RestApiImpl.getInstance()),
+                entityMapper), threadExecutor, postExecutionThread);
     }
 
     /**
@@ -69,9 +78,11 @@ public class DataUseCase implements IDataUseCase {
     static void initWithRealm(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor,
                               PostExecutionThread postExecutionThread) {
         hasRealm = true;
-        DatabaseManagerFactory.initRealm();
+        if (handlerThread == null)
+            handlerThread = new HandlerThread("backgroundThread");
+        DatabaseManagerFactory.initRealm(handlerThread.getLooper());
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
-                .getInstance(), Config.getInstance().getContext()), entityMapper), threadExecutor,
+                .getInstance(), RestApiImpl.getInstance()), entityMapper), threadExecutor,
                 postExecutionThread);
     }
 
@@ -86,8 +97,9 @@ public class DataUseCase implements IDataUseCase {
      * @param jobExecutor    job executor
      * @param uiThread       ui thread implementation
      */
-    public static void init(DataRepository dataRepository, JobExecutor jobExecutor, UIThread uiThread) {
-        sDataUseCase = new DataUseCase(dataRepository, jobExecutor, uiThread);
+    public static void init(DataRepository dataRepository, JobExecutor jobExecutor, UIThread uiThread,
+                            HandlerThread handlerThread) {
+        sDataUseCase = new DataUseCase(dataRepository, jobExecutor, uiThread, handlerThread);
     }
 
     public static DataUseCase getInstance() {
@@ -107,6 +119,10 @@ public class DataUseCase implements IDataUseCase {
      */
     public static boolean hasRealm() {
         return hasRealm;
+    }
+
+    public static void setHasRealm(boolean value) {
+        hasRealm = value;
     }
 
     /**
@@ -241,7 +257,7 @@ public class DataUseCase implements IDataUseCase {
         Observable<List> online = mData.getListDynamically(getRequest.getUrl(), getRequest.getPresentationClass(),
                 getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache());
         List lastList = listOffLineFirst.getValue();
-        if (Utils.isNotEmpty(lastList) && lastList.get(0).getClass() == getRequest.getPresentationClass())
+        if (Utils.getInstance().isNotEmpty(lastList) && lastList.get(0).getClass() == getRequest.getPresentationClass())
             listOffLineFirst.onNext(lastList);
         else
             mData.getListDynamically("", getRequest.getPresentationClass(), getRequest.getDataClass(),
@@ -249,7 +265,7 @@ public class DataUseCase implements IDataUseCase {
                     .flatMap(new Func1<List, Observable<?>>() {
                         @Override
                         public Observable<List> call(List list) {
-                            if (Utils.isNotEmpty(list))
+                            if (Utils.getInstance().isNotEmpty(list))
                                 return Observable.just(list);
                             else return online;
                         }

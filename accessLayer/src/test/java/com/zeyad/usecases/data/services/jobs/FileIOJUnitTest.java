@@ -2,7 +2,6 @@ package com.zeyad.usecases.data.services.jobs;
 
 import android.annotation.TargetApi;
 import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -20,8 +19,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -38,17 +35,16 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
-@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest({JobScheduler.class})
 public class FileIOJUnitTest {
-    // TODO: 9/25/16 Mock Job Scheduler
-    Context context;
+    Context mockContext;
+
     @Before
     public void setUp() throws Exception {
-        context = mock(Context.class);
+        mockContext = mock(Context.class);
     }
 
     @After
@@ -67,7 +63,7 @@ public class FileIOJUnitTest {
                 , fileIOReq
                 , true);
         fileIO.execute();
-        Mockito.verify(restApi).dynamicDownload(eq(FileIOJUnitTestRobot.getValidUrl()));
+        verify(restApi).dynamicDownload(eq(FileIOJUnitTestRobot.getValidUrl()));
     }
 
     @Test
@@ -89,14 +85,14 @@ public class FileIOJUnitTest {
         FileIORequest fileIOReq =
                 FileIOJUnitTestRobot.createFileIoReq(true, true, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
         final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
-        final FirebaseJobDispatcher gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager(context);
+        final FirebaseJobDispatcher gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager(mockContext);
         FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 1
                 , fileIOReq
                 , true);
         fileIO.queueIOFile();
-        Mockito.verify(gcmNetworkManager).schedule(Mockito.any(Job.class));
+        verify(gcmNetworkManager).schedule(Mockito.any(Job.class));
     }
 
     @Test
@@ -104,7 +100,7 @@ public class FileIOJUnitTest {
         FileIORequest fileIOReq =
                 FileIOJUnitTestRobot.createFileIoReq(true, false, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
         final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
-        final FirebaseJobDispatcher gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager(context);
+        final FirebaseJobDispatcher gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager(mockContext);
         FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 1
@@ -134,7 +130,7 @@ public class FileIOJUnitTest {
                 , fileIOReq
                 , true);
         fileIO.queueIOFile();
-        Mockito.verify(FileIOJUnitTestRobot.getMockedJobScheduler()).schedule(Mockito.any(JobInfo.class));
+        verify(FileIOJUnitTestRobot.getMockedJobScheduler()).schedule(Mockito.any(JobInfo.class));
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -150,7 +146,7 @@ public class FileIOJUnitTest {
                 , true);
         fileIO.queueIOFile();
         ArgumentCaptor<JobInfo> argumentCaptor = ArgumentCaptor.forClass(JobInfo.class);
-        Mockito.verify(FileIOJUnitTestRobot.getMockedJobScheduler()).schedule(argumentCaptor.capture());
+        verify(FileIOJUnitTestRobot.getMockedJobScheduler()).schedule(argumentCaptor.capture());
         assertThat(argumentCaptor.getValue().getService().getClassName(), is(equalTo(GenericJobService.class.getName())));
         assertThat(argumentCaptor.getValue().isRequireCharging(), is(fileIOReq.isWhileCharging()));
         assertThat(argumentCaptor.getValue().isPersisted(), is(true));
@@ -164,14 +160,14 @@ public class FileIOJUnitTest {
         FileIORequest fileIOReq =
                 FileIOJUnitTestRobot.createFileIoReq(true, true, FileIOJUnitTestRobot.createFileWhichDoesNotExist());
         final RestApiImpl restApi = FileIOJUnitTestRobot.createRestApi();
-        final FirebaseJobDispatcher gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager(context);
+        final FirebaseJobDispatcher gcmNetworkManager = FileIOJUnitTestRobot.getGcmNetworkManager(mockContext);
         FileIO fileIO = FileIOJUnitTestRobot.createFileIO(FileIOJUnitTestRobot.createMockedContext()
                 , restApi
                 , 2
                 , fileIOReq
                 , true);
         fileIO.queueIOFile();
-        Mockito.verify(gcmNetworkManager, times(0)).schedule(Mockito.any(Job.class));
+        verify(gcmNetworkManager, times(0)).schedule(Mockito.any(Job.class));
     }
 
     @Test
@@ -185,6 +181,6 @@ public class FileIOJUnitTest {
                 , fileIOReq
                 , true);
         fileIO.execute();
-        Mockito.verify(restApi, times(0)).dynamicDownload(eq(FileIOJUnitTestRobot.getValidUrl()));
+        verify(restApi, times(0)).dynamicDownload(eq(FileIOJUnitTestRobot.getValidUrl()));
     }
 }

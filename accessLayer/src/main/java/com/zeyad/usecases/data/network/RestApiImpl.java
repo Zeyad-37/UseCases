@@ -62,7 +62,7 @@ public class RestApiImpl implements RestApi {
      * @return Observable with the Object response.
      */
     @Override
-    public Observable<Object> upload(@Url String url, @PartMap Map<String, RequestBody> partMap, @Part MultipartBody.Part file) {
+    public Observable<Object> dynamicUpload(@Url String url, @PartMap Map<String, RequestBody> partMap, @Part MultipartBody.Part file) {
         return mApiConnection.upload(url, partMap, file);
     }
 

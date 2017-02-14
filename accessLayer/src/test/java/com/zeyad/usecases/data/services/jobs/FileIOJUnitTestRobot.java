@@ -36,7 +36,7 @@ class FileIOJUnitTestRobot {
     private static final JobScheduler JOB_SCHEDULER;
 
     static {
-        JOB_SCHEDULER = Utils.hasLollipop() ? Mockito.mock(JobScheduler.class) : null;
+        JOB_SCHEDULER = Utils.getInstance().hasLollipop() ? Mockito.mock(JobScheduler.class) : null;
     }
 
     static String getValidUrl() {

@@ -1,142 +1,102 @@
 package com.zeyad.usecases.domain.interactors;
 
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import android.os.HandlerThread;
+import android.os.Looper;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.repository.DataRepository;
-import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.interactors.data.DataUseCase;
-import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 import com.zeyad.usecases.domain.repositories.Data;
-import com.zeyad.usecases.utils.TestModel;
-import com.zeyad.usecases.utils.TestViewModel;
+import com.zeyad.usecases.utils.TestRealmObject;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
 
-import java.io.File;
 import java.util.HashMap;
 
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest({DataUseCaseFactory.class})
+@RunWith(JUnit4.class)
 public class DataUseCaseTest {
 
-    private Class PRESENTATION_CLASS = TestModel.class;
-    private Class DATA_CLASS = TestModel.class;
-    private TestModel TEST_MODEL = new TestModel(1, "123");
-    private JSONObject JSON_OBJECT = new JSONObject();
-    private JSONArray JSON_ARRAY = new JSONArray();
     private HashMap<String, Object> HASH_MAP = new HashMap<>();
-    private File MOCKED_FILE = Mockito.mock(File.class);
-    //    private  final RealmQuery<TestModel> REALM_QUERY = Realm.getDefaultInstance().where(TestModel.class);
-    @Nullable
-    private
-    RealmManager.RealmQueryProvider REALM_QUERY = null;
-    @Nullable
-    private
-    Data mDataData = getMockedDataRepo();
-    @Nullable
-    private
-    JobExecutor mJobExecutor = getMockedJobExecuter();
-    @Nullable
-    private
-    UIThread mUIThread = getMockedUiThread();
+    private JobExecutor mJobExecutor = getMockedJobExecuter();
+    private UIThread mUIThread = getMockedUiThread();
     private IDataUseCase mDataUseCase;
-    private boolean mToPersist, mWhileCharging, mQueuable;
-
-    private int getItemId() {
-        return 1;
-    }
-
-    private String getIdColumnName() {
-        return "id";
-    }
-
-    @NonNull
-    private Class getDataClass() {
-        return TestModel.class;
-    }
-
-    @NonNull
-    private Class getPresentationClass() {
-        return TestViewModel.class;
-    }
-
-    String getUrl() {
-        return "www.google.com";
-    }
+    private Observable observable = Observable.just(true);
+    private Data mData = getMockedDataRepo();
 
     Data getMockedDataRepo() {
         final DataRepository dataRepository = Mockito.mock(DataRepository.class);
-        Mockito.doReturn(getObjectObservable())
+        Mockito.doReturn(observable)
                 .when(dataRepository)
                 .getObjectDynamicallyById(Mockito.anyString(), Mockito.anyString()
-                        , Mockito.anyInt(), Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-        Mockito.doReturn(getObjectObservable())
+                        , Mockito.anyInt(), any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+        Mockito.doReturn(observable)
                 .when(dataRepository)
                 .getObjectDynamicallyById(Mockito.anyString(), Mockito.anyString()
-                        , Mockito.anyInt(), Mockito.any()
-                        , Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-        Mockito.doReturn(getObjectObservable())
+                        , Mockito.anyInt(), any()
+                        , any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+        Mockito.doReturn(observable)
                 .when(dataRepository)
-                .deleteAllDynamically(Mockito.anyString(), Mockito.any(), Mockito.anyBoolean());
-        Mockito.doReturn(getObjectObservable())
+                .deleteAllDynamically(Mockito.anyString(), any(), Mockito.anyBoolean());
+        Mockito.doReturn(observable)
                 .when(dataRepository)
-                .putListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class),
-                        Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-        Mockito.doReturn(getObjectObservable())
+                .putListDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONArray.class),
+                        any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+        Mockito.doReturn(observable)
                 .when(dataRepository)
-                .putListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class),
-                        Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-//        Mockito.doReturn(getObjectObservable())
+                .putListDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONArray.class),
+                        any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+//        Mockito.doReturn(observable)
 //                .when(dataRepository)
 //                .uploadFileDynamically(Mockito.anyString(), Mockito.any(File.class), Mockito.anyString(),
 //                        Mockito.any(HashMap.class), Mockito.anyBoolean(), Mockito.anyBoolean(),
 //                        Mockito.anyBoolean(), Mockito.any(), Mockito.any());
-        Mockito.doReturn(getObjectObservable())
+        Mockito.doReturn(observable)
                 .when(dataRepository)
-                .putObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class),
-                        Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-        Mockito.doReturn(getObjectObservable())
+                .putObjectDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONObject.class),
+                        any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+        Mockito.doReturn(observable)
                 .when(dataRepository)
-                .deleteListDynamically(Mockito.anyString(), Mockito.any(JSONArray.class), Mockito.any(),
-                        Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-        Mockito.doReturn(getObjectObservable())
+                .deleteListDynamically(Mockito.anyString(), any(JSONArray.class), any(),
+                        any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+        Mockito.doReturn(observable)
                 .when(dataRepository)
-                .queryDisk(Mockito.any(RealmManager.RealmQueryProvider.class), Mockito.any());
-        Mockito.doReturn(getObjectObservable())
+                .queryDisk(any(RealmManager.RealmQueryProvider.class), any());
+        Mockito.doReturn(observable)
                 .when(dataRepository)
-                .postListDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONArray.class),
-                        Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-        Mockito.doReturn(getObjectObservable())
+                .postListDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONArray.class),
+                        any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+        Mockito.doReturn(observable)
                 .when(dataRepository)
-                .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class),
-                        Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-        Mockito.doReturn(getObjectObservable())
+                .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONObject.class),
+                        any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+        Mockito.doReturn(observable)
                 .when(dataRepository)
-                .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), Mockito.any(JSONObject.class),
-                        Mockito.any(), Mockito.any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+                .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONObject.class),
+                        any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         return dataRepository;
     }
 
@@ -148,285 +108,118 @@ public class DataUseCaseTest {
         return Mockito.mock(UIThread.class);
     }
 
-    @NonNull
-    private Observable<Object> getObjectObservable() {
-        //        final ObjectObservable mock1 = getMockedObjectObservable();
-        //        final ObjectObservable mock2 = getMockedObjectObservable();
-        //        final ObjectObservable mock3 = getMockedObjectObservable();
-        //        final ObjectObservable mock4 = getMockedObjectObservable();
-        //        Mockito.when(mock1.map(Mockito.any())).thenReturn(mock2);
-        //        Mockito.when(mock2.compose(Mockito.any())).thenReturn(mock3);
-        //        Mockito.when(mock3.compose(Mockito.any())).thenReturn(mock4);
-        //        return mock1;
-        return Observable.just(createTestModel());
-    }
-
-    @NonNull
-    private TestModel createTestModel() {
-        return TEST_MODEL;
-    }
-
-    private void deleteAll(@NonNull IDataUseCase genericUse, boolean toPersist) {
-
-    }
-
-    @NonNull
-    JSONObject getJSONObject() {
-        return JSON_OBJECT;
-    }
-
-    @NonNull
-    private JSONArray getJsonArray() {
-        return JSON_ARRAY;
-    }
-
-    @NonNull
-    HashMap<String, Object> getHashmap() {
-        return HASH_MAP;
-    }
-
-    File getFile() {
-        return MOCKED_FILE;
-    }
-
-    String getKey() {
-        return "image";
-    }
-
-    @NonNull
-    private TestSubscriber putObject(@NonNull IDataUseCase genericUse, boolean toPersist) {
-        final TestSubscriber subscriber = new TestSubscriber();
-        genericUse.putObject(getHashmapPostRequest(toPersist)).subscribe(subscriber);
-        return subscriber;
-    }
-
-    private String getColumnQueryValue() {
-        return "1";
-    }
-
-    private String getStringQuery() {
-        return "some query";
-    }
-
-    @NonNull
-    private FileIORequest getUploadRequest(boolean onWifi, boolean whileCharging) {
-        return new FileIORequest(getUrl(), getFile(), getKey(), getHashmap(), onWifi, whileCharging, getPresentationClass(), getDataClass());
-    }
-
-    @NonNull
-    private PostRequest getHashmapPostRequest(boolean toPersist) {
-        return new PostRequest(new TestSubscriber(), getIdColumnName(), getUrl(), getHashmap(),
-                getPresentationClass(), getDataClass(), toPersist);
-    }
-
-    @NonNull
-    private PostRequest getJsonArrayPostRequest(boolean toPersist) {
-        return new PostRequest(new TestSubscriber(), getIdColumnName(), getUrl(), getJsonArray(),
-                getPresentationClass(), getDataClass(), toPersist);
-    }
-
-    @NonNull
-    private PostRequest getJsonObjectPostRequest(boolean toPersist) {
-        return new PostRequest(new TestSubscriber(), getIdColumnName(), getUrl(), getJSONObject(),
-                getPresentationClass(), getDataClass(), toPersist);
-    }
-
-    @Nullable
-    public RealmManager.RealmQueryProvider getRealmQuery() {
-        return REALM_QUERY;
-    }
-
     @Before
     public void setUp() throws Exception {
-        mDataUseCase = getGenericUseImplementation((DataRepository) mDataData, mJobExecutor, mUIThread);
-        PowerMockito.mockStatic(DataUseCaseFactory.class);
-//        Mockito.when(Utils.isNotEmpty(getUrl())).thenReturn(true);
+        HandlerThread handlerThread = mock(HandlerThread.class);
+        when(handlerThread.getLooper()).thenReturn(mock(Looper.class));
+        mDataUseCase = getGenericUseImplementation((DataRepository) mData, mJobExecutor, mUIThread,
+                handlerThread);
         Config.setBaseURL("www.google.com");
     }
 
     @Test
-    public void testGetObject_ifDataRepositoryMethodGetObjectDynamicallyIsCalled_whenArgumentsArePassedAsExpected() {
-        final TestSubscriber<Object> useCaseSubscriber = new TestSubscriber<>();
-        mDataUseCase.getObject(new GetRequest(useCaseSubscriber, getUrl(), getIdColumnName(), getItemId(),
-                getPresentationClass(), getDataClass(), mToPersist, false))
-                .subscribe(useCaseSubscriber);
+    public void testGetObject() {
+        when(mData.getObjectDynamicallyById(anyString(), anyString(), anyInt(),
+                any(Class.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        Mockito.verify(getMockedDataRepo()).getObjectDynamicallyById(
-                eq(getUrl()),
-                eq(getIdColumnName()),
-                eq(getItemId()),
-                eq(getPresentationClass()),
-                eq(getDataClass()),
-                eq(mToPersist),
-                eq(false));
+        mDataUseCase.getObject(new GetRequest("", "", 0, Object.class, Object.class, false, false));
+
+        verify(mData, times(1)).getObjectDynamicallyById(anyString(), anyString(),
+                anyInt(), any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
-    public void testExecuteDynamicPostObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestOfHasmapIsPassed() {
-        final PostRequest jsonObjectPostRequest = getHashmapPostRequest(mToPersist);
-        TestSubscriber<Object> subscriber = (TestSubscriber<Object>) jsonObjectPostRequest.getSubscriber();
-        mDataUseCase.postObject(jsonObjectPostRequest).subscribe(subscriber);
+    public void testGetList() {
+        when(mData.getListDynamically(anyString(), any(Class.class), any(Class.class), anyBoolean(),
+                anyBoolean())).thenReturn(observable);
 
-        Mockito.verify(mDataData).postObjectDynamically(
-                eq(getUrl()),
-                eq(getIdColumnName()),
-                eq(getJSONObject()),
-                eq(getPresentationClass()),
-                eq(getDataClass()),
-                eq(mToPersist),
-                eq(mQueuable));
+        mDataUseCase.getList(new GetRequest("", "", 0, Object.class, Object.class, false, false));
+
+        verify(mData, times(1)).getListDynamically(anyString(), any(Class.class), any(Class.class),
+                anyBoolean(), anyBoolean());
     }
 
     @Test
-    public void testPostObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestOfJsonObjectIsPassed() {
-        final PostRequest jsonObjectPostRequest = getJsonObjectPostRequest(mToPersist);
-        TestSubscriber<Object> subscriber = (TestSubscriber<Object>) jsonObjectPostRequest.getSubscriber();
-        mDataUseCase.postObject(jsonObjectPostRequest).subscribe(subscriber);
+    public void testExecuteDynamicPostObject() {
+        when(mData.postObjectDynamically(anyString(), anyString(), any(JSONObject.class), any(Class.class),
+                any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        Mockito.verify(mDataData)
-                .postObjectDynamically(
-                        eq(getUrl()),
-                        eq(getIdColumnName()),
-                        eq(getJSONObject()),
-                        eq(getPresentationClass()),
-                        eq(getDataClass()),
-                        eq(mToPersist),
-                        eq(mQueuable));
+        mDataUseCase.postObject(new PostRequest(new TestSubscriber(), "", "",
+                new JSONArray(), Object.class, Object.class, false));
+
+        verify(mData, times(1)).postObjectDynamically(anyString(), anyString(), any(JSONObject.class),
+                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
-    public void testPostObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestOfHashMapIsPassed() {
-        final PostRequest jsonObjectPostRequest = getHashmapPostRequest(mToPersist);
-        TestSubscriber<Object> subscriber = (TestSubscriber<Object>) jsonObjectPostRequest.getSubscriber();
-        mDataUseCase.postObject(jsonObjectPostRequest).subscribe(subscriber);
+    public void testPutObject() {
+        when(mData.putObjectDynamically(anyString(), anyString(), any(JSONObject.class), any(Class.class),
+                any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        Mockito.verify(mDataData).postObjectDynamically(
-                eq(getUrl()),
-                eq(getIdColumnName()),
-                eq(getJSONObject()),
-                eq(getPresentationClass()),
-                eq(getDataClass()),
-                eq(mToPersist),
-                eq(mQueuable));
+        mDataUseCase.putObject(new PostRequest(new TestSubscriber(), "", "",
+                new JSONArray(), Object.class, Object.class, false));
+
+        verify(mData, times(1)).putObjectDynamically(anyString(), anyString(), any(JSONObject.class),
+                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
-    public void testPostList_ifDataRepoCorrectMethodIsCalled_whenPostRequestIsPassed() {
-        final PostRequest jsonArrayPostRequest = getJsonArrayPostRequest(mToPersist);
-        TestSubscriber<Object> testSubscriber = (TestSubscriber<Object>) jsonArrayPostRequest.getSubscriber();
-        mDataUseCase.postList(jsonArrayPostRequest).subscribe(testSubscriber);
+    public void testPostList() {
+        when(mData.postListDynamically(anyString(), anyString(), any(JSONArray.class), any(Class.class),
+                any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+        mDataUseCase.postList(new PostRequest(new TestSubscriber(), "", "", HASH_MAP, Object.class,
+                Object.class, false));
 
-        Mockito.verify(mDataData)
-                .postListDynamically(
-                        eq(getUrl()),
-                        eq(getIdColumnName()),
-                        eq(getJsonArray()),
-                        eq(getPresentationClass()),
-                        eq(getDataClass()),
-                        eq(mToPersist),
-                        eq(mQueuable));
+        verify(mData, times(1)).postListDynamically(anyString(), anyString(), any(JSONArray.class),
+                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
-    public void testExecuteSearch_ifDataRepoCorrectMethodIsCalled_whenRealmQueryIsPassed() {
-        mDataUseCase.queryDisk(getRealmQuery(), getPresentationClass()).subscribe(new TestSubscriber<>());
-        Mockito.verify(mDataData).queryDisk(eq(getRealmQuery()), eq(getPresentationClass()));
+    public void testPutList() {
+        when(mData.putListDynamically(anyString(), anyString(), any(JSONArray.class), any(Class.class),
+                any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+
+        mDataUseCase.putList(new PostRequest(new TestSubscriber(), "", "", HASH_MAP, Object.class,
+                Object.class, false));
+
+        verify(mData, times(1)).putListDynamically(anyString(), anyString(), any(JSONArray.class),
+                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
-    public void testDeleteCollection_ifDataRepoCorrectMethodIsCalled_whenPostRequestIsPassed() {
-        final PostRequest deleteRequest = getHashmapPostRequest(mToPersist);
-        final TestSubscriber subscriber = (TestSubscriber) deleteRequest.getSubscriber();
-        mDataUseCase.deleteCollection(deleteRequest).subscribe(subscriber);
-        Mockito.verify(mDataData)
-                .deleteListDynamically(
-                        eq(getUrl()),
-                        eq(getJsonArray()),
-                        eq(getPresentationClass()),
-                        eq(getDataClass()),
-                        eq(mToPersist),
-                        eq(mQueuable));
+    public void testExecuteSearch() {
+        when(mData.queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class))).thenReturn(observable);
+
+        mDataUseCase.queryDisk(realm -> realm.where(TestRealmObject.class), Object.class);
+
+        verify(mData, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class));
     }
 
     @Test
-    public void testExecuteDynamicPutObject_ifDataRepoCorrectMethodIsCalled_whenNonPutRequestIsPassed() {
-        putObject(mDataUseCase, mToPersist);
-        Mockito.verify(mDataData).putObjectDynamically(
-                eq(getUrl()),
-                eq(getIdColumnName()),
-                eq(getJSONObject()),
-                eq(getPresentationClass()),
-                eq(getDataClass()),
-                eq(mToPersist),
-                eq(mQueuable));
-    }
+    public void testDeleteCollection() {
+        when(mData.deleteListDynamically(anyString(), any(JSONArray.class), any(Class.class),
+                any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
 
-    @Test
-    public void testPutObject_ifDataRepoCorrectMethodIsCalled_whenPostRequestIsPassed() {
-        putObject(mDataUseCase, mToPersist);
-        Mockito.verify(mDataData).putObjectDynamically(
-                eq(getUrl()),
-                eq(getIdColumnName()),
-                eq(getJSONObject()),
-                eq(getPresentationClass()),
-                eq(getDataClass()),
-                eq(mToPersist),
-                eq(mQueuable));
-    }
+        mDataUseCase.deleteCollection(new PostRequest(new TestSubscriber(), "", "", HASH_MAP, Object.class,
+                Object.class, false));
 
-//    @Test
-//    public void testUploadFile_ifDataRepoCorrectMethodIsCalled_whenPutRequestIsPassed() {
-//        mDataUseCase.uploadFile(getUploadRequest(mToPersist, mWhileCharging)).subscribe(new TestSubscriber());
-//        Mockito.verify(mDataData).uploadFileDynamically(eq(getUrl()),
-//                eq(getFile()),
-//                eq(getKey()),
-//                eq(getHashmap()),
-//                eq(false),
-//                eq(false),
-//                eq(mQueuable),
-//                eq(PRESENTATION_CLASS),
-//                eq(DATA_CLASS));
-//    }
-
-    @Test
-    public void testPutList_ifDataRepoCorrectMethodIsCalled_whenJsonArrayIsPassed() {
-        final PostRequest postRequest = new PostRequest(new TestSubscriber(), getIdColumnName(),
-                getUrl(), getJsonArray(), getPresentationClass(), getDataClass(), mToPersist);
-        mDataUseCase.putList(postRequest).subscribe(new TestSubscriber<>());
-
-        Mockito.verify(mDataData).putListDynamically(eq(getUrl()),
-                eq(getIdColumnName()),
-                eq(getJsonArray()),
-                eq(getPresentationClass()),
-                eq(getDataClass()),
-                eq(mToPersist),
-                eq(mQueuable));
-    }
-
-    @Test
-    public void testPutList_ifDataRepoCorrectMethodIsCalled_whenHashmapIsPassed() {
-        mDataUseCase.putList(getHashmapPostRequest(mToPersist)).subscribe(new TestSubscriber<>());
-        Mockito.verify(mDataData).putListDynamically(eq(getUrl()),
-                eq(getIdColumnName()),
-                eq(getJsonArray()),
-                eq(getPresentationClass()),
-                eq(getDataClass()),
-                eq(mToPersist),
-                eq(mQueuable));
+        verify(mData, times(1)).deleteListDynamically(anyString(), any(JSONArray.class),
+                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testDeleteAll_ifDataRepositoryCorrectMethodIsCalled_whenPostRequestIsPassed() {
-        final PostRequest postRequest = new PostRequest
-                .PostRequestBuilder(getDataClass(), mToPersist)
-                .url(getUrl()).build();
-        mDataUseCase.deleteAll(postRequest).subscribe(new TestSubscriber<>());
-        Mockito.verify(mDataData).deleteAllDynamically(eq(getUrl()), eq(getDataClass()), eq(mToPersist));
+        when(mData.deleteAllDynamically(anyString(), any(Class.class), anyBoolean())).thenReturn(observable);
+
+        mDataUseCase.deleteAll(new PostRequest(new TestSubscriber(), "", "", HASH_MAP, Object.class,
+                Object.class, false));
+
+        verify(mData, times(1)).deleteAllDynamically(anyString(), any(Class.class), anyBoolean());
     }
 
     public IDataUseCase getGenericUseImplementation(DataRepository datarepo, JobExecutor jobExecuter
-            , UIThread uithread) {
-        DataUseCase.init(datarepo, jobExecuter, uithread);
+            , UIThread uithread, HandlerThread handlerThread) {
+        DataUseCase.init(datarepo, jobExecuter, uithread, handlerThread);
         return DataUseCase.getInstance();
     }
 }

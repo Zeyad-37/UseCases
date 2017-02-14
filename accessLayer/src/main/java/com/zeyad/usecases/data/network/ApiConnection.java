@@ -149,7 +149,7 @@ class ApiConnection implements IApiConnection {
 
     @Override
     public Observable<Object> upload(String url, Map<String, RequestBody> partMap, MultipartBody.Part file) {
-        return getRestApi().upload(url, partMap, file);
+        return getRestApi().dynamicUpload(url, partMap, file);
     }
 
     @Override
@@ -186,7 +186,7 @@ class ApiConnection implements IApiConnection {
     private Interceptor provideOfflineCacheInterceptor() {
         return chain -> {
             Request request = chain.request();
-            if (!Utils.isNetworkAvailable(Config.getInstance().getContext())) {
+            if (!Utils.getInstance().isNetworkAvailable(Config.getInstance().getContext())) {
                 request = request.newBuilder()
                         .cacheControl(new CacheControl.Builder()
                                 .maxStale(1, TimeUnit.DAYS)

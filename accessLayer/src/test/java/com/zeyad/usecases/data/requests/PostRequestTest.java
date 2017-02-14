@@ -42,11 +42,6 @@ public class PostRequestTest {
     }
 
     @Test
-    public void testGetSubscriber() throws Exception {
-        assertThat(mPostRequest.getSubscriber(), is(equalTo(PostRequestTestRobot.SUBSCRIBER)));
-    }
-
-    @Test
     public void testGetDataClass() throws Exception {
         assertThat(mPostRequest.getDataClass(), is(equalTo(PostRequestTestRobot.DATA_CLASS)));
     }

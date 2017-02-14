@@ -8,8 +8,6 @@ import android.webkit.MimeTypeMap;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
-import com.google.gson.Gson;
-import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.FileIORequest;
@@ -37,15 +35,13 @@ public class FileIO {
     private final FileIORequest mFileIORequest;
     private final Context mContext;
     private final RestApi mRestApi;
-    private final Gson gson;
     private boolean mIsDownload;
 
-    public FileIO(int trailCount, @NonNull String payLoad, @NonNull Context context, boolean isDownload) {
-        gson = Config.getGson();
+    public FileIO(int trailCount, @NonNull FileIORequest payLoad, @NonNull Context context, boolean isDownload) {
         mRestApi = RestApiImpl.getInstance();
         mContext = context;
         mTrailCount = trailCount;
-        mFileIORequest = gson.fromJson(payLoad, FileIORequest.class);
+        mFileIORequest = payLoad;
         mIsDownload = isDownload;
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
     }
@@ -54,7 +50,6 @@ public class FileIO {
      * This constructor meant to be used in testing and restricted environments only. Use public constructors instead.
      */
     FileIO(Context context, RestApi restApi, int trailCount, FileIORequest fileIORequest, boolean isDownload) {
-        gson = Config.getGson();
         mContext = context;
         mRestApi = restApi;
         mTrailCount = trailCount;
@@ -123,8 +118,8 @@ public class FileIO {
             map.put(mFileIORequest.getKey(), requestFile);
             if (mFileIORequest.getParameters() != null && !mFileIORequest.getParameters().isEmpty())
                 for (Map.Entry<String, Object> entry : mFileIORequest.getParameters().entrySet())
-                    map.put(entry.getKey(), Utils.createPartFromString(entry.getValue()));
-            return mRestApi.upload(mFileIORequest.getUrl(), map, MultipartBody.Part
+                    map.put(entry.getKey(), Utils.getInstance().createPartFromString(entry.getValue()));
+            return mRestApi.dynamicUpload(mFileIORequest.getUrl(), map, MultipartBody.Part
                     .createFormData(mFileIORequest.getKey(), mFileIORequest.getFile().getName(), requestFile))
                     .doOnSubscribe(() -> Log.d(TAG, "Uploading " + mFileIORequest.getFile().getName()))
                     .subscribe(o -> {
@@ -135,7 +130,7 @@ public class FileIO {
     void queueIOFile() {
         mTrailCount++;
         if (mTrailCount < 3) {
-            Utils.queueFileIOCore(mDispatcher, mIsDownload, mFileIORequest, gson);
+            Utils.getInstance().queueFileIOCore(mDispatcher, mIsDownload, mFileIORequest);
         }
     }
 

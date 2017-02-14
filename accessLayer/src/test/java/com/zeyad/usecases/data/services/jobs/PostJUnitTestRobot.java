@@ -46,7 +46,7 @@ public class PostJUnitTestRobot {
     private static final TestRealmObject TEST_MODEL = new TestRealmObject(1, "123");
 
     static {
-        JOB_SCHEDULER = Utils.hasLollipop() ? mock(JobScheduler.class) : null;
+        JOB_SCHEDULER = Utils.getInstance().hasLollipop() ? mock(JobScheduler.class) : null;
     }
 
     @NonNull
@@ -114,7 +114,7 @@ public class PostJUnitTestRobot {
         when(mock.dynamicGetList(any(), anyBoolean())).thenReturn(getListObservable());
         when(mock.dynamicPost(any(), any())).thenReturn(OBJECT_OBSERVABLE);
         when(mock.dynamicPut(any(), any())).thenReturn(OBJECT_OBSERVABLE);
-        when(mock.upload(any(), any(Map.class), any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
+        when(mock.dynamicUpload(any(), any(Map.class), any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
         return mock;
     }
 
@@ -143,34 +143,31 @@ public class PostJUnitTestRobot {
     }
 
 
-    public static PostRequest createPostRequestForHashmap(Subscriber subscriber, String method) {
+    public static PostRequest createPostRequestForHashmap(String method) {
         return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
                 .payLoad(new HashMap<>())
                 .idColumnName(getValidColumnName())
                 .presentationClass(getPresentationClass())
-                .subscriber(subscriber)
                 .url(getValidUrl())
                 .method(method)
                 .build();
     }
 
-    public static PostRequest createPostRequestForJsonObject(Subscriber subscriber, String method) {
+    public static PostRequest createPostRequestForJsonObject(String method) {
         return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
                 .payLoad(new JSONObject())
                 .idColumnName(getValidColumnName())
                 .presentationClass(getPresentationClass())
-                .subscriber(subscriber)
                 .url(getValidUrl())
                 .method(method)
                 .build();
     }
 
-    public static PostRequest createPostRequestForJsonArray(Subscriber subscriber, String method) {
+    public static PostRequest createPostRequestForJsonArray(String method) {
         return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
                 .payLoad(new JSONArray())
                 .idColumnName(getValidColumnName())
                 .presentationClass(getPresentationClass())
-                .subscriber(subscriber)
                 .url(getValidUrl())
                 .method(method)
                 .build();
