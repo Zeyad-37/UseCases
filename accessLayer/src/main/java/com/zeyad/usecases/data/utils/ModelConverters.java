@@ -13,7 +13,7 @@ public class ModelConverters {
 
     @Nullable
     public static List<Long> convertToListOfId(@Nullable JSONArray jsonArray) {
-        List<Long> idList = null;
+        List<Long> idList = new ArrayList<>();
         if (jsonArray != null && jsonArray.length() > 0) {
             try {
                 jsonArray.getLong(0);

@@ -33,7 +33,7 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -140,7 +140,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        verify(restApi, times(1)).dynamicPost(eq(PostJUnitTestRobot.getValidUrl()), any(RequestBody.class));
+        verify(restApi, times(1)).dynamicPost(anyString(), any(RequestBody.class));
     }
 
     @Test
@@ -151,7 +151,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        verify(restApi, times(1)).dynamicPost(eq(PostJUnitTestRobot.getValidUrl()), any(RequestBody.class));
+        verify(restApi, times(1)).dynamicPost(anyString(), any(RequestBody.class));
     }
 
     @Test
@@ -162,7 +162,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        verify(restApi, times(1)).dynamicPost(eq(PostJUnitTestRobot.getValidUrl()), any(RequestBody.class));
+        verify(restApi, times(1)).dynamicPost(anyString(), any(RequestBody.class));
     }
 
     @Test
@@ -173,7 +173,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        verify(restApi, times(1)).dynamicPut(eq(PostJUnitTestRobot.getValidUrl()), any(RequestBody.class));
+        verify(restApi, times(1)).dynamicPut(anyString(), any(RequestBody.class));
     }
 
     @Test
@@ -184,7 +184,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        verify(restApi, times(1)).dynamicPut(eq(PostJUnitTestRobot.getValidUrl()), any(RequestBody.class));
+        verify(restApi, times(1)).dynamicPut(anyString(), any(RequestBody.class));
     }
 
     @Test
@@ -195,7 +195,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        verify(restApi, times(1)).dynamicPut(eq(PostJUnitTestRobot.getValidUrl()), any(RequestBody.class));
+        verify(restApi, times(1)).dynamicPut(anyString(), any(RequestBody.class));
     }
 
     @Test
@@ -206,7 +206,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        verify(restApi, times(1)).dynamicDelete(eq(PostJUnitTestRobot.getValidUrl()), any(RequestBody.class));
+        verify(restApi, times(1)).dynamicDelete(anyString(), any(RequestBody.class));
     }
 
     @Test
@@ -217,7 +217,7 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        verify(restApi, times(1)).dynamicDelete(eq(PostJUnitTestRobot.getValidUrl()), any(RequestBody.class));
+        verify(restApi, times(1)).dynamicDelete(anyString(), any(RequestBody.class));
     }
 
     @Test
@@ -228,6 +228,6 @@ public class PostJUnitTest {
                 , restApi
                 , 1);
         post.execute();
-        verify(restApi, times(1)).dynamicDelete(eq(PostJUnitTestRobot.getValidUrl()), any(RequestBody.class));
+        verify(restApi, times(1)).dynamicDelete(anyString(), any(RequestBody.class));
     }
 }

@@ -60,15 +60,18 @@ public class CloudDataStore implements DataStore {
     public static final String APPLICATION_JSON = "application/json";
     private static final String TAG = CloudDataStore.class.getSimpleName();
     private static final String MULTIPART_FORM_DATA = "multipart/form-data";
+    private static final String NO_INTERNET_NOT_PERSISTED = "Could not " +
+            "reach server and could not persist request to queue!\\nGoogle play services not " +
+            "available and android version less than 5.0!";
     private static final int COUNTER_START = 1, ATTEMPTS = 3;
     private final DataBaseManager mDataBaseManager;
     private final IDAOMapper mEntityDataMapper;
     private final Context mContext;
-    private final Observable<Object> mErrorObservableNotPersisted, mQueueFileIO;
+    private final Observable<Object> mErrorObservableNotPersisted;
     private final RestApi mRestApi;
     private final FirebaseJobDispatcher mDispatcher;
-    private final boolean mCanPersist;
     private final Utils utils;
+    boolean mCanPersist;
 
     /**
      * Construct a {@link DataStore} based on connections to the api (Cloud).
@@ -81,10 +84,7 @@ public class CloudDataStore implements DataStore {
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
         mContext = Config.getInstance().getContext();
-        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException("Could not " +
-                "reach server and could not persist request to queue!\\nGoogle play services not " +
-                "available and android version less than 5.0!"));
-        mQueueFileIO = Observable.empty();
+        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException(NO_INTERNET_NOT_PERSISTED));
         mCanPersist = DataUseCase.hasRealm();
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
         utils = Utils.getInstance();
@@ -96,10 +96,7 @@ public class CloudDataStore implements DataStore {
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
         mContext = context;
-        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException("Could not " +
-                "reach server and could not persist request to queue!\\nGoogle play services not " +
-                "available and android version less than 5.0!"));
-        mQueueFileIO = Observable.empty();
+        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException(NO_INTERNET_NOT_PERSISTED));
         mCanPersist = DataUseCase.hasRealm();
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
         utils = Utils.getInstance();
@@ -284,17 +281,15 @@ public class CloudDataStore implements DataStore {
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(mContext) == onWifi
                     && isChargingReqCompatible(isCharging(mContext), whileCharging)) {
                 queueIOFile(url, file, true, whileCharging, false);
-                return mQueueFileIO;
+                return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
             RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
             HashMap<String, RequestBody> map = new HashMap<>();
             map.put(key, requestFile);
-            if (parameters != null && !parameters.isEmpty()) {
-                for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+            if (parameters != null && !parameters.isEmpty())
+                for (Map.Entry<String, Object> entry : parameters.entrySet())
                     map.put(entry.getKey(), utils.createPartFromString(entry.getValue()));
-                }
-            }
             return mRestApi.dynamicUpload(url, map, MultipartBody.Part.createFormData(key, file.getName(), requestFile))
                     .doOnError(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
@@ -312,46 +307,47 @@ public class CloudDataStore implements DataStore {
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(mContext) == onWifi
                     && isChargingReqCompatible(isCharging(mContext), whileCharging)) {
                 queueIOFile(url, file, onWifi, whileCharging, true);
-                return mQueueFileIO;
-            } else
-                return mRestApi.dynamicDownload(url)
-                        .doOnError(throwable -> {
-                            if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
-                                queueIOFile(url, file, true, whileCharging, false);
-                        })
-                        .map(responseBody -> {
+                return Observable.empty();
+            } else if (!utils.isNetworkAvailable(mContext))
+                return mErrorObservableNotPersisted;
+            return mRestApi.dynamicDownload(url)
+                    .doOnError(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
+                            queueIOFile(url, file, true, whileCharging, false);
+                    })
+                    .map(responseBody -> {
+                        try {
+                            InputStream inputStream = null;
+                            OutputStream outputStream = null;
                             try {
-                                InputStream inputStream = null;
-                                OutputStream outputStream = null;
-                                try {
-                                    byte[] fileReader = new byte[4096];
-                                    long fileSize = responseBody.contentLength();
-                                    long fileSizeDownloaded = 0;
-                                    inputStream = responseBody.byteStream();
-                                    outputStream = new FileOutputStream(file);
-                                    while (true) {
-                                        int read = inputStream.read(fileReader);
-                                        if (read == -1)
-                                            break;
-                                        outputStream.write(fileReader, 0, read);
-                                        fileSizeDownloaded += read;
-                                        Log.d(TAG, "file download: " + fileSizeDownloaded + " of "
-                                                + fileSize);
-                                    }
-                                    outputStream.flush();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } finally {
-                                    if (inputStream != null)
-                                        inputStream.close();
-                                    if (outputStream != null)
-                                        outputStream.close();
+                                byte[] fileReader = new byte[4096];
+                                long fileSize = responseBody.contentLength();
+                                long fileSizeDownloaded = 0;
+                                inputStream = responseBody.byteStream();
+                                outputStream = new FileOutputStream(file);
+                                while (true) {
+                                    int read = inputStream.read(fileReader);
+                                    if (read == -1)
+                                        break;
+                                    outputStream.write(fileReader, 0, read);
+                                    fileSizeDownloaded += read;
+                                    Log.d(TAG, "file download: " + fileSizeDownloaded + " of "
+                                            + fileSize);
                                 }
+                                outputStream.flush();
                             } catch (IOException e) {
                                 e.printStackTrace();
+                            } finally {
+                                if (inputStream != null)
+                                    inputStream.close();
+                                if (outputStream != null)
+                                    outputStream.close();
                             }
-                            return file;
-                        });
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        return file;
+                    });
         });
     }
 
@@ -517,7 +513,8 @@ public class CloudDataStore implements DataStore {
     private void deleteFromPersistence(List collection, String idColumnName, Class dataClass) {
         for (int i = 0, collectionSize = collection.size(); i < collectionSize; i++) {
             mDataBaseManager.evictById(dataClass, idColumnName, (long) collection.get(i));
-            Storo.delete(dataClass.getSimpleName() + (long) collection.get(i));
+            if (Config.isWithCache())
+                Storo.delete(dataClass.getSimpleName() + (long) collection.get(i));
         }
     }
 

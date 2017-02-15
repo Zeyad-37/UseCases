@@ -24,6 +24,9 @@ import java.io.StringWriter;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.realm.Realm;
+import io.realm.RealmConfiguration;
+import io.realm.rx.RealmObservableFactory;
 import rx.exceptions.CompositeException;
 import rx.observers.TestSubscriber;
 
@@ -172,13 +175,14 @@ public class TestUtility {
         };
     }
 
-    public static void performInitialSetupOfDb() {
-//        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
-//                .name("app.realm")
+    public static void performInitialSetupOfDb(Context context) {
+        Realm.init(context);
+        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
+                .name("app.realm")
 //                .modules(Realm.getDefaultModule(), new LibraryModule())
-//                .rxFactory(new RealmObservableFactory())
-//                .deleteRealmIfMigrationNeeded()
-//                .build());
+                .rxFactory(new RealmObservableFactory())
+                .deleteRealmIfMigrationNeeded()
+                .build());
     }
 
 //    @TargetApi(Build.VERSION_CODES.LOLLIPOP)

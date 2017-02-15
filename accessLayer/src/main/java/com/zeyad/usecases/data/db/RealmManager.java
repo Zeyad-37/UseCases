@@ -40,8 +40,9 @@ public class RealmManager implements DataBaseManager {
             backgroundHandler = new Handler(backgroundLooper);
     }
 
-    RealmManager(Handler backgroundHandler) {
-        RealmManager.backgroundHandler = backgroundHandler;
+    RealmManager() {
+        if (backgroundHandler == null)
+            backgroundHandler = new Handler();
     }
 
     /**

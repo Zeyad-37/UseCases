@@ -1,8 +1,8 @@
 package com.zeyad.usecases.data.services;
 
-import android.app.job.JobScheduler;
 import android.content.Intent;
 
+import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.Job;
 import com.zeyad.usecases.BuildConfig;
 
@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.is;
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest({JobScheduler.class})
+@PrepareForTest({FirebaseJobDispatcher.class})
 public class GenericJobServiceJUnitTest {
 
     @Before

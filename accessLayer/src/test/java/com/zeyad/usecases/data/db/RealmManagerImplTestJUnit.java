@@ -1,5 +1,6 @@
 package com.zeyad.usecases.data.db;
 
+import android.content.Context;
 import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.test.InstrumentationRegistry;
@@ -20,13 +21,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.rule.PowerMockRule;
+import org.powermock.modules.junit4.PowerMockRunner;
+import org.powermock.modules.junit4.PowerMockRunnerDelegate;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -54,20 +54,26 @@ import static org.hamcrest.Matchers.iterableWithSize;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.mock;
 import static org.powermock.api.mockito.PowerMockito.mockStatic;
 import static org.powermock.api.mockito.PowerMockito.when;
 
 // FIXME: 2/10/17 Redo!
-@RunWith(RobolectricTestRunner.class)
+//@RunWith(RobolectricTestRunner.class)
+//@Config(constants = BuildConfig.class, sdk = 21)
+//@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
+//@PrepareForTest({Realm.class})
+
+@RunWith(PowerMockRunner.class)
+@PowerMockRunnerDelegate(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest({Realm.class})
 public class RealmManagerImplTestJUnit {
 
     private static final String TEST_MODEL_PREFIX = "random value:";
 
-    @Rule
-    public PowerMockRule rule = new PowerMockRule();
+    //    @Rule
+//    public PowerMockRule rule = new PowerMockRule();
     private RealmManager mRealmManager;
     private Random mRandom;
 
@@ -89,7 +95,7 @@ public class RealmManagerImplTestJUnit {
     @Before
     public void before() {
         com.zeyad.usecases.Config.init();
-        TestUtility.performInitialSetupOfDb();
+        TestUtility.performInitialSetupOfDb(mock(Context.class));
         mRandom = new Random();
         mRealmManager = getGeneralRealmManager();
         mRealmManager.evictAll(TestRealmObject.class).subscribe(new TestSubscriber<>());

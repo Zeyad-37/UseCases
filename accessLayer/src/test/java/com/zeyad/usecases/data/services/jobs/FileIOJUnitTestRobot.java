@@ -1,6 +1,5 @@
 package com.zeyad.usecases.data.services.jobs;
 
-import android.app.job.JobScheduler;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -13,7 +12,6 @@ import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.FileIORequest;
-import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.utils.TestRealmObject;
 import com.zeyad.usecases.utils.TestViewModel;
 
@@ -28,15 +26,17 @@ import okhttp3.ResponseBody;
 import rx.Observable;
 import rx.Subscriber;
 
+import static org.mockito.Mockito.mock;
+
 class FileIOJUnitTestRobot {
 
-    private static final ResponseBody RESPONSE_BODY = Mockito.mock(ResponseBody.class);
-    private static final InputStream INPUT_STREAM = Mockito.mock(InputStream.class);
+    private static final ResponseBody RESPONSE_BODY = mock(ResponseBody.class);
+    private static final InputStream INPUT_STREAM = mock(InputStream.class);
     @Nullable
-    private static final JobScheduler JOB_SCHEDULER;
+    private static final FirebaseJobDispatcher JOB_SCHEDULER;
 
     static {
-        JOB_SCHEDULER = Utils.getInstance().hasLollipop() ? Mockito.mock(JobScheduler.class) : null;
+        JOB_SCHEDULER = new FirebaseJobDispatcher(new GooglePlayDriver(mock(Context.class)));
     }
 
     static String getValidUrl() {
@@ -72,7 +72,7 @@ class FileIOJUnitTestRobot {
     }
 
     static FileIORequest createFileIoReq(boolean wifi, boolean isCharging, File file) {
-        final FileIORequest fileIORequest = Mockito.mock(FileIORequest.class);
+        final FileIORequest fileIORequest = mock(FileIORequest.class);
         Mockito.when(fileIORequest.getDataClass()).thenReturn(getValidDataClass());
         Mockito.when(fileIORequest.getPresentationClass()).thenReturn(getPresentationClass());
         Mockito.when(fileIORequest.getUrl()).thenReturn(getValidUrl());
@@ -111,11 +111,11 @@ class FileIOJUnitTestRobot {
     }
 
     public static Context createMockedContext() throws PackageManager.NameNotFoundException {
-        final Context context = Mockito.mock(Context.class);
-        final Resources resources = Mockito.mock(Resources.class);
-        final PackageManager packageManager = Mockito.mock(PackageManager.class);
+        final Context context = mock(Context.class);
+        final Resources resources = mock(Resources.class);
+        final PackageManager packageManager = mock(PackageManager.class);
         Mockito.when(context.getApplicationContext())
-                .thenReturn(Mockito.mock(Context.class));
+                .thenReturn(mock(Context.class));
         Mockito.when(context.getResources()).thenReturn(resources);
         Mockito.when(context.getPackageManager()).thenReturn(packageManager);
         Mockito.when(context.getSystemService(Context.STORAGE_SERVICE)).thenReturn(getMockedJobScheduler());
@@ -123,12 +123,12 @@ class FileIOJUnitTestRobot {
     }
 
     @Nullable
-    static JobScheduler getMockedJobScheduler() {
+    static FirebaseJobDispatcher getMockedJobScheduler() {
         return JOB_SCHEDULER;
     }
 
     static RestApiImpl createRestApi() {
-        final RestApiImpl restApi = Mockito.mock(RestApiImpl.class);
+        final RestApiImpl restApi = mock(RestApiImpl.class);
         Mockito.when(restApi.dynamicDownload(Mockito.anyString())).thenReturn(getResponseBodyObservable());
         return restApi;
     }

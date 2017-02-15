@@ -51,6 +51,8 @@ public class DataUseCase implements IDataUseCase {
     private DataUseCase(Data data, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
                         HandlerThread handlerThread) {
         DataUseCase.handlerThread = handlerThread;
+        if (!DataUseCase.handlerThread.isAlive())
+            DataUseCase.handlerThread.start();
         mThreadExecutor = threadExecutor;
         mPostExecutionThread = postExecutionThread;
         mData = data;
@@ -80,6 +82,8 @@ public class DataUseCase implements IDataUseCase {
         hasRealm = true;
         if (handlerThread == null)
             handlerThread = new HandlerThread("backgroundThread");
+        if (!handlerThread.isAlive())
+            handlerThread.start();
         DatabaseManagerFactory.initRealm(handlerThread.getLooper());
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
                 .getInstance(), RestApiImpl.getInstance()), entityMapper), threadExecutor,
