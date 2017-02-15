@@ -15,8 +15,7 @@ import rx.schedulers.Schedulers;
 /**
  * @author zeyad on 11/11/16.
  */
-
-class PrefsUseCase implements IPrefsUseCase {
+public class PrefsUseCase implements IPrefsUseCase {
 
     private static PrefsUseCase sPrefsUseCases;
     private final Prefs mPrefs;
@@ -28,6 +27,12 @@ class PrefsUseCase implements IPrefsUseCase {
         mThreadExecutor = threadExecutor;
         mPostExecutionThread = postExecutionThread;
         mPrefs = PrefsRepository.getInstance();
+    }
+
+    public PrefsUseCase(Prefs prefs, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+        mThreadExecutor = threadExecutor;
+        mPostExecutionThread = postExecutionThread;
+        mPrefs = prefs;
     }
 
     public static void init(Context context, String prefsFileName) {

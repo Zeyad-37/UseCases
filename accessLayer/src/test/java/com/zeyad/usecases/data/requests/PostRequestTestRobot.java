@@ -11,16 +11,16 @@ import java.util.HashMap;
 class PostRequestTestRobot {
 
 
-    static final Class DATA_CLASS = TestRealmObject.class;
     static final boolean TO_PERSIST = false;
-    static final HashMap<String, Object> HASH_MAP = new HashMap<>();
-    static final String ID_COLUMN_NAME = "id";
-    static final JSONArray JSON_ARRAY = new JSONArray();
-    static final JSONObject JSON_OBJECT = new JSONObject();
+    static final Class DATA_CLASS = TestRealmObject.class;
     static final Class PRESENTATION_CLASS = TestViewModel.class;
+    static final String ID_COLUMN_NAME = "id";
     static final String URL = "www.google.com";
+    private static final JSONArray JSON_ARRAY = new JSONArray();
+    private static final JSONObject JSON_OBJECT = new JSONObject();
+    private static final HashMap<String, Object> HASH_MAP = new HashMap<>();
 
-    public static PostRequest buildPostRequest() {
+    static PostRequest buildPostRequest() {
         return new PostRequest.PostRequestBuilder(DATA_CLASS, TO_PERSIST)
                 .payLoad(HASH_MAP)
                 .idColumnName(ID_COLUMN_NAME)

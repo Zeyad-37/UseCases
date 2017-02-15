@@ -1,8 +1,5 @@
 package com.zeyad.usecases.domain.interactors.files;
 
-import android.content.Context;
-
-import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.executors.ThreadExecutor;
 
@@ -19,21 +16,17 @@ public class FileUseCaseFactory {
      */
     public static IFileUseCase getInstance() {
         if (sFilesUseCase == null)
-            throw new NullPointerException("FileUseCaseFactory#init must be called before calling getInstance()");
+            sFilesUseCase = FileUseCase.getInstance();
         return sFilesUseCase;
     }
 
-    public static void init(Context context) {
-        if (!Utils.getInstance().doesContextBelongsToApplication(context))
-            throw new IllegalArgumentException("Context should be application context only.");
-        FileUseCase.init(context);
+    public static void init() {
+        FileUseCase.init();
         sFilesUseCase = FileUseCase.getInstance();
     }
 
-    public static void init(Context context, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
-        if (!Utils.getInstance().doesContextBelongsToApplication(context))
-            throw new IllegalArgumentException("Context should be application context only.");
-        FileUseCase.init(context, threadExecutor, postExecutionThread);
+    public static void init(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+        FileUseCase.init(threadExecutor, postExecutionThread);
         sFilesUseCase = FileUseCase.getInstance();
     }
 

@@ -5,8 +5,6 @@ import android.support.annotation.NonNull;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.repository.DataRepository;
 
-import rx.Subscriber;
-
 /**
  * @author zeyad on 7/29/16.
  */
@@ -73,7 +71,6 @@ public class GetRequest {
         private String mIdColumnName;
         private int mItemId;
         private String mUrl;
-        private Subscriber mSubscriber;
         private Class mDataClass, mPresentationClass;
         private boolean mPersist;
 
@@ -97,12 +94,6 @@ public class GetRequest {
         @NonNull
         public GetRequestBuilder presentationClass(Class presentationClass) {
             mPresentationClass = presentationClass;
-            return this;
-        }
-
-        @NonNull
-        public GetRequestBuilder subscriber(Subscriber subscriber) {
-            mSubscriber = subscriber;
             return this;
         }
 

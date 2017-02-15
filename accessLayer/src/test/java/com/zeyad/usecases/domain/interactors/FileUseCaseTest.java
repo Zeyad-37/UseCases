@@ -2,26 +2,33 @@ package com.zeyad.usecases.domain.interactors;
 
 import android.support.test.rule.BuildConfig;
 
-import com.zeyad.usecases.domain.interactors.files.FileUseCaseFactory;
+import com.zeyad.usecases.data.executor.JobExecutor;
+import com.zeyad.usecases.data.requests.FileIORequest;
+import com.zeyad.usecases.domain.executors.UIThread;
+import com.zeyad.usecases.domain.interactors.files.FileUseCase;
 import com.zeyad.usecases.domain.interactors.files.IFileUseCase;
 import com.zeyad.usecases.domain.repositories.Files;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.HashMap;
 
 import rx.Observable;
-import rx.observers.TestSubscriber;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * @author zeyad on 11/21/16.
@@ -31,30 +38,14 @@ import static org.hamcrest.Matchers.is;
 public class FileUseCaseTest {
 
     private IFileUseCase mFilesUseCase;
-
-    public static Files createMockedFilesUseCase() {
-        final Files files = Mockito.mock(Files.class);
-        Mockito.when(files.readFromResource(Mockito.anyString()))
-                .thenReturn(readResponse());
-        Mockito.when(files.readFromFile(Mockito.anyString()))
-                .thenReturn(readResponse());
-        Mockito.when(files.saveToFile(Mockito.anyString(), Mockito.anyString()))
-                .thenReturn(saveResponse());
-        return files;
-    }
-
-    public static Observable<String> readResponse() {
-        return Observable.just("");
-    }
-
-    public static Observable<Boolean> saveResponse() {
-        return Observable.just(true);
-    }
+    private Files mFiles;
+    private Observable observable;
 
     @Before
     public void setUp() throws Exception {
-        FileUseCaseFactory.init(RuntimeEnvironment.application.getApplicationContext());
-        mFilesUseCase = FileUseCaseFactory.getInstance();
+        observable = Observable.just(new Object());
+        mFiles = mock(Files.class);
+        mFilesUseCase = new FileUseCase(mFiles, new JobExecutor(), new UIThread());
     }
 
     public Observable fileNotFoundException() {
@@ -63,21 +54,41 @@ public class FileUseCaseTest {
 
     @Test
     public void readFromResource() {
-        TestSubscriber<String> subscriber = new TestSubscriber<>();
-        mFilesUseCase.readFromResource("").subscribe(subscriber);
-        subscriber.awaitTerminalEvent();
-        subscriber.assertError(new NullPointerException());
+        when(mFiles.readFromResource(anyString())).thenReturn(observable);
+        mFilesUseCase.readFromResource("");
+        verify(mFiles, times(1)).readFromResource(anyString());
     }
 
     @Test
     public void readFromFile() {
-//        assertThat(mFilesUseCase.readFromFile(""), is(equalTo(readResponse())));
-        mFilesUseCase.readFromFile("").subscribe(new TestSubscriber<>());
-        Mockito.verify(createMockedFilesUseCase()).readFromFile("");
+        when(mFiles.readFromFile(anyString())).thenReturn(observable);
+        mFilesUseCase.readFromFile("");
+        verify(mFiles, times(1)).readFromFile(anyString());
     }
 
     @Test
     public void saveToFile() {
-        assertThat(mFilesUseCase.saveToFile("", ""), is(equalTo(readResponse())));
+        when(mFiles.saveToFile(anyString(), anyString())).thenReturn(observable);
+        mFilesUseCase.saveToFile("", "");
+        verify(mFiles, times(1)).saveToFile(anyString(), anyString());
+    }
+
+    @Test
+    public void uploadFile() {
+        when(mFiles.uploadFileDynamically(anyString(), any(File.class), anyString(), (HashMap<String, Object>) anyMap(),
+                anyBoolean(), anyBoolean(), anyBoolean(), any(Class.class), any(Class.class)))
+                .thenReturn(observable);
+        mFilesUseCase.uploadFile(new FileIORequest());
+        verify(mFiles, times(1)).uploadFileDynamically(anyString(), any(File.class), anyString(), (HashMap<String, Object>) anyMap(), anyBoolean(),
+                anyBoolean(), anyBoolean(), any(Class.class), any(Class.class));
+    }
+
+    @Test
+    public void downloadFile() {
+        when(mFiles.downloadFileDynamically(anyString(), any(File.class), anyBoolean(),
+                anyBoolean(), anyBoolean(), any(Class.class), any(Class.class))).thenReturn(observable);
+        mFilesUseCase.downloadFile(new FileIORequest());
+        verify(mFiles, times(1)).downloadFileDynamically(anyString(), any(File.class), anyBoolean(),
+                anyBoolean(), anyBoolean(), any(Class.class), any(Class.class));
     }
 }

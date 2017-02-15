@@ -6,13 +6,13 @@ import org.mockito.Mockito;
 
 import java.io.File;
 
-public class FileIORequestTestRobot {
+class FileIORequestTestRobot {
 
-    static final Class DATA_CLASS = TestRealmObject.class;
     static final boolean ON_WIFI = false;
     static final boolean WHILE_CHARGING = false;
     static final String URL = "www.google.com";
     static final File FILE = Mockito.mock(File.class);
+    private static final Class DATA_CLASS = TestRealmObject.class;
 
     static FileIORequest createUploadRequest() {
         return new FileIORequest.FileIORequestBuilder(URL, FILE)

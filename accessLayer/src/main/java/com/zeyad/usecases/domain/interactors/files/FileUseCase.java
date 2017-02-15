@@ -1,7 +1,5 @@
 package com.zeyad.usecases.domain.interactors.files;
 
-import android.content.Context;
-
 import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.repository.FilesRepository;
 import com.zeyad.usecases.data.requests.FileIORequest;
@@ -16,26 +14,31 @@ import rx.schedulers.Schedulers;
 /**
  * @author zeyad on 11/11/16.
  */
-class FileUseCase implements IFileUseCase {
+public class FileUseCase implements IFileUseCase {
 
     private static FileUseCase sFilesUseCase;
     private final Files mFiles;
     private final ThreadExecutor mThreadExecutor;
     private final PostExecutionThread mPostExecutionThread;
 
-    private FileUseCase(Context context, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+    private FileUseCase(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
         mThreadExecutor = threadExecutor;
         mPostExecutionThread = postExecutionThread;
-        FilesRepository.init(context);
-        mFiles = FilesRepository.getInstance();
+        mFiles = new FilesRepository();
     }
 
-    public static void init(Context context) {
-        sFilesUseCase = new FileUseCase(context, new JobExecutor(), new UIThread());
+    public FileUseCase(Files mFiles, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+        mThreadExecutor = threadExecutor;
+        mPostExecutionThread = postExecutionThread;
+        this.mFiles = mFiles;
     }
 
-    public static void init(Context context, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
-        sFilesUseCase = new FileUseCase(context, threadExecutor, postExecutionThread);
+    public static void init() {
+        sFilesUseCase = new FileUseCase(new JobExecutor(), new UIThread());
+    }
+
+    public static void init(ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+        sFilesUseCase = new FileUseCase(threadExecutor, postExecutionThread);
     }
 
     protected static FileUseCase getInstance() {

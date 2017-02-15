@@ -1,6 +1,5 @@
 package com.zeyad.usecases.data.repository;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.google.gson.Gson;
@@ -28,11 +27,10 @@ import rx.Observable;
  */
 public class FilesRepository implements Files {
     private static Gson mGson;
-    private static Files sInstance;
     private final DataStoreFactory mDataStoreFactory;
     private final IDAOMapperFactory mEntityMapperUtil;
 
-    private FilesRepository(Context context) {
+    public FilesRepository() {
         if (Config.getInstance().getDataStoreFactory() == null) {
             mDataStoreFactory = new DataStoreFactory(RestApiImpl.getInstance());
             Config.getInstance().setDataStoreFactory(mDataStoreFactory);
@@ -47,20 +45,14 @@ public class FilesRepository implements Files {
         mGson = Config.getGson();
     }
 
-    public static Files getInstance() throws IllegalArgumentException {
-        if (sInstance == null)
-            throw new NullPointerException("FilesRepository is null, please call FilesRepository#init(Context) first");
-        return sInstance;
-    }
-
-    public static Files getInstance(Context context) {
-        if (sInstance == null)
-            sInstance = new FilesRepository(context);
-        return sInstance;
-    }
-
-    public static void init(Context context) {
-        sInstance = new FilesRepository(context);
+    public FilesRepository(DataStoreFactory dataStoreFactory, DAOMapperFactory daoMapperFactory, Gson gson) {
+        if (Config.getInstance().getDataStoreFactory() == null) {
+            mDataStoreFactory = dataStoreFactory;
+            Config.getInstance().setDataStoreFactory(mDataStoreFactory);
+        } else
+            mDataStoreFactory = Config.getInstance().getDataStoreFactory();
+        mEntityMapperUtil = daoMapperFactory;
+        mGson = gson;
     }
 
     @Override
