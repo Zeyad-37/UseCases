@@ -73,7 +73,7 @@ ext {
     espressoCore = '2.2.2'
     hamcrest = '1.3'
     junit = '4.12'
-    powerMock = '1.6.2'
+    powerMock = '1.6.6'
     robolectric = '3.2.2'
 }
 

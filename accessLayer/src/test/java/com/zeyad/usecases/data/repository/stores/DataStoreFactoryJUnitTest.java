@@ -1,12 +1,11 @@
 package com.zeyad.usecases.data.repository.stores;
 
-import com.zeyad.usecases.Config;
-import com.zeyad.usecases.data.db.DataBaseManager;
+import com.zeyad.usecases.data.db.RealmManager;
+import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,115 +20,88 @@ import static org.mockito.Mockito.mock;
 @RunWith(JUnit4.class)
 public class DataStoreFactoryJUnitTest {
 
-    private DataBaseManager mDataBaseManager;
     private IDAOMapper mIDAOMapper;
     private DataStoreFactory mDataStoreFactory; // class under test
 
     @Before
     public void setUp() throws Exception {
-//        PowerMockito.mockStatic(Utils.class);
-        Config.setBaseURL("www.google.com");
-//        ApiConnectionFactory.init();
-        mDataBaseManager = DataStoreFactoryJUnitRobot.createMockedDataBaseManager();
-        mIDAOMapper = DataStoreFactoryJUnitRobot.createMockedEntityMapper();
+        mIDAOMapper = mock(DefaultDAOMapper.class);
 
-        mDataStoreFactory = DataStoreFactoryJUnitRobot.createDataStoreFactory(mDataBaseManager,
-                mock(RestApiImpl.class));
+        mDataStoreFactory = new DataStoreFactory(mock(RealmManager.class), mock(RestApiImpl.class));
     }
 
-    @After
-    public void tearDown() throws Exception {
+    private String getSomeValidUrl() {
+        return "https://www.google.com";
+    }
+
+    private String getInvalidUrl() {
+        return "";
     }
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValid() throws Exception {
-        DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItems(mDataBaseManager);
-        assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
-                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+                is(instanceOf(DiskDataStore.class)));
     }
 
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidAndNetWorkNotAvailable() throws Exception {
-        DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItems(mDataBaseManager);
-//        TestUtility.changeStateOfNetwork(mMockedContext, false);
-        assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
-                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+                is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkNotAvailable() throws Exception {
-        DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItems(mDataBaseManager);
-//        TestUtility.changeStateOfNetwork(mMockedContext, false);
-        assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
-                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+                is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkIsAvailable() throws Exception {
-        DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItems(mDataBaseManager);
-//        TestUtility.changeStateOfNetwork(mMockedContext, true);
-        assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
-                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+                is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmpty() throws Exception {
-//        when(Utils.isNetworkAvailable(mMockedContext)).thenReturn(true);
-//
-//        ConnectivityManager connectivityManager = mock(ConnectivityManager.class);
-//        when(mMockedContext.getSystemService(Context.CONNECTIVITY_SERVICE))
-//                .thenReturn(mock(ConnectivityManager.class));
-//        when(connectivityManager.getAllNetworks()).thenReturn(new Network[]{});
-//        when(connectivityManager.getAllNetworkInfo()).thenReturn(new NetworkInfo[0]);
-
-        DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
-        assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getSomeValidUrl(),
-                mIDAOMapper), is(instanceOf(CloudDataStore.class)));
+        assertThat(mDataStoreFactory.dynamically(getSomeValidUrl(), mIDAOMapper),
+                is(instanceOf(CloudDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItem() throws Exception {
-        DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
-        assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
-                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+                is(instanceOf(DiskDataStore.class)));
     }
 
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItemAndNetWorkNotAvailable() throws Exception {
-        DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
-//        TestUtility.changeStateOfNetwork(mMockedContext, false);
-        assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
-                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+                is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkNotAvailable() throws Exception {
-        DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItem(mDataBaseManager);
-//        TestUtility.changeStateOfNetwork(mMockedContext, false);
-        assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
-                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+                is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkIsAvailable() throws Exception {
-        DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItem(mDataBaseManager);
-//        TestUtility.changeStateOfNetwork(mMockedContext, true);
-        assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getInvalidUrl(),
-                mIDAOMapper), is(instanceOf(DiskDataStore.class)));
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+                is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmptyForSingleItem() throws Exception {
-        DataStoreFactoryJUnitRobot.setDataBaseManagerForValidItem(mDataBaseManager);
-        assertThat(mDataStoreFactory.dynamically(DataStoreFactoryJUnitRobot.getSomeValidUrl(),
-                mIDAOMapper), is(instanceOf(CloudDataStore.class)));
+        assertThat(mDataStoreFactory.dynamically(getSomeValidUrl(), mIDAOMapper),
+                is(instanceOf(CloudDataStore.class)));
     }
 
     @Test
     public void testDiskMethod_ifExpectedDataStoreIsReturned_whenMockedEntityMapperIsPassed() throws IllegalAccessException {
-        DataStoreFactoryJUnitRobot.setDataBaseManagerForInvalidItem(mDataBaseManager);
         DataUseCase.setHasRealm(true);
         assertThat(mDataStoreFactory.disk(mIDAOMapper), is(notNullValue()));
     }

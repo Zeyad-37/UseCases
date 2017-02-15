@@ -13,7 +13,6 @@ import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.utils.TestRealmObject;
-import com.zeyad.usecases.utils.TestViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -56,20 +55,6 @@ public class PostJUnitTestRobot {
 
     static String getValidUrl() {
         return "http://www.google.com";
-    }
-
-    @NonNull
-    static Class getValidDomainClass() {
-        return TestViewModel.class;
-    }
-
-    static int getValidColumnId() {
-        return 12;
-    }
-
-    @NonNull
-    static HashMap<String, Object> getValidHashmap() {
-        return new HashMap<>();
     }
 
     @NonNull
@@ -204,5 +189,4 @@ public class PostJUnitTestRobot {
     static FirebaseJobDispatcher getGcmNetworkManager() {
         return mock(FirebaseJobDispatcher.class);
     }
-
 }

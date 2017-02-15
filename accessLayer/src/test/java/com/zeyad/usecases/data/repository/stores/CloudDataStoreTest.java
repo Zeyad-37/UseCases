@@ -1,6 +1,10 @@
 package com.zeyad.usecases.data.repository.stores;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkInfo;
+import android.support.annotation.NonNull;
 import android.support.test.rule.BuildConfig;
 
 import com.zeyad.usecases.data.db.DataBaseManager;
@@ -9,6 +13,7 @@ import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
+import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.utils.TestRealmObject;
 
 import org.json.JSONArray;
@@ -16,6 +21,7 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.annotation.Config;
 
@@ -31,7 +37,6 @@ import okhttp3.RequestBody;
 import rx.Observable;
 import rx.observers.TestSubscriber;
 
-import static com.zeyad.usecases.utils.TestUtility.changeStateOfNetwork;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -553,5 +558,23 @@ public class CloudDataStoreTest {
         verify(mockDataBaseManager, times(putO)).put(any(RealmObject.class), any(Class.class));
         verify(mockDataBaseManager, times(putM)).put(any(RealmModel.class), any(Class.class));
         verify(mockDataBaseManager, atLeast(evict)).evictById(any(Class.class), anyString(), anyLong());
+    }
+
+    private Context changeStateOfNetwork(@NonNull Context mockedContext, boolean toEnable) {
+        ConnectivityManager connectivityManager = Mockito.mock(ConnectivityManager.class);
+        Mockito.when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager);
+        if (Utils.getInstance().hasLollipop()) {
+            Network network = Mockito.mock(Network.class);
+            Network[] networks = new Network[]{network};
+            Mockito.when(connectivityManager.getAllNetworks()).thenReturn(networks);
+            NetworkInfo networkInfo = Mockito.mock(NetworkInfo.class);
+            Mockito.when(connectivityManager.getNetworkInfo(network)).thenReturn(networkInfo);
+            Mockito.when(networkInfo.getState()).thenReturn(toEnable ? NetworkInfo.State.CONNECTED : NetworkInfo.State.DISCONNECTED);
+        } else {
+            NetworkInfo networkInfo = Mockito.mock(NetworkInfo.class);
+            Mockito.when(connectivityManager.getAllNetworkInfo()).thenReturn(new NetworkInfo[]{networkInfo});
+            Mockito.when(networkInfo.getState()).thenReturn(toEnable ? NetworkInfo.State.CONNECTED : NetworkInfo.State.DISCONNECTED);
+        }
+        return mockedContext;
     }
 }

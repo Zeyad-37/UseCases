@@ -9,7 +9,6 @@ import com.zeyad.usecases.data.repository.stores.DataStore;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.repository.stores.DiskDataStore;
 import com.zeyad.usecases.utils.TestRealmObject;
-import com.zeyad.usecases.utils.TestViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -67,7 +66,7 @@ public class DataRepositoryJUnitTest {
         when(mockDataStore.dynamicGetList(anyString(), any(Class.class), any(Class.class), anyBoolean(),
                 anyBoolean())).thenReturn(observable);
         // invoke method under test
-        mDataRepository.getListDynamically(validUrl, TestViewModel.class, TestRealmObject.class, false,
+        mDataRepository.getListDynamically(validUrl, Object.class, Object.class, false,
                 false);
         // verify interactions
         verify(mockDataStoreFactory, times(1)).dynamically(anyString(), any(IDAOMapper.class));
@@ -82,8 +81,8 @@ public class DataRepositoryJUnitTest {
         final Observable<List> mockedObservable = mock(Observable.class);
         when(mockDataStore.dynamicGetList(anyString(), any(Class.class), any(Class.class), anyBoolean(),
                 anyBoolean())).thenReturn(mockedObservable);
-        Observable<List> observable = mDataRepository.getListDynamically(validUrl, TestViewModel.class,
-                TestRealmObject.class, false, false);
+        Observable<List> observable = mDataRepository.getListDynamically(validUrl, Object.class,
+                Object.class, false, false);
         assertThat(observable, is(equalTo(mockedObservable)));
     }
 
@@ -94,8 +93,7 @@ public class DataRepositoryJUnitTest {
         when(mockDataStore.dynamicGetList(anyString(), any(Class.class), any(Class.class), anyBoolean(),
                 anyBoolean())).thenReturn(observable);
         // invoke method under test
-        mDataRepository.getObjectDynamicallyById(validUrl, "", 0, TestViewModel.class,
-                TestRealmObject.class, false, false);
+        mDataRepository.getObjectDynamicallyById(validUrl, "", 0, Object.class, Object.class, false, false);
         // verify interactions
         verify(mockDataStoreFactory, times(1)).dynamically(anyString(), any(IDAOMapper.class));
         verify(mockDataStore, times(1)).dynamicGetObject(anyString(), anyString(), anyInt(), any(),
@@ -108,7 +106,7 @@ public class DataRepositoryJUnitTest {
     @Test
     public void testPostObjectDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenJsonObjectIsPassed() {
         mDataRepository.postObjectDynamically(validUrl, DataRepository.DEFAULT_ID_KEY,
-                any(JSONObject.class), TestViewModel.class, TestRealmObject.class, true, true);
+                any(JSONObject.class), Object.class, TestRealmObject.class, true, true);
         verify(mockDataStore, times(1)).dynamicPostObject(anyString(), anyString(), any(JSONObject.class),
                 any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
     }
@@ -116,14 +114,14 @@ public class DataRepositoryJUnitTest {
     @Test
     public void testPostListDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.postListDynamically(validUrl, DataRepository.DEFAULT_ID_KEY, any(JSONArray.class),
-                TestViewModel.class, TestRealmObject.class, true, true);
+                Object.class, Object.class, true, true);
         verify(mockDataStore, times(1)).dynamicPostList(anyString(), anyString(), any(JSONArray.class),
                 any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testDeleteListDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
-        mDataRepository.deleteListDynamically(validUrl, any(JSONArray.class), TestViewModel.class,
+        mDataRepository.deleteListDynamically(validUrl, any(JSONArray.class), Object.class,
                 TestRealmObject.class, true, true);
         verify(mockDataStore, times(1)).dynamicDeleteCollection(anyString(), anyString(), any(JSONArray.class),
                 any(Class.class), anyBoolean(), anyBoolean());
@@ -134,7 +132,7 @@ public class DataRepositoryJUnitTest {
         mockDataStore = mock(DiskDataStore.class);
         when(mockDataStoreFactory.disk(any(IDAOMapper.class))).thenReturn(mockDataStore);
 
-        mDataRepository.queryDisk(any(RealmManager.RealmQueryProvider.class), TestViewModel.class);
+        mDataRepository.queryDisk(any(RealmManager.RealmQueryProvider.class), Object.class);
         verify(mockDataStore, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class),
                 any(Class.class));
     }
@@ -142,7 +140,7 @@ public class DataRepositoryJUnitTest {
     @Test
     public void testPutObjectDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.putObjectDynamically(validUrl, DataRepository.DEFAULT_ID_KEY, any(JSONObject.class),
-                TestViewModel.class, TestRealmObject.class, true, true);
+                Object.class, Object.class, true, true);
         verify(mockDataStore, times(1)).dynamicPutObject(anyString(), anyString(), any(JSONObject.class),
                 any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
     }
@@ -150,7 +148,7 @@ public class DataRepositoryJUnitTest {
     @Test
     public void testPutListDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.putListDynamically(validUrl, DataRepository.DEFAULT_ID_KEY, any(JSONArray.class),
-                TestViewModel.class, TestRealmObject.class, true, true);
+                Object.class, Object.class, true, true);
         verify(mockDataStore, times(1)).dynamicPutList(anyString(), anyString(), any(JSONArray.class),
                 any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
     }

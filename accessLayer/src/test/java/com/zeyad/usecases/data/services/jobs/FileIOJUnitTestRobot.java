@@ -13,14 +13,12 @@ import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.utils.TestRealmObject;
-import com.zeyad.usecases.utils.TestViewModel;
 
 import org.mockito.Mockito;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.HashMap;
 
 import okhttp3.ResponseBody;
 import rx.Observable;
@@ -44,27 +42,10 @@ class FileIOJUnitTestRobot {
     }
 
     @NonNull
-    static Class getValidDomainClass() {
-        return TestViewModel.class;
-    }
-
-    static int getValidColumnId() {
-        return 12;
-    }
-
-    @NonNull
-    static HashMap<String, Object> getValidHashmap() {
-        return new HashMap<>();
-    }
-
-    @NonNull
     static Class getPresentationClass() {
         return TestRealmObject.class;
     }
 
-    static String getValidColumnName() {
-        return "id";
-    }
 
     @NonNull
     static Class getValidDataClass() {

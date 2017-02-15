@@ -1,6 +1,5 @@
 package com.zeyad.usecases.app.components.exceptions;
 
-import com.zeyad.usecases.data.exceptions.ErrorBundle;
 import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
 
 import org.json.JSONException;
@@ -17,10 +16,6 @@ import retrofit2.adapter.rxjava.HttpException;
 public class ErrorMessageFactory {
     private static final String NO_INTERNET = "Please check your internet connection",
             UNKNOWN_ERROR = "Unknown error";
-
-    public static String create(ErrorBundle exception) {
-        return exception.getMessage();
-    }
 
     /**
      * Creates a String representing an error message.

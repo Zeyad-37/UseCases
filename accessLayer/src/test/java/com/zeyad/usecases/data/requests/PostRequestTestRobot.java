@@ -1,7 +1,6 @@
 package com.zeyad.usecases.data.requests;
 
 import com.zeyad.usecases.utils.TestRealmObject;
-import com.zeyad.usecases.utils.TestViewModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -13,7 +12,7 @@ class PostRequestTestRobot {
 
     static final boolean TO_PERSIST = false;
     static final Class DATA_CLASS = TestRealmObject.class;
-    static final Class PRESENTATION_CLASS = TestViewModel.class;
+    static final Class PRESENTATION_CLASS = Object.class;
     static final String ID_COLUMN_NAME = "id";
     static final String URL = "www.google.com";
     private static final JSONArray JSON_ARRAY = new JSONArray();
