@@ -56,8 +56,7 @@ public class UserListVMTest {
         verify(mockDataUseCase, times(1)).getListOffLineFirst(any(GetRequest.class));
 
         // Assert return type
-        assertEquals(UserListState.class.getSimpleName(), observable.toBlocking().first().getClass()
-                .getSimpleName());
+        assertEquals(UserListState.class, observable.toBlocking().first().getClass());
     }
 
     @Test
@@ -73,8 +72,7 @@ public class UserListVMTest {
         verify(mockDataUseCase, times(1)).deleteCollection(any(PostRequest.class));
 
         // Assert return type
-        assertEquals(Boolean.class.getSimpleName(), observable.toBlocking().first().getClass()
-                .getSimpleName());
+        assertEquals(Boolean.class, observable.toBlocking().first().getClass());
     }
 
     @Test
@@ -89,15 +87,19 @@ public class UserListVMTest {
         when(mockDataUseCase.queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class)))
                 .thenReturn(observableUserRealm);
 
-        Observable observable = userListVM.search("");
+        Observable<UserListState> observable = userListVM.search("m");
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class),
                 any(Class.class));
 
         // Assert return type
-        assertEquals(ArrayList.class.getSimpleName(), observable.toBlocking().first().getClass()
-                .getSimpleName());
+//        TestSubscriber<UserListState> userListStateTestSubscriber = new TestSubscriber<>();
+//        observable.subscribe(userListStateTestSubscriber);
+//        userListStateTestSubscriber.awaitTerminalEvent();
+//        userListStateTestSubscriber.assertValueCount(1);
+//        userListStateTestSubscriber.getOnErrorEvents().get(0).printStackTrace();
+
     }
 
     @Test
@@ -175,7 +177,6 @@ public class UserListVMTest {
         verify(mockDataUseCase, times(1)).getList(any(GetRequest.class));
 
         // Assert return type
-        assertEquals(UserListState.class.getSimpleName(), observable.toBlocking().first().getClass()
-                .getSimpleName());
+        assertEquals(UserListState.class, observable.toBlocking().first().getClass());
     }
 }

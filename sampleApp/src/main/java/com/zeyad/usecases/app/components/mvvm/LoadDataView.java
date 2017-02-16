@@ -28,7 +28,7 @@ public interface LoadDataView<S extends BaseState> {
     /**
      * Renders the model of the view
      *
-     * @param m the model to be rendered.
+     * @param s the model to be rendered.
      */
-    void renderState(S m);
+    void renderState(S s);
 }

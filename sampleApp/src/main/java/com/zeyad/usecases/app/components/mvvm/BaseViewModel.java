@@ -9,9 +9,11 @@ import rx.subjects.BehaviorSubject;
 public abstract class BaseViewModel<S extends BaseState> {
     private S viewState;
 
-    private final BehaviorSubject<S> state = BehaviorSubject.create(getViewState());
+    private BehaviorSubject<S> state = BehaviorSubject.create(getViewState());
 
     public Observable<S> getState(Observable<S> input) {
+        if (state == null)
+            state = BehaviorSubject.create(getViewState());
         return state.concatMap(o -> input);
     }
 
@@ -25,5 +27,9 @@ public abstract class BaseViewModel<S extends BaseState> {
 
     public void setViewState(S viewState) {
         this.viewState = viewState;
+    }
+
+    public BehaviorSubject<S> getState() {
+        return state;
     }
 }

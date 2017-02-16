@@ -42,10 +42,13 @@ public class BaseSubscriber<V extends LoadDataView, S extends BaseState> extends
 
     @Override
     public void onNext(S s) {
-        view.toggleLoading(s.isLoading());
-        if (s.getState().equals(BaseState.ERROR))
-            onError(s.getError());
-        else
-            view.renderState(s);
+        if (s != null) {
+            view.toggleLoading(s.isLoading());
+            if (s.getState() != null)
+                if (s.getState().equals(BaseState.ERROR))
+                    onError(s.getError());
+                else
+                    view.renderState(s);
+        }
     }
 }

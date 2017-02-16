@@ -17,16 +17,8 @@ public class UserDetailState extends BaseState {
     final UserRealm user;
     final List<RepoRealm> repos;
 
-    public UserDetailState(UserRealm user, List<RepoRealm> repos, boolean isTwoPane, boolean isLoading,
-                           Throwable error, String state) {
-        super(isLoading, error, state);
-        this.user = user;
-        this.repos = repos;
-        this.isTwoPane = isTwoPane;
-    }
-
     UserDetailState() {
-        super(false, null, null);
+        super(false, null, "");
         user = null;
         repos = null;
         isTwoPane = false;
@@ -40,51 +32,52 @@ public class UserDetailState extends BaseState {
     }
 
     public static UserDetailState error(Throwable error) {
-        return UserDetailState.builder()
+        return UserDetailState.builder(ERROR)
                 .setUser(null)
                 .setRepos(null)
                 .setIsTwoPane(false)
                 .setIsLoading(false)
                 .setError(error)
-                .setState(ERROR)
                 .build();
     }
 
     public static UserDetailState loading() {
-        return UserDetailState.builder()
+        return UserDetailState.builder(LOADING)
                 .setUser(null)
                 .setRepos(null)
                 .setIsTwoPane(false)
                 .setError(null)
                 .setIsLoading(true)
-                .setState(LOADING)
                 .build();
     }
 
     public static UserDetailState onNext(UserRealm user, List<RepoRealm> repos, boolean isTwoPane) {
-        return UserDetailState.builder()
+        return UserDetailState.builder(NEXT)
                 .setUser(user)
                 .setRepos(repos)
                 .setIsTwoPane(isTwoPane)
                 .setError(null)
                 .setIsLoading(false)
-                .setState(NEXT)
                 .build();
     }
 
-    public static Builder builder() {
-        return new Builder();
+    public static Builder builder(String state) {
+        return new Builder(state);
     }
 
-    boolean isTwoPane() {
+    public static Builder builder(UserDetailState state) {
+        return new Builder(state);
+    }
+
+    public boolean isTwoPane() {
         return isTwoPane;
     }
 
-    UserRealm getUser() {
+    public UserRealm getUser() {
         return user;
     }
 
-    List<RepoRealm> getRepos() {
+    public List<RepoRealm> getRepos() {
         return repos;
     }
 
@@ -94,6 +87,16 @@ public class UserDetailState extends BaseState {
         boolean isLoading, isTwoPane;
         Throwable error;
         String state;
+
+        public Builder(String value) {
+            state = value;
+        }
+
+        public Builder(UserDetailState userDetailState) {
+            state = userDetailState.getState();
+            isLoading = userDetailState.isLoading();
+            error = userDetailState.getError();
+        }
 
         public Builder setRepos(List<RepoRealm> value) {
             repos = value;
@@ -117,11 +120,6 @@ public class UserDetailState extends BaseState {
 
         public Builder setError(Throwable value) {
             error = value;
-            return this;
-        }
-
-        public Builder setState(String value) {
-            state = value;
             return this;
         }
 

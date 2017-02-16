@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
 import android.util.Pair;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -44,8 +45,10 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
+import rx.Subscriber;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
+import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.NO_ERROR;
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.INITIAL;
 
 /**
@@ -69,11 +72,10 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
     GenericRecyclerViewAdapter usersAdapter;
-    private ActionMode actionMode;
     private boolean twoPane;
+    private ActionMode actionMode;
     private String currentFragTag;
     private UserListState userListState;
-    private List<ItemInfo> itemInfos;
 
     public static Intent getCallingIntent(Context context) {
         return new Intent(context, UserListActivity.class);
@@ -109,7 +111,8 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     }
 
     private void setupRecyclerView() {
-        usersAdapter = new GenericRecyclerViewAdapter(this, new ArrayList<>()) {
+        usersAdapter = new GenericRecyclerViewAdapter((LayoutInflater) getSystemService(Context
+                .LAYOUT_INFLATER_SERVICE), new ArrayList<>()) {
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 switch (viewType) {
@@ -130,10 +133,9 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                 toggleSelection(position);
             } else if (itemInfo.getData() instanceof UserRealm) {
                 UserRealm userModel = (UserRealm) itemInfo.getData();
-                UserDetailState userDetailState = UserDetailState.builder()
+                UserDetailState userDetailState = UserDetailState.builder(INITIAL)
                         .setUser(userModel)
                         .setIsTwoPane(twoPane)
-                        .setState(INITIAL)
                         .build();
                 Pair<View, String> pair = null;
                 Pair<View, String> secondPair = null;
@@ -182,9 +184,8 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                 int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                 if ((layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
-                    userListState = new UserListState.Builder()
+                    userListState = new UserListState.Builder(userListState.getState())
                             .setUsers(userListState.getUsers())
-                            .setState(userListState.getState())
                             .setError(userListState.getError())
                             .setIsLoading(userListState.isLoading())
                             .setCurrentPage(userListState.getCurrentPage() + 1)
@@ -208,19 +209,19 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
         this.userListState = userListModel;
         List<UserRealm> users = userListModel.getUsers();
         if (Utils.isNotEmpty(users)) {
-            itemInfos = new ArrayList<>(users.size());
+            List<ItemInfo> itemInfoList = new ArrayList<>(users.size());
             UserRealm userRealm;
             for (int i = 0, repoModelsSize = users.size(); i < repoModelsSize; i++) {
                 userRealm = users.get(i);
-                itemInfos.add(new ItemInfo<>(userRealm, R.layout.user_item_layout).setId(userRealm.getId()));
+                itemInfoList.add(new ItemInfo<>(userRealm, R.layout.user_item_layout).setId(userRealm.getId()));
             }
 
             DiffUtil.DiffResult diffResult = DiffUtil
-                    .calculateDiff(new UserListDiffCallback(usersAdapter.getDataList(), itemInfos));
+                    .calculateDiff(new UserListDiffCallback(usersAdapter.getDataList(), itemInfoList));
             diffResult.dispatchUpdatesTo(usersAdapter);
 
-            usersAdapter.setDataList(itemInfos);
-            userRecycler.smoothScrollToPosition(userListModel.getyScroll());
+            usersAdapter.setDataList(itemInfoList);
+            userRecycler.smoothScrollToPosition(userListModel.getYScroll());
         }
     }
 
@@ -249,31 +250,15 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView mSearchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        RxSearchView.queryTextChanges(mSearchView)
-                .filter(charSequence -> Utils.isNotEmpty(charSequence.toString()))
+        Observable.defer(() -> RxSearchView.queryTextChanges(mSearchView)
                 .throttleLast(100, TimeUnit.MILLISECONDS)
                 .debounce(200, TimeUnit.MILLISECONDS)
                 .onBackpressureLatest()
+                .onErrorResumeNext(Observable.empty()))
+//                .flatMap(query -> userListVM.getState(userListVM.search(query.toString())))
                 .flatMap(query -> userListVM.search(query.toString()))
-                .onErrorResumeNext(Observable.empty())
-                .subscribe(list -> usersAdapter.animateTo(Utils.isNotEmpty(list) ? list : itemInfos),
-                        Throwable::printStackTrace);
-//        mSearchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String query) {
-//                userListVM.search(query);
-//                return true;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-//                if (newText.isEmpty())
-//                    userListVM.showItemsListInView(userListVM.getItemsViewModels());
-//                else
-//                    userListVM.search(newText);
-//                return true;
-//            }
-//        });
+                .compose(bindToLifecycle())
+                .subscribe(new BaseSubscriber<>(this, NO_ERROR));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -321,8 +306,23 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete_item:
-                userListVM.deleteCollection(usersAdapter.getSelectedItemsIds());
-                mode.finish();
+                userListVM.deleteCollection(usersAdapter.getSelectedItemsIds())
+                        .subscribe(new Subscriber() {
+                            @Override
+                            public void onCompleted() {
+                                mode.finish();
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+                                e.printStackTrace();
+                            }
+
+                            @Override
+                            public void onNext(Object o) {
+                                usersAdapter.removeItemsById(usersAdapter.getSelectedItemsIds());
+                            }
+                        });
                 return true;
             default:
                 return false;

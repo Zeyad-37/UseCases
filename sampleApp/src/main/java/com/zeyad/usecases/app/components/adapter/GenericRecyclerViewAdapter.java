@@ -1,6 +1,5 @@
 package com.zeyad.usecases.app.components.adapter;
 
-import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.util.ArraySet;
 import android.util.SparseBooleanArray;
@@ -30,9 +29,9 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
             areItemsClickable = true, areItemsExpandable = false;
     private int expandedPosition = -1;
 
-    public GenericRecyclerViewAdapter(Context context, List<ItemInfo> list) {
+    public GenericRecyclerViewAdapter(LayoutInflater layoutInflater, List<ItemInfo> list) {
         validateList(list);
-        mLayoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        mLayoutInflater = layoutInflater;
         mDataList = list;
         mSelectedItems = new SparseBooleanArray();
     }
@@ -495,6 +494,20 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
             if (newModels.contains(item))
                 newModels.remove(item);
         appendList(newModels);
+    }
+
+    public void removeItemById(Long id) {
+        for (ItemInfo item : mDataList)
+            if (item.getId() == id)
+                mDataList.remove(item);
+    }
+
+    public void removeItemsById(List<Long> ids) {
+        List<ItemInfo> newList = new ArrayList<>(mDataList.size() - ids.size());
+        for (ItemInfo item : mDataList)
+            if (!ids.contains(item.getId()))
+                newList.add(item);
+        animateTo(newList);
     }
 
     //-----------------animations--------------------------//

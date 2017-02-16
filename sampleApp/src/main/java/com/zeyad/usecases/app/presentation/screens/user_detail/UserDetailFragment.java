@@ -1,6 +1,7 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
 import android.app.Activity;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
@@ -102,7 +103,8 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
 
     void setupRecyclerView() {
         recyclerViewRepositories.setLayoutManager(new LinearLayoutManager(getContext()));
-        repositoriesAdapter = new GenericRecyclerViewAdapter(getContext(), new ArrayList<>()) {
+        repositoriesAdapter = new GenericRecyclerViewAdapter((LayoutInflater) getContext()
+                .getSystemService(Context.LAYOUT_INFLATER_SERVICE), new ArrayList<>()) {
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 return new RepositoryViewHolder(mLayoutInflater.inflate(viewType, parent, false));

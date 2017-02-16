@@ -11,30 +11,21 @@ import java.util.List;
  */
 @Parcel
 public class UserListState extends BaseState {
-
+    public static final String SEARCH = "search";
     final List<UserRealm> users;
     final int yScroll;
     final int currentPage;
     final long lastId;
 
-    public UserListState() {
-        super(false, null, null);
+    UserListState() {
+        super(false, null, "");
         users = null;
         yScroll = 0;
         currentPage = 0;
         lastId = 0;
     }
 
-    public UserListState(List<UserRealm> users, int yScroll, int currentPage, long lastId, boolean isLoading,
-                         Throwable error, String state) {
-        super(isLoading, error, state);
-        this.users = users;
-        this.yScroll = yScroll;
-        this.currentPage = currentPage;
-        this.lastId = lastId;
-    }
-
-    public UserListState(Builder builder) {
+    private UserListState(Builder builder) {
         super(builder.isLoading, builder.error, builder.state);
         users = builder.users;
         yScroll = builder.yScroll;
@@ -43,41 +34,50 @@ public class UserListState extends BaseState {
     }
 
     public static UserListState loading() {
-        return UserListState.builder()
+        return UserListState.builder(LOADING)
                 .setUsers(null)
                 .setError(null)
                 .setIsLoading(true)
-                .setState(LOADING)
                 .build();
     }
 
     public static UserListState onNext(List<UserRealm> users) {
-        return UserListState.builder()
+        return UserListState.builder(NEXT)
                 .setUsers(users)
                 .setError(null)
                 .setIsLoading(false)
-                .setState(NEXT)
+                .build();
+    }
+
+    public static UserListState onSearch(List<UserRealm> users) {
+        return UserListState.builder(SEARCH)
+                .setUsers(users)
+                .setError(null)
+                .setIsLoading(false)
                 .build();
     }
 
     public static UserListState error(Throwable error) {
-        return UserListState.builder()
+        return UserListState.builder(ERROR)
                 .setUsers(null)
                 .setIsLoading(false)
                 .setError(error)
-                .setState(ERROR)
                 .build();
     }
 
-    public static Builder builder() {
-        return new Builder();
+    private static Builder builder(String state) {
+        return new Builder(state);
+    }
+
+    public static Builder builder(UserListState state) {
+        return new Builder(state);
     }
 
     public List<UserRealm> getUsers() {
         return users;
     }
 
-    public int getyScroll() {
+    public int getYScroll() {
         return yScroll;
     }
 
@@ -96,6 +96,16 @@ public class UserListState extends BaseState {
         Throwable error;
         String state;
         long lastId;
+
+        public Builder(String value) {
+            state = value;
+        }
+
+        public Builder(UserListState userListState) {
+            state = userListState.getState();
+            error = userListState.getError();
+            isLoading = userListState.isLoading();
+        }
 
         Builder setUsers(List<UserRealm> value) {
             users = value;
@@ -124,11 +134,6 @@ public class UserListState extends BaseState {
 
         Builder setError(Throwable value) {
             error = value;
-            return this;
-        }
-
-        Builder setState(String value) {
-            state = value;
             return this;
         }
 

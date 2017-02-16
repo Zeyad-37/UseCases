@@ -11,11 +11,6 @@ import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
 import rx.Observable;
 
-import static com.zeyad.usecases.app.components.mvvm.BaseState.ERROR;
-import static com.zeyad.usecases.app.components.mvvm.BaseState.LOADING;
-import static com.zeyad.usecases.app.components.mvvm.BaseState.NEXT;
-import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.Builder;
-import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.INITIAL;
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.builder;
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.error;
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.loading;
@@ -63,33 +58,16 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> implements User
                 .doOnEach(notification -> setViewState((UserDetailState) notification.getValue()));
     }
 
-    // FIXME: 2/9/17
     @Override
     public UserDetailState reduce(UserDetailState previous, UserDetailState changes) {
         if (previous == null)
             return changes;
         Log.d("Detail reduce states:", previous.getState() + " -> " + changes.getState());
-        Builder builder = builder();
-        if ((previous.getState().equals(LOADING) && changes.getState().equals(NEXT)) ||
-                (previous.getState().equals(NEXT) && changes.getState().equals(NEXT))) {
-            builder.setIsLoading(false)
-                    .setError(null)
-                    .setState(NEXT);
-        } else if (previous.getState().equals(LOADING) && changes.getState().equals(ERROR)) {
-            builder.setIsLoading(false)
-                    .setError(changes.getError())
-                    .setState(ERROR);
-        } else if (previous.getState().equals(INITIAL) || (previous.getState().equals(ERROR)
-                && changes.getState().equals(LOADING)) || (previous.getState().equals(NEXT)
-                && changes.getState().equals(LOADING))) {
-            builder.setError(null)
-                    .setIsLoading(true)
-                    .setState(LOADING);
-        } else return changes;
-        builder.setIsTwoPane(previous.isTwoPane())
+        return builder(changes).setIsTwoPane(previous.isTwoPane())
                 .setRepos(Utils.isNotEmpty(changes.getRepos()) ? Utils.union(previous.getRepos(),
                         changes.getRepos()) : previous.getRepos())
-                .setUser(changes.getUser());
-        return builder.build();
+                .setUser(changes.getUser() != null ? changes.getUser() :
+                        previous.getUser() != null ? previous.getUser() : new UserRealm())
+                .build();
     }
 }

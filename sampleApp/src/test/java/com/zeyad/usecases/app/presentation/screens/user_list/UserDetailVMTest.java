@@ -17,6 +17,9 @@ import static com.zeyad.usecases.app.components.mvvm.BaseState.ERROR;
 import static com.zeyad.usecases.app.components.mvvm.BaseState.LOADING;
 import static com.zeyad.usecases.app.components.mvvm.BaseState.NEXT;
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.INITIAL;
+import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.error;
+import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.loading;
+import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.onNext;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -43,11 +46,10 @@ public class UserDetailVMTest {
         userRealm = new UserRealm();
         userRealm.setLogin("testUser");
         userRealm.setId(1);
-        userDetailState = UserDetailState.builder()
+        userDetailState = UserDetailState.builder(INITIAL)
                 .setUser(userRealm)
                 .setIsTwoPane(false)
                 .setRepos(new ArrayList<>())
-                .setState(INITIAL)
                 .build();
     }
 
@@ -67,14 +69,13 @@ public class UserDetailVMTest {
                 any(Class.class));
 
         // Assert return type
-        assertEquals(UserDetailState.class.getSimpleName(), observable.toBlocking().first().getClass()
-                .getSimpleName());
+        assertEquals(UserDetailState.class, observable.toBlocking().first().getClass());
     }
 
     @Test
     public void reduceFromLoadingToOnNext() throws Exception {
-        UserDetailState previous = UserDetailState.loading();
-        UserDetailState changes = UserDetailState.onNext(userRealm, new ArrayList<>(), false);
+        UserDetailState previous = loading();
+        UserDetailState changes = onNext(userRealm, new ArrayList<>(), false);
         UserDetailState result = userDetailVM.reduce(previous, changes);
 
         assertEquals(result.getState(), NEXT);
@@ -82,28 +83,25 @@ public class UserDetailVMTest {
 
     @Test
     public void reduceFromLoadingToError() throws Exception {
-        UserDetailState previous = UserDetailState.loading();
-        UserDetailState changes = UserDetailState.error(new Throwable());
-        UserDetailState result = userDetailVM.reduce(previous, changes);
+        UserDetailState result = userDetailVM.reduce(loading(), error(new Throwable()));
 
-        assertEquals(result.getState(), ERROR);
+        assertEquals(ERROR, result.getState());
     }
 
     @Test
     public void reduceFromOnNextToLoading() throws Exception {
-        UserDetailState previous = UserDetailState.onNext(userRealm, new ArrayList<>(), false);
-        UserDetailState changes = UserDetailState.loading();
-        UserDetailState result = userDetailVM.reduce(previous, changes);
+        UserDetailState result = userDetailVM.reduce(onNext(userRealm, new ArrayList<>(), false), loading());
 
         assertEquals(result.getState(), LOADING);
+        assertEquals(result.getUser(), userRealm);
     }
 
     @Test
     public void reduceFromOnNextToOnNext() throws Exception {
-        UserDetailState previous = UserDetailState.onNext(userRealm, new ArrayList<>(), false);
-        UserDetailState changes = UserDetailState.onNext(userRealm, new ArrayList<>(), false);
-        UserDetailState result = userDetailVM.reduce(previous, changes);
+        UserDetailState result = userDetailVM.reduce(onNext(userRealm, new ArrayList<>(), false),
+                onNext(userRealm, new ArrayList<>(), false));
 
         assertEquals(result.getState(), NEXT);
+        assertEquals(result.getUser(), userRealm);
     }
 }
