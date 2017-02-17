@@ -37,20 +37,11 @@ public interface DataBaseManager {
     /**
      * Puts and element into the DB.
      *
-     * @param realmObject Element to insert in the DB.
-     * @param dataClass   Class type of the items to be put.
-     */
-    @NonNull
-    Observable<?> put(RealmObject realmObject, Class dataClass);
-
-    /**
-     * Puts and element into the DB.
-     *
      * @param realmModel Element to insert in the DB.
      * @param dataClass  Class type of the items to be put.
      */
     @NonNull
-    Observable<?> put(RealmModel realmModel, Class dataClass);
+    <M extends RealmModel> Observable<?> put(M realmModel, Class dataClass);
 
     /**
      * Puts and element into the DB.
@@ -67,7 +58,7 @@ public interface DataBaseManager {
      * @param realmObjects Element to insert in the DB.
      * @param dataClass    Class type of the items to be put.
      */
-    Observable<?> putAll(List<RealmObject> realmObjects, Class dataClass);
+    <M extends RealmModel> Observable<?> putAll(List<M> realmObjects, Class dataClass);
 
     /**
      * Puts and element into the DB.

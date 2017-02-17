@@ -2,33 +2,39 @@ package com.zeyad.usecases.data.requests;
 
 import android.support.annotation.Nullable;
 
-import com.zeyad.usecases.Config;
+import com.zeyad.usecases.utils.TestRealmModel;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.junit.runners.JUnit4;
+import org.mockito.Mockito;
+
+import java.io.File;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest({Config.class})
+@RunWith(JUnit4.class)
 public class FileIORequestTest {
 
+    private final boolean ON_WIFI = false;
+    private final boolean WHILE_CHARGING = false;
+    private final String URL = "www.google.com";
+    private final File FILE = Mockito.mock(File.class);
+    private final Class DATA_CLASS = TestRealmModel.class;
     @Nullable
     private FileIORequest mFileIORequest;
 
     @Before
     public void setUp() throws Exception {
-//        PowerMockito.mockStatic(DataUseCaseFactory.class);
-//        when(Config.getBaseURL()).thenReturn("www.google.com");
-        mFileIORequest = FileIORequestTestRobot.createUploadRequest();
+        mFileIORequest = new FileIORequest.FileIORequestBuilder(URL, FILE)
+                .onWifi(ON_WIFI)
+                .whileCharging(WHILE_CHARGING)
+                .dataClass(DATA_CLASS)
+                .build();
     }
 
     @After
@@ -38,26 +44,26 @@ public class FileIORequestTest {
 
     @Test
     public void testGetUrl() throws Exception {
-        assertThat(mFileIORequest.getUrl(), is(equalTo(FileIORequestTestRobot.URL)));
+        assertThat(mFileIORequest.getUrl(), is(equalTo(URL)));
     }
 
     @Test
     public void testIsPersist() throws Exception {
-        assertThat(mFileIORequest.onWifi(), is(equalTo(FileIORequestTestRobot.ON_WIFI)));
+        assertThat(mFileIORequest.onWifi(), is(equalTo(ON_WIFI)));
     }
 
     @Test
     public void testGetFile() throws Exception {
-        assertThat(mFileIORequest.getFile(), is(equalTo(FileIORequestTestRobot.FILE)));
+        assertThat(mFileIORequest.getFile(), is(equalTo(FILE)));
     }
 
     @Test
     public void testOnWifi() throws Exception {
-        assertThat(mFileIORequest.onWifi(), is(equalTo(FileIORequestTestRobot.ON_WIFI)));
+        assertThat(mFileIORequest.onWifi(), is(equalTo(ON_WIFI)));
     }
 
     @Test
     public void testWhileChargingGetFile() throws Exception {
-        assertThat(mFileIORequest.isWhileCharging(), is(equalTo(FileIORequestTestRobot.WHILE_CHARGING)));
+        assertThat(mFileIORequest.isWhileCharging(), is(equalTo(WHILE_CHARGING)));
     }
 }

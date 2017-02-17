@@ -48,7 +48,7 @@ public class TestRealmModel implements RealmModel {
     @NonNull
     @Override
     public String toString() {
-        return "TestRealmObject{" +
+        return "TestRealmModel{" +
                 "id=" + id +
                 ", value='" + value + '\'' +
                 '}';
@@ -57,8 +57,8 @@ public class TestRealmModel implements RealmModel {
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (!(o instanceof TestRealmObject)) return false;
-        TestRealmObject testRealmObject = (TestRealmObject) o;
+        if (!(o instanceof TestRealmModel)) return false;
+        TestRealmModel testRealmObject = (TestRealmModel) o;
         return getId() == testRealmObject.getId() && getValue().equals(testRealmObject.getValue());
     }
 

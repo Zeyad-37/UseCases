@@ -8,11 +8,12 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
+import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
-import com.zeyad.usecases.utils.TestRealmObject;
+import com.zeyad.usecases.utils.TestRealmModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -42,7 +43,7 @@ public class PostJUnitTestRobot {
     private static final JobScheduler JOB_SCHEDULER;
     private static final ResponseBody RESPONSE_BODY = mock(ResponseBody.class);
     private static final InputStream INPUT_STREAM = mock(InputStream.class);
-    private static final TestRealmObject TEST_MODEL = new TestRealmObject(1, "123");
+    private static final TestRealmModel TEST_MODEL = new TestRealmModel(1, "123");
 
     static {
         JOB_SCHEDULER = Utils.getInstance().hasLollipop() ? mock(JobScheduler.class) : null;
@@ -59,7 +60,7 @@ public class PostJUnitTestRobot {
 
     @NonNull
     static Class getPresentationClass() {
-        return TestRealmObject.class;
+        return TestRealmModel.class;
     }
 
     static String getValidColumnName() {
@@ -68,7 +69,7 @@ public class PostJUnitTestRobot {
 
     @NonNull
     static Class getValidDataClass() {
-        return TestRealmObject.class;
+        return TestRealmModel.class;
     }
 
     static Context createMockedContext() throws PackageManager.NameNotFoundException {
@@ -123,7 +124,7 @@ public class PostJUnitTestRobot {
     }
 
     @NonNull
-    public static TestRealmObject createTestModel() {
+    public static TestRealmModel createTestModel() {
         return TEST_MODEL;
     }
 
@@ -187,6 +188,6 @@ public class PostJUnitTestRobot {
     }
 
     static FirebaseJobDispatcher getGcmNetworkManager() {
-        return mock(FirebaseJobDispatcher.class);
+        return new FirebaseJobDispatcher(new GooglePlayDriver(mock(Context.class)));
     }
 }

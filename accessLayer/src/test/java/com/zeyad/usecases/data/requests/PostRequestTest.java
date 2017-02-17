@@ -1,34 +1,44 @@
 package com.zeyad.usecases.data.requests;
 
-import android.support.annotation.Nullable;
+import com.zeyad.usecases.utils.TestRealmModel;
 
-import com.zeyad.usecases.Config;
-
+import org.json.JSONArray;
+import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.powermock.core.classloader.annotations.PowerMockIgnore;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.junit.runners.JUnit4;
+
+import java.util.HashMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@RunWith(PowerMockRunner.class)
-@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-@PrepareForTest({Config.class})
+@RunWith(JUnit4.class)
 public class PostRequestTest {
 
-    @Nullable
+    private final boolean TO_PERSIST = false;
+    private final Class DATA_CLASS = TestRealmModel.class;
+    private final Class PRESENTATION_CLASS = Object.class;
+    private final String ID_COLUMN_NAME = "id";
+    private final String URL = "www.google.com";
+    private final JSONArray JSON_ARRAY = new JSONArray();
+    private final JSONObject JSON_OBJECT = new JSONObject();
+    private final HashMap<String, Object> HASH_MAP = new HashMap<>();
     private PostRequest mPostRequest;
 
     @Before
     public void setUp() throws Exception {
-//        PowerMockito.mockStatic(DataUseCaseFactory.class);
-//        when(Config.getBaseURL()).thenReturn("www.google.com");
-        mPostRequest = PostRequestTestRobot.buildPostRequest();
+        mPostRequest = new PostRequest.PostRequestBuilder(DATA_CLASS, TO_PERSIST)
+                .payLoad(HASH_MAP)
+                .idColumnName(ID_COLUMN_NAME)
+                .payLoad(JSON_ARRAY)
+                .payLoad(JSON_OBJECT)
+                .presentationClass(PRESENTATION_CLASS)
+                .fullUrl(URL)
+                .build();
     }
 
     @After
@@ -38,26 +48,26 @@ public class PostRequestTest {
 
     @Test
     public void testGetUrl() throws Exception {
-        assertThat(mPostRequest.getUrl(), is(equalTo(PostRequestTestRobot.URL)));
+        assertThat(mPostRequest.getUrl(), is(equalTo(URL)));
     }
 
     @Test
     public void testGetDataClass() throws Exception {
-        assertThat(mPostRequest.getDataClass(), is(equalTo(PostRequestTestRobot.DATA_CLASS)));
+        assertThat(mPostRequest.getDataClass(), is(equalTo(DATA_CLASS)));
     }
 
     @Test
     public void testGetPresentationClass() throws Exception {
-        assertThat(mPostRequest.getPresentationClass(), is(equalTo(PostRequestTestRobot.PRESENTATION_CLASS)));
+        assertThat(mPostRequest.getPresentationClass(), is(equalTo(PRESENTATION_CLASS)));
     }
 
     @Test
     public void testIsPersist() throws Exception {
-        assertThat(mPostRequest.isPersist(), is(equalTo(PostRequestTestRobot.TO_PERSIST)));
+        assertThat(mPostRequest.isPersist(), is(equalTo(TO_PERSIST)));
     }
 
     @Test
     public void testGetIdColumnName() throws Exception {
-        assertThat(mPostRequest.getIdColumnName(), is(equalTo(PostRequestTestRobot.ID_COLUMN_NAME)));
+        assertThat(mPostRequest.getIdColumnName(), is(equalTo(ID_COLUMN_NAME)));
     }
 }

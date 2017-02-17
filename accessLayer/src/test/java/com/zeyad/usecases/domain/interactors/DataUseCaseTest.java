@@ -13,7 +13,7 @@ import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 import com.zeyad.usecases.domain.repositories.Data;
-import com.zeyad.usecases.utils.TestRealmObject;
+import com.zeyad.usecases.utils.TestRealmModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -190,7 +190,7 @@ public class DataUseCaseTest {
     public void testExecuteSearch() {
         when(mData.queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class))).thenReturn(observable);
 
-        mDataUseCase.queryDisk(realm -> realm.where(TestRealmObject.class), Object.class);
+        mDataUseCase.queryDisk(realm -> realm.where(TestRealmModel.class), Object.class);
 
         verify(mData, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class));
     }

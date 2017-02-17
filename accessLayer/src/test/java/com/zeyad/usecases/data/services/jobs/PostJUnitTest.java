@@ -11,7 +11,6 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.Job;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.PostRequest;
-import com.zeyad.usecases.data.services.GenericJobService;
 
 import org.junit.After;
 import org.junit.Before;
@@ -25,7 +24,6 @@ import java.io.IOException;
 
 import okhttp3.RequestBody;
 
-import static android.app.job.JobInfo.NETWORK_TYPE_ANY;
 import static com.zeyad.usecases.data.services.GenericJobService.JOB_TYPE;
 import static com.zeyad.usecases.data.services.GenericJobService.POST;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -59,7 +57,7 @@ public class PostJUnitTest {
                 , PostJUnitTestRobot.createRestApi()
                 , 3);
         post.execute();
-        assertThat(post.getTrailCount(), is(equalTo(4)));
+        assertThat(post.getTrailCount(), is(equalTo(3)));
     }
 
     @Test
@@ -81,14 +79,14 @@ public class PostJUnitTest {
                 , PostJUnitTestRobot.createRestApi()
                 , 1);
         post.execute();
-//        ArgumentCaptor<OneoffTask> peopleCaptor = ArgumentCaptor.forClass(OneoffTask.class);
-//        verify(gcmNetworkManager).schedule(peopleCaptor.capture());
+        ArgumentCaptor<Job> peopleCaptor = ArgumentCaptor.forClass(Job.class);
+        verify(gcmNetworkManager).schedule(peopleCaptor.capture());
 //        assertThat(peopleCaptor.getValue().getWindowEnd(), is(30L));
 //        assertThat(peopleCaptor.getValue().getWindowStart(), is(0L));
 //        assertThat(peopleCaptor.getValue().getRequiresCharging(), is(false));
-//        assertThat(peopleCaptor.getValue().getExtras(), is(notNullValue()));
-//        assertThat(peopleCaptor.getValue().getExtras().getString(JOB_TYPE), is(POST));
-//        assertThat(peopleCaptor.getValue().getServiceName(), is(GenericGCMService.class.getName()));
+        assertThat(peopleCaptor.getValue().getExtras(), is(notNullValue()));
+        assertThat(peopleCaptor.getValue().getExtras().getString(JOB_TYPE), is(POST));
+//        assertThat(peopleCaptor.getValue().getServiceName(), is(GenericJobService.class.getName()));
 //        assertThat(peopleCaptor.getValue().getRequiredNetwork(), is(NETWORK_STATE_CONNECTED));
     }
 
@@ -111,12 +109,12 @@ public class PostJUnitTest {
                 , PostJUnitTestRobot.createRestApi()
                 , 1);
         post.execute();
-        ArgumentCaptor<JobInfo> argumentCaptor = ArgumentCaptor.forClass(JobInfo.class);
-        verify(PostJUnitTestRobot.getMockedJobScheduler()).schedule(argumentCaptor.capture());
-        assertThat(argumentCaptor.getValue().getService().getClassName(), is(equalTo(GenericJobService.class.getName())));
-        assertThat(argumentCaptor.getValue().isRequireCharging(), is(false));
-        assertThat(argumentCaptor.getValue().isPersisted(), is(true));
-        assertThat(argumentCaptor.getValue().getNetworkType(), is(NETWORK_TYPE_ANY));
+        ArgumentCaptor<Job> argumentCaptor = ArgumentCaptor.forClass(Job.class);
+        verify(PostJUnitTestRobot.getGcmNetworkManager()).schedule(argumentCaptor.capture());
+//        assertThat(argumentCaptor.getValue().getService().getClassName(), is(equalTo(GenericJobService.class.getName())));
+//        assertThat(argumentCaptor.getValue().isRequireCharging(), is(false));
+//        assertThat(argumentCaptor.getValue().isPersisted(), is(true));
+//        assertThat(argumentCaptor.getValue().getNetworkType(), is(NETWORK_TYPE_ANY));
         assertThat(argumentCaptor.getValue().getExtras(), is(notNullValue()));
         assertThat(argumentCaptor.getValue().getExtras().getString(JOB_TYPE), is(POST));
     }

@@ -76,49 +76,45 @@ public class Post {
                 isObject = true;
             }
         } else bundle = mPostRequest.getArrayBundle().toString();
+        RequestBody requestBody = RequestBody.create(MediaType.parse(APPLICATION_JSON), bundle);
+        RequestBody listRequestBody = RequestBody.create(MediaType
+                .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString());
         switch (mPostRequest.getMethod()) {
             case PostRequest.PATCH:
-                return mRestApi.dynamicPatch(mPostRequest.getUrl(), RequestBody
-                        .create(MediaType.parse(APPLICATION_JSON), bundle))
+                return mRestApi.dynamicPatch(mPostRequest.getUrl(), requestBody)
                         .doOnSubscribe(() -> Log.d(TAG, "Posting " + mPostRequest.getDataClass()
                                 .getSimpleName()))
                         .subscribe(handleError);
             case PostRequest.POST:
                 if (isObject)
-                    return mRestApi.dynamicPost(mPostRequest.getUrl(), RequestBody
-                            .create(MediaType.parse(APPLICATION_JSON), bundle))
+                    return mRestApi.dynamicPost(mPostRequest.getUrl(), requestBody)
                             .doOnSubscribe(() -> Log.d(TAG, "Posting " + mPostRequest.getDataClass()
                                     .getSimpleName()))
                             .subscribe(handleError);
                 else
-                    return mRestApi.dynamicPost(mPostRequest.getUrl(), RequestBody.create(MediaType
-                            .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString()))
+                    return mRestApi.dynamicPost(mPostRequest.getUrl(), listRequestBody)
                             .doOnSubscribe(() -> Log.d(TAG, "Posting List of " + mPostRequest
                                     .getDataClass().getSimpleName()))
                             .subscribe(handleError);
             case PostRequest.PUT:
                 if (isObject)
-                    return mRestApi.dynamicPut(mPostRequest.getUrl(), RequestBody
-                            .create(MediaType.parse(APPLICATION_JSON), bundle))
+                    return mRestApi.dynamicPut(mPostRequest.getUrl(), requestBody)
                             .doOnSubscribe(() -> Log.d(TAG, "Puting " + mPostRequest.getDataClass()
                                     .getSimpleName()))
                             .subscribe(handleError);
                 else
-                    return mRestApi.dynamicPut(mPostRequest.getUrl(), RequestBody.create(MediaType
-                            .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString()))
+                    return mRestApi.dynamicPut(mPostRequest.getUrl(), listRequestBody)
                             .doOnSubscribe(() -> Log.d(TAG, "Puting " + mPostRequest.getDataClass()
                                     .getSimpleName()))
                             .subscribe(handleError);
             case PostRequest.DELETE:
                 if (isObject)
-                    return mRestApi.dynamicDelete(mPostRequest.getUrl(), RequestBody
-                            .create(MediaType.parse(APPLICATION_JSON), bundle))
+                    return mRestApi.dynamicDelete(mPostRequest.getUrl(), requestBody)
                             .doOnSubscribe(() -> Log.d(TAG, "Deleting " + mPostRequest.getDataClass()
                                     .getSimpleName()))
                             .subscribe(handleError);
                 else
-                    return mRestApi.dynamicDelete(mPostRequest.getUrl(), RequestBody.create(MediaType
-                            .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString()))
+                    return mRestApi.dynamicDelete(mPostRequest.getUrl(), listRequestBody)
                             .doOnSubscribe(() -> Log.d(TAG, "Deleting List of " + mPostRequest
                                     .getPresentationClass().getSimpleName()))
                             .subscribe(handleError);

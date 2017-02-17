@@ -40,7 +40,7 @@ public class RealmManager implements DataBaseManager {
             backgroundHandler = new Handler(backgroundLooper);
     }
 
-    RealmManager() {
+    public RealmManager() {
         if (backgroundHandler == null)
             backgroundHandler = new Handler();
     }
@@ -121,42 +121,6 @@ public class RealmManager implements DataBaseManager {
                     .map(realm::copyFromRealm)
                     .doOnUnsubscribe(() -> closeRealm(realm));
         });
-    }
-
-    /**
-     * Puts and element into the DB.
-     *
-     * @param realmObject Element to insert in the DB.
-     * @param dataClass   Class type of the items to be put.
-     */
-    @NonNull
-    @Override
-    public Observable<?> put(@Nullable RealmObject realmObject, @NonNull Class dataClass) {
-        if (realmObject != null) {
-            return Observable.defer(() -> {
-                if (hasKitKat())
-                    try (Realm realm = Realm.getDefaultInstance()) {
-                        RealmObject result = executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmObject));
-                        if (RealmObject.isValid(result)) {
-                            return Observable.just(Boolean.TRUE);
-                        } else
-                            return Observable.error(new IllegalArgumentException(REALM_OBJECT_INVALID));
-                    }
-                else {
-                    Realm realm = Realm.getDefaultInstance();
-                    try {
-                        RealmObject result = executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmObject));
-                        if (RealmObject.isValid(result)) {
-                            return Observable.just(Boolean.TRUE);
-                        } else
-                            return Observable.error(new IllegalArgumentException(REALM_OBJECT_INVALID));
-                    } finally {
-                        closeRealm(realm);
-                    }
-                }
-            });
-        }
-        return Observable.error(new IllegalArgumentException(REALM_OBJECT_INVALID));
     }
 
     /**
@@ -269,24 +233,18 @@ public class RealmManager implements DataBaseManager {
         });
     }
 
-    /**
-     * Puts and element into the DB.
-     *
-     * @param realmModels Element to insert in the DB.
-     * @param dataClass   Class type of the items to be put.
-     */
     @Override
-    public Observable<?> putAll(@NonNull List<RealmObject> realmModels, @NonNull Class dataClass) {
+    public <T extends RealmModel> Observable<?> putAll(List<T> realmObjects, Class dataClass) {
         return Observable.defer(() -> {
             if (hasKitKat())
                 try (Realm realm = Realm.getDefaultInstance()) {
-                    executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmModels));
+                    executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmObjects));
                     return Observable.just(Boolean.TRUE);
                 }
             else {
                 Realm realm = Realm.getDefaultInstance();
                 try {
-                    executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmModels));
+                    executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmObjects));
                     return Observable.just(Boolean.TRUE);
                 } finally {
                     closeRealm(realm);
@@ -294,6 +252,32 @@ public class RealmManager implements DataBaseManager {
             }
         });
     }
+
+//    /**
+//     * Puts and element into the DB.
+//     *
+//     * @param realmObjects Element to insert in the DB.
+//     * @param dataClass   Class type of the items to be put.
+//     */
+//    @Override
+//    public Observable<?> putAll(@NonNull List<RealmObject> realmObjects, @NonNull Class dataClass) {
+//        return Observable.defer(() -> {
+//            if (hasKitKat())
+//                try (Realm realm = Realm.getDefaultInstance()) {
+//                    executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmObjects));
+//                    return Observable.just(Boolean.TRUE);
+//                }
+//            else {
+//                Realm realm = Realm.getDefaultInstance();
+//                try {
+//                    executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmObjects));
+//                    return Observable.just(Boolean.TRUE);
+//                } finally {
+//                    closeRealm(realm);
+//                }
+//            }
+//        });
+//    }
 
     /**
      * Evict all elements of the DB.

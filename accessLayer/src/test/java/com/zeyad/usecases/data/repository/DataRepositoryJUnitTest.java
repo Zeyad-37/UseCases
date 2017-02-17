@@ -8,7 +8,7 @@ import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.repository.stores.DataStore;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.repository.stores.DiskDataStore;
-import com.zeyad.usecases.utils.TestRealmObject;
+import com.zeyad.usecases.utils.TestRealmModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -106,7 +106,7 @@ public class DataRepositoryJUnitTest {
     @Test
     public void testPostObjectDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenJsonObjectIsPassed() {
         mDataRepository.postObjectDynamically(validUrl, DataRepository.DEFAULT_ID_KEY,
-                any(JSONObject.class), Object.class, TestRealmObject.class, true, true);
+                any(JSONObject.class), Object.class, TestRealmModel.class, true, true);
         verify(mockDataStore, times(1)).dynamicPostObject(anyString(), anyString(), any(JSONObject.class),
                 any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
     }
@@ -122,7 +122,7 @@ public class DataRepositoryJUnitTest {
     @Test
     public void testDeleteListDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.deleteListDynamically(validUrl, any(JSONArray.class), Object.class,
-                TestRealmObject.class, true, true);
+                TestRealmModel.class, true, true);
         verify(mockDataStore, times(1)).dynamicDeleteCollection(anyString(), anyString(), any(JSONArray.class),
                 any(Class.class), anyBoolean(), anyBoolean());
     }
@@ -158,7 +158,7 @@ public class DataRepositoryJUnitTest {
         mockDataStore = mock(DiskDataStore.class);
         when(mockDataStoreFactory.disk(any(IDAOMapper.class))).thenReturn(mockDataStore);
 
-        mDataRepository.deleteAllDynamically(validUrl, TestRealmObject.class, true);
+        mDataRepository.deleteAllDynamically(validUrl, TestRealmModel.class, true);
         verify(mockDataStore, times(1)).dynamicDeleteAll(any(Class.class));
     }
 }

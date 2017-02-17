@@ -14,7 +14,7 @@ import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.utils.Utils;
-import com.zeyad.usecases.utils.TestRealmObject;
+import com.zeyad.usecases.utils.TestRealmModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -105,8 +105,8 @@ public class CloudDataStoreTest {
 
     @Test
     public void dynamicGetList() throws Exception {
-        List<TestRealmObject> testRealmObjects = new ArrayList<>();
-        testRealmObjects.add(new TestRealmObject());
+        List<TestRealmModel> testRealmObjects = new ArrayList<>();
+        testRealmObjects.add(new TestRealmModel());
         Observable<List> observable = Observable.just(testRealmObjects);
         when(mockRestApi.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
 
@@ -540,7 +540,7 @@ public class CloudDataStoreTest {
 
     @Test(expected = RuntimeException.class)
     public void queryDisk() throws Exception {
-        Observable observable = cloudDataStore.queryDisk(realm -> realm.where(TestRealmObject.class),
+        Observable observable = cloudDataStore.queryDisk(realm -> realm.where(TestRealmModel.class),
                 Object.class);
 
         // Verify repository interactions

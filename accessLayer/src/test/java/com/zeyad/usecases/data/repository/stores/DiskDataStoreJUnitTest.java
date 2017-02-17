@@ -6,7 +6,6 @@ import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.utils.TestRealmModel;
-import com.zeyad.usecases.utils.TestRealmObject;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -53,8 +52,8 @@ public class DiskDataStoreJUnitTest {
 
     @Test
     public void testGetAll() {
-        List<TestRealmObject> testRealmObjects = new ArrayList<>();
-        testRealmObjects.add(new TestRealmObject());
+        List<TestRealmModel> testRealmObjects = new ArrayList<>();
+        testRealmObjects.add(new TestRealmModel());
         Observable<List> observable = Observable.just(testRealmObjects);
         when(dbManager.getAll(any(Class.class))).thenReturn(observable);
 
@@ -65,7 +64,7 @@ public class DiskDataStoreJUnitTest {
 
     @Test
     public void testGetObject() {
-        Observable observable = Observable.just(new TestRealmObject());
+        Observable observable = Observable.just(new TestRealmModel());
         when(dbManager.getById(anyString(), anyInt(), any(Class.class))).thenReturn(observable);
 
         mDiskDataStore.dynamicGetObject("", "", 0, Object.class, Object.class, false, false);

@@ -12,7 +12,7 @@ import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.FileIORequest;
-import com.zeyad.usecases.utils.TestRealmObject;
+import com.zeyad.usecases.utils.TestRealmModel;
 
 import org.mockito.Mockito;
 
@@ -43,13 +43,13 @@ class FileIOJUnitTestRobot {
 
     @NonNull
     static Class getPresentationClass() {
-        return TestRealmObject.class;
+        return TestRealmModel.class;
     }
 
 
     @NonNull
     static Class getValidDataClass() {
-        return TestRealmObject.class;
+        return TestRealmModel.class;
     }
 
     static FileIORequest createFileIoReq(boolean wifi, boolean isCharging, File file) {
