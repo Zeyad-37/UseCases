@@ -74,8 +74,8 @@ public class UserDetailActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-        navigateUpTo(new Intent(this, UserListActivity.class));
-//        supportFinishAfterTransition(); // exit animation
+//        navigateUpTo(new Intent(this, UserListActivity.class));
+        supportFinishAfterTransition(); // exit animation
     }
 
     @Override

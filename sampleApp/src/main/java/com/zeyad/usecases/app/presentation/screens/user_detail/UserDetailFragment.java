@@ -9,6 +9,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -19,6 +20,9 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
@@ -127,7 +131,24 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
         if (Utils.isNotEmpty(repoModels))
             for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
                 repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
-        if (userRealm != null)
+        if (userRealm != null) {
+            RequestListener<String, GlideDrawable> requestListener = new RequestListener<String, GlideDrawable>() {
+                @Override
+                public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                    FragmentActivity activity = getActivity();
+                    if (activity != null)
+                        activity.supportStartPostponedEnterTransition();
+                    return false;
+                }
+
+                @Override
+                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                    FragmentActivity activity = getActivity();
+                    if (activity != null)
+                        activity.supportStartPostponedEnterTransition();
+                    return false;
+                }
+            };
             if (userDetailState.isTwoPane()) {
                 UserListActivity activity = (UserListActivity) getActivity();
                 if (activity != null) {
@@ -137,11 +158,15 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
                     if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
                         Glide.with(getContext())
                                 .load(userRealm.getAvatarUrl())
+                                .dontAnimate()
+                                .listener(requestListener)
                                 .into(activity.imageViewAvatar);
                     else
                         Glide.with(getContext())
                                 .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
                                         "https://help.github.com/assets/images/help/profile/identicon.png")
+                                .dontAnimate()
+                                .listener(requestListener)
                                 .into(activity.imageViewAvatar);
                 }
             } else {
@@ -153,14 +178,19 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
                     if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
                         Glide.with(getContext())
                                 .load(userRealm.getAvatarUrl())
+                                .dontAnimate()
+                                .listener(requestListener)
                                 .into(activity.imageViewAvatar);
                     else
                         Glide.with(getContext())
                                 .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
                                         "https://help.github.com/assets/images/help/profile/identicon.png")
+                                .dontAnimate()
+                                .listener(requestListener)
                                 .into(activity.imageViewAvatar);
                 }
             }
+        }
 //        applyPalette();
     }
 

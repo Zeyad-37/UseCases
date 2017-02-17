@@ -1,5 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
+import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
@@ -156,12 +157,12 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                     currentFragTag = orderDetailFragment.getClass().getSimpleName() + userModel.getId();
                     addFragment(R.id.user_detail_container, orderDetailFragment, null/*pairs*/, currentFragTag);
                 } else {
-//                    if (Utils.hasLollipop()) {
-//                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
-//                                pair, secondPair);
-//                        navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this,
-//                                userDetailState), options);
-//                    } else
+                    if (Utils.hasLollipop()) {
+                        ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
+                                pair, secondPair);
+                        navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this,
+                                userDetailState), options);
+                    } else
                     navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this, userDetailState));
                 }
             }
