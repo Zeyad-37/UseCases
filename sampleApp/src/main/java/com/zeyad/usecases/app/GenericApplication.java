@@ -15,6 +15,7 @@ import io.flowup.FlowUp;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.rx.RealmObservableFactory;
+import jp.wasabeef.takt.Takt;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.Interceptor;
@@ -41,6 +42,8 @@ public class GenericApplication extends Application {
 //        initializeStrickMode();
         super.onCreate();
         sInstance = this;
+        if (BuildConfig.DEBUG)
+            Takt.stock(this).play();
         initializeRealm();
         DataUseCaseFactory.init(new DataUseCaseConfig.Builder(this)
                 .baseUrl(API_BASE_URL)
