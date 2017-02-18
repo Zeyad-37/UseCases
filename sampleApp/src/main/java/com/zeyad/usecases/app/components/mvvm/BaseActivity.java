@@ -85,8 +85,8 @@ public abstract class BaseActivity extends RxAppCompatActivity {
      * @param containerViewId The container view to where add the fragment.
      * @param fragment        The fragment to be added.
      */
-    protected void addFragment(int containerViewId, Fragment fragment, List<Pair<View, String>> sharedElements,
-                               String currentFragTag) {
+    public void addFragment(int containerViewId, Fragment fragment, String currentFragTag,
+                            List<Pair<View, String>> sharedElements) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         if (sharedElements != null)
             for (Pair<View, String> pair : sharedElements)
@@ -97,7 +97,7 @@ public abstract class BaseActivity extends RxAppCompatActivity {
         fragmentTransaction.add(containerViewId, fragment, fragment.getTag()).commit();
     }
 
-    protected void removeFragment(String tag) {
+    public void removeFragment(String tag) {
         getSupportFragmentManager().beginTransaction()
                 .remove(getSupportFragmentManager().findFragmentByTag(tag))
                 .commit();

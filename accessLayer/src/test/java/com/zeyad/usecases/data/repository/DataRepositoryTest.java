@@ -38,7 +38,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 @org.robolectric.annotation.Config(constants = BuildConfig.class, sdk = 21)
-public class DataRepositoryJUnitTest {
+public class DataRepositoryTest {
 
     private DataStore mockDataStore;
     private DataRepository mDataRepository; // class under test

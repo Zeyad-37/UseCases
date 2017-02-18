@@ -155,7 +155,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                         removeFragment(currentFragTag);
                     UserDetailFragment orderDetailFragment = UserDetailFragment.newInstance(userDetailState);
                     currentFragTag = orderDetailFragment.getClass().getSimpleName() + userModel.getId();
-                    addFragment(R.id.user_detail_container, orderDetailFragment, null/*pairs*/, currentFragTag);
+                    addFragment(R.id.user_detail_container, orderDetailFragment, currentFragTag, pairs);
                 } else {
                     if (Utils.hasLollipop()) {
                         ActivityOptions options = ActivityOptions.makeSceneTransitionAnimation(this,
@@ -163,7 +163,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                         navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this,
                                 userDetailState), options);
                     } else
-                    navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this, userDetailState));
+                        navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this, userDetailState));
                 }
             }
         });
@@ -201,6 +201,9 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
 
     @Override
     public void loadData() {
+//        userListVM.getState().compose(bindToLifecycle())
+//                .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
+//        userListVM.getUsers();
         userListVM.getState(userListVM.getUsers()).compose(bindToLifecycle())
                 .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }

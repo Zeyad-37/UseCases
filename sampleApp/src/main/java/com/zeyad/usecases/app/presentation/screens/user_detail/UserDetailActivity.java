@@ -65,7 +65,7 @@ public class UserDetailActivity extends BaseActivity {
         }
         if (isNewActivity)
             addFragment(R.id.user_detail_container, UserDetailFragment.newInstance(Parcels.unwrap(getIntent()
-                    .getParcelableExtra(ARG_USER_DETAIL_MODEL))), null, "");
+                    .getParcelableExtra(ARG_USER_DETAIL_MODEL))), "", null);
     }
 
     @Override

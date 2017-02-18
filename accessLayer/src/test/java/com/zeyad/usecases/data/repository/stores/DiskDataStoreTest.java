@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when;
 
 @RunWith(RobolectricTestRunner.class)
 @org.robolectric.annotation.Config(constants = BuildConfig.class, sdk = 21)
-public class DiskDataStoreJUnitTest {
+public class DiskDataStoreTest {
 
     private DiskDataStore mDiskDataStore;
     private DataBaseManager dbManager;

@@ -85,16 +85,6 @@ class ApiConnection implements IApiConnection {
         sInstance = new ApiConnection(okhttpBuilder, cache);
     }
 
-//    /**
-//     * Meant only for mocking and testing purposed.
-//     *
-//     * @param restApiWithoutCache
-//     * @param restApiWithCache
-//     */
-//    static void init(RestApi restApiWithoutCache, RestApi restApiWithCache) {
-//        sInstance = new ApiConnection(restApiWithoutCache, restApiWithCache);
-//    }
-
     @NonNull
     @Override
     public HttpLoggingInterceptor provideHttpLoggingInterceptor() {
@@ -278,9 +268,10 @@ class ApiConnection implements IApiConnection {
     }
 
     private OkHttpClient provideOkHttpClient(@NonNull OkHttpClient.Builder okHttpBuilder, @Nullable Cache cache) {
-        if (cache != null) {
+        boolean useApiWithCache = cache != null;
+        Config.getInstance().setUseApiWithCache(useApiWithCache);
+        if (useApiWithCache)
             okHttpBuilder.cache(cache);
-        }
         return okHttpBuilder.build();
     }
 

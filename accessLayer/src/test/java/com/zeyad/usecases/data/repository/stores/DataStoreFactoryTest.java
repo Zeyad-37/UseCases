@@ -18,7 +18,7 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Mockito.mock;
 
 @RunWith(JUnit4.class)
-public class DataStoreFactoryJUnitTest {
+public class DataStoreFactoryTest {
 
     private IDAOMapper mIDAOMapper;
     private DataStoreFactory mDataStoreFactory; // class under test
