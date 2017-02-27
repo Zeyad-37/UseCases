@@ -32,7 +32,7 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> implements User
     }
 
     @Override
-    public Observable<UserDetailState> getRepositories(UserDetailState userDetailState) {
+    public void getRepositories(UserDetailState userDetailState) {
         Observable<UserDetailState> userDetailModelObservable;
         UserRealm user = userDetailState.getUser();
         String userLogin = user.getLogin();
@@ -46,7 +46,7 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> implements User
                                         .build())),
                 (userRealm, repos) -> reduce(userDetailState, onNext(userRealm, repos, false)))
                 .compose(applyStates()) : Observable.just(error(new IllegalArgumentException("User name can not be empty")));
-        return userDetailModelObservable;
+        userDetailModelObservable.subscribe(getSubscriber());
     }
 
     @Override

@@ -11,15 +11,11 @@ interface UserListViewModel {
 
     Observable<UserListState> getState();
 
-    Observable<UserListState> getState(Observable<UserListState> users);
+    void incrementPage();
 
-//    void getUsers();
-
-    Observable<UserListState> getUsers();
+    void getUsers();
 
     Observable<UserListState> search(String query);
 
     Observable deleteCollection(List<Long> selectedItemsIds);
-
-    Observable<UserListState> incrementPage();
 }

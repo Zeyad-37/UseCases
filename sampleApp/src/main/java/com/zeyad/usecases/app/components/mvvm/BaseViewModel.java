@@ -1,6 +1,7 @@
 package com.zeyad.usecases.app.components.mvvm;
 
 import rx.Observable;
+import rx.Subscriber;
 import rx.subjects.BehaviorSubject;
 
 /**
@@ -11,11 +12,23 @@ public abstract class BaseViewModel<S extends BaseState> {
 
     private BehaviorSubject<S> state = BehaviorSubject.create(getViewState());
 
-    public Observable<S> getState(Observable<S> input) {
-        if (state == null)
-            state = BehaviorSubject.create(getViewState());
-        return state.concatMap(o -> input);
-    }
+    private Subscriber<S> bvmSubscriber = new Subscriber<S>() {
+        @Override
+        public void onCompleted() {
+            unsubscribe();
+        }
+
+        @Override
+        public void onError(Throwable e) {
+            unsubscribe();
+            e.printStackTrace();
+        }
+
+        @Override
+        public void onNext(S s) {
+            getState().onNext(s);
+        }
+    };
 
     public abstract S reduce(S previous, S changes);
 
@@ -31,5 +44,9 @@ public abstract class BaseViewModel<S extends BaseState> {
 
     public BehaviorSubject<S> getState() {
         return state;
+    }
+
+    public Subscriber<S> getSubscriber() {
+        return bvmSubscriber;
     }
 }

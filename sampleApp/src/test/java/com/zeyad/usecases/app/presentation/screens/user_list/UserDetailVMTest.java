@@ -62,7 +62,8 @@ public class UserDetailVMTest {
         when(mockDataUseCase.queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class)))
                 .thenReturn(observableUserRealm);
 
-        Observable observable = userDetailVM.getRepositories(userDetailState);
+        userDetailVM.getRepositories(userDetailState);
+        Observable observable = userDetailVM.getState();
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class),

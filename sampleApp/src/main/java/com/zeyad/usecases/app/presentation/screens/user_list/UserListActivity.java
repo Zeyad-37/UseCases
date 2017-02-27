@@ -46,7 +46,6 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
-import rx.Subscriber;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.NO_ERROR;
@@ -109,6 +108,34 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
         setupRecyclerView();
         if (findViewById(R.id.user_detail_container) != null)
             twoPane = true;
+    }
+
+    @Override
+    public void loadData() {
+        userListVM.getState().compose(bindToLifecycle())
+                .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
+        userListVM.getUsers();
+    }
+
+    @Override
+    public void renderState(UserListState userListModel) {
+        this.userListState = userListModel;
+        List<UserRealm> users = userListModel.getUsers();
+        if (Utils.isNotEmpty(users)) {
+            List<ItemInfo> itemInfoList = new ArrayList<>(users.size());
+            UserRealm userRealm;
+            for (int i = 0, repoModelsSize = users.size(); i < repoModelsSize; i++) {
+                userRealm = users.get(i);
+                itemInfoList.add(new ItemInfo<>(userRealm, R.layout.user_item_layout).setId(userRealm.getId()));
+            }
+
+            DiffUtil.DiffResult diffResult = DiffUtil
+                    .calculateDiff(new UserListDiffCallback(usersAdapter.getDataList(), itemInfoList));
+            diffResult.dispatchUpdatesTo(usersAdapter);
+
+            usersAdapter.setDataList(itemInfoList);
+            userRecycler.smoothScrollToPosition(userListModel.getYScroll());
+        }
     }
 
     private void setupRecyclerView() {
@@ -192,41 +219,10 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                             .setCurrentPage(userListState.getCurrentPage() + 1)
                             .setyScroll(firstVisibleItemPosition)
                             .build();
-                    userListVM.getState(userListVM.incrementPage()).compose(bindToLifecycle())
-                            .subscribe(new BaseSubscriber<>(UserListActivity.this, ERROR_WITH_RETRY));
+                    userListVM.incrementPage();
                 }
             }
         });
-    }
-
-    @Override
-    public void loadData() {
-//        userListVM.getState().compose(bindToLifecycle())
-//                .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
-//        userListVM.getUsers();
-        userListVM.getState(userListVM.getUsers()).compose(bindToLifecycle())
-                .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
-    }
-
-    @Override
-    public void renderState(UserListState userListModel) {
-        this.userListState = userListModel;
-        List<UserRealm> users = userListModel.getUsers();
-        if (Utils.isNotEmpty(users)) {
-            List<ItemInfo> itemInfoList = new ArrayList<>(users.size());
-            UserRealm userRealm;
-            for (int i = 0, repoModelsSize = users.size(); i < repoModelsSize; i++) {
-                userRealm = users.get(i);
-                itemInfoList.add(new ItemInfo<>(userRealm, R.layout.user_item_layout).setId(userRealm.getId()));
-            }
-
-            DiffUtil.DiffResult diffResult = DiffUtil
-                    .calculateDiff(new UserListDiffCallback(usersAdapter.getDataList(), itemInfoList));
-            diffResult.dispatchUpdatesTo(usersAdapter);
-
-            usersAdapter.setDataList(itemInfoList);
-            userRecycler.smoothScrollToPosition(userListModel.getYScroll());
-        }
     }
 
     @Override
@@ -259,7 +255,6 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                 .debounce(200, TimeUnit.MILLISECONDS)
                 .onBackpressureLatest()
                 .onErrorResumeNext(Observable.empty()))
-//                .flatMap(query -> userListVM.getState(userListVM.search(query.toString())))
                 .flatMap(query -> userListVM.search(query.toString()))
                 .compose(bindToLifecycle())
                 .subscribe(new BaseSubscriber<>(this, NO_ERROR));
@@ -311,22 +306,12 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
         switch (item.getItemId()) {
             case R.id.delete_item:
                 userListVM.deleteCollection(usersAdapter.getSelectedItemsIds())
-                        .subscribe(new Subscriber() {
-                            @Override
-                            public void onCompleted() {
-                                mode.finish();
-                            }
+                        .compose(bindToLifecycle())
+                        .subscribe(o -> {
+                            usersAdapter.removeItemsById(usersAdapter.getSelectedItemsIds());
+                            mode.finish();
 
-                            @Override
-                            public void onError(Throwable e) {
-                                e.printStackTrace();
-                            }
-
-                            @Override
-                            public void onNext(Object o) {
-                                usersAdapter.removeItemsById(usersAdapter.getSelectedItemsIds());
-                            }
-                        });
+                        }, throwable -> ((Throwable) throwable).printStackTrace());
                 return true;
             default:
                 return false;

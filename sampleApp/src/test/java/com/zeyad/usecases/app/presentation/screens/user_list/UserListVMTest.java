@@ -50,7 +50,8 @@ public class UserListVMTest {
         when(mockDataUseCase.getListOffLineFirst(any()))
                 .thenReturn(observableUserRealm);
 
-        Observable observable = userListVM.getUsers();
+        userListVM.getUsers();
+        Observable observable = userListVM.getState();
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).getListOffLineFirst(any(GetRequest.class));
@@ -138,26 +139,6 @@ public class UserListVMTest {
         assertEquals(result.getState(), NEXT);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void incrementPageShouldReturnExceptionOnNullViewState() throws Exception {
-        UserRealm userRealm = new UserRealm();
-        userRealm.setLogin("testUser");
-        userRealm.setId(1);
-        userRealmList = new ArrayList<>();
-        userRealmList.add(userRealm);
-        Observable<List> observableUserRealm = Observable.just(userRealmList);
-
-        when(mockDataUseCase.getList(any())).thenReturn(observableUserRealm);
-
-        Observable observable = userListVM.incrementPage();
-
-        // Verify repository interactions
-        verify(mockDataUseCase, times(0)).getList(any(GetRequest.class));
-
-        // Assert return type
-        assertEquals(new IllegalStateException(), observable.toBlocking().first());
-    }
-
     @Test
     public void incrementPageShouldReturnNextPageObservable() throws Exception {
         UserRealm userRealm = new UserRealm();
@@ -171,7 +152,8 @@ public class UserListVMTest {
 
         when(mockDataUseCase.getList(any())).thenReturn(observableUserRealm);
 
-        Observable observable = userListVM.incrementPage();
+        userListVM.incrementPage();
+        Observable observable = userListVM.getState();
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).getList(any(GetRequest.class));

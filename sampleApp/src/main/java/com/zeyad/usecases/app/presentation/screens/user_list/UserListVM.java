@@ -65,38 +65,26 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
         return builder.build();
     }
 
-    //    @Override
-    @SuppressWarnings("unused")
-    public void getUsersExperimental() {
-        getState(dataUseCase.getListOffLineFirst(new GetRequest
+    @Override
+    public void getUsers() {
+        dataUseCase.getListOffLineFirst(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, getViewState() != null ? getViewState().getCurrentPage() : 0,
                         getViewState() != null ? getViewState().getLastId() : 0))
                 .build())
                 .map(UserListState::onNext)
-                .compose(applyStates()));
+                .compose(applyStates())
+                .subscribe(getSubscriber());
     }
 
     @Override
-    public Observable<UserListState> getUsers() {
-        return dataUseCase.getListOffLineFirst(new GetRequest
-                .GetRequestBuilder(UserRealm.class, true)
-                .url(String.format(USERS, getViewState() != null ? getViewState().getCurrentPage() : 0,
-                        getViewState() != null ? getViewState().getLastId() : 0))
-                .build())
-                .map(UserListState::onNext)
-                .compose(applyStates());
-    }
-
-    @Override
-    public Observable<UserListState> incrementPage() {
-        if (getViewState() == null)
-            return Observable.error(new IllegalStateException("View State is null!"));
-        return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
+    public void incrementPage() {
+        dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, getViewState().getCurrentPage() + 1, getViewState().getLastId()))
                 .build())
                 .map(UserListState::onNext)
-                .compose(applyStates());
+                .compose(applyStates())
+                .subscribe(getSubscriber());
     }
 
     @Override

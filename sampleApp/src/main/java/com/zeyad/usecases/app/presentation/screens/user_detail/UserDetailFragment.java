@@ -119,8 +119,9 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
 
     @Override
     public void loadData() {
-        userDetailVM.getState(userDetailVM.getRepositories(userDetailState)).compose(bindToLifecycle())
+        userDetailVM.getState().compose(bindToLifecycle())
                 .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
+        userDetailVM.getRepositories(userDetailState);
     }
 
     @Override
