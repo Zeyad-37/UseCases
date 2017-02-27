@@ -2,10 +2,10 @@ package com.zeyad.usecases.data.services.jobs;
 
 import android.content.Context;
 
+import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.PostRequest;
-import com.zeyad.usecases.utils.TestRealmModel;
 
 import org.json.JSONObject;
 import org.junit.Before;

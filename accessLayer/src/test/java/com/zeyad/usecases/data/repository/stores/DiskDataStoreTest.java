@@ -3,9 +3,9 @@ package com.zeyad.usecases.data.repository.stores;
 import android.support.test.rule.BuildConfig;
 
 import com.zeyad.usecases.Config;
+import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
-import com.zeyad.usecases.utils.TestRealmModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

@@ -4,6 +4,7 @@ import android.os.HandlerThread;
 import android.os.Looper;
 
 import com.zeyad.usecases.Config;
+import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.repository.DataRepository;
@@ -13,7 +14,6 @@ import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 import com.zeyad.usecases.domain.repositories.Data;
-import com.zeyad.usecases.utils.TestRealmModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

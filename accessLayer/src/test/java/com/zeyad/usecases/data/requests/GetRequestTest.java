@@ -1,6 +1,6 @@
 package com.zeyad.usecases.data.requests;
 
-import com.zeyad.usecases.utils.TestRealmModel;
+import com.zeyad.usecases.TestRealmModel;
 
 import org.junit.After;
 import org.junit.Before;

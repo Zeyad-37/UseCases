@@ -1,4 +1,4 @@
-package com.zeyad.usecases.utils;
+package com.zeyad.usecases;
 
 import android.support.annotation.NonNull;
 

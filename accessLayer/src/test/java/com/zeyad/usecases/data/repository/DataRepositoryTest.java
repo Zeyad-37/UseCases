@@ -2,13 +2,13 @@ package com.zeyad.usecases.data.repository;
 
 import android.support.test.rule.BuildConfig;
 
+import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.repository.stores.DataStore;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.repository.stores.DiskDataStore;
-import com.zeyad.usecases.utils.TestRealmModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

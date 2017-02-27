@@ -2,7 +2,7 @@ package com.zeyad.usecases.data.db;
 
 import android.support.test.rule.BuildConfig;
 
-import com.zeyad.usecases.utils.TestRealmModel;
+import com.zeyad.usecases.TestRealmModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

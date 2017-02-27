@@ -7,6 +7,7 @@ import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.test.rule.BuildConfig;
 
+import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
@@ -14,7 +15,6 @@ import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.utils.Utils;
-import com.zeyad.usecases.utils.TestRealmModel;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

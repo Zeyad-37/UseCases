@@ -2,22 +2,30 @@ package com.zeyad.usecases.data.network;
 
 import android.support.annotation.NonNull;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
+import rx.Observable;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @RunWith(JUnit4.class)
 public class RestApiTest {
@@ -32,15 +40,46 @@ public class RestApiTest {
     @NonNull
     private MultipartBody.Part mMultipart = MultipartBody.Part.create(mRequestBody);
 
-    @Before
-    public void setUp() throws Exception {
-        mMockedApiConnection = RestApiTestRobot.createMockedApiConnection();
-        mRestApi = getRestApiImplementation(mMockedApiConnection);
+    public static IApiConnection createMockedApiConnection() {
+        final IApiConnection apiConnection = mock(IApiConnection.class);
+        when(apiConnection.dynamicDownload(anyString()))
+                .thenReturn(Observable.just(mock(ResponseBody.class)));
+        when(apiConnection.dynamicGetObject(anyString()))
+                .thenReturn(getObjectObservable());
+        when(apiConnection.dynamicGetObject(anyString(), anyBoolean()))
+                .thenReturn(getObjectObservable());
+        when(apiConnection.dynamicGetList(anyString()))
+                .thenReturn(getListObservable());
+        when(apiConnection.dynamicGetList(anyString(), anyBoolean()))
+                .thenReturn(getListObservable());
+        when(apiConnection.dynamicPost(anyString(), any()))
+                .thenReturn(getObjectObservable());
+        when(apiConnection.dynamicPut(anyString(), any()))
+                .thenReturn(getObjectObservable());
+        when(apiConnection.upload(anyString(), any(Map.class),
+                any(MultipartBody.Part.class)))
+                .thenReturn(getObjectObservable());
+        when(apiConnection.dynamicDelete(anyString(), any()))
+                .thenReturn(getObjectObservable());
+        when(apiConnection.dynamicDelete(anyString(), any(RequestBody.class)))
+                .thenReturn(getObjectObservable());
+        return apiConnection;
     }
 
-    @After
-    public void tearDown() throws Exception {
+    @NonNull
+    private static Observable<List> getListObservable() {
+        return Observable.just(Collections.singletonList(""));
+    }
 
+    @NonNull
+    private static Observable<Object> getObjectObservable() {
+        return Observable.just("");
+    }
+
+    @Before
+    public void setUp() throws Exception {
+        mMockedApiConnection = createMockedApiConnection();
+        mRestApi = getRestApiImplementation(mMockedApiConnection);
     }
 
     @Test
