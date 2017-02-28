@@ -46,16 +46,16 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> implements User
                                         .build())),
                 (userRealm, repos) -> reduce(userDetailState, onNext(userRealm, repos, false)))
                 .compose(applyStates()) : Observable.just(error(new IllegalArgumentException("User name can not be empty")));
-        userDetailModelObservable.subscribe(getSubscriber());
+        userDetailModelObservable.subscribe();
     }
 
     @Override
     public Observable.Transformer<UserDetailState, UserDetailState> applyStates() {
         return listObservable -> listObservable
+                .onErrorResumeNext(throwable -> Observable.just(error(throwable)))
                 .flatMap(userDetailState -> Observable.just(reduce(getViewState(), userDetailState)))
-                .onErrorReturn(throwable -> reduce(getViewState(), error(throwable)))
-                .startWith(reduce(getViewState(), loading()))
-                .doOnEach(notification -> setViewState((UserDetailState) notification.getValue()));
+                .startWith(loading())
+                .doOnEach(notification -> getState().onNext((UserDetailState) notification.getValue()));
     }
 
     @Override

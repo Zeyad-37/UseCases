@@ -236,7 +236,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     @Override
     public void showErrorWithRetry(String message) {
         showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, userRecycler, message, R.string.retry,
-                view -> onResume());
+                view -> loadData());
     }
 
     @Override

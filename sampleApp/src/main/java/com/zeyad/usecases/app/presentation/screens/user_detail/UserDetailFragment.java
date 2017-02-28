@@ -98,6 +98,16 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+//        postponeEnterTransition();
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            setSharedElementEnterTransition(TransitionInflater.from(getContext()).inflateTransition(android.R.transition.move));
+//        }
+//        setSharedElementReturnTransition(null); // supply the correct element for return transition
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.user_detail, container, false);
         ButterKnife.bind(this, rootView);

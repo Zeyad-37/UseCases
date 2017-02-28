@@ -106,13 +106,13 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     @Override
     public void onStart() {
         super.onStart();
-        isNewActivity = false; // TODO: 1/28/17 double check!
+        isNewActivity = false;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        isNewActivity = false; // TODO: 1/28/17 double check!
+        isNewActivity = false;
         loadData();
     }
 

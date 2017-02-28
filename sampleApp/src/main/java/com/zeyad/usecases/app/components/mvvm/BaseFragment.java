@@ -1,6 +1,5 @@
 package com.zeyad.usecases.app.components.mvvm;
 
-import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -40,6 +39,7 @@ public abstract class BaseFragment extends RxFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         initialize();
+        isNewActivity = savedInstanceState == null;
         if (!isNewActivity)
             restoreState(savedInstanceState);
     }
@@ -105,8 +105,8 @@ public abstract class BaseFragment extends RxFragment {
             });
     }
 
-    public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view, String message,
-                                       int actionText, View.OnClickListener onClickListener) {
+    public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,
+                                       String message, int actionText, View.OnClickListener onClickListener) {
         showSnackBarWithAction(typeSnackBar, view, message, getString(actionText), onClickListener);
     }
 
@@ -123,10 +123,6 @@ public abstract class BaseFragment extends RxFragment {
                     SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_ERROR, view, message, duration).show();
                 else throw new NullPointerException("View is null");
             });
-    }
-
-    public Context getApplicationContext() {
-        return getContext().getApplicationContext();
     }
 
     @Override

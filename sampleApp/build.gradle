@@ -80,12 +80,12 @@ android {
 }
 
 ext {
-    supportLibraryVersion = '25.1.1'
+    supportLibraryVersion = '25.2.0'
     retrofitVersion = '2.1.0'
     okhttpVersion = '3.3.1'
     googlePlayVersion = '10.0.1'
     butterKnifeVersion = '8.4.0'
-    rxbindingVersion = '0.4.0'
+    rxbindingVersion = '1.0.1'
     parcelerVersion = '1.1.1'
     leakCanaryVersion = '1.4'
     androidSupportTest = '0.5'

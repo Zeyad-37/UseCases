@@ -148,7 +148,7 @@ public class UserListVMTest {
         userRealmList.add(userRealm);
         Observable<List> observableUserRealm = Observable.just(userRealmList);
 
-        userListVM.setViewState(UserListState.loading());
+//        userListVM.setViewState(UserListState.loading());
 
         when(mockDataUseCase.getList(any())).thenReturn(observableUserRealm);
 

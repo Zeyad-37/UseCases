@@ -40,10 +40,10 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
     @Override
     public Observable.Transformer<UserListState, UserListState> applyStates() {
         return listObservable -> listObservable
+                .startWith(loading())
+                .onErrorResumeNext(throwable -> Observable.just(error(throwable)))
                 .flatMap(userListState -> Observable.just(reduce(getViewState(), userListState)))
-                .onErrorReturn(throwable -> reduce(getViewState(), error(throwable)))
-                .startWith(reduce(getViewState(), loading()))
-                .doOnEach(notification -> setViewState((UserListState) notification.getValue()));
+                .doOnEach(notification -> getState().onNext((UserListState) notification.getValue()));
     }
 
     @Override
@@ -74,7 +74,7 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
                 .build())
                 .map(UserListState::onNext)
                 .compose(applyStates())
-                .subscribe(getSubscriber());
+                .subscribe();
     }
 
     @Override
@@ -84,7 +84,7 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
                 .build())
                 .map(UserListState::onNext)
                 .compose(applyStates())
-                .subscribe(getSubscriber());
+                .subscribe();
     }
 
     @Override
