@@ -1,7 +1,5 @@
 package com.zeyad.usecases.data.repository;
 
-import android.support.test.rule.BuildConfig;
-
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
@@ -15,8 +13,8 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
-import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,8 +34,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@RunWith(RobolectricTestRunner.class)
-@org.robolectric.annotation.Config(constants = BuildConfig.class, sdk = 21)
+@RunWith(JUnit4.class)
 public class DataRepositoryTest {
 
     private DataStore mockDataStore;

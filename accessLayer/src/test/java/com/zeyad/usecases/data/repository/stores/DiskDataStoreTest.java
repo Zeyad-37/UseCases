@@ -1,7 +1,5 @@
 package com.zeyad.usecases.data.repository.stores;
 
-import android.support.test.rule.BuildConfig;
-
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.data.db.DataBaseManager;
@@ -12,8 +10,8 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
-import org.robolectric.RobolectricTestRunner;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -33,18 +31,16 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-@RunWith(RobolectricTestRunner.class)
-@org.robolectric.annotation.Config(constants = BuildConfig.class, sdk = 21)
+@RunWith(JUnit4.class)
 public class DiskDataStoreTest {
 
     private DiskDataStore mDiskDataStore;
     private DataBaseManager dbManager;
-    private IDAOMapper mapper;
 
     @Before
     public void setUp() throws Exception {
         dbManager = mock(DataBaseManager.class);
-        mapper = mock(IDAOMapper.class);
+        IDAOMapper mapper = mock(IDAOMapper.class);
         when(mapper.mapAllToDomain(any(List.class), any(Class.class))).thenReturn(new ArrayList());
         Config.setWithCache(false);
         mDiskDataStore = new DiskDataStore(dbManager, mapper);
