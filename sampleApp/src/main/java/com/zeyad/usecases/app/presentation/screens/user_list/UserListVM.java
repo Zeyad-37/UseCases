@@ -9,10 +9,13 @@ import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func2;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseState.NEXT;
 import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.Builder;
@@ -20,6 +23,8 @@ import static com.zeyad.usecases.app.presentation.screens.user_list.UserListStat
 import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.builder;
 import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.error;
 import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.loading;
+import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.onSearch;
+import static com.zeyad.usecases.app.utils.Constants.URLS.USER;
 import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
 
 /**
@@ -91,7 +96,18 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
     public Observable<UserListState> search(String query) {
         return dataUseCase.queryDisk(realm -> realm.where(UserRealm.class)
                 .beginsWith(UserRealm.LOGIN, query), UserRealm.class)
-                .map(UserListState::onSearch)
+                .zipWith(dataUseCase.getObject(new GetRequest
+                        .GetRequestBuilder(UserRealm.class, true)
+                        .url(String.format(USER, query))
+                        .build())
+                        .onErrorReturn(null), new Func2<List, UserRealm, List>() {
+                    @Override
+                    public List call(List list, UserRealm userRealm) {
+                        list.add(0, userRealm);
+                        return Arrays.asList(new HashSet<>(list));
+                    }
+                })
+                .map(list -> onSearch((List<UserRealm>) list))
                 .compose(applyStates())
                 .observeOn(AndroidSchedulers.mainThread());
     }

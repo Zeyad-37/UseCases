@@ -9,6 +9,7 @@ import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.utils.ModelConverters;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
@@ -43,20 +44,17 @@ public class DiskDataStore implements DataStore {
         else
             return mDataBaseManager.getById(idColumnName, itemId, dataClass)
                     .map(realmModel -> {
+                        try {
+                            if (Config.isWithCache() && !Storo.contains(dataClass.getSimpleName() + itemId))
+                                cacheObject(idColumnName, new JSONObject(gson.toJson(realmModel)),
+                                        dataClass);
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
                         if (domainClass == dataClass)
                             return realmModel;
                         else return mEntityDataMapper.mapToDomain(realmModel, domainClass);
                     });
-    }
-
-    @Override
-    public Observable<?> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                            Class domainClass, Class dataClass, boolean persist, boolean queuable) {
-        return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnNext(o -> {
-                    if (Config.isWithCache())
-                        cacheObject(idColumnName, jsonObject, dataClass);
-                });
     }
 
     @NonNull
@@ -68,6 +66,16 @@ public class DiskDataStore implements DataStore {
                     if (domainClass == dataClass)
                         return realmModels;
                     else return mEntityDataMapper.mapAllToDomain(realmModels, domainClass);
+                });
+    }
+
+    @Override
+    public Observable<?> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                            Class domainClass, Class dataClass, boolean persist, boolean queuable) {
+        return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+                .doOnNext(o -> {
+                    if (Config.isWithCache())
+                        cacheObject(idColumnName, jsonObject, dataClass);
                 });
     }
 
