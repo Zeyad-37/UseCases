@@ -29,14 +29,16 @@ android {
 
     signingConfigs {
         releaseConfig {
-            storeFile file(project.jksDir)
+//            storeFile file(project.jksDir)
+            storeFile file('../keystore/genericusecase.keystore')
             storePassword "generic123"
             keyAlias "Zeyad"
             keyPassword "generic123"
         }
 
         debugConfig {
-            storeFile file(project.jksDir)
+//            storeFile file(project.jksDir)
+            storeFile file('../keystore/genericusecase.keystore')
             storePassword "generic123"
             keyAlias "Zeyad"
             keyPassword "generic123"
@@ -48,7 +50,8 @@ android {
             minifyEnabled false
             shrinkResources false
             debuggable true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/tools/rules-proguard-debug.pro"
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
 //            signingConfig signingConfigs.debugConfig
         }
 
@@ -81,8 +84,6 @@ android {
 
 ext {
     supportLibraryVersion = '25.2.0'
-    retrofitVersion = '2.1.0'
-    okhttpVersion = '3.3.1'
     googlePlayVersion = '10.0.1'
     butterKnifeVersion = '8.4.0'
     rxbindingVersion = '1.0.1'
@@ -144,4 +145,9 @@ dependencies {
 //    testCompile 'org.mockito:mockito-core:2.0.57-beta'
 }
 
-apply from: '../config/quality/quality.gradle'
+//apply from: '../tools/quality/quality.gradle'
+apply from: "$project.rootDir/tools/script-git-version.gradle"
+apply from: "$project.rootDir/tools/script-findbugs.gradle"
+apply from: "$project.rootDir/tools/script-lint.gradle"
+apply from: "$project.rootDir/tools/script-pmd.gradle"
+apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"

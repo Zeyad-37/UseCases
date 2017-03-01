@@ -60,16 +60,18 @@ public class GenericApplication extends Application {
     private void initializeStrickMode() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectDiskReads()
-                    .detectDiskWrites()
-                    .detectNetwork()   // or .detectAll() for all detectable problems
-                    .detectCustomSlowCalls()
+                    .detectAll()
+//                    .detectDiskReads()
+//                    .detectDiskWrites()
+//                    .detectNetwork()   // or .detectAll() for all detectable problems
+//                    .detectCustomSlowCalls()
                     .penaltyLog()
                     .build());
             StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    .detectLeakedClosableObjects()
+                    .detectAll()
+//                    .detectLeakedClosableObjects()
                     .penaltyLog()
-                    .penaltyDeath()
+//                    .penaltyDeath()
                     .build());
         }
     }
