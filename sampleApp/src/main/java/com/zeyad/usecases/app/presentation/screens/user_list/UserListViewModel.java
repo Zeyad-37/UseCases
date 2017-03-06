@@ -15,7 +15,7 @@ interface UserListViewModel {
 
     void getUsers();
 
-    Observable<UserListState> search(String query);
+    Observable search(String query);
 
     Observable deleteCollection(List<Long> selectedItemsIds);
 }

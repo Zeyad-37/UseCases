@@ -1,1 +1,1 @@
-include ':sampleApp', ':accessLayer', ':processor', ':annotations'
+include ':sampleApp', ':usecases', ':processor', ':annotations'

@@ -15,7 +15,6 @@ import java.util.List;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func2;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseState.NEXT;
 import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.Builder;
@@ -47,8 +46,10 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
         return listObservable -> listObservable
                 .startWith(loading())
                 .onErrorResumeNext(throwable -> Observable.just(error(throwable)))
-                .flatMap(userListState -> Observable.just(reduce(getViewState(), userListState)))
-                .doOnEach(notification -> getState().onNext((UserListState) notification.getValue()));
+                .flatMap(userListState -> {
+                    getState().onNext(reduce(getViewState(), userListState));
+                    return Observable.just(getState().getValue());
+                });
     }
 
     @Override
@@ -100,12 +101,9 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
                         .GetRequestBuilder(UserRealm.class, true)
                         .url(String.format(USER, query))
                         .build())
-                        .onErrorReturn(null), new Func2<List, UserRealm, List>() {
-                    @Override
-                    public List call(List list, UserRealm userRealm) {
-                        list.add(0, userRealm);
-                        return Arrays.asList(new HashSet<>(list));
-                    }
+                        .onErrorReturn(null), (list, userRealm) -> {
+                    list.add(0, userRealm);
+                    return Arrays.asList(new HashSet<>(list));
                 })
                 .map(list -> onSearch((List<UserRealm>) list))
                 .compose(applyStates())

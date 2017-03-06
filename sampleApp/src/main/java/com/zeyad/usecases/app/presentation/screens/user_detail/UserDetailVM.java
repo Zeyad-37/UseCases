@@ -9,6 +9,8 @@ import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
+import java.util.List;
+
 import rx.Observable;
 
 import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.builder;
@@ -44,7 +46,8 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> implements User
                                         .GetRequestBuilder(RepoRealm.class, true)
                                         .url(String.format(REPOSITORIES, userLogin))
                                         .build())),
-                (userRealm, repos) -> reduce(userDetailState, onNext(userRealm, repos, false)))
+                (userRealm, repos) -> reduce(userDetailState, onNext(userRealm, (List<RepoRealm>) repos,
+                        false)))
                 .compose(applyStates()) : Observable.just(error(new IllegalArgumentException("User name can not be empty")));
         userDetailModelObservable.subscribe();
     }
@@ -52,10 +55,12 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> implements User
     @Override
     public Observable.Transformer<UserDetailState, UserDetailState> applyStates() {
         return listObservable -> listObservable
-                .onErrorResumeNext(throwable -> Observable.just(error(throwable)))
-                .flatMap(userDetailState -> Observable.just(reduce(getViewState(), userDetailState)))
                 .startWith(loading())
-                .doOnEach(notification -> getState().onNext((UserDetailState) notification.getValue()));
+                .onErrorResumeNext(throwable -> Observable.just(error(throwable)))
+                .flatMap(userDetailState -> {
+                    getState().onNext(reduce(getViewState(), userDetailState));
+                    return Observable.just(getState().getValue());
+                });
     }
 
     @Override

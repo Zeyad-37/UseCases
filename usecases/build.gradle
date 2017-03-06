@@ -4,6 +4,36 @@ apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'android-apt'
 apply plugin: 'maven'
 apply plugin: 'realm-android'
+apply plugin: 'com.jfrog.bintray'
+
+//def siteUrl = "https://github.com/Zeyad-37/UseCases"
+//def gitUrl = "https://github.com/Zeyad-37/UseCases.git"
+version = "1.0.1"
+group = "com.github.zeyad-37"
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'usecases'
+
+    publishedGroupId = 'com.github.zeyad-37'
+    libraryName = 'UseCases'
+    artifact = 'usecases'
+
+    libraryDescription = 'Is a library that is a generic implementation of the Domain and Data layers in a clean architecture.'
+
+    siteUrl = 'https://github.com/Zeyad-37/UseCases'
+    gitUrl = 'https://github.com/Zeyad-37/UseCases.git'
+
+    libraryVersion = version
+
+    developerId = 'zeyad-37'
+    developerName = 'Zeyad Gasser'
+    developerEmail = 'zeyad.gasser@gmail.com'
+
+    licenseName = 'The Apache Software License, Version 2.0'
+    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+    allLicenses = ["Apache-2.0"]
+}
 
 buildscript {
     repositories {
@@ -119,6 +149,76 @@ dependencies {
     testCompile "org.powermock:powermock-module-junit4-rule:$powerMock"
     testCompile "org.powermock:powermock-api-mockito:$powerMock"
     testCompile "org.powermock:powermock-classloading-xstream:$powerMock"
+
+//    compile 'org.jsoup:jsoup:1.8.1'
+}
+
+task createPom {
+    apply plugin: 'maven'
+    description "Generates pom.xml"
+    pom {
+        project {
+            groupId group
+            artifactId 'usecases'
+            version version
+            packaging 'aar'
+        }
+    }.withXml {
+        def dependenciesNode = asNode().appendNode('dependencies')
+
+        configurations.compile.allDependencies.each { dependency ->
+            def dependencyNode = dependenciesNode.appendNode('dependency')
+            dependencyNode.appendNode('groupId', dependency.group)
+            dependencyNode.appendNode('artifactId', dependency.name)
+            dependencyNode.appendNode('version', dependency.version)
+        }
+    }.writeTo("$buildDir/pom.xml")
+}
+
+task sourcesJar(type: Jar) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
+
+bintray {
+    user = 'zeyad-37'
+    key = '24dde90ae6153839f9a6053e9154d03619db2e63'
+
+    configurations = ['archives']
+
+    pkg {
+        repo = "maven"
+        name = 'usecases'
+
+//        websiteUrl = siteUrl
+//        vcsUrl = gitUrl
+        websiteUrl = 'https://github.com/Zeyad-37/UseCases'
+        vcsUrl = 'https://github.com/Zeyad-37/UseCases.git'
+
+        licenses = ["Apache-2.0"]
+        publish = true
+        version {
+            gpg {
+                sign = true //Determines whether to GPG sign the files. The default is false
+                passphrase = 'ziado123' //Optional. The passphrase for GPG signing'
+            }
+        }
+    }
 }
 
 //apply from: '../tools/quality/quality.gradle'
@@ -126,4 +226,7 @@ apply from: "$project.rootDir/tools/script-git-version.gradle"
 apply from: "$project.rootDir/tools/script-findbugs.gradle"
 apply from: "$project.rootDir/tools/script-lint.gradle"
 apply from: "$project.rootDir/tools/script-pmd.gradle"
-apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
+//apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
+
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
+//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'

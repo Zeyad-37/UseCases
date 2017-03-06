@@ -189,6 +189,11 @@ public class CloudDataStore implements DataStore {
             return mRestApi.dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
                     //.compose(applyExponentialBackoff())
+//                    .onErrorResumeNext(throwable -> {
+//                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
+//                            queuePost(POST, url, idColumnName, jsonArray, persist);
+//                        return Observable.just(gson.fromJson(jsonArray.toString(), dataClass));
+//                    })
                     .doOnError(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
                             queuePost(POST, url, idColumnName, jsonArray, persist);

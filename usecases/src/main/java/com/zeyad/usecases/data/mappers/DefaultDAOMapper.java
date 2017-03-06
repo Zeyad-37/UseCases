@@ -5,6 +5,7 @@ package com.zeyad.usecases.data.mappers;
  */
 public class DefaultDAOMapper extends DAOMapper {
     private static DefaultDAOMapper sDefaultDAOMapper;
+
     public DefaultDAOMapper() {
         super();
     }
