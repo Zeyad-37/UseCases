@@ -1,4 +1,5 @@
 [![License](https://img.shields.io/badge/license-Apache%202.0-blue.svg)](https://github.com/Zeyad-37/GenericUseCase/blob/master/LICENSE)
+[![](https://www.jitpack.io/v/zeyad-37/usecases.svg)](https://www.jitpack.io/#zeyad-37/usecases)
 # UseCases
 
 Is a library that is a generic implementation of the Domain and Data layers in a clean architecture.
