@@ -143,9 +143,12 @@ public class CloudDataStore implements DataStore {
             return mRestApi.dynamicPatch(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
                     //.compose(applyExponentialBackoff())
-                    .doOnError(throwable -> {
-                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PATCH, url, idColumnName, jsonObject, persist);
+                            return Observable.empty();
+                        }
+                        return Observable.error(throwable);
                     })
                     .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         });
@@ -166,9 +169,12 @@ public class CloudDataStore implements DataStore {
             return mRestApi.dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
                     //.compose(applyExponentialBackoff())
-                    .doOnError(throwable -> {
-                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(POST, url, idColumnName, jsonObject, persist);
+                            return Observable.empty();
+                        }
+                        return Observable.error(throwable);
                     })
                     .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         });
@@ -189,14 +195,12 @@ public class CloudDataStore implements DataStore {
             return mRestApi.dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
                     //.compose(applyExponentialBackoff())
-//                    .onErrorResumeNext(throwable -> {
-//                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
-//                            queuePost(POST, url, idColumnName, jsonArray, persist);
-//                        return Observable.just(gson.fromJson(jsonArray.toString(), dataClass));
-//                    })
-                    .doOnError(throwable -> {
-                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(POST, url, idColumnName, jsonArray, persist);
+                            return Observable.empty();
+                        }
+                        return Observable.error(throwable);
                     })
                     .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         });
@@ -217,9 +221,12 @@ public class CloudDataStore implements DataStore {
             return mRestApi.dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
                     //.compose(applyExponentialBackoff())
-                    .doOnError(throwable -> {
-                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PUT, url, idColumnName, jsonObject, persist);
+                            return Observable.empty();
+                        }
+                        return Observable.error(throwable);
                     })
                     .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         });
@@ -240,9 +247,12 @@ public class CloudDataStore implements DataStore {
             return mRestApi.dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
                     //.compose(applyExponentialBackoff())
-                    .doOnError(throwable -> {
-                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PUT, url, idColumnName, jsonArray, persist);
+                            return Observable.empty();
+                        }
+                        return Observable.error(throwable);
                     })
                     .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         });
@@ -265,9 +275,12 @@ public class CloudDataStore implements DataStore {
             return mRestApi.dynamicDelete(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
                     //.compose(applyExponentialBackoff())
-                    .doOnError(throwable -> {
-                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PostRequest.DELETE, url, idColumnName, jsonArray, persist);
+                            return Observable.empty();
+                        }
+                        return Observable.error(throwable);
                     });
         });
     }
@@ -296,9 +309,12 @@ public class CloudDataStore implements DataStore {
                 for (Map.Entry<String, Object> entry : parameters.entrySet())
                     map.put(entry.getKey(), utils.createPartFromString(entry.getValue()));
             return mRestApi.dynamicUpload(url, map, MultipartBody.Part.createFormData(key, file.getName(), requestFile))
-                    .doOnError(throwable -> {
-                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queueIOFile(url, file, true, whileCharging, false);
+                            return Observable.empty();
+                        }
+                        return Observable.error(throwable);
                     })
                     .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
         });
@@ -316,9 +332,12 @@ public class CloudDataStore implements DataStore {
             } else if (!utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
             return mRestApi.dynamicDownload(url)
-                    .doOnError(throwable -> {
-                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queueIOFile(url, file, true, whileCharging, false);
+                            return Observable.empty();
+                        }
+                        return Observable.error(throwable);
                     })
                     .map(responseBody -> {
                         try {
@@ -379,7 +398,8 @@ public class CloudDataStore implements DataStore {
     }
 
     private boolean isNetworkFailure(Throwable throwable) {
-        return throwable instanceof UnknownHostException || throwable instanceof ConnectException;
+        return throwable instanceof UnknownHostException || throwable instanceof ConnectException
+                || throwable instanceof IOException;
     }
 
     private boolean isQueuableIfOutOfNetwork(boolean queuable) {
@@ -421,8 +441,7 @@ public class CloudDataStore implements DataStore {
                 .build());
     }
 
-    private void queuePost(String method, String url, String idColumnName, JSONArray jsonArray,
-                           boolean persist) {
+    private void queuePost(String method, String url, String idColumnName, JSONArray jsonArray, boolean persist) {
         queuePostCore(new PostRequest.PostRequestBuilder(null, persist)
                 .idColumnName(idColumnName)
                 .payLoad(jsonArray)
@@ -431,8 +450,7 @@ public class CloudDataStore implements DataStore {
                 .build());
     }
 
-    private void queuePost(String method, String url, String idColumnName, JSONObject jsonObject,
-                           boolean persist) {
+    private void queuePost(String method, String url, String idColumnName, JSONObject jsonObject, boolean persist) {
         queuePostCore(new PostRequest.PostRequestBuilder(null, persist)
                 .idColumnName(idColumnName)
                 .payLoad(jsonObject)

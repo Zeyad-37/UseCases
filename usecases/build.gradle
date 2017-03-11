@@ -4,7 +4,9 @@ apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'android-apt'
 apply plugin: 'maven'
 apply plugin: 'realm-android'
+
 apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
 
 //def siteUrl = "https://github.com/Zeyad-37/UseCases"
 //def gitUrl = "https://github.com/Zeyad-37/UseCases.git"

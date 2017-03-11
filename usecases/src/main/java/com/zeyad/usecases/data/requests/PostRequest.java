@@ -13,8 +13,6 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-import rx.Subscriber;
-
 /**
  * @author zeyad on 7/29/16.
  */
@@ -33,7 +31,7 @@ public class PostRequest implements Parcelable {
     };
     private String url, idColumnName, method;
     private Class dataClass, presentationClass;
-    private boolean persist, queuable;
+    private boolean onWifi, whileCharging, persist, queuable;
     private JSONObject jsonObject;
     private JSONArray jsonArray;
     private HashMap<String, Object> keyValuePairs;
@@ -44,6 +42,8 @@ public class PostRequest implements Parcelable {
         dataClass = postRequestBuilder.dataClass;
         presentationClass = postRequestBuilder.presentationClass;
         persist = postRequestBuilder.persist;
+        onWifi = postRequestBuilder.onWifi;
+        whileCharging = postRequestBuilder.whileCharging;
         queuable = postRequestBuilder.queuable;
         keyValuePairs = postRequestBuilder.keyValuePairs;
         jsonObject = postRequestBuilder.jsonObject;
@@ -53,7 +53,7 @@ public class PostRequest implements Parcelable {
         object = postRequestBuilder.object;
     }
 
-    public PostRequest(Subscriber subscriber, String idColumnName, String url, JSONObject keyValuePairs,
+    public PostRequest(String idColumnName, String url, JSONObject keyValuePairs,
                        Class presentationClass, Class dataClass, boolean persist) {
         this.idColumnName = idColumnName;
         jsonObject = keyValuePairs;
@@ -64,7 +64,7 @@ public class PostRequest implements Parcelable {
     }
 
     // for test
-    public PostRequest(Subscriber subscriber, String idColumnName, String url, JSONArray keyValuePairs,
+    public PostRequest(String idColumnName, String url, JSONArray keyValuePairs,
                        Class presentationClass, Class dataClass, boolean persist) {
         this.idColumnName = idColumnName;
         jsonArray = keyValuePairs;
@@ -74,7 +74,7 @@ public class PostRequest implements Parcelable {
         this.url = url;
     }
 
-    public PostRequest(Subscriber subscriber, String idColumnName, String url, HashMap<String, Object> keyValuePairs,
+    public PostRequest(String idColumnName, String url, HashMap<String, Object> keyValuePairs,
                        Class presentationClass, Class dataClass, boolean persist) {
         this.idColumnName = idColumnName;
         this.keyValuePairs = keyValuePairs;
@@ -91,6 +91,8 @@ public class PostRequest implements Parcelable {
         this.dataClass = (Class) in.readSerializable();
         this.presentationClass = (Class) in.readSerializable();
         this.persist = in.readByte() != 0;
+        this.whileCharging = in.readByte() != 0;
+        this.onWifi = in.readByte() != 0;
         this.queuable = in.readByte() != 0;
         this.jsonObject = in.readParcelable(JSONObject.class.getClassLoader());
         this.jsonArray = in.readParcelable(JSONArray.class.getClassLoader());
@@ -181,6 +183,8 @@ public class PostRequest implements Parcelable {
         dest.writeSerializable(this.dataClass);
         dest.writeSerializable(this.presentationClass);
         dest.writeByte(this.persist ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.whileCharging ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.onWifi ? (byte) 1 : (byte) 0);
         dest.writeByte(this.queuable ? (byte) 1 : (byte) 0);
         dest.writeParcelable((Parcelable) this.jsonObject, flags);
         dest.writeParcelable((Parcelable) this.jsonArray, flags);
@@ -195,7 +199,7 @@ public class PostRequest implements Parcelable {
         HashMap<String, Object> keyValuePairs;
         String url, idColumnName, method;
         Class dataClass, presentationClass;
-        boolean persist, queuable;
+        boolean persist, queuable, onWifi, whileCharging;
 
         public PostRequestBuilder(Class dataClass, boolean persist) {
             this.dataClass = dataClass;
@@ -215,8 +219,20 @@ public class PostRequest implements Parcelable {
         }
 
         @NonNull
-        public PostRequestBuilder queuable(boolean queuable) {
-            this.queuable = queuable;
+        public PostRequestBuilder queuable() {
+            queuable = true;
+            return this;
+        }
+
+        @NonNull
+        public PostRequestBuilder onWifi() {
+            onWifi = true;
+            return this;
+        }
+
+        @NonNull
+        public PostRequestBuilder whileCharging() {
+            whileCharging = true;
             return this;
         }
 

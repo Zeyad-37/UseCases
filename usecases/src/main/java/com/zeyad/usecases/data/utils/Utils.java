@@ -9,6 +9,7 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.facebook.network.connectionclass.ConnectionClassManager;
 import com.facebook.network.connectionclass.ConnectionQuality;
@@ -127,6 +128,7 @@ public class Utils {
                 .setConstraints(Constraint.ON_ANY_NETWORK, Constraint.DEVICE_CHARGING)
                 .setExtras(extras)
                 .build());
+        Log.d("FBJDQ", postRequest.getMethod() + " request is queued successfully!");
     }
 
     public void queueFileIOCore(FirebaseJobDispatcher dispatcher, boolean isDownload,
@@ -146,5 +148,6 @@ public class Utils {
                         fileIORequest.isWhileCharging() ? Constraint.DEVICE_CHARGING : 0)
                 .setExtras(extras)
                 .build());
+        Log.d("FBJDQ", String.format("%s file request is queued successfully!", isDownload ? "Download" : "Upload"));
     }
 }

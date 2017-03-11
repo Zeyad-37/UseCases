@@ -26,7 +26,6 @@ import org.mockito.Mockito;
 import java.util.HashMap;
 
 import rx.Observable;
-import rx.observers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -144,7 +143,7 @@ public class DataUseCaseTest {
         when(mData.postObjectDynamically(anyString(), anyString(), any(JSONObject.class), any(Class.class),
                 any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        mDataUseCase.postObject(new PostRequest(new TestSubscriber(), "", "",
+        mDataUseCase.postObject(new PostRequest("", "",
                 new JSONArray(), Object.class, Object.class, false));
 
         verify(mData, times(1)).postObjectDynamically(anyString(), anyString(), any(JSONObject.class),
@@ -156,8 +155,7 @@ public class DataUseCaseTest {
         when(mData.putObjectDynamically(anyString(), anyString(), any(JSONObject.class), any(Class.class),
                 any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        mDataUseCase.putObject(new PostRequest(new TestSubscriber(), "", "",
-                new JSONArray(), Object.class, Object.class, false));
+        mDataUseCase.putObject(new PostRequest("", "", new JSONArray(), Object.class, Object.class, false));
 
         verify(mData, times(1)).putObjectDynamically(anyString(), anyString(), any(JSONObject.class),
                 any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
@@ -167,7 +165,8 @@ public class DataUseCaseTest {
     public void testPostList() {
         when(mData.postListDynamically(anyString(), anyString(), any(JSONArray.class), any(Class.class),
                 any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
-        mDataUseCase.postList(new PostRequest(new TestSubscriber(), "", "", HASH_MAP, Object.class,
+
+        mDataUseCase.postList(new PostRequest("", "", HASH_MAP, Object.class,
                 Object.class, false));
 
         verify(mData, times(1)).postListDynamically(anyString(), anyString(), any(JSONArray.class),
@@ -179,7 +178,7 @@ public class DataUseCaseTest {
         when(mData.putListDynamically(anyString(), anyString(), any(JSONArray.class), any(Class.class),
                 any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        mDataUseCase.putList(new PostRequest(new TestSubscriber(), "", "", HASH_MAP, Object.class,
+        mDataUseCase.putList(new PostRequest("", "", HASH_MAP, Object.class,
                 Object.class, false));
 
         verify(mData, times(1)).putListDynamically(anyString(), anyString(), any(JSONArray.class),
@@ -200,7 +199,7 @@ public class DataUseCaseTest {
         when(mData.deleteListDynamically(anyString(), any(JSONArray.class), any(Class.class),
                 any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        mDataUseCase.deleteCollection(new PostRequest(new TestSubscriber(), "", "", HASH_MAP, Object.class,
+        mDataUseCase.deleteCollection(new PostRequest("", "", HASH_MAP, Object.class,
                 Object.class, false));
 
         verify(mData, times(1)).deleteListDynamically(anyString(), any(JSONArray.class),
@@ -211,7 +210,7 @@ public class DataUseCaseTest {
     public void testDeleteAll_ifDataRepositoryCorrectMethodIsCalled_whenPostRequestIsPassed() {
         when(mData.deleteAllDynamically(anyString(), any(Class.class), anyBoolean())).thenReturn(observable);
 
-        mDataUseCase.deleteAll(new PostRequest(new TestSubscriber(), "", "", HASH_MAP, Object.class,
+        mDataUseCase.deleteAll(new PostRequest("", "", HASH_MAP, Object.class,
                 Object.class, false));
 
         verify(mData, times(1)).deleteAllDynamically(anyString(), any(Class.class), anyBoolean());

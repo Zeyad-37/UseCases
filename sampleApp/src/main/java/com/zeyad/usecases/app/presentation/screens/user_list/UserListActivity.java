@@ -255,7 +255,8 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                 .debounce(200, TimeUnit.MILLISECONDS)
                 .onBackpressureLatest()
                 .onErrorResumeNext(Observable.empty()))
-                .flatMap(query -> userListVM.search(query.toString()))
+                .flatMap(query -> userListVM.search(query.toString())
+                        .onErrorResumeNext(throwable -> Observable.empty()))
                 .compose(bindToLifecycle())
                 .subscribe(new BaseSubscriber<>(this, NO_ERROR));
         return super.onCreateOptionsMenu(menu);
