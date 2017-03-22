@@ -1,6 +1,9 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
+import android.util.Log;
+
 import com.zeyad.usecases.app.components.mvvm.BaseState;
+import com.zeyad.usecases.app.utils.Utils;
 
 import org.parceler.Parcel;
 
@@ -11,7 +14,7 @@ import java.util.List;
  */
 @Parcel
 public class UserListState extends BaseState {
-    public static final String SEARCH = "search";
+    private static final String SEARCH = "search";
     final List<UserRealm> users;
     final int yScroll;
     final int currentPage;
@@ -26,7 +29,7 @@ public class UserListState extends BaseState {
     }
 
     private UserListState(Builder builder) {
-        super(builder.isLoading, builder.error, builder.state);
+        super(false, null, builder.state);
         users = builder.users;
         yScroll = builder.yScroll;
         currentPage = builder.currentPage;
@@ -49,7 +52,7 @@ public class UserListState extends BaseState {
                 .build();
     }
 
-    public static UserListState onSearch(List<UserRealm> users) {
+    static UserListState onSearch(List<UserRealm> users) {
         return UserListState.builder(SEARCH)
                 .setUsers(users)
                 .setError(null)
@@ -69,24 +72,55 @@ public class UserListState extends BaseState {
         return new Builder(state);
     }
 
-    public static Builder builder(UserListState state) {
+    private static Builder builder(UserListState state) {
         return new Builder(state);
     }
 
-    public List<UserRealm> getUsers() {
+    List<UserRealm> getUsers() {
         return users;
     }
 
-    public int getYScroll() {
+    int getYScroll() {
         return yScroll;
     }
 
-    public int getCurrentPage() {
+    int getCurrentPage() {
         return currentPage;
     }
 
-    public long getLastId() {
+    long getLastId() {
         return lastId;
+    }
+
+    @Override
+    public BaseState reduce(BaseState previous) {
+        if (previous == null)
+            return this;
+        if (previous instanceof UserListState) {
+            UserListState oldState = (UserListState) previous;
+            Log.d("List reduce states:", previous.getState() + " -> " + getState());
+            Builder builder = builder(this);
+            builder.setyScroll(!Utils.isNotEmpty(oldState.getUsers()) ? 0 :
+                    getYScroll() == 0 ?
+                            oldState.getYScroll() : getYScroll())
+                    .setCurrentPage(getState().equals(NEXT) ? oldState.getCurrentPage() + 1 :
+                            getCurrentPage())
+                    .setUsers(getState().equals(SEARCH) ? getUsers() :
+                            Utils.isNotEmpty(getUsers()) ? Utils.union(oldState.getUsers(),
+                                    getUsers()) : oldState.getUsers())
+                    .setLastId(builder.users != null && builder.users.size() > 0 ?
+                            builder.users.get(builder.users.size() - 1).getId() : 0);
+            return builder.build();
+        }
+        return builder(this)
+                .setyScroll(getYScroll())
+                .setCurrentPage(getCurrentPage())
+                .setUsers(getUsers())
+                .setLastId(getUsers() != null && getUsers().size() > 0 ?
+                        getUsers().get(getUsers().size() - 1).getId() : 0)
+                .setError(previous.getError())
+                .setIsLoading(previous.isLoading())
+                .build();
     }
 
     static class Builder {
@@ -97,11 +131,11 @@ public class UserListState extends BaseState {
         String state;
         long lastId;
 
-        public Builder(String value) {
+        Builder(String value) {
             state = value;
         }
 
-        public Builder(UserListState userListState) {
+        Builder(UserListState userListState) {
             state = userListState.getState();
             error = userListState.getError();
             isLoading = userListState.isLoading();

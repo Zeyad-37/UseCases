@@ -110,7 +110,7 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.user_detail, container, false);
-        ButterKnife.bind(this, rootView);
+        unbinder = ButterKnife.bind(this, rootView);
         setupRecyclerView();
         return rootView;
     }

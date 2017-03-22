@@ -11,6 +11,8 @@ import com.zeyad.usecases.app.components.navigation.INavigator;
 import com.zeyad.usecases.app.components.navigation.NavigatorFactory;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
+import butterknife.Unbinder;
+
 /**
  * @author zeyad on 11/28/16.
  */
@@ -19,6 +21,7 @@ public abstract class BaseFragment extends RxFragment {
     public INavigator navigator;
     public IRxEventBus rxEventBus;
     public boolean isNewActivity;
+    public Unbinder unbinder;
 
     public BaseFragment() {
         super();
@@ -30,18 +33,27 @@ public abstract class BaseFragment extends RxFragment {
         setRetainInstance(true);
         navigator = NavigatorFactory.getInstance();
         rxEventBus = RxEventBusFactory.getInstance();
+        initialize();
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         isNewActivity = savedInstanceState == null;
         if (!isNewActivity)
             restoreState(savedInstanceState);
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        initialize();
-        isNewActivity = savedInstanceState == null;
-        if (!isNewActivity)
-            restoreState(savedInstanceState);
+    public void onResume() {
+        super.onResume();
+        loadData();
+    }
+
+    @Override
+    public void onDestroyView() {
+        unbinder.unbind();
+        super.onDestroyView();
     }
 
     @Override
@@ -123,17 +135,5 @@ public abstract class BaseFragment extends RxFragment {
                     SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_ERROR, view, message, duration).show();
                 else throw new NullPointerException("View is null");
             });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        isNewActivity = false;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        loadData();
     }
 }

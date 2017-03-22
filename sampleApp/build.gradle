@@ -50,14 +50,14 @@ android {
             debuggable true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), "$project.rootDir/tools/rules-proguard-debug.pro"
 //            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.debugConfig
+//            signingConfig signingConfigs.debugConfig
         }
 
         release {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro', 'proguard-fresco.pro'
-            signingConfig signingConfigs.releaseConfig
+//            signingConfig signingConfigs.releaseConfig
         }
     }
 

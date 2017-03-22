@@ -16,6 +16,14 @@ public class BaseState {
         this.state = state;
     }
 
+    public static BaseState loading() {
+        return new BaseState(true, null, LOADING);
+    }
+
+    public static BaseState error(Throwable error) {
+        return new BaseState(false, error, ERROR);
+    }
+
     public boolean isLoading() {
         return isLoading;
     }
@@ -26,5 +34,9 @@ public class BaseState {
 
     public String getState() {
         return state;
+    }
+
+    public BaseState reduce(BaseState previous) {
+        return this;
     }
 }

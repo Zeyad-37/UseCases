@@ -102,7 +102,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     @Override
     public void setupUI() {
         setContentView(R.layout.activity_user_list);
-        ButterKnife.bind(this);
+        unbinder = ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
         setupRecyclerView();
@@ -214,8 +214,6 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
                     userListState = new UserListState.Builder(userListState.getState())
                             .setUsers(userListState.getUsers())
-                            .setError(userListState.getError())
-                            .setIsLoading(userListState.isLoading())
                             .setCurrentPage(userListState.getCurrentPage() + 1)
                             .setyScroll(firstVisibleItemPosition)
                             .build();

@@ -17,6 +17,8 @@ import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
 import java.util.List;
 
+import butterknife.Unbinder;
+
 /**
  * @author zeyad on 11/28/16.
  */
@@ -25,6 +27,7 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     public INavigator navigator;
     public IRxEventBus rxEventBus;
     public boolean isNewActivity;
+    public Unbinder unbinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +70,30 @@ public abstract class BaseActivity extends RxAppCompatActivity {
      */
     public abstract void restoreState(Bundle outState);
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadData();
+    }
+
+    @Override
+    protected void onPause() {
+        saveState();
+        super.onPause();
+    }
+
+    @Override
+    protected void onStop() {
+        saveState();
+        super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        unbinder.unbind();
+        super.onDestroy();
+    }
+
     /**
      * Initialize any objects or any required dependencies.
      */
@@ -101,19 +128,6 @@ public abstract class BaseActivity extends RxAppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .remove(getSupportFragmentManager().findFragmentByTag(tag))
                 .commit();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        isNewActivity = false;
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        isNewActivity = false;
-        loadData();
     }
 
     public void showToastMessage(String message) {

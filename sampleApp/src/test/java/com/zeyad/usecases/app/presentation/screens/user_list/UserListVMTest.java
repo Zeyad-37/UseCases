@@ -14,9 +14,6 @@ import java.util.List;
 import rx.Observable;
 import rx.subjects.BehaviorSubject;
 
-import static com.zeyad.usecases.app.components.mvvm.BaseState.ERROR;
-import static com.zeyad.usecases.app.components.mvvm.BaseState.LOADING;
-import static com.zeyad.usecases.app.components.mvvm.BaseState.NEXT;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -106,42 +103,6 @@ public class UserListVMTest {
     }
 
     @Test
-    public void reduceFromLoadingToOnNext() throws Exception {
-        UserListState previous = UserListState.loading();
-        UserListState changes = UserListState.onNext(new ArrayList<>());
-        UserListState result = userListVM.reduce(previous, changes);
-
-        assertEquals(result.getState(), NEXT);
-    }
-
-    @Test
-    public void reduceFromLoadingToError() throws Exception {
-        UserListState previous = UserListState.loading();
-        UserListState changes = UserListState.error(new Throwable());
-        UserListState result = userListVM.reduce(previous, changes);
-
-        assertEquals(result.getState(), ERROR);
-    }
-
-    @Test
-    public void reduceFromOnNextToLoading() throws Exception {
-        UserListState previous = UserListState.onNext(new ArrayList<>());
-        UserListState changes = UserListState.loading();
-        UserListState result = userListVM.reduce(previous, changes);
-
-        assertEquals(result.getState(), LOADING);
-    }
-
-    @Test
-    public void reduceFromOnNextToOnNext() throws Exception {
-        UserListState previous = UserListState.onNext(new ArrayList<>());
-        UserListState changes = UserListState.onNext(new ArrayList<>());
-        UserListState result = userListVM.reduce(previous, changes);
-
-        assertEquals(result.getState(), NEXT);
-    }
-
-    @Test
     public void incrementPageShouldReturnNextPageObservable() throws Exception {
         UserRealm userRealm = new UserRealm();
         userRealm.setLogin("testUser");
@@ -150,7 +111,7 @@ public class UserListVMTest {
         userRealmList.add(userRealm);
         Observable<List> observableUserRealm = Observable.just(userRealmList);
 
-        userListVM.getState().onNext(UserListState.loading());
+        userListVM.getState().onNext(UserListState.onNext(null));
 
         when(mockDataUseCase.getList(any())).thenReturn(observableUserRealm);
 

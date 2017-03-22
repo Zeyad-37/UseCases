@@ -56,7 +56,7 @@ public class UserDetailActivity extends BaseActivity {
     @Override
     public void setupUI() {
         setContentView(R.layout.activity_user_detail);
-        ButterKnife.bind(this);
+        unbinder = ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {

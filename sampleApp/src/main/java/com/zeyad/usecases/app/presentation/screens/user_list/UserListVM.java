@@ -1,9 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
-import android.util.Log;
-
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
-import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
@@ -16,12 +13,6 @@ import java.util.List;
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 
-import static com.zeyad.usecases.app.components.mvvm.BaseState.NEXT;
-import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.Builder;
-import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.SEARCH;
-import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.builder;
-import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.error;
-import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.loading;
 import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.onSearch;
 import static com.zeyad.usecases.app.utils.Constants.URLS.USER;
 import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
@@ -39,36 +30,6 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
 
     UserListVM(IDataUseCase dataUseCase) {
         this.dataUseCase = dataUseCase;
-    }
-
-    @Override
-    public Observable.Transformer<UserListState, UserListState> applyStates() {
-        return listObservable -> listObservable
-                .startWith(loading())
-                .onErrorResumeNext(throwable -> Observable.just(error(throwable)))
-                .flatMap(userListState -> {
-                    getState().onNext(reduce(getViewState(), userListState));
-                    return Observable.just(getState().getValue());
-                });
-    }
-
-    @Override
-    public UserListState reduce(UserListState previous, UserListState changes) {
-        if (previous == null)
-            return changes;
-        Log.d("List reduce states:", previous.getState() + " -> " + changes.getState());
-        Builder builder = builder(changes);
-        builder.setyScroll(!Utils.isNotEmpty(previous.getUsers()) ? 0 :
-                changes.getYScroll() == 0 ?
-                        previous.getYScroll() : changes.getYScroll())
-                .setCurrentPage(changes.getState().equals(NEXT) ? previous.getCurrentPage() + 1 :
-                        changes.getCurrentPage())
-                .setUsers(changes.getState().equals(SEARCH) ? changes.getUsers() :
-                        Utils.isNotEmpty(changes.getUsers()) ? Utils.union(previous.getUsers(),
-                                changes.getUsers()) : previous.getUsers())
-                .setLastId(builder.users != null && builder.users.size() > 0 ?
-                        builder.users.get(builder.users.size() - 1).getId() : 0);
-        return builder.build();
     }
 
     @Override
