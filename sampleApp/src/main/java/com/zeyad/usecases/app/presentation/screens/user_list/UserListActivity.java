@@ -23,6 +23,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.jakewharton.rxbinding.support.v7.widget.RxSearchView;
+import com.jakewharton.rxbinding.view.RxMenuItem;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
@@ -46,10 +47,10 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
+import rx.exceptions.OnErrorNotImplementedException;
 
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.NO_ERROR;
-import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.INITIAL;
 
 /**
  * An activity representing a list of Repos. This activity
@@ -61,7 +62,7 @@ import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetail
  */
 public class UserListActivity extends BaseActivity implements ActionMode.Callback, LoadDataView<UserListState> {
     public static final int PAGE_SIZE = 6;
-    private static final String USER_LIST_MODEL = "userListState";
+    private static final String USER_LIST_MODEL = "viewState";
     @BindView(R.id.imageView_avatar)
     public ImageView imageViewAvatar;
     UserListViewModel userListVM;
@@ -71,11 +72,11 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     LinearLayout loaderLayout;
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
-    GenericRecyclerViewAdapter usersAdapter;
+    private GenericRecyclerViewAdapter usersAdapter;
     private boolean twoPane;
+    private UserListState userListState;
     private ActionMode actionMode;
     private String currentFragTag;
-    private UserListState userListState;
 
     public static Intent getCallingIntent(Context context) {
         return new Intent(context, UserListActivity.class);
@@ -112,15 +113,14 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
 
     @Override
     public void loadData() {
-        userListVM.getState().compose(bindToLifecycle())
+        userListVM.getUsers().compose(bindToLifecycle())
                 .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
-        userListVM.getUsers();
     }
 
     @Override
-    public void renderState(UserListState userListModel) {
-        this.userListState = userListModel;
-        List<UserRealm> users = userListModel.getUsers();
+    public void renderState(UserListState state) {
+        userListState = state;
+        List<UserRealm> users = userListState.getUsers();
         if (Utils.isNotEmpty(users)) {
             List<ItemInfo> itemInfoList = new ArrayList<>(users.size());
             UserRealm userRealm;
@@ -134,7 +134,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
             diffResult.dispatchUpdatesTo(usersAdapter);
 
             usersAdapter.setDataList(itemInfoList);
-            userRecycler.smoothScrollToPosition(userListModel.getYScroll());
+            userRecycler.smoothScrollToPosition(state.getYScroll());
         }
     }
 
@@ -161,7 +161,7 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                 toggleSelection(position);
             } else if (itemInfo.getData() instanceof UserRealm) {
                 UserRealm userModel = (UserRealm) itemInfo.getData();
-                UserDetailState userDetailState = UserDetailState.builder(INITIAL)
+                UserDetailState userDetailState = UserDetailState.builder()
                         .setUser(userModel)
                         .setIsTwoPane(twoPane)
                         .build();
@@ -212,10 +212,11 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                 int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                 if ((layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
-                    userListState = new UserListState.Builder(userListState.getState())
+                    // TODO: 4/2/17 revisit!
+                    userListState = new UserListState.Builder(userListState)
                             .setUsers(userListState.getUsers())
                             .setCurrentPage(userListState.getCurrentPage() + 1)
-                            .setyScroll(firstVisibleItemPosition)
+                            .setYScroll(firstVisibleItemPosition)
                             .build();
                     userListVM.incrementPage();
                 }
@@ -261,12 +262,12 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     }
 
     /**
-     * Toggle the selection state of an item.
+     * Toggle the selection viewState of an item.
      * <p>
      * If the item was the last one in the selection and is unselected, the selection is stopped.
      * Note that the selection must already be started (actionMode must not be null).
      *
-     * @param position Position of the item to toggle the selection state
+     * @param position Position of the item to toggle the selection viewState
      */
     private boolean toggleSelection(int position) {
         try {
@@ -304,13 +305,18 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete_item:
-                userListVM.deleteCollection(usersAdapter.getSelectedItemsIds())
+                RxMenuItem.clicks(item)
+                        .map(click -> new DeleteUsersEvent(usersAdapter.getSelectedItemsIds()))
+                        .compose(deleteUsersEvents -> deleteUsersEvents
+                                .flatMap(deleteUsersEvent -> userListVM
+                                        .deleteCollection(deleteUsersEvent.getSelectedItemsIds())))
                         .compose(bindToLifecycle())
                         .subscribe(o -> {
                             usersAdapter.removeItemsById(usersAdapter.getSelectedItemsIds());
                             mode.finish();
-
-                        }, throwable -> ((Throwable) throwable).printStackTrace());
+                        }, throwable -> {
+                            throw new OnErrorNotImplementedException(throwable);
+                        });
                 return true;
             default:
                 return false;
@@ -327,4 +333,12 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
         actionMode = null;
         toolbar.setVisibility(View.VISIBLE);
     }
+
+//    private <E extends BaseEvent, S extends ViewState> void flux(android.support.v4.util.Pair<Observable, Class> result) {
+//        Observable.Transformer<E, S> eventResult = events -> events.flatMap(event -> result.first);
+//        Observable.Transformer<E, S> submitUI =
+//                deleteUsersEventObservable -> deleteUsersEventObservable.publish(shared -> Observable
+//                        .merge(shared.ofType(DeleteUsersEvent.class).compose(eventResult),
+//                                shared.ofType(DeleteUsersEvent.class).compose(delete)));
+//    }
 }

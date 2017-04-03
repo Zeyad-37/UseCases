@@ -1,6 +1,7 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
+import com.zeyad.usecases.app.components.mvvm.ViewState;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
@@ -33,29 +34,29 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
     }
 
     @Override
-    public void getUsers() {
-        dataUseCase.getListOffLineFirst(new GetRequest
+    public Observable<ViewState> getUsers() {
+        return dataUseCase.getListOffLineFirst(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
-                .url(String.format(USERS, getViewState() != null ? getViewState().getCurrentPage() : 0,
-                        getViewState() != null ? getViewState().getLastId() : 0))
+                .url(String.format(USERS, getViewStateBundle() != null ?
+                                getViewStateBundle().getCurrentPage() : 0,
+                        getViewStateBundle() != null ? getViewStateBundle().getLastId() : 0))
                 .build())
                 .map(UserListState::onNext)
-                .compose(applyStates())
-                .subscribe();
+                .compose(stateTransformer());
     }
 
     @Override
-    public void incrementPage() {
-        dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
-                .url(String.format(USERS, getViewState().getCurrentPage() + 1, getViewState().getLastId()))
+    public Observable<ViewState> incrementPage() {
+        return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
+                .url(String.format(USERS, getViewStateBundle().getCurrentPage() + 1,
+                        getViewStateBundle().getLastId()))
                 .build())
                 .map(UserListState::onNext)
-                .compose(applyStates())
-                .subscribe();
+                .compose(stateTransformer());
     }
 
     @Override
-    public Observable<UserListState> search(String query) {
+    public Observable<ViewState> search(String query) {
         return dataUseCase.queryDisk(realm -> realm.where(UserRealm.class)
                 .beginsWith(UserRealm.LOGIN, query), UserRealm.class)
                 .zipWith(dataUseCase.getObject(new GetRequest
@@ -67,14 +68,15 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
                     return Arrays.asList(new HashSet<>(list));
                 })
                 .map(list -> onSearch((List<UserRealm>) list))
-                .compose(applyStates())
+                .compose(stateTransformer())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
-    public Observable deleteCollection(List<Long> selectedItemsIds) {
+    public Observable<ViewState> deleteCollection(List<Long> selectedItemsIds) {
         return dataUseCase.deleteCollection(new PostRequest.PostRequestBuilder(UserRealm.class, true)
                 .payLoad(selectedItemsIds)
-                .build());
+                .build())
+                .compose(stateTransformer());
     }
 }

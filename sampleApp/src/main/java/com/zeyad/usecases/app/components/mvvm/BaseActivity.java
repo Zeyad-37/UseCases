@@ -57,16 +57,16 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     }
 
     /**
-     * To implement! Saves the state of the current view. Do not return null!
+     * To implement! Saves the viewState of the current view. Do not return null!
      *
      * @return {@link Bundle}
      */
     public abstract Bundle saveState();
 
     /**
-     * To implement! Restores the state of the view.
+     * To implement! Restores the viewState of the view.
      *
-     * @param outState a {@link Bundle} with saved state
+     * @param outState a {@link Bundle} with saved viewState
      */
     public abstract void restoreState(Bundle outState);
 
@@ -166,7 +166,7 @@ public abstract class BaseActivity extends RxAppCompatActivity {
     }
 
     /**
-     * Shows a {@link android.support.design.widget.Snackbar} error message.
+     * Shows a {@link android.support.design.widget.Snackbar} errorState message.
      *
      * @param message  An string representing a message to be shown.
      * @param duration Visibility duration.

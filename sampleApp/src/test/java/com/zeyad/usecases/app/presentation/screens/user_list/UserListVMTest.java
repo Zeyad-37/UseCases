@@ -1,5 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
+import com.zeyad.usecases.app.components.mvvm.ViewState;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
@@ -12,7 +13,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
-import rx.subjects.BehaviorSubject;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -36,6 +36,8 @@ public class UserListVMTest {
         userListVM = new UserListVM(mockDataUseCase);
     }
 
+    // TODO: 3/31/17 Add value assertions!
+
     @Test
     public void returnUserListStateObservableWhenGetUserIsCalled() {
         UserRealm userRealm = new UserRealm();
@@ -48,8 +50,7 @@ public class UserListVMTest {
         when(mockDataUseCase.getListOffLineFirst(any()))
                 .thenReturn(observableUserRealm);
 
-        userListVM.getUsers();
-        BehaviorSubject observable = userListVM.getState();
+        Observable observable = userListVM.getUsers();
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).getListOffLineFirst(any(GetRequest.class));
@@ -71,7 +72,7 @@ public class UserListVMTest {
         verify(mockDataUseCase, times(1)).deleteCollection(any(PostRequest.class));
 
         // Assert return type
-        assertEquals(Boolean.class, observable.toBlocking().first().getClass());
+        assertEquals(ViewState.class, observable.toBlocking().first().getClass());
     }
 
     @Test
@@ -87,7 +88,7 @@ public class UserListVMTest {
         when(mockDataUseCase.queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class)))
                 .thenReturn(observableUserRealm);
 
-        Observable<UserListState> observable = userListVM.search("m");
+        Observable<ViewState> observable = userListVM.search("m");
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class),
@@ -111,12 +112,9 @@ public class UserListVMTest {
         userRealmList.add(userRealm);
         Observable<List> observableUserRealm = Observable.just(userRealmList);
 
-        userListVM.getState().onNext(UserListState.onNext(null));
-
         when(mockDataUseCase.getList(any())).thenReturn(observableUserRealm);
 
-        userListVM.incrementPage();
-        BehaviorSubject observable = userListVM.getState();
+        Observable observable = userListVM.incrementPage();
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).getList(any(GetRequest.class));

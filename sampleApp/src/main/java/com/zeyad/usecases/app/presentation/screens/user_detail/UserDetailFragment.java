@@ -55,11 +55,11 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
      * The fragment argument representing the item that this fragment represents.
      */
     public static final String ARG_USER_DETAIL_MODEL = "userDetailState";
-    UserDetailVM userDetailVM;
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
     @BindView(R.id.recyclerView_repositories)
     RecyclerView recyclerViewRepositories;
+    private UserDetailVM userDetailVM;
     private GenericRecyclerViewAdapter repositoriesAdapter;
     private UserDetailState userDetailState;
 
@@ -129,23 +129,23 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
 
     @Override
     public void loadData() {
-        userDetailVM.getState().compose(bindToLifecycle())
+        userDetailVM.getRepositories(userDetailState).compose(bindToLifecycle())
                 .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
-        userDetailVM.getRepositories(userDetailState);
     }
 
     @Override
-    public void renderState(UserDetailState userDetailModel) {
-        this.userDetailState = userDetailModel;
-        UserRealm userRealm = userDetailModel.getUser();
-        List<RepoRealm> repoModels = userDetailModel.getRepos();
+    public void renderState(UserDetailState viewState) {
+        userDetailState = viewState;
+        UserRealm userRealm = userDetailState.getUser();
+        List<RepoRealm> repoModels = userDetailState.getRepos();
         if (Utils.isNotEmpty(repoModels))
             for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
                 repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
         if (userRealm != null) {
             RequestListener<String, GlideDrawable> requestListener = new RequestListener<String, GlideDrawable>() {
                 @Override
-                public boolean onException(Exception e, String model, Target<GlideDrawable> target, boolean isFirstResource) {
+                public boolean onException(Exception e, String model, Target<GlideDrawable> target,
+                                           boolean isFirstResource) {
                     FragmentActivity activity = getActivity();
                     if (activity != null)
                         activity.supportStartPostponedEnterTransition();
@@ -153,7 +153,8 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
                 }
 
                 @Override
-                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target, boolean isFromMemoryCache, boolean isFirstResource) {
+                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target,
+                                               boolean isFromMemoryCache, boolean isFirstResource) {
                     FragmentActivity activity = getActivity();
                     if (activity != null)
                         activity.supportStartPostponedEnterTransition();

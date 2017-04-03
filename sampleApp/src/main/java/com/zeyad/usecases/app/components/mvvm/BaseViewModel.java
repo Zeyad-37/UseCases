@@ -6,26 +6,23 @@ import rx.subjects.BehaviorSubject;
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseViewModel<S extends BaseState> {
+public abstract class BaseViewModel<B> {
 
-    private BehaviorSubject<S> state = BehaviorSubject.create();
+    private BehaviorSubject<ViewState> state = BehaviorSubject.create();
 
-    public Observable.Transformer<Object, S> applyStates() {
+    public Observable.Transformer<Object, ViewState> stateTransformer() {
         return listObservable -> listObservable
-                .onErrorReturn(throwable -> BaseState.error(throwable))
-                .startWith(BaseState.loading())
-                .flatMap(state -> {
-                    if (state != null)
-                        getState().onNext((S) ((S) state).reduce(getViewState()));
-                    return getState();
+                .startWith(ViewState.loadingState(getViewStateBundle()))
+                .onErrorReturn(throwable -> ViewState.errorState(throwable, getViewStateBundle()))
+                .flatMap(nextState -> {
+                    state.onNext((ViewState) nextState);
+                    return state;
                 });
     }
 
-    public BehaviorSubject<S> getState() {
-        return state;
-    }
-
-    public S getViewState() {
-        return getState().getValue();
+    public B getViewStateBundle() {
+        if (state.getValue() != null)
+            return (B) state.getValue().getBundle();
+        else return null;
     }
 }

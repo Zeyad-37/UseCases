@@ -3,7 +3,7 @@ package com.zeyad.usecases.app.components.mvvm;
 /**
  * Interface representing a View that will use to load data.
  */
-public interface LoadDataView<S extends BaseState> {
+public interface LoadDataView<B> {
     /**
      * Show or hide a view with a progress bar indicating a loading process.
      *
@@ -12,16 +12,16 @@ public interface LoadDataView<S extends BaseState> {
     void toggleLoading(boolean toggle);
 
     /**
-     * Show a retry view in case of an error when retrieving data.
+     * Show a retry view in case of an errorState when retrieving data.
      *
-     * @param message A string representing an error.
+     * @param message A string representing an errorState.
      */
     void showErrorWithRetry(String message);
 
     /**
-     * Show an error message
+     * Show an errorState message
      *
-     * @param message A string representing an error.
+     * @param message A string representing an errorState.
      */
     void showError(String message);
 
@@ -30,5 +30,5 @@ public interface LoadDataView<S extends BaseState> {
      *
      * @param s the model to be rendered.
      */
-    void renderState(S s);
+    void renderState(B s);
 }

@@ -1,5 +1,7 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
+import com.zeyad.usecases.app.components.mvvm.ViewState;
+
 import java.util.List;
 
 import rx.Observable;
@@ -9,13 +11,11 @@ import rx.Observable;
  */
 interface UserListViewModel {
 
-    Observable<UserListState> getState();
+    Observable<ViewState> incrementPage();
 
-    void incrementPage();
+    Observable<ViewState> getUsers();
 
-    void getUsers();
+    Observable<ViewState> search(String query);
 
-    Observable search(String query);
-
-    Observable deleteCollection(List<Long> selectedItemsIds);
+    Observable<ViewState> deleteCollection(List<Long> selectedItemsIds);
 }

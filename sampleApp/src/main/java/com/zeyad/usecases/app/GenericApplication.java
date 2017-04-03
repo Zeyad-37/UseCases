@@ -1,14 +1,21 @@
 package com.zeyad.usecases.app;
 
+import android.annotation.TargetApi;
 import android.app.Application;
+import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.Signature;
 import android.os.StrictMode;
+import android.util.Base64;
 import android.util.Log;
 
-import com.zeyad.usecases.app.presentation.models.AutoMap_DAOMapperFactory;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
 import java.io.File;
+import java.security.MessageDigest;
 import java.util.concurrent.TimeUnit;
 
 import io.flowup.FlowUp;
@@ -37,11 +44,62 @@ public class GenericApplication extends Application {
         return sInstance;
     }
 
+    @TargetApi(value = 24)
+    private static boolean checkAppSignature(Context context) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),
+                    PackageManager.GET_SIGNATURES);
+            for (Signature signature : packageInfo.signatures) {
+                byte[] signatureBytes = signature.toByteArray();
+                MessageDigest md = MessageDigest.getInstance("SHA");
+                md.update(signature.toByteArray());
+                final String currentSignature = Base64.encodeToString(md.digest(), Base64.DEFAULT);
+                Log.d("REMOVE_ME", "Include this string as a value for SIGNATURE:" + currentSignature);
+                //compare signatures
+                if (java.security.CryptoPrimitive.SIGNATURE.equals(currentSignature)) {
+                    return true;
+                }
+            }
+        } catch (Exception e) {
+            //assumes an issue in checking signature., but we let the caller decide on what to do.
+        }
+        return false;
+    }
+
+    public static boolean verifyInstaller(Context context) {
+        final String installer = context.getPackageManager().getInstallerPackageName(context.getPackageName());
+        return installer != null && installer.startsWith("com.android.vending");
+    }
+
+    public static boolean checkEmulator() {
+        try {
+            boolean goldfish = getSystemProperty("ro.hardware").contains("goldfish");
+            boolean emu = getSystemProperty("ro.kernel.qemu").length() > 0;
+            boolean sdk = getSystemProperty("ro.product.model").equals("sdk");
+            if (emu || goldfish || sdk) {
+                return true;
+            }
+        } catch (Exception ignored) {
+        }
+        return false;
+    }
+
+    private static String getSystemProperty(String name) throws Exception {
+        Class systemPropertyClazz = Class.forName("android.os.SystemProperties");
+        return (String) systemPropertyClazz.getMethod("get", new Class[]{String.class})
+                .invoke(systemPropertyClazz, name);
+    }
+
+    public static boolean checkDebuggable(Context context) {
+        return (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+    }
+
     @Override
     public void onCreate() {
 //        initializeStrickMode();
         super.onCreate();
         sInstance = this;
+//        checkAppTampering(sInstance);
         if (BuildConfig.DEBUG)
             Takt.stock(this).play();
         initializeRealm();
@@ -49,7 +107,7 @@ public class GenericApplication extends Application {
                 .baseUrl(API_BASE_URL)
                 .withCache(CACHE_EXPIRY, TimeUnit.MINUTES)
                 .withRealm()
-                .entityMapper(new AutoMap_DAOMapperFactory())
+//                .entityMapper(new AutoMap_DAOMapperFactory())
                 .okHttpBuilder(provideOkHttpClientBuilder())
 //                .okhttpCache(provideCache())
                 .build());
@@ -143,5 +201,10 @@ public class GenericApplication extends Application {
                 .apiKey(getString(R.string.flow_up_api_key))
                 .forceReports(BuildConfig.DEBUG)
                 .start();
+    }
+
+    private boolean checkAppTampering(Context context) {
+        return checkAppSignature(context) && verifyInstaller(context) && checkEmulator()
+                && checkDebuggable(context);
     }
 }

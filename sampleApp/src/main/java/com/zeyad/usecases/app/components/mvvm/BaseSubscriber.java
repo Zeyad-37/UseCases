@@ -8,7 +8,7 @@ import rx.Subscriber;
  * @author zeyad on 11/28/16.
  */
 
-public class BaseSubscriber<V extends LoadDataView, S extends BaseState> extends Subscriber<S> {
+public class BaseSubscriber<V extends LoadDataView> extends Subscriber<ViewState> {
     public final static int NO_ERROR = 0, ERROR = 1, ERROR_WITH_RETRY = 2;
     private V view;
     private int errorPolicy;
@@ -41,14 +41,14 @@ public class BaseSubscriber<V extends LoadDataView, S extends BaseState> extends
     }
 
     @Override
-    public void onNext(S s) {
+    public void onNext(ViewState s) {
         if (s != null) {
-            if (s.getState() != null)
-                if (s.getState().equals(BaseState.ERROR))
-                    onError(s.getError());
-                else
-                    view.renderState(s);
             view.toggleLoading(s.isLoading());
+            if (s.getState() != null)
+                if (s.getState().equals(ViewState.ERROR))
+                    onError(s.getError());
+                else if (!s.getState().equals(ViewState.LOADING))
+                    view.renderState(s.getBundle());
         }
     }
 }

@@ -12,7 +12,6 @@ import java.util.List;
 
 import rx.Observable;
 
-import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState.INITIAL;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -30,6 +29,8 @@ public class UserDetailVMTest {
     private UserDetailState userDetailState;
     private UserDetailVM userDetailVM;
 
+    // TODO: 3/31/17 Add value assertions!
+
     @Before
     public void setUp() throws Exception {
         mockDataUseCase = mock(IDataUseCase.class);
@@ -38,7 +39,7 @@ public class UserDetailVMTest {
         userRealm = new UserRealm();
         userRealm.setLogin("testUser");
         userRealm.setId(1);
-        userDetailState = UserDetailState.builder(INITIAL)
+        userDetailState = UserDetailState.builder()
                 .setUser(userRealm)
                 .setIsTwoPane(false)
                 .setRepos(new ArrayList<>())
@@ -54,8 +55,7 @@ public class UserDetailVMTest {
         when(mockDataUseCase.queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class)))
                 .thenReturn(observableUserRealm);
 
-        userDetailVM.getRepositories(userDetailState);
-        Observable observable = userDetailVM.getState();
+        Observable observable = userDetailVM.getRepositories(userDetailState);
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class),

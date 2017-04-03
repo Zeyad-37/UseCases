@@ -14,6 +14,13 @@ apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'realm-android'
 
+//apply from: '../tools/quality/quality.gradle'
+apply from: "$project.rootDir/tools/script-git-version.gradle"
+apply from: "$project.rootDir/tools/script-findbugs.gradle"
+apply from: "$project.rootDir/tools/script-lint.gradle"
+apply from: "$project.rootDir/tools/script-pmd.gradle"
+apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
+
 android {
     compileSdkVersion 25
     buildToolsVersion '25.0.2'
@@ -30,16 +37,16 @@ android {
     signingConfigs {
         releaseConfig {
             storeFile file('../keystore/genericusecase.keystore')
-            storePassword "generic123"
+            storePassword KEYSTORE_PASSWORD
             keyAlias "Zeyad"
-            keyPassword "generic123"
+            keyPassword KEYSTORE_PASSWORD
         }
 
         debugConfig {
             storeFile file('../keystore/genericusecase.keystore')
-            storePassword "generic123"
+            storePassword KEYSTORE_PASSWORD
             keyAlias "Zeyad"
-            keyPassword "generic123"
+            keyPassword KEYSTORE_PASSWORD
         }
     }
 
@@ -67,7 +74,7 @@ android {
     }
 
     lintOptions {
-        abortOnError true
+        abortOnError false
         disable 'InvalidPackage'
     }
 
@@ -81,7 +88,7 @@ android {
 }
 
 ext {
-    supportLibraryVersion = '25.2.0'
+    supportLibraryVersion = '25.3.0'
     googlePlayVersion = '10.0.1'
     butterKnifeVersion = '8.4.0'
     rxbindingVersion = '1.0.1'
@@ -104,7 +111,7 @@ dependencies {
     compile "com.android.support:design:$supportLibraryVersion"
     compile "com.android.support:cardview-v7:$supportLibraryVersion"
     compile "com.android.support:palette-v7:$supportLibraryVersion"
-//    compile 'com.android.support.constraint:constraint-layout:1.0.0'
+//    compile 'com.android.support.constraint:constraint-layout:1.0.1'
     // Network
 //    compile 'com.facebook.fresco:fresco:0.14.1'
     compile 'com.github.bumptech.glide:glide:3.7.0'
@@ -143,10 +150,3 @@ dependencies {
 //    testCompile 'org.hamcrest:hamcrest-library:1.3'
 //    testCompile 'org.mockito:mockito-core:2.0.57-beta'
 }
-
-//apply from: '../tools/quality/quality.gradle'
-//apply from: "$project.rootDir/tools/script-git-version.gradle"
-//apply from: "$project.rootDir/tools/script-findbugs.gradle"
-//apply from: "$project.rootDir/tools/script-lint.gradle"
-//apply from: "$project.rootDir/tools/script-pmd.gradle"
-//apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
