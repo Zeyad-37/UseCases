@@ -28,11 +28,11 @@ import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.mvvm.BaseFragment;
 import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
-import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
 import com.zeyad.usecases.app.utils.Utils;
+import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
 import org.parceler.Parcels;
 
@@ -42,6 +42,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
+import static com.zeyad.usecases.app.components.mvvm.BaseActivity.VIEW_STATE;
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 
 /**
@@ -50,18 +51,13 @@ import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_R
  * in two-pane mode (on tablets) or a {@link UserDetailActivity}
  * on handsets.
  */
-public class UserDetailFragment extends BaseFragment implements LoadDataView<UserDetailState> {
-    /**
-     * The fragment argument representing the item that this fragment represents.
-     */
-    public static final String ARG_USER_DETAIL_MODEL = "userDetailState";
+public class UserDetailFragment extends BaseFragment<UserDetailState> {
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
     @BindView(R.id.recyclerView_repositories)
     RecyclerView recyclerViewRepositories;
     private UserDetailVM userDetailVM;
     private GenericRecyclerViewAdapter repositoriesAdapter;
-    private UserDetailState userDetailState;
 
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
@@ -73,28 +69,16 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
     public static UserDetailFragment newInstance(UserDetailState userDetailState) {
         UserDetailFragment userDetailFragment = new UserDetailFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(ARG_USER_DETAIL_MODEL, Parcels.wrap(userDetailState));
+        bundle.putParcelable(VIEW_STATE, Parcels.wrap(userDetailState));
         userDetailFragment.setArguments(bundle);
         return userDetailFragment;
     }
 
     @Override
-    public Bundle saveState() {
-        Bundle bundle = new Bundle(1);
-        bundle.putParcelable(ARG_USER_DETAIL_MODEL, Parcels.wrap(userDetailState));
-        return bundle;
-    }
-
-    @Override
-    public void restoreState(Bundle outState) {
-        userDetailState = Parcels.unwrap(outState.getParcelable(ARG_USER_DETAIL_MODEL));
-    }
-
-    @Override
     public void initialize() {
-        userDetailVM = new UserDetailVM();
         if (getArguments() != null)
-            userDetailState = Parcels.unwrap(getArguments().getParcelable(ARG_USER_DETAIL_MODEL));
+            viewState = Parcels.unwrap(getArguments().getParcelable(VIEW_STATE));
+        userDetailVM = new UserDetailVM(DataUseCaseFactory.getInstance());
     }
 
     @Override
@@ -129,15 +113,15 @@ public class UserDetailFragment extends BaseFragment implements LoadDataView<Use
 
     @Override
     public void loadData() {
-        userDetailVM.getRepositories(userDetailState).compose(bindToLifecycle())
+        userDetailVM.getRepositories(viewState).compose(bindToLifecycle())
                 .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }
 
     @Override
-    public void renderState(UserDetailState viewState) {
-        userDetailState = viewState;
-        UserRealm userRealm = userDetailState.getUser();
-        List<RepoRealm> repoModels = userDetailState.getRepos();
+    public void renderState(UserDetailState userDetailState) {
+        viewState = userDetailState;
+        UserRealm userRealm = viewState.getUser();
+        List<RepoRealm> repoModels = viewState.getRepos();
         if (Utils.isNotEmpty(repoModels))
             for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
                 repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));

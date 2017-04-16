@@ -41,7 +41,7 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
     @Override
     public Observable<ViewState> incrementPage() {
         return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
-                .url(String.format(USERS, getViewStateBundle().getLastId()))
+                .url(String.format(USERS, getViewStateBundle() != null ? getViewStateBundle().getLastId() : 0))
                 .build())
                 .map(UserListState::onNext)
                 .compose(stateTransformer());

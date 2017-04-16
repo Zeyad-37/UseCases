@@ -7,9 +7,9 @@ package com.zeyad.usecases.app.utils;
 public class Constants {
 
     public static class URLS {
-        public static String API_BASE_URL = "https://api.github.com/";
-        public static String USERS = "users?since=%s";
-        public static String USER = "users/%s";
-        public static String REPOSITORIES = "users/%s/repos";
+        public static final String API_BASE_URL = "https://api.github.com/";
+        public static final String USERS = "users?since=%s";
+        public static final String USER = "users/%s";
+        public static final String REPOSITORIES = "users/%s/repos";
     }
 }
