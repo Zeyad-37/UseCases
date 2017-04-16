@@ -4,7 +4,6 @@ import android.app.ActivityOptions;
 import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v7.util.DiffUtil;
 import android.support.v7.view.ActionMode;
@@ -29,7 +28,6 @@ import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.mvvm.BaseActivity;
 import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
-import com.zeyad.usecases.app.components.mvvm.LoadDataView;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailActivity;
 import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailFragment;
@@ -37,8 +35,7 @@ import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState;
 import com.zeyad.usecases.app.presentation.screens.user_list.view_holders.EmptyViewHolder;
 import com.zeyad.usecases.app.presentation.screens.user_list.view_holders.UserViewHolder;
 import com.zeyad.usecases.app.utils.Utils;
-
-import org.parceler.Parcels;
+import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,9 +57,8 @@ import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.NO_ERROR;
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class UserListActivity extends BaseActivity implements ActionMode.Callback, LoadDataView<UserListState> {
+public class UserListActivity extends BaseActivity<UserListState> implements ActionMode.Callback {
     public static final int PAGE_SIZE = 6;
-    private static final String USER_LIST_MODEL = "viewState";
     @BindView(R.id.imageView_avatar)
     public ImageView imageViewAvatar;
     UserListViewModel userListVM;
@@ -74,7 +70,6 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     RecyclerView userRecycler;
     private GenericRecyclerViewAdapter usersAdapter;
     private boolean twoPane;
-    private UserListState userListState;
     private ActionMode actionMode;
     private String currentFragTag;
 
@@ -83,21 +78,8 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
     }
 
     @Override
-    public Bundle saveState() {
-        Bundle bundle = new Bundle(1);
-        bundle.putParcelable(USER_LIST_MODEL, Parcels.wrap(userListState));
-        return bundle;
-    }
-
-    @Override
-    public void restoreState(Bundle savedInstanceState) {
-        if (savedInstanceState != null)
-            renderState(Parcels.unwrap(savedInstanceState.getParcelable(USER_LIST_MODEL)));
-    }
-
-    @Override
     public void initialize() {
-        userListVM = new UserListVM();
+        userListVM = new UserListVM(DataUseCaseFactory.getInstance());
     }
 
     @Override
@@ -119,8 +101,8 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
 
     @Override
     public void renderState(UserListState state) {
-        userListState = state;
-        List<UserRealm> users = userListState.getUsers();
+        viewState = state;
+        List<UserRealm> users = viewState.getUsers();
         if (Utils.isNotEmpty(users)) {
             List<ItemInfo> itemInfoList = new ArrayList<>(users.size());
             UserRealm userRealm;
@@ -212,13 +194,12 @@ public class UserListActivity extends BaseActivity implements ActionMode.Callbac
                 int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                 if ((layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                         && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
-                    // TODO: 4/2/17 revisit!
-                    userListState = new UserListState.Builder(userListState)
-                            .setUsers(userListState.getUsers())
-                            .setCurrentPage(userListState.getCurrentPage() + 1)
+                    viewState = new UserListState.Builder(viewState)
+                            .setUsers(viewState.getUsers())
                             .setYScroll(firstVisibleItemPosition)
                             .build();
-                    userListVM.incrementPage();
+                    userListVM.incrementPage().compose(bindToLifecycle())
+                            .subscribe(new BaseSubscriber<>(UserListActivity.this));
                 }
             }
         });

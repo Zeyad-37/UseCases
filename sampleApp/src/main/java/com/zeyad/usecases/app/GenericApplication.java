@@ -121,7 +121,7 @@ public class GenericApplication extends Application {
                     .detectAll()
 //                    .detectDiskReads()
 //                    .detectDiskWrites()
-//                    .detectNetwork()   // or .detectAll() for all detectable problems
+//                    .detectNetwork()
 //                    .detectCustomSlowCalls()
                     .penaltyLog()
                     .build());

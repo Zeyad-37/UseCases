@@ -5,7 +5,6 @@ import com.zeyad.usecases.app.components.mvvm.ViewState;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
-import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
 import java.util.List;
@@ -19,10 +18,6 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
  */
 class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailView {
     private final IDataUseCase dataUseCase;
-
-    UserDetailVM() {
-        dataUseCase = DataUseCaseFactory.getInstance();
-    }
 
     UserDetailVM(IDataUseCase dataUseCase) {
         this.dataUseCase = dataUseCase;

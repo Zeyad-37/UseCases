@@ -48,7 +48,7 @@ public class BaseSubscriber<V extends LoadDataView> extends Subscriber<ViewState
                 if (s.getState().equals(ViewState.ERROR))
                     onError(s.getError());
                 else if (!s.getState().equals(ViewState.LOADING))
-                    view.renderState(s.getBundle());
+                    view.renderState(s);
         }
     }
 }

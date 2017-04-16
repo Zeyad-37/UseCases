@@ -48,11 +48,10 @@ import rx.Observable;
  */
 class ApiConnection implements IApiConnection {
     private static final String CACHING_DISABLED = "There would be no caching. Since caching module is disabled.",
-            BUILDER_NULL = "OkHttp builder can not be null", CACHE_CONTROL = "Cache-Control";
+            CACHE_CONTROL = "Cache-Control";
     private static final int TIME_OUT = 15;
     private static ApiConnection sInstance;
-    private final RestApi mRestApiWithoutCache;
-    private final RestApi mRestApiWithCache;
+    private final RestApi mRestApiWithoutCache, mRestApiWithCache;
 
     private ApiConnection(@Nullable OkHttpClient.Builder okhttpBuilder, @Nullable Cache cache) {
         if (okhttpBuilder == null)

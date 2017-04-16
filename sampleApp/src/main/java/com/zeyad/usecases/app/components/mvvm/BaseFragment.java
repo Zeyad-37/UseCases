@@ -11,16 +11,20 @@ import com.zeyad.usecases.app.components.navigation.INavigator;
 import com.zeyad.usecases.app.components.navigation.NavigatorFactory;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
+import org.parceler.Parcels;
+
 import butterknife.Unbinder;
+
+import static com.zeyad.usecases.app.components.mvvm.BaseActivity.VIEW_STATE;
 
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseFragment extends RxFragment {
+public abstract class BaseFragment<S> extends RxFragment implements LoadDataView<S> {
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
-    public boolean isNewActivity;
+    public S viewState;
     public Unbinder unbinder;
 
     public BaseFragment() {
@@ -39,9 +43,8 @@ public abstract class BaseFragment extends RxFragment {
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        isNewActivity = savedInstanceState == null;
-        if (!isNewActivity)
-            restoreState(savedInstanceState);
+        if (savedInstanceState != null)
+            renderState(Parcels.unwrap(savedInstanceState.getParcelable(VIEW_STATE)));
     }
 
     @Override
@@ -68,14 +71,11 @@ public abstract class BaseFragment extends RxFragment {
      *
      * @return {@link Bundle}
      */
-    public abstract Bundle saveState();
-
-    /**
-     * To implement! Restores the viewState of the view.
-     *
-     * @param outState a {@link Bundle} with saved viewState
-     */
-    public abstract void restoreState(Bundle outState);
+    private Bundle saveState() {
+        Bundle bundle = new Bundle(1);
+        bundle.putParcelable(VIEW_STATE, Parcels.wrap(viewState));
+        return bundle;
+    }
 
     /**
      * Initialize any objects or any required dependencies.

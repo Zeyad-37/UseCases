@@ -6,7 +6,6 @@ import android.os.Looper;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.data.db.RealmManager;
-import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.repository.DataRepository;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
@@ -40,13 +39,12 @@ import static org.mockito.Mockito.when;
 public class DataUseCaseTest {
 
     private HashMap<String, Object> HASH_MAP = new HashMap<>();
-    private JobExecutor mJobExecutor = getMockedJobExecuter();
     private UIThread mUIThread = getMockedUiThread();
     private IDataUseCase mDataUseCase;
     private Observable observable = Observable.just(true);
     private Data mData = getMockedDataRepo();
 
-    Data getMockedDataRepo() {
+    private Data getMockedDataRepo() {
         final DataRepository dataRepository = Mockito.mock(DataRepository.class);
         Mockito.doReturn(observable)
                 .when(dataRepository)
@@ -99,11 +97,7 @@ public class DataUseCaseTest {
         return dataRepository;
     }
 
-    JobExecutor getMockedJobExecuter() {
-        return Mockito.mock(JobExecutor.class);
-    }
-
-    UIThread getMockedUiThread() {
+    private UIThread getMockedUiThread() {
         return Mockito.mock(UIThread.class);
     }
 
@@ -111,8 +105,7 @@ public class DataUseCaseTest {
     public void setUp() throws Exception {
         HandlerThread handlerThread = mock(HandlerThread.class);
         when(handlerThread.getLooper()).thenReturn(mock(Looper.class));
-        mDataUseCase = getGenericUseImplementation((DataRepository) mData, mJobExecutor, mUIThread,
-                handlerThread);
+        mDataUseCase = getGenericUseImplementation((DataRepository) mData, mUIThread, handlerThread);
         Config.setBaseURL("www.google.com");
     }
 
@@ -216,9 +209,9 @@ public class DataUseCaseTest {
         verify(mData, times(1)).deleteAllDynamically(anyString(), any(Class.class), anyBoolean());
     }
 
-    public IDataUseCase getGenericUseImplementation(DataRepository datarepo, JobExecutor jobExecuter
-            , UIThread uithread, HandlerThread handlerThread) {
-        DataUseCase.init(datarepo, jobExecuter, uithread, handlerThread);
+    public IDataUseCase getGenericUseImplementation(DataRepository datarepo, UIThread uithread,
+                                                    HandlerThread handlerThread) {
+        DataUseCase.init(datarepo, uithread, handlerThread);
         return DataUseCase.getInstance();
     }
 }

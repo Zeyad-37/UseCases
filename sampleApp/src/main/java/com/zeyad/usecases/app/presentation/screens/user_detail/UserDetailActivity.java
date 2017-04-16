@@ -3,22 +3,30 @@ package com.zeyad.usecases.app.presentation.screens.user_detail;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Pair;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 
 import com.zeyad.usecases.app.R;
-import com.zeyad.usecases.app.components.mvvm.BaseActivity;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
 
 import org.parceler.Parcels;
 
+import java.util.List;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
-import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailFragment.ARG_USER_DETAIL_MODEL;
+import static com.zeyad.usecases.app.components.mvvm.BaseActivity.VIEW_STATE;
 
 /**
  * An activity representing a single RepoRealm detail screen. This
@@ -26,35 +34,24 @@ import static com.zeyad.usecases.app.presentation.screens.user_detail.UserDetail
  * item details are presented side-by-side with a list of items
  * in a {@link UserListActivity}.
  */
-public class UserDetailActivity extends BaseActivity {
+public class UserDetailActivity extends AppCompatActivity {
     @BindView(R.id.detail_toolbar)
     Toolbar toolbar;
     @BindView(R.id.imageView_avatar)
     ImageView imageViewAvatar;
     @BindView(R.id.toolbar_layout)
     CollapsingToolbarLayout collapsingToolbarLayout;
+    Unbinder unbinder;
 
     public static Intent getCallingIntent(Context context, UserDetailState userDetailModel) {
         return new Intent(context, UserDetailActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra(ARG_USER_DETAIL_MODEL, Parcels.wrap(userDetailModel));
+                .putExtra(VIEW_STATE, Parcels.wrap(userDetailModel));
     }
 
     @Override
-    public Bundle saveState() {
-        return new Bundle(0);
-    }
-
-    @Override
-    public void restoreState(Bundle outState) {
-    }
-
-    @Override
-    public void initialize() {
-    }
-
-    @Override
-    public void setupUI() {
+    protected void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user_detail);
         unbinder = ButterKnife.bind(this);
         setSupportActionBar(toolbar);
@@ -63,13 +60,22 @@ public class UserDetailActivity extends BaseActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle("");
         }
-        if (isNewActivity)
+        if (savedInstanceState == null)
             addFragment(R.id.user_detail_container, UserDetailFragment.newInstance(Parcels.unwrap(getIntent()
-                    .getParcelableExtra(ARG_USER_DETAIL_MODEL))), "", null);
+                    .getParcelableExtra(VIEW_STATE))), "", null);
     }
 
-    @Override
-    public void loadData() {
+    // TODO: 4/15/17 remove!
+    public void addFragment(int containerViewId, Fragment fragment, String currentFragTag,
+                            List<Pair<View, String>> sharedElements) {
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        if (sharedElements != null)
+            for (Pair<View, String> pair : sharedElements)
+                fragmentTransaction.addSharedElement(pair.first, pair.second);
+        if (currentFragTag == null || currentFragTag.isEmpty())
+            fragmentTransaction.addToBackStack(fragment.getTag());
+        else fragmentTransaction.addToBackStack(currentFragTag);
+        fragmentTransaction.add(containerViewId, fragment, fragment.getTag()).commit();
     }
 
     @Override

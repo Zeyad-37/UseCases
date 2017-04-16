@@ -1,17 +1,19 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
+import com.zeyad.usecases.app.components.mvvm.ViewState;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
 
 import org.parceler.Parcel;
 
 import java.util.List;
 
+import static com.zeyad.usecases.app.components.mvvm.ViewState.NEXT;
+
 /**
  * @author zeyad on 1/25/17.
  */
 @Parcel
 public final class UserDetailState {
-    public static final String INITIAL = "initial";
     final boolean isTwoPane;
     final UserRealm user;
     final List<RepoRealm> repos;
@@ -28,12 +30,12 @@ public final class UserDetailState {
         repos = builder.repos;
     }
 
-    public static UserDetailState onNext(UserRealm user, List<RepoRealm> repos, boolean isTwoPane) {
-        return UserDetailState.builder()
+    static ViewState<UserDetailState> onNext(UserRealm user, List<RepoRealm> repos, boolean isTwoPane) {
+        return new ViewState<>(false, null, NEXT, UserDetailState.builder()
                 .setUser(user)
                 .setRepos(repos)
                 .setIsTwoPane(isTwoPane)
-                .build();
+                .build());
     }
 
     public static Builder builder() {

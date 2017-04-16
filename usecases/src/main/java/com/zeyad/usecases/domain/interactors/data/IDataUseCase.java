@@ -33,7 +33,7 @@ public interface IDataUseCase {
      * @param postRequest contains the attributes of the request.
      * @return Observable with the Object.
      */
-//    Observable patchObject(PostRequest postRequest);
+    Observable patchObject(PostRequest postRequest);
 
     /**
      * Post Object to postRequest.

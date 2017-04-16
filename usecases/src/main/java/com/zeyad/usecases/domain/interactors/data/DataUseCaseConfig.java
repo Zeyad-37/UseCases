@@ -3,7 +3,6 @@ package com.zeyad.usecases.domain.interactors.data;
 import android.content.Context;
 import android.support.annotation.NonNull;
 
-import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.mappers.DAOMapperFactory;
 import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
@@ -30,7 +29,6 @@ public class DataUseCaseConfig {
     private boolean withCache, withRealm;
     private int cacheSize, cacheAmount;
     private TimeUnit timeUnit;
-    private ThreadExecutor threadExecutor;
     private PostExecutionThread postExecutionThread;
 
     private DataUseCaseConfig(Builder dataUseCaseConfigBuilder) {
@@ -44,7 +42,6 @@ public class DataUseCaseConfig {
         cacheSize = dataUseCaseConfigBuilder.getCacheSize();
         cacheAmount = dataUseCaseConfigBuilder.getCacheAmount();
         timeUnit = dataUseCaseConfigBuilder.getTimeUnit();
-        threadExecutor = dataUseCaseConfigBuilder.getThreadExecutor();
         postExecutionThread = dataUseCaseConfigBuilder.getPostExecutionThread();
     }
 
@@ -67,10 +64,6 @@ public class DataUseCaseConfig {
             };
         }
         return entityMapper;
-    }
-
-    ThreadExecutor getThreadExecutor() {
-        return threadExecutor == null ? new JobExecutor() : threadExecutor;
     }
 
     PostExecutionThread getPostExecutionThread() {

@@ -8,21 +8,21 @@ import rx.subjects.BehaviorSubject;
  */
 public abstract class BaseViewModel<B> {
 
-    private BehaviorSubject<ViewState> state = BehaviorSubject.create();
+    private BehaviorSubject<ViewState<B>> state = BehaviorSubject.create();
 
     public Observable.Transformer<Object, ViewState> stateTransformer() {
         return listObservable -> listObservable
                 .startWith(ViewState.loadingState(getViewStateBundle()))
                 .onErrorReturn(throwable -> ViewState.errorState(throwable, getViewStateBundle()))
                 .flatMap(nextState -> {
-                    state.onNext((ViewState) nextState);
+                    state.onNext((ViewState<B>) nextState);
                     return state;
                 });
     }
 
     public B getViewStateBundle() {
         if (state.getValue() != null)
-            return (B) state.getValue().getBundle();
+            return state.getValue().getBundle();
         else return null;
     }
 }

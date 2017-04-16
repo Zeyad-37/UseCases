@@ -15,6 +15,8 @@ import com.zeyad.usecases.app.components.navigation.INavigator;
 import com.zeyad.usecases.app.components.navigation.NavigatorFactory;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
+import org.parceler.Parcels;
+
 import java.util.List;
 
 import butterknife.Unbinder;
@@ -22,31 +24,32 @@ import butterknife.Unbinder;
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseActivity extends RxAppCompatActivity {
-
+public abstract class BaseActivity<S> extends RxAppCompatActivity implements LoadDataView<S> {
+    public static final String VIEW_STATE = "viewState";
     public INavigator navigator;
     public IRxEventBus rxEventBus;
-    public boolean isNewActivity;
+    public S viewState;
     public Unbinder unbinder;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        isNewActivity = savedInstanceState == null;
         navigator = NavigatorFactory.getInstance();
         rxEventBus = RxEventBusFactory.getInstance();
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         initialize();
         setupUI();
-        if (!isNewActivity)
-            restoreState(savedInstanceState);
+        if (savedInstanceState != null) {
+            viewState = Parcels.unwrap(savedInstanceState.getParcelable(VIEW_STATE));
+            renderState(viewState);
+        }
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null)
-            restoreState(savedInstanceState);
+            renderState(Parcels.unwrap(savedInstanceState.getParcelable(VIEW_STATE)));
     }
 
     @Override
@@ -61,31 +64,16 @@ public abstract class BaseActivity extends RxAppCompatActivity {
      *
      * @return {@link Bundle}
      */
-    public abstract Bundle saveState();
-
-    /**
-     * To implement! Restores the viewState of the view.
-     *
-     * @param outState a {@link Bundle} with saved viewState
-     */
-    public abstract void restoreState(Bundle outState);
+    private Bundle saveState() {
+        Bundle bundle = new Bundle(1);
+        bundle.putParcelable(VIEW_STATE, Parcels.wrap(viewState));
+        return bundle;
+    }
 
     @Override
     public void onResume() {
         super.onResume();
         loadData();
-    }
-
-    @Override
-    protected void onPause() {
-        saveState();
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        saveState();
-        super.onStop();
     }
 
     @Override

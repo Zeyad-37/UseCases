@@ -4,7 +4,6 @@ import android.os.HandlerThread;
 
 import com.zeyad.usecases.data.db.DatabaseManagerFactory;
 import com.zeyad.usecases.data.db.RealmManager;
-import com.zeyad.usecases.data.executor.JobExecutor;
 import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.repository.DataRepository;
@@ -13,7 +12,6 @@ import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
-import com.zeyad.usecases.domain.executors.ThreadExecutor;
 import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.repositories.Data;
 
@@ -37,23 +35,19 @@ public class DataUseCase implements IDataUseCase {
     private static HandlerThread handlerThread;
     private static DataUseCase sDataUseCase;
     private final Data mData;
-    private final ThreadExecutor mThreadExecutor;
     private final PostExecutionThread mPostExecutionThread;
 
-    private DataUseCase(Data data, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread) {
+    private DataUseCase(Data data, PostExecutionThread postExecutionThread) {
         if (handlerThread == null)
             handlerThread = new HandlerThread("backgroundThread");
-        mThreadExecutor = threadExecutor;
         mPostExecutionThread = postExecutionThread;
         mData = data;
     }
 
-    private DataUseCase(Data data, ThreadExecutor threadExecutor, PostExecutionThread postExecutionThread,
-                        HandlerThread handlerThread) {
+    private DataUseCase(Data data, PostExecutionThread postExecutionThread, HandlerThread handlerThread) {
         DataUseCase.handlerThread = handlerThread;
         if (!DataUseCase.handlerThread.isAlive())
             DataUseCase.handlerThread.start();
-        mThreadExecutor = threadExecutor;
         mPostExecutionThread = postExecutionThread;
         mData = data;
     }
@@ -64,11 +58,10 @@ public class DataUseCase implements IDataUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    static void initWithoutDB(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor,
-                              PostExecutionThread postExecutionThread) {
+    static void initWithoutDB(IDAOMapperFactory entityMapper, PostExecutionThread postExecutionThread) {
         hasRealm = false;
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(RestApiImpl.getInstance()),
-                entityMapper), threadExecutor, postExecutionThread);
+                entityMapper), postExecutionThread);
     }
 
     /**
@@ -77,8 +70,7 @@ public class DataUseCase implements IDataUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    static void initWithRealm(IDAOMapperFactory entityMapper, ThreadExecutor threadExecutor,
-                              PostExecutionThread postExecutionThread) {
+    static void initWithRealm(IDAOMapperFactory entityMapper, PostExecutionThread postExecutionThread) {
         hasRealm = true;
         if (handlerThread == null)
             handlerThread = new HandlerThread("backgroundThread");
@@ -86,8 +78,7 @@ public class DataUseCase implements IDataUseCase {
             handlerThread.start();
         DatabaseManagerFactory.initRealm(handlerThread.getLooper());
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
-                .getInstance(), RestApiImpl.getInstance()), entityMapper), threadExecutor,
-                postExecutionThread);
+                .getInstance(), RestApiImpl.getInstance()), entityMapper), postExecutionThread);
     }
 
     /**
@@ -98,12 +89,11 @@ public class DataUseCase implements IDataUseCase {
      * This function may be called n number of times if required, during mocking and testing.
      *
      * @param dataRepository data repository
-     * @param jobExecutor    job executor
      * @param uiThread       ui thread implementation
+     * @param handlerThread  background thread
      */
-    public static void init(DataRepository dataRepository, JobExecutor jobExecutor, UIThread uiThread,
-                            HandlerThread handlerThread) {
-        sDataUseCase = new DataUseCase(dataRepository, jobExecutor, uiThread, handlerThread);
+    public static void init(DataRepository dataRepository, UIThread uiThread, HandlerThread handlerThread) {
+        sDataUseCase = new DataUseCase(dataRepository, uiThread, handlerThread);
     }
 
     public static DataUseCase getInstance() {
@@ -165,14 +155,13 @@ public class DataUseCase implements IDataUseCase {
                 });
     }
 
-    //    @Override
-    @SuppressWarnings("unchecked")
-//    public Observable patchObject(PostRequest postRequest) {
-//        return mData.dynamicPatchObject(postRequest.getUrl(), postRequest.getIdColumnName(),
-//                postRequest.getObjectBundle(), postRequest.getPresentationClass(), postRequest
-//                        .getDataClass(), postRequest.isPersist(), postRequest.isQueuable())
-//                .compose(applySchedulers());
-//    }
+    @Override
+    public Observable patchObject(PostRequest postRequest) {
+        return mData.dynamicPatchObject(postRequest.getUrl(), postRequest.getIdColumnName(),
+                postRequest.getObjectBundle(), postRequest.getPresentationClass(), postRequest
+                        .getDataClass(), postRequest.isPersist(), postRequest.isQueuable())
+                .compose(applySchedulers());
+    }
 
     @Override
     public Observable postObject(PostRequest postRequest) {
@@ -266,7 +255,7 @@ public class DataUseCase implements IDataUseCase {
         else
             mData.getListDynamically("", getRequest.getPresentationClass(), getRequest.getDataClass(),
                     getRequest.isPersist(), getRequest.isShouldCache())
-                    .flatMap(new Func1<List, Observable<?>>() {
+                    .flatMap(new Func1<List, Observable<List>>() {
                         @Override
                         public Observable<List> call(List list) {
                             if (Utils.getInstance().isNotEmpty(list))
@@ -275,7 +264,7 @@ public class DataUseCase implements IDataUseCase {
                         }
                     })
                     .onErrorResumeNext(throwable -> online)
-                    .doOnNext(list -> listOffLineFirst.onNext((List) list))
+                    .doOnNext(list -> listOffLineFirst.onNext(list))
                     .doOnError(listOffLineFirst::onError)
                     .compose(applySchedulers())
                     .subscribe();
@@ -291,7 +280,7 @@ public class DataUseCase implements IDataUseCase {
         mData.getObjectDynamicallyById("", getRequest.getIdColumnName(), getRequest.getItemId(),
                 getRequest.getPresentationClass(), getRequest.getDataClass(), getRequest.isPersist(),
                 getRequest.isShouldCache())
-                .flatMap(object -> object == null ? Observable.just(object) : online)
+                .flatMap(object -> object != null ? Observable.just(object) : online)
                 .onErrorResumeNext(throwable -> online)
                 .doOnNext(ObjectOffLineFirst::onNext)
                 .doOnError(ObjectOffLineFirst::onError)

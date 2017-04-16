@@ -3,7 +3,7 @@ package com.zeyad.usecases.app.components.mvvm;
 /**
  * Interface representing a View that will use to load data.
  */
-public interface LoadDataView<B> {
+interface LoadDataView<S> {
     /**
      * Show or hide a view with a progress bar indicating a loading process.
      *
@@ -30,5 +30,5 @@ public interface LoadDataView<B> {
      *
      * @param s the model to be rendered.
      */
-    void renderState(B s);
+    void renderState(S s);
 }

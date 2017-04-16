@@ -4,7 +4,6 @@ import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
 import com.zeyad.usecases.app.components.mvvm.ViewState;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
-import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
 import java.util.Arrays;
@@ -25,10 +24,6 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
 
     private final IDataUseCase dataUseCase;
 
-    UserListVM() {
-        dataUseCase = DataUseCaseFactory.getInstance();
-    }
-
     UserListVM(IDataUseCase dataUseCase) {
         this.dataUseCase = dataUseCase;
     }
@@ -37,9 +32,7 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
     public Observable<ViewState> getUsers() {
         return dataUseCase.getListOffLineFirst(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
-                .url(String.format(USERS, getViewStateBundle() != null ?
-                                getViewStateBundle().getCurrentPage() : 0,
-                        getViewStateBundle() != null ? getViewStateBundle().getLastId() : 0))
+                .url(String.format(USERS, getViewStateBundle() != null ? getViewStateBundle().getLastId() : 0))
                 .build())
                 .map(UserListState::onNext)
                 .compose(stateTransformer());
@@ -48,8 +41,7 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
     @Override
     public Observable<ViewState> incrementPage() {
         return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
-                .url(String.format(USERS, getViewStateBundle().getCurrentPage() + 1,
-                        getViewStateBundle().getLastId()))
+                .url(String.format(USERS, getViewStateBundle().getLastId()))
                 .build())
                 .map(UserListState::onNext)
                 .compose(stateTransformer());
