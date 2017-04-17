@@ -11,9 +11,9 @@ import rx.Observable;
  */
 interface UserListViewModel {
 
-    Observable<ViewState> incrementPage();
-
     Observable<ViewState> getUsers();
+
+    Observable<ViewState> incrementPage();
 
     Observable<ViewState> search(String query);
 

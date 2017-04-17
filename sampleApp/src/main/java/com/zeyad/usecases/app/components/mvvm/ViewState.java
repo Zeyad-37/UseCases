@@ -19,7 +19,7 @@ public class ViewState<B> {
     }
 
     public static ViewState loadingState(Object bundle) {
-        return new ViewState<>(false, null, LOADING, bundle);
+        return new ViewState<>(true, null, LOADING, bundle);
     }
 
     public static ViewState errorState(Throwable error, Object bundle) {

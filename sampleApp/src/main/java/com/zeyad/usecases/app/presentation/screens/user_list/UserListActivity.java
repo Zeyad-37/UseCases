@@ -61,13 +61,13 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     public static final int PAGE_SIZE = 6;
     @BindView(R.id.imageView_avatar)
     public ImageView imageViewAvatar;
-    UserListViewModel userListVM;
     @BindView(R.id.toolbar)
     Toolbar toolbar;
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
+    private UserListVM userListVM;
     private GenericRecyclerViewAdapter usersAdapter;
     private boolean twoPane;
     private ActionMode actionMode;
@@ -95,8 +95,7 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
 
     @Override
     public void loadData() {
-        userListVM.getUsers().compose(bindToLifecycle())
-                .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
+        userListVM.getUsers().compose(bindToLifecycle()).subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }
 
     @Override
@@ -208,8 +207,8 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     @Override
     public void toggleLoading(boolean toggle) {
         runOnUiThread(() -> {
-            loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
             loaderLayout.bringToFront();
+            loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
         });
     }
 

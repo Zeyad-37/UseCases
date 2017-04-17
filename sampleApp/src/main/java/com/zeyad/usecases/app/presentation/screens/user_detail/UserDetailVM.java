@@ -39,8 +39,7 @@ class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailV
                     List<RepoRealm> finalRepos = Utils.isNotEmpty(repos) ? Utils.union(userDetailState.getRepos(), repos)
                             : userDetailState.getRepos();
                     return UserDetailState.onNext(finalUser, finalRepos, false);
-                })
-                .compose(stateTransformer()) :
+                }) :
                 Observable.just(ViewState.errorState(new IllegalArgumentException("User name can not be empty"),
                         getViewStateBundle()));
     }

@@ -99,7 +99,7 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
         return rootView;
     }
 
-    void setupRecyclerView() {
+    private void setupRecyclerView() {
         recyclerViewRepositories.setLayoutManager(new LinearLayoutManager(getContext()));
         repositoriesAdapter = new GenericRecyclerViewAdapter((LayoutInflater) getContext()
                 .getSystemService(Context.LAYOUT_INFLATER_SERVICE), new ArrayList<>()) {

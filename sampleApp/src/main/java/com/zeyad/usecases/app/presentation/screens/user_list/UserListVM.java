@@ -32,16 +32,20 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
     public Observable<ViewState> getUsers() {
         return dataUseCase.getListOffLineFirst(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
-                .url(String.format(USERS, getViewStateBundle() != null ? getViewStateBundle().getLastId() : 0))
+                .url(getUsersURL())
                 .build())
                 .map(UserListState::onNext)
                 .compose(stateTransformer());
     }
 
+    private String getUsersURL() {
+        return String.format(USERS, getViewStateBundle() != null ? getViewStateBundle().getLastId() : 0);
+    }
+
     @Override
     public Observable<ViewState> incrementPage() {
         return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
-                .url(String.format(USERS, getViewStateBundle() != null ? getViewStateBundle().getLastId() : 0))
+                .url(getUsersURL())
                 .build())
                 .map(UserListState::onNext)
                 .compose(stateTransformer());
@@ -60,8 +64,8 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
                     return Arrays.asList(new HashSet<>(list));
                 })
                 .map(list -> onSearch((List<UserRealm>) list))
-                .compose(stateTransformer())
-                .observeOn(AndroidSchedulers.mainThread());
+                .observeOn(AndroidSchedulers.mainThread())
+                .compose(stateTransformer());
     }
 
     @Override
