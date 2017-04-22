@@ -6,8 +6,8 @@ package com.zeyad.usecases.app.components.mvvm;
 public class UIModel<B> {
     public static final String LOADING = "loading", ERROR = "error", SUCCESS = "success",
             IDLE = "idle";
-    public static UIModel idleState = new UIModel<>(IDLE, false, null, false, null);
-    public static UIModel loadingState = new UIModel<>(LOADING, true, null, false, null);
+    public static final UIModel idleState = new UIModel<>(IDLE, false, null, false, null);
+    public static final UIModel loadingState = new UIModel<>(LOADING, true, null, false, null);
     private final boolean isLoading, isSuccessful;
     private final Throwable error;
     private final String state;
@@ -19,6 +19,14 @@ public class UIModel<B> {
         this.isSuccessful = isSuccessful;
         this.bundle = bundle;
         this.state = state;
+    }
+
+    public static UIModel loadingState(Object bundle) {
+        return new UIModel<>(LOADING, true, null, false, bundle);
+    }
+
+    public static UIModel idleState(Object bundle) {
+        return new UIModel<>(ERROR, false, null, false, bundle);
     }
 
     public static UIModel errorState(Throwable error) {

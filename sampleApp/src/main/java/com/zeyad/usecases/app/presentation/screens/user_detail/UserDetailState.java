@@ -1,6 +1,5 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
-import com.zeyad.usecases.app.components.mvvm.UIModel;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
 
 import org.parceler.Parcel;
@@ -26,14 +25,6 @@ public final class UserDetailState {
         isTwoPane = builder.isTwoPane;
         user = builder.user;
         repos = builder.repos;
-    }
-
-    static UIModel<UserDetailState> onNext(UserRealm user, List<RepoRealm> repos, boolean isTwoPane) {
-        return new UIModel<>(UIModel.SUCCESS, false, null, true, UserDetailState.builder()
-                .setUser(user)
-                .setRepos(repos)
-                .setIsTwoPane(isTwoPane)
-                .build());
     }
 
     public static Builder builder() {

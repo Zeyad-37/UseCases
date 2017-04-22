@@ -12,7 +12,8 @@ public class BaseViewModel {
 
     public Observable.Transformer<BaseEvent, UIModel> uiModels(Func1<BaseEvent, BaseAction> mapEventsToActions,
                                                                Func1<BaseAction, Observable<?>> mapActionsToExecutables,
-                                                               Func2<UIModel, BaseResult, UIModel> stateReducer) {
+                                                               Func2<UIModel, BaseResult, UIModel> stateAccumulator,
+                                                               UIModel initialState) {
         return events -> events.map(mapEventsToActions)
                 .compose(actions -> actions.flatMap(action -> Observable.just(action)
                         .flatMap(mapActionsToExecutables)
@@ -20,6 +21,12 @@ public class BaseViewModel {
                         .onErrorReturn(BaseResult::errorResult)
                         .observeOn(AndroidSchedulers.mainThread())
                         .startWith(BaseResult.IN_FLIGHT)))
-                .scan(UIModel.idleState, stateReducer);
+                .scan(initialState, stateAccumulator);
+    }
+
+    public Observable.Transformer<BaseEvent, UIModel> uiModels(Func1<BaseEvent, BaseAction> mapEventsToActions,
+                                                               Func1<BaseAction, Observable<?>> mapActionsToExecutables,
+                                                               Func2<UIModel, BaseResult, UIModel> stateAccumulator) {
+        return uiModels(mapEventsToActions, mapActionsToExecutables, stateAccumulator, UIModel.idleState);
     }
 }

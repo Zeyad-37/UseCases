@@ -1,6 +1,5 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -125,17 +124,22 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
                 .compose(userDetailVM.uiModels(event -> new GetReposAction(((GetReposEvent) event).getLogin()),
                         action -> userDetailVM.getRepositories(((GetReposAction) action).getLogin()),
                         (currentUIModel, newUIModel) -> {
+                            UserDetailState bundle = (UserDetailState) currentUIModel.getBundle();
                             if (newUIModel.isLoading())
-                                currentUIModel = UIModel.loadingState;
-                            else if (newUIModel.isSuccessful())
+                                currentUIModel = UIModel.loadingState(UserDetailState.builder()
+                                        .setRepos(bundle.getRepos())
+                                        .setUser(bundle.getUser())
+                                        .setIsTwoPane(bundle.isTwoPane())
+                                        .build());
+                            else if (newUIModel.isSuccessful()) {
                                 currentUIModel = UIModel.successState(UserDetailState.builder()
                                         .setRepos((List<RepoRealm>) newUIModel.getBundle())
-                                        .setUser(viewState.getUser())
-                                        .setIsTwoPane(viewState.isTwoPane())
+                                        .setUser(bundle.getUser())
+                                        .setIsTwoPane(bundle.isTwoPane())
                                         .build());
-                            else currentUIModel = UIModel.errorState(newUIModel.getError());
+                            } else currentUIModel = UIModel.errorState(newUIModel.getError());
                             return currentUIModel;
-                        }))
+                        }, UIModel.idleState(viewState)))
                 .compose(bindToLifecycle()).subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }
 
@@ -179,13 +183,6 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
                                 .dontAnimate()
                                 .listener(requestListener)
                                 .into(activity.imageViewAvatar);
-                    else
-                        Glide.with(getContext())
-                                .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
-                                        "https://help.github.com/assets/images/help/profile/identicon.png")
-                                .dontAnimate()
-                                .listener(requestListener)
-                                .into(activity.imageViewAvatar);
                 }
             } else {
                 UserDetailActivity activity = (UserDetailActivity) getActivity();
@@ -196,13 +193,6 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
                     if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
                         Glide.with(getContext())
                                 .load(userRealm.getAvatarUrl())
-                                .dontAnimate()
-                                .listener(requestListener)
-                                .into(activity.imageViewAvatar);
-                    else
-                        Glide.with(getContext())
-                                .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
-                                        "https://help.github.com/assets/images/help/profile/identicon.png")
                                 .dontAnimate()
                                 .listener(requestListener)
                                 .into(activity.imageViewAvatar);
@@ -219,12 +209,8 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
 
     @Override
     public void toggleLoading(boolean toggle) {
-        Activity activity = getActivity();
-        if (activity != null)
-            activity.runOnUiThread(() -> {
-                loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
-                loaderLayout.bringToFront();
-            });
+        loaderLayout.bringToFront();
+        loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
     }
 
     @Override

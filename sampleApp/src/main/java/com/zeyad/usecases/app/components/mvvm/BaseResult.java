@@ -5,7 +5,7 @@ package com.zeyad.usecases.app.components.mvvm;
  */
 public class BaseResult<B> {
 
-    public static BaseResult IN_FLIGHT = new BaseResult<>(true, null, false, null);
+    public static final BaseResult IN_FLIGHT = new BaseResult<>(true, null, false, null);
 
     private final boolean isLoading, isSuccessful;
     private final Throwable error;

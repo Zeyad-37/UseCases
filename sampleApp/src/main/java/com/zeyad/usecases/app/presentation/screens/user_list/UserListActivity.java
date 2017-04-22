@@ -134,11 +134,14 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
                     if (newUIModel.isLoading())
                         currentUIModel = UIModel.loadingState;
                     else if (newUIModel.isSuccessful())
-                        currentUIModel = UIModel.successState(UserListState.builder().setUsers((List<UserRealm>) newUIModel.getBundle()).build());
+                        currentUIModel = UIModel.successState(UserListState.builder()
+                                .setUsers((List<UserRealm>) newUIModel.getBundle())
+                                .build());
                     else currentUIModel = UIModel.errorState(newUIModel.getError());
                     return currentUIModel;
                 }))
-                .compose(bindToLifecycle()).subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
+                .compose(bindToLifecycle())
+                .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }
 
     @Override
@@ -152,13 +155,11 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
                 userRealm = users.get(i);
                 itemInfoList.add(new ItemInfo<>(userRealm, R.layout.user_item_layout).setId(userRealm.getId()));
             }
-
 //            DiffUtil.DiffResult diffResult = DiffUtil
 //                    .calculateDiff(new UserListDiffCallback(usersAdapter.getDataList(), itemInfoList));
 //            diffResult.dispatchUpdatesTo(usersAdapter);
-
             usersAdapter.setDataList(itemInfoList);
-            userRecycler.smoothScrollToPosition(state.getYScroll());
+//            userRecycler.smoothScrollToPosition(state.getYScroll());
         }
     }
 
@@ -255,10 +256,8 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
 
     @Override
     public void toggleLoading(boolean toggle) {
-        runOnUiThread(() -> {
-            loaderLayout.bringToFront();
-            loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
-        });
+        loaderLayout.bringToFront();
+        loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
     }
 
     @Override
@@ -318,9 +317,9 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         mode.getMenuInflater().inflate(R.menu.selected_list_menu, menu);
-        events = events.mergeWith(RxMenuItem.clicks(menu.findItem(R.id.delete_item))
+        events = events.mergeWith(Observable.defer(() -> RxMenuItem.clicks(menu.findItem(R.id.delete_item))
                 .map(click -> new DeleteUsersEvent(usersAdapter.getSelectedItemsIds()))
-                .doOnNext(searchUsersEvent -> Log.d("deleteEvent", "eventFired")));
+                .doOnNext(searchUsersEvent -> Log.d("deleteEvent", "eventFired"))));
         return true;
     }
 
