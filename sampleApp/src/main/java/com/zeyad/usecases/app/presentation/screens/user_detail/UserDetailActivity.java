@@ -26,7 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.zeyad.usecases.app.components.mvvm.BaseActivity.VIEW_STATE;
+import static com.zeyad.usecases.app.components.mvvm.BaseActivity.UI_MODEL;
 
 /**
  * An activity representing a single RepoRealm detail screen. This
@@ -46,7 +46,7 @@ public class UserDetailActivity extends AppCompatActivity {
     public static Intent getCallingIntent(Context context, UserDetailState userDetailModel) {
         return new Intent(context, UserDetailActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra(VIEW_STATE, Parcels.wrap(userDetailModel));
+                .putExtra(UI_MODEL, Parcels.wrap(userDetailModel));
     }
 
     @Override
@@ -62,7 +62,7 @@ public class UserDetailActivity extends AppCompatActivity {
         }
         if (savedInstanceState == null)
             addFragment(R.id.user_detail_container, UserDetailFragment.newInstance(Parcels.unwrap(getIntent()
-                    .getParcelableExtra(VIEW_STATE))), "", null);
+                    .getParcelableExtra(UI_MODEL))), "", null);
     }
 
     // TODO: 4/15/17 remove!

@@ -1,13 +1,11 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
-import com.zeyad.usecases.app.components.mvvm.ViewState;
+import com.zeyad.usecases.app.components.mvvm.UIModel;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
 
 import org.parceler.Parcel;
 
 import java.util.List;
-
-import static com.zeyad.usecases.app.components.mvvm.ViewState.NEXT;
 
 /**
  * @author zeyad on 1/25/17.
@@ -30,8 +28,8 @@ public final class UserDetailState {
         repos = builder.repos;
     }
 
-    static ViewState<UserDetailState> onNext(UserRealm user, List<RepoRealm> repos, boolean isTwoPane) {
-        return new ViewState<>(false, null, NEXT, UserDetailState.builder()
+    static UIModel<UserDetailState> onNext(UserRealm user, List<RepoRealm> repos, boolean isTwoPane) {
+        return new UIModel<>(UIModel.SUCCESS, false, null, true, UserDetailState.builder()
                 .setUser(user)
                 .setRepos(repos)
                 .setIsTwoPane(isTwoPane)

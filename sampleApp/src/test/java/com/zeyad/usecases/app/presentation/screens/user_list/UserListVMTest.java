@@ -1,6 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
-import com.zeyad.usecases.app.components.mvvm.ViewState;
+import com.zeyad.usecases.app.components.mvvm.UIModel;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
@@ -72,7 +72,7 @@ public class UserListVMTest {
         verify(mockDataUseCase, times(1)).deleteCollection(any(PostRequest.class));
 
         // Assert return type
-        assertEquals(ViewState.class, observable.toBlocking().first().getClass());
+        assertEquals(UIModel.class, observable.toBlocking().first().getClass());
     }
 
     @Test
@@ -88,7 +88,7 @@ public class UserListVMTest {
         when(mockDataUseCase.queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class)))
                 .thenReturn(observableUserRealm);
 
-        Observable<ViewState> observable = userListVM.search("m");
+        Observable<UIModel> observable = userListVM.search("m");
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class),
@@ -114,7 +114,7 @@ public class UserListVMTest {
 
         when(mockDataUseCase.getList(any())).thenReturn(observableUserRealm);
 
-        Observable observable = userListVM.incrementPage();
+        Observable observable = userListVM.incrementPage(0);
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).getList(any(GetRequest.class));

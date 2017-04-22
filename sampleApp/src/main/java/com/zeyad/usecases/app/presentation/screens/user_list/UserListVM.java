@@ -1,26 +1,26 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
-import com.zeyad.usecases.app.components.mvvm.ViewState;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
 import rx.Observable;
 import rx.android.schedulers.AndroidSchedulers;
 
-import static com.zeyad.usecases.app.presentation.screens.user_list.UserListState.onSearch;
 import static com.zeyad.usecases.app.utils.Constants.URLS.USER;
 import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
 
 /**
  * @author zeyad on 11/1/16.
  */
-class UserListVM extends BaseViewModel<UserListState> implements UserListViewModel {
+class UserListVM extends BaseViewModel implements UserListViewModel {
 
     private final IDataUseCase dataUseCase;
 
@@ -29,50 +29,43 @@ class UserListVM extends BaseViewModel<UserListState> implements UserListViewMod
     }
 
     @Override
-    public Observable<ViewState> getUsers() {
+    public Observable getUsers() {
         return dataUseCase.getListOffLineFirst(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
-                .url(getUsersURL())
-                .build())
-                .map(UserListState::onNext)
-                .compose(stateTransformer());
-    }
-
-    private String getUsersURL() {
-        return String.format(USERS, getViewStateBundle() != null ? getViewStateBundle().getLastId() : 0);
+                .url(String.format(USERS, 0))
+                .build());
     }
 
     @Override
-    public Observable<ViewState> incrementPage() {
-        return dataUseCase.getList(new GetRequest.GetRequestBuilder(UserRealm.class, true)
-                .url(getUsersURL())
-                .build())
-                .map(UserListState::onNext)
-                .compose(stateTransformer());
+    public Observable incrementPage(long lastId) {
+        return dataUseCase.getList(new GetRequest
+                .GetRequestBuilder(UserRealm.class, true)
+                .url(String.format(USERS, lastId))
+                .build());
     }
 
     @Override
-    public Observable<ViewState> search(String query) {
+    public Observable search(String query) {
         return dataUseCase.queryDisk(realm -> realm.where(UserRealm.class)
                 .beginsWith(UserRealm.LOGIN, query), UserRealm.class)
                 .zipWith(dataUseCase.getObject(new GetRequest
-                        .GetRequestBuilder(UserRealm.class, true)
-                        .url(String.format(USER, query))
-                        .build())
-                        .onErrorReturn(null), (list, userRealm) -> {
-                    list.add(0, userRealm);
-                    return Arrays.asList(new HashSet<>(list));
-                })
-                .map(list -> onSearch((List<UserRealm>) list))
-                .observeOn(AndroidSchedulers.mainThread())
-                .compose(stateTransformer());
+                                .GetRequestBuilder(UserRealm.class, true)
+                                .url(String.format(USER, query))
+                                .build())
+                                .onErrorReturn(o -> null)
+                                .map(o -> o != null ? Collections.singletonList(o) : Collections.emptyList()),
+                        (list, singletonList) -> {
+                            list.addAll((Collection) singletonList);
+                            return new ArrayList<>(new HashSet<>(list));
+                        })
+                .observeOn(AndroidSchedulers.mainThread());
     }
 
     @Override
-    public Observable<ViewState> deleteCollection(List<Long> selectedItemsIds) {
-        return dataUseCase.deleteCollection(new PostRequest.PostRequestBuilder(UserRealm.class, true)
+    public Observable deleteCollection(List<Long> selectedItemsIds) {
+        return dataUseCase.deleteCollection(new PostRequest
+                .PostRequestBuilder(UserRealm.class, true)
                 .payLoad(selectedItemsIds)
-                .build())
-                .compose(stateTransformer());
+                .build());
     }
 }

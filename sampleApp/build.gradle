@@ -88,7 +88,7 @@ android {
 }
 
 ext {
-    supportLibraryVersion = '25.3.0'
+    supportLibraryVersion = '25.3.1'
     googlePlayVersion = '10.0.1'
     butterKnifeVersion = '8.4.0'
     rxbindingVersion = '1.0.1'

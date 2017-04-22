@@ -11,17 +11,17 @@ import java.net.UnknownHostException;
 import retrofit2.adapter.rxjava.HttpException;
 
 /**
- * Factory used to create errorState messages from an Exception as a condition.
+ * Factory used to create errorResult messages from an Exception as a condition.
  */
 public class ErrorMessageFactory {
     private static final String NO_INTERNET = "Please check your internet connection",
-            UNKNOWN_ERROR = "Unknown errorState";
+            UNKNOWN_ERROR = "Unknown errorResult";
 
     /**
-     * Creates a String representing an errorState message.
+     * Creates a String representing an errorResult message.
      *
-     * @param exception An exception used as a condition to retrieve the correct errorState message.
-     * @return {@link String} an errorState message.
+     * @param exception An exception used as a condition to retrieve the correct errorResult message.
+     * @return {@link String} an errorResult message.
      */
     public static String create(Exception exception) {
         if (exception instanceof NetworkConnectionException) {
@@ -35,22 +35,22 @@ public class ErrorMessageFactory {
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject = new JSONObject(((HttpException) exception).response().errorBody().string());
-                return jsonObject.getJSONObject("errorState").getString("message");
+                return jsonObject.getJSONObject("errorResult").getString("message");
             } catch (IOException | JSONException e) {
                 try {
-                    if (jsonObject.has("errorState")) {
+                    if (jsonObject.has("errorResult")) {
                         jsonObject = new JSONObject(((HttpException) exception).response().errorBody().string());
-                        if (jsonObject.get("errorState") instanceof JSONObject) {
-                            if (jsonObject.getJSONObject("errorState").has("message"))
-                                return jsonObject.getJSONObject("errorState").getString("message");
-                            else if (jsonObject.getJSONObject("errorState").has("error_description"))
-                                return jsonObject.getJSONObject("errorState").getString("error_description");
-                            else if (jsonObject.getJSONObject("errorState").has("errorState"))
-                                return jsonObject.getJSONObject("errorState").getString("errorState");
+                        if (jsonObject.get("errorResult") instanceof JSONObject) {
+                            if (jsonObject.getJSONObject("errorResult").has("message"))
+                                return jsonObject.getJSONObject("errorResult").getString("message");
+                            else if (jsonObject.getJSONObject("errorResult").has("error_description"))
+                                return jsonObject.getJSONObject("errorResult").getString("error_description");
+                            else if (jsonObject.getJSONObject("errorResult").has("errorResult"))
+                                return jsonObject.getJSONObject("errorResult").getString("errorResult");
                         } else if (jsonObject.has("error_description"))
                             return jsonObject.getString("error_description");
-                        else if (jsonObject.get("errorState") instanceof String)
-                            return jsonObject.getString("errorState");
+                        else if (jsonObject.get("errorResult") instanceof String)
+                            return jsonObject.getString("errorResult");
                     }
                 } catch (JSONException | IOException ignored) {
                 }

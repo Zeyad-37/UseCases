@@ -1,28 +1,25 @@
 package com.zeyad.usecases.app.components.mvvm;
 
 import rx.Observable;
-import rx.subjects.BehaviorSubject;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Func1;
+import rx.functions.Func2;
 
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseViewModel<B> {
+public class BaseViewModel {
 
-    private BehaviorSubject<ViewState<B>> state = BehaviorSubject.create();
-
-    public Observable.Transformer<Object, ViewState> stateTransformer() {
-        return listObservable -> listObservable
-                .startWith(ViewState.loadingState(getViewStateBundle()))
-                .onErrorReturn(throwable -> ViewState.errorState(throwable, getViewStateBundle()))
-                .flatMap(nextState -> {
-                    state.onNext((ViewState<B>) nextState);
-                    return state;
-                });
-    }
-
-    public B getViewStateBundle() {
-        if (state.getValue() != null)
-            return state.getValue().getBundle();
-        else return null;
+    public Observable.Transformer<BaseEvent, UIModel> uiModels(Func1<BaseEvent, BaseAction> mapEventsToActions,
+                                                               Func1<BaseAction, Observable<?>> mapActionsToExecutables,
+                                                               Func2<UIModel, BaseResult, UIModel> stateReducer) {
+        return events -> events.map(mapEventsToActions)
+                .compose(actions -> actions.flatMap(action -> Observable.just(action)
+                        .flatMap(mapActionsToExecutables)
+                        .map(BaseResult::successResult)
+                        .onErrorReturn(BaseResult::errorResult)
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .startWith(BaseResult.IN_FLIGHT)))
+                .scan(UIModel.idleState, stateReducer);
     }
 }

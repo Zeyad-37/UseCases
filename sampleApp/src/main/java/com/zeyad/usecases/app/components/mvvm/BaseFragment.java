@@ -13,9 +13,13 @@ import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
 import org.parceler.Parcels;
 
-import butterknife.Unbinder;
+import java.util.Arrays;
+import java.util.List;
 
-import static com.zeyad.usecases.app.components.mvvm.BaseActivity.VIEW_STATE;
+import butterknife.Unbinder;
+import rx.Observable;
+
+import static com.zeyad.usecases.app.components.mvvm.BaseActivity.UI_MODEL;
 
 /**
  * @author zeyad on 11/28/16.
@@ -26,6 +30,7 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
     public IRxEventBus rxEventBus;
     public S viewState;
     public Unbinder unbinder;
+    public Observable<BaseEvent> events;
 
     public BaseFragment() {
         super();
@@ -44,7 +49,7 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         if (savedInstanceState != null)
-            renderState(Parcels.unwrap(savedInstanceState.getParcelable(VIEW_STATE)));
+            renderState(Parcels.unwrap(savedInstanceState.getParcelable(UI_MODEL)));
     }
 
     @Override
@@ -67,13 +72,13 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
     }
 
     /**
-     * To implement! Saves the viewState of the current view. Do not return null!
+     * To implement! Saves the uiModel of the current view. Do not return null!
      *
      * @return {@link Bundle}
      */
     private Bundle saveState() {
         Bundle bundle = new Bundle(1);
-        bundle.putParcelable(VIEW_STATE, Parcels.wrap(viewState));
+        bundle.putParcelable(UI_MODEL, Parcels.wrap(viewState));
         return bundle;
     }
 
@@ -83,6 +88,15 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
     public abstract void initialize();
 
     public abstract void loadData();
+
+    public Observable.Transformer<BaseEvent, BaseEvent> mergeEvents(Class... classes) {
+        List<Class> classList = Arrays.asList(classes);
+        return events -> events.publish(shared -> {
+            for (int i = 0; i < classList.size(); i++)
+                shared = shared.mergeWith(shared.ofType(classList.get(i)));
+            return shared;
+        });
+    }
 
     public void showToastMessage(String message) {
         showToastMessage(message, Toast.LENGTH_LONG);
@@ -123,7 +137,7 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
     }
 
     /**
-     * Shows a {@link android.support.design.widget.Snackbar} errorState message.
+     * Shows a {@link android.support.design.widget.Snackbar} errorResult message.
      *
      * @param message  An string representing a message to be shown.
      * @param duration Visibility duration.

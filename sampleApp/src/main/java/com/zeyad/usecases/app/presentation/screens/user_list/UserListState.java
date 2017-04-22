@@ -1,13 +1,11 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
-import com.zeyad.usecases.app.components.mvvm.ViewState;
+import com.zeyad.usecases.app.components.mvvm.UIModel;
 
 import org.parceler.Parcel;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.zeyad.usecases.app.components.mvvm.ViewState.NEXT;
 
 /**
  * @author by ZIaDo on 1/28/17.
@@ -31,15 +29,15 @@ public class UserListState {
         lastId = builder.lastId;
     }
 
-    static ViewState<UserListState> onNext(List<UserRealm> users) {
-        return new ViewState<>(false, null, NEXT, UserListState.builder().setUsers(users).build());
+    static UIModel<UserListState> onNext(List<UserRealm> users) {
+        return new UIModel<>(UIModel.SUCCESS, false, null, true, UserListState.builder().setUsers(users).build());
     }
 
-    static ViewState<UserListState> onSearch(List<UserRealm> users) {
-        return new ViewState<>(false, null, SEARCH, UserListState.builder().setUsers(users).build());
+    static UIModel<UserListState> onSearch(List<UserRealm> users) {
+        return new UIModel<>(UIModel.SUCCESS, false, null, true, UserListState.builder().setUsers(users).build());
     }
 
-    private static Builder builder() {
+    public static Builder builder() {
         return new Builder();
     }
 

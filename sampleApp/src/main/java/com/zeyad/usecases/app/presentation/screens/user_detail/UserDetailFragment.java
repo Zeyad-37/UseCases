@@ -28,9 +28,14 @@ import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.mvvm.BaseFragment;
 import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
+import com.zeyad.usecases.app.components.mvvm.UIModel;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
+import com.zeyad.usecases.app.presentation.screens.user_list.events.DeleteUsersEvent;
+import com.zeyad.usecases.app.presentation.screens.user_list.events.GetUsersEvent;
+import com.zeyad.usecases.app.presentation.screens.user_list.events.SearchUsersEvent;
+import com.zeyad.usecases.app.presentation.screens.user_list.events.UsersNextPageEvent;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
@@ -41,8 +46,9 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import rx.Observable;
 
-import static com.zeyad.usecases.app.components.mvvm.BaseActivity.VIEW_STATE;
+import static com.zeyad.usecases.app.components.mvvm.BaseActivity.UI_MODEL;
 import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
 
 /**
@@ -69,7 +75,7 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
     public static UserDetailFragment newInstance(UserDetailState userDetailState) {
         UserDetailFragment userDetailFragment = new UserDetailFragment();
         Bundle bundle = new Bundle();
-        bundle.putParcelable(VIEW_STATE, Parcels.wrap(userDetailState));
+        bundle.putParcelable(UI_MODEL, Parcels.wrap(userDetailState));
         userDetailFragment.setArguments(bundle);
         return userDetailFragment;
     }
@@ -77,8 +83,9 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
     @Override
     public void initialize() {
         if (getArguments() != null)
-            viewState = Parcels.unwrap(getArguments().getParcelable(VIEW_STATE));
+            viewState = Parcels.unwrap(getArguments().getParcelable(UI_MODEL));
         userDetailVM = new UserDetailVM(DataUseCaseFactory.getInstance());
+        events = Observable.just(new GetReposEvent(viewState.getUser().getLogin()));
     }
 
     @Override
@@ -113,8 +120,23 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
 
     @Override
     public void loadData() {
-        userDetailVM.getRepositories(viewState).compose(bindToLifecycle())
-                .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
+        events.compose(mergeEvents(DeleteUsersEvent.class, GetUsersEvent.class, SearchUsersEvent.class,
+                UsersNextPageEvent.class))
+                .compose(userDetailVM.uiModels(event -> new GetReposAction(((GetReposEvent) event).getLogin()),
+                        action -> userDetailVM.getRepositories(((GetReposAction) action).getLogin()),
+                        (currentUIModel, newUIModel) -> {
+                            if (newUIModel.isLoading())
+                                currentUIModel = UIModel.loadingState;
+                            else if (newUIModel.isSuccessful())
+                                currentUIModel = UIModel.successState(UserDetailState.builder()
+                                        .setRepos((List<RepoRealm>) newUIModel.getBundle())
+                                        .setUser(viewState.getUser())
+                                        .setIsTwoPane(viewState.isTwoPane())
+                                        .build());
+                            else currentUIModel = UIModel.errorState(newUIModel.getError());
+                            return currentUIModel;
+                        }))
+                .compose(bindToLifecycle()).subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }
 
     @Override
@@ -188,6 +210,11 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
             }
         }
 //        applyPalette();
+    }
+
+    @Override
+    public View getViewToToggleEnabling() {
+        return null;
     }
 
     @Override

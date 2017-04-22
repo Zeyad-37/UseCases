@@ -1,13 +1,9 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
 import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
-import com.zeyad.usecases.app.components.mvvm.ViewState;
-import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
-
-import java.util.List;
 
 import rx.Observable;
 
@@ -16,7 +12,7 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
 /**
  * @author zeyad on 1/10/17.
  */
-class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailView {
+class UserDetailVM extends BaseViewModel implements UserDetailView {
     private final IDataUseCase dataUseCase;
 
     UserDetailVM(IDataUseCase dataUseCase) {
@@ -24,23 +20,12 @@ class UserDetailVM extends BaseViewModel<UserDetailState> implements UserDetailV
     }
 
     @Override
-    public Observable<ViewState> getRepositories(UserDetailState userDetailState) {
-        UserRealm user = userDetailState.getUser();
-        String userLogin = user.getLogin();
-        return Utils.isNotEmpty(userLogin) ? Observable.zip(Observable.just(user),
-                dataUseCase.queryDisk(realm -> realm.where(RepoRealm.class)
-                        .equalTo("owner.login", userLogin), RepoRealm.class)
-                        .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
-                                dataUseCase.getList(new GetRequest.GetRequestBuilder(RepoRealm.class, true)
-                                        .url(String.format(REPOSITORIES, userLogin)).build())),
-                (userRealm, repos) -> {
-                    UserRealm finalUser = userRealm != null ? userRealm :
-                            userDetailState.getUser() != null ? userDetailState.getUser() : new UserRealm();
-                    List<RepoRealm> finalRepos = Utils.isNotEmpty(repos) ? Utils.union(userDetailState.getRepos(), repos)
-                            : userDetailState.getRepos();
-                    return UserDetailState.onNext(finalUser, finalRepos, false);
-                }) :
-                Observable.just(ViewState.errorState(new IllegalArgumentException("User name can not be empty"),
-                        getViewStateBundle()));
+    public Observable getRepositories(String userLogin) {
+        return Utils.isNotEmpty(userLogin) ? dataUseCase.queryDisk(realm -> realm.where(RepoRealm.class)
+                .equalTo("owner.login", userLogin), RepoRealm.class)
+                .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
+                        dataUseCase.getList(new GetRequest.GetRequestBuilder(RepoRealm.class, true)
+                                .url(String.format(REPOSITORIES, userLogin)).build())) :
+                Observable.error(new IllegalArgumentException("User name can not be empty"));
     }
 }

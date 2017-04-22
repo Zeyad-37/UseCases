@@ -17,19 +17,22 @@ import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
 import org.parceler.Parcels;
 
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.Unbinder;
+import rx.Observable;
 
 /**
  * @author zeyad on 11/28/16.
  */
 public abstract class BaseActivity<S> extends RxAppCompatActivity implements LoadDataView<S> {
-    public static final String VIEW_STATE = "viewState";
+    public static final String UI_MODEL = "uiModel";
     public INavigator navigator;
     public IRxEventBus rxEventBus;
-    public S viewState;
+    public S uiModel;
     public Unbinder unbinder;
+    public Observable<BaseEvent> events;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +43,8 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
         initialize();
         setupUI();
         if (savedInstanceState != null) {
-            viewState = Parcels.unwrap(savedInstanceState.getParcelable(VIEW_STATE));
-            renderState(viewState);
+            uiModel = Parcels.unwrap(savedInstanceState.getParcelable(UI_MODEL));
+            renderState(uiModel);
         }
     }
 
@@ -49,7 +52,7 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null)
-            renderState(Parcels.unwrap(savedInstanceState.getParcelable(VIEW_STATE)));
+            renderState(Parcels.unwrap(savedInstanceState.getParcelable(UI_MODEL)));
     }
 
     @Override
@@ -60,13 +63,13 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
     }
 
     /**
-     * To implement! Saves the viewState of the current view. Do not return null!
+     * To implement! Saves the uiModel of the current view. Do not return null!
      *
      * @return {@link Bundle}
      */
     private Bundle saveState() {
         Bundle bundle = new Bundle(1);
-        bundle.putParcelable(VIEW_STATE, Parcels.wrap(viewState));
+        bundle.putParcelable(UI_MODEL, Parcels.wrap(uiModel));
         return bundle;
     }
 
@@ -93,6 +96,15 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
     public abstract void setupUI();
 
     public abstract void loadData();
+
+    public Observable.Transformer<BaseEvent, BaseEvent> mergeEvents(Class... classes) {
+        List<Class> classList = Arrays.asList(classes);
+        return events -> events.publish(shared -> {
+            for (int i = 0; i < classList.size(); i++)
+                shared = shared.mergeWith(shared.ofType(classList.get(i)));
+            return shared;
+        });
+    }
 
     /**
      * Adds a {@link Fragment} to this activity's layout.
@@ -154,7 +166,7 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
     }
 
     /**
-     * Shows a {@link android.support.design.widget.Snackbar} errorState message.
+     * Shows a {@link android.support.design.widget.Snackbar} errorResult message.
      *
      * @param message  An string representing a message to be shown.
      * @param duration Visibility duration.
