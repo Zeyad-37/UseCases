@@ -1,7 +1,5 @@
 package com.zeyad.usecases.app.components.mvvm;
 
-import android.view.View;
-
 /**
  * Interface representing a View that will use to load data.
  */
@@ -11,7 +9,7 @@ interface LoadDataView<S> {
      *
      * @param toggle whether to show or hide the loading view.
      */
-    void toggleLoading(boolean toggle);
+    void toggleViews(boolean toggle);
 
     /**
      * Show a retry view in case of an errorResult when retrieving data.
@@ -33,11 +31,4 @@ interface LoadDataView<S> {
      * @param s the model to be rendered.
      */
     void renderState(S s);
-
-    /**
-     * Returns a view that would be disabled while loading.
-     *
-     * @return View to be toggled.
-     */
-    View getViewToToggleEnabling();
 }

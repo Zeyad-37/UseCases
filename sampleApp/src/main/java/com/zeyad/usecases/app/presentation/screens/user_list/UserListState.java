@@ -11,19 +11,16 @@ import java.util.List;
 @Parcel
 public class UserListState {
     final List<UserRealm> users;
-    final long lastId;
 
     UserListState() {
         users = new ArrayList<>();
-        lastId = 0;
     }
 
     private UserListState(Builder builder) {
         users = builder.users;
-        lastId = builder.lastId;
     }
 
-    public static Builder builder() {
+    static Builder builder() {
         return new Builder();
     }
 
@@ -31,29 +28,14 @@ public class UserListState {
         return users;
     }
 
-    long getLastId() {
-        return lastId;
-    }
-
     static class Builder {
         List<UserRealm> users;
-        long lastId;
 
         Builder() {
         }
 
-        Builder(UserListState userListState) {
-            users = userListState.getUsers();
-            lastId = userListState.getLastId();
-        }
-
         Builder setUsers(List<UserRealm> value) {
             users = value;
-            return this;
-        }
-
-        Builder setLastId(int value) {
-            lastId = value;
             return this;
         }
 

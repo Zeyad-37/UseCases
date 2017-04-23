@@ -29,6 +29,7 @@ import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.mvvm.BaseAction;
 import com.zeyad.usecases.app.components.mvvm.BaseActivity;
+import com.zeyad.usecases.app.components.mvvm.BaseEvent;
 import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
 import com.zeyad.usecases.app.components.mvvm.UIModel;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
@@ -49,6 +50,7 @@ import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -76,6 +78,8 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     LinearLayout loaderLayout;
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
+    Observable.Transformer<BaseEvent, BaseEvent> mergeEventsTransformer;
+    Observable.Transformer<BaseEvent, UIModel> uiModelsTransformer;
     private UserListVM userListVM;
     private GenericRecyclerViewAdapter usersAdapter;
     private boolean twoPane;
@@ -90,6 +94,15 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     public void initialize() {
         userListVM = new UserListVM(DataUseCaseFactory.getInstance());
         events = Observable.just(new GetUsersEvent());
+        rxEventBus.toObserverable()
+                .compose(bindToLifecycle())
+                .subscribe(stream -> {
+                    events = events.mergeWith((Observable<? extends BaseEvent>) stream);
+                    events.compose(mergeEventsTransformer)
+                            .compose(uiModelsTransformer)
+                            .compose(bindToLifecycle())
+                            .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
+                });
     }
 
     @Override
@@ -105,41 +118,54 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
 
     @Override
     public void loadData() {
-        events.compose(mergeEvents(DeleteUsersEvent.class, GetUsersEvent.class, SearchUsersEvent.class,
-                UsersNextPageEvent.class))
-                .compose(userListVM.uiModels(event -> {
-                    BaseAction action = null;
-                    if (event instanceof GetUsersEvent)
-                        action = new GetUsersAction();
-                    else if (event instanceof DeleteUsersEvent)
-                        action = new DeleteUserAction(((DeleteUsersEvent) event).getSelectedItemsIds());
-                    else if (event instanceof SearchUsersEvent)
-                        action = new SearchUsersAction(((SearchUsersEvent) event).getQuery());
-                    else if (event instanceof UsersNextPageEvent)
-                        action = new UsersNextPageAction(((UsersNextPageEvent) event).getLastId());
-                    return action;
-                }, action -> {
-                    Observable result = Observable.empty();
-                    if (action instanceof GetUsersAction)
-                        result = userListVM.getUsers();
-                    else if (action instanceof DeleteUserAction)
-                        result = userListVM.deleteCollection(((DeleteUserAction) action).getSelectedItemsIds());
-                    else if (action instanceof SearchUsersAction)
-                        result = userListVM.search(((SearchUsersAction) action).getQuery());
-                    else if (action instanceof UsersNextPageAction)
-                        result = userListVM.incrementPage(((UsersNextPageAction) action).getLastId());
-                    return result;
-                }, (currentUIModel, newUIModel) -> {
-                    // FIXME: 4/22/17 Apply all states
-                    if (newUIModel.isLoading())
-                        currentUIModel = UIModel.loadingState;
-                    else if (newUIModel.isSuccessful())
-                        currentUIModel = UIModel.successState(UserListState.builder()
-                                .setUsers((List<UserRealm>) newUIModel.getBundle())
-                                .build());
-                    else currentUIModel = UIModel.errorState(newUIModel.getError());
-                    return currentUIModel;
-                }))
+        mergeEventsTransformer = mergeEvents(DeleteUsersEvent.class, GetUsersEvent.class, SearchUsersEvent.class,
+                UsersNextPageEvent.class);
+        uiModelsTransformer = userListVM.uiModels(event -> {
+            BaseAction action = null;
+            if (event instanceof GetUsersEvent)
+                action = new GetUsersAction();
+            else if (event instanceof DeleteUsersEvent)
+                action = new DeleteUserAction(((DeleteUsersEvent) event).getSelectedItemsIds());
+            else if (event instanceof SearchUsersEvent)
+                action = new SearchUsersAction(((SearchUsersEvent) event).getQuery());
+            else if (event instanceof UsersNextPageEvent)
+                action = new UsersNextPageAction(((UsersNextPageEvent) event).getLastId());
+            return action;
+        }, action -> {
+            Observable result = Observable.empty();
+            if (action instanceof GetUsersAction)
+                result = userListVM.getUsers();
+            else if (action instanceof DeleteUserAction)
+                result = userListVM.deleteCollection(((DeleteUserAction) action).getSelectedItemsIds());
+            else if (action instanceof SearchUsersAction)
+                result = userListVM.search(((SearchUsersAction) action).getQuery());
+            else if (action instanceof UsersNextPageAction)
+                result = userListVM.incrementPage(((UsersNextPageAction) action).getLastId());
+            return result;
+        }, (currentUIModel, newUIModel) -> {
+            // FIXME: 4/22/17 Apply state precedence
+            if (newUIModel.isLoading())
+                currentUIModel = UIModel.loadingState(currentUIModel.getBundle());
+            else if (newUIModel.isSuccessful()) {
+                List list = (List) newUIModel.getBundle();
+                List<UserRealm> users;
+                if (list.get(0).getClass().equals(UserRealm.class))
+                    users = (List<UserRealm>) newUIModel.getBundle();
+                else {
+                    users = ((UserListState) currentUIModel.getBundle()).getUsers();
+                    final Iterator<UserRealm> each = users.iterator();
+                    while (each.hasNext()) if (list.contains((long) each.next().getId()))
+                        each.remove();
+
+                }
+                currentUIModel = UIModel.successState(UserListState.builder()
+                        .setUsers(users)
+                        .build());
+            } else currentUIModel = UIModel.errorState(newUIModel.getError());
+            return currentUIModel;
+        });
+        events.compose(mergeEventsTransformer)
+                .compose(uiModelsTransformer)
                 .compose(bindToLifecycle())
                 .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
     }
@@ -161,11 +187,6 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
             usersAdapter.setDataList(itemInfoList);
 //            userRecycler.smoothScrollToPosition(state.getYScroll());
         }
-    }
-
-    @Override
-    public View getViewToToggleEnabling() {
-        return null;
     }
 
     private void setupRecyclerView() {
@@ -235,19 +256,14 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
         userRecycler.setLayoutManager(layoutManager);
         userRecycler.setAdapter(usersAdapter);
         usersAdapter.setAllowSelection(true);
-        events = events.mergeWith(Observable.defer(() -> RxRecyclerView.scrollEvents(userRecycler).map(recyclerViewScrollEvent -> {
-            int totalItemCount = layoutManager.getItemCount();
-            int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-            if ((layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
-                    && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE) {
-//                uiModel = new UserListState.Builder(uiModel)
-//                        .setUsers(uiModel.getUsers())
-//                        .setYScroll(firstVisibleItemPosition)
-//                        .build();
-                return new UsersNextPageEvent(uiModel.getLastId());
-            }
-            return null;
-        }).filter(usersNextPageEvent -> usersNextPageEvent != null)
+        events = events.mergeWith(Observable.defer(() -> RxRecyclerView.scrollEvents(userRecycler)
+                .map(recyclerViewScrollEvent -> {
+                    int totalItemCount = layoutManager.getItemCount();
+                    int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                    return (layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
+                            && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE ?
+                            new UsersNextPageEvent(usersAdapter.getLastItem().getId()) : null;
+                }).filter(usersNextPageEvent -> usersNextPageEvent != null)
                 .throttleLast(200, TimeUnit.MILLISECONDS)
                 .debounce(300, TimeUnit.MILLISECONDS)
                 .onBackpressureLatest()
@@ -255,9 +271,11 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     }
 
     @Override
-    public void toggleLoading(boolean toggle) {
-        loaderLayout.bringToFront();
-        loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
+    public void toggleViews(boolean toggle) {
+        runOnUiThread(() -> {
+            loaderLayout.bringToFront();
+            loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
+        });
     }
 
     @Override
@@ -319,7 +337,11 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
         mode.getMenuInflater().inflate(R.menu.selected_list_menu, menu);
         events = events.mergeWith(Observable.defer(() -> RxMenuItem.clicks(menu.findItem(R.id.delete_item))
                 .map(click -> new DeleteUsersEvent(usersAdapter.getSelectedItemsIds()))
-                .doOnNext(searchUsersEvent -> Log.d("deleteEvent", "eventFired"))));
+                .doOnEach(notification -> {
+                    actionMode.finish();
+                    Log.d("deleteEvent", "eventFired");
+                })));
+        rxEventBus.send(events);
         return true;
     }
 
@@ -334,15 +356,6 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
         switch (item.getItemId()) {
             case R.id.delete_item:
-                events = events.mergeWith(RxMenuItem.clicks(item)
-                        .map(click -> new DeleteUsersEvent(usersAdapter.getSelectedItemsIds()))
-                        .doOnNext(searchUsersEvent -> Log.d("deleteEvent", "eventFired")));
-//                        .subscribe(o -> {
-//                            usersAdapter.removeItemsById(usersAdapter.getSelectedItemsIds());
-//                            mode.finish();
-//                        }, throwable -> {
-//                            throw new OnErrorNotImplementedException((Throwable) throwable);
-//                        });
                 return true;
             default:
                 return false;

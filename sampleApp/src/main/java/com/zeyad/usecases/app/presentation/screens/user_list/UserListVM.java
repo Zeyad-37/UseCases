@@ -20,7 +20,7 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
 /**
  * @author zeyad on 11/1/16.
  */
-class UserListVM extends BaseViewModel implements UserListViewModel {
+class UserListVM extends BaseViewModel {
 
     private final IDataUseCase dataUseCase;
 
@@ -28,24 +28,21 @@ class UserListVM extends BaseViewModel implements UserListViewModel {
         this.dataUseCase = dataUseCase;
     }
 
-    @Override
-    public Observable getUsers() {
+    Observable getUsers() {
         return dataUseCase.getListOffLineFirst(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, 0))
                 .build());
     }
 
-    @Override
-    public Observable incrementPage(long lastId) {
+    Observable incrementPage(long lastId) {
         return dataUseCase.getList(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, lastId))
                 .build());
     }
 
-    @Override
-    public Observable search(String query) {
+    Observable search(String query) {
         return dataUseCase.queryDisk(realm -> realm.where(UserRealm.class)
                 .beginsWith(UserRealm.LOGIN, query), UserRealm.class)
                 .zipWith(dataUseCase.getObject(new GetRequest
@@ -61,11 +58,11 @@ class UserListVM extends BaseViewModel implements UserListViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    @Override
-    public Observable deleteCollection(List<Long> selectedItemsIds) {
+    Observable deleteCollection(List<Long> selectedItemsIds) {
         return dataUseCase.deleteCollection(new PostRequest
                 .PostRequestBuilder(UserRealm.class, true)
                 .payLoad(selectedItemsIds)
-                .build());
+                .build())
+                .map(o -> selectedItemsIds);
     }
 }

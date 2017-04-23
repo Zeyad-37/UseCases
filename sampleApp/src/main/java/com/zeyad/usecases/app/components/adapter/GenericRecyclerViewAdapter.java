@@ -83,6 +83,14 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         return mDataList.get(index);
     }
 
+    public ItemInfo getFirstItem() {
+        return mDataList.get(0);
+    }
+
+    public ItemInfo getLastItem() {
+        return mDataList.get(mDataList.size() - 1);
+    }
+
     public List<Long> getSelectedItemsIds() {
         ArrayList<Long> integers = new ArrayList<>();
         for (int i = 0; i < mDataList.size(); i++)

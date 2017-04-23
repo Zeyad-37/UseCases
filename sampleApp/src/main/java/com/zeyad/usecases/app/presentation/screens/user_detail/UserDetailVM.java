@@ -12,15 +12,14 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
 /**
  * @author zeyad on 1/10/17.
  */
-class UserDetailVM extends BaseViewModel implements UserDetailView {
+class UserDetailVM extends BaseViewModel {
     private final IDataUseCase dataUseCase;
 
     UserDetailVM(IDataUseCase dataUseCase) {
         this.dataUseCase = dataUseCase;
     }
 
-    @Override
-    public Observable getRepositories(String userLogin) {
+    Observable getRepositories(String userLogin) {
         return Utils.isNotEmpty(userLogin) ? dataUseCase.queryDisk(realm -> realm.where(RepoRealm.class)
                 .equalTo("owner.login", userLogin), RepoRealm.class)
                 .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :

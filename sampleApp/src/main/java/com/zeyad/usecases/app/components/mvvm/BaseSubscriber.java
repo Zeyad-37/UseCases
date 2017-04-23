@@ -1,7 +1,5 @@
 package com.zeyad.usecases.app.components.mvvm;
 
-import android.view.View;
-
 import com.zeyad.usecases.app.components.exceptions.ErrorMessageFactory;
 
 import rx.Subscriber;
@@ -39,10 +37,7 @@ public class BaseSubscriber<V extends LoadDataView> extends Subscriber<UIModel> 
 
     @Override
     public void onNext(UIModel uiModel) {
-        view.toggleLoading(uiModel.isLoading());
-        View toggleableView = view.getViewToToggleEnabling();
-        if (toggleableView != null)
-            toggleableView.setEnabled(!uiModel.isLoading());
+        view.toggleViews(uiModel.isLoading());
         if (!uiModel.isLoading()) {
             if (uiModel.isSuccessful())
                 view.renderState(uiModel.getBundle());

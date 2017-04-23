@@ -203,12 +203,7 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
     }
 
     @Override
-    public View getViewToToggleEnabling() {
-        return null;
-    }
-
-    @Override
-    public void toggleLoading(boolean toggle) {
+    public void toggleViews(boolean toggle) {
         loaderLayout.bringToFront();
         loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
     }
