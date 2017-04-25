@@ -90,9 +90,9 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
     public abstract void loadData();
 
     public Observable.Transformer<BaseEvent, BaseEvent> mergeEvents(Class... classes) {
-        List<Class> classList = Arrays.asList(classes);
         return events -> events.publish(shared -> {
-            for (int i = 0; i < classList.size(); i++)
+            List<Class> classList = Arrays.asList(classes);
+            for (int i = 0, size = classList.size(); i < size; i++)
                 shared = shared.mergeWith(shared.ofType(classList.get(i)));
             return shared;
         });
@@ -112,23 +112,17 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
      * @param message An string representing a message to be shown.
      */
     public void showSnackBarMessage(View view, String message, int duration) {
-        if (getActivity() != null)
-            getActivity().runOnUiThread(() -> {
-                if (view != null)
-                    SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_INFO, view, message, duration).show();
-                else throw new NullPointerException("view is null");
-            });
+        if (view != null)
+            SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_INFO, view, message, duration).show();
+        else throw new NullPointerException("view is null");
     }
 
     public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,
                                        String message, String actionText, View.OnClickListener onClickListener) {
-        if (getActivity() != null)
-            getActivity().runOnUiThread(() -> {
-                if (view != null)
-                    SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText,
-                            onClickListener).show();
-                else throw new NullPointerException("View is null");
-            });
+        if (view != null)
+            SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText,
+                    onClickListener).show();
+        else throw new NullPointerException("View is null");
     }
 
     public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,
@@ -143,11 +137,8 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
      * @param duration Visibility duration.
      */
     public void showErrorSnackBar(String message, View view, int duration) {
-        if (getActivity() != null)
-            getActivity().runOnUiThread(() -> {
-                if (view != null)
-                    SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_ERROR, view, message, duration).show();
-                else throw new NullPointerException("View is null");
-            });
+        if (view != null)
+            SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_ERROR, view, message, duration).show();
+        else throw new NullPointerException("View is null");
     }
 }

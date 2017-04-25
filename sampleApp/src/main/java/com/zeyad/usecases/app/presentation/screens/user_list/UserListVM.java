@@ -20,7 +20,7 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
 /**
  * @author zeyad on 11/1/16.
  */
-class UserListVM extends BaseViewModel {
+class UserListVM extends BaseViewModel<UserListState> {
 
     private final IDataUseCase dataUseCase;
 
@@ -28,14 +28,14 @@ class UserListVM extends BaseViewModel {
         this.dataUseCase = dataUseCase;
     }
 
-    Observable getUsers() {
+    Observable<List> getUsers() {
         return dataUseCase.getListOffLineFirst(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, 0))
                 .build());
     }
 
-    Observable incrementPage(long lastId) {
+    Observable<List> incrementPage(long lastId) {
         return dataUseCase.getList(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, lastId))
@@ -43,14 +43,15 @@ class UserListVM extends BaseViewModel {
     }
 
     Observable search(String query) {
-        return dataUseCase.queryDisk(realm -> realm.where(UserRealm.class)
-                .beginsWith(UserRealm.LOGIN, query), UserRealm.class)
+        return dataUseCase.queryDisk(new GetRequest.GetRequestBuilder(null, false)
+                .queryFactory(realm -> realm.where(UserRealm.class).beginsWith(UserRealm.LOGIN, query))
+                .presentationClass(UserRealm.class).build())
                 .zipWith(dataUseCase.getObject(new GetRequest
                                 .GetRequestBuilder(UserRealm.class, true)
                                 .url(String.format(USER, query))
                                 .build())
-                                .onErrorReturn(o -> null)
-                                .map(o -> o != null ? Collections.singletonList(o) : Collections.emptyList()),
+                                .onErrorReturn(o -> Collections.EMPTY_LIST)
+                                .map(Collections::singletonList),
                         (list, singletonList) -> {
                             list.addAll((Collection) singletonList);
                             return new ArrayList<>(new HashSet<>(list));
@@ -58,7 +59,7 @@ class UserListVM extends BaseViewModel {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    Observable deleteCollection(List<Long> selectedItemsIds) {
+    Observable<List<Long>> deleteCollection(List<Long> selectedItemsIds) {
         return dataUseCase.deleteCollection(new PostRequest
                 .PostRequestBuilder(UserRealm.class, true)
                 .payLoad(selectedItemsIds)

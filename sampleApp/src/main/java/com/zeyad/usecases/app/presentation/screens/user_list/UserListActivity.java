@@ -50,6 +50,7 @@ import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -79,7 +80,7 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
     Observable.Transformer<BaseEvent, BaseEvent> mergeEventsTransformer;
-    Observable.Transformer<BaseEvent, UIModel> uiModelsTransformer;
+    Observable.Transformer<BaseEvent, UIModel<UserListState>> uiModelsTransformer;
     private UserListVM userListVM;
     private GenericRecyclerViewAdapter usersAdapter;
     private boolean twoPane;
@@ -96,13 +97,11 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
         events = Observable.just(new GetUsersEvent());
         rxEventBus.toObserverable()
                 .compose(bindToLifecycle())
-                .subscribe(stream -> {
-                    events = events.mergeWith((Observable<? extends BaseEvent>) stream);
-                    events.compose(mergeEventsTransformer)
-                            .compose(uiModelsTransformer)
-                            .compose(bindToLifecycle())
-                            .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
-                });
+                .subscribe(stream -> events.mergeWith((Observable<? extends BaseEvent>) stream)
+                        .compose(mergeEventsTransformer)
+                        .compose(uiModelsTransformer)
+                        .compose(bindToLifecycle())
+                        .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY)));
     }
 
     @Override
@@ -122,6 +121,7 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
                 UsersNextPageEvent.class);
         uiModelsTransformer = userListVM.uiModels(event -> {
             BaseAction action = null;
+            Log.d("Events To Actions", "Thread Name: " + Thread.currentThread().getName());
             if (event instanceof GetUsersEvent)
                 action = new GetUsersAction();
             else if (event instanceof DeleteUsersEvent)
@@ -133,6 +133,7 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
             return action;
         }, action -> {
             Observable result = Observable.empty();
+            Log.d("Actions To Executables", "Thread Name: " + Thread.currentThread().getName());
             if (action instanceof GetUsersAction)
                 result = userListVM.getUsers();
             else if (action instanceof DeleteUserAction)
@@ -142,26 +143,27 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
             else if (action instanceof UsersNextPageAction)
                 result = userListVM.incrementPage(((UsersNextPageAction) action).getLastId());
             return result;
-        }, (currentUIModel, newUIModel) -> {
-            // FIXME: 4/22/17 Apply state precedence
-            if (newUIModel.isLoading())
-                currentUIModel = UIModel.loadingState(currentUIModel.getBundle());
-            else if (newUIModel.isSuccessful()) {
-                List list = (List) newUIModel.getBundle();
+        }, (currentUIModel, result) -> {
+            UserListState bundle = currentUIModel.getBundle();
+            Log.d("State Accumulator", "Thread Name: " + Thread.currentThread().getName());
+            if (result.isLoading())
+                currentUIModel = UIModel.loadingState(bundle);
+            else if (result.isSuccessful()) {
+                List list = (List) result.getBundle();
                 List<UserRealm> users;
-                if (list.get(0).getClass().equals(UserRealm.class))
-                    users = (List<UserRealm>) newUIModel.getBundle();
-                else {
-                    users = ((UserListState) currentUIModel.getBundle()).getUsers();
+                if (list.get(0).getClass().equals(UserRealm.class)) {
+                    users = list;
+                    if (bundle != null)
+                        users.addAll(bundle.getUsers());
+                    users = new ArrayList<>(new HashSet<>(users));
+                } else {
+                    users = bundle.getUsers();
                     final Iterator<UserRealm> each = users.iterator();
                     while (each.hasNext()) if (list.contains((long) each.next().getId()))
                         each.remove();
-
                 }
-                currentUIModel = UIModel.successState(UserListState.builder()
-                        .setUsers(users)
-                        .build());
-            } else currentUIModel = UIModel.errorState(newUIModel.getError());
+                currentUIModel = UIModel.successState(UserListState.builder().setUsers(users).build());
+            } else currentUIModel = UIModel.errorState(result.getError());
             return currentUIModel;
         });
         events.compose(mergeEventsTransformer)
@@ -272,10 +274,8 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
 
     @Override
     public void toggleViews(boolean toggle) {
-        runOnUiThread(() -> {
-            loaderLayout.bringToFront();
-            loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
-        });
+        loaderLayout.bringToFront();
+        loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
     }
 
     @Override

@@ -12,7 +12,7 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
 /**
  * @author zeyad on 1/10/17.
  */
-class UserDetailVM extends BaseViewModel {
+class UserDetailVM extends BaseViewModel<UserDetailState> {
     private final IDataUseCase dataUseCase;
 
     UserDetailVM(IDataUseCase dataUseCase) {
@@ -20,8 +20,9 @@ class UserDetailVM extends BaseViewModel {
     }
 
     Observable getRepositories(String userLogin) {
-        return Utils.isNotEmpty(userLogin) ? dataUseCase.queryDisk(realm -> realm.where(RepoRealm.class)
-                .equalTo("owner.login", userLogin), RepoRealm.class)
+        return Utils.isNotEmpty(userLogin) ? dataUseCase.queryDisk(new GetRequest.GetRequestBuilder(null, false)
+                .queryFactory(realm -> realm.where(RepoRealm.class).equalTo("owner.login", userLogin))
+                .presentationClass(RepoRealm.class).build())
                 .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
                         dataUseCase.getList(new GetRequest.GetRequestBuilder(RepoRealm.class, true)
                                 .url(String.format(REPOSITORIES, userLogin)).build())) :

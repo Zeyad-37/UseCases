@@ -34,9 +34,11 @@ public class DataUseCaseFactory {
         Config.setCacheExpiry(config.getCacheAmount(), config.getTimeUnit());
         ApiConnectionFactory.init(config.getOkHttpBuilder(), config.getOkHttpCache());
         if (config.isWithRealm()) {
-            DataUseCase.initWithRealm(config.getEntityMapper(), config.getPostExecutionThread());
+            DataUseCase.initWithRealm(config.getEntityMapper(), config.getPostExecutionThread(),
+                    config.getHandlerThread());
         } else
-            DataUseCase.initWithoutDB(config.getEntityMapper(), config.getPostExecutionThread());
+            DataUseCase.initWithoutDB(config.getEntityMapper(), config.getPostExecutionThread(),
+                    config.getHandlerThread());
         if (config.isWithCache())
             StoroBuilder.configure(config.getCacheSize())
                     .setDefaultCacheDirectory(config.getContext().getApplicationContext())

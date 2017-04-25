@@ -3,27 +3,27 @@ package com.zeyad.usecases.app.components.mvvm;
 /**
  * @author by ZIaDo on 4/19/17.
  */
-public class BaseResult<B> {
+public class Result<B> {
 
-    public static final BaseResult IN_FLIGHT = new BaseResult<>(true, null, false, null);
+    static final Result IN_FLIGHT = new Result<>(true, null, false, null);
 
     private final boolean isLoading, isSuccessful;
     private final Throwable error;
     private final B bundle;
 
-    public BaseResult(boolean isLoading, Throwable error, boolean isSuccessful, B bundle) {
+    private Result(boolean isLoading, Throwable error, boolean isSuccessful, B bundle) {
         this.isLoading = isLoading;
         this.error = error;
         this.isSuccessful = isSuccessful;
         this.bundle = bundle;
     }
 
-    public static BaseResult errorResult(Throwable error) {
-        return new BaseResult<>(false, error, false, null);
+    static <B> Result<B> errorResult(Throwable error) {
+        return new Result<>(false, error, false, null);
     }
 
-    public static BaseResult successResult(Object bundle) {
-        return new BaseResult<>(false, null, true, bundle);
+    static <B> Result<B> successResult(B bundle) {
+        return new Result<>(false, null, true, bundle);
     }
 
     public boolean isLoading() {

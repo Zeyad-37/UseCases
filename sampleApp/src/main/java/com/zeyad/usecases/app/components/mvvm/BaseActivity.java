@@ -98,12 +98,13 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
     public abstract void loadData();
 
     public Observable.Transformer<BaseEvent, BaseEvent> mergeEvents(Class... classes) {
-        List<Class> classList = Arrays.asList(classes);
-        return events -> events.publish(shared -> {
-            for (int i = 0; i < classList.size(); i++)
-                shared = shared.mergeWith(shared.ofType(classList.get(i)));
-            return shared;
-        });
+        return events -> events
+                .publish(shared -> {
+                    List<Class> classList = Arrays.asList(classes);
+                    for (int i = 0, size = classList.size(); i < size; i++)
+                        shared = shared.mergeWith(shared.ofType(classList.get(i)));
+                    return shared;
+                });
     }
 
     /**
@@ -144,20 +145,16 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
      * @param message An string representing a message to be shown.
      */
     public void showSnackBarMessage(View view, String message, int duration) {
-        runOnUiThread(() -> {
-            if (view != null)
-                SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_INFO, view, message, duration).show();
-            else throw new NullPointerException("view is null");
-        });
+        if (view != null)
+            SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_INFO, view, message, duration).show();
+        else throw new NullPointerException("view is null");
     }
 
     public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,
                                        String message, String actionText, View.OnClickListener onClickListener) {
-        runOnUiThread(() -> {
-            if (view != null)
-                SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText, onClickListener).show();
-            else throw new NullPointerException("view is null");
-        });
+        if (view != null)
+            SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText, onClickListener).show();
+        else throw new NullPointerException("view is null");
     }
 
     public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view, String message,
@@ -172,10 +169,8 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
      * @param duration Visibility duration.
      */
     public void showErrorSnackBar(String message, View view, int duration) {
-        runOnUiThread(() -> {
-            if (view != null)
-                SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_ERROR, view, message, duration);
-            else throw new NullPointerException("view is null");
-        });
+        if (view != null)
+            SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_ERROR, view, message, duration);
+        else throw new NullPointerException("view is null");
     }
 }

@@ -3,6 +3,7 @@ package com.zeyad.usecases.data.requests;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.repository.DataRepository;
 
 /**
@@ -10,14 +11,13 @@ import com.zeyad.usecases.data.repository.DataRepository;
  */
 public class GetRequest {
 
-    private String url;
+    private String url, idColumnName;
     private Class dataClass, presentationClass;
-    private boolean persist;
-    private String idColumnName;
+    private boolean persist, shouldCache;
     private int itemId;
-    private boolean shouldCache;
+    private RealmManager.RealmQueryProvider queryFactory;
 
-    public GetRequest(@NonNull GetRequestBuilder getRequestBuilder) {
+    private GetRequest(@NonNull GetRequestBuilder getRequestBuilder) {
         url = getRequestBuilder.mUrl;
         dataClass = getRequestBuilder.mDataClass;
         presentationClass = getRequestBuilder.mPresentationClass;
@@ -25,17 +25,7 @@ public class GetRequest {
         idColumnName = getRequestBuilder.mIdColumnName;
         itemId = getRequestBuilder.mItemId;
         shouldCache = getRequestBuilder.mShouldCache;
-    }
-
-    public GetRequest(String url, String idColumnName, int itemId, @NonNull Class presentationClass,
-                      Class dataClass, boolean persist, boolean shouldCache) {
-        this.url = url;
-        this.idColumnName = idColumnName;
-        this.itemId = itemId;
-        this.presentationClass = presentationClass;
-        this.dataClass = dataClass;
-        this.persist = persist;
-        this.shouldCache = shouldCache;
+        queryFactory = getRequestBuilder.mQueryFactory;
     }
 
     public String getUrl() {
@@ -62,17 +52,20 @@ public class GetRequest {
         return idColumnName != null ? idColumnName : DataRepository.DEFAULT_ID_KEY;
     }
 
+    public RealmManager.RealmQueryProvider getQueryFactory() {
+        return queryFactory;
+    }
+
     public int getItemId() {
         return itemId;
     }
 
     public static class GetRequestBuilder {
-        private boolean mShouldCache;
-        private String mIdColumnName;
         private int mItemId;
-        private String mUrl;
+        private boolean mShouldCache, mPersist;
+        private String mIdColumnName, mUrl;
         private Class mDataClass, mPresentationClass;
-        private boolean mPersist;
+        private RealmManager.RealmQueryProvider mQueryFactory;
 
         public GetRequestBuilder(Class dataClass, boolean persist) {
             mDataClass = dataClass;
@@ -112,6 +105,12 @@ public class GetRequest {
         @NonNull
         public GetRequestBuilder id(int id) {
             mItemId = id;
+            return this;
+        }
+
+        @NonNull
+        public GetRequestBuilder queryFactory(RealmManager.RealmQueryProvider queryFactory) {
+            mQueryFactory = queryFactory;
             return this;
         }
 

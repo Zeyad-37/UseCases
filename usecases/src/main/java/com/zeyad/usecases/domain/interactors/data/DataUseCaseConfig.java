@@ -1,6 +1,7 @@
 package com.zeyad.usecases.domain.interactors.data;
 
 import android.content.Context;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.data.mappers.DAOMapperFactory;
@@ -30,6 +31,7 @@ public class DataUseCaseConfig {
     private int cacheSize, cacheAmount;
     private TimeUnit timeUnit;
     private PostExecutionThread postExecutionThread;
+    private HandlerThread handlerThread;
 
     private DataUseCaseConfig(Builder dataUseCaseConfigBuilder) {
         context = dataUseCaseConfigBuilder.getContext();
@@ -100,6 +102,10 @@ public class DataUseCaseConfig {
 
     TimeUnit getTimeUnit() {
         return timeUnit;
+    }
+
+    public HandlerThread getHandlerThread() {
+        return handlerThread == null ? new HandlerThread("backgroundThread") : handlerThread;
     }
 
     public static class Builder {

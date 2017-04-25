@@ -120,6 +120,7 @@ public class DataRepository implements Data {
         }
     }
 
+    @NonNull
     @Override
     public Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass) {
         try {

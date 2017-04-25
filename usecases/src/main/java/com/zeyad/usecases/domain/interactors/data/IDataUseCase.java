@@ -1,13 +1,11 @@
 package com.zeyad.usecases.domain.interactors.data;
 
-import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 
 import java.util.List;
 
 import rx.Observable;
-import rx.subjects.BehaviorSubject;
 
 public interface IDataUseCase {
 
@@ -86,25 +84,10 @@ public interface IDataUseCase {
     /**
      * Get list of items according to the query passed.
      *
-     * @param queryFactory      query to be executed.
-     * @param presentationClass return type of query.
+     * @param getRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class presentationClass);
-
-    /**
-     * Relay the last emitted object by any of the use cases.
-     *
-     * @return {@link BehaviorSubject} with the latest object.
-     */
-    BehaviorSubject getLastObject();
-
-    /**
-     * Relay the last emitted list by any of the use cases.
-     *
-     * @return {@link BehaviorSubject} with the latest list.
-     */
-    BehaviorSubject<List> getLastList();
+    Observable<List> queryDisk(GetRequest getRequest);
 
     /**
      * Creates a repository pattern with live objects

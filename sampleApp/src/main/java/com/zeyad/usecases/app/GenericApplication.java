@@ -107,6 +107,7 @@ public class GenericApplication extends Application {
                 .baseUrl(API_BASE_URL)
                 .withCache(CACHE_EXPIRY, TimeUnit.MINUTES)
                 .withRealm()
+                .postExecutionThread(null)
 //                .entityMapper(new AutoMap_DAOMapperFactory())
                 .okHttpBuilder(provideOkHttpClientBuilder())
 //                .okhttpCache(provideCache())
@@ -207,4 +208,5 @@ public class GenericApplication extends Application {
         return checkAppSignature(context) && verifyInstaller(context) && checkEmulator()
                 && checkDebuggable(context);
     }
+
 }

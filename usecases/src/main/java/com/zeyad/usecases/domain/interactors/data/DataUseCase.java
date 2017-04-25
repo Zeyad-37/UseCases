@@ -3,7 +3,6 @@ package com.zeyad.usecases.domain.interactors.data;
 import android.os.HandlerThread;
 
 import com.zeyad.usecases.data.db.DatabaseManagerFactory;
-import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.repository.DataRepository;
@@ -12,13 +11,14 @@ import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
-import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.repositories.Data;
 
 import java.util.List;
 
 import rx.Observable;
+import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.exceptions.OnErrorNotImplementedException;
 import rx.functions.Func1;
 import rx.subjects.BehaviorSubject;
 
@@ -29,25 +29,13 @@ public class DataUseCase implements IDataUseCase {
 
     private final static BehaviorSubject ObjectOffLineFirst = BehaviorSubject.create();
     private final static BehaviorSubject<List> listOffLineFirst = BehaviorSubject.create();
-    private final static BehaviorSubject lastObject = BehaviorSubject.create();
-    private final static BehaviorSubject<List> lastList = BehaviorSubject.create();
     private static boolean hasRealm;
     private static HandlerThread handlerThread;
     private static DataUseCase sDataUseCase;
     private final Data mData;
     private final PostExecutionThread mPostExecutionThread;
 
-    private DataUseCase(Data data, PostExecutionThread postExecutionThread) {
-        if (handlerThread == null)
-            handlerThread = new HandlerThread("backgroundThread");
-        mPostExecutionThread = postExecutionThread;
-        mData = data;
-    }
-
-    private DataUseCase(Data data, PostExecutionThread postExecutionThread, HandlerThread handlerThread) {
-        DataUseCase.handlerThread = handlerThread;
-        if (!DataUseCase.handlerThread.isAlive())
-            DataUseCase.handlerThread.start();
+    private DataUseCase(Data data, PostExecutionThread postExecutionThread, HandlerThread thread) {
         mPostExecutionThread = postExecutionThread;
         mData = data;
     }
@@ -58,10 +46,14 @@ public class DataUseCase implements IDataUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    static void initWithoutDB(IDAOMapperFactory entityMapper, PostExecutionThread postExecutionThread) {
+    static void initWithoutDB(IDAOMapperFactory entityMapper, PostExecutionThread postExecutionThread,
+                              HandlerThread thread) {
         hasRealm = false;
+        handlerThread = thread;
+        if (!handlerThread.isAlive())
+            handlerThread.start();
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(RestApiImpl.getInstance()),
-                entityMapper), postExecutionThread);
+                entityMapper), postExecutionThread, thread);
     }
 
     /**
@@ -70,30 +62,15 @@ public class DataUseCase implements IDataUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    static void initWithRealm(IDAOMapperFactory entityMapper, PostExecutionThread postExecutionThread) {
+    static void initWithRealm(IDAOMapperFactory entityMapper, PostExecutionThread postExecutionThread,
+                              HandlerThread thread) {
         hasRealm = true;
-        if (handlerThread == null)
-            handlerThread = new HandlerThread("backgroundThread");
+        handlerThread = thread;
         if (!handlerThread.isAlive())
             handlerThread.start();
         DatabaseManagerFactory.initRealm(handlerThread.getLooper());
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
-                .getInstance(), RestApiImpl.getInstance()), entityMapper), postExecutionThread);
-    }
-
-    /**
-     * Testing only!
-     * This function should be called at-least once before calling getInstance() method
-     * This function should not be called multiple times, but only when required.
-     * Ideally this function should be called once when application  is started or created.
-     * This function may be called n number of times if required, during mocking and testing.
-     *
-     * @param dataRepository data repository
-     * @param uiThread       ui thread implementation
-     * @param handlerThread  background thread
-     */
-    public static void init(DataRepository dataRepository, UIThread uiThread, HandlerThread handlerThread) {
-        sDataUseCase = new DataUseCase(dataRepository, uiThread, handlerThread);
+                .getInstance(), RestApiImpl.getInstance()), entityMapper), postExecutionThread, thread);
     }
 
     public static DataUseCase getInstance() {
@@ -131,10 +108,7 @@ public class DataUseCase implements IDataUseCase {
                 .getPresentationClass(), genericUseCaseRequest.getDataClass(), genericUseCaseRequest
                 .isPersist(), genericUseCaseRequest.isShouldCache())
                 .compose(applySchedulers())
-                .flatMap(list -> {
-                    lastList.onNext(list);
-                    return Observable.just(list);
-                });
+                .flatMap(Observable::just);
     }
 
     /**
@@ -149,10 +123,7 @@ public class DataUseCase implements IDataUseCase {
                 getRequest.getItemId(), getRequest.getPresentationClass(), getRequest.getDataClass(),
                 getRequest.isPersist(), getRequest.isShouldCache())
                 .compose(applySchedulers())
-                .flatMap(object -> {
-                    lastObject.onNext(object);
-                    return Observable.just(object);
-                });
+                .flatMap(Observable::just);
     }
 
     @Override
@@ -226,54 +197,37 @@ public class DataUseCase implements IDataUseCase {
      */
     @Override
     @SuppressWarnings("unchecked")
-    public Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class presentationClass) {
-        return mData.queryDisk(queryFactory, presentationClass)
-                .flatMap(list -> {
-                    lastObject.onNext(list);
-                    return Observable.just(list);
-                })
+    public Observable<List> queryDisk(GetRequest getRequest) {
+        return mData.queryDisk(getRequest.getQueryFactory(), getRequest.getPresentationClass())
+                .flatMap(Observable::just)
                 .compose(applySchedulers());
-    }
-
-    @Override
-    public BehaviorSubject getLastObject() {
-        return lastObject;
-    }
-
-    @Override
-    public BehaviorSubject<List> getLastList() {
-        return lastList;
     }
 
     @Override
     public Observable<List> getListOffLineFirst(GetRequest getRequest) {
         Observable<List> online = mData.getListDynamically(getRequest.getUrl(), getRequest.getPresentationClass(),
                 getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache());
-        List lastList = listOffLineFirst.getValue();
-        if (Utils.getInstance().isNotEmpty(lastList) && lastList.get(0).getClass() == getRequest.getPresentationClass())
-            listOffLineFirst.onNext(lastList);
-        else
-            mData.getListDynamically("", getRequest.getPresentationClass(), getRequest.getDataClass(),
-                    getRequest.isPersist(), getRequest.isShouldCache())
-                    .flatMap(new Func1<List, Observable<List>>() {
-                        @Override
-                        public Observable<List> call(List list) {
-                            if (Utils.getInstance().isNotEmpty(list))
-                                return Observable.just(list);
-                            else return online;
-                        }
-                    })
-                    .onErrorResumeNext(throwable -> online)
-                    .doOnNext(list -> listOffLineFirst.onNext(list))
-                    .doOnError(listOffLineFirst::onError)
-                    .compose(applySchedulers())
-                    .subscribe();
-        return listOffLineFirst.subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
-                .observeOn(mPostExecutionThread.getScheduler());
+        mData.getListDynamically("", getRequest.getPresentationClass(), getRequest.getDataClass(),
+                getRequest.isPersist(), getRequest.isShouldCache())
+                .flatMap(new Func1<List, Observable<List>>() {
+                    @Override
+                    public Observable<List> call(List list) {
+                        if (Utils.getInstance().isNotEmpty(list))
+                            return Observable.just(list);
+                        else return online;
+                    }
+                })
+                .onErrorResumeNext(throwable -> online)
+                .doOnNext(listOffLineFirst::onNext)
+                .doOnError(listOffLineFirst::onError)
+                .compose(applySchedulers())
+                .subscribe(o -> {
+                }, OnErrorNotImplementedException::new);
+        return listOffLineFirst.compose(applySchedulers());
     }
 
     @Override
-    public BehaviorSubject getObjectOffLineFirst(GetRequest getRequest) {
+    public Observable<?> getObjectOffLineFirst(GetRequest getRequest) {
         Observable<?> online = mData.getObjectDynamicallyById(getRequest.getUrl(), getRequest
                         .getIdColumnName(), getRequest.getItemId(), getRequest.getPresentationClass(),
                 getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache());
@@ -286,9 +240,8 @@ public class DataUseCase implements IDataUseCase {
                 .doOnError(ObjectOffLineFirst::onError)
                 .compose(applySchedulers())
                 .subscribe(o -> {
-                }, throwable -> {
-                });
-        return ObjectOffLineFirst;
+                }, OnErrorNotImplementedException::new);
+        return ObjectOffLineFirst.compose(applySchedulers());
     }
 
     /**
@@ -298,12 +251,12 @@ public class DataUseCase implements IDataUseCase {
      * @return the transformed observable
      */
     private <T> Observable.Transformer<T, T> applySchedulers() {
-        handlerThread = getHandlerThread();
         if (!handlerThread.isAlive())
             handlerThread.start();
-//        return observable -> observable.subscribeOn(AndroidSchedulers.from(mThreadExecutor.getLooper()))
-        return observable -> observable.subscribeOn(AndroidSchedulers.from(handlerThread.getLooper()))
+        Scheduler backgroundThread = AndroidSchedulers.from(handlerThread.getLooper());
+        return mPostExecutionThread != null ? observable -> observable.subscribeOn(backgroundThread)
                 .observeOn(mPostExecutionThread.getScheduler())
-                .unsubscribeOn(AndroidSchedulers.from(handlerThread.getLooper()));
+                .unsubscribeOn(backgroundThread) : observable -> observable.subscribeOn(backgroundThread)
+                .unsubscribeOn(backgroundThread);
     }
 }
