@@ -27,19 +27,15 @@ import com.jakewharton.rxbinding.view.RxMenuItem;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
-import com.zeyad.usecases.app.components.mvvm.BaseAction;
-import com.zeyad.usecases.app.components.mvvm.BaseActivity;
-import com.zeyad.usecases.app.components.mvvm.BaseEvent;
-import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
-import com.zeyad.usecases.app.components.mvvm.UIModel;
+import com.zeyad.usecases.app.components.redux.BaseActivity;
+import com.zeyad.usecases.app.components.redux.BaseEvent;
+import com.zeyad.usecases.app.components.redux.Result;
+import com.zeyad.usecases.app.components.redux.UIModel;
+import com.zeyad.usecases.app.components.redux.UISubscriber;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailActivity;
 import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailFragment;
 import com.zeyad.usecases.app.presentation.screens.user_detail.UserDetailState;
-import com.zeyad.usecases.app.presentation.screens.user_list.actions.DeleteUserAction;
-import com.zeyad.usecases.app.presentation.screens.user_list.actions.GetUsersAction;
-import com.zeyad.usecases.app.presentation.screens.user_list.actions.SearchUsersAction;
-import com.zeyad.usecases.app.presentation.screens.user_list.actions.UsersNextPageAction;
 import com.zeyad.usecases.app.presentation.screens.user_list.events.DeleteUsersEvent;
 import com.zeyad.usecases.app.presentation.screens.user_list.events.GetUsersEvent;
 import com.zeyad.usecases.app.presentation.screens.user_list.events.SearchUsersEvent;
@@ -58,8 +54,10 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
+import rx.functions.Func1;
+import rx.functions.Func2;
 
-import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
+import static com.zeyad.usecases.app.components.redux.UISubscriber.ERROR_WITH_RETRY;
 
 /**
  * An activity representing a list of Repos. This activity
@@ -79,7 +77,6 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     LinearLayout loaderLayout;
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
-    Observable.Transformer<BaseEvent, BaseEvent> mergeEventsTransformer;
     Observable.Transformer<BaseEvent, UIModel<UserListState>> uiModelsTransformer;
     private UserListVM userListVM;
     private GenericRecyclerViewAdapter usersAdapter;
@@ -98,16 +95,15 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
         rxEventBus.toObserverable()
                 .compose(bindToLifecycle())
                 .subscribe(stream -> events.mergeWith((Observable<? extends BaseEvent>) stream)
-                        .compose(mergeEventsTransformer)
                         .compose(uiModelsTransformer)
                         .compose(bindToLifecycle())
-                        .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY)));
+                        .subscribe(new UISubscriber<>(this, ERROR_WITH_RETRY)));
     }
 
     @Override
     public void setupUI() {
         setContentView(R.layout.activity_user_list);
-        unbinder = ButterKnife.bind(this);
+        ButterKnife.bind(this);
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
         setupRecyclerView();
@@ -117,35 +113,21 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
 
     @Override
     public void loadData() {
-        mergeEventsTransformer = mergeEvents(DeleteUsersEvent.class, GetUsersEvent.class, SearchUsersEvent.class,
-                UsersNextPageEvent.class);
-        uiModelsTransformer = userListVM.uiModels(event -> {
-            BaseAction action = null;
-            Log.d("Events To Actions", "Thread Name: " + Thread.currentThread().getName());
-            if (event instanceof GetUsersEvent)
-                action = new GetUsersAction();
-            else if (event instanceof DeleteUsersEvent)
-                action = new DeleteUserAction(((DeleteUsersEvent) event).getSelectedItemsIds());
-            else if (event instanceof SearchUsersEvent)
-                action = new SearchUsersAction(((SearchUsersEvent) event).getQuery());
-            else if (event instanceof UsersNextPageEvent)
-                action = new UsersNextPageAction(((UsersNextPageEvent) event).getLastId());
-            return action;
-        }, action -> {
+        Func1<BaseEvent, Observable<?>> mapEventsToExecutables = event -> {
             Observable result = Observable.empty();
-            Log.d("Actions To Executables", "Thread Name: " + Thread.currentThread().getName());
-            if (action instanceof GetUsersAction)
+            if (event instanceof GetUsersEvent)
                 result = userListVM.getUsers();
-            else if (action instanceof DeleteUserAction)
-                result = userListVM.deleteCollection(((DeleteUserAction) action).getSelectedItemsIds());
-            else if (action instanceof SearchUsersAction)
-                result = userListVM.search(((SearchUsersAction) action).getQuery());
-            else if (action instanceof UsersNextPageAction)
-                result = userListVM.incrementPage(((UsersNextPageAction) action).getLastId());
+            else if (event instanceof DeleteUsersEvent)
+                result = userListVM.deleteCollection(((DeleteUsersEvent) event).getSelectedItemsIds());
+            else if (event instanceof SearchUsersEvent)
+                result = userListVM.search(((SearchUsersEvent) event).getQuery());
+            else if (event instanceof UsersNextPageEvent)
+                result = userListVM.incrementPage(((UsersNextPageEvent) event).getLastId());
             return result;
-        }, (currentUIModel, result) -> {
+        };
+        Func2<UIModel<UserListState>, Result, UIModel<UserListState>> stateAccumulator = (currentUIModel, result) -> {
+            Log.d("State Accumulator", "Result: " + result.toString());
             UserListState bundle = currentUIModel.getBundle();
-            Log.d("State Accumulator", "Thread Name: " + Thread.currentThread().getName());
             if (result.isLoading())
                 currentUIModel = UIModel.loadingState(bundle);
             else if (result.isSuccessful()) {
@@ -165,11 +147,15 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
                 currentUIModel = UIModel.successState(UserListState.builder().setUsers(users).build());
             } else currentUIModel = UIModel.errorState(result.getError());
             return currentUIModel;
-        });
-        events.compose(mergeEventsTransformer)
-                .compose(uiModelsTransformer)
-                .compose(bindToLifecycle())
-                .subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
+        };
+        Class[] classes = {DeleteUsersEvent.class, GetUsersEvent.class, SearchUsersEvent.class, UsersNextPageEvent.class};
+
+        uiModelsTransformer = userListVM.uiModels(mapEventsToExecutables, stateAccumulator, classes);
+
+        uiModelsTransformer = userListVM.uiModels2(mapEventsToExecutables, stateAccumulator, classes);
+
+        events.compose(uiModelsTransformer).compose(bindToLifecycle())
+                .subscribe(new UISubscriber<>(this, ERROR_WITH_RETRY));
     }
 
     @Override
@@ -258,7 +244,7 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
         userRecycler.setLayoutManager(layoutManager);
         userRecycler.setAdapter(usersAdapter);
         usersAdapter.setAllowSelection(true);
-        events = events.mergeWith(Observable.defer(() -> RxRecyclerView.scrollEvents(userRecycler)
+        events = events.mergeWith(Observable.defer(() -> RxRecyclerView.scrollStateChanges(userRecycler)
                 .map(recyclerViewScrollEvent -> {
                     int totalItemCount = layoutManager.getItemCount();
                     int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();

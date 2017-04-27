@@ -1,6 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
-import com.zeyad.usecases.app.components.mvvm.BaseViewModel;
+import com.zeyad.usecases.app.components.redux.BaseViewModel;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;

@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.components.mvvm;
+package com.zeyad.usecases.app.components.redux;
 
 /**
  * @author zeyad on 1/24/17.
@@ -29,7 +29,7 @@ public class UIModel<B> {
         return new UIModel<>(IDLE, false, null, false, bundle);
     }
 
-    public static UIModel errorState(Throwable error) {
+    public static <B> UIModel<B> errorState(Throwable error) {
         return new UIModel<>(ERROR, false, error, false, null);
     }
 
@@ -55,5 +55,12 @@ public class UIModel<B> {
 
     public String getState() {
         return state;
+    }
+
+    @Override
+    public String toString() {
+        return "State: " + state + ", IsLoading: " + String.valueOf(isLoading) + ", isSuccessful: "
+                + String.valueOf(isSuccessful) + ", Error: " + (error != null ? error.toString() : "null")
+                + ", Bundle type: " + (bundle != null ? bundle.getClass().getSimpleName() : "null");
     }
 }

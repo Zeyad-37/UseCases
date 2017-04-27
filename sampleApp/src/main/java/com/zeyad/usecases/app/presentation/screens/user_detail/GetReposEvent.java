@@ -1,6 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
-import com.zeyad.usecases.app.components.mvvm.BaseEvent;
+import com.zeyad.usecases.app.components.redux.BaseEvent;
 
 /**
  * @author by ZIaDo on 4/22/17.

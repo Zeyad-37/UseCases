@@ -25,16 +25,12 @@ import com.bumptech.glide.request.target.Target;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
-import com.zeyad.usecases.app.components.mvvm.BaseFragment;
-import com.zeyad.usecases.app.components.mvvm.BaseSubscriber;
-import com.zeyad.usecases.app.components.mvvm.UIModel;
+import com.zeyad.usecases.app.components.redux.BaseFragment;
+import com.zeyad.usecases.app.components.redux.UIModel;
+import com.zeyad.usecases.app.components.redux.UISubscriber;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
 import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
-import com.zeyad.usecases.app.presentation.screens.user_list.events.DeleteUsersEvent;
-import com.zeyad.usecases.app.presentation.screens.user_list.events.GetUsersEvent;
-import com.zeyad.usecases.app.presentation.screens.user_list.events.SearchUsersEvent;
-import com.zeyad.usecases.app.presentation.screens.user_list.events.UsersNextPageEvent;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
@@ -47,8 +43,8 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
 
-import static com.zeyad.usecases.app.components.mvvm.BaseActivity.UI_MODEL;
-import static com.zeyad.usecases.app.components.mvvm.BaseSubscriber.ERROR_WITH_RETRY;
+import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
+import static com.zeyad.usecases.app.components.redux.UISubscriber.ERROR_WITH_RETRY;
 
 /**
  * A fragment representing a single RepoRealm detail screen.
@@ -100,7 +96,7 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.user_detail, container, false);
-        unbinder = ButterKnife.bind(this, rootView);
+        ButterKnife.bind(this, rootView);
         setupRecyclerView();
         return rootView;
     }
@@ -119,28 +115,25 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
 
     @Override
     public void loadData() {
-        events.compose(mergeEvents(DeleteUsersEvent.class, GetUsersEvent.class, SearchUsersEvent.class,
-                UsersNextPageEvent.class))
-                .compose(userDetailVM.uiModels(event -> new GetReposAction(((GetReposEvent) event).getLogin()),
-                        action -> userDetailVM.getRepositories(((GetReposAction) action).getLogin()),
-                        (currentUIModel, newUIModel) -> {
-                            UserDetailState bundle = (UserDetailState) currentUIModel.getBundle();
-                            if (newUIModel.isLoading())
-                                currentUIModel = UIModel.loadingState(UserDetailState.builder()
-                                        .setRepos(bundle.getRepos())
-                                        .setUser(bundle.getUser())
-                                        .setIsTwoPane(bundle.isTwoPane())
-                                        .build());
-                            else if (newUIModel.isSuccessful()) {
-                                currentUIModel = UIModel.successState(UserDetailState.builder()
-                                        .setRepos((List<RepoRealm>) newUIModel.getBundle())
-                                        .setUser(bundle.getUser())
-                                        .setIsTwoPane(bundle.isTwoPane())
-                                        .build());
-                            } else currentUIModel = UIModel.errorState(newUIModel.getError());
-                            return currentUIModel;
-                        }, UIModel.idleState(viewState)))
-                .compose(bindToLifecycle()).subscribe(new BaseSubscriber<>(this, ERROR_WITH_RETRY));
+        events.compose(userDetailVM.uiModels(event -> userDetailVM.getRepositories(((GetReposEvent) event).getLogin()),
+                (currentUIModel, newUIModel) -> {
+                    UserDetailState bundle = currentUIModel.getBundle();
+                    if (newUIModel.isLoading())
+                        currentUIModel = UIModel.loadingState(UserDetailState.builder()
+                                .setRepos(bundle.getRepos())
+                                .setUser(bundle.getUser())
+                                .setIsTwoPane(bundle.isTwoPane())
+                                .build());
+                    else if (newUIModel.isSuccessful()) {
+                        currentUIModel = UIModel.successState(UserDetailState.builder()
+                                .setRepos((List<RepoRealm>) newUIModel.getBundle())
+                                .setUser(bundle.getUser())
+                                .setIsTwoPane(bundle.isTwoPane())
+                                .build());
+                    } else currentUIModel = UIModel.errorState(newUIModel.getError());
+                    return currentUIModel;
+                }, UIModel.idleState(viewState), GetReposEvent.class))
+                .compose(bindToLifecycle()).subscribe(new UISubscriber<>(this, ERROR_WITH_RETRY));
     }
 
     @Override

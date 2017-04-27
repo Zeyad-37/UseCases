@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.components.mvvm;
+package com.zeyad.usecases.app.components.redux;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -17,10 +17,8 @@ import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
 import org.parceler.Parcels;
 
-import java.util.Arrays;
 import java.util.List;
 
-import butterknife.Unbinder;
 import rx.Observable;
 
 /**
@@ -30,9 +28,8 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
     public static final String UI_MODEL = "uiModel";
     public INavigator navigator;
     public IRxEventBus rxEventBus;
-    public S uiModel;
-    public Unbinder unbinder;
     public Observable<BaseEvent> events;
+    public S uiModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,12 +76,6 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
         loadData();
     }
 
-    @Override
-    protected void onDestroy() {
-        unbinder.unbind();
-        super.onDestroy();
-    }
-
     /**
      * Initialize any objects or any required dependencies.
      */
@@ -96,16 +87,6 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
     public abstract void setupUI();
 
     public abstract void loadData();
-
-    public Observable.Transformer<BaseEvent, BaseEvent> mergeEvents(Class... classes) {
-        return events -> events
-                .publish(shared -> {
-                    List<Class> classList = Arrays.asList(classes);
-                    for (int i = 0, size = classList.size(); i < size; i++)
-                        shared = shared.mergeWith(shared.ofType(classList.get(i)));
-                    return shared;
-                });
-    }
 
     /**
      * Adds a {@link Fragment} to this activity's layout.

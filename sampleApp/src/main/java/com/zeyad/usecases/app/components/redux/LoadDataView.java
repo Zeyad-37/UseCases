@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.components.mvvm;
+package com.zeyad.usecases.app.components.redux;
 
 /**
  * Interface representing a View that will use to load data.

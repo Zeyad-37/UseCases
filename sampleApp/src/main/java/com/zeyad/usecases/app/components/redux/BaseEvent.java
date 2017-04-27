@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.components.mvvm;
+package com.zeyad.usecases.app.components.redux;
 
 /**
  * @author by ZIaDo on 3/22/17.

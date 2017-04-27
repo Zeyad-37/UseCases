@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.components.mvvm;
+package com.zeyad.usecases.app.components.redux;
 
 import android.os.Bundle;
 import android.view.View;
@@ -13,13 +13,9 @@ import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
 import org.parceler.Parcels;
 
-import java.util.Arrays;
-import java.util.List;
-
-import butterknife.Unbinder;
 import rx.Observable;
 
-import static com.zeyad.usecases.app.components.mvvm.BaseActivity.UI_MODEL;
+import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
 
 /**
  * @author zeyad on 11/28/16.
@@ -28,9 +24,8 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
-    public S viewState;
-    public Unbinder unbinder;
     public Observable<BaseEvent> events;
+    public S viewState;
 
     public BaseFragment() {
         super();
@@ -59,12 +54,6 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
     }
 
     @Override
-    public void onDestroyView() {
-        unbinder.unbind();
-        super.onDestroyView();
-    }
-
-    @Override
     public void onSaveInstanceState(Bundle outState) {
         if (outState != null)
             outState.putAll(saveState());
@@ -88,15 +77,6 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
     public abstract void initialize();
 
     public abstract void loadData();
-
-    public Observable.Transformer<BaseEvent, BaseEvent> mergeEvents(Class... classes) {
-        return events -> events.publish(shared -> {
-            List<Class> classList = Arrays.asList(classes);
-            for (int i = 0, size = classList.size(); i < size; i++)
-                shared = shared.mergeWith(shared.ofType(classList.get(i)));
-            return shared;
-        });
-    }
 
     public void showToastMessage(String message) {
         showToastMessage(message, Toast.LENGTH_LONG);

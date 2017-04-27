@@ -26,7 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.zeyad.usecases.app.components.mvvm.BaseActivity.UI_MODEL;
+import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
 
 /**
  * An activity representing a single RepoRealm detail screen. This
@@ -65,9 +65,8 @@ public class UserDetailActivity extends AppCompatActivity {
                     .getParcelableExtra(UI_MODEL))), "", null);
     }
 
-    // TODO: 4/15/17 remove!
-    public void addFragment(int containerViewId, Fragment fragment, String currentFragTag,
-                            List<Pair<View, String>> sharedElements) {
+    private void addFragment(int containerViewId, Fragment fragment, String currentFragTag,
+                             List<Pair<View, String>> sharedElements) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         if (sharedElements != null)
             for (Pair<View, String> pair : sharedElements)
