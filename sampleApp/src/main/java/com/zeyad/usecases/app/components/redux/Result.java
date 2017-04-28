@@ -54,8 +54,8 @@ public class Result<B> {
 
     @Override
     public String toString() {
-        return "State: " + state + ", IsLoading: " + String.valueOf(isLoading) + ", isSuccessful: " + String.valueOf(isSuccessful)
-                + ", Error: " + (error != null ? error.toString() : "null") + ", Bundle type: "
-                + (bundle != null ? bundle.getClass().getSimpleName() : "null");
+        return "State: " + state + ", Error: " + (error != null ? error.toString() : "null") +
+                ", Bundle type: " + (bundle != null ? bundle.getClass().getSimpleName() : "null") +
+                ", Key Selector: " + state + (bundle != null ? bundle.toString() : "");
     }
 }

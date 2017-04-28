@@ -29,7 +29,6 @@ import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.redux.BaseActivity;
 import com.zeyad.usecases.app.components.redux.BaseEvent;
-import com.zeyad.usecases.app.components.redux.Result;
 import com.zeyad.usecases.app.components.redux.UIModel;
 import com.zeyad.usecases.app.components.redux.UISubscriber;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
@@ -54,8 +53,6 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
-import rx.functions.Func1;
-import rx.functions.Func2;
 
 import static com.zeyad.usecases.app.components.redux.UISubscriber.ERROR_WITH_RETRY;
 
@@ -113,19 +110,18 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
 
     @Override
     public void loadData() {
-        Func1<BaseEvent, Observable<?>> mapEventsToExecutables = event -> {
-            Observable result = Observable.empty();
+        uiModelsTransformer = userListVM.uiModels(event -> {
+            Observable executable = Observable.empty();
             if (event instanceof GetUsersEvent)
-                result = userListVM.getUsers();
+                executable = userListVM.getUsers();
             else if (event instanceof DeleteUsersEvent)
-                result = userListVM.deleteCollection(((DeleteUsersEvent) event).getSelectedItemsIds());
+                executable = userListVM.deleteCollection(((DeleteUsersEvent) event).getSelectedItemsIds());
             else if (event instanceof SearchUsersEvent)
-                result = userListVM.search(((SearchUsersEvent) event).getQuery());
+                executable = userListVM.search(((SearchUsersEvent) event).getQuery());
             else if (event instanceof UsersNextPageEvent)
-                result = userListVM.incrementPage(((UsersNextPageEvent) event).getLastId());
-            return result;
-        };
-        Func2<UIModel<UserListState>, Result, UIModel<UserListState>> stateAccumulator = (currentUIModel, result) -> {
+                executable = userListVM.incrementPage(((UsersNextPageEvent) event).getLastId());
+            return executable;
+        }, (currentUIModel, result) -> {
             Log.d("State Accumulator", "Result: " + result.toString());
             UserListState bundle = currentUIModel.getBundle();
             if (result.isLoading())
@@ -147,12 +143,7 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
                 currentUIModel = UIModel.successState(UserListState.builder().setUsers(users).build());
             } else currentUIModel = UIModel.errorState(result.getError());
             return currentUIModel;
-        };
-        Class[] classes = {DeleteUsersEvent.class, GetUsersEvent.class, SearchUsersEvent.class, UsersNextPageEvent.class};
-
-        uiModelsTransformer = userListVM.uiModels(mapEventsToExecutables, stateAccumulator, classes);
-
-        uiModelsTransformer = userListVM.uiModels2(mapEventsToExecutables, stateAccumulator, classes);
+        });
 
         events.compose(uiModelsTransformer).compose(bindToLifecycle())
                 .subscribe(new UISubscriber<>(this, ERROR_WITH_RETRY));

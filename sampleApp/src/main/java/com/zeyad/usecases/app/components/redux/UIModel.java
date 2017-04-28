@@ -4,9 +4,9 @@ package com.zeyad.usecases.app.components.redux;
  * @author zeyad on 1/24/17.
  */
 public class UIModel<B> {
-    public static final String LOADING = "loading", ERROR = "error", SUCCESS = "success",
+    static final String LOADING = "loading", ERROR = "error", SUCCESS = "success",
             IDLE = "idle";
-    public static final UIModel idleState = new UIModel<>(IDLE, false, null, false, null);
+    static final UIModel idleState = new UIModel<>(IDLE, false, null, false, null);
 
     private final boolean isLoading, isSuccessful;
     private final Throwable error;
@@ -37,11 +37,11 @@ public class UIModel<B> {
         return new UIModel<>(SUCCESS, false, null, true, bundle);
     }
 
-    public boolean isLoading() {
+    boolean isLoading() {
         return isLoading;
     }
 
-    public Throwable getError() {
+    Throwable getError() {
         return error;
     }
 
@@ -49,18 +49,18 @@ public class UIModel<B> {
         return bundle;
     }
 
-    public boolean isSuccessful() {
+    boolean isSuccessful() {
         return isSuccessful;
     }
 
-    public String getState() {
+    String getState() {
         return state;
     }
 
     @Override
     public String toString() {
-        return "State: " + state + ", IsLoading: " + String.valueOf(isLoading) + ", isSuccessful: "
-                + String.valueOf(isSuccessful) + ", Error: " + (error != null ? error.toString() : "null")
-                + ", Bundle type: " + (bundle != null ? bundle.getClass().getSimpleName() : "null");
+        return "State: " + state + ", Error: " + (error != null ? error.toString() : "null") +
+                ", Bundle type: " + (bundle != null ? bundle.getClass().getSimpleName() : "null") +
+                ", Key Selector: " + state + (bundle != null ? bundle.toString() : "");
     }
 }

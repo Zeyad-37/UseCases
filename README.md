@@ -228,80 +228,10 @@ Write to File
 mFileUseCase.writeToFile(String fullFilePath, String data);
 mFileUseCase.writeToFile(String fullFilePath, byte[] data);
 ```
-
-# Annotations
-It can be tedious to maintain the models with their mappers. Here is a good chance to use some annotations for code generation. Enter @AutoMap and @FindMapped. 
-Make your model and annotate the class with @AutoMap. If the class has a field that you would like to map as well, annotate that field with @FindMapped. The annotation processor copies the file with its static final fields and its field annotations. Dont forget to add the realm annotations.
-
-Example:
-```
-import com.google.gson.annotations.SerializedName;
-import com.zeyad.usecases.annotations.AutoMap;
-
-import io.realm.annotations.Ignore;
-import io.realm.annotations.PrimaryKey;
-
-@AutoMap
-public class UserModel {
-
-    public static final String LOGIN = "login", ID = "id", AVATAR_URL = "avatarUrl", REPOS = "repos";
-    
-    @SerializedName(LOGIN)
-    String login;
-    @PrimaryKey
-    @SerializedName(ID)
-    int id;
-    @SerializedName(AVATAR_URL)
-    String avatarUrl;
-    @Ignore
-    String followersUrl;
-    @FindMapped
-    @SerializedName(REPOS)
-    List<Repos> repos;
-
-    public UserModel() {
-    }
-
-    public String getLogin() {
-        return login;
-    }
-
-    public void setLogin(String login) {
-        this.login = login;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
-    }
-
-    public String getAvatarUrl() {
-        return avatarUrl;
-    }
-
-    public void setAvatarUrl(String avatarUrl) {
-        this.avatarUrl = avatarUrl;
-    }
-    
-    public List<Repos> getRepos() {
-        return repos;
-    }
-
-    public void setRepos(List<Repos> repos) {
-        this.repos = repos;
-    }
-}    
-```
-This class would generate it's Realm counter part, mapper and the DAOMapperUtil which you supply to the DataUseCaseConfig.Builder when you initialize the DataUseCase. So now you dont have to worry about all of this boiler plate.
-
 Initialization Example:
 ```
  DataUseCaseFactory.init(new DataUseCaseConfig.Builder(applicationContext)
                 .withRealm()
-                .entityMapper(new AutoMap_DAOMapperUtil())
                 .build());
 ```
 

@@ -211,7 +211,9 @@ public class PrefsUseCase implements IPrefsUseCase {
      * @return the transformed observable
      */
     private <T> Observable.Transformer<T, T> applySchedulers() {
-        return observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor))
-                .observeOn(mPostExecutionThread.getScheduler());
+        return mPostExecutionThread != null ?
+                observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor))
+                        .observeOn(mPostExecutionThread.getScheduler()) :
+                observable -> observable.subscribeOn(Schedulers.from(mThreadExecutor));
     }
 }

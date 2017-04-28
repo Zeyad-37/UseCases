@@ -132,7 +132,7 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
                                 .build());
                     } else currentUIModel = UIModel.errorState(newUIModel.getError());
                     return currentUIModel;
-                }, UIModel.idleState(viewState), GetReposEvent.class))
+                }, UIModel.idleState(viewState)))
                 .compose(bindToLifecycle()).subscribe(new UISubscriber<>(this, ERROR_WITH_RETRY));
     }
 
