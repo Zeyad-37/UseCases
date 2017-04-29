@@ -1,6 +1,6 @@
-package com.zeyad.usecases.app.presentation.screens.user_detail;
+package com.zeyad.usecases.app.presentation.user_detail;
 
-import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
+import com.zeyad.usecases.app.presentation.user_list.UserRealm;
 
 import org.parceler.Parcel;
 

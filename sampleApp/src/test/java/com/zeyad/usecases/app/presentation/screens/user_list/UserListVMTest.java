@@ -1,6 +1,8 @@
 package com.zeyad.usecases.app.presentation.screens.user_list;
 
 import com.zeyad.usecases.app.components.redux.UIModel;
+import com.zeyad.usecases.app.presentation.user_list.UserListVM;
+import com.zeyad.usecases.app.presentation.user_list.UserRealm;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;

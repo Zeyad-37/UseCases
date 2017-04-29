@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.screens.user_detail;
+package com.zeyad.usecases.app.presentation.user_detail;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -31,8 +31,8 @@ import com.zeyad.usecases.app.components.redux.BaseFragment;
 import com.zeyad.usecases.app.components.redux.UIModel;
 import com.zeyad.usecases.app.components.redux.UISubscriber;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
-import com.zeyad.usecases.app.presentation.screens.user_list.UserListActivity;
-import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
+import com.zeyad.usecases.app.presentation.user_list.UserListActivity;
+import com.zeyad.usecases.app.presentation.user_list.UserRealm;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 

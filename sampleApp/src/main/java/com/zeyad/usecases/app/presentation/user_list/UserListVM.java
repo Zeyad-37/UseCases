@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.screens.user_list;
+package com.zeyad.usecases.app.presentation.user_list;
 
 import com.zeyad.usecases.app.components.redux.BaseViewModel;
 import com.zeyad.usecases.data.requests.GetRequest;
@@ -20,29 +20,29 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
 /**
  * @author zeyad on 11/1/16.
  */
-class UserListVM extends BaseViewModel<UserListState> {
+public class UserListVM extends BaseViewModel<UserListState> {
 
     private final IDataUseCase dataUseCase;
 
-    UserListVM(IDataUseCase dataUseCase) {
+    public UserListVM(IDataUseCase dataUseCase) {
         this.dataUseCase = dataUseCase;
     }
 
-    Observable<List> getUsers() {
+    public Observable<List> getUsers() {
         return dataUseCase.getListOffLineFirst(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, 0))
                 .build());
     }
 
-    Observable<List> incrementPage(long lastId) {
+    public Observable<List> incrementPage(long lastId) {
         return dataUseCase.getList(new GetRequest
                 .GetRequestBuilder(UserRealm.class, true)
                 .url(String.format(USERS, lastId))
                 .build());
     }
 
-    Observable search(String query) {
+    public Observable search(String query) {
         return dataUseCase.queryDisk(new GetRequest.GetRequestBuilder(null, false)
                 .queryFactory(realm -> realm.where(UserRealm.class).beginsWith(UserRealm.LOGIN, query))
                 .presentationClass(UserRealm.class).build())
@@ -59,7 +59,7 @@ class UserListVM extends BaseViewModel<UserListState> {
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    Observable<List<Long>> deleteCollection(List<Long> selectedItemsIds) {
+    public Observable<List<Long>> deleteCollection(List<Long> selectedItemsIds) {
         return dataUseCase.deleteCollection(new PostRequest
                 .PostRequestBuilder(UserRealm.class, true)
                 .payLoad(selectedItemsIds)

@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.screens.user_list;
+package com.zeyad.usecases.app.presentation.user_list;
 
 import org.parceler.Parcel;
 
@@ -34,7 +34,7 @@ public class UserListState {
         Builder() {
         }
 
-        Builder setUsers(List<UserRealm> value) {
+        public Builder setUsers(List<UserRealm> value) {
             users = value;
             return this;
         }

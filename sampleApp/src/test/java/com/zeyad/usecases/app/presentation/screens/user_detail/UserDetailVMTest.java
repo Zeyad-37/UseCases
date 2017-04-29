@@ -1,6 +1,8 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
-import com.zeyad.usecases.app.presentation.screens.user_list.UserRealm;
+import com.zeyad.usecases.app.presentation.user_detail.UserDetailState;
+import com.zeyad.usecases.app.presentation.user_detail.UserDetailVM;
+import com.zeyad.usecases.app.presentation.user_list.UserRealm;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 

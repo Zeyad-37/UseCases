@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.screens.user_detail;
+package com.zeyad.usecases.app.presentation.user_detail;
 
 import com.zeyad.usecases.app.components.redux.BaseViewModel;
 import com.zeyad.usecases.app.utils.Utils;
@@ -12,14 +12,14 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
 /**
  * @author zeyad on 1/10/17.
  */
-class UserDetailVM extends BaseViewModel<UserDetailState> {
+public class UserDetailVM extends BaseViewModel<UserDetailState> {
     private final IDataUseCase dataUseCase;
 
-    UserDetailVM(IDataUseCase dataUseCase) {
+    public UserDetailVM(IDataUseCase dataUseCase) {
         this.dataUseCase = dataUseCase;
     }
 
-    Observable getRepositories(String userLogin) {
+    public Observable getRepositories(String userLogin) {
         return Utils.isNotEmpty(userLogin) ? dataUseCase.queryDisk(new GetRequest.GetRequestBuilder(null, false)
                 .queryFactory(realm -> realm.where(RepoRealm.class).equalTo("owner.login", userLogin))
                 .presentationClass(RepoRealm.class).build())
