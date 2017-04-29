@@ -8,5 +8,5 @@
     <ProgressBar
         android:layout_width="@dimen/forty_eight_dp"
         android:layout_height="@dimen/forty_eight_dp"
-        android:layout_gravity="center" />
+        android:indeterminate="true" />
 </LinearLayout>

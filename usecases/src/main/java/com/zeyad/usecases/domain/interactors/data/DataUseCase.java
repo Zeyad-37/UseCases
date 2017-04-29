@@ -11,6 +11,7 @@ import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
+import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.repositories.Data;
 
 import java.util.List;
@@ -71,6 +72,21 @@ public class DataUseCase implements IDataUseCase {
         DatabaseManagerFactory.initRealm(handlerThread.getLooper());
         sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
                 .getInstance(), RestApiImpl.getInstance()), entityMapper), postExecutionThread, thread);
+    }
+
+    /**
+     * Testing only!
+     * This function should be called at-least once before calling getInstance() method
+     * This function should not be called multiple times, but only when required.
+     * Ideally this function should be called once when application  is started or created.
+     * This function may be called n number of times if required, during mocking and testing.
+     *
+     * @param dataRepository data repository
+     * @param uiThread       ui thread implementation
+     * @param handlerThread  background thread
+     */
+    public static void init(DataRepository dataRepository, UIThread uiThread, HandlerThread handlerThread) {
+        sDataUseCase = new DataUseCase(dataRepository, uiThread, handlerThread);
     }
 
     public static DataUseCase getInstance() {

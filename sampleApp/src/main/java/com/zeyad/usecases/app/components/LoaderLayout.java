@@ -105,6 +105,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
      * Show progress bar and hide another views.
      */
     public void showProgress() {
+        mProgressBar.bringToFront();
         mProgressBar.setVisibility(VISIBLE);
         mTxvStatus.setVisibility(GONE);
         setSubViewVisibility(INVISIBLE);
@@ -115,6 +116,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
      * Show progress bar over a semi transparent content.
      */
     public void showProgressOverContent() {
+        mProgressBar.bringToFront();
         mProgressBar.setVisibility(VISIBLE);
         bringChildToFront(mProgressBar);
         mTxvStatus.setVisibility(GONE);

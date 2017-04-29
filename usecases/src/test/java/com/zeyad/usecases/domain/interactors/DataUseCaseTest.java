@@ -43,6 +43,8 @@ public class DataUseCaseTest {
     private IDataUseCase mDataUseCase;
     private Observable observable = Observable.just(true);
     private Data mData = getMockedDataRepo();
+    private GetRequest getRequest = new GetRequest.GetRequestBuilder(Object.class, false)
+            .build();
 
     private Data getMockedDataRepo() {
         final DataRepository dataRepository = Mockito.mock(DataRepository.class);
@@ -114,7 +116,7 @@ public class DataUseCaseTest {
         when(mData.getObjectDynamicallyById(anyString(), anyString(), anyInt(),
                 any(Class.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        mDataUseCase.getObject(new GetRequest("", "", 0, Object.class, Object.class, false, false));
+        mDataUseCase.getObject(getRequest);
 
         verify(mData, times(1)).getObjectDynamicallyById(anyString(), anyString(),
                 anyInt(), any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
@@ -125,7 +127,7 @@ public class DataUseCaseTest {
         when(mData.getListDynamically(anyString(), any(Class.class), any(Class.class), anyBoolean(),
                 anyBoolean())).thenReturn(observable);
 
-        mDataUseCase.getList(new GetRequest("", "", 0, Object.class, Object.class, false, false));
+        mDataUseCase.getList(getRequest);
 
         verify(mData, times(1)).getListDynamically(anyString(), any(Class.class), any(Class.class),
                 anyBoolean(), anyBoolean());
@@ -182,7 +184,9 @@ public class DataUseCaseTest {
     public void testExecuteSearch() {
         when(mData.queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class))).thenReturn(observable);
 
-        mDataUseCase.queryDisk(realm -> realm.where(TestRealmModel.class), Object.class);
+        mDataUseCase.queryDisk(new GetRequest.GetRequestBuilder(null, true)
+                .queryFactory(realm -> realm.where(TestRealmModel.class))
+                .build());
 
         verify(mData, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class));
     }
