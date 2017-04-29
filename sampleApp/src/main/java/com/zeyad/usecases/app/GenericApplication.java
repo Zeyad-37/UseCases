@@ -11,6 +11,7 @@ import android.os.StrictMode;
 import android.util.Base64;
 import android.util.Log;
 
+import com.squareup.leakcanary.LeakCanary;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
@@ -98,6 +99,12 @@ public class GenericApplication extends Application {
     public void onCreate() {
 //        initializeStrickMode();
         super.onCreate();
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this);
         sInstance = this;
 //        checkAppTampering(sInstance);
         if (BuildConfig.DEBUG)

@@ -1,1 +1,1 @@
-include ':sampleApp', ':usecases', ':processor', ':annotations'
+include ':sampleApp', ':usecases'
