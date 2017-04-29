@@ -67,12 +67,12 @@ public class GenericApplication extends Application {
         return false;
     }
 
-    public static boolean verifyInstaller(Context context) {
+    private static boolean verifyInstaller(Context context) {
         final String installer = context.getPackageManager().getInstallerPackageName(context.getPackageName());
         return installer != null && installer.startsWith("com.android.vending");
     }
 
-    public static boolean checkEmulator() {
+    private static boolean checkEmulator() {
         try {
             boolean goldfish = getSystemProperty("ro.hardware").contains("goldfish");
             boolean emu = getSystemProperty("ro.kernel.qemu").length() > 0;
@@ -91,7 +91,7 @@ public class GenericApplication extends Application {
                 .invoke(systemPropertyClazz, name);
     }
 
-    public static boolean checkDebuggable(Context context) {
+    private static boolean checkDebuggable(Context context) {
         return (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
     }
 
@@ -215,5 +215,4 @@ public class GenericApplication extends Application {
         return checkAppSignature(context) && verifyInstaller(context) && checkEmulator()
                 && checkDebuggable(context);
     }
-
 }
