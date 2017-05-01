@@ -16,7 +16,7 @@
         <!--android:value="GlideModule" />-->
 
         <activity
-            android:name=".presentation.screens.splash.SplashActivity"
+            android:name=".presentation.splash.SplashActivity"
             android:theme="@style/SplashTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -25,16 +25,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".presentation.screens.user_list.UserListActivity"
+            android:name=".presentation.user_list.UserListActivity"
             android:label="@string/title_user_list"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.screens.user_detail.UserDetailActivity"
-            android:parentActivityName=".presentation.screens.user_list.UserListActivity"
+            android:name=".presentation.user_detail.UserDetailActivity"
+            android:parentActivityName=".presentation.user_list.UserListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".presentation.screens.user_list.UserListActivity" />
+                android:value=".presentation.user_list.UserListActivity" />
         </activity>
     </application>
 </manifest>

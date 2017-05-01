@@ -15,34 +15,24 @@ import static com.zeyad.usecases.app.components.redux.UIModel.SUCCESS;
 public class BaseViewModel<S> {
 
     public Transformer<BaseEvent, UIModel<S>> uiModels(Func1<BaseEvent, Observable<?>> mapEventsToExecutables,
-                                                       Func2<UIModel<S>, Result, UIModel<S>> stateAccumulator,
+                                                       Func2<UIModel<S>, Result<?>, UIModel<S>> stateAccumulator,
                                                        UIModel<S> initialState) {
         return events -> events.observeOn(Schedulers.io())
                 .flatMap(event -> Observable.just(event)
                         .flatMap(mapEventsToExecutables)
                         .map(Result::successResult)
                         .onErrorReturn(Result::errorResult)
-                        .startWith(Result.IN_FLIGHT))
-                .distinctUntilChanged(new Func1<Result, String>() {
-                    @Override
-                    public String call(Result result) {
-                        return result.getState() + (result.getState().equals(SUCCESS) ?
-                                (result.getBundle() != null ? result.getBundle().toString() : "") : "");
-                    }
-                })
+                        .startWith(Result.loadingResult()))
+                .distinctUntilChanged(result -> result.getState() + (result.getState().equals(SUCCESS) ?
+                        (result.getBundle() != null ? result.getBundle().toString() : "") : ""))
                 .scan(initialState, stateAccumulator)
-                .distinctUntilChanged(new Func1<UIModel<S>, String>() {
-                    @Override
-                    public String call(UIModel uiModel) {
-                        return uiModel.getState() + (uiModel.getState().equals(SUCCESS) ?
-                                (uiModel.getBundle() != null ? uiModel.getBundle().toString() : "") : "");
-                    }
-                })
+                .distinctUntilChanged(uiModel -> uiModel.getState() + (uiModel.getState().equals(SUCCESS) ?
+                        (uiModel.getBundle() != null ? uiModel.getBundle().toString() : "") : ""))
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
     public Transformer<BaseEvent, UIModel<S>> uiModels(Func1<BaseEvent, Observable<?>> mapEventsToExecutables,
-                                                       Func2<UIModel<S>, Result, UIModel<S>> stateAccumulator) {
-        return uiModels(mapEventsToExecutables, stateAccumulator, UIModel.idleState);
+                                                       Func2<UIModel<S>, Result<?>, UIModel<S>> stateAccumulator) {
+        return uiModels(mapEventsToExecutables, stateAccumulator, UIModel.idleState());
     }
 }

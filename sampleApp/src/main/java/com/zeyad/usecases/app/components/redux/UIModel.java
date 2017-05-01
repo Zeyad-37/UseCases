@@ -4,10 +4,8 @@ package com.zeyad.usecases.app.components.redux;
  * @author zeyad on 1/24/17.
  */
 public class UIModel<B> {
-    static final String LOADING = "loading", ERROR = "error", SUCCESS = "success",
-            IDLE = "idle";
-    static final UIModel idleState = new UIModel<>(IDLE, false, null, false, null);
-
+    static final String LOADING = "loading", ERROR = "error", SUCCESS = "success";
+    private static final String IDLE = "idle";
     private final boolean isLoading, isSuccessful;
     private final Throwable error;
     private final String state;
@@ -21,12 +19,16 @@ public class UIModel<B> {
         this.state = state;
     }
 
-    public static <B> UIModel<B> loadingState(B bundle) {
-        return new UIModel<>(LOADING, true, null, false, bundle);
+    static <B> UIModel<B> idleState() {
+        return new UIModel<>(IDLE, false, null, false, null);
     }
 
     public static <B> UIModel<B> idleState(B bundle) {
         return new UIModel<>(IDLE, false, null, false, bundle);
+    }
+
+    public static <B> UIModel<B> loadingState(B bundle) {
+        return new UIModel<>(LOADING, true, null, false, bundle);
     }
 
     public static <B> UIModel<B> errorState(Throwable error) {

@@ -9,8 +9,6 @@ import static com.zeyad.usecases.app.components.redux.UIModel.SUCCESS;
  */
 public class Result<B> {
 
-    static final Result IN_FLIGHT = new Result<>(LOADING, true, null, false, null);
-
     private final boolean isLoading, isSuccessful;
     private final Throwable error;
     private final String state;
@@ -22,6 +20,10 @@ public class Result<B> {
         this.isSuccessful = isSuccessful;
         this.bundle = bundle;
         this.state = state;
+    }
+
+    static <B> Result<B> loadingResult() {
+        return new Result<>(LOADING, true, null, false, null);
     }
 
     static <B> Result<B> errorResult(Throwable error) {
