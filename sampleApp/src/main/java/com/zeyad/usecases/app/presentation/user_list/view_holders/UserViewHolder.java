@@ -8,7 +8,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
-import com.zeyad.usecases.app.presentation.user_list.UserRealm;
+import com.zeyad.usecases.app.presentation.user_list.User;
 import com.zeyad.usecases.app.utils.Utils;
 
 import butterknife.BindView;
@@ -31,7 +31,7 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     @Override
     public void bindData(Object data, boolean isItemSelected, int position, boolean isEnabled) {
         if (data != null) {
-            UserRealm userModel = (UserRealm) data;
+            User userModel = (User) data;
             if (Utils.isNotEmpty(userModel.getAvatarUrl()))
                 Glide.with(itemView.getContext())
                         .load(userModel.getAvatarUrl())

@@ -1,7 +1,7 @@
 package com.zeyad.usecases.app.presentation.user_detail;
 
 import com.google.gson.annotations.SerializedName;
-import com.zeyad.usecases.app.presentation.user_list.UserRealm;
+import com.zeyad.usecases.app.presentation.user_list.User;
 
 import org.parceler.Parcel;
 
@@ -11,7 +11,7 @@ import io.realm.RealmObject;
  * @author zeyad on 1/25/17.
  */
 @Parcel
-public class RepoRealm extends RealmObject {
+public class Repository extends RealmObject {
     @SerializedName("id")
     int id;
     @SerializedName("name")
@@ -19,7 +19,7 @@ public class RepoRealm extends RealmObject {
     @SerializedName("full_name")
     String fullName;
     @SerializedName("owner")
-    UserRealm owner;
+    User owner;
     @SerializedName("html_url")
     String htmlUrl;
     @SerializedName("description")
@@ -147,32 +147,32 @@ public class RepoRealm extends RealmObject {
     @SerializedName("default_branch")
     String defaultBranch;
 
-    public RepoRealm() {
+    public Repository() {
     }
 
-    public static boolean isEmpty(RepoRealm repoRealm) {
-        return repoRealm == null || (repoRealm.name == null && repoRealm.fullName == null &&
-                repoRealm.owner == null && repoRealm.htmlUrl == null && repoRealm.description == null &&
-                repoRealm.url == null && repoRealm.forksUrl == null && repoRealm.keysUrl == null &&
-                repoRealm.collaboratorsUrl == null && repoRealm.teamsUrl == null &&
-                repoRealm.hooksUrl == null && repoRealm.issueEventsUrl == null && repoRealm.eventsUrl == null &&
-                repoRealm.assigneesUrl == null && repoRealm.branchesUrl == null && repoRealm.tagsUrl == null &&
-                repoRealm.blobsUrl == null && repoRealm.gitTagsUrl == null && repoRealm.gitRefsUrl == null &&
-                repoRealm.treesUrl == null && repoRealm.statusesUrl == null && repoRealm.languagesUrl == null &&
-                repoRealm.stargazersUrl == null && repoRealm.contributorsUrl == null &&
-                repoRealm.subscribersUrl == null && repoRealm.subscriptionUrl == null &&
-                repoRealm.commitsUrl == null && repoRealm.gitCommitsUrl == null &&
-                repoRealm.commentsUrl == null && repoRealm.issueCommentUrl == null &&
-                repoRealm.contentsUrl == null && repoRealm.compareUrl == null &&
-                repoRealm.mergesUrl == null && repoRealm.archiveUrl == null &&
-                repoRealm.downloadsUrl == null && repoRealm.issuesUrl == null &&
-                repoRealm.pullsUrl == null && repoRealm.milestonesUrl == null &&
-                repoRealm.notificationsUrl == null && repoRealm.labelsUrl == null &&
-                repoRealm.releasesUrl == null && repoRealm.deploymentsUrl == null &&
-                repoRealm.createdAt == null && repoRealm.updatedAt == null && repoRealm.pushedAt == null &&
-                repoRealm.gitUrl == null && repoRealm.sshUrl == null && repoRealm.cloneUrl == null &&
-                repoRealm.svnUrl == null && repoRealm.homepage == null && repoRealm.language == null &&
-                repoRealm.mirrorUrl == null && repoRealm.defaultBranch == null);
+    public static boolean isEmpty(Repository repository) {
+        return repository == null || (repository.name == null && repository.fullName == null &&
+                repository.owner == null && repository.htmlUrl == null && repository.description == null &&
+                repository.url == null && repository.forksUrl == null && repository.keysUrl == null &&
+                repository.collaboratorsUrl == null && repository.teamsUrl == null &&
+                repository.hooksUrl == null && repository.issueEventsUrl == null && repository.eventsUrl == null &&
+                repository.assigneesUrl == null && repository.branchesUrl == null && repository.tagsUrl == null &&
+                repository.blobsUrl == null && repository.gitTagsUrl == null && repository.gitRefsUrl == null &&
+                repository.treesUrl == null && repository.statusesUrl == null && repository.languagesUrl == null &&
+                repository.stargazersUrl == null && repository.contributorsUrl == null &&
+                repository.subscribersUrl == null && repository.subscriptionUrl == null &&
+                repository.commitsUrl == null && repository.gitCommitsUrl == null &&
+                repository.commentsUrl == null && repository.issueCommentUrl == null &&
+                repository.contentsUrl == null && repository.compareUrl == null &&
+                repository.mergesUrl == null && repository.archiveUrl == null &&
+                repository.downloadsUrl == null && repository.issuesUrl == null &&
+                repository.pullsUrl == null && repository.milestonesUrl == null &&
+                repository.notificationsUrl == null && repository.labelsUrl == null &&
+                repository.releasesUrl == null && repository.deploymentsUrl == null &&
+                repository.createdAt == null && repository.updatedAt == null && repository.pushedAt == null &&
+                repository.gitUrl == null && repository.sshUrl == null && repository.cloneUrl == null &&
+                repository.svnUrl == null && repository.homepage == null && repository.language == null &&
+                repository.mirrorUrl == null && repository.defaultBranch == null);
     }
 
     public int getId() {
@@ -199,11 +199,11 @@ public class RepoRealm extends RealmObject {
         this.fullName = fullName;
     }
 
-    public UserRealm getOwner() {
+    public User getOwner() {
         return owner;
     }
 
-    public void setOwner(UserRealm owner) {
+    public void setOwner(User owner) {
         this.owner = owner;
     }
 

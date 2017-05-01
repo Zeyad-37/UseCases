@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Parcel
 public class UserListState {
-    final List<UserRealm> users;
+    final List<User> users;
 
     UserListState() {
         users = new ArrayList<>();
@@ -24,17 +24,17 @@ public class UserListState {
         return new Builder();
     }
 
-    List<UserRealm> getUsers() {
+    List<User> getUsers() {
         return users;
     }
 
     static class Builder {
-        List<UserRealm> users;
+        List<User> users;
 
         Builder() {
         }
 
-        public Builder setUsers(List<UserRealm> value) {
+        public Builder setUsers(List<User> value) {
             users = value;
             return this;
         }

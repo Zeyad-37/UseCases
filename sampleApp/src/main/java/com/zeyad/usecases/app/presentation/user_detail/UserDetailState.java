@@ -1,6 +1,6 @@
 package com.zeyad.usecases.app.presentation.user_detail;
 
-import com.zeyad.usecases.app.presentation.user_list.UserRealm;
+import com.zeyad.usecases.app.presentation.user_list.User;
 
 import org.parceler.Parcel;
 
@@ -12,8 +12,8 @@ import java.util.List;
 @Parcel
 public final class UserDetailState {
     final boolean isTwoPane;
-    final UserRealm user;
-    final List<RepoRealm> repos;
+    final User user;
+    final List<Repository> repos;
 
     UserDetailState() {
         user = null;
@@ -35,23 +35,23 @@ public final class UserDetailState {
         return isTwoPane;
     }
 
-    UserRealm getUser() {
+    User getUser() {
         return user;
     }
 
-    List<RepoRealm> getRepos() {
+    List<Repository> getRepos() {
         return repos;
     }
 
     public static class Builder {
-        List<RepoRealm> repos;
-        UserRealm user;
+        List<Repository> repos;
+        User user;
         boolean isTwoPane;
 
         Builder() {
         }
 
-        public Builder setRepos(List<RepoRealm> value) {
+        public Builder setRepos(List<Repository> value) {
             repos = value;
             return this;
         }
@@ -61,7 +61,7 @@ public final class UserDetailState {
             return this;
         }
 
-        public Builder setUser(UserRealm value) {
+        public Builder setUser(User value) {
             user = value;
             return this;
         }

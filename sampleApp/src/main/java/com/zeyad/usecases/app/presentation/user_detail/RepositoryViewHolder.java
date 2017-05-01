@@ -24,8 +24,8 @@ class RepositoryViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
 
     @Override
     public void bindData(Object data, boolean isItemSelected, int position, boolean isEnabled) {
-        if (data != null && data instanceof RepoRealm) {
-            RepoRealm repoModel = (RepoRealm) data;
+        if (data != null && data instanceof Repository) {
+            Repository repoModel = (Repository) data;
             if (Utils.isNotEmpty(repoModel.getName()))
                 textView_repo_title.setText(repoModel.getName());
         }

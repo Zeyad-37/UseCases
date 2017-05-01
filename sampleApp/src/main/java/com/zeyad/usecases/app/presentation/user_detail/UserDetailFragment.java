@@ -31,8 +31,8 @@ import com.zeyad.usecases.app.components.redux.BaseFragment;
 import com.zeyad.usecases.app.components.redux.UIModel;
 import com.zeyad.usecases.app.components.redux.UISubscriber;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
+import com.zeyad.usecases.app.presentation.user_list.User;
 import com.zeyad.usecases.app.presentation.user_list.UserListActivity;
-import com.zeyad.usecases.app.presentation.user_list.UserRealm;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
@@ -49,7 +49,7 @@ import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
 import static com.zeyad.usecases.app.components.redux.UISubscriber.ERROR_WITH_RETRY;
 
 /**
- * A fragment representing a single RepoRealm detail screen.
+ * A fragment representing a single Repository detail screen.
  * This fragment is either contained in a {@link UserListActivity}
  * in two-pane mode (on tablets) or a {@link UserDetailActivity}
  * on handsets.
@@ -117,36 +117,19 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
 
     @Override
     public void loadData() {
-        events.compose(userDetailVM.uiModels(event -> userDetailVM.getRepositories(((GetReposEvent) event).getLogin()),
-                (currentUIModel, newUIModel) -> {
-                    UserDetailState bundle = currentUIModel.getBundle();
-                    if (newUIModel.isLoading())
-                        currentUIModel = UIModel.loadingState(UserDetailState.builder()
-                                .setRepos(bundle.getRepos())
-                                .setUser(bundle.getUser())
-                                .setIsTwoPane(bundle.isTwoPane())
-                                .build());
-                    else if (newUIModel.isSuccessful()) {
-                        currentUIModel = UIModel.successState(UserDetailState.builder()
-                                .setRepos((List<RepoRealm>) newUIModel.getBundle())
-                                .setUser(bundle.getUser())
-                                .setIsTwoPane(bundle.isTwoPane())
-                                .build());
-                    } else currentUIModel = UIModel.errorState(newUIModel.getError());
-                    return currentUIModel;
-                }, UIModel.idleState(viewState)))
+        events.compose(userDetailVM.uiModels(UIModel.idleState(viewState)))
                 .compose(bindToLifecycle()).subscribe(new UISubscriber<>(this, ERROR_WITH_RETRY));
     }
 
     @Override
     public void renderState(UserDetailState userDetailState) {
         viewState = userDetailState;
-        UserRealm userRealm = viewState.getUser();
-        List<RepoRealm> repoModels = viewState.getRepos();
+        User user = viewState.getUser();
+        List<Repository> repoModels = viewState.getRepos();
         if (Utils.isNotEmpty(repoModels))
             for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
                 repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
-        if (userRealm != null) {
+        if (user != null) {
             RequestListener<String, GlideDrawable> requestListener = new RequestListener<String, GlideDrawable>() {
                 @Override
                 public boolean onException(Exception e, String model, Target<GlideDrawable> target,
@@ -171,10 +154,10 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
                 if (activity != null) {
                     Toolbar appBarLayout = (Toolbar) activity.findViewById(R.id.toolbar);
                     if (appBarLayout != null)
-                        appBarLayout.setTitle(userRealm.getLogin());
-                    if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
+                        appBarLayout.setTitle(user.getLogin());
+                    if (Utils.isNotEmpty(user.getAvatarUrl()))
                         Glide.with(getContext())
-                                .load(userRealm.getAvatarUrl())
+                                .load(user.getAvatarUrl())
                                 .dontAnimate()
                                 .listener(requestListener)
                                 .into(activity.imageViewAvatar);
@@ -184,10 +167,10 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
                 if (activity != null) {
                     CollapsingToolbarLayout appBarLayout = activity.collapsingToolbarLayout;
                     if (appBarLayout != null)
-                        appBarLayout.setTitle(userRealm.getLogin());
-                    if (Utils.isNotEmpty(userRealm.getAvatarUrl()))
+                        appBarLayout.setTitle(user.getLogin());
+                    if (Utils.isNotEmpty(user.getAvatarUrl()))
                         Glide.with(getContext())
-                                .load(userRealm.getAvatarUrl())
+                                .load(user.getAvatarUrl())
                                 .dontAnimate()
                                 .listener(requestListener)
                                 .into(activity.imageViewAvatar);
