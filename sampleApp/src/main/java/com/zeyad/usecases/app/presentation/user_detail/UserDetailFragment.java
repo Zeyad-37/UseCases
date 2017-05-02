@@ -29,8 +29,6 @@ import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.redux.BaseFragment;
 import com.zeyad.usecases.app.components.redux.UIModel;
-import com.zeyad.usecases.app.components.redux.UISubscriber;
-import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.presentation.user_list.User;
 import com.zeyad.usecases.app.presentation.user_list.UserListActivity;
 import com.zeyad.usecases.app.utils.Utils;
@@ -46,7 +44,6 @@ import butterknife.ButterKnife;
 import rx.Observable;
 
 import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
-import static com.zeyad.usecases.app.components.redux.UISubscriber.ERROR_WITH_RETRY;
 
 /**
  * A fragment representing a single Repository detail screen.
@@ -54,12 +51,11 @@ import static com.zeyad.usecases.app.components.redux.UISubscriber.ERROR_WITH_RE
  * in two-pane mode (on tablets) or a {@link UserDetailActivity}
  * on handsets.
  */
-public class UserDetailFragment extends BaseFragment<UserDetailState> {
+public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetailVM> {
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
     @BindView(R.id.recyclerView_repositories)
     RecyclerView recyclerViewRepositories;
-    private UserDetailVM userDetailVM;
     private GenericRecyclerViewAdapter repositoriesAdapter;
 
     /**
@@ -81,7 +77,24 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
     public void initialize() {
         if (getArguments() != null)
             viewState = Parcels.unwrap(getArguments().getParcelable(UI_MODEL));
-        userDetailVM = new UserDetailVM(DataUseCaseFactory.getInstance());
+        stateAccumulator = (currentUIModel, newUIModel) -> {
+            UserDetailState bundle = currentUIModel.getBundle();
+            if (newUIModel.isLoading())
+                currentUIModel = UIModel.loadingState(UserDetailState.builder()
+                        .setRepos(bundle.getRepos())
+                        .setUser(bundle.getUser())
+                        .setIsTwoPane(bundle.isTwoPane())
+                        .build());
+            else if (newUIModel.isSuccessful()) {
+                currentUIModel = UIModel.successState(UserDetailState.builder()
+                        .setRepos((List<Repository>) newUIModel.getBundle())
+                        .setUser(bundle.getUser())
+                        .setIsTwoPane(bundle.isTwoPane())
+                        .build());
+            } else currentUIModel = UIModel.errorState(newUIModel.getError());
+            return currentUIModel;
+        };
+        viewModel = new UserDetailVM(DataUseCaseFactory.getInstance());
         events = Observable.just(new GetReposEvent(viewState.getUser().getLogin()));
     }
 
@@ -113,12 +126,6 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
             }
         };
         recyclerViewRepositories.setAdapter(repositoriesAdapter);
-    }
-
-    @Override
-    public void loadData() {
-        events.compose(userDetailVM.uiModels(UIModel.idleState(viewState)))
-                .compose(bindToLifecycle()).subscribe(new UISubscriber<>(this, ERROR_WITH_RETRY));
     }
 
     @Override
@@ -187,12 +194,8 @@ public class UserDetailFragment extends BaseFragment<UserDetailState> {
     }
 
     @Override
-    public void showErrorWithRetry(String message) {
-        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, loaderLayout, message, R.string.retry, view -> loadData());
-    }
-
-    @Override
     public void showError(String message) {
+//        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, loaderLayout, message, R.string.retry, view -> loadData());
         showErrorSnackBar(message, loaderLayout, Snackbar.LENGTH_LONG);
     }
 

@@ -12,22 +12,21 @@ import rx.schedulers.Schedulers;
  */
 public abstract class BaseViewModel<S> {
 
-    public Transformer<BaseEvent, UIModel<S>> uiModels(UIModel<S> initialState) {
+    public Transformer<BaseEvent, UIModel<S>> uiModels(Func2<UIModel<S>, Result<?>, UIModel<S>> stateAccumulator,
+                                                       UIModel<S> initialState) {
         return events -> events.observeOn(Schedulers.io())
                 .flatMap(event -> Observable.just(event)
                         .flatMap(mapEventsToExecutables())
                         .map(Result::successResult)
                         .onErrorReturn(Result::errorResult)
                         .startWith(Result.loadingResult()))
-                .scan(initialState, stateAccumulator())
+                .scan(initialState, stateAccumulator)
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
-    public Transformer<BaseEvent, UIModel<S>> uiModels() {
-        return uiModels(UIModel.idleState());
+    public Transformer<BaseEvent, UIModel<S>> uiModels(Func2<UIModel<S>, Result<?>, UIModel<S>> stateAccumulator) {
+        return uiModels(stateAccumulator, UIModel.idleState());
     }
 
     public abstract Func1<BaseEvent, Observable<?>> mapEventsToExecutables();
-
-    public abstract Func2<UIModel<S>, Result<?>, UIModel<S>> stateAccumulator();
 }

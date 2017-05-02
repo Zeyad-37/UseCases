@@ -20,16 +20,20 @@ import org.parceler.Parcels;
 import java.util.List;
 
 import rx.Observable;
+import rx.functions.Func2;
 
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseActivity<S> extends RxAppCompatActivity implements LoadDataView<S> {
-    public static final String UI_MODEL = "uiModel";
+public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxAppCompatActivity
+        implements LoadDataView<S> {
+    public static final String UI_MODEL = "viewState";
     public INavigator navigator;
     public IRxEventBus rxEventBus;
     public Observable<BaseEvent> events;
-    public S uiModel;
+    public S viewState;
+    public VM viewModel;
+    public Func2<UIModel<S>, Result<?>, UIModel<S>> stateAccumulator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,8 +44,8 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
         initialize();
         setupUI();
         if (savedInstanceState != null) {
-            uiModel = Parcels.unwrap(savedInstanceState.getParcelable(UI_MODEL));
-            renderState(uiModel);
+            viewState = Parcels.unwrap(savedInstanceState.getParcelable(UI_MODEL));
+            renderState(viewState);
         }
     }
 
@@ -60,20 +64,22 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
     }
 
     /**
-     * To implement! Saves the uiModel of the current view. Do not return null!
+     * To implement! Saves the viewState of the current view. Do not return null!
      *
      * @return {@link Bundle}
      */
     private Bundle saveState() {
         Bundle bundle = new Bundle(1);
-        bundle.putParcelable(UI_MODEL, Parcels.wrap(uiModel));
+        bundle.putParcelable(UI_MODEL, Parcels.wrap(viewState));
         return bundle;
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        loadData();
+        events.compose(viewModel.uiModels(stateAccumulator, UIModel.idleState(viewState)))
+                .compose(bindToLifecycle())
+                .subscribe(new UISubscriber<>(this));
     }
 
     /**
@@ -85,8 +91,6 @@ public abstract class BaseActivity<S> extends RxAppCompatActivity implements Loa
      * Setup the UI.
      */
     public abstract void setupUI();
-
-    public abstract void loadData();
 
     /**
      * Adds a {@link Fragment} to this activity's layout.

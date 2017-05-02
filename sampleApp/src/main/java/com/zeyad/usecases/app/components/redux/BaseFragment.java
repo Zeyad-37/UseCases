@@ -14,18 +14,21 @@ import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import org.parceler.Parcels;
 
 import rx.Observable;
+import rx.functions.Func2;
 
 import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
 
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseFragment<S> extends RxFragment implements LoadDataView<S> {
+public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFragment implements LoadDataView<S> {
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
     public Observable<BaseEvent> events;
     public S viewState;
+    public VM viewModel;
+    public Func2<UIModel<S>, Result<?>, UIModel<S>> stateAccumulator;
 
     public BaseFragment() {
         super();
@@ -50,7 +53,9 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
     @Override
     public void onResume() {
         super.onResume();
-        loadData();
+        events.compose(viewModel.uiModels(stateAccumulator, UIModel.idleState(viewState)))
+                .compose(bindToLifecycle())
+                .subscribe(new UISubscriber<>(this));
     }
 
     @Override
@@ -61,7 +66,7 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
     }
 
     /**
-     * To implement! Saves the uiModel of the current view. Do not return null!
+     * To implement! Saves the viewState of the current view. Do not return null!
      *
      * @return {@link Bundle}
      */
@@ -75,8 +80,6 @@ public abstract class BaseFragment<S> extends RxFragment implements LoadDataView
      * Initialize any objects or any required dependencies.
      */
     public abstract void initialize();
-
-    public abstract void loadData();
 
     public void showToastMessage(String message) {
         showToastMessage(message, Toast.LENGTH_LONG);

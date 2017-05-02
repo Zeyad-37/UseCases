@@ -31,7 +31,6 @@ import com.zeyad.usecases.app.components.redux.BaseActivity;
 import com.zeyad.usecases.app.components.redux.BaseEvent;
 import com.zeyad.usecases.app.components.redux.UIModel;
 import com.zeyad.usecases.app.components.redux.UISubscriber;
-import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailActivity;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailFragment;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailState;
@@ -44,6 +43,9 @@ import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -51,8 +53,6 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
 import rx.Single;
-
-import static com.zeyad.usecases.app.components.redux.UISubscriber.ERROR_WITH_RETRY;
 
 /**
  * An activity representing a list of Repos. This activity
@@ -62,7 +62,7 @@ import static com.zeyad.usecases.app.components.redux.UISubscriber.ERROR_WITH_RE
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class UserListActivity extends BaseActivity<UserListState> implements ActionMode.Callback {
+public class UserListActivity extends BaseActivity<UserListState, UserListVM> implements ActionMode.Callback {
     public static final int PAGE_SIZE = 6;
     @BindView(R.id.imageView_avatar)
     public ImageView imageViewAvatar;
@@ -73,11 +73,11 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
     Observable.Transformer<BaseEvent, UIModel<UserListState>> uiModelsTransformer;
-    private UserListVM userListVM;
     private GenericRecyclerViewAdapter usersAdapter;
     private boolean twoPane;
     private ActionMode actionMode;
     private String currentFragTag;
+    private long lastId;
 
     public static Intent getCallingIntent(Context context) {
         return new Intent(context, UserListActivity.class);
@@ -85,16 +85,40 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
 
     @Override
     public void initialize() {
-        userListVM = new UserListVM(DataUseCaseFactory.getInstance());
+        stateAccumulator = (currentUIModel, result) -> {
+            Log.d("State Accumulator", "CurrentUIModel: " + currentUIModel.toString());
+            Log.d("State Accumulator", "Result: " + result.toString());
+            UserListState currentBundle = currentUIModel.getBundle();
+            if (result.isLoading())
+                currentUIModel = UIModel.loadingState(currentBundle);
+            else if (result.isSuccessful()) {
+                List resultList = (List) result.getBundle();
+                List<User> users = currentBundle == null ? new ArrayList<>() : currentBundle.getUsers();
+                if (resultList.get(0).getClass().equals(User.class)) {
+                    users.addAll(resultList);
+                } else {
+                    final Iterator<User> each = users.iterator();
+                    while (each.hasNext()) if (resultList.contains((long) each.next().getId()))
+                        each.remove();
+                }
+                lastId = users.get(users.size() - 1).getId();
+                users = new ArrayList<>(new HashSet<>(users));
+                Collections.sort(users, (user1, user2) -> String.valueOf(user1.getId())
+                        .compareTo(String.valueOf(user2.getId())));
+                currentUIModel = UIModel.successState(UserListState.builder().setUsers(users).build());
+            } else currentUIModel = UIModel.errorState(result.getError());
+            return currentUIModel;
+        };
+        viewModel = new UserListVM(DataUseCaseFactory.getInstance());
         events = Single.<BaseEvent>just(new GetPaginatedUsersEvent(0))
                 .toObservable()
                 .doOnEach(notification -> Log.d("GetUsersEvent", "fired!"));
         rxEventBus.toObserverable()
                 .compose(bindToLifecycle())
-                .subscribe(stream -> events.mergeWith((Observable<? extends BaseEvent>) stream)
+                .subscribe(stream -> events.mergeWith((Observable<DeleteUsersEvent>) stream)
                         .compose(uiModelsTransformer)
                         .compose(bindToLifecycle())
-                        .subscribe(new UISubscriber<>(this, ERROR_WITH_RETRY)));
+                        .subscribe(new UISubscriber<>(this)));
     }
 
     @Override
@@ -109,16 +133,9 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     }
 
     @Override
-    public void loadData() {
-        uiModelsTransformer = userListVM.uiModels();
-        events.compose(uiModelsTransformer).compose(bindToLifecycle())
-                .subscribe(new UISubscriber<>(this, ERROR_WITH_RETRY));
-    }
-
-    @Override
     public void renderState(UserListState state) {
-        uiModel = state;
-        List<User> users = uiModel.getUsers();
+        viewState = state;
+        List<User> users = viewState.getUsers();
         if (Utils.isNotEmpty(users)) {
             List<ItemInfo> itemInfoList = new ArrayList<>(users.size());
             User user;
@@ -203,7 +220,7 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
                     int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                     return (layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                             && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE ?
-                            new GetPaginatedUsersEvent(userListVM.getLastId()) : null;
+                            new GetPaginatedUsersEvent(lastId) : null;
                 }).filter(usersNextPageEvent -> usersNextPageEvent != null)
                 .throttleLast(200, TimeUnit.MILLISECONDS)
                 .debounce(300, TimeUnit.MILLISECONDS)
@@ -218,13 +235,9 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     }
 
     @Override
-    public void showErrorWithRetry(String message) {
-        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, userRecycler, message, R.string.retry,
-                view -> loadData());
-    }
-
-    @Override
     public void showError(String message) {
+//        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, userRecycler, message, R.string.retry,
+//                view -> loadData());
         showErrorSnackBar(message, userRecycler, Snackbar.LENGTH_LONG);
     }
 
@@ -245,12 +258,12 @@ public class UserListActivity extends BaseActivity<UserListState> implements Act
     }
 
     /**
-     * Toggle the selection uiModel of an item.
+     * Toggle the selection viewState of an item.
      * <p>
      * If the item was the last one in the selection and is unselected, the selection is stopped.
      * Note that the selection must already be started (actionMode must not be null).
      *
-     * @param position Position of the item to toggle the selection uiModel
+     * @param position Position of the item to toggle the selection viewState
      */
     private boolean toggleSelection(int position) {
         try {

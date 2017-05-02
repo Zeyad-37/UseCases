@@ -3,15 +3,15 @@ package com.zeyad.usecases.app.components.redux;
 /**
  * @author zeyad on 1/24/17.
  */
-public class UIModel<B> {
+public class UIModel<S> {
     static final String LOADING = "loading", ERROR = "error", SUCCESS = "success";
     private static final String IDLE = "idle";
     private final boolean isLoading, isSuccessful;
     private final Throwable error;
     private final String state;
-    private final B bundle;
+    private final S bundle;
 
-    private UIModel(String state, boolean isLoading, Throwable error, boolean isSuccessful, B bundle) {
+    private UIModel(String state, boolean isLoading, Throwable error, boolean isSuccessful, S bundle) {
         this.isLoading = isLoading;
         this.error = error;
         this.isSuccessful = isSuccessful;
@@ -47,7 +47,7 @@ public class UIModel<B> {
         return error;
     }
 
-    public B getBundle() {
+    public S getBundle() {
         return bundle;
     }
 

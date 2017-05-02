@@ -11,13 +11,13 @@ import rx.exceptions.OnErrorNotImplementedException;
  * @author zeyad on 11/28/16.
  */
 public class UISubscriber<V extends LoadDataView> extends Subscriber<UIModel> {
-    public final static int NO_ERROR = 0, ERROR = 1, ERROR_WITH_RETRY = 2;
+    public final static int NO_ERROR = 0, ERROR = 1;
     private V view;
     private int errorPolicy;
 
     public UISubscriber(V view, int errorPolicy) {
         this.view = view;
-        if (errorPolicy < NO_ERROR || errorPolicy > ERROR_WITH_RETRY)
+        if (errorPolicy < NO_ERROR || errorPolicy > ERROR)
             errorPolicy = NO_ERROR;
         this.errorPolicy = errorPolicy;
     }
@@ -49,8 +49,6 @@ public class UISubscriber<V extends LoadDataView> extends Subscriber<UIModel> {
                 String errorMsg = ErrorMessageFactory.create(throwable);
                 if (errorPolicy == ERROR)
                     view.showError(errorMsg);
-                else if (errorPolicy == ERROR_WITH_RETRY)
-                    view.showErrorWithRetry(errorMsg);
             }
         }
     }
