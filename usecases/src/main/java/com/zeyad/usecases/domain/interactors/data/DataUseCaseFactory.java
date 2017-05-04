@@ -41,7 +41,7 @@ public class DataUseCaseFactory {
                     config.getHandlerThread());
         if (config.isWithCache())
             StoroBuilder.configure(config.getCacheSize())
-                    .setDefaultCacheDirectory(config.getContext().getApplicationContext())
+                    .setDefaultCacheDirectory(config.getContext())
                     .setGsonInstance(Config.getGson())
                     .initialize();
         sDataUseCase = DataUseCase.getInstance();
