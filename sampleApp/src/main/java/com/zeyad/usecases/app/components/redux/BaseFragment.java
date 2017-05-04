@@ -14,7 +14,6 @@ import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 import org.parceler.Parcels;
 
 import rx.Observable;
-import rx.functions.Func2;
 
 import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
 
@@ -26,9 +25,9 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
     public INavigator navigator;
     public IRxEventBus rxEventBus;
     public Observable<BaseEvent> events;
-    public S viewState;
+    public Observable.Transformer<BaseEvent, UIModel<S>> uiModelsTransformer;
     public VM viewModel;
-    public Func2<UIModel<S>, Result<?>, UIModel<S>> stateAccumulator;
+    public S viewState;
 
     public BaseFragment() {
         super();
@@ -40,20 +39,16 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
         setRetainInstance(true);
         navigator = NavigatorFactory.getInstance();
         rxEventBus = RxEventBusFactory.getInstance();
+        if (savedInstanceState != null)
+            viewState = Parcels.unwrap(savedInstanceState.getParcelable(UI_MODEL));
         initialize();
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        if (savedInstanceState != null)
-            renderState(Parcels.unwrap(savedInstanceState.getParcelable(UI_MODEL)));
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        events.compose(viewModel.uiModels(stateAccumulator, UIModel.idleState(viewState)))
+    public void onStart() {
+        super.onStart();
+        uiModelsTransformer = viewModel.uiModels(successStateAccumulator(), viewState);
+        events.compose(uiModelsTransformer)
                 .compose(bindToLifecycle())
                 .subscribe(new UISubscriber<>(this));
     }
@@ -81,6 +76,8 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
      */
     public abstract void initialize();
 
+    public abstract SuccessStateAccumulator<S> successStateAccumulator();
+
     public void showToastMessage(String message) {
         showToastMessage(message, Toast.LENGTH_LONG);
     }
@@ -97,7 +94,7 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
     public void showSnackBarMessage(View view, String message, int duration) {
         if (view != null)
             SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_INFO, view, message, duration).show();
-        else throw new NullPointerException("view is null");
+        else throw new NullPointerException("View is null");
     }
 
     public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,

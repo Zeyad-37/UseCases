@@ -8,6 +8,7 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.squareup.moshi.Moshi;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 
 import java.util.concurrent.TimeUnit;
@@ -20,6 +21,7 @@ public class Config {
     private static Config sInstance;
     private static DataStoreFactory mDataStoreFactory;
     private static Gson mGson;
+    private static Moshi mMoshi;
     private static String mBaseURL;
     private static boolean withCache;
     private static int cacheAmount;
@@ -31,6 +33,7 @@ public class Config {
         mContext = context;
         mGson = createGson();
         setupRealm();
+        mMoshi = new Moshi.Builder().build();
     }
 
     private Config() {

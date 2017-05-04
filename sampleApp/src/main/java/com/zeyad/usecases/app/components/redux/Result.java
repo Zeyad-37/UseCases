@@ -50,10 +50,6 @@ public class Result<B> {
         return isSuccessful;
     }
 
-    String getState() {
-        return state;
-    }
-
     @Override
     public String toString() {
         return "State: " + state + ", Error: " + (error != null ? error.toString() : "null") +

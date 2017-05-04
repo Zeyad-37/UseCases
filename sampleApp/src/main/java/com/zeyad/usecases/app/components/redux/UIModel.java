@@ -19,11 +19,7 @@ public class UIModel<S> {
         this.state = state;
     }
 
-    static <B> UIModel<B> idleState() {
-        return new UIModel<>(IDLE, false, null, false, null);
-    }
-
-    public static <B> UIModel<B> idleState(B bundle) {
+    static <B> UIModel<B> idleState(B bundle) {
         return new UIModel<>(IDLE, false, null, false, bundle);
     }
 

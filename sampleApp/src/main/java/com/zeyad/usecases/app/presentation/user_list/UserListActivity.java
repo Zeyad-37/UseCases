@@ -29,7 +29,7 @@ import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.redux.BaseActivity;
 import com.zeyad.usecases.app.components.redux.BaseEvent;
-import com.zeyad.usecases.app.components.redux.UIModel;
+import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.components.redux.UISubscriber;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailActivity;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailFragment;
@@ -52,7 +52,6 @@ import java.util.concurrent.TimeUnit;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import rx.Observable;
-import rx.Single;
 
 /**
  * An activity representing a list of Repos. This activity
@@ -72,7 +71,6 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     LinearLayout loaderLayout;
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
-    Observable.Transformer<BaseEvent, UIModel<UserListState>> uiModelsTransformer;
     private GenericRecyclerViewAdapter usersAdapter;
     private boolean twoPane;
     private ActionMode actionMode;
@@ -85,33 +83,8 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
 
     @Override
     public void initialize() {
-        stateAccumulator = (currentUIModel, result) -> {
-            Log.d("State Accumulator", "CurrentUIModel: " + currentUIModel.toString());
-            Log.d("State Accumulator", "Result: " + result.toString());
-            UserListState currentBundle = currentUIModel.getBundle();
-            if (result.isLoading())
-                currentUIModel = UIModel.loadingState(currentBundle);
-            else if (result.isSuccessful()) {
-                List resultList = (List) result.getBundle();
-                List<User> users = currentBundle == null ? new ArrayList<>() : currentBundle.getUsers();
-                if (resultList.get(0).getClass().equals(User.class)) {
-                    users.addAll(resultList);
-                } else {
-                    final Iterator<User> each = users.iterator();
-                    while (each.hasNext()) if (resultList.contains((long) each.next().getId()))
-                        each.remove();
-                }
-                lastId = users.get(users.size() - 1).getId();
-                users = new ArrayList<>(new HashSet<>(users));
-                Collections.sort(users, (user1, user2) -> String.valueOf(user1.getId())
-                        .compareTo(String.valueOf(user2.getId())));
-                currentUIModel = UIModel.successState(UserListState.builder().setUsers(users).build());
-            } else currentUIModel = UIModel.errorState(result.getError());
-            return currentUIModel;
-        };
         viewModel = new UserListVM(DataUseCaseFactory.getInstance());
-        events = Single.<BaseEvent>just(new GetPaginatedUsersEvent(0))
-                .toObservable()
+        events = Observable.<BaseEvent>just(new GetPaginatedUsersEvent(0))
                 .doOnEach(notification -> Log.d("GetUsersEvent", "fired!"));
         rxEventBus.toObserverable()
                 .compose(bindToLifecycle())
@@ -130,6 +103,26 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
         setupRecyclerView();
         if (findViewById(R.id.user_detail_container) != null)
             twoPane = true;
+    }
+
+    @Override
+    public SuccessStateAccumulator<UserListState> successStateAccumulator() {
+        return (newResult, currentStateBundle) -> {
+            List resultList = (List) newResult.getBundle();
+            List<User> users = currentStateBundle == null ? new ArrayList<>() : currentStateBundle.getUsers();
+            if (resultList.get(0).getClass().equals(User.class)) {
+                users.addAll(resultList);
+            } else {
+                final Iterator<User> each = users.iterator();
+                while (each.hasNext()) if (resultList.contains((long) each.next().getId()))
+                    each.remove();
+            }
+            lastId = users.get(users.size() - 1).getId();
+            users = new ArrayList<>(new HashSet<>(users));
+            Collections.sort(users, (user1, user2) -> String.valueOf(user1.getId())
+                    .compareTo(String.valueOf(user2.getId())));
+            return UserListState.builder().setUsers(users).build();
+        };
     }
 
     @Override
@@ -266,20 +259,16 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
      * @param position Position of the item to toggle the selection viewState
      */
     private boolean toggleSelection(int position) {
-        try {
-            if (usersAdapter.isSelectionAllowed()) {
-                usersAdapter.toggleSelection(position);
-                int count = usersAdapter.getSelectedItemCount();
-                if (count == 0) {
-                    actionMode.finish();
-                } else {
-                    actionMode.setTitle(String.valueOf(count));
-                    actionMode.invalidate();
-                }
-                return true;
+        if (usersAdapter.isSelectionAllowed()) {
+            usersAdapter.toggleSelection(position);
+            int count = usersAdapter.getSelectedItemCount();
+            if (count == 0) {
+                actionMode.finish();
+            } else {
+                actionMode.setTitle(String.valueOf(count));
+                actionMode.invalidate();
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            return true;
         }
         return false;
     }

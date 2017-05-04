@@ -10,21 +10,11 @@ import rx.exceptions.OnErrorNotImplementedException;
 /**
  * @author zeyad on 11/28/16.
  */
-public class UISubscriber<V extends LoadDataView> extends Subscriber<UIModel> {
-    public final static int NO_ERROR = 0, ERROR = 1;
+public class UISubscriber<V extends LoadDataView<S>, S> extends Subscriber<UIModel<S>> {
     private V view;
-    private int errorPolicy;
-
-    public UISubscriber(V view, int errorPolicy) {
-        this.view = view;
-        if (errorPolicy < NO_ERROR || errorPolicy > ERROR)
-            errorPolicy = NO_ERROR;
-        this.errorPolicy = errorPolicy;
-    }
 
     public UISubscriber(V view) {
         this.view = view;
-        this.errorPolicy = ERROR;
     }
 
     @Override
@@ -37,7 +27,7 @@ public class UISubscriber<V extends LoadDataView> extends Subscriber<UIModel> {
     }
 
     @Override
-    public void onNext(UIModel uiModel) {
+    public void onNext(UIModel<S> uiModel) {
         Log.d("onNext", "UIModel: " + uiModel.toString());
         view.toggleViews(uiModel.isLoading());
         if (!uiModel.isLoading()) {
@@ -47,8 +37,7 @@ public class UISubscriber<V extends LoadDataView> extends Subscriber<UIModel> {
                 Exception throwable = (Exception) uiModel.getError();
                 throwable.printStackTrace();
                 String errorMsg = ErrorMessageFactory.create(throwable);
-                if (errorPolicy == ERROR)
-                    view.showError(errorMsg);
+                view.showError(errorMsg);
             }
         }
     }

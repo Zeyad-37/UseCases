@@ -20,7 +20,6 @@ import org.parceler.Parcels;
 import java.util.List;
 
 import rx.Observable;
-import rx.functions.Func2;
 
 /**
  * @author zeyad on 11/28/16.
@@ -31,9 +30,9 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
     public INavigator navigator;
     public IRxEventBus rxEventBus;
     public Observable<BaseEvent> events;
+    public Observable.Transformer<BaseEvent, UIModel<S>> uiModelsTransformer;
     public S viewState;
     public VM viewModel;
-    public Func2<UIModel<S>, Result<?>, UIModel<S>> stateAccumulator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,9 +74,10 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        events.compose(viewModel.uiModels(stateAccumulator, UIModel.idleState(viewState)))
+    protected void onStart() {
+        super.onStart();
+        uiModelsTransformer = viewModel.uiModels(successStateAccumulator(), viewState);
+        events.compose(uiModelsTransformer)
                 .compose(bindToLifecycle())
                 .subscribe(new UISubscriber<>(this));
     }
@@ -91,6 +91,8 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
      * Setup the UI.
      */
     public abstract void setupUI();
+
+    public abstract SuccessStateAccumulator<S> successStateAccumulator();
 
     /**
      * Adds a {@link Fragment} to this activity's layout.
@@ -155,7 +157,7 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
      */
     public void showErrorSnackBar(String message, View view, int duration) {
         if (view != null)
-            SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_ERROR, view, message, duration);
+            SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_ERROR, view, message, duration).show();
         else throw new NullPointerException("view is null");
     }
 }
