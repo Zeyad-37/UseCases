@@ -17,4 +17,9 @@ public class EmptyViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     @Override
     public void bindData(Object data, boolean isItemSelected, int position, boolean isEnabled) {
     }
+
+    @Override
+    public void expand(boolean isExpanded) {
+
+    }
 }

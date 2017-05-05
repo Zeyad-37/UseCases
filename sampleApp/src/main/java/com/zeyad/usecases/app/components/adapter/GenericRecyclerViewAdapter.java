@@ -578,17 +578,14 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         boolean onItemLongClicked(int position, ItemInfo itemInfo, GenericRecyclerViewAdapter.ViewHolder holder);
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder implements ItemBase {
+    public abstract static class ViewHolder extends RecyclerView.ViewHolder {
 
         public ViewHolder(View itemView) {
             super(itemView);
         }
 
-        @Override
-        public void bindData(Object data, boolean itemSelected, int position, boolean isEnabled) {
-        }
+        public abstract void bindData(Object data, boolean itemSelected, int position, boolean isEnabled);
 
-        public void expand(boolean isExpanded) {
-        }
+        public abstract void expand(boolean isExpanded);
     }
 }

@@ -46,6 +46,11 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
         itemView.setBackgroundColor(isItemSelected ? Color.GRAY : Color.WHITE);
     }
 
+    @Override
+    public void expand(boolean isExpanded) {
+
+    }
+
     public TextView getTextViewTitle() {
         return textViewTitle;
     }
