@@ -12,8 +12,10 @@ import com.firebase.jobdispatcher.Job;
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.zeyad.usecases.R;
+import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.services.jobs.FileIO;
 import com.zeyad.usecases.data.services.jobs.Post;
+import com.zeyad.usecases.data.utils.Utils;
 
 import rx.subscriptions.CompositeSubscription;
 
@@ -61,12 +63,14 @@ public class GenericJobService extends JobService {
                     break;
                 case DOWNLOAD_FILE:
                     mCompositeSubscription.add(new FileIO(params.getExtras().getInt(TRIAL_COUNT),
-                            params.getExtras().getParcelable(PAYLOAD), this, true).execute());
+                            params.getExtras().getParcelable(PAYLOAD), this, true, RestApiImpl.getInstance(),
+                            Utils.getInstance()).execute());
                     Log.d(TAG, getString(R.string.job_started, DOWNLOAD_FILE));
                     break;
                 case UPLOAD_FILE:
                     mCompositeSubscription.add(new FileIO(params.getExtras().getInt(TRIAL_COUNT),
-                            params.getExtras().getParcelable(PAYLOAD), this, false).execute());
+                            params.getExtras().getParcelable(PAYLOAD), this, false, RestApiImpl.getInstance(),
+                            Utils.getInstance()).execute());
                     Log.d(TAG, getString(R.string.job_started, UPLOAD_FILE));
                     break;
                 default:

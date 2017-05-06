@@ -1,4 +1,4 @@
-package com.zeyad.usecases.domain.repositories;
+package com.zeyad.usecases.domain.repository;
 
 import android.support.annotation.NonNull;
 
@@ -7,6 +7,8 @@ import com.zeyad.usecases.data.db.RealmManager;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 import rx.Observable;
@@ -61,4 +63,13 @@ public interface Data {
 
     @NonNull
     Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass);
+
+    @NonNull
+    Observable<?> uploadFileDynamically(String url, File file, String key, HashMap<String, Object> parameters,
+                                        boolean onWifi, boolean whileCharging, boolean queuable,
+                                        Class domainClass, Class dataClass);
+
+    @NonNull
+    Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
+                                          boolean queuable, Class domainClass, Class dataClass);
 }

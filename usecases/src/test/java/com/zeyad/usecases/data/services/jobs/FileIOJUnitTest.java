@@ -14,9 +14,9 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.firebase.jobdispatcher.Job;
 import com.zeyad.usecases.TestRealmModel;
-import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.FileIORequest;
+import com.zeyad.usecases.data.utils.Utils;
 
 import org.junit.After;
 import org.junit.Before;
@@ -33,14 +33,12 @@ import java.io.InputStream;
 
 import okhttp3.ResponseBody;
 import rx.Observable;
-import rx.Subscriber;
 
-import static com.zeyad.usecases.data.services.GenericJobService.DOWNLOAD_FILE;
-import static com.zeyad.usecases.data.services.GenericJobService.JOB_TYPE;
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -50,165 +48,108 @@ import static org.mockito.Mockito.verify;
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 public class FileIOJUnitTest {
-    // ---- //
-    private final ResponseBody RESPONSE_BODY = mock(ResponseBody.class);
-    private final InputStream INPUT_STREAM = mock(InputStream.class);
-    @Nullable
-    private final FirebaseJobDispatcher JOB_SCHEDULER;
-    Context mockContext;
-
-    {
-        JOB_SCHEDULER = new FirebaseJobDispatcher(new GooglePlayDriver(mock(Context.class)));
-    }
+    private final ResponseBody responseBody = mock(ResponseBody.class);
+    private final InputStream inputStream = mock(InputStream.class);
+    private FirebaseJobDispatcher firebaseJobDispatcher;
+    private Context mockContext;
+    private Utils utils;
+    // item under test
+    private FileIO fileIO;
 
     @Before
     public void setUp() throws Exception {
+        firebaseJobDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mock(Context.class)));
         mockContext = mock(Context.class);
+        utils = mock(Utils.class);
     }
 
     @After
     public void tearDown() throws Exception {
-        clearAll();
+        Mockito.reset(responseBody, inputStream);
     }
 
     @Test
-    public void testExecute_ifFileIsDownloaded_whenFileIsToBeDownloadedAndFileDoesNotExist() throws PackageManager.NameNotFoundException {
-        FileIORequest fileIOReq =
-                createFileIoReq(true, true, createFileWhichDoesNotExist());
+    public void testExecute_ifFileIsDownloaded_whenFileIsToBeDownloadedAndFileDoesNotExist() {
+        FileIORequest fileIOReq = mockFileIoReq(true, true, createFileWhichDoesNotExist());
         final RestApiImpl restApi = createRestApi();
-        FileIO fileIO = createFileIO(createMockedContext()
-                , restApi
-                , 3
-                , fileIOReq
-                , true);
+        fileIO = createFileIO(fileIOReq);
         fileIO.execute();
         verify(restApi).dynamicDownload(eq(getValidUrl()));
     }
 
     @Test
-    public void testQueueIoFile_ifTrailCountIncrements_whenFileIsToBeDownloadedAndFileDoesNotExist() throws IOException, PackageManager.NameNotFoundException {
-        FileIORequest fileIOReq =
-                createFileIoReq(true, true, createFileWhichDoesNotExist());
-        final RestApiImpl restApi = createRestApi();
-        FileIO fileIO = createFileIO(createMockedContext()
-                , restApi
-                , 3
-                , fileIOReq
-                , true);
+    public void testQueueIoFile_ifTrailCountIncrements_whenFileIsToBeDownloadedAndFileDoesNotExist() {
+        FileIORequest fileIOReq = mockFileIoReq(true, true, createFileWhichDoesNotExist());
+        fileIO = createFileIO(fileIOReq);
         fileIO.queueIOFile();
         assertThat(fileIO.getTrailCount(), is(equalTo(4)));
     }
 
     @Test
-    public void testQueueIoFile_ifGCMNetworkManagerIsScheduled_whenGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
-        FileIORequest fileIOReq =
-                createFileIoReq(true, true, createFileWhichDoesNotExist());
-        final RestApiImpl restApi = createRestApi();
-        final FirebaseJobDispatcher gcmNetworkManager = getGcmNetworkManager(mockContext);
-        FileIO fileIO = createFileIO(createMockedContext()
-                , restApi
-                , 1
-                , fileIOReq
-                , true);
+    public void testQueueIoFile_ifGCMNetworkManagerIsScheduled_whenGooglePlayServicesAreAvailable() {
+        FileIORequest fileIOReq = mockFileIoReq(true, true, createFileWhichDoesNotExist());
+        fileIO = createFileIO(fileIOReq);
+        Mockito.doNothing().when(utils).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
         fileIO.queueIOFile();
-        verify(gcmNetworkManager).schedule(Mockito.any(Job.class));
+        verify(utils, times(1)).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
     }
 
     @Test
-    public void testQueueIoFile_ifCorrectArgumentsArePassedToGCMNetworkManager_whenGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
+    public void testQueueIoFile_ifCorrectArgumentsArePassedToGCMNetworkManager_whenGooglePlayServicesAreAvailable() {
         FileIORequest fileIOReq =
-                createFileIoReq(true, false, createFileWhichDoesNotExist());
-        final RestApiImpl restApi = createRestApi();
-        final FirebaseJobDispatcher gcmNetworkManager = getGcmNetworkManager(mockContext);
-        FileIO fileIO = createFileIO(createMockedContext()
-                , restApi
-                , 1
-                , fileIOReq
-                , true);
+                mockFileIoReq(true, false, createFileWhichDoesNotExist());
+        fileIO = createFileIO(fileIOReq);
+        Mockito.doNothing().when(utils).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
         fileIO.queueIOFile();
-//        ArgumentCaptor<OneoffTask> peopleCaptor = ArgumentCaptor.forClass(OneoffTask.class);
-//        Mockito.verify(gcmNetworkManager).schedule(peopleCaptor.capture());
-//        assertThat(peopleCaptor.getValue().getWindowEnd(), is(30L));
-//        assertThat(peopleCaptor.getValue().getWindowStart(), is(0L));
-//        assertThat(peopleCaptor.getValue().getRequiresCharging(), is(false));
-//        assertThat(peopleCaptor.getValue().getExtras(), is(notNullValue()));
-//        assertThat(peopleCaptor.getValue().getExtras().getString(JOB_TYPE), is(DOWNLOAD_FILE));
-//        assertThat(peopleCaptor.getValue().getServiceName(), is(GenericGCMService.class.getName()));
-//        assertThat(peopleCaptor.getValue().getRequiredNetwork(), is(fileIOReq.onWifi() ? NETWORK_STATE_UNMETERED : NETWORK_STATE_CONNECTED));
+        verify(utils, times(1)).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Test
-    public void testQueueIoFile_ifJobSchedulerIsInvoked_whenGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
-        FileIORequest fileIOReq =
-                createFileIoReq(true, true, createFileWhichDoesNotExist());
-        final RestApiImpl restApi = createRestApi();
-        FileIO fileIO = createFileIO(createMockedContext()
-                , restApi
-                , 1
-                , fileIOReq
-                , true);
+    public void testQueueIoFile_ifJobSchedulerIsInvoked_whenGooglePlayServicesAreAvailable() {
+        FileIORequest fileIOReq = mockFileIoReq(true, true, createFileWhichDoesNotExist());
+        fileIO = createFileIO(fileIOReq);
+        Mockito.doNothing().when(utils).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
         fileIO.queueIOFile();
-        verify(getMockedJobScheduler()).schedule(Mockito.any(Job.class));
+        verify(utils, times(1)).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Test
-    public void testQueueIoFile_ifCorrectArgumentsArePassedToJobScheduler_whenGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
+    public void testQueueIoFile_ifCorrectArgumentsArePassedToJobScheduler_whenGooglePlayServicesAreAvailable() {
         FileIORequest fileIOReq =
-                createFileIoReq(true, true, createFileWhichDoesNotExist());
-        final RestApiImpl restApi = createRestApi();
-        FileIO fileIO = createFileIO(createMockedContext()
-                , restApi
-                , 1
-                , fileIOReq
-                , true);
+                mockFileIoReq(true, true, createFileWhichDoesNotExist());
+        fileIO = createFileIO(fileIOReq);
+        Mockito.doNothing().when(utils).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
         fileIO.queueIOFile();
+        verify(utils, times(1)).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
         ArgumentCaptor<Job> argumentCaptor = ArgumentCaptor.forClass(Job.class);
         verify(getMockedJobScheduler()).schedule(argumentCaptor.capture());
-//        assertThat(argumentCaptor.getValue().getService().getClassName(), is(equalTo(GenericJobService.class.getName())));
-//        assertThat(argumentCaptor.getValue().isRequireCharging(), is(fileIOReq.isWhileCharging()));
-//        assertThat(argumentCaptor.getValue().isPersisted(), is(true));
-//        assertThat(argumentCaptor.getValue().getNetworkType(), is(fileIOReq.onWifi() ? NETWORK_TYPE_UNMETERED : NETWORK_TYPE_ANY));
-        assertThat(argumentCaptor.getValue().getExtras(), is(notNullValue()));
-        assertThat(argumentCaptor.getValue().getExtras().getString(JOB_TYPE), is(DOWNLOAD_FILE));
     }
 
     @Test
-    public void testQueueIoFile_ifGCMNetworkManagerIsNotScheduled_whenGooglePlayServicesAreNotAvailable() throws IOException, PackageManager.NameNotFoundException {
-        FileIORequest fileIOReq =
-                createFileIoReq(true, true, createFileWhichDoesNotExist());
-        final RestApiImpl restApi = createRestApi();
-        final FirebaseJobDispatcher gcmNetworkManager = getGcmNetworkManager(mockContext);
-        FileIO fileIO = createFileIO(createMockedContext()
-                , restApi
-                , 2
-                , fileIOReq
-                , true);
+    public void testQueueIoFile_ifGCMNetworkManagerIsNotScheduled_whenGooglePlayServicesAreNotAvailable() {
+        FileIORequest fileIOReq = mockFileIoReq(true, true, createFileWhichDoesNotExist());
+        fileIO = createFileIO(fileIOReq);
+        Mockito.doNothing().when(utils).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
         fileIO.queueIOFile();
-        verify(gcmNetworkManager, times(0)).schedule(Mockito.any(Job.class));
+        verify(utils, times(1)).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
     }
 
     @Test
-    public void testExecute_ifFileIsNotDownloaded_whenFileIsToBeDownloadedAndFileDoesExist() throws IOException, PackageManager.NameNotFoundException {
-        FileIORequest fileIOReq =
-                createFileIoReq(true, true, createFileWhichDoesExist());
+    public void testExecute_ifFileIsNotDownloaded_whenFileIsToBeDownloadedAndFileDoesExist() throws IOException {
+        FileIORequest fileIOReq = mockFileIoReq(true, true, createFileWhichDoesExist());
         final RestApiImpl restApi = createRestApi();
-        FileIO fileIO = createFileIO(createMockedContext()
-                , restApi
-                , 3
-                , fileIOReq
-                , true);
+        fileIO = createFileIO(fileIOReq);
         fileIO.execute();
         verify(restApi, times(0)).dynamicDownload(anyString());
     }
 
-    String getValidUrl() {
+    private String getValidUrl() {
         return "http://www.google.com";
     }
 
-
-    FileIORequest createFileIoReq(boolean wifi, boolean isCharging, File file) {
+    private FileIORequest mockFileIoReq(boolean wifi, boolean isCharging, File file) {
         final FileIORequest fileIORequest = mock(FileIORequest.class);
         Mockito.when(fileIORequest.getDataClass()).thenReturn(TestRealmModel.class);
         Mockito.when(fileIORequest.getPresentationClass()).thenReturn(Object.class);
@@ -220,39 +161,33 @@ public class FileIOJUnitTest {
     }
 
     @NonNull
-    File getValidFile() {
+    private File getValidFile() {
         return new File(Environment.getExternalStorageDirectory(), "someFile.txt");
     }
 
-    FirebaseJobDispatcher getGcmNetworkManager(Context context) {
-        return new FirebaseJobDispatcher(new GooglePlayDriver(context));
+    @NonNull
+    private FileIO createFileIO(FileIORequest fileIoReq) {
+        return new FileIO(3, fileIoReq, mockContext, true, createRestApi(), utils);
     }
 
     @NonNull
-    FileIO createFileIO(Context mockedContext, RestApi mockedRestApi, int trailCount
-            , FileIORequest fileIoReq, boolean toDownLoad) {
-        return new FileIO(mockedContext, mockedRestApi, trailCount, fileIoReq, toDownLoad);
-    }
-
-    @NonNull
-    File createFileWhichDoesNotExist() {
+    private File createFileWhichDoesNotExist() {
         getValidFile().delete();
         return getValidFile();
     }
 
     @NonNull
-    File createFileWhichDoesExist() throws IOException {
+    private File createFileWhichDoesExist() throws IOException {
         getValidFile().delete();
         getValidFile().createNewFile();
         return getValidFile();
     }
 
-    public Context createMockedContext() throws PackageManager.NameNotFoundException {
+    private Context createMockedContext() {
         final Context context = mock(Context.class);
         final Resources resources = mock(Resources.class);
         final PackageManager packageManager = mock(PackageManager.class);
-        Mockito.when(context.getApplicationContext())
-                .thenReturn(mock(Context.class));
+        Mockito.when(context.getApplicationContext()).thenReturn(mock(Context.class));
         Mockito.when(context.getResources()).thenReturn(resources);
         Mockito.when(context.getPackageManager()).thenReturn(packageManager);
         Mockito.when(context.getSystemService(Context.STORAGE_SERVICE)).thenReturn(getMockedJobScheduler());
@@ -260,41 +195,28 @@ public class FileIOJUnitTest {
     }
 
     @Nullable
-    FirebaseJobDispatcher getMockedJobScheduler() {
-        return JOB_SCHEDULER;
+    private FirebaseJobDispatcher getMockedJobScheduler() {
+        return firebaseJobDispatcher;
     }
 
-    RestApiImpl createRestApi() {
+    private RestApiImpl createRestApi() {
         final RestApiImpl restApi = mock(RestApiImpl.class);
         Mockito.when(restApi.dynamicDownload(Mockito.anyString())).thenReturn(getResponseBodyObservable());
         return restApi;
     }
 
-    Observable<ResponseBody> getResponseBodyObservable() {
-        return Observable.create(new Observable.OnSubscribe<ResponseBody>() {
-            @Override
-            public void call(@NonNull Subscriber<? super ResponseBody> subscriber) {
-                try {
-                    subscriber.onNext(getResponseBody());
-                } catch (IOException e) {
-                    subscriber.onError(e);
-                }
-            }
-        });
+    private Observable<ResponseBody> getResponseBodyObservable() {
+        return Observable.fromCallable(this::getResponseBody);
     }
 
-    ResponseBody getResponseBody() throws IOException {
-        Mockito.when(RESPONSE_BODY.byteStream()).thenReturn(getInputSreamReader());
-        Mockito.when(RESPONSE_BODY.contentLength()).thenReturn((long) (1096 * 1096));
-        return RESPONSE_BODY;
+    private ResponseBody getResponseBody() throws IOException {
+        Mockito.when(responseBody.byteStream()).thenReturn(getInputStreamReader());
+        Mockito.when(responseBody.contentLength()).thenReturn((long) (1096 * 1096));
+        return responseBody;
     }
 
-    InputStream getInputSreamReader() throws IOException {
-        Mockito.when(INPUT_STREAM.read(Mockito.any())).thenReturn(1096, 1096, 1096, -1);
-        return INPUT_STREAM;
-    }
-
-    void clearAll() {
-        Mockito.reset(RESPONSE_BODY, INPUT_STREAM, JOB_SCHEDULER);
+    private InputStream getInputStreamReader() throws IOException {
+        Mockito.when(inputStream.read(Mockito.any())).thenReturn(1096, 1096, 1096, -1);
+        return inputStream;
     }
 }

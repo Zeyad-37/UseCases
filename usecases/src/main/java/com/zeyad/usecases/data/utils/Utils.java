@@ -140,8 +140,8 @@ public class Utils {
                 .setService(GenericJobService.class)
                 .setTag(isDownload ? GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE)
                 .setRecurring(false)
-                .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
-                .setTrigger(Trigger.executionWindow(0, 60))
+                .setLifetime(Lifetime.FOREVER)
+//                .setTrigger(Trigger.executionWindow(0, 60))
                 .setReplaceCurrent(false)
                 .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
                 .setConstraints(fileIORequest.onWifi() ? Constraint.ON_UNMETERED_NETWORK : Constraint.ON_ANY_NETWORK,

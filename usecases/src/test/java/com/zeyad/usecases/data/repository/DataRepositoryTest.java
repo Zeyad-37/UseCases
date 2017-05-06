@@ -16,7 +16,9 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import rx.Observable;
@@ -28,6 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -157,5 +160,24 @@ public class DataRepositoryTest {
 
         mDataRepository.deleteAllDynamically(validUrl, TestRealmModel.class, true);
         verify(mockDataStore, times(1)).dynamicDeleteAll(any(Class.class));
+    }
+
+    @Test
+    public void uploadFileDynamically() throws Exception {
+        mDataRepository.uploadFileDynamically(validUrl, new File(""), "", new HashMap<>(), false,
+                false, false, Object.class, Object.class);
+//        verify(mockDataStoreFactory, times(1)).cloud(any(IDAOMapper.class));
+        verify(mockDataStore, times(1)).dynamicUploadFile(anyString(), any(File.class), anyString(),
+                (HashMap<String, Object>) anyMap(), anyBoolean(), anyBoolean(), anyBoolean(),
+                any(Class.class));
+    }
+
+    @Test
+    public void downloadFileDynamically() throws Exception {
+        mDataRepository.downloadFileDynamically(validUrl, new File(""), false, false, false,
+                Object.class, Object.class);
+        verify(mockDataStoreFactory, times(1)).cloud(any(IDAOMapper.class));
+        verify(mockDataStore, times(1)).dynamicDownloadFile(anyString(), any(File.class), anyBoolean(),
+                anyBoolean(), anyBoolean());
     }
 }

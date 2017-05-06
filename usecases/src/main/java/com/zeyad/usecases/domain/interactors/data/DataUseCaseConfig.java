@@ -9,8 +9,6 @@ import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapper;
 import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
-import com.zeyad.usecases.domain.executors.ThreadExecutor;
-import com.zeyad.usecases.domain.executors.UIThread;
 
 import java.util.concurrent.TimeUnit;
 
@@ -31,7 +29,6 @@ public class DataUseCaseConfig {
     private int cacheSize, cacheAmount;
     private TimeUnit timeUnit;
     private PostExecutionThread postExecutionThread;
-    private HandlerThread handlerThread;
 
     private DataUseCaseConfig(Builder dataUseCaseConfigBuilder) {
         context = dataUseCaseConfigBuilder.getContext();
@@ -56,20 +53,17 @@ public class DataUseCaseConfig {
     }
 
     IDAOMapperFactory getEntityMapper() {
-        if (entityMapper == null) {
-            return new DAOMapperFactory() {
-                @NonNull
-                @Override
-                public IDAOMapper getDataMapper(Class dataClass) {
-                    return new DefaultDAOMapper();
-                }
-            };
-        }
-        return entityMapper;
+        return entityMapper == null ? new DAOMapperFactory() {
+            @NonNull
+            @Override
+            public IDAOMapper getDataMapper(Class dataClass) {
+                return new DefaultDAOMapper();
+            }
+        } : entityMapper;
     }
 
     PostExecutionThread getPostExecutionThread() {
-        return postExecutionThread == null ? new UIThread() : postExecutionThread;
+        return postExecutionThread;
     }
 
     OkHttpClient.Builder getOkHttpBuilder() {
@@ -104,8 +98,8 @@ public class DataUseCaseConfig {
         return timeUnit;
     }
 
-    public HandlerThread getHandlerThread() {
-        return handlerThread == null ? new HandlerThread("backgroundThread") : handlerThread;
+    HandlerThread getHandlerThread() {
+        return new HandlerThread("backgroundThread");
     }
 
     public static class Builder {
@@ -117,17 +111,10 @@ public class DataUseCaseConfig {
         private boolean withCache, withRealm;
         private int cacheSize, cacheAmount;
         private TimeUnit timeUnit;
-        private ThreadExecutor threadExecutor;
         private PostExecutionThread postExecutionThread;
 
         public Builder(Context context) {
             this.context = context;
-        }
-
-        @NonNull
-        public Builder threadExecutor(ThreadExecutor threadExecutor) {
-            this.threadExecutor = threadExecutor;
-            return this;
         }
 
         @NonNull
@@ -182,10 +169,6 @@ public class DataUseCaseConfig {
 
         Context getContext() {
             return context;
-        }
-
-        ThreadExecutor getThreadExecutor() {
-            return threadExecutor;
         }
 
         PostExecutionThread getPostExecutionThread() {

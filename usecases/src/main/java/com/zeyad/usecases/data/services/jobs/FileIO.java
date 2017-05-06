@@ -1,7 +1,6 @@
 package com.zeyad.usecases.data.services.jobs;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
@@ -9,7 +8,6 @@ import android.webkit.MimeTypeMap;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.zeyad.usecases.data.network.RestApi;
-import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.utils.Utils;
 
@@ -33,29 +31,18 @@ public class FileIO {
     private static int mTrailCount;
     private final FirebaseJobDispatcher mDispatcher;
     private final FileIORequest mFileIORequest;
-    private final Context mContext;
     private final RestApi mRestApi;
+    private final Utils mUtils;
     private boolean mIsDownload;
 
-    public FileIO(int trailCount, @NonNull FileIORequest payLoad, @NonNull Context context, boolean isDownload) {
-        mRestApi = RestApiImpl.getInstance();
-        mContext = context;
+    public FileIO(int trailCount, FileIORequest payLoad, Context context, boolean isDownload, RestApi restApi,
+                  Utils utils) {
+        mRestApi = restApi;
         mTrailCount = trailCount;
         mFileIORequest = payLoad;
         mIsDownload = isDownload;
-        mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
-    }
-
-    /**
-     * This constructor meant to be used in testing and restricted environments only. Use public constructors instead.
-     */
-    FileIO(Context context, RestApi restApi, int trailCount, FileIORequest fileIORequest, boolean isDownload) {
-        mContext = context;
-        mRestApi = restApi;
-        mTrailCount = trailCount;
-        mFileIORequest = fileIORequest;
-        mIsDownload = isDownload;
-        mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
+        mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(context));
+        mUtils = utils;
     }
 
     @Nullable
@@ -130,7 +117,7 @@ public class FileIO {
     void queueIOFile() {
         mTrailCount++;
         if (mTrailCount < 3) {
-            Utils.getInstance().queueFileIOCore(mDispatcher, mIsDownload, mFileIORequest);
+            mUtils.queueFileIOCore(mDispatcher, mIsDownload, mFileIORequest);
         }
     }
 

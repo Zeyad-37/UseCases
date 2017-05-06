@@ -52,15 +52,6 @@ DataUseCaseFactory.init(new DataUseCaseConfig.Builder(applicationContext)
                 .withRealm() // if you want a DB
                 .withCache() // adds a cache layer above the server & DB if exists
                 .cacheSize(8192)  // maximum size to allocate in bytes
-                .entityMapper(new DAOMapperUtil() {
-                    @Override
-                    public IDAOMapper getDataMapper(Class dataClass) {
-                        if (dataClass == UserRealm.class) {
-                            return UserModelMapper.getInstance(); // better to have them as singletons, or use dagger to have an activity scope
-                        }
-                        return DefaultDAOMapper.getInstance();
-                    }
-                })
                 .okHttpBuilder(provideOkHttpClientBuilder()) 
                 .okhttpCache(provideCache()) // you can also provide a cache for okHttp
                 .threadExecutor(new JobExecutor()) // your implementation of background thread.
@@ -73,12 +64,6 @@ FileUseCaseFactory.init(applicationContext);
 // or
 FileUseCaseFactory.init(applicationContext, threadExecutor, postExecutionThread);
 FileUseCaseFactory.getInstance();
-
-// For Shared Prefs Access
-PrefsUseCaseFactory.init(applicationContext);
-// or
-PrefsUseCaseFactory.init(applicationContext, threadExecutor, postExecutionThread);
-PrefsUseCaseFactory.getInstance();
 ```
 
 # Code Example
@@ -218,15 +203,6 @@ mFileUseCase.downloadFile(new FileIORequest
         .dataClass(OrdersRealmModel.class)
         .presentationClass(OrdersViewModel.class)
         .build())
-```
-Read from File
-```
-mFileUseCase.readFile(String fullFilePath);
-```
-Write to File
-```
-mFileUseCase.writeToFile(String fullFilePath, String data);
-mFileUseCase.writeToFile(String fullFilePath, byte[] data);
 ```
 Initialization Example:
 ```

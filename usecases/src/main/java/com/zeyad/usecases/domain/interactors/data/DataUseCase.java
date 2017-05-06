@@ -7,12 +7,13 @@ import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.repository.DataRepository;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
+import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.executors.UIThread;
-import com.zeyad.usecases.domain.repositories.Data;
+import com.zeyad.usecases.domain.repository.Data;
 
 import java.util.List;
 
@@ -258,6 +259,22 @@ public class DataUseCase implements IDataUseCase {
                 .subscribe(o -> {
                 }, OnErrorNotImplementedException::new);
         return ObjectOffLineFirst.compose(applySchedulers());
+    }
+
+    @Override
+    public Observable uploadFile(FileIORequest fileIORequest) {
+        return mData.uploadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
+                fileIORequest.getKey(), fileIORequest.getParameters(), fileIORequest.onWifi(),
+                fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
+                fileIORequest.getPresentationClass(), fileIORequest.getDataClass())
+                .compose(applySchedulers());
+    }
+
+    @Override
+    public Observable downloadFile(FileIORequest fileIORequest) {
+        return mData.downloadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
+                fileIORequest.onWifi(), fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
+                fileIORequest.getPresentationClass(), fileIORequest.getDataClass()).compose(applySchedulers());
     }
 
     /**

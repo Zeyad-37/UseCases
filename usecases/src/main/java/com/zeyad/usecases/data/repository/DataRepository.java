@@ -6,11 +6,13 @@ import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
-import com.zeyad.usecases.domain.repositories.Data;
+import com.zeyad.usecases.domain.repository.Data;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 
 import rx.Observable;
@@ -167,5 +169,23 @@ public class DataRepository implements Data {
         } catch (IllegalAccessException e) {
             return Observable.error(e);
         }
+    }
+
+    @NonNull
+    @Override
+    public Observable<?> uploadFileDynamically(String url, File file, String key, HashMap<String, Object> parameters,
+                                               boolean onWifi, boolean whileCharging, boolean queuable,
+                                               Class domainClass, Class dataClass) {
+        return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
+                .dynamicUploadFile(url, file, key, parameters, onWifi, queuable, whileCharging, domainClass);
+    }
+
+
+    @NonNull
+    @Override
+    public Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
+                                                 boolean queuable, Class domainClass, Class dataClass) {
+        return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
+                .dynamicDownloadFile(url, file, onWifi, whileCharging, queuable);
     }
 }

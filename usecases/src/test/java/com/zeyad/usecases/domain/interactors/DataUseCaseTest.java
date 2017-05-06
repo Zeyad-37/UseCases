@@ -7,12 +7,13 @@ import com.zeyad.usecases.Config;
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.repository.DataRepository;
+import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
-import com.zeyad.usecases.domain.repositories.Data;
+import com.zeyad.usecases.domain.repository.Data;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -22,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
 
+import java.io.File;
 import java.util.HashMap;
 
 import rx.Observable;
@@ -29,6 +31,7 @@ import rx.Observable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -211,6 +214,25 @@ public class DataUseCaseTest {
                 Object.class, false));
 
         verify(mData, times(1)).deleteAllDynamically(anyString(), any(Class.class), anyBoolean());
+    }
+
+    @Test
+    public void uploadFile() {
+        when(mData.uploadFileDynamically(anyString(), any(File.class), anyString(), (HashMap<String, Object>) anyMap(),
+                anyBoolean(), anyBoolean(), anyBoolean(), any(Class.class), any(Class.class)))
+                .thenReturn(observable);
+        mDataUseCase.uploadFile(new FileIORequest());
+        verify(mData, times(1)).uploadFileDynamically(anyString(), any(File.class), anyString(), (HashMap<String, Object>) anyMap(), anyBoolean(),
+                anyBoolean(), anyBoolean(), any(Class.class), any(Class.class));
+    }
+
+    @Test
+    public void downloadFile() {
+        when(mData.downloadFileDynamically(anyString(), any(File.class), anyBoolean(),
+                anyBoolean(), anyBoolean(), any(Class.class), any(Class.class))).thenReturn(observable);
+        mDataUseCase.downloadFile(new FileIORequest());
+        verify(mData, times(1)).downloadFileDynamically(anyString(), any(File.class), anyBoolean(),
+                anyBoolean(), anyBoolean(), any(Class.class), any(Class.class));
     }
 
     public IDataUseCase getGenericUseImplementation(DataRepository datarepo, UIThread uithread,
