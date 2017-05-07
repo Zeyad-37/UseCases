@@ -36,7 +36,6 @@ public class PostRequestTest {
                 .idColumnName(ID_COLUMN_NAME)
                 .payLoad(JSON_ARRAY)
                 .payLoad(JSON_OBJECT)
-                .presentationClass(PRESENTATION_CLASS)
                 .fullUrl(URL)
                 .build();
     }
@@ -54,11 +53,6 @@ public class PostRequestTest {
     @Test
     public void testGetDataClass() throws Exception {
         assertThat(mPostRequest.getDataClass(), is(equalTo(DATA_CLASS)));
-    }
-
-    @Test
-    public void testGetPresentationClass() throws Exception {
-        assertThat(mPostRequest.getPresentationClass(), is(equalTo(PRESENTATION_CLASS)));
     }
 
     @Test

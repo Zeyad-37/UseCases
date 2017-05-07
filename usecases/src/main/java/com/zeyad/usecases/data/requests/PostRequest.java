@@ -30,7 +30,7 @@ public class PostRequest implements Parcelable {
         }
     };
     private String url, idColumnName, method;
-    private Class dataClass, presentationClass;
+    private Class dataClass;
     private boolean onWifi, whileCharging, persist, queuable;
     private JSONObject jsonObject;
     private JSONArray jsonArray;
@@ -40,7 +40,6 @@ public class PostRequest implements Parcelable {
     public PostRequest(@NonNull PostRequestBuilder postRequestBuilder) {
         url = postRequestBuilder.url;
         dataClass = postRequestBuilder.dataClass;
-        presentationClass = postRequestBuilder.presentationClass;
         persist = postRequestBuilder.persist;
         onWifi = postRequestBuilder.onWifi;
         whileCharging = postRequestBuilder.whileCharging;
@@ -53,33 +52,28 @@ public class PostRequest implements Parcelable {
         object = postRequestBuilder.object;
     }
 
-    public PostRequest(String idColumnName, String url, JSONObject keyValuePairs,
-                       Class presentationClass, Class dataClass, boolean persist) {
+    public PostRequest(String idColumnName, String url, JSONObject keyValuePairs, Class dataClass, boolean persist) {
         this.idColumnName = idColumnName;
         jsonObject = keyValuePairs;
         this.persist = persist;
-        this.presentationClass = presentationClass;
         this.dataClass = dataClass;
         this.url = url;
     }
 
     // for test
-    public PostRequest(String idColumnName, String url, JSONArray keyValuePairs,
-                       Class presentationClass, Class dataClass, boolean persist) {
+    public PostRequest(String idColumnName, String url, JSONArray keyValuePairs, Class dataClass, boolean persist) {
         this.idColumnName = idColumnName;
         jsonArray = keyValuePairs;
         this.persist = persist;
-        this.presentationClass = presentationClass;
         this.dataClass = dataClass;
         this.url = url;
     }
 
     public PostRequest(String idColumnName, String url, HashMap<String, Object> keyValuePairs,
-                       Class presentationClass, Class dataClass, boolean persist) {
+                       Class dataClass, boolean persist) {
         this.idColumnName = idColumnName;
         this.keyValuePairs = keyValuePairs;
         this.persist = persist;
-        this.presentationClass = presentationClass;
         this.dataClass = dataClass;
         this.url = url;
     }
@@ -89,7 +83,6 @@ public class PostRequest implements Parcelable {
         this.idColumnName = in.readString();
         this.method = in.readString();
         this.dataClass = (Class) in.readSerializable();
-        this.presentationClass = (Class) in.readSerializable();
         this.persist = in.readByte() != 0;
         this.whileCharging = in.readByte() != 0;
         this.onWifi = in.readByte() != 0;
@@ -132,10 +125,6 @@ public class PostRequest implements Parcelable {
 
     public Class getDataClass() {
         return dataClass;
-    }
-
-    public Class getPresentationClass() {
-        return presentationClass != null ? presentationClass : dataClass;
     }
 
     public boolean isPersist() {
@@ -181,7 +170,6 @@ public class PostRequest implements Parcelable {
         dest.writeString(this.idColumnName);
         dest.writeString(this.method);
         dest.writeSerializable(this.dataClass);
-        dest.writeSerializable(this.presentationClass);
         dest.writeByte(this.persist ? (byte) 1 : (byte) 0);
         dest.writeByte(this.whileCharging ? (byte) 1 : (byte) 0);
         dest.writeByte(this.onWifi ? (byte) 1 : (byte) 0);
@@ -198,7 +186,7 @@ public class PostRequest implements Parcelable {
         JSONObject jsonObject;
         HashMap<String, Object> keyValuePairs;
         String url, idColumnName, method;
-        Class dataClass, presentationClass;
+        Class dataClass;
         boolean persist, queuable, onWifi, whileCharging;
 
         public PostRequestBuilder(Class dataClass, boolean persist) {
@@ -233,12 +221,6 @@ public class PostRequest implements Parcelable {
         @NonNull
         public PostRequestBuilder whileCharging() {
             whileCharging = true;
-            return this;
-        }
-
-        @NonNull
-        public PostRequestBuilder presentationClass(Class presentationClass) {
-            this.presentationClass = presentationClass;
             return this;
         }
 

@@ -344,7 +344,6 @@ public class PostJUnitTest {
         return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
                 .payLoad(new HashMap<>())
                 .idColumnName(getValidColumnName())
-                .presentationClass(getPresentationClass())
                 .url(getValidUrl())
                 .method(method)
                 .build();
@@ -354,7 +353,6 @@ public class PostJUnitTest {
         return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
                 .payLoad(new JSONObject())
                 .idColumnName(getValidColumnName())
-                .presentationClass(getPresentationClass())
                 .url(getValidUrl())
                 .method(method)
                 .build();
@@ -364,7 +362,6 @@ public class PostJUnitTest {
         return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
                 .payLoad(new JSONArray())
                 .idColumnName(getValidColumnName())
-                .presentationClass(getPresentationClass())
                 .url(getValidUrl())
                 .method(method)
                 .build();

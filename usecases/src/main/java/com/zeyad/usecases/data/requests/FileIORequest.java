@@ -28,22 +28,21 @@ public class FileIORequest implements Parcelable {
     private File file;
     private String url, key;
     private boolean onWifi, whileCharging, queuable;
-    private Class dataClass, presentationClass;
+    private Class dataClass;
     private HashMap<String, Object> parameters;
 
     public FileIORequest() {
     }
 
     private FileIORequest(@NonNull FileIORequestBuilder uploadRequestBuilder) {
-        url = uploadRequestBuilder.getUrl();
-        onWifi = uploadRequestBuilder.isOnWifi();
-        whileCharging = uploadRequestBuilder.isWhileCharging();
-        queuable = uploadRequestBuilder.isQueuable();
-        file = uploadRequestBuilder.getFile();
-        key = uploadRequestBuilder.getKey();
-        parameters = uploadRequestBuilder.getParameters();
-        dataClass = uploadRequestBuilder.getDataClass();
-        presentationClass = uploadRequestBuilder.getPresentationClass();
+        url = uploadRequestBuilder.url;
+        onWifi = uploadRequestBuilder.onWifi;
+        whileCharging = uploadRequestBuilder.whileCharging;
+        queuable = uploadRequestBuilder.queuable;
+        file = uploadRequestBuilder.file;
+        key = uploadRequestBuilder.key;
+        parameters = uploadRequestBuilder.parameters;
+        dataClass = uploadRequestBuilder.dataClass;
     }
 
     private FileIORequest(Parcel in) {
@@ -54,7 +53,6 @@ public class FileIORequest implements Parcelable {
         this.whileCharging = in.readByte() != 0;
         this.queuable = in.readByte() != 0;
         this.dataClass = (Class) in.readSerializable();
-        this.presentationClass = (Class) in.readSerializable();
         this.parameters = (HashMap<String, Object>) in.readSerializable();
     }
 
@@ -76,10 +74,6 @@ public class FileIORequest implements Parcelable {
 
     public Class getDataClass() {
         return dataClass;
-    }
-
-    public Class getPresentationClass() {
-        return presentationClass != null ? presentationClass : dataClass;
     }
 
     public File getFile() {
@@ -108,7 +102,6 @@ public class FileIORequest implements Parcelable {
         dest.writeByte(this.whileCharging ? (byte) 1 : (byte) 0);
         dest.writeByte(this.queuable ? (byte) 1 : (byte) 0);
         dest.writeSerializable(this.dataClass);
-        dest.writeSerializable(this.presentationClass);
         dest.writeSerializable(this.parameters);
     }
 
@@ -117,7 +110,7 @@ public class FileIORequest implements Parcelable {
         private File file;
         private String url, key;
         private boolean onWifi, whileCharging, queuable;
-        private Class dataClass, presentationClass;
+        private Class dataClass;
         private HashMap<String, Object> parameters;
 
         public FileIORequestBuilder(String url, File file) {
@@ -134,12 +127,6 @@ public class FileIORequest implements Parcelable {
         @NonNull
         public FileIORequestBuilder fullUrl(String url) {
             this.url = url;
-            return this;
-        }
-
-        @NonNull
-        public FileIORequestBuilder presentationClass(Class presentationClass) {
-            this.presentationClass = presentationClass;
             return this;
         }
 
@@ -182,42 +169,6 @@ public class FileIORequest implements Parcelable {
         @NonNull
         public FileIORequest build() {
             return new FileIORequest(this);
-        }
-
-        public File getFile() {
-            return file;
-        }
-
-        public String getUrl() {
-            return url;
-        }
-
-        public boolean isOnWifi() {
-            return onWifi;
-        }
-
-        public boolean isQueuable() {
-            return queuable;
-        }
-
-        public boolean isWhileCharging() {
-            return whileCharging;
-        }
-
-        public Class getDataClass() {
-            return dataClass;
-        }
-
-        public Class getPresentationClass() {
-            return presentationClass;
-        }
-
-        public String getKey() {
-            return key;
-        }
-
-        public HashMap<String, Object> getParameters() {
-            return parameters;
         }
     }
 }

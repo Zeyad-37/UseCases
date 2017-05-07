@@ -152,7 +152,6 @@ public class FileIOJUnitTest {
     private FileIORequest mockFileIoReq(boolean wifi, boolean isCharging, File file) {
         final FileIORequest fileIORequest = mock(FileIORequest.class);
         Mockito.when(fileIORequest.getDataClass()).thenReturn(TestRealmModel.class);
-        Mockito.when(fileIORequest.getPresentationClass()).thenReturn(Object.class);
         Mockito.when(fileIORequest.getUrl()).thenReturn(getValidUrl());
         Mockito.when(fileIORequest.getFile()).thenReturn(file);
         Mockito.when(fileIORequest.isWhileCharging()).thenReturn(isCharging);

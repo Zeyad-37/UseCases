@@ -1,8 +1,7 @@
 package com.zeyad.usecases.data.repository.stores;
 
 import com.zeyad.usecases.data.db.RealmManager;
-import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
-import com.zeyad.usecases.data.mappers.IDAOMapper;
+import com.zeyad.usecases.data.mapper.DAOMapper;
 import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.domain.interactors.data.DataUseCase;
 
@@ -20,14 +19,11 @@ import static org.mockito.Mockito.mock;
 @RunWith(JUnit4.class)
 public class DataStoreFactoryTest {
 
-    private IDAOMapper mIDAOMapper;
     private DataStoreFactory mDataStoreFactory; // class under test
 
     @Before
     public void setUp() throws Exception {
-        mIDAOMapper = mock(DefaultDAOMapper.class);
-
-        mDataStoreFactory = new DataStoreFactory(mock(RealmManager.class), mock(RestApiImpl.class));
+        mDataStoreFactory = new DataStoreFactory(mock(RealmManager.class), mock(RestApiImpl.class), mock(DAOMapper.class));
     }
 
     private String getSomeValidUrl() {
@@ -40,74 +36,74 @@ public class DataStoreFactoryTest {
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValid() throws Exception {
-        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl()),
                 is(instanceOf(DiskDataStore.class)));
     }
 
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidAndNetWorkNotAvailable() throws Exception {
-        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl()),
                 is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkNotAvailable() throws Exception {
-        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl()),
                 is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkIsAvailable() throws Exception {
-        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl()),
                 is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmpty() throws Exception {
-        assertThat(mDataStoreFactory.dynamically(getSomeValidUrl(), mIDAOMapper),
+        assertThat(mDataStoreFactory.dynamically(getSomeValidUrl()),
                 is(instanceOf(CloudDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItem() throws Exception {
-        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl()),
                 is(instanceOf(DiskDataStore.class)));
     }
 
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItemAndNetWorkNotAvailable() throws Exception {
-        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl()),
                 is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkNotAvailable() throws Exception {
-        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl()),
                 is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkIsAvailable() throws Exception {
-        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), mIDAOMapper),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl()),
                 is(instanceOf(DiskDataStore.class)));
     }
 
     @Test
     public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmptyForSingleItem() throws Exception {
-        assertThat(mDataStoreFactory.dynamically(getSomeValidUrl(), mIDAOMapper),
+        assertThat(mDataStoreFactory.dynamically(getSomeValidUrl()),
                 is(instanceOf(CloudDataStore.class)));
     }
 
     @Test
     public void testDiskMethod_ifExpectedDataStoreIsReturned_whenMockedEntityMapperIsPassed() throws IllegalAccessException {
         DataUseCase.setHasRealm(true);
-        assertThat(mDataStoreFactory.disk(mIDAOMapper), is(notNullValue()));
+        assertThat(mDataStoreFactory.disk(), is(notNullValue()));
     }
 
     @Test
     public void testDiskMethod_ifExpectedCloudStoreIsReturned_whenMockedEntityMapperIsPassed() {
-        assertThat(mDataStoreFactory.cloud(mIDAOMapper), is(notNullValue()));
+        assertThat(mDataStoreFactory.cloud(), is(notNullValue()));
     }
 }

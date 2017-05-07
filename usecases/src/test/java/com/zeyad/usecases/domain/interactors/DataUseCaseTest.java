@@ -54,51 +54,50 @@ public class DataUseCaseTest {
         Mockito.doReturn(observable)
                 .when(dataRepository)
                 .getObjectDynamicallyById(Mockito.anyString(), Mockito.anyString()
-                        , Mockito.anyInt(), any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+                        , Mockito.anyInt(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(observable)
                 .when(dataRepository)
                 .getObjectDynamicallyById(Mockito.anyString(), Mockito.anyString()
-                        , Mockito.anyInt(), any()
-                        , any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+                        , Mockito.anyInt(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(observable)
                 .when(dataRepository)
                 .deleteAllDynamically(Mockito.anyString(), any(), Mockito.anyBoolean());
         Mockito.doReturn(observable)
                 .when(dataRepository)
                 .putListDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONArray.class),
-                        any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-        Mockito.doReturn(observable)
-                .when(dataRepository)
-                .putListDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONArray.class),
-                        any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-//        Mockito.doReturn(observable)
-//                .when(dataRepository)
-//                .uploadFileDynamically(Mockito.anyString(), Mockito.any(File.class), Mockito.anyString(),
-//                        Mockito.any(HashMap.class), Mockito.anyBoolean(), Mockito.anyBoolean(),
-//                        Mockito.anyBoolean(), Mockito.any(), Mockito.any());
-        Mockito.doReturn(observable)
-                .when(dataRepository)
-                .putObjectDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONObject.class),
-                        any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
-        Mockito.doReturn(observable)
-                .when(dataRepository)
-                .deleteListDynamically(Mockito.anyString(), any(JSONArray.class), any(),
                         any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(observable)
                 .when(dataRepository)
-                .queryDisk(any(RealmManager.RealmQueryProvider.class), any());
+                .putListDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONArray.class),
+                        any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+        Mockito.doReturn(observable)
+                .when(dataRepository)
+                .uploadFileDynamically(Mockito.anyString(), Mockito.any(File.class), Mockito.anyString(),
+                        Mockito.any(HashMap.class), Mockito.anyBoolean(), Mockito.anyBoolean(),
+                        Mockito.anyBoolean(), Mockito.any());
+        Mockito.doReturn(observable)
+                .when(dataRepository)
+                .putObjectDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONObject.class),
+                        any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+        Mockito.doReturn(observable)
+                .when(dataRepository)
+                .deleteListDynamically(Mockito.anyString(), any(JSONArray.class), any(),
+                        Mockito.anyBoolean(), Mockito.anyBoolean());
+        Mockito.doReturn(observable)
+                .when(dataRepository)
+                .queryDisk(any(RealmManager.RealmQueryProvider.class));
         Mockito.doReturn(observable)
                 .when(dataRepository)
                 .postListDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONArray.class),
-                        any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+                        any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(observable)
                 .when(dataRepository)
                 .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONObject.class),
-                        any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+                        any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         Mockito.doReturn(observable)
                 .when(dataRepository)
                 .postObjectDynamically(Mockito.anyString(), Mockito.anyString(), any(JSONObject.class),
-                        any(), any(), Mockito.anyBoolean(), Mockito.anyBoolean());
+                        any(), Mockito.anyBoolean(), Mockito.anyBoolean());
         return dataRepository;
     }
 
@@ -117,101 +116,95 @@ public class DataUseCaseTest {
     @Test
     public void testGetObject() {
         when(mData.getObjectDynamicallyById(anyString(), anyString(), anyInt(),
-                any(Class.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+                any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
 
         mDataUseCase.getObject(getRequest);
 
         verify(mData, times(1)).getObjectDynamicallyById(anyString(), anyString(),
-                anyInt(), any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
+                anyInt(), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testGetList() {
-        when(mData.getListDynamically(anyString(), any(Class.class), any(Class.class), anyBoolean(),
+        when(mData.getListDynamically(anyString(), any(Class.class), anyBoolean(),
                 anyBoolean())).thenReturn(observable);
 
         mDataUseCase.getList(getRequest);
 
-        verify(mData, times(1)).getListDynamically(anyString(), any(Class.class), any(Class.class),
+        verify(mData, times(1)).getListDynamically(anyString(), any(Class.class),
                 anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testExecuteDynamicPostObject() {
         when(mData.postObjectDynamically(anyString(), anyString(), any(JSONObject.class), any(Class.class),
-                any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+                anyBoolean(), anyBoolean())).thenReturn(observable);
 
         mDataUseCase.postObject(new PostRequest("", "",
-                new JSONArray(), Object.class, Object.class, false));
+                new JSONArray(), Object.class, false));
 
         verify(mData, times(1)).postObjectDynamically(anyString(), anyString(), any(JSONObject.class),
-                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
+                any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testPutObject() {
         when(mData.putObjectDynamically(anyString(), anyString(), any(JSONObject.class), any(Class.class),
-                any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+                anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        mDataUseCase.putObject(new PostRequest("", "", new JSONArray(), Object.class, Object.class, false));
+        mDataUseCase.putObject(new PostRequest("", "", new JSONArray(), Object.class, false));
 
         verify(mData, times(1)).putObjectDynamically(anyString(), anyString(), any(JSONObject.class),
-                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
+                any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testPostList() {
         when(mData.postListDynamically(anyString(), anyString(), any(JSONArray.class), any(Class.class),
-                any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+                anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        mDataUseCase.postList(new PostRequest("", "", HASH_MAP, Object.class,
-                Object.class, false));
+        mDataUseCase.postList(new PostRequest("", "", HASH_MAP, Object.class, false));
 
         verify(mData, times(1)).postListDynamically(anyString(), anyString(), any(JSONArray.class),
-                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
+                any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testPutList() {
         when(mData.putListDynamically(anyString(), anyString(), any(JSONArray.class), any(Class.class),
-                any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+                anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        mDataUseCase.putList(new PostRequest("", "", HASH_MAP, Object.class,
-                Object.class, false));
+        mDataUseCase.putList(new PostRequest("", "", HASH_MAP, Object.class, false));
 
         verify(mData, times(1)).putListDynamically(anyString(), anyString(), any(JSONArray.class),
-                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
+                any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testExecuteSearch() {
-        when(mData.queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class))).thenReturn(observable);
+        when(mData.queryDisk(any(RealmManager.RealmQueryProvider.class))).thenReturn(observable);
 
-        mDataUseCase.queryDisk(new GetRequest.GetRequestBuilder(null, true)
-                .queryFactory(realm -> realm.where(TestRealmModel.class))
-                .build());
+        mDataUseCase.queryDisk(realm -> realm.where(TestRealmModel.class));
 
-        verify(mData, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class), any(Class.class));
+        verify(mData, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class));
     }
 
     @Test
     public void testDeleteCollection() {
         when(mData.deleteListDynamically(anyString(), any(JSONArray.class), any(Class.class),
-                any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+                anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        mDataUseCase.deleteCollection(new PostRequest("", "", HASH_MAP, Object.class,
-                Object.class, false));
+        mDataUseCase.deleteCollection(new PostRequest("", "", HASH_MAP, Object.class, false));
 
         verify(mData, times(1)).deleteListDynamically(anyString(), any(JSONArray.class),
-                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
+                any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testDeleteAll_ifDataRepositoryCorrectMethodIsCalled_whenPostRequestIsPassed() {
         when(mData.deleteAllDynamically(anyString(), any(Class.class), anyBoolean())).thenReturn(observable);
 
-        mDataUseCase.deleteAll(new PostRequest("", "", HASH_MAP, Object.class,
-                Object.class, false));
+        mDataUseCase.deleteAll(new PostRequest("", "", HASH_MAP, Object.class, false));
 
         verify(mData, times(1)).deleteAllDynamically(anyString(), any(Class.class), anyBoolean());
     }
@@ -219,20 +212,20 @@ public class DataUseCaseTest {
     @Test
     public void uploadFile() {
         when(mData.uploadFileDynamically(anyString(), any(File.class), anyString(), (HashMap<String, Object>) anyMap(),
-                anyBoolean(), anyBoolean(), anyBoolean(), any(Class.class), any(Class.class)))
+                anyBoolean(), anyBoolean(), anyBoolean(), any(Class.class)))
                 .thenReturn(observable);
         mDataUseCase.uploadFile(new FileIORequest());
-        verify(mData, times(1)).uploadFileDynamically(anyString(), any(File.class), anyString(), (HashMap<String, Object>) anyMap(), anyBoolean(),
-                anyBoolean(), anyBoolean(), any(Class.class), any(Class.class));
+        verify(mData, times(1)).uploadFileDynamically(anyString(), any(File.class), anyString(),
+                (HashMap<String, Object>) anyMap(), anyBoolean(), anyBoolean(), anyBoolean(), any(Class.class));
     }
 
     @Test
     public void downloadFile() {
         when(mData.downloadFileDynamically(anyString(), any(File.class), anyBoolean(),
-                anyBoolean(), anyBoolean(), any(Class.class), any(Class.class))).thenReturn(observable);
+                anyBoolean(), anyBoolean(), any(Class.class))).thenReturn(observable);
         mDataUseCase.downloadFile(new FileIORequest());
         verify(mData, times(1)).downloadFileDynamically(anyString(), any(File.class), anyBoolean(),
-                anyBoolean(), anyBoolean(), any(Class.class), any(Class.class));
+                anyBoolean(), anyBoolean(), any(Class.class));
     }
 
     public IDataUseCase getGenericUseImplementation(DataRepository datarepo, UIThread uithread,

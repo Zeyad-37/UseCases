@@ -4,7 +4,6 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.RealmManager;
-import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.domain.repository.Data;
 
@@ -21,16 +20,14 @@ public class DataRepository implements Data {
 
     public static final String DEFAULT_ID_KEY = "id";
     private final DataStoreFactory mDataStoreFactory;
-    private final IDAOMapperFactory mEntityMapperUtil;
 
     /**
      * Constructs a {@link Data}.
      *
      * @param dataStoreFactory A factory to construct different data source implementations.
      */
-    public DataRepository(DataStoreFactory dataStoreFactory, IDAOMapperFactory entityMapperUtil) {
+    public DataRepository(DataStoreFactory dataStoreFactory) {
         mDataStoreFactory = dataStoreFactory;
-        mEntityMapperUtil = entityMapperUtil;
         Config.getInstance().setDataStoreFactory(dataStoreFactory);
     }
 
@@ -40,7 +37,6 @@ public class DataRepository implements Data {
      * If persist is true its going to save the list to the database, given it fetched from the cloud.
      *
      * @param url         end point.
-     * @param domainClass The domain class representation of the object.
      * @param dataClass   The data class representation of the object.
      * @param persist     boolean to decide whether to persist the result or not
      * @param shouldCache boolean to decide whether to cache network response or not
@@ -48,11 +44,11 @@ public class DataRepository implements Data {
      */
     @NonNull
     @Override
-    public Observable<List> getListDynamically(@NonNull String url, Class domainClass, @NonNull Class dataClass,
+    public Observable<List> getListDynamically(@NonNull String url, @NonNull Class dataClass,
                                                boolean persist, boolean shouldCache) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicGetList(url, domainClass, dataClass, persist, shouldCache);
+            return mDataStoreFactory.dynamically(url)
+                    .dynamicGetList(url, dataClass, persist, shouldCache);
         } catch (Exception e) {
             return Observable.error(e);
         }
@@ -61,11 +57,11 @@ public class DataRepository implements Data {
     @NonNull
     @Override
     public Observable<?> getObjectDynamicallyById(@NonNull String url, String idColumnName, int itemId,
-                                                  Class domainClass, Class dataClass, boolean persist,
+                                                  Class dataClass, boolean persist,
                                                   boolean shouldCache) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicGetObject(url, idColumnName, itemId, domainClass, dataClass, persist,
+            return mDataStoreFactory.dynamically(url)
+                    .dynamicGetObject(url, idColumnName, itemId, dataClass, persist,
                             shouldCache);
         } catch (Exception e) {
             return Observable.error(e);
@@ -75,11 +71,11 @@ public class DataRepository implements Data {
     @NonNull
     @Override
     public Observable<?> postObjectDynamically(@NonNull String url, String idColumnName, JSONObject keyValuePairs,
-                                               Class domainClass, @NonNull Class dataClass, boolean persist,
+                                               @NonNull Class dataClass, boolean persist,
                                                boolean queuable) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPostObject(url, idColumnName, keyValuePairs, domainClass, dataClass, persist, queuable);
+            return mDataStoreFactory.dynamically(url)
+                    .dynamicPostObject(url, idColumnName, keyValuePairs, dataClass, persist, queuable);
         } catch (Exception e) {
             return Observable.error(e);
         }
@@ -88,10 +84,10 @@ public class DataRepository implements Data {
     @NonNull
     @Override
     public Observable<?> postListDynamically(@NonNull String url, String idColumnName, JSONArray jsonArray,
-                                             Class domainClass, @NonNull Class dataClass, boolean persist, boolean queuable) {
+                                             @NonNull Class dataClass, boolean persist, boolean queuable) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPostList(url, idColumnName, jsonArray, domainClass, dataClass, persist, queuable);
+            return mDataStoreFactory.dynamically(url)
+                    .dynamicPostList(url, idColumnName, jsonArray, dataClass, persist, queuable);
         } catch (Exception e) {
             return Observable.error(e);
         }
@@ -100,10 +96,10 @@ public class DataRepository implements Data {
     @NonNull
     @Override
     public Observable<?> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                            Class domainClass, Class dataClass, boolean persist, boolean queuable) {
+                                            Class dataClass, boolean persist, boolean queuable) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPatchObject(url, idColumnName, jsonObject, domainClass, dataClass, persist, queuable);
+            return mDataStoreFactory.dynamically(url)
+                    .dynamicPatchObject(url, idColumnName, jsonObject, dataClass, persist, queuable);
         } catch (Exception e) {
             return Observable.error(e);
         }
@@ -111,10 +107,10 @@ public class DataRepository implements Data {
 
     @NonNull
     @Override
-    public Observable<?> deleteListDynamically(@NonNull String url, JSONArray jsonArray, Class domainClass,
+    public Observable<?> deleteListDynamically(@NonNull String url, JSONArray jsonArray,
                                                @NonNull Class dataClass, boolean persist, boolean queuable) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
+            return mDataStoreFactory.dynamically(url)
                     .dynamicDeleteCollection(url, DataRepository.DEFAULT_ID_KEY, jsonArray,
                             dataClass, persist, queuable);
         } catch (Exception e) {
@@ -124,10 +120,9 @@ public class DataRepository implements Data {
 
     @NonNull
     @Override
-    public Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass) {
+    public Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory) {
         try {
-            return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(domainClass))
-                    .queryDisk(queryFactory, domainClass);
+            return mDataStoreFactory.disk().queryDisk(queryFactory);
         } catch (IllegalAccessException e) {
             return Observable.error(e);
         }
@@ -136,12 +131,11 @@ public class DataRepository implements Data {
     @NonNull
     @Override
     public Observable<?> putObjectDynamically(@NonNull String url, String idColumnName, JSONObject keyValuePairs,
-                                              Class domainClass, @NonNull Class dataClass, boolean persist,
+                                              @NonNull Class dataClass, boolean persist,
                                               boolean queuable) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPutObject(url, idColumnName, keyValuePairs, domainClass, dataClass, persist,
-                            queuable);
+            return mDataStoreFactory.dynamically(url)
+                    .dynamicPutObject(url, idColumnName, keyValuePairs, dataClass, persist, queuable);
         } catch (Exception e) {
             return Observable.error(e);
         }
@@ -150,11 +144,11 @@ public class DataRepository implements Data {
     @NonNull
     @Override
     public Observable<?> putListDynamically(@NonNull String url, String idColumnName, JSONArray jsonArray,
-                                            Class domainClass, @NonNull Class dataClass, boolean persist,
+                                            @NonNull Class dataClass, boolean persist,
                                             boolean queuable) {
         try {
-            return mDataStoreFactory.dynamically(url, mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicPutList(url, idColumnName, jsonArray, domainClass, dataClass, persist, queuable);
+            return mDataStoreFactory.dynamically(url)
+                    .dynamicPutList(url, idColumnName, jsonArray, dataClass, persist, queuable);
         } catch (Exception e) {
             return Observable.error(e);
         }
@@ -164,8 +158,7 @@ public class DataRepository implements Data {
     @Override
     public Observable<Boolean> deleteAllDynamically(@NonNull String url, @NonNull Class dataClass, boolean persist) {
         try {
-            return mDataStoreFactory.disk(mEntityMapperUtil.getDataMapper(dataClass))
-                    .dynamicDeleteAll(dataClass);
+            return mDataStoreFactory.disk().dynamicDeleteAll(dataClass);
         } catch (IllegalAccessException e) {
             return Observable.error(e);
         }
@@ -175,17 +168,17 @@ public class DataRepository implements Data {
     @Override
     public Observable<?> uploadFileDynamically(String url, File file, String key, HashMap<String, Object> parameters,
                                                boolean onWifi, boolean whileCharging, boolean queuable,
-                                               Class domainClass, Class dataClass) {
-        return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
-                .dynamicUploadFile(url, file, key, parameters, onWifi, queuable, whileCharging, domainClass);
+                                               Class dataClass) {
+        return mDataStoreFactory.cloud()
+                .dynamicUploadFile(url, file, key, parameters, onWifi, queuable, whileCharging, dataClass);
     }
 
 
     @NonNull
     @Override
     public Observable<?> downloadFileDynamically(String url, File file, boolean onWifi, boolean whileCharging,
-                                                 boolean queuable, Class domainClass, Class dataClass) {
-        return mDataStoreFactory.cloud(mEntityMapperUtil.getDataMapper(dataClass))
+                                                 boolean queuable, Class dataClass) {
+        return mDataStoreFactory.cloud()
                 .dynamicDownloadFile(url, file, onWifi, whileCharging, queuable);
     }
 }

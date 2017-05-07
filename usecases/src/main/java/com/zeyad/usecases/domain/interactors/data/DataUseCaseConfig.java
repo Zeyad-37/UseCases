@@ -4,10 +4,7 @@ import android.content.Context;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
-import com.zeyad.usecases.data.mappers.DAOMapperFactory;
-import com.zeyad.usecases.data.mappers.DefaultDAOMapper;
-import com.zeyad.usecases.data.mappers.IDAOMapper;
-import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
+import com.zeyad.usecases.data.mapper.DAOMapper;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
 
 import java.util.concurrent.TimeUnit;
@@ -21,7 +18,6 @@ import okhttp3.OkHttpClient;
 public class DataUseCaseConfig {
 
     private Context context;
-    private IDAOMapperFactory entityMapper;
     private OkHttpClient.Builder okHttpBuilder;
     private Cache okHttpCache;
     private String baseUrl;
@@ -31,17 +27,16 @@ public class DataUseCaseConfig {
     private PostExecutionThread postExecutionThread;
 
     private DataUseCaseConfig(Builder dataUseCaseConfigBuilder) {
-        context = dataUseCaseConfigBuilder.getContext();
-        entityMapper = dataUseCaseConfigBuilder.getEntityMapper();
-        okHttpBuilder = dataUseCaseConfigBuilder.getOkHttpBuilder();
-        okHttpCache = dataUseCaseConfigBuilder.getOkHttpCache();
-        baseUrl = dataUseCaseConfigBuilder.getBaseUrl();
-        withCache = dataUseCaseConfigBuilder.isWithCache();
-        withRealm = dataUseCaseConfigBuilder.isWithRealm();
-        cacheSize = dataUseCaseConfigBuilder.getCacheSize();
-        cacheAmount = dataUseCaseConfigBuilder.getCacheAmount();
-        timeUnit = dataUseCaseConfigBuilder.getTimeUnit();
-        postExecutionThread = dataUseCaseConfigBuilder.getPostExecutionThread();
+        context = dataUseCaseConfigBuilder.context;
+        okHttpBuilder = dataUseCaseConfigBuilder.okHttpBuilder;
+        okHttpCache = dataUseCaseConfigBuilder.okHttpCache;
+        baseUrl = dataUseCaseConfigBuilder.baseUrl;
+        withCache = dataUseCaseConfigBuilder.withCache;
+        withRealm = dataUseCaseConfigBuilder.withRealm;
+        cacheSize = dataUseCaseConfigBuilder.cacheSize;
+        cacheAmount = dataUseCaseConfigBuilder.cacheAmount;
+        timeUnit = dataUseCaseConfigBuilder.timeUnit;
+        postExecutionThread = dataUseCaseConfigBuilder.postExecutionThread;
     }
 
     public Context getContext() {
@@ -52,14 +47,8 @@ public class DataUseCaseConfig {
         this.context = context;
     }
 
-    IDAOMapperFactory getEntityMapper() {
-        return entityMapper == null ? new DAOMapperFactory() {
-            @NonNull
-            @Override
-            public IDAOMapper getDataMapper(Class dataClass) {
-                return new DefaultDAOMapper();
-            }
-        } : entityMapper;
+    DAOMapper getEntityMapper() {
+        return new DAOMapper();
     }
 
     PostExecutionThread getPostExecutionThread() {
@@ -104,7 +93,6 @@ public class DataUseCaseConfig {
 
     public static class Builder {
         private Context context;
-        private IDAOMapperFactory entityMapper;
         private OkHttpClient.Builder okHttpBuilder;
         private Cache okHttpCache;
         private String baseUrl;
@@ -126,12 +114,6 @@ public class DataUseCaseConfig {
         @NonNull
         public Builder baseUrl(String baseUrl) {
             this.baseUrl = baseUrl;
-            return this;
-        }
-
-        @NonNull
-        public Builder entityMapper(IDAOMapperFactory entityMapper) {
-            this.entityMapper = entityMapper;
             return this;
         }
 
@@ -165,54 +147,6 @@ public class DataUseCaseConfig {
         public Builder cacheSize(int cacheSize) {
             this.cacheSize = cacheSize;
             return this;
-        }
-
-        Context getContext() {
-            return context;
-        }
-
-        PostExecutionThread getPostExecutionThread() {
-            return postExecutionThread;
-        }
-
-        IDAOMapperFactory getEntityMapper() {
-            return entityMapper;
-        }
-
-        OkHttpClient.Builder getOkHttpBuilder() {
-            return okHttpBuilder;
-        }
-
-        Cache getOkHttpCache() {
-            return okHttpCache;
-        }
-
-        void setOkHttpCache(Cache okHttpCache) {
-            this.okHttpCache = okHttpCache;
-        }
-
-        String getBaseUrl() {
-            return baseUrl;
-        }
-
-        boolean isWithRealm() {
-            return withRealm;
-        }
-
-        boolean isWithCache() {
-            return withCache;
-        }
-
-        int getCacheSize() {
-            return cacheSize;
-        }
-
-        int getCacheAmount() {
-            return cacheAmount;
-        }
-
-        TimeUnit getTimeUnit() {
-            return timeUnit;
         }
 
         @NonNull

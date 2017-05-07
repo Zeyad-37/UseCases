@@ -64,9 +64,7 @@ public class UserListVM extends BaseViewModel<UserListState> {
     }
 
     public Observable search(String query) {
-        return dataUseCase.queryDisk(new GetRequest.GetRequestBuilder(null, false)
-                .queryFactory(realm -> realm.where(User.class).beginsWith(User.LOGIN, query))
-                .presentationClass(User.class).build())
+        return dataUseCase.queryDisk(realm -> realm.where(User.class).beginsWith(User.LOGIN, query))
                 .zipWith(dataUseCase.getObject(new GetRequest
                                 .GetRequestBuilder(User.class, true)
                                 .url(String.format(USER, query))

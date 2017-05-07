@@ -29,7 +29,6 @@ public class GetRequestTest {
         mGetRequest = new GetRequest.GetRequestBuilder(DATA_CLASS, TO_PERSIST)
                 .fullUrl(URL)
                 .shouldCache(SHOULD_CACHE)
-                .presentationClass(PRESENTATION_CLASS)
                 .idColumnName(ID_COLUMN_NAME)
                 .id(ID_COLUMN_ID)
                 .build();
@@ -48,11 +47,6 @@ public class GetRequestTest {
     @Test
     public void testGetDataClass() throws Exception {
         assertThat(mGetRequest.getDataClass(), is(equalTo(DATA_CLASS)));
-    }
-
-    @Test
-    public void testGetPresentationClass() throws Exception {
-        assertThat(mGetRequest.getPresentationClass(), is(equalTo(PRESENTATION_CLASS)));
     }
 
     @Test

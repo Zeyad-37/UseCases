@@ -1,4 +1,4 @@
-package com.zeyad.usecases.data.mappers;
+package com.zeyad.usecases.data.mapper;
 
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -9,16 +9,21 @@ import com.zeyad.usecases.Config;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class DAOMapper<VM, DM> implements IDAOMapper {
+public class DAOMapper {
+    private static DAOMapper sDAOMapper;
     public Gson gson;
 
     public DAOMapper() {
         gson = Config.getGson();
     }
 
-    public abstract VM mapToDomainManual(DM object);
+    public static DAOMapper getInstance() {
+        if (sDAOMapper == null)
+            sDAOMapper = new DAOMapper();
+        return sDAOMapper;
+    }
 
-    @Override
+    @NonNull
     public Object mapToRealm(Object item, @NonNull Class dataClass) {
         if (item != null)
             if (item instanceof List)
@@ -36,7 +41,6 @@ public abstract class DAOMapper<VM, DM> implements IDAOMapper {
      * @return {@link java.util.List } if valid {.} otherwise empty List.
      */
     @NonNull
-    @Override
     public List mapAllToRealm(@NonNull List list, @NonNull Class dataClass) {
         List<Object> objects = new ArrayList<>(list.size());
         for (int i = 0, listSize = list.size(); i < listSize; i++)
@@ -45,7 +49,6 @@ public abstract class DAOMapper<VM, DM> implements IDAOMapper {
     }
 
     @Nullable
-    @Override
     public Object mapToDomain(@Nullable Object object, @NonNull Class domainClass) {
         if (object != null)
             if (object instanceof List)
@@ -61,7 +64,6 @@ public abstract class DAOMapper<VM, DM> implements IDAOMapper {
      * @return {Model} if valid {Entity} otherwise empty Object.
      */
     @NonNull
-    @Override
     public List mapAllToDomain(@NonNull List list, @NonNull Class domainClass) {
         List<Object> objects = new ArrayList<>(list.size());
         for (int i = 0, size = list.size(); i < size; i++)
@@ -75,12 +77,7 @@ public abstract class DAOMapper<VM, DM> implements IDAOMapper {
             return gson.fromJson(gson.toJson(object), domainClass);
         } catch (Exception e1) {
             e1.printStackTrace();
-            try {
-                return mapToDomainManual((DM) object);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
         }
-        return new Object();
+        return object;
     }
 }

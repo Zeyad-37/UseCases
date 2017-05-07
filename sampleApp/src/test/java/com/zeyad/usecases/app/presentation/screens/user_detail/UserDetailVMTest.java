@@ -3,7 +3,7 @@ package com.zeyad.usecases.app.presentation.screens.user_detail;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailState;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailVM;
 import com.zeyad.usecases.app.presentation.user_list.User;
-import com.zeyad.usecases.data.requests.GetRequest;
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 
 import org.junit.Before;
@@ -54,13 +54,13 @@ public class UserDetailVMTest {
         userList.add(user);
         Observable<List> observableUserRealm = Observable.just(userList);
 
-        when(mockDataUseCase.queryDisk(any(GetRequest.class)))
+        when(mockDataUseCase.queryDisk(any(RealmManager.RealmQueryProvider.class)))
                 .thenReturn(observableUserRealm);
 
         Observable observable = userDetailVM.getRepositories(user.getLogin());
 
         // Verify repository interactions
-        verify(mockDataUseCase, times(1)).queryDisk(any(GetRequest.class));
+        verify(mockDataUseCase, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class));
 
         // Assert return type
 //        assertEquals(UserDetailState.class, observable.toBlocking().first().getClass());

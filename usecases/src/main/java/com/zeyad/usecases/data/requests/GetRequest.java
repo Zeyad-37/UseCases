@@ -1,31 +1,48 @@
 package com.zeyad.usecases.data.requests;
 
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.repository.DataRepository;
 
 /**
  * @author zeyad on 7/29/16.
  */
-public class GetRequest {
+public class GetRequest implements Parcelable {
+    public static final Creator<GetRequest> CREATOR = new Creator<GetRequest>() {
+        @Override
+        public GetRequest createFromParcel(Parcel source) {
+            return new GetRequest(source);
+        }
 
+        @Override
+        public GetRequest[] newArray(int size) {
+            return new GetRequest[size];
+        }
+    };
     private String url, idColumnName;
-    private Class dataClass, presentationClass;
+    private Class dataClass;
     private boolean persist, shouldCache;
     private int itemId;
-    private RealmManager.RealmQueryProvider queryFactory;
 
     private GetRequest(@NonNull GetRequestBuilder getRequestBuilder) {
         url = getRequestBuilder.mUrl;
         dataClass = getRequestBuilder.mDataClass;
-        presentationClass = getRequestBuilder.mPresentationClass;
         persist = getRequestBuilder.mPersist;
         idColumnName = getRequestBuilder.mIdColumnName;
         itemId = getRequestBuilder.mItemId;
         shouldCache = getRequestBuilder.mShouldCache;
-        queryFactory = getRequestBuilder.mQueryFactory;
+    }
+
+    protected GetRequest(Parcel in) {
+        this.url = in.readString();
+        this.idColumnName = in.readString();
+        this.dataClass = (Class) in.readSerializable();
+        this.persist = in.readByte() != 0;
+        this.shouldCache = in.readByte() != 0;
+        this.itemId = in.readInt();
     }
 
     public String getUrl() {
@@ -34,10 +51,6 @@ public class GetRequest {
 
     public Class getDataClass() {
         return dataClass;
-    }
-
-    public Class getPresentationClass() {
-        return presentationClass != null ? presentationClass : dataClass;
     }
 
     public boolean isPersist() {
@@ -52,20 +65,30 @@ public class GetRequest {
         return idColumnName != null ? idColumnName : DataRepository.DEFAULT_ID_KEY;
     }
 
-    public RealmManager.RealmQueryProvider getQueryFactory() {
-        return queryFactory;
-    }
-
     public int getItemId() {
         return itemId;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(this.url);
+        dest.writeString(this.idColumnName);
+        dest.writeSerializable(this.dataClass);
+        dest.writeByte(this.persist ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.shouldCache ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.itemId);
     }
 
     public static class GetRequestBuilder {
         private int mItemId;
         private boolean mShouldCache, mPersist;
         private String mIdColumnName, mUrl;
-        private Class mDataClass, mPresentationClass;
-        private RealmManager.RealmQueryProvider mQueryFactory;
+        private Class mDataClass;
 
         public GetRequestBuilder(Class dataClass, boolean persist) {
             mDataClass = dataClass;
@@ -85,12 +108,6 @@ public class GetRequest {
         }
 
         @NonNull
-        public GetRequestBuilder presentationClass(Class presentationClass) {
-            mPresentationClass = presentationClass;
-            return this;
-        }
-
-        @NonNull
         public GetRequestBuilder shouldCache(boolean shouldCache) {
             mShouldCache = shouldCache;
             return this;
@@ -105,12 +122,6 @@ public class GetRequest {
         @NonNull
         public GetRequestBuilder id(int id) {
             mItemId = id;
-            return this;
-        }
-
-        @NonNull
-        public GetRequestBuilder queryFactory(RealmManager.RealmQueryProvider queryFactory) {
-            mQueryFactory = queryFactory;
             return this;
         }
 

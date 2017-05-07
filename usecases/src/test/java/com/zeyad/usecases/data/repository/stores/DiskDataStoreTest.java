@@ -3,7 +3,8 @@ package com.zeyad.usecases.data.repository.stores;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.data.db.DataBaseManager;
-import com.zeyad.usecases.data.mappers.IDAOMapper;
+import com.zeyad.usecases.data.db.RealmManager;
+import com.zeyad.usecases.data.mapper.DAOMapper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -40,7 +41,7 @@ public class DiskDataStoreTest {
     @Before
     public void setUp() throws Exception {
         dbManager = mock(DataBaseManager.class);
-        IDAOMapper mapper = mock(IDAOMapper.class);
+        DAOMapper mapper = mock(DAOMapper.class);
         when(mapper.mapAllToDomain(any(List.class), any(Class.class))).thenReturn(new ArrayList());
         Config.setWithCache(false);
         mDiskDataStore = new DiskDataStore(dbManager, mapper);
@@ -53,7 +54,7 @@ public class DiskDataStoreTest {
         Observable<List> observable = Observable.just(testRealmObjects);
         when(dbManager.getAll(any(Class.class))).thenReturn(observable);
 
-        mDiskDataStore.dynamicGetList("", Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicGetList("", Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).getAll(any(Class.class));
     }
@@ -63,19 +64,19 @@ public class DiskDataStoreTest {
         Observable observable = Observable.just(new TestRealmModel());
         when(dbManager.getById(anyString(), anyInt(), any(Class.class))).thenReturn(observable);
 
-        mDiskDataStore.dynamicGetObject("", "", 0, Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicGetObject("", "", 0, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).getById(anyString(), anyInt(), any(Class.class));
     }
 
-//    @Test
-//    public void testSearchDiskRealmQuery() {
-//        when(dbManager.getQuery(any(RealmManager.RealmQueryProvider.class))).thenReturn(any(Observable.class));
-//
-//        mDiskDataStore.queryDisk(realm -> realm.where(TestRealmModel.class), TestRealmModel.class);
-//
-//        Mockito.verify(dbManager, times(1)).getQuery(any(RealmManager.RealmQueryProvider.class));
-//    }
+    @Test
+    public void testSearchDiskRealmQuery() {
+        when(dbManager.getQuery(any(RealmManager.RealmQueryProvider.class))).thenReturn(any(Observable.class));
+
+        mDiskDataStore.queryDisk(realm -> realm.where(TestRealmModel.class));
+
+        Mockito.verify(dbManager, times(1)).getQuery(any(RealmManager.RealmQueryProvider.class));
+    }
 
     @Test
     public void testDynamicDeleteAll() {
@@ -102,7 +103,7 @@ public class DiskDataStoreTest {
         Observable observable = Observable.just(true);
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(observable);
 
-        mDiskDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).put(any(JSONObject.class), anyString(), any(Class.class));
     }
@@ -112,7 +113,7 @@ public class DiskDataStoreTest {
         Observable observable = Observable.just(true);
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(observable);
 
-        mDiskDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).put(any(JSONObject.class), anyString(), any(Class.class));
     }
@@ -122,7 +123,7 @@ public class DiskDataStoreTest {
         Observable observable = Observable.just(true);
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(observable);
 
-        mDiskDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).put(any(JSONObject.class), anyString(), any(Class.class));
     }
@@ -132,7 +133,7 @@ public class DiskDataStoreTest {
         Observable observable = Observable.just(true);
         when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(observable);
 
-        mDiskDataStore.dynamicPostList("", "", new JSONArray(), Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicPostList("", "", new JSONArray(), Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).putAll(any(JSONArray.class), anyString(), any(Class.class));
     }
@@ -142,7 +143,7 @@ public class DiskDataStoreTest {
         Observable observable = Observable.just(true);
         when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(observable);
 
-        mDiskDataStore.dynamicPutList("", "", new JSONArray(), Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicPutList("", "", new JSONArray(), Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).putAll(any(JSONArray.class), anyString(), any(Class.class));
     }

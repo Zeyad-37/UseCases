@@ -1,9 +1,6 @@
 package com.zeyad.usecases.data.repository;
 
 import com.zeyad.usecases.TestRealmModel;
-import com.zeyad.usecases.data.db.RealmManager;
-import com.zeyad.usecases.data.mappers.IDAOMapper;
-import com.zeyad.usecases.data.mappers.IDAOMapperFactory;
 import com.zeyad.usecases.data.repository.stores.DataStore;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.repository.stores.DiskDataStore;
@@ -14,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-import org.mockito.Mockito;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -51,26 +47,25 @@ public class DataRepositoryTest {
         mockDataStore = mock(DiskDataStore.class);
 
         mockDataStoreFactory = mock(DataStoreFactory.class);
-        when(mockDataStoreFactory.cloud(Mockito.any())).thenReturn(mockDataStore);
+        when(mockDataStoreFactory.cloud()).thenReturn(mockDataStore);
 
         // init class under test
-        mDataRepository = new DataRepository(mockDataStoreFactory, mock(IDAOMapperFactory.class));
+        mDataRepository = new DataRepository(mockDataStoreFactory);
         // global stub
-        when(mockDataStoreFactory.dynamically(anyString(), any(IDAOMapper.class))).thenReturn(mockDataStore);
+        when(mockDataStoreFactory.dynamically(anyString())).thenReturn(mockDataStore);
     }
 
     @Test
     public void testGetListDynamicallyCacheVersion_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() throws Exception {
         // dependency behaviour
         Observable<List> observable = Observable.just(new ArrayList());
-        when(mockDataStore.dynamicGetList(anyString(), any(Class.class), any(Class.class), anyBoolean(),
+        when(mockDataStore.dynamicGetList(anyString(), any(Class.class), anyBoolean(),
                 anyBoolean())).thenReturn(observable);
         // invoke method under test
-        mDataRepository.getListDynamically(validUrl, Object.class, Object.class, false,
-                false);
+        mDataRepository.getListDynamically(validUrl, Object.class, false, false);
         // verify interactions
-        verify(mockDataStoreFactory, times(1)).dynamically(anyString(), any(IDAOMapper.class));
-        verify(mockDataStore, times(1)).dynamicGetList(anyString(), any(Class.class), any(Class.class),
+        verify(mockDataStoreFactory, times(1)).dynamically(anyString());
+        verify(mockDataStore, times(1)).dynamicGetList(anyString(), any(Class.class),
                 anyBoolean(), anyBoolean());
         // assert values
         assertEquals(ArrayList.class.getSimpleName(), observable.toBlocking().first().getClass().getSimpleName());
@@ -79,10 +74,10 @@ public class DataRepositoryTest {
     @Test
     public void testGetListDynamicallyCacheVersion_ifExpectedObservableIsReturned_whenArgumentsArePassed() {
         final Observable<List> mockedObservable = mock(Observable.class);
-        when(mockDataStore.dynamicGetList(anyString(), any(Class.class), any(Class.class), anyBoolean(),
-                anyBoolean())).thenReturn(mockedObservable);
-        Observable<List> observable = mDataRepository.getListDynamically(validUrl, Object.class,
-                Object.class, false, false);
+        when(mockDataStore.dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+                .thenReturn(mockedObservable);
+        Observable<List> observable = mDataRepository.getListDynamically(validUrl, Object.class, false,
+                false);
         assertThat(observable, is(equalTo(mockedObservable)));
     }
 
@@ -90,14 +85,14 @@ public class DataRepositoryTest {
     public void testGetObjectDynamicallyByIdCacheVersion_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() throws Exception {
         // dependency behaviour
         Observable<List> observable = Observable.just(new ArrayList());
-        when(mockDataStore.dynamicGetList(anyString(), any(Class.class), any(Class.class), anyBoolean(),
-                anyBoolean())).thenReturn(observable);
+        when(mockDataStore.dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+                .thenReturn(observable);
         // invoke method under test
-        mDataRepository.getObjectDynamicallyById(validUrl, "", 0, Object.class, Object.class, false, false);
+        mDataRepository.getObjectDynamicallyById(validUrl, "", 0, Object.class, false, false);
         // verify interactions
-        verify(mockDataStoreFactory, times(1)).dynamically(anyString(), any(IDAOMapper.class));
+        verify(mockDataStoreFactory, times(1)).dynamically(anyString());
         verify(mockDataStore, times(1)).dynamicGetObject(anyString(), anyString(), anyInt(), any(),
-                any(Class.class), anyBoolean(), anyBoolean());
+                anyBoolean(), anyBoolean());
         // assert values
         assertEquals(ArrayList.class.getSimpleName(), observable.toBlocking().first().getClass()
                 .getSimpleName());
@@ -106,57 +101,56 @@ public class DataRepositoryTest {
     @Test
     public void testPostObjectDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenJsonObjectIsPassed() {
         mDataRepository.postObjectDynamically(validUrl, DataRepository.DEFAULT_ID_KEY,
-                any(JSONObject.class), Object.class, TestRealmModel.class, true, true);
+                any(JSONObject.class), TestRealmModel.class, true, true);
         verify(mockDataStore, times(1)).dynamicPostObject(anyString(), anyString(), any(JSONObject.class),
-                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
+                any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testPostListDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.postListDynamically(validUrl, DataRepository.DEFAULT_ID_KEY, any(JSONArray.class),
-                Object.class, Object.class, true, true);
+                Object.class, true, true);
         verify(mockDataStore, times(1)).dynamicPostList(anyString(), anyString(), any(JSONArray.class),
-                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
-    }
-
-    @Test
-    public void testDeleteListDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
-        mDataRepository.deleteListDynamically(validUrl, any(JSONArray.class), Object.class,
-                TestRealmModel.class, true, true);
-        verify(mockDataStore, times(1)).dynamicDeleteCollection(anyString(), anyString(), any(JSONArray.class),
                 any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
-    public void testSearchDisk_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenRealmQueryIsPassed() throws IllegalAccessException {
-        mockDataStore = mock(DiskDataStore.class);
-        when(mockDataStoreFactory.disk(any(IDAOMapper.class))).thenReturn(mockDataStore);
-
-        mDataRepository.queryDisk(any(RealmManager.RealmQueryProvider.class), Object.class);
-        verify(mockDataStore, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class),
-                any(Class.class));
+    public void testDeleteListDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
+        mDataRepository.deleteListDynamically(validUrl, any(JSONArray.class), TestRealmModel.class,
+                true, true);
+        verify(mockDataStore, times(1)).dynamicDeleteCollection(anyString(), anyString(), any(JSONArray.class),
+                any(Class.class), anyBoolean(), anyBoolean());
     }
+
+//    @Test
+//    public void testSearchDisk_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenRealmQueryIsPassed() throws IllegalAccessException {
+//        mockDataStore = mock(DiskDataStore.class);
+//        when(mockDataStoreFactory.disk()).thenReturn(mockDataStore);
+//
+//        mDataRepository.queryDisk(any(RealmManager.RealmQueryProvider.class));
+//        verify(mockDataStore, times(1)).queryDisk(any());
+//    }
 
     @Test
     public void testPutObjectDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.putObjectDynamically(validUrl, DataRepository.DEFAULT_ID_KEY, any(JSONObject.class),
-                Object.class, Object.class, true, true);
+                Object.class, true, true);
         verify(mockDataStore, times(1)).dynamicPutObject(anyString(), anyString(), any(JSONObject.class),
-                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
+                any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testPutListDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() {
         mDataRepository.putListDynamically(validUrl, DataRepository.DEFAULT_ID_KEY, any(JSONArray.class),
-                Object.class, Object.class, true, true);
+                Object.class, true, true);
         verify(mockDataStore, times(1)).dynamicPutList(anyString(), anyString(), any(JSONArray.class),
-                any(Class.class), any(Class.class), anyBoolean(), anyBoolean());
+                any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testDeleteALlDynamically_ifDataStoreGetMethodIsCalledWithExpectedParameters_whenArgumentsArePassed() throws Exception {
         mockDataStore = mock(DiskDataStore.class);
-        when(mockDataStoreFactory.disk(any(IDAOMapper.class))).thenReturn(mockDataStore);
+        when(mockDataStoreFactory.disk()).thenReturn(mockDataStore);
 
         mDataRepository.deleteAllDynamically(validUrl, TestRealmModel.class, true);
         verify(mockDataStore, times(1)).dynamicDeleteAll(any(Class.class));
@@ -165,7 +159,7 @@ public class DataRepositoryTest {
     @Test
     public void uploadFileDynamically() throws Exception {
         mDataRepository.uploadFileDynamically(validUrl, new File(""), "", new HashMap<>(), false,
-                false, false, Object.class, Object.class);
+                false, false, Object.class);
 //        verify(mockDataStoreFactory, times(1)).cloud(any(IDAOMapper.class));
         verify(mockDataStore, times(1)).dynamicUploadFile(anyString(), any(File.class), anyString(),
                 (HashMap<String, Object>) anyMap(), anyBoolean(), anyBoolean(), anyBoolean(),
@@ -174,9 +168,8 @@ public class DataRepositoryTest {
 
     @Test
     public void downloadFileDynamically() throws Exception {
-        mDataRepository.downloadFileDynamically(validUrl, new File(""), false, false, false,
-                Object.class, Object.class);
-        verify(mockDataStoreFactory, times(1)).cloud(any(IDAOMapper.class));
+        mDataRepository.downloadFileDynamically(validUrl, new File(""), false, false, false, Object.class);
+        verify(mockDataStoreFactory, times(1)).cloud();
         verify(mockDataStore, times(1)).dynamicDownloadFile(anyString(), any(File.class), anyBoolean(),
                 anyBoolean(), anyBoolean());
     }

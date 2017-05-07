@@ -24,7 +24,7 @@ public interface DataBaseManager {
      * @param userId       The user id to retrieve data.
      */
     @NonNull
-    Observable<?> getById(final String idColumnName, final int userId, Class clazz);
+    Observable<?> getById(String idColumnName, int userId, Class clazz);
 
     /**
      * Gets an {@link Observable} which will emit a List of Objects.
@@ -84,7 +84,7 @@ public interface DataBaseManager {
      * @param realmModel Element to deleted from the DB.
      * @param clazz      Class type of the items to be deleted.
      */
-    void evict(final RealmObject realmModel, Class clazz);
+    void evict(RealmObject realmModel, Class clazz);
 
     /**
      * Evict element by id of the DB.

@@ -3,6 +3,7 @@ package com.zeyad.usecases.app.presentation.screens.user_list;
 import com.zeyad.usecases.app.components.redux.UIModel;
 import com.zeyad.usecases.app.presentation.user_list.User;
 import com.zeyad.usecases.app.presentation.user_list.UserListVM;
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
@@ -86,13 +87,13 @@ public class UserListVMTest {
         Observable<List> observableUserRealm = Observable.just(userList);
 
         when(mockDataUseCase.getObject(any(GetRequest.class))).thenReturn(observableUserRealm);
-        when(mockDataUseCase.queryDisk(any(GetRequest.class)))
+        when(mockDataUseCase.queryDisk(any(RealmManager.RealmQueryProvider.class)))
                 .thenReturn(observableUserRealm);
 
         Observable<UIModel> observable = userListVM.search("m");
 
         // Verify repository interactions
-        verify(mockDataUseCase, times(1)).queryDisk(any(GetRequest.class));
+        verify(mockDataUseCase, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class));
 
         // Assert return type
 //        TestSubscriber<UserListState> userListStateTestSubscriber = new TestSubscriber<>();

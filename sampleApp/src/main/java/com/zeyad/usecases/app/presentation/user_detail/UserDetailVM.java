@@ -25,9 +25,8 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> {
     }
 
     public Observable getRepositories(String userLogin) {
-        return Utils.isNotEmpty(userLogin) ? dataUseCase.queryDisk(new GetRequest.GetRequestBuilder(null, false)
-                .queryFactory(realm -> realm.where(Repository.class).equalTo("owner.login", userLogin))
-                .presentationClass(Repository.class).build())
+        return Utils.isNotEmpty(userLogin) ? dataUseCase.queryDisk(realm -> realm.where(Repository.class)
+                .equalTo("owner.login", userLogin))
                 .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
                         dataUseCase.getList(new GetRequest.GetRequestBuilder(Repository.class, true)
                                 .url(String.format(REPOSITORIES, userLogin)).build())) :

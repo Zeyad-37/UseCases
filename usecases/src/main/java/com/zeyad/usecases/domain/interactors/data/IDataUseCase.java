@@ -1,5 +1,6 @@
 package com.zeyad.usecases.domain.interactors.data;
 
+import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
@@ -85,10 +86,10 @@ public interface IDataUseCase {
     /**
      * Get list of items according to the query passed.
      *
-     * @param getRequest contains the attributes of the request.
-     * @return Observable with the list.
+     * @param realmQueryProvider query tp select list of item(s).
+     * @return
      */
-    Observable<List> queryDisk(GetRequest getRequest);
+    Observable<List> queryDisk(RealmManager.RealmQueryProvider realmQueryProvider);
 
     /**
      * Creates a repository pattern with live objects

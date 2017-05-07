@@ -107,7 +107,7 @@ public class Post {
                 else
                     return mRestApi.dynamicDelete(mPostRequest.getUrl(), listRequestBody)
                             .doOnSubscribe(() -> Log.d(TAG, "Deleting List of " + mPostRequest
-                                    .getPresentationClass().getSimpleName()))
+                                    .getDataClass().getSimpleName()))
                             .subscribe(handleError);
         }
         return Subscriptions.empty();

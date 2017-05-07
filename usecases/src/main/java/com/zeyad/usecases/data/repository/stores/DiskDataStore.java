@@ -5,7 +5,7 @@ import android.support.annotation.NonNull;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.RealmManager;
-import com.zeyad.usecases.data.mappers.IDAOMapper;
+import com.zeyad.usecases.data.mapper.DAOMapper;
 import com.zeyad.usecases.data.utils.ModelConverters;
 
 import org.json.JSONArray;
@@ -22,58 +22,50 @@ import st.lowlevel.storo.Storo;
 public class DiskDataStore implements DataStore {
     private static final String IO_DB_ERROR = "Can not IO file to local DB";
     private DataBaseManager mDataBaseManager;
-    private IDAOMapper mEntityDataMapper;
+    private DAOMapper mEntityDataMapper;
 
     /**
      * Construct a {@link DataStore} based file system data store.
      *
      * @param realmManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    DiskDataStore(DataBaseManager realmManager, IDAOMapper entityDataMapper) {
+    DiskDataStore(DataBaseManager realmManager, DAOMapper entityDataMapper) {
         mDataBaseManager = realmManager;
         mEntityDataMapper = entityDataMapper;
     }
 
     @NonNull
     @Override
-    public Observable<?> dynamicGetObject(String url, String idColumnName, int itemId, Class domainClass,
-                                          Class dataClass, boolean persist, boolean shouldCache) {
+    public Observable<?> dynamicGetObject(String url, String idColumnName, int itemId, Class dataClass,
+                                          boolean persist, boolean shouldCache) {
         if (Config.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
             return Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
-                    .map(realmModel -> mEntityDataMapper.mapToDomain(realmModel, domainClass));
+                    .map(object -> mEntityDataMapper.mapToDomain(object, dataClass));
         else
             return mDataBaseManager.getById(idColumnName, itemId, dataClass)
-                    .map(realmModel -> {
+                    .map(object -> {
                         try {
                             if (Config.isWithCache() && !Storo.contains(dataClass.getSimpleName() + itemId))
-                                cacheObject(idColumnName, new JSONObject(gson.toJson(realmModel)),
+                                cacheObject(idColumnName, new JSONObject(gson.toJson(object)),
                                         dataClass);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        if (domainClass == dataClass)
-                            return realmModel;
-                        else return mEntityDataMapper.mapToDomain(realmModel, domainClass);
+                        return object;
                     });
     }
 
     @NonNull
     @Override
-    public Observable<List> dynamicGetList(String url, Class domainClass, Class dataClass, boolean persist,
-                                           boolean shouldCache) {
-        return mDataBaseManager.getAll(dataClass)
-                .map(realmModels -> {
-                    if (domainClass == dataClass)
-                        return realmModels;
-                    else return mEntityDataMapper.mapAllToDomain(realmModels, domainClass);
-                });
+    public Observable<List> dynamicGetList(String url, Class dataClass, boolean persist, boolean shouldCache) {
+        return mDataBaseManager.getAll(dataClass);
     }
 
     @Override
     public Observable<?> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                            Class domainClass, Class dataClass, boolean persist, boolean queuable) {
+                                            Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnNext(o -> {
+                .doOnNext(object -> {
                     if (Config.isWithCache())
                         cacheObject(idColumnName, jsonObject, dataClass);
                 });
@@ -81,13 +73,8 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory, Class domainClass) {
-        return mDataBaseManager.getQuery(queryFactory)
-                .map(realmModel -> {
-                    if (domainClass == realmModel.getClass())
-                        return realmModel;
-                    else return mEntityDataMapper.mapToDomain(realmModel, domainClass);
-                });
+    public Observable<List> queryDisk(RealmManager.RealmQueryProvider queryFactory) {
+        return mDataBaseManager.getQuery(queryFactory);
     }
 
     @NonNull
@@ -96,7 +83,7 @@ public class DiskDataStore implements DataStore {
                                                  Class dataClass, boolean persist, boolean queuable) {
         List<Long> convertToListOfId = ModelConverters.convertToListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
-                .doOnNext(o -> {
+                .doOnNext(object -> {
                     if (Config.isWithCache()) {
                         for (int i = 0, convertToListOfIdSize = convertToListOfId != null ? convertToListOfId.size() : 0;
                              i < convertToListOfIdSize; i++)
@@ -114,9 +101,9 @@ public class DiskDataStore implements DataStore {
     @NonNull
     @Override
     public Observable<?> dynamicPostObject(String url, String idColumnName, JSONObject jsonObject,
-                                           Class domainClass, Class dataClass, boolean persist, boolean queuable) {
+                                           Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnNext(o -> {
+                .doOnNext(object -> {
                     if (Config.isWithCache())
                         cacheObject(idColumnName, jsonObject, dataClass);
                 });
@@ -125,16 +112,16 @@ public class DiskDataStore implements DataStore {
     @NonNull
     @Override
     public Observable<?> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
-                                         Class domainClass, Class dataClass, boolean persist, boolean queuable) {
+                                         Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass);
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicPutObject(String url, String idColumnName, JSONObject jsonObject,
-                                          Class domainClass, Class dataClass, boolean persist, boolean queuable) {
+                                          Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnNext(o -> {
+                .doOnNext(object -> {
                     if (Config.isWithCache())
                         cacheObject(idColumnName, jsonObject, dataClass);
                 });
@@ -143,7 +130,7 @@ public class DiskDataStore implements DataStore {
     @NonNull
     @Override
     public Observable<?> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
-                                        Class domainClass, Class dataClass, boolean persist, boolean queuable) {
+                                        Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass);
     }
 
