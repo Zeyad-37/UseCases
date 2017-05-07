@@ -28,7 +28,6 @@ import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.redux.BaseFragment;
-import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.presentation.user_list.User;
 import com.zeyad.usecases.app.presentation.user_list.UserListActivity;
 import com.zeyad.usecases.app.utils.Utils;
@@ -77,17 +76,12 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
     public void initialize() {
         if (getArguments() != null)
             viewState = Parcels.unwrap(getArguments().getParcelable(UI_MODEL));
-        viewModel = new UserDetailVM(DataUseCaseFactory.getInstance());
-        events = Observable.just(new GetReposEvent(viewState.getUser().getLogin()));
-    }
-
-    @Override
-    public SuccessStateAccumulator<UserDetailState> successStateAccumulator() {
-        return (newResult, currentStateBundle) -> UserDetailState.builder()
+        viewModel = new UserDetailVM(DataUseCaseFactory.getInstance(), (newResult, currentStateBundle) -> UserDetailState.builder()
                 .setRepos((List<Repository>) newResult.getBundle())
                 .setUser(currentStateBundle.getUser())
                 .setIsTwoPane(currentStateBundle.isTwoPane())
-                .build();
+                .build(), viewState);
+        events = Observable.just(new GetReposEvent(viewState.getUser().getLogin()));
     }
 
     @Override

@@ -24,6 +24,7 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
+    public ErrorMessageFactory errorMessageFactory;
     public Observable<BaseEvent> events;
     public Observable.Transformer<BaseEvent, UIModel<S>> uiModelsTransformer;
     public VM viewModel;
@@ -47,10 +48,10 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
     @Override
     public void onStart() {
         super.onStart();
-        uiModelsTransformer = viewModel.uiModels(successStateAccumulator(), viewState);
+        uiModelsTransformer = viewModel.uiModels();
         events.compose(uiModelsTransformer)
                 .compose(bindToLifecycle())
-                .subscribe(new UISubscriber<>(this));
+                .subscribe(new UISubscriber<>(this, errorMessageFactory));
     }
 
     @Override
@@ -75,8 +76,6 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
      * Initialize any objects or any required dependencies.
      */
     public abstract void initialize();
-
-    public abstract SuccessStateAccumulator<S> successStateAccumulator();
 
     public void showToastMessage(String message) {
         showToastMessage(message, Toast.LENGTH_LONG);

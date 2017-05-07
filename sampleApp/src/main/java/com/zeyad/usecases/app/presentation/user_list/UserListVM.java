@@ -2,6 +2,7 @@ package com.zeyad.usecases.app.presentation.user_list;
 
 import com.zeyad.usecases.app.components.redux.BaseEvent;
 import com.zeyad.usecases.app.components.redux.BaseViewModel;
+import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.presentation.user_list.events.DeleteUsersEvent;
 import com.zeyad.usecases.app.presentation.user_list.events.GetPaginatedUsersEvent;
 import com.zeyad.usecases.app.presentation.user_list.events.SearchUsersEvent;
@@ -29,7 +30,8 @@ public class UserListVM extends BaseViewModel<UserListState> {
 
     private final IDataUseCase dataUseCase;
 
-    public UserListVM(IDataUseCase dataUseCase) {
+    public UserListVM(IDataUseCase dataUseCase, SuccessStateAccumulator<UserListState> successStateAccumulator) {
+        super(successStateAccumulator, null);
         this.dataUseCase = dataUseCase;
     }
 

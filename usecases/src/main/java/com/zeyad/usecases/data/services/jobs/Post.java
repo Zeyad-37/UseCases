@@ -7,7 +7,6 @@ import android.util.Log;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.zeyad.usecases.data.network.RestApi;
-import com.zeyad.usecases.data.network.RestApiImpl;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
 
@@ -29,8 +28,8 @@ public class Post {
     private static int mTrailCount;
     private final FirebaseJobDispatcher mDispatcher;
     private final PostRequest mPostRequest;
-    private final Context mContext;
     private final RestApi mRestApi;
+    private final Utils mUtils;
     @NonNull
     private Subscriber<Object> handleError = new Subscriber<Object>() {
         @Override
@@ -40,7 +39,7 @@ public class Post {
 
         @Override
         public void onError(Throwable e) {
-            reQueue();
+            queuePost();
             e.printStackTrace();
         }
 
@@ -50,20 +49,12 @@ public class Post {
         }
     };
 
-    public Post(int trailCount, @NonNull PostRequest payLoad, @NonNull Context context) {
-        mRestApi = RestApiImpl.getInstance();
-        mContext = context;
-        mTrailCount = trailCount;
-        mPostRequest = payLoad;
-        mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
-    }
-
-    Post(Context context, PostRequest postRequest, RestApi restApi, int trailCount) {
-        mContext = context;
+    public Post(Context context, PostRequest postRequest, RestApi restApi, int trailCount, Utils utils) {
         mPostRequest = postRequest;
         mRestApi = restApi;
         mTrailCount = trailCount;
-        mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
+        mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(context));
+        mUtils = utils;
     }
 
     public Subscription execute() {
@@ -82,7 +73,7 @@ public class Post {
         switch (mPostRequest.getMethod()) {
             case PostRequest.PATCH:
                 return mRestApi.dynamicPatch(mPostRequest.getUrl(), requestBody)
-                        .doOnSubscribe(() -> Log.d(TAG, "Posting " + mPostRequest.getDataClass()
+                        .doOnSubscribe(() -> Log.d(TAG, "Patching " + mPostRequest.getDataClass()
                                 .getSimpleName()))
                         .subscribe(handleError);
             case PostRequest.POST:
@@ -99,12 +90,12 @@ public class Post {
             case PostRequest.PUT:
                 if (isObject)
                     return mRestApi.dynamicPut(mPostRequest.getUrl(), requestBody)
-                            .doOnSubscribe(() -> Log.d(TAG, "Puting " + mPostRequest.getDataClass()
+                            .doOnSubscribe(() -> Log.d(TAG, "Putting " + mPostRequest.getDataClass()
                                     .getSimpleName()))
                             .subscribe(handleError);
                 else
                     return mRestApi.dynamicPut(mPostRequest.getUrl(), listRequestBody)
-                            .doOnSubscribe(() -> Log.d(TAG, "Puting " + mPostRequest.getDataClass()
+                            .doOnSubscribe(() -> Log.d(TAG, "Putting List of " + mPostRequest.getDataClass()
                                     .getSimpleName()))
                             .subscribe(handleError);
             case PostRequest.DELETE:
@@ -122,10 +113,10 @@ public class Post {
         return Subscriptions.empty();
     }
 
-    private void reQueue() {
+    void queuePost() {
         mTrailCount++;
         if (mTrailCount < 3) { // inject value at initRealm!
-            Utils.getInstance().queuePostCore(mDispatcher, mPostRequest);
+            mUtils.queuePostCore(mDispatcher, mPostRequest);
         }
     }
 

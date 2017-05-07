@@ -55,22 +55,25 @@ public class GenericJobService extends JobService {
         if (params.getExtras() != null && params.getExtras().containsKey(PAYLOAD)) {
             if (mCompositeSubscription == null || mCompositeSubscription.isUnsubscribed())
                 mCompositeSubscription = new CompositeSubscription();
+            RestApiImpl instance = RestApiImpl.getInstance();
+            int trailCount = params.getExtras().getInt(TRIAL_COUNT);
+            Utils utils = Utils.getInstance();
             switch (params.getExtras().getString(JOB_TYPE, "")) {
                 case POST:
-                    mCompositeSubscription.add(new Post(params.getExtras().getInt(TRIAL_COUNT),
-                            params.getExtras().getParcelable(PAYLOAD), this).execute());
+                    mCompositeSubscription.add(new Post(this, params.getExtras().getParcelable(PAYLOAD),
+                            instance, trailCount, utils).execute());
                     Log.d(TAG, getString(R.string.job_started, POST));
                     break;
                 case DOWNLOAD_FILE:
-                    mCompositeSubscription.add(new FileIO(params.getExtras().getInt(TRIAL_COUNT),
-                            params.getExtras().getParcelable(PAYLOAD), this, true, RestApiImpl.getInstance(),
-                            Utils.getInstance()).execute());
+                    mCompositeSubscription.add(new FileIO(trailCount,
+                            params.getExtras().getParcelable(PAYLOAD), this, true, instance,
+                            utils).execute());
                     Log.d(TAG, getString(R.string.job_started, DOWNLOAD_FILE));
                     break;
                 case UPLOAD_FILE:
-                    mCompositeSubscription.add(new FileIO(params.getExtras().getInt(TRIAL_COUNT),
-                            params.getExtras().getParcelable(PAYLOAD), this, false, RestApiImpl.getInstance(),
-                            Utils.getInstance()).execute());
+                    mCompositeSubscription.add(new FileIO(trailCount,
+                            params.getExtras().getParcelable(PAYLOAD), this, false, instance,
+                            utils).execute());
                     Log.d(TAG, getString(R.string.job_started, UPLOAD_FILE));
                     break;
                 default:

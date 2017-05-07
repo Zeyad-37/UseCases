@@ -30,4 +30,9 @@ class RepositoryViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
                 textView_repo_title.setText(repoModel.getName());
         }
     }
+
+    @Override
+    public void expand(boolean isExpanded) {
+
+    }
 }

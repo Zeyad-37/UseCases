@@ -34,7 +34,7 @@ public class UserListVMTest {
     @Before
     public void setUp() throws Exception {
         mockDataUseCase = mock(IDataUseCase.class);
-        userListVM = new UserListVM(mockDataUseCase);
+        userListVM = new UserListVM(mockDataUseCase, any());
     }
 
     // TODO: 3/31/17 Add value assertions!

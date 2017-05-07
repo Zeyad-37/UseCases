@@ -34,7 +34,7 @@ public class FileIORequest implements Parcelable {
     public FileIORequest() {
     }
 
-    public FileIORequest(@NonNull FileIORequestBuilder uploadRequestBuilder) {
+    private FileIORequest(@NonNull FileIORequestBuilder uploadRequestBuilder) {
         url = uploadRequestBuilder.getUrl();
         onWifi = uploadRequestBuilder.isOnWifi();
         whileCharging = uploadRequestBuilder.isWhileCharging();
@@ -46,7 +46,7 @@ public class FileIORequest implements Parcelable {
         presentationClass = uploadRequestBuilder.getPresentationClass();
     }
 
-    protected FileIORequest(Parcel in) {
+    private FileIORequest(Parcel in) {
         this.file = (File) in.readSerializable();
         this.url = in.readString();
         this.key = in.readString();

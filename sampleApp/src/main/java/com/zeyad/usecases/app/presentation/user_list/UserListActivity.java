@@ -29,7 +29,6 @@ import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.redux.BaseActivity;
 import com.zeyad.usecases.app.components.redux.BaseEvent;
-import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.components.redux.UISubscriber;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailActivity;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailFragment;
@@ -72,9 +71,9 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
     private GenericRecyclerViewAdapter usersAdapter;
-    private boolean twoPane;
     private ActionMode actionMode;
     private String currentFragTag;
+    private boolean twoPane;
     private long lastId;
 
     public static Intent getCallingIntent(Context context) {
@@ -83,31 +82,8 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
 
     @Override
     public void initialize() {
-        viewModel = new UserListVM(DataUseCaseFactory.getInstance());
-        events = Observable.<BaseEvent>just(new GetPaginatedUsersEvent(0))
-                .doOnEach(notification -> Log.d("GetUsersEvent", "fired!"));
-        rxEventBus.toObserverable()
-                .compose(bindToLifecycle())
-                .subscribe(stream -> events.mergeWith((Observable<DeleteUsersEvent>) stream)
-                        .compose(uiModelsTransformer)
-                        .compose(bindToLifecycle())
-                        .subscribe(new UISubscriber<>(this)));
-    }
-
-    @Override
-    public void setupUI() {
-        setContentView(R.layout.activity_user_list);
-        ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
-        toolbar.setTitle(getTitle());
-        setupRecyclerView();
-        if (findViewById(R.id.user_detail_container) != null)
-            twoPane = true;
-    }
-
-    @Override
-    public SuccessStateAccumulator<UserListState> successStateAccumulator() {
-        return (newResult, currentStateBundle) -> {
+        errorMessageFactory = Throwable::getMessage;
+        viewModel = new UserListVM(DataUseCaseFactory.getInstance(), (newResult, currentStateBundle) -> {
             List resultList = (List) newResult.getBundle();
             List<User> users = currentStateBundle == null ? new ArrayList<>() : currentStateBundle.getUsers();
             if (resultList.get(0).getClass().equals(User.class)) {
@@ -122,7 +98,26 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
             Collections.sort(users, (user1, user2) -> String.valueOf(user1.getId())
                     .compareTo(String.valueOf(user2.getId())));
             return UserListState.builder().setUsers(users).build();
-        };
+        });
+        events = Observable.<BaseEvent>just(new GetPaginatedUsersEvent(0))
+                .doOnEach(notification -> Log.d("GetUsersEvent", "fired!"));
+        rxEventBus.toObserverable()
+                .compose(bindToLifecycle())
+                .subscribe(stream -> events.mergeWith((Observable<DeleteUsersEvent>) stream)
+                        .compose(uiModelsTransformer)
+                        .compose(bindToLifecycle())
+                        .subscribe(new UISubscriber<>(this, errorMessageFactory)));
+    }
+
+    @Override
+    public void setupUI() {
+        setContentView(R.layout.activity_user_list);
+        ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle(getTitle());
+        setupRecyclerView();
+        if (findViewById(R.id.user_detail_container) != null)
+            twoPane = true;
     }
 
     @Override
@@ -259,18 +254,15 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
      * @param position Position of the item to toggle the selection viewState
      */
     private boolean toggleSelection(int position) {
-        if (usersAdapter.isSelectionAllowed()) {
-            usersAdapter.toggleSelection(position);
-            int count = usersAdapter.getSelectedItemCount();
-            if (count == 0) {
-                actionMode.finish();
-            } else {
-                actionMode.setTitle(String.valueOf(count));
-                actionMode.invalidate();
-            }
-            return true;
+        usersAdapter.toggleSelection(position);
+        int count = usersAdapter.getSelectedItemCount();
+        if (count == 0) {
+            actionMode.finish();
+        } else {
+            actionMode.setTitle(String.valueOf(count));
+            actionMode.invalidate();
         }
-        return false;
+        return true;
     }
 
     @Override

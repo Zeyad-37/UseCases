@@ -20,13 +20,6 @@ public class RestApiImpl implements RestApi {
     private static RestApiImpl sRestAPI;
     private final IApiConnection mApiConnection;
 
-//    /**
-//     * Creates a new instance.
-//     */
-//    private RestApiImpl() {
-//        mApiConnection = ApiConnectionFactory.getInstance();
-//    }
-
     RestApiImpl(IApiConnection apiConnection) {
         if (apiConnection == null)
             apiConnection = ApiConnectionFactory.getInstance();

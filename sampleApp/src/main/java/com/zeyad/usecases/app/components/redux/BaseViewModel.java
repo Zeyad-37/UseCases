@@ -10,15 +10,25 @@ import rx.schedulers.Schedulers;
  * @author zeyad on 11/28/16.
  */
 public abstract class BaseViewModel<S> {
+
+    public final SuccessStateAccumulator<S> successStateAccumulator;
+    public final S initialState;
+
+    /**
+     * @param successStateAccumulator a success State Accumulator.
+     * @param initialState            Initial state to start with.
+     */
+    protected BaseViewModel(SuccessStateAccumulator<S> successStateAccumulator, S initialState) {
+        this.successStateAccumulator = successStateAccumulator;
+        this.initialState = initialState;
+    }
+
     /**
      * A Transformer, given events returns UIModels by applying the redux pattern.
      *
-     * @param successStateAccumulator a success State Accumulator.
-     * @param initialState            Initial state to start with.
      * @return {@link Transformer} the redux pattern transformer.
      */
-    Transformer<BaseEvent, UIModel<S>> uiModels(SuccessStateAccumulator<S> successStateAccumulator,
-                                                S initialState) {
+    Transformer<BaseEvent, UIModel<S>> uiModels() {
         return events -> events.observeOn(Schedulers.io())
                 .flatMap(event -> Observable.just(event)
                         .flatMap(mapEventsToExecutables())

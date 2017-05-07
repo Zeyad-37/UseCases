@@ -69,17 +69,17 @@ public class PostJUnitTest {
     private Context mockedContext;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mockedContext = createMockedContext();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         clearAll();
     }
 
     @Test
-    public void testExecute_ifTrailCountIncrements_whenNetworkNotAvailable() throws IOException, PackageManager.NameNotFoundException {
+    public void testExecute_ifTrailCountIncrements_whenNetworkNotAvailable() {
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.POST)
                 , createRestApi()
@@ -89,7 +89,7 @@ public class PostJUnitTest {
     }
 
     @Test
-    public void testExecute_ifGCMNetworkManagerIsScheduled_whenNetworkNotAvailableAndGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
+    public void testExecute_ifGCMNetworkManagerIsScheduled_whenNetworkNotAvailableAndGooglePlayServicesAreAvailable() {
         final FirebaseJobDispatcher gcmNetworkManager = getGcmNetworkManager();
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.POST)
@@ -100,7 +100,7 @@ public class PostJUnitTest {
     }
 
     @Test
-    public void testExecute_ifCorrectArgumentsArePassedToGCMNetworkManager_whenNetworkNotAvailableAndGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
+    public void testExecute_ifCorrectArgumentsArePassedToGCMNetworkManager_whenNetworkNotAvailableAndGooglePlayServicesAreAvailable() {
         final FirebaseJobDispatcher gcmNetworkManager = getGcmNetworkManager();
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.POST)
@@ -120,7 +120,7 @@ public class PostJUnitTest {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Test
-    public void testExecute_ifJobSchedulerIsInvoked_whenNetworkNotAvailableAndGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
+    public void testExecute_ifJobSchedulerIsInvoked_whenNetworkNotAvailableAndGooglePlayServicesAreAvailable() {
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.POST)
                 , createRestApi()
@@ -131,7 +131,7 @@ public class PostJUnitTest {
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Test
-    public void testExecute_ifCorrectArgumentsArePassedToJobScheduler_whenNetworkNotAvailableAndGooglePlayServicesAreAvailable() throws IOException, PackageManager.NameNotFoundException {
+    public void testExecute_ifCorrectArgumentsArePassedToJobScheduler_whenNetworkNotAvailableAndGooglePlayServicesAreAvailable() {
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.POST)
                 , createRestApi()
@@ -148,7 +148,7 @@ public class PostJUnitTest {
     }
 
     @Test
-    public void testExecute_ifGCMNetworkManagerIsNotScheduled_whenNetworkNotAvailableAndGooglePlayServicesAreNotAvailable() throws IOException, PackageManager.NameNotFoundException {
+    public void testExecute_ifGCMNetworkManagerIsNotScheduled_whenNetworkNotAvailableAndGooglePlayServicesAreNotAvailable() {
         final FirebaseJobDispatcher gcmNetworkManager = getGcmNetworkManager();
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.POST)
@@ -159,7 +159,7 @@ public class PostJUnitTest {
     }
 
     @Test
-    public void testExecute_ifRestApiDynamicPostObjectIsCalled_whenNetworkIsAvailableAndHashmapAndPostMethodIsPassed() throws Exception {
+    public void testExecute_ifRestApiDynamicPostObjectIsCalled_whenNetworkIsAvailableAndHashmapAndPostMethodIsPassed() {
         final RestApiImpl restApi = createRestApi();
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.POST)
@@ -170,7 +170,7 @@ public class PostJUnitTest {
     }
 
     @Test
-    public void testExecute_ifRestApiDynamicPostObjectIsCalled_whenNetworkIsAvailableAndJsonObjectAndPostMethodIsPassed() throws Exception {
+    public void testExecute_ifRestApiDynamicPostObjectIsCalled_whenNetworkIsAvailableAndJsonObjectAndPostMethodIsPassed() {
         final RestApiImpl restApi = createRestApi();
         Post post = createPost(mockedContext
                 , createPostRequestForJsonObject(PostRequest.POST)
@@ -181,7 +181,7 @@ public class PostJUnitTest {
     }
 
     @Test
-    public void testExecute_ifRestApiDynamicPostListIsCalled_whenNetworkIsAvailableAndJsonArrayAndPostMethodIsPassed() throws Exception {
+    public void testExecute_ifRestApiDynamicPostListIsCalled_whenNetworkIsAvailableAndJsonArrayAndPostMethodIsPassed() {
         final RestApiImpl restApi = createRestApi();
         Post post = createPost(mockedContext
                 , createPostRequestForJsonArray(PostRequest.POST)
@@ -192,7 +192,7 @@ public class PostJUnitTest {
     }
 
     @Test
-    public void testExecute_ifRestApiDynamicPutObjectIsCalled_whenNetworkIsAvailableAndHashmapAndPutMethodIsPassed() throws Exception {
+    public void testExecute_ifRestApiDynamicPutObjectIsCalled_whenNetworkIsAvailableAndHashmapAndPutMethodIsPassed() {
         final RestApiImpl restApi = createRestApi();
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.PUT)
@@ -203,7 +203,7 @@ public class PostJUnitTest {
     }
 
     @Test
-    public void testExecute_ifRestApiDynamicPutObjectIsCalled_whenNetworkIsAvailableAndJsonObjectAndPutMethodIsPassed() throws Exception {
+    public void testExecute_ifRestApiDynamicPutObjectIsCalled_whenNetworkIsAvailableAndJsonObjectAndPutMethodIsPassed() {
         final RestApiImpl restApi = createRestApi();
         Post post = createPost(mockedContext
                 , createPostRequestForJsonObject(PostRequest.PUT)
@@ -217,7 +217,7 @@ public class PostJUnitTest {
     // --- //
 
     @Test
-    public void testExecute_ifRestApiDynamicPutListIsCalled_whenNetworkIsAvailableAndJsonArrayAndPutMethodIsPassed() throws Exception {
+    public void testExecute_ifRestApiDynamicPutListIsCalled_whenNetworkIsAvailableAndJsonArrayAndPutMethodIsPassed() {
         final RestApiImpl restApi = createRestApi();
         Post post = createPost(mockedContext
                 , createPostRequestForJsonArray(PostRequest.PUT)
@@ -228,7 +228,7 @@ public class PostJUnitTest {
     }
 
     @Test
-    public void testExecute_ifRestApiDynamicDeleteObjectIsCalled_whenNetworkIsAvailableAndHashmapAndDeleteMethodIsPassed() throws Exception {
+    public void testExecute_ifRestApiDynamicDeleteObjectIsCalled_whenNetworkIsAvailableAndHashmapAndDeleteMethodIsPassed() {
         final RestApiImpl restApi = createRestApi();
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.DELETE)
@@ -239,7 +239,7 @@ public class PostJUnitTest {
     }
 
     @Test
-    public void testExecute_ifRestApiDynamicDeleteObjectIsCalled_whenNetworkIsAvailableAndJsonObjectAndDeleteMethodIsPassed() throws Exception {
+    public void testExecute_ifRestApiDynamicDeleteObjectIsCalled_whenNetworkIsAvailableAndJsonObjectAndDeleteMethodIsPassed() {
         final RestApiImpl restApi = createRestApi();
         Post post = createPost(mockedContext
                 , createPostRequestForJsonObject(PostRequest.DELETE)
@@ -250,7 +250,7 @@ public class PostJUnitTest {
     }
 
     @Test
-    public void testExecute_ifRestApiDynamicDeleteListIsCalled_whenNetworkIsAvailableAndJsonArrayAndDeleteMethodIsPassed() throws Exception {
+    public void testExecute_ifRestApiDynamicDeleteListIsCalled_whenNetworkIsAvailableAndJsonArrayAndDeleteMethodIsPassed() {
         final RestApiImpl restApi = createRestApi();
         Post post = createPost(mockedContext
                 , createPostRequestForJsonArray(PostRequest.DELETE)
@@ -262,7 +262,7 @@ public class PostJUnitTest {
 
     @NonNull
     Post createPost(Context context, PostRequest postRequest, RestApi restApi, int trailCount) {
-        return new Post(context, postRequest, restApi, trailCount);
+        return new Post(context, postRequest, restApi, trailCount, null);
     }
 
     String getValidUrl() {
@@ -283,7 +283,7 @@ public class PostJUnitTest {
         return TestRealmModel.class;
     }
 
-    Context createMockedContext() throws PackageManager.NameNotFoundException {
+    Context createMockedContext() {
         final Context context = mock(Context.class);
         final Resources resources = mock(Resources.class);
         final PackageManager packageManager = mock(PackageManager.class);
@@ -371,16 +371,7 @@ public class PostJUnitTest {
     }
 
     Observable<ResponseBody> getResponseBodyObservable() {
-        return Observable.create(new Observable.OnSubscribe<ResponseBody>() {
-            @Override
-            public void call(@NonNull Subscriber<? super ResponseBody> subscriber) {
-                try {
-                    subscriber.onNext(getResponseBody());
-                } catch (IOException e) {
-                    subscriber.onError(e);
-                }
-            }
-        });
+        return Observable.fromCallable(this::getResponseBody);
     }
 
     ResponseBody getResponseBody() throws IOException {

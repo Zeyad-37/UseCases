@@ -2,8 +2,6 @@ package com.zeyad.usecases.app.components.redux;
 
 import android.util.Log;
 
-import com.zeyad.usecases.app.components.exceptions.ErrorMessageFactory;
-
 import rx.Subscriber;
 import rx.exceptions.OnErrorNotImplementedException;
 
@@ -11,10 +9,12 @@ import rx.exceptions.OnErrorNotImplementedException;
  * @author zeyad on 11/28/16.
  */
 public class UISubscriber<V extends LoadDataView<S>, S> extends Subscriber<UIModel<S>> {
+    private ErrorMessageFactory errorMessageFactory;
     private V view;
 
-    public UISubscriber(V view) {
+    public UISubscriber(V view, ErrorMessageFactory errorMessageFactory) {
         this.view = view;
+        this.errorMessageFactory = errorMessageFactory;
     }
 
     @Override
@@ -34,10 +34,9 @@ public class UISubscriber<V extends LoadDataView<S>, S> extends Subscriber<UIMod
             if (uiModel.isSuccessful())
                 view.renderState(uiModel.getBundle());
             else if (uiModel.getError() != null) {
-                Exception throwable = (Exception) uiModel.getError();
+                Throwable throwable = uiModel.getError();
                 throwable.printStackTrace();
-                String errorMsg = ErrorMessageFactory.create(throwable);
-                view.showError(errorMsg);
+                view.showError(errorMessageFactory.getErrorMessage(throwable));
             }
         }
     }

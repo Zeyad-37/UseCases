@@ -29,6 +29,7 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
     public static final String UI_MODEL = "viewState";
     public INavigator navigator;
     public IRxEventBus rxEventBus;
+    public ErrorMessageFactory errorMessageFactory;
     public Observable<BaseEvent> events;
     public Observable.Transformer<BaseEvent, UIModel<S>> uiModelsTransformer;
     public S viewState;
@@ -40,19 +41,17 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
         navigator = NavigatorFactory.getInstance();
         rxEventBus = RxEventBusFactory.getInstance();
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+        if (savedInstanceState != null)
+            viewState = Parcels.unwrap(savedInstanceState.getParcelable(UI_MODEL));
         initialize();
         setupUI();
-        if (savedInstanceState != null) {
-            viewState = Parcels.unwrap(savedInstanceState.getParcelable(UI_MODEL));
-            renderState(viewState);
-        }
     }
 
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         if (savedInstanceState != null)
-            renderState(Parcels.unwrap(savedInstanceState.getParcelable(UI_MODEL)));
+            viewState = Parcels.unwrap(savedInstanceState.getParcelable(UI_MODEL));
     }
 
     @Override
@@ -76,10 +75,10 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
     @Override
     protected void onStart() {
         super.onStart();
-        uiModelsTransformer = viewModel.uiModels(successStateAccumulator(), viewState);
+        uiModelsTransformer = viewModel.uiModels();
         events.compose(uiModelsTransformer)
                 .compose(bindToLifecycle())
-                .subscribe(new UISubscriber<>(this));
+                .subscribe(new UISubscriber<>(this, errorMessageFactory));
     }
 
     /**
@@ -91,8 +90,6 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
      * Setup the UI.
      */
     public abstract void setupUI();
-
-    public abstract SuccessStateAccumulator<S> successStateAccumulator();
 
     /**
      * Adds a {@link Fragment} to this activity's layout.

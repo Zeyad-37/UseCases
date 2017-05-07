@@ -36,7 +36,7 @@ public class UserDetailVMTest {
     @Before
     public void setUp() throws Exception {
         mockDataUseCase = mock(IDataUseCase.class);
-        userDetailVM = new UserDetailVM(mockDataUseCase);
+        userDetailVM = new UserDetailVM(mockDataUseCase, any(), any());
 
         user = new User();
         user.setLogin("testUser");
