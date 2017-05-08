@@ -50,17 +50,13 @@ public class UserListVM extends BaseViewModel<UserListState> {
     }
 
     public Observable<List> getUsers(long lastId) {
-        if (lastId != 0) {
-            return dataUseCase.getList(new GetRequest
-                    .GetRequestBuilder(User.class, true)
-                    .url(String.format(USERS, lastId))
-                    .build());
-        } else {
-            return dataUseCase.getListOffLineFirst(new GetRequest
-                    .GetRequestBuilder(User.class, true)
-                    .url(String.format(USERS, lastId))
-                    .build());
-        }
+        return lastId == 0 ? dataUseCase.getListOffLineFirst(new GetRequest
+                .GetRequestBuilder(User.class, true)
+                .url(String.format(USERS, lastId))
+                .build()) : dataUseCase.getList(new GetRequest
+                .GetRequestBuilder(User.class, true)
+                .url(String.format(USERS, lastId))
+                .build());
     }
 
     public Observable search(String query) {

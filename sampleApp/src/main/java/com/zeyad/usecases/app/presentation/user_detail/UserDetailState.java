@@ -10,7 +10,7 @@ import java.util.List;
  * @author zeyad on 1/25/17.
  */
 @Parcel
-public final class UserDetailState {
+public class UserDetailState {
     final boolean isTwoPane;
     final User user;
     final List<Repository> repos;

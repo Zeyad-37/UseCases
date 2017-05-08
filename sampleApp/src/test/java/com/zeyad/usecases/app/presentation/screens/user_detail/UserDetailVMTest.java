@@ -1,5 +1,6 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
+import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailState;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailVM;
 import com.zeyad.usecases.app.presentation.user_list.User;
@@ -28,7 +29,6 @@ public class UserDetailVMTest {
 
     private IDataUseCase mockDataUseCase;
     private User user;
-    private UserDetailState userDetailState;
     private UserDetailVM userDetailVM;
 
     // TODO: 3/31/17 Add value assertions!
@@ -36,16 +36,12 @@ public class UserDetailVMTest {
     @Before
     public void setUp() throws Exception {
         mockDataUseCase = mock(IDataUseCase.class);
-        userDetailVM = new UserDetailVM(mockDataUseCase, any(), any());
+        userDetailVM = new UserDetailVM(mockDataUseCase, mock(SuccessStateAccumulator.class),
+                mock(UserDetailState.class));
 
         user = new User();
         user.setLogin("testUser");
         user.setId(1);
-        userDetailState = UserDetailState.builder()
-                .setUser(user)
-                .setIsTwoPane(false)
-                .setRepos(new ArrayList<>())
-                .build();
     }
 
     @Test
@@ -57,12 +53,9 @@ public class UserDetailVMTest {
         when(mockDataUseCase.queryDisk(any(RealmManager.RealmQueryProvider.class)))
                 .thenReturn(observableUserRealm);
 
-        Observable observable = userDetailVM.getRepositories(user.getLogin());
+        userDetailVM.getRepositories(user.getLogin());
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class));
-
-        // Assert return type
-//        assertEquals(UserDetailState.class, observable.toBlocking().first().getClass());
     }
 }
