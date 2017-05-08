@@ -119,8 +119,4 @@ public class Post {
             mUtils.queuePostCore(mDispatcher, mPostRequest);
         }
     }
-
-    int getTrailCount() {
-        return mTrailCount;
-    }
 }

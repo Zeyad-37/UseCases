@@ -11,6 +11,7 @@ import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.utils.Utils;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -55,11 +56,12 @@ public class FileIO {
     }
 
     public Subscription execute() {
+        File file = mFileIORequest.getFile();
         if (mIsDownload) {
-            if (!mFileIORequest.getFile().exists())
-                mFileIORequest.getFile().mkdir();
+            if (!file.exists())
+                file.mkdir();
             return mRestApi.dynamicDownload(mFileIORequest.getUrl())
-                    .doOnSubscribe(() -> Log.d(TAG, "Downloading " + mFileIORequest.getFile().getName()))
+                    .doOnSubscribe(() -> Log.d(TAG, "Downloading " + file.getName()))
                     .subscribe(responseBody -> {
                         InputStream inputStream = null;
                         OutputStream outputStream = null;
@@ -67,7 +69,7 @@ public class FileIO {
                             byte[] fileReader = new byte[4096];
                             long fileSize = responseBody.contentLength();
                             long fileSizeDownloaded = 0;
-                            outputStream = new FileOutputStream(mFileIORequest.getFile());
+                            outputStream = new FileOutputStream(file);
                             inputStream = responseBody.byteStream();
                             while (true) {
                                 int read = inputStream.read(fileReader);
@@ -99,16 +101,16 @@ public class FileIO {
                         throwable.printStackTrace();
                     });
         } else {
-            RequestBody requestFile = RequestBody.create(MediaType.parse(getMimeType(mFileIORequest.getFile()
-                    .getAbsolutePath())), mFileIORequest.getFile());
+            RequestBody requestFile = RequestBody.create(MediaType.parse(getMimeType(file.getAbsolutePath())),
+                    file);
             HashMap<String, RequestBody> map = new HashMap<>();
             map.put(mFileIORequest.getKey(), requestFile);
             if (mFileIORequest.getParameters() != null && !mFileIORequest.getParameters().isEmpty())
                 for (Map.Entry<String, Object> entry : mFileIORequest.getParameters().entrySet())
                     map.put(entry.getKey(), Utils.getInstance().createPartFromString(entry.getValue()));
             return mRestApi.dynamicUpload(mFileIORequest.getUrl(), map, MultipartBody.Part
-                    .createFormData(mFileIORequest.getKey(), mFileIORequest.getFile().getName(), requestFile))
-                    .doOnSubscribe(() -> Log.d(TAG, "Uploading " + mFileIORequest.getFile().getName()))
+                    .createFormData(mFileIORequest.getKey(), file.getName(), requestFile))
+                    .doOnSubscribe(() -> Log.d(TAG, "Uploading " + file.getName()))
                     .subscribe(o -> {
                     }, throwable -> queueIOFile());
         }

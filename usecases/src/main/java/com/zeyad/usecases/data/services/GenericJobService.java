@@ -1,14 +1,9 @@
 package com.zeyad.usecases.data.services;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.VisibleForTesting;
 import android.util.Log;
 
-import com.firebase.jobdispatcher.FirebaseJobDispatcher;
-import com.firebase.jobdispatcher.GooglePlayDriver;
-import com.firebase.jobdispatcher.Job;
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.zeyad.usecases.R;
@@ -26,28 +21,11 @@ public class GenericJobService extends JobService {
     private static final String TAG = GenericJobService.class.getSimpleName();
     @Nullable
     private CompositeSubscription mCompositeSubscription;
-    private Context mContext;
 
     @Override
     public void onCreate() {
         super.onCreate();
         Log.i(TAG, "Service created");
-        mContext = this;
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.i(TAG, "Service destroyed");
-    }
-
-    /**
-     * Send job to the JobScheduler.
-     */
-    public void scheduleJob(Job params) {
-        Log.d(TAG, "Scheduling job");
-        FirebaseJobDispatcher tm = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
-        tm.schedule(params);
     }
 
     @Override
@@ -91,13 +69,10 @@ public class GenericJobService extends JobService {
         return true; // Answers the question: "Should this job be retried?"
     }
 
-    /**
-     * This method is meant for testing purposes. To set a mocked context.
-     *
-     * @param context mocked context
-     */
-    @VisibleForTesting
-    void setContext(Context context) {
-        mContext = context;
+    @Override
+    public void onDestroy() {
+        if (mCompositeSubscription != null)
+            mCompositeSubscription.unsubscribe();
+        super.onDestroy();
     }
 }

@@ -1,6 +1,9 @@
 package com.zeyad.usecases.data.services.jobs;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.test.rule.BuildConfig;
 
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.data.network.RestApi;
@@ -9,13 +12,19 @@ import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
 
 import org.json.JSONArray;
+import org.json.JSONException;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -28,72 +37,197 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * @author by ZIaDo on 2/16/17.
- */
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 21)
 public class PostTest {
-    private Post post;
-    private RestApi restApi;
-    private Context context;
+    @Nullable
+    private final ResponseBody RESPONSE_BODY = mock(ResponseBody.class);
+    private final InputStream INPUT_STREAM = mock(InputStream.class);
+    private final TestRealmModel TEST_MODEL = new TestRealmModel(1, "123");
+    private Context mockedContext;
+    private RestApiImpl restApi;
     private Utils utils;
-    private Observable<Object> objectObservable;
-
-    private static RestApiImpl createRestApi() throws IOException {
-        Observable<Object> objectObservable = Observable.just(new TestRealmModel());
-        Observable<List> listObservable = Observable.just(Collections.singletonList(new TestRealmModel()));
-        InputStream inputStream = mock(InputStream.class);
-        when(inputStream.read(any())).thenReturn(1096, 1096, 1096, -1);
-        final ResponseBody responseBody = mock(ResponseBody.class);
-//        when(responseBody.byteStream()).thenReturn(inputStream);
-//        when(responseBody.contentLength()).thenReturn((long) (1096 * 1096));
-        final RestApiImpl mock = mock(RestApiImpl.class);
-        when(mock.dynamicDownload(anyString())).thenReturn(Observable.just(responseBody));
-        when(mock.dynamicDelete(anyString(), any())).thenReturn(objectObservable);
-        when(mock.dynamicGetObject(any(), anyBoolean())).thenReturn(objectObservable);
-        when(mock.dynamicGetObject(any())).thenReturn(objectObservable);
-        when(mock.dynamicGetList(any())).thenReturn(listObservable);
-        when(mock.dynamicGetList(any(), anyBoolean())).thenReturn(listObservable);
-        when(mock.dynamicPost(any(), any())).thenReturn(objectObservable);
-        when(mock.dynamicPut(any(), any())).thenReturn(objectObservable);
-        when(mock.dynamicUpload(any(), any(Map.class), any(MultipartBody.Part.class))).thenReturn(objectObservable);
-        return mock;
-    }
 
     @Before
-    public void setUp() throws Exception {
-        context = mock(Context.class);
+    public void setUp() {
+        mockedContext = mock(Context.class);
         restApi = createRestApi();
-        objectObservable = Observable.just(true);
         utils = mock(Utils.class);
     }
 
-    @Test
-    public void execute() throws Exception {
-        when(restApi.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(objectObservable);
-        post = new Post(context, mockPostReq(), restApi, 0, utils);
-        post.execute();
-        verify(restApi, times(1)).dynamicPost(anyString(), any(RequestBody.class));
+    @After
+    public void tearDown() {
+        reset(RESPONSE_BODY, INPUT_STREAM);
     }
 
     @Test
-    public void testQueuePost() throws Exception {
-        post = new Post(context, mockPostReq(), restApi, 0, utils);
+    public void testPatchObject() {
+        Post post = createPost(mockedContext
+                , createPostRequestForHashmap(PostRequest.PATCH)
+                , restApi
+                , 3);
+        post.execute();
+        verify(restApi).dynamicPatch(anyString(), any(RequestBody.class));
+    }
+
+    @Test
+    public void testPostObject() {
+        Post post = createPost(mockedContext
+                , createPostRequestForHashmap(PostRequest.POST)
+                , restApi
+                , 3);
+        post.execute();
+        verify(restApi).dynamicPost(anyString(), any(RequestBody.class));
+    }
+
+    @Test
+    public void testPostList() throws JSONException {
+        Post post = createPost(mockedContext
+                , createPostRequestForJsonArray(PostRequest.POST)
+                , restApi
+                , 3);
+        post.execute();
+        verify(restApi).dynamicPost(anyString(), any(RequestBody.class));
+    }
+
+    @Test
+    public void testPutObject() {
+        Post post = createPost(mockedContext
+                , createPostRequestForHashmap(PostRequest.PUT)
+                , restApi
+                , 3);
+        post.execute();
+        verify(restApi).dynamicPut(anyString(), any(RequestBody.class));
+    }
+
+    @Test
+    public void testPutList() throws JSONException {
+        Post post = createPost(mockedContext
+                , createPostRequestForJsonArray(PostRequest.PUT)
+                , restApi
+                , 3);
+        post.execute();
+        verify(restApi).dynamicPut(anyString(), any(RequestBody.class));
+    }
+
+    @Test
+    public void testDeleteObject() {
+        Post post = createPost(mockedContext
+                , createPostRequestForHashmap(PostRequest.DELETE)
+                , restApi
+                , 3);
+        post.execute();
+        verify(restApi).dynamicDelete(anyString(), any(RequestBody.class));
+    }
+
+    @Test
+    public void testDeleteList() throws JSONException {
+        Post post = createPost(mockedContext
+                , createPostRequestForJsonArray(PostRequest.DELETE)
+                , restApi
+                , 3);
+        post.execute();
+        verify(restApi).dynamicDelete(anyString(), any(RequestBody.class));
+    }
+
+    @Test
+    public void testReQueue() throws JSONException {
+        Post post = createPost(mockedContext
+                , createPostRequestForJsonArray(PostRequest.DELETE)
+                , restApi
+                , 0);
         Mockito.doNothing().when(utils).queuePostCore(any(), any(PostRequest.class));
         post.queuePost();
         verify(utils, times(1)).queuePostCore(any(), any(PostRequest.class));
     }
 
-    private PostRequest mockPostReq() {
-        final PostRequest postRequest = mock(PostRequest.class);
-        Mockito.when(postRequest.getArrayBundle()).thenReturn(any(JSONArray.class));
-        Mockito.when(postRequest.getDataClass()).thenReturn(any(Class.class));
-//        Mockito.when(postRequest.getPresentationClass()).thenReturn(eq(Object.class));
-        Mockito.when(postRequest.getUrl()).thenReturn(anyString());
-        Mockito.when(postRequest.getMethod()).thenReturn(anyString());
-        return postRequest;
+    //--------------------------------------------------------------------------------------------//
+
+    @NonNull
+    private Post createPost(Context context, PostRequest postRequest, RestApi restApi, int trailCount) {
+        return new Post(context, postRequest, restApi, trailCount, utils);
+    }
+
+    private String getValidUrl() {
+        return "http://www.google.com";
+    }
+
+    private String getValidColumnName() {
+        return "id";
+    }
+
+    @NonNull
+    private Class getValidDataClass() {
+        return TestRealmModel.class;
+    }
+
+    private RestApiImpl createRestApi() {
+        final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
+        restApi = mock(RestApiImpl.class);
+        when(restApi.dynamicDownload(anyString())).thenReturn(getResponseBodyObservable());
+        when(restApi.dynamicDelete(anyString(), any())).thenReturn(OBJECT_OBSERVABLE);
+        when(restApi.dynamicGetObject(any(), anyBoolean())).thenReturn(OBJECT_OBSERVABLE);
+        when(restApi.dynamicGetObject(any())).thenReturn(OBJECT_OBSERVABLE);
+        when(restApi.dynamicGetList(any())).thenReturn(getListObservable());
+        when(restApi.dynamicGetList(any(), anyBoolean())).thenReturn(getListObservable());
+        when(restApi.dynamicPost(any(), any())).thenReturn(OBJECT_OBSERVABLE);
+        when(restApi.dynamicPut(any(), any())).thenReturn(OBJECT_OBSERVABLE);
+        when(restApi.dynamicPatch(any(), any())).thenReturn(OBJECT_OBSERVABLE);
+        when(restApi.dynamicUpload(any(), any(Map.class), any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
+        return restApi;
+    }
+
+    @NonNull
+    private Observable<List> getListObservable() {
+        return Observable.just(Collections.singletonList(createTestModel()));
+    }
+
+    @NonNull
+    private Observable<Object> getObjectObservable() {
+        return Observable.just(createTestModel());
+    }
+
+    @NonNull
+    private TestRealmModel createTestModel() {
+        return TEST_MODEL;
+    }
+
+
+    private PostRequest createPostRequestForHashmap(String method) {
+        return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
+                .payLoad(new HashMap<>())
+                .idColumnName(getValidColumnName())
+                .url(getValidUrl())
+                .method(method)
+                .build();
+    }
+
+    private PostRequest createPostRequestForJsonArray(String method) throws JSONException {
+        return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
+                .payLoad(new JSONArray("[ \"Ford\", \"BMW\", \"Fiat\" ]"))
+                .idColumnName(getValidColumnName())
+                .url(getValidUrl())
+                .method(method)
+                .build();
+    }
+
+    private Observable<ResponseBody> getResponseBodyObservable() {
+        return Observable.fromCallable(this::getResponseBody);
+    }
+
+    private ResponseBody getResponseBody() throws IOException {
+        when(RESPONSE_BODY.byteStream()).thenReturn(getInputStreamReader());
+        when(RESPONSE_BODY.contentLength()).thenReturn((long) (1096 * 1096));
+        return RESPONSE_BODY;
+    }
+
+    private InputStream getInputStreamReader() throws IOException {
+        when(INPUT_STREAM.read(any())).thenReturn(1096, 1096, 1096, -1);
+        return INPUT_STREAM;
     }
 }
