@@ -3,7 +3,7 @@ package com.zeyad.usecases.data.repository.stores;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.mapper.DAOMapper;
 import com.zeyad.usecases.data.network.RestApiImpl;
-import com.zeyad.usecases.domain.interactors.data.DataUseCase;
+import com.zeyad.usecases.domain.interactors.DataUseCase;
 
 import org.junit.Before;
 import org.junit.Test;

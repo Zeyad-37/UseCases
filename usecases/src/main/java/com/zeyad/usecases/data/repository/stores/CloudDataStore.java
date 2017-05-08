@@ -23,7 +23,7 @@ import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.ModelConverters;
 import com.zeyad.usecases.data.utils.Utils;
-import com.zeyad.usecases.domain.interactors.data.DataUseCase;
+import com.zeyad.usecases.domain.interactors.DataUseCase;
 
 import org.json.JSONArray;
 import org.json.JSONObject;

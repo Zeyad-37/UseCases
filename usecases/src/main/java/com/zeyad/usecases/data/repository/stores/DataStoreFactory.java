@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.mapper.DAOMapper;
 import com.zeyad.usecases.data.network.RestApiImpl;
-import com.zeyad.usecases.domain.interactors.data.DataUseCase;
+import com.zeyad.usecases.domain.interactors.DataUseCase;
 
 public class DataStoreFactory {
     private final static String DB_NOT_ENABLED = "Database not enabled!", DB_MANAGER_NULL = "DataBaseManager cannot be null!";

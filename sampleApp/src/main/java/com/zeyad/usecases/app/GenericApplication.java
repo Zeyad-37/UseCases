@@ -11,8 +11,8 @@ import android.os.StrictMode;
 import android.util.Base64;
 import android.util.Log;
 
-import com.zeyad.usecases.domain.interactors.data.DataUseCaseConfig;
-import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
+import com.zeyad.usecases.domain.interactors.DataUseCaseConfig;
+import com.zeyad.usecases.domain.interactors.DataUseCaseFactory;
 
 import java.io.File;
 import java.security.MessageDigest;

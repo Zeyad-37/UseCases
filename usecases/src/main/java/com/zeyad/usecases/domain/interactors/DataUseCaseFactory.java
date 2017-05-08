@@ -1,4 +1,4 @@
-package com.zeyad.usecases.domain.interactors.data;
+package com.zeyad.usecases.domain.interactors;
 
 import android.support.annotation.VisibleForTesting;
 

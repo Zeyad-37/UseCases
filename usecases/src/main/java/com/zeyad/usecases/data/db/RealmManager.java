@@ -8,7 +8,7 @@ import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.zeyad.usecases.data.utils.Utils;
-import com.zeyad.usecases.domain.interactors.data.DataUseCase;
+import com.zeyad.usecases.domain.interactors.DataUseCase;
 
 import org.json.JSONArray;
 import org.json.JSONException;

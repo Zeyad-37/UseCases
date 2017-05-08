@@ -11,8 +11,6 @@ import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.domain.executors.UIThread;
-import com.zeyad.usecases.domain.interactors.data.DataUseCase;
-import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
 import com.zeyad.usecases.domain.repository.Data;
 
 import org.json.JSONArray;

@@ -2,7 +2,7 @@ package com.zeyad.usecases.data.db;
 
 import android.os.Looper;
 
-import com.zeyad.usecases.domain.interactors.data.DataUseCase;
+import com.zeyad.usecases.domain.interactors.DataUseCase;
 
 /**
  * DatabaseManager interface implementer.

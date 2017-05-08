@@ -1,4 +1,4 @@
-package com.zeyad.usecases.domain.interactors.data;
+package com.zeyad.usecases.domain.interactors;
 
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.requests.FileIORequest;
