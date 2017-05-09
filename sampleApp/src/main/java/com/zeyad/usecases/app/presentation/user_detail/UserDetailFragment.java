@@ -181,7 +181,6 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
 
     @Override
     public void showError(String message) {
-//        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, loaderLayout, message, R.string.retry, view -> loadData());
         showErrorSnackBar(message, loaderLayout, Snackbar.LENGTH_LONG);
     }
 

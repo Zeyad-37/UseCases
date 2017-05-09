@@ -224,8 +224,6 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
 
     @Override
     public void showError(String message) {
-//        showSnackBarWithAction(SnackBarFactory.TYPE_ERROR, userRecycler, message, R.string.retry,
-//                view -> loadData());
         showErrorSnackBar(message, userRecycler, Snackbar.LENGTH_LONG);
     }
 

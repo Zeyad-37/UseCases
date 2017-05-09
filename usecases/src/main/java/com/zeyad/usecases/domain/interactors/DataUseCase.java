@@ -119,8 +119,8 @@ public class DataUseCase implements IDataUseCase {
     public Observable<List> getList(GetRequest genericUseCaseRequest) {
         return mData.getListDynamically(genericUseCaseRequest.getUrl(), genericUseCaseRequest.getDataClass(),
                 genericUseCaseRequest.isPersist(), genericUseCaseRequest.isShouldCache())
-                .compose(applySchedulers())
-                .flatMap(Observable::just);
+                .compose(ReplayingShare.instance())
+                .compose(applySchedulers());
     }
 
     /**
@@ -133,8 +133,8 @@ public class DataUseCase implements IDataUseCase {
     public Observable getObject(GetRequest getRequest) {
         return mData.getObjectDynamicallyById(getRequest.getUrl(), getRequest.getIdColumnName(),
                 getRequest.getItemId(), getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
-                .compose(applySchedulers())
-                .flatMap(Observable::just);
+                .compose(ReplayingShare.instance())
+                .compose(applySchedulers());
     }
 
     @Override
@@ -209,7 +209,7 @@ public class DataUseCase implements IDataUseCase {
     @SuppressWarnings("unchecked")
     public Observable<List> queryDisk(RealmManager.RealmQueryProvider realmQueryProvider) {
         return mData.queryDisk(realmQueryProvider)
-                .flatMap(Observable::just)
+                .compose(ReplayingShare.instance())
                 .compose(applySchedulers());
     }
 

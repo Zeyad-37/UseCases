@@ -2,7 +2,6 @@ package com.zeyad.usecases.data.repository;
 
 import android.support.annotation.NonNull;
 
-import com.zeyad.usecases.Config;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.domain.repository.Data;
@@ -28,7 +27,6 @@ public class DataRepository implements Data {
      */
     public DataRepository(DataStoreFactory dataStoreFactory) {
         mDataStoreFactory = dataStoreFactory;
-        Config.getInstance().setDataStoreFactory(dataStoreFactory);
     }
 
     /**

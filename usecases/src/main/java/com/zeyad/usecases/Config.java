@@ -8,7 +8,6 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 
 import java.util.concurrent.TimeUnit;
 
@@ -18,7 +17,6 @@ import io.realm.RealmObject;
 
 public class Config {
     private static Config sInstance;
-    private static DataStoreFactory mDataStoreFactory;
     private static Gson mGson;
     private static String mBaseURL;
     private static boolean withCache;
@@ -131,13 +129,5 @@ public class Config {
 
     public void setUseApiWithCache(boolean useApiWithCache) {
         mUseApiWithCache = useApiWithCache;
-    }
-
-    public DataStoreFactory getDataStoreFactory() {
-        return mDataStoreFactory;
-    }
-
-    public void setDataStoreFactory(DataStoreFactory dataStoreFactory) {
-        mDataStoreFactory = dataStoreFactory;
     }
 }
