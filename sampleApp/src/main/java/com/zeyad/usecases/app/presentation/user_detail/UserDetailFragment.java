@@ -31,7 +31,7 @@ import com.zeyad.usecases.app.components.redux.BaseFragment;
 import com.zeyad.usecases.app.presentation.user_list.User;
 import com.zeyad.usecases.app.presentation.user_list.UserListActivity;
 import com.zeyad.usecases.app.utils.Utils;
-import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
+import com.zeyad.usecases.domain.interactors.DataUseCaseFactory;
 
 import org.parceler.Parcels;
 

@@ -5,7 +5,7 @@ import com.zeyad.usecases.app.components.redux.BaseViewModel;
 import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.data.requests.GetRequest;
-import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
+import com.zeyad.usecases.domain.interactors.IDataUseCase;
 
 import rx.Observable;
 import rx.functions.Func1;

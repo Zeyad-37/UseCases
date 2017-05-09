@@ -6,7 +6,7 @@ import com.zeyad.usecases.app.presentation.user_list.UserListVM;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
-import com.zeyad.usecases.domain.interactors.data.IDataUseCase;
+import com.zeyad.usecases.domain.interactors.IDataUseCase;
 
 import org.junit.Before;
 import org.junit.Test;

@@ -39,7 +39,7 @@ import com.zeyad.usecases.app.presentation.user_list.events.SearchUsersEvent;
 import com.zeyad.usecases.app.presentation.user_list.view_holders.EmptyViewHolder;
 import com.zeyad.usecases.app.presentation.user_list.view_holders.UserViewHolder;
 import com.zeyad.usecases.app.utils.Utils;
-import com.zeyad.usecases.domain.interactors.data.DataUseCaseFactory;
+import com.zeyad.usecases.domain.interactors.DataUseCaseFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;

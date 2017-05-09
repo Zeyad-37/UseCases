@@ -12,6 +12,7 @@ import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
+import com.zeyad.usecases.domain.ReplayingShare;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.repository.Data;
@@ -21,17 +22,13 @@ import java.util.List;
 import rx.Observable;
 import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.exceptions.OnErrorNotImplementedException;
 import rx.functions.Func1;
-import rx.subjects.BehaviorSubject;
 
 /**
  * This class is a general implementation that represents a use case for retrieving data.
  */
 public class DataUseCase implements IDataUseCase {
 
-    private final static BehaviorSubject ObjectOffLineFirst = BehaviorSubject.create();
-    private final static BehaviorSubject<List> listOffLineFirst = BehaviorSubject.create();
     private static boolean hasRealm;
     private static HandlerThread handlerThread;
     private static DataUseCase sDataUseCase;
@@ -217,45 +214,6 @@ public class DataUseCase implements IDataUseCase {
     }
 
     @Override
-    public Observable<List> getListOffLineFirst(GetRequest getRequest) {
-        Observable<List> online = mData.getListDynamically(getRequest.getUrl(), getRequest.getDataClass(),
-                getRequest.isPersist(), getRequest.isShouldCache());
-        mData.getListDynamically("", getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
-                .flatMap(new Func1<List, Observable<List>>() {
-                    @Override
-                    public Observable<List> call(List list) {
-                        if (Utils.getInstance().isNotEmpty(list))
-                            return Observable.just(list);
-                        else return online;
-                    }
-                })
-                .onErrorResumeNext(throwable -> online)
-                .doOnNext(listOffLineFirst::onNext)
-                .doOnError(listOffLineFirst::onError)
-                .compose(applySchedulers())
-                .subscribe(o -> {
-                }, OnErrorNotImplementedException::new);
-        return listOffLineFirst.compose(applySchedulers());
-    }
-
-    @Override
-    public Observable<?> getObjectOffLineFirst(GetRequest getRequest) {
-        Observable<?> online = mData.getObjectDynamicallyById(getRequest.getUrl(), getRequest
-                        .getIdColumnName(), getRequest.getItemId(), getRequest.getDataClass(),
-                getRequest.isPersist(), getRequest.isShouldCache());
-        mData.getObjectDynamicallyById("", getRequest.getIdColumnName(), getRequest.getItemId(),
-                getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
-                .flatMap(object -> object != null ? Observable.just(object) : online)
-                .onErrorResumeNext(throwable -> online)
-                .doOnNext(ObjectOffLineFirst::onNext)
-                .doOnError(ObjectOffLineFirst::onError)
-                .compose(applySchedulers())
-                .subscribe(o -> {
-                }, OnErrorNotImplementedException::new);
-        return ObjectOffLineFirst.compose(applySchedulers());
-    }
-
-    @Override
     public Observable uploadFile(FileIORequest fileIORequest) {
         return mData.uploadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
                 fileIORequest.getKey(), fileIORequest.getParameters(), fileIORequest.onWifi(),
@@ -268,6 +226,36 @@ public class DataUseCase implements IDataUseCase {
         return mData.downloadFileDynamically(fileIORequest.getUrl(), fileIORequest.getFile(),
                 fileIORequest.onWifi(), fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
                 fileIORequest.getDataClass()).compose(applySchedulers());
+    }
+
+    @Override
+    public Observable<List> getListOffLineFirst(GetRequest getRequest) {
+        Observable<List> online = mData.getListDynamically(getRequest.getUrl(), getRequest.getDataClass(),
+                getRequest.isPersist(), getRequest.isShouldCache());
+        return mData.getListDynamically("", getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
+                .flatMap(new Func1<List, Observable<List>>() {
+                    @Override
+                    public Observable<List> call(List list) {
+                        if (Utils.getInstance().isNotEmpty(list))
+                            return Observable.just(list);
+                        else return online;
+                    }
+                })
+                .compose(ReplayingShare.instance())
+                .compose(applySchedulers());
+    }
+
+    @Override
+    public Observable<?> getObjectOffLineFirst(GetRequest getRequest) {
+        Observable<?> online = mData.getObjectDynamicallyById(getRequest.getUrl(), getRequest
+                        .getIdColumnName(), getRequest.getItemId(), getRequest.getDataClass(),
+                getRequest.isPersist(), getRequest.isShouldCache());
+        return mData.getObjectDynamicallyById("", getRequest.getIdColumnName(), getRequest.getItemId(),
+                getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
+                .flatMap(object -> object != null ? Observable.just(object) : online)
+                .onErrorResumeNext(throwable -> online)
+                .compose(ReplayingShare.instance())
+                .compose(applySchedulers());
     }
 
     /**
