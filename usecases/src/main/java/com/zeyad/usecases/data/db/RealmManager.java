@@ -35,7 +35,7 @@ public class RealmManager implements DataBaseManager {
     private static DataBaseManager sInstance;
     private static Handler backgroundHandler;
 
-    private RealmManager(Looper backgroundLooper) {
+    public RealmManager(Looper backgroundLooper) {
         if (backgroundHandler == null)
             backgroundHandler = new Handler(backgroundLooper);
     }

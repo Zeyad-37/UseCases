@@ -6,7 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.test.rule.BuildConfig;
 
 import com.zeyad.usecases.TestRealmModel;
-import com.zeyad.usecases.data.network.RestApiImpl;
+import com.zeyad.usecases.data.network.ApiConnection;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.utils.Utils;
 
@@ -41,7 +41,7 @@ import static org.mockito.Mockito.when;
 public class FileIOTest {
     private final InputStream inputStream = mock(InputStream.class);
     private ResponseBody responseBody;
-    private RestApiImpl restApi;
+    private ApiConnection apiConnection;
     private Context mockContext;
     private Utils utils;
     // item under test
@@ -51,7 +51,7 @@ public class FileIOTest {
     public void setUp() throws Exception {
         mockContext = mock(Context.class);
         utils = mock(Utils.class);
-        restApi = createRestApi();
+        apiConnection = createRestApi();
     }
 
     @Test
@@ -59,7 +59,7 @@ public class FileIOTest {
         FileIORequest fileIOReq = mockFileIoReq(true, true, getValidFile());
         fileIO = createFileIO(fileIOReq, true);
         fileIO.execute();
-        verify(restApi).dynamicDelete(anyString(), any(RequestBody.class));
+        verify(apiConnection).dynamicDelete(anyString(), any(RequestBody.class));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class FileIOTest {
         FileIORequest fileIOReq = mockFileIoReq(true, true, getValidFile());
         fileIO = createFileIO(fileIOReq, false);
         fileIO.execute();
-        verify(restApi).dynamicDelete(anyString(), any(RequestBody.class));
+        verify(apiConnection).dynamicDelete(anyString(), any(RequestBody.class));
     }
 
     @Test
@@ -107,8 +107,8 @@ public class FileIOTest {
         return new FileIO(0, fileIoReq, mockContext, isDownload, createRestApi(), utils);
     }
 
-    private RestApiImpl createRestApi() {
-        final RestApiImpl restApi = mock(RestApiImpl.class);
+    private ApiConnection createRestApi() {
+        final ApiConnection restApi = mock(ApiConnection.class);
         Mockito.when(restApi.dynamicDownload(Mockito.anyString())).thenReturn(getResponseBodyObservable());
         Mockito.when(restApi.dynamicUpload(Mockito.anyString(), anyMap(), any(MultipartBody.Part.class)))
                 .thenReturn(Observable.just(new Object()));

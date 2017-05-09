@@ -6,8 +6,7 @@ import android.support.annotation.Nullable;
 import android.support.test.rule.BuildConfig;
 
 import com.zeyad.usecases.TestRealmModel;
-import com.zeyad.usecases.data.network.RestApi;
-import com.zeyad.usecases.data.network.RestApiImpl;
+import com.zeyad.usecases.data.network.ApiConnection;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
 
@@ -50,13 +49,13 @@ public class PostTest {
     private final InputStream INPUT_STREAM = mock(InputStream.class);
     private final TestRealmModel TEST_MODEL = new TestRealmModel(1, "123");
     private Context mockedContext;
-    private RestApiImpl restApi;
+    private ApiConnection apiConnection;
     private Utils utils;
 
     @Before
     public void setUp() {
         mockedContext = mock(Context.class);
-        restApi = createRestApi();
+        apiConnection = createRestApi();
         utils = mock(Utils.class);
     }
 
@@ -69,77 +68,77 @@ public class PostTest {
     public void testPatchObject() {
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.PATCH)
-                , restApi
+                , apiConnection
                 , 3);
         post.execute();
-        verify(restApi).dynamicPatch(anyString(), any(RequestBody.class));
+        verify(apiConnection).dynamicPatch(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testPostObject() {
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.POST)
-                , restApi
+                , apiConnection
                 , 3);
         post.execute();
-        verify(restApi).dynamicPost(anyString(), any(RequestBody.class));
+        verify(apiConnection).dynamicPost(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testPostList() throws JSONException {
         Post post = createPost(mockedContext
                 , createPostRequestForJsonArray(PostRequest.POST)
-                , restApi
+                , apiConnection
                 , 3);
         post.execute();
-        verify(restApi).dynamicPost(anyString(), any(RequestBody.class));
+        verify(apiConnection).dynamicPost(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testPutObject() {
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.PUT)
-                , restApi
+                , apiConnection
                 , 3);
         post.execute();
-        verify(restApi).dynamicPut(anyString(), any(RequestBody.class));
+        verify(apiConnection).dynamicPut(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testPutList() throws JSONException {
         Post post = createPost(mockedContext
                 , createPostRequestForJsonArray(PostRequest.PUT)
-                , restApi
+                , apiConnection
                 , 3);
         post.execute();
-        verify(restApi).dynamicPut(anyString(), any(RequestBody.class));
+        verify(apiConnection).dynamicPut(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testDeleteObject() {
         Post post = createPost(mockedContext
                 , createPostRequestForHashmap(PostRequest.DELETE)
-                , restApi
+                , apiConnection
                 , 3);
         post.execute();
-        verify(restApi).dynamicDelete(anyString(), any(RequestBody.class));
+        verify(apiConnection).dynamicDelete(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testDeleteList() throws JSONException {
         Post post = createPost(mockedContext
                 , createPostRequestForJsonArray(PostRequest.DELETE)
-                , restApi
+                , apiConnection
                 , 3);
         post.execute();
-        verify(restApi).dynamicDelete(anyString(), any(RequestBody.class));
+        verify(apiConnection).dynamicDelete(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testReQueue() throws JSONException {
         Post post = createPost(mockedContext
                 , createPostRequestForJsonArray(PostRequest.DELETE)
-                , restApi
+                , apiConnection
                 , 0);
         Mockito.doNothing().when(utils).queuePostCore(any(), any(PostRequest.class));
         post.queuePost();
@@ -149,8 +148,8 @@ public class PostTest {
     //--------------------------------------------------------------------------------------------//
 
     @NonNull
-    private Post createPost(Context context, PostRequest postRequest, RestApi restApi, int trailCount) {
-        return new Post(context, postRequest, restApi, trailCount, utils);
+    private Post createPost(Context context, PostRequest postRequest, ApiConnection apiConnection, int trailCount) {
+        return new Post(context, postRequest, apiConnection, trailCount, utils);
     }
 
     private String getValidUrl() {
@@ -166,20 +165,20 @@ public class PostTest {
         return TestRealmModel.class;
     }
 
-    private RestApiImpl createRestApi() {
+    private ApiConnection createRestApi() {
         final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
-        restApi = mock(RestApiImpl.class);
-        when(restApi.dynamicDownload(anyString())).thenReturn(getResponseBodyObservable());
-        when(restApi.dynamicDelete(anyString(), any())).thenReturn(OBJECT_OBSERVABLE);
-        when(restApi.dynamicGetObject(any(), anyBoolean())).thenReturn(OBJECT_OBSERVABLE);
-        when(restApi.dynamicGetObject(any())).thenReturn(OBJECT_OBSERVABLE);
-        when(restApi.dynamicGetList(any())).thenReturn(getListObservable());
-        when(restApi.dynamicGetList(any(), anyBoolean())).thenReturn(getListObservable());
-        when(restApi.dynamicPost(any(), any())).thenReturn(OBJECT_OBSERVABLE);
-        when(restApi.dynamicPut(any(), any())).thenReturn(OBJECT_OBSERVABLE);
-        when(restApi.dynamicPatch(any(), any())).thenReturn(OBJECT_OBSERVABLE);
-        when(restApi.dynamicUpload(any(), any(Map.class), any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
-        return restApi;
+        apiConnection = mock(ApiConnection.class);
+        when(apiConnection.dynamicDownload(anyString())).thenReturn(getResponseBodyObservable());
+        when(apiConnection.dynamicDelete(anyString(), any())).thenReturn(OBJECT_OBSERVABLE);
+        when(apiConnection.dynamicGetObject(any(), anyBoolean())).thenReturn(OBJECT_OBSERVABLE);
+        when(apiConnection.dynamicGetObject(any())).thenReturn(OBJECT_OBSERVABLE);
+        when(apiConnection.dynamicGetList(any())).thenReturn(getListObservable());
+        when(apiConnection.dynamicGetList(any(), anyBoolean())).thenReturn(getListObservable());
+        when(apiConnection.dynamicPost(any(), any())).thenReturn(OBJECT_OBSERVABLE);
+        when(apiConnection.dynamicPut(any(), any())).thenReturn(OBJECT_OBSERVABLE);
+        when(apiConnection.dynamicPatch(any(), any())).thenReturn(OBJECT_OBSERVABLE);
+        when(apiConnection.dynamicUpload(any(), any(Map.class), any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
+        return apiConnection;
     }
 
     @NonNull

@@ -2,7 +2,7 @@ package com.zeyad.usecases.data.repository.stores;
 
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.mapper.DAOMapper;
-import com.zeyad.usecases.data.network.RestApiImpl;
+import com.zeyad.usecases.data.network.ApiConnection;
 import com.zeyad.usecases.domain.interactors.DataUseCase;
 
 import org.junit.Before;
@@ -23,7 +23,7 @@ public class DataStoreFactoryTest {
 
     @Before
     public void setUp() throws Exception {
-        mDataStoreFactory = new DataStoreFactory(mock(RealmManager.class), mock(RestApiImpl.class), mock(DAOMapper.class));
+        mDataStoreFactory = new DataStoreFactory(mock(RealmManager.class), mock(ApiConnection.class), mock(DAOMapper.class));
     }
 
     private String getSomeValidUrl() {

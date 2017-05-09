@@ -7,7 +7,7 @@ import android.webkit.MimeTypeMap;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
-import com.zeyad.usecases.data.network.RestApi;
+import com.zeyad.usecases.data.network.ApiConnection;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.utils.Utils;
 
@@ -32,11 +32,11 @@ public class FileIO {
     private static int mTrailCount;
     private final FirebaseJobDispatcher mDispatcher;
     private final FileIORequest mFileIORequest;
-    private final RestApi mRestApi;
+    private final ApiConnection mRestApi;
     private final Utils mUtils;
     private boolean mIsDownload;
 
-    public FileIO(int trailCount, FileIORequest payLoad, Context context, boolean isDownload, RestApi restApi,
+    public FileIO(int trailCount, FileIORequest payLoad, Context context, boolean isDownload, ApiConnection restApi,
                   Utils utils) {
         mRestApi = restApi;
         mTrailCount = trailCount;

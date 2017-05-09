@@ -30,14 +30,14 @@ public class ApiConnectionTest {
     private final RequestBody mMockedRequestBody = mock(RequestBody.class);
     private final Map<String, RequestBody> mPartMap = Mockito.mock(Map.class);
     private final MultipartBody.Part mMultipartBodyPart = MultipartBody.Part.create(mMockedRequestBody);
-    private IApiConnection mApiConnection;
+    private ApiConnection mApiConnection;
     private RestApi mRestApiWithCache;
     private RestApi mRestApiWithoutCache;
 
     @Before
     public void setUp() throws Exception {
-        mRestApiWithCache = mock(RestApiImpl.class);
-        mRestApiWithoutCache = mock(RestApiImpl.class);
+        mRestApiWithCache = mock(RestApi.class);
+        mRestApiWithoutCache = mock(RestApi.class);
         mApiConnection = getApiImplementation(mRestApiWithoutCache, mRestApiWithCache);
     }
 
@@ -57,7 +57,7 @@ public class ApiConnectionTest {
 
     @Test
     public void testProvideHttpLoggingInterceptor() throws Exception {
-        HttpLoggingInterceptor httpLoggingInterceptor = mApiConnection.provideHttpLoggingInterceptor();
+        HttpLoggingInterceptor httpLoggingInterceptor = ApiConnection.provideHttpLoggingInterceptor();
         assertThat(httpLoggingInterceptor.getLevel(), is(equalTo(BuildConfig.DEBUG ?
                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE)));
     }
@@ -130,7 +130,7 @@ public class ApiConnectionTest {
 
     @Test
     public void testUploadPartAndRequestBody() throws Exception {
-        mApiConnection.upload(mValidUrl, mPartMap, mMultipartBodyPart);
+        mApiConnection.dynamicUpload(mValidUrl, mPartMap, mMultipartBodyPart);
         Mockito.verify(mRestApiWithoutCache).dynamicUpload(eq(mValidUrl), eq(mPartMap), eq(mMultipartBodyPart));
     }
 
@@ -146,15 +146,15 @@ public class ApiConnectionTest {
         Mockito.verify(mRestApiWithoutCache).dynamicDelete(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
-    private RestApi getCurrentSetRestApiWithoutCache(@NonNull IApiConnection apiConnection) {
-        return ((ApiConnection) apiConnection).getRestApiWithoutCache();
+    private RestApi getCurrentSetRestApiWithoutCache(@NonNull ApiConnection apiConnection) {
+        return apiConnection.getRestApiWithoutCache();
     }
 
-    private RestApi getCurrentSetRestApiWithCache(@NonNull IApiConnection apiConnection) {
-        return ((ApiConnection) apiConnection).getRestApiWithCache();
+    private RestApi getCurrentSetRestApiWithCache(@NonNull ApiConnection apiConnection) {
+        return apiConnection.getRestApiWithCache();
     }
 
-    private IApiConnection getApiImplementation(RestApi restApiWithoutCache, RestApi restApiWithCache) {
+    private ApiConnection getApiImplementation(RestApi restApiWithoutCache, RestApi restApiWithCache) {
         return new ApiConnection(restApiWithoutCache, restApiWithCache);
     }
 }

@@ -5,28 +5,28 @@ import android.support.annotation.Nullable;
 
 import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.mapper.DAOMapper;
-import com.zeyad.usecases.data.network.RestApiImpl;
+import com.zeyad.usecases.data.network.ApiConnection;
 import com.zeyad.usecases.domain.interactors.DataUseCase;
 
 public class DataStoreFactory {
     private final static String DB_NOT_ENABLED = "Database not enabled!", DB_MANAGER_NULL = "DataBaseManager cannot be null!";
     @Nullable
     private DataBaseManager mDataBaseManager;
-    private RestApiImpl mRestApi;
+    private ApiConnection mApiConnection;
     private DAOMapper mDAOMapper;
 
-    public DataStoreFactory(RestApiImpl restApi, DAOMapper daoMapper) {
+    public DataStoreFactory(ApiConnection restApi, DAOMapper daoMapper) {
         mDataBaseManager = null;
-        mRestApi = restApi;
+        mApiConnection = restApi;
         mDAOMapper = daoMapper;
     }
 
-    public DataStoreFactory(DataBaseManager dataBaseManager, RestApiImpl restApi, DAOMapper daoMapper) {
+    public DataStoreFactory(DataBaseManager dataBaseManager, ApiConnection restApi, DAOMapper daoMapper) {
         if (dataBaseManager == null)
             throw new IllegalArgumentException(DB_MANAGER_NULL);
         DataUseCase.setHasRealm(true);
         mDataBaseManager = dataBaseManager;
-        mRestApi = restApi;
+        mApiConnection = restApi;
         mDAOMapper = daoMapper;
     }
 
@@ -59,6 +59,6 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore cloud() {
-        return new CloudDataStore(mRestApi, mDataBaseManager, mDAOMapper);
+        return new CloudDataStore(mApiConnection, mDataBaseManager, mDAOMapper);
     }
 }

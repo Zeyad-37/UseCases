@@ -7,7 +7,7 @@ import android.util.Log;
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.zeyad.usecases.R;
-import com.zeyad.usecases.data.network.RestApiImpl;
+import com.zeyad.usecases.data.network.ApiConnection;
 import com.zeyad.usecases.data.services.jobs.FileIO;
 import com.zeyad.usecases.data.services.jobs.Post;
 import com.zeyad.usecases.data.utils.Utils;
@@ -33,7 +33,7 @@ public class GenericJobService extends JobService {
         if (params.getExtras() != null && params.getExtras().containsKey(PAYLOAD)) {
             if (mCompositeSubscription == null || mCompositeSubscription.isUnsubscribed())
                 mCompositeSubscription = new CompositeSubscription();
-            RestApiImpl instance = RestApiImpl.getInstance();
+            ApiConnection instance = ApiConnection.getInstance();
             int trailCount = params.getExtras().getInt(TRIAL_COUNT);
             Utils utils = Utils.getInstance();
             switch (params.getExtras().getString(JOB_TYPE, "")) {

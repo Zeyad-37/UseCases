@@ -18,6 +18,7 @@ import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
 import com.zeyad.usecases.data.mapper.DAOMapper;
+import com.zeyad.usecases.data.network.ApiConnection;
 import com.zeyad.usecases.data.network.RestApi;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.PostRequest;
@@ -68,7 +69,7 @@ public class CloudDataStore implements DataStore {
     private final DAOMapper mEntityDataMapper;
     private final Context mContext;
     private final Observable<Object> mErrorObservableNotPersisted;
-    private final RestApi mRestApi;
+    private final ApiConnection mApiConnection;
     private final FirebaseJobDispatcher mDispatcher;
     private final Utils utils;
     boolean mCanPersist;
@@ -76,11 +77,11 @@ public class CloudDataStore implements DataStore {
     /**
      * Construct a {@link DataStore} based on connections to the api (Cloud).
      *
-     * @param restApi         The {@link RestApi} implementation to use.
+     * @param apiConnection         The {@link RestApi} implementation to use.
      * @param dataBaseManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    CloudDataStore(RestApi restApi, DataBaseManager dataBaseManager, DAOMapper entityDataMapper) {
-        mRestApi = restApi;
+    CloudDataStore(ApiConnection apiConnection, DataBaseManager dataBaseManager, DAOMapper entityDataMapper) {
+        mApiConnection = apiConnection;
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
         mContext = Config.getInstance().getContext();
@@ -90,9 +91,9 @@ public class CloudDataStore implements DataStore {
         utils = Utils.getInstance();
     }
 
-    CloudDataStore(RestApi restApi, DataBaseManager dataBaseManager, DAOMapper entityDataMapper,
+    CloudDataStore(ApiConnection apiConnection, DataBaseManager dataBaseManager, DAOMapper entityDataMapper,
                    Context context) {
-        mRestApi = restApi;
+        mApiConnection = apiConnection;
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
         mContext = context;
@@ -106,7 +107,7 @@ public class CloudDataStore implements DataStore {
     @Override
     public Observable<?> dynamicGetObject(String url, String idColumnName, int itemId, Class dataClass,
                                           boolean persist, boolean shouldCache) {
-        return mRestApi.dynamicGetObject(url, shouldCache)
+        return mApiConnection.dynamicGetObject(url, shouldCache)
                 .doOnNext(object -> {
                     if (willPersist(persist))
                         persistGeneric(object, idColumnName, dataClass);
@@ -117,7 +118,7 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public Observable<List> dynamicGetList(String url, Class dataClass, boolean persist, boolean shouldCache) {
-        return mRestApi.dynamicGetList(url, shouldCache)
+        return mApiConnection.dynamicGetList(url, shouldCache)
                 .doOnNext(list -> {
                     if (willPersist(persist))
                         persistAllGenerics(list, dataClass);
@@ -137,7 +138,7 @@ public class CloudDataStore implements DataStore {
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
-            return mRestApi.dynamicPatch(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+            return mApiConnection.dynamicPatch(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
                     .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
                     .onErrorResumeNext(throwable -> {
@@ -162,7 +163,7 @@ public class CloudDataStore implements DataStore {
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
-            return mRestApi.dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+            return mApiConnection.dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
                     .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
                     .onErrorResumeNext(throwable -> {
@@ -187,7 +188,7 @@ public class CloudDataStore implements DataStore {
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
-            return mRestApi.dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+            return mApiConnection.dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
                     .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
                     .onErrorResumeNext(throwable -> {
@@ -212,7 +213,7 @@ public class CloudDataStore implements DataStore {
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
-            return mRestApi.dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+            return mApiConnection.dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
                     .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
                     .onErrorResumeNext(throwable -> {
@@ -237,7 +238,7 @@ public class CloudDataStore implements DataStore {
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
-            return mRestApi.dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+            return mApiConnection.dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
                     .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
                     .onErrorResumeNext(throwable -> {
@@ -263,7 +264,7 @@ public class CloudDataStore implements DataStore {
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
-            return mRestApi.dynamicDelete(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+            return mApiConnection.dynamicDelete(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
                     .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
                     .onErrorResumeNext(throwable -> {
@@ -299,7 +300,7 @@ public class CloudDataStore implements DataStore {
             if (parameters != null && !parameters.isEmpty())
                 for (Map.Entry<String, Object> entry : parameters.entrySet())
                     map.put(entry.getKey(), utils.createPartFromString(entry.getValue()));
-            return mRestApi.dynamicUpload(url, map, MultipartBody.Part.createFormData(key, file.getName(), requestFile))
+            return mApiConnection.dynamicUpload(url, map, MultipartBody.Part.createFormData(key, file.getName(), requestFile))
                     .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
@@ -322,7 +323,7 @@ public class CloudDataStore implements DataStore {
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
                 return mErrorObservableNotPersisted;
-            return mRestApi.dynamicDownload(url)
+            return mApiConnection.dynamicDownload(url)
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queueIOFile(url, file, true, whileCharging, false);

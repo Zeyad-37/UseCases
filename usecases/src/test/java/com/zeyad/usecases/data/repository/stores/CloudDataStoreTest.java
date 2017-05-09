@@ -12,8 +12,7 @@ import com.zeyad.usecases.data.db.DataBaseManager;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.exceptions.NetworkConnectionException;
 import com.zeyad.usecases.data.mapper.DAOMapper;
-import com.zeyad.usecases.data.network.RestApi;
-import com.zeyad.usecases.data.network.RestApiImpl;
+import com.zeyad.usecases.data.network.ApiConnection;
 import com.zeyad.usecases.data.utils.Utils;
 
 import org.json.JSONArray;
@@ -59,7 +58,7 @@ import static org.mockito.Mockito.when;
 public class CloudDataStoreTest {
     private CloudDataStore cloudDataStore;
     private Context mockContext;
-    private RestApi mockRestApi;
+    private ApiConnection mockApiConnection;
     private DataBaseManager mockDataBaseManager;
     private Observable observable;
 
@@ -67,29 +66,29 @@ public class CloudDataStoreTest {
     public void setUp() throws Exception {
         observable = Observable.just(new Object());
         mockContext = mock(Context.class);
-        mockRestApi = mock(RestApiImpl.class);
+        mockApiConnection = mock(ApiConnection.class);
         mockDataBaseManager = mock(RealmManager.class);
         changeStateOfNetwork(mockContext, true);
         when(mockDataBaseManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(observable);
         when(mockDataBaseManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(observable);
         when(mockDataBaseManager.putAll(anyList(), any(Class.class))).thenReturn(observable);
-        cloudDataStore = new CloudDataStore(mockRestApi, mockDataBaseManager, mock(DAOMapper.class), mockContext);
+        cloudDataStore = new CloudDataStore(mockApiConnection, mockDataBaseManager, mock(DAOMapper.class), mockContext);
     }
 
     @Test
     public void dynamicGetObject() throws Exception {
-        when(mockRestApi.dynamicGetObject(anyString(), anyBoolean())).thenReturn(observable);
+        when(mockApiConnection.dynamicGetObject(anyString(), anyBoolean())).thenReturn(observable);
 
         cloudDataStore.dynamicGetObject("", "", 0, Object.class, false, false);
 
-        verify(mockRestApi, times(1)).dynamicGetObject(anyString(), anyBoolean());
+        verify(mockApiConnection, times(1)).dynamicGetObject(anyString(), anyBoolean());
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
     @Test
     public void dynamicGetObjectCanWillPersist() throws Exception {
         cloudDataStore.mCanPersist = true;
-        when(mockRestApi.dynamicGetObject(anyString(), anyBoolean())).thenReturn(observable);
+        when(mockApiConnection.dynamicGetObject(anyString(), anyBoolean())).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicGetObject("", "", 0, Object.class, true, false)
@@ -97,7 +96,7 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicGetObject(anyString(), anyBoolean());
+        verify(mockApiConnection, times(1)).dynamicGetObject(anyString(), anyBoolean());
         verifyDBInteractions(0, 0, 1, 0, 0, 0);
     }
 
@@ -106,11 +105,11 @@ public class CloudDataStoreTest {
         List<TestRealmModel> testRealmObjects = new ArrayList<>();
         testRealmObjects.add(new TestRealmModel());
         Observable<List> observable = Observable.just(testRealmObjects);
-        when(mockRestApi.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
+        when(mockApiConnection.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
 
         cloudDataStore.dynamicGetList("", Object.class, false, false);
 
-        verify(mockRestApi, times(1)).dynamicGetList(anyString(), anyBoolean());
+        verify(mockApiConnection, times(1)).dynamicGetList(anyString(), anyBoolean());
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
@@ -118,7 +117,7 @@ public class CloudDataStoreTest {
     public void dynamicGetListCanWillPersist() throws Exception {
         cloudDataStore.mCanPersist = true;
         Observable observable = Observable.from(new ArrayList<>());
-        when(mockRestApi.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
+        when(mockApiConnection.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicGetList("", Object.class, true, false)
@@ -126,13 +125,13 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicGetList(anyString(), anyBoolean());
+        verify(mockApiConnection, times(1)).dynamicGetList(anyString(), anyBoolean());
 //        verifyDBInteractions(0, 1, 0, 0, 0, 0);
     }
 
     @Test
     public void dynamicPatchObject() throws Exception {
-        when(mockRestApi.dynamicPatch(anyString(), any(RequestBody.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicPatch(anyString(), any(RequestBody.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, false, false)
@@ -140,14 +139,14 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicPatch(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicPatch(anyString(), any(RequestBody.class));
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
     @Test
     public void dynamicPatchObjectCanWillPersist() throws Exception {
         cloudDataStore.mCanPersist = true;
-        when(mockRestApi.dynamicPatch(anyString(), any(RequestBody.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicPatch(anyString(), any(RequestBody.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, true, false)
@@ -155,7 +154,7 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicPatch(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicPatch(anyString(), any(RequestBody.class));
         verifyDBInteractions(0, 0, 1, 0, 0, 0);
     }
 
@@ -185,7 +184,7 @@ public class CloudDataStoreTest {
 
     @Test
     public void dynamicPostObject() throws Exception {
-        when(mockRestApi.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, false, false)
@@ -193,14 +192,14 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicPost(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicPost(anyString(), any(RequestBody.class));
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
     @Test
     public void dynamicPostObjectCanWillPersist() throws Exception {
         cloudDataStore.mCanPersist = true;
-        when(mockRestApi.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, true, false)
@@ -208,7 +207,7 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicPost(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicPost(anyString(), any(RequestBody.class));
         verifyDBInteractions(0, 0, 1, 0, 0, 0);
     }
 
@@ -238,7 +237,7 @@ public class CloudDataStoreTest {
 
     @Test
     public void dynamicPostList() throws Exception {
-        when(mockRestApi.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicPostList("", "", new JSONArray(), Object.class, false, false)
@@ -246,14 +245,14 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicPost(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicPost(anyString(), any(RequestBody.class));
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
     @Test
     public void dynamicPostListCanWillPersist() throws Exception {
         cloudDataStore.mCanPersist = true;
-        when(mockRestApi.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicPostList("", "", new JSONArray(), Object.class, true, false)
@@ -261,7 +260,7 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicPost(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicPost(anyString(), any(RequestBody.class));
         verifyDBInteractions(1, 0, 0, 0, 0, 0);
     }
 
@@ -291,7 +290,7 @@ public class CloudDataStoreTest {
 
     @Test
     public void dynamicPutObject() throws Exception {
-        when(mockRestApi.dynamicPut(anyString(), any(RequestBody.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, false, false)
@@ -299,14 +298,14 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicPut(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicPut(anyString(), any(RequestBody.class));
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
     @Test
     public void dynamicPutObjectCanWillPersist() throws Exception {
         cloudDataStore.mCanPersist = true;
-        when(mockRestApi.dynamicPut(anyString(), any(RequestBody.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, true, false)
@@ -314,7 +313,7 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicPut(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicPut(anyString(), any(RequestBody.class));
         verifyDBInteractions(0, 0, 1, 0, 0, 0);
     }
 
@@ -344,7 +343,7 @@ public class CloudDataStoreTest {
 
     @Test
     public void dynamicPutList() throws Exception {
-        when(mockRestApi.dynamicPut(anyString(), any(RequestBody.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicPutList("", "", new JSONArray(), Object.class, false, false)
@@ -352,14 +351,14 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicPut(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicPut(anyString(), any(RequestBody.class));
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
     @Test
     public void dynamicPutListCanWillPersist() throws Exception {
         cloudDataStore.mCanPersist = true;
-        when(mockRestApi.dynamicPut(anyString(), any(RequestBody.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicPutList("", "", new JSONArray(), Object.class, true, false)
@@ -367,7 +366,7 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicPut(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicPut(anyString(), any(RequestBody.class));
         verifyDBInteractions(1, 0, 0, 0, 0, 0);
     }
 
@@ -397,7 +396,7 @@ public class CloudDataStoreTest {
 
     @Test
     public void dynamicDeleteCollection() throws Exception {
-        when(mockRestApi.dynamicDelete(anyString(), any(RequestBody.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicDelete(anyString(), any(RequestBody.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicDeleteCollection("", "", new JSONArray(), Object.class, false, false)
@@ -405,14 +404,14 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicDelete(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicDelete(anyString(), any(RequestBody.class));
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
     @Test
     public void dynamicDeleteCollectionCanWillPersist() throws Exception {
         cloudDataStore.mCanPersist = true;
-        when(mockRestApi.dynamicDelete(anyString(), any(RequestBody.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicDelete(anyString(), any(RequestBody.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicDeleteCollection("", "", new JSONArray(), Object.class, true, false)
@@ -420,7 +419,7 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicDelete(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicDelete(anyString(), any(RequestBody.class));
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
@@ -453,7 +452,7 @@ public class CloudDataStoreTest {
         Observable observable = cloudDataStore.dynamicDeleteAll(Object.class);
 
         // Verify repository interactions
-        verifyZeroInteractions(mockRestApi);
+        verifyZeroInteractions(mockApiConnection);
         verifyZeroInteractions(mockDataBaseManager);
 
         // Assert return type
@@ -462,7 +461,7 @@ public class CloudDataStoreTest {
 
     @Test
     public void dynamicUploadFile() throws Exception {
-        when(mockRestApi.dynamicUpload(anyString(), anyMap(), any(MultipartBody.Part.class))).thenReturn(observable);
+        when(mockApiConnection.dynamicUpload(anyString(), anyMap(), any(MultipartBody.Part.class))).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicUploadFile("", new File(""), "", new HashMap(), false, false, false, Object.class)
@@ -470,7 +469,7 @@ public class CloudDataStoreTest {
 
         testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicUpload(anyString(), anyMap(), any(MultipartBody.Part.class));
+        verify(mockApiConnection, times(1)).dynamicUpload(anyString(), anyMap(), any(MultipartBody.Part.class));
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
@@ -500,7 +499,7 @@ public class CloudDataStoreTest {
 
     @Test
     public void dynamicDownloadFile() throws Exception {
-        when(mockRestApi.dynamicDownload(anyString())).thenReturn(observable);
+        when(mockApiConnection.dynamicDownload(anyString())).thenReturn(observable);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicDownloadFile("", new File(""), false, false, false)
@@ -508,7 +507,7 @@ public class CloudDataStoreTest {
 
 //        testSubscriber.assertNoErrors();
 
-        verify(mockRestApi, times(1)).dynamicDownload(anyString());
+        verify(mockApiConnection, times(1)).dynamicDownload(anyString());
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
@@ -541,7 +540,7 @@ public class CloudDataStoreTest {
         Observable observable = cloudDataStore.queryDisk(realm -> realm.where(TestRealmModel.class));
 
         // Verify repository interactions
-        verifyZeroInteractions(mockRestApi);
+        verifyZeroInteractions(mockApiConnection);
         verifyZeroInteractions(mockDataBaseManager);
 
         // Assert return type

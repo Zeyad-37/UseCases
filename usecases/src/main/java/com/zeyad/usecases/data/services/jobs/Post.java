@@ -6,7 +6,7 @@ import android.util.Log;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
-import com.zeyad.usecases.data.network.RestApi;
+import com.zeyad.usecases.data.network.ApiConnection;
 import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
 
@@ -28,7 +28,7 @@ public class Post {
     private static int mTrailCount;
     private final FirebaseJobDispatcher mDispatcher;
     private final PostRequest mPostRequest;
-    private final RestApi mRestApi;
+    private final ApiConnection mRestApi;
     private final Utils mUtils;
     @NonNull
     private Subscriber<Object> handleError = new Subscriber<Object>() {
@@ -49,7 +49,7 @@ public class Post {
         }
     };
 
-    public Post(Context context, PostRequest postRequest, RestApi restApi, int trailCount, Utils utils) {
+    public Post(Context context, PostRequest postRequest, ApiConnection restApi, int trailCount, Utils utils) {
         mPostRequest = postRequest;
         mRestApi = restApi;
         mTrailCount = trailCount;

@@ -3,7 +3,7 @@ package com.zeyad.usecases.domain.interactors;
 import android.support.annotation.VisibleForTesting;
 
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.data.network.ApiConnectionFactory;
+import com.zeyad.usecases.data.network.ApiConnection;
 import com.zeyad.usecases.data.utils.Utils;
 
 import st.lowlevel.storo.StoroBuilder;
@@ -32,12 +32,13 @@ public class DataUseCaseFactory {
         Config.setBaseURL(config.getBaseUrl());
         Config.setWithCache(config.isWithCache());
         Config.setCacheExpiry(config.getCacheAmount(), config.getTimeUnit());
-        ApiConnectionFactory.init(config.getOkHttpBuilder(), config.getOkHttpCache());
+        ApiConnection apiConnection = new ApiConnection(ApiConnection.init(config.getOkHttpBuilder()),
+                ApiConnection.initWithCache(config.getOkHttpBuilder(), config.getOkHttpCache()));
         if (config.isWithRealm()) {
-            DataUseCase.initWithRealm(config.getEntityMapper(), config.getPostExecutionThread(),
+            DataUseCase.initWithRealm(apiConnection, config.getEntityMapper(), config.getPostExecutionThread(),
                     config.getHandlerThread());
         } else
-            DataUseCase.initWithoutDB(config.getEntityMapper(), config.getPostExecutionThread(),
+            DataUseCase.initWithoutDB(apiConnection, config.getEntityMapper(), config.getPostExecutionThread(),
                     config.getHandlerThread());
         if (config.isWithCache())
             StoroBuilder.configure(config.getCacheSize())

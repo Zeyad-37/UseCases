@@ -2,10 +2,9 @@ package com.zeyad.usecases.domain.interactors;
 
 import android.os.HandlerThread;
 
-import com.zeyad.usecases.data.db.DatabaseManagerFactory;
 import com.zeyad.usecases.data.db.RealmManager;
 import com.zeyad.usecases.data.mapper.DAOMapper;
-import com.zeyad.usecases.data.network.RestApiImpl;
+import com.zeyad.usecases.data.network.ApiConnection;
 import com.zeyad.usecases.data.repository.DataRepository;
 import com.zeyad.usecases.data.repository.stores.DataStoreFactory;
 import com.zeyad.usecases.data.requests.FileIORequest;
@@ -49,10 +48,10 @@ public class DataUseCase implements IDataUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    static void initWithoutDB(DAOMapper entityMapper, PostExecutionThread postExecutionThread,
+    static void initWithoutDB(ApiConnection apiConnection, DAOMapper entityMapper, PostExecutionThread postExecutionThread,
                               HandlerThread thread) {
         hasRealm = false;
-        sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(RestApiImpl.getInstance(),
+        sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(apiConnection,
                 entityMapper)), postExecutionThread, thread);
     }
 
@@ -62,13 +61,14 @@ public class DataUseCase implements IDataUseCase {
      * Ideally this function should be called once when application  is started or created.
      * This function may be called n number of times if required, during mocking and testing.
      */
-    static void initWithRealm(DAOMapper entityMapper, PostExecutionThread postExecutionThread,
+    static void initWithRealm(ApiConnection apiConnection, DAOMapper entityMapper, PostExecutionThread postExecutionThread,
                               HandlerThread thread) {
         hasRealm = true;
         handlerThread = thread;
-        DatabaseManagerFactory.initRealm(handlerThread.getLooper());
-        sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(DatabaseManagerFactory
-                .getInstance(), RestApiImpl.getInstance(), entityMapper)), postExecutionThread, thread);
+        if (!handlerThread.isAlive())
+            handlerThread.start();
+        sDataUseCase = new DataUseCase(new DataRepository(new DataStoreFactory(new RealmManager(handlerThread.getLooper()),
+                apiConnection, entityMapper)), postExecutionThread, thread);
     }
 
     /**
