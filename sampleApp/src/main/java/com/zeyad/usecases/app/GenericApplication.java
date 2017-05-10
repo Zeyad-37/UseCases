@@ -11,8 +11,8 @@ import android.os.StrictMode;
 import android.util.Base64;
 import android.util.Log;
 
-import com.zeyad.usecases.domain.interactors.DataUseCaseConfig;
-import com.zeyad.usecases.domain.interactors.DataUseCaseFactory;
+import com.zeyad.usecases.api.DataServiceConfig;
+import com.zeyad.usecases.api.DataServiceFactory;
 
 import java.io.File;
 import java.security.MessageDigest;
@@ -38,11 +38,6 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.API_BASE_URL;
 public class GenericApplication extends Application {
 
     private static final int TIME_OUT = 15, CACHE_EXPIRY = 3;
-    private static GenericApplication sInstance;
-
-    public static GenericApplication getInstance() {
-        return sInstance;
-    }
 
     @TargetApi(value = 24)
     private static boolean checkAppSignature(Context context) {
@@ -96,7 +91,7 @@ public class GenericApplication extends Application {
 
     @Override
     public void onCreate() {
-//        initializeStrickMode();
+//        initializeStrictMode();
         super.onCreate();
 //        if (LeakCanary.isInAnalyzerProcess(this)) {
 //            // This process is dedicated to LeakCanary for heap analysis.
@@ -104,17 +99,15 @@ public class GenericApplication extends Application {
 //            return;
 //        }
 //        LeakCanary.install(this);
-        sInstance = this;
 //        checkAppTampering(sInstance);
         if (BuildConfig.DEBUG)
             Takt.stock(this).play();
         initializeRealm();
-        DataUseCaseFactory.init(new DataUseCaseConfig.Builder(this)
+        DataServiceFactory.init(new DataServiceConfig.Builder(this)
                 .baseUrl(API_BASE_URL)
                 .withCache(CACHE_EXPIRY, TimeUnit.MINUTES)
                 .withRealm()
-                .postExecutionThread(null)
-//                .entityMapper(new AutoMap_DAOMapperFactory())
+//                .postExecutionThread(null)
                 .okHttpBuilder(provideOkHttpClientBuilder())
 //                .okhttpCache(provideCache())
                 .build());
@@ -122,7 +115,7 @@ public class GenericApplication extends Application {
         initializeFlowUp();
     }
 
-    private void initializeStrickMode() {
+    private void initializeStrictMode() {
         if (BuildConfig.DEBUG) {
             StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
                     .detectAll()
