@@ -10,7 +10,7 @@
         android:supportsRtl="true">
 
         <service
-            android:name=".data.services.GenericJobService"
+            android:name=".services.GenericJobService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.firebase.jobdispatcher.ACTION_EXECUTE" />

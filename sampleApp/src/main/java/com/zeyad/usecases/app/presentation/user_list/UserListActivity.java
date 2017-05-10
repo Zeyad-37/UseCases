@@ -39,7 +39,7 @@ import com.zeyad.usecases.app.presentation.user_list.events.SearchUsersEvent;
 import com.zeyad.usecases.app.presentation.user_list.view_holders.EmptyViewHolder;
 import com.zeyad.usecases.app.presentation.user_list.view_holders.UserViewHolder;
 import com.zeyad.usecases.app.utils.Utils;
-import com.zeyad.usecases.domain.interactors.DataUseCaseFactory;
+import com.zeyad.usecases.api.DataServiceFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -83,7 +83,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     @Override
     public void initialize() {
         errorMessageFactory = Throwable::getMessage;
-        viewModel = new UserListVM(DataUseCaseFactory.getInstance(), (newResult, currentStateBundle) -> {
+        viewModel = new UserListVM(DataServiceFactory.getInstance(), (newResult, currentStateBundle) -> {
             List resultList = (List) newResult.getBundle();
             List<User> users = currentStateBundle == null ? new ArrayList<>() : currentStateBundle.getUsers();
             if (resultList.get(0).getClass().equals(User.class)) {

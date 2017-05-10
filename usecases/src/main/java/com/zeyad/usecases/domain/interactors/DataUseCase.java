@@ -13,6 +13,7 @@ import com.zeyad.usecases.data.requests.PostRequest;
 import com.zeyad.usecases.data.utils.Utils;
 import com.zeyad.usecases.domain.ReplayingShare;
 import com.zeyad.usecases.domain.executors.PostExecutionThread;
+import com.zeyad.usecases.domain.executors.UIThread;
 import com.zeyad.usecases.domain.repository.Data;
 
 import java.util.List;
@@ -81,7 +82,7 @@ public class DataUseCase implements IDataUseCase {
      * @param uiThread       ui thread implementation
      * @param handlerThread  background thread
      */
-    public static void init(DataRepository dataRepository, PostExecutionThread uiThread, HandlerThread handlerThread) {
+    public static void init(DataRepository dataRepository, UIThread uiThread, HandlerThread handlerThread) {
         sDataUseCase = new DataUseCase(dataRepository, uiThread, handlerThread);
     }
 

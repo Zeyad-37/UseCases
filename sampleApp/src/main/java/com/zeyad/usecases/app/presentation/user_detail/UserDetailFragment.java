@@ -31,7 +31,7 @@ import com.zeyad.usecases.app.components.redux.BaseFragment;
 import com.zeyad.usecases.app.presentation.user_list.User;
 import com.zeyad.usecases.app.presentation.user_list.UserListActivity;
 import com.zeyad.usecases.app.utils.Utils;
-import com.zeyad.usecases.domain.interactors.DataUseCaseFactory;
+import com.zeyad.usecases.api.DataServiceFactory;
 
 import org.parceler.Parcels;
 
@@ -76,7 +76,7 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
     public void initialize() {
         if (getArguments() != null)
             viewState = Parcels.unwrap(getArguments().getParcelable(UI_MODEL));
-        viewModel = new UserDetailVM(DataUseCaseFactory.getInstance(), (newResult, currentStateBundle) -> UserDetailState.builder()
+        viewModel = new UserDetailVM(DataServiceFactory.getInstance(), (newResult, currentStateBundle) -> UserDetailState.builder()
                 .setRepos((List<Repository>) newResult.getBundle())
                 .setUser(currentStateBundle.getUser())
                 .setIsTwoPane(currentStateBundle.isTwoPane())
