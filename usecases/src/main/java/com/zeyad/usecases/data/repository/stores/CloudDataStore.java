@@ -300,7 +300,8 @@ public class CloudDataStore implements DataStore {
             if (parameters != null && !parameters.isEmpty())
                 for (Map.Entry<String, Object> entry : parameters.entrySet())
                     map.put(entry.getKey(), utils.createPartFromString(entry.getValue()));
-            return mApiConnection.dynamicUpload(url, map, MultipartBody.Part.createFormData(key, file.getName(), requestFile))
+            return mApiConnection.dynamicUpload(url, map, MultipartBody.Part.createFormData(key,
+                    file.getName(), requestFile))
                     .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {

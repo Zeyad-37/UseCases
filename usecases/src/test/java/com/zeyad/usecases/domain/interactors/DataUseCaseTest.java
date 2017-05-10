@@ -10,7 +10,7 @@ import com.zeyad.usecases.data.repository.DataRepository;
 import com.zeyad.usecases.data.requests.FileIORequest;
 import com.zeyad.usecases.data.requests.GetRequest;
 import com.zeyad.usecases.data.requests.PostRequest;
-import com.zeyad.usecases.domain.executors.UIThread;
+import com.zeyad.usecases.domain.executors.PostExecutionThread;
 import com.zeyad.usecases.domain.repository.Data;
 
 import org.json.JSONArray;
@@ -25,6 +25,7 @@ import java.io.File;
 import java.util.HashMap;
 
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -40,7 +41,6 @@ import static org.mockito.Mockito.when;
 public class DataUseCaseTest {
 
     private HashMap<String, Object> HASH_MAP = new HashMap<>();
-    private UIThread mUIThread = getMockedUiThread();
     private IDataUseCase mDataUseCase;
     private Observable observable = Observable.just(true);
     private Data mData = getMockedDataRepo();
@@ -99,15 +99,12 @@ public class DataUseCaseTest {
         return dataRepository;
     }
 
-    private UIThread getMockedUiThread() {
-        return Mockito.mock(UIThread.class);
-    }
-
     @Before
     public void setUp() throws Exception {
         HandlerThread handlerThread = mock(HandlerThread.class);
         when(handlerThread.getLooper()).thenReturn(mock(Looper.class));
-        mDataUseCase = getGenericUseImplementation((DataRepository) mData, mUIThread, handlerThread);
+        mDataUseCase = getGenericUseImplementation((DataRepository) mData, AndroidSchedulers::mainThread,
+                handlerThread);
         Config.setBaseURL("www.google.com");
     }
 
@@ -226,7 +223,7 @@ public class DataUseCaseTest {
                 anyBoolean(), anyBoolean(), any(Class.class));
     }
 
-    public IDataUseCase getGenericUseImplementation(DataRepository datarepo, UIThread uithread,
+    public IDataUseCase getGenericUseImplementation(DataRepository datarepo, PostExecutionThread uithread,
                                                     HandlerThread handlerThread) {
         DataUseCase.init(datarepo, uithread, handlerThread);
         return DataUseCase.getInstance();
