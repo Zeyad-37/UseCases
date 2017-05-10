@@ -27,10 +27,10 @@ import rx.functions.Func1;
 class DataService implements IDataService {
 
     private static final String DEFAULT_ID_KEY = "id";
-    private final DataStoreFactory mDataStoreFactory;
-    private final PostExecutionThread mPostExecutionThread;
     private static HandlerThread handlerThread;
     private static DataService sDataService;
+    private final DataStoreFactory mDataStoreFactory;
+    private final PostExecutionThread mPostExecutionThread;
 
     DataService(ApiConnection apiConnection, DAOMapper daoMapper, PostExecutionThread postExecutionThread,
                 HandlerThread thread, boolean withRealm) {
@@ -188,7 +188,7 @@ class DataService implements IDataService {
     @Override
     public Observable<List> getListOffLineFirst(GetRequest getRequest) {
         try {
-            Observable<List> online = mDataStoreFactory.dynamically(getRequest.getUrl())
+            Observable<List> online = mDataStoreFactory.cloud()
                     .dynamicGetList(getRequest.getUrl(), getRequest.getDataClass(),
                             getRequest.isPersist(), getRequest.isShouldCache());
             return mDataStoreFactory.disk()
@@ -212,7 +212,7 @@ class DataService implements IDataService {
     @Override
     public Observable getObjectOffLineFirst(GetRequest getRequest) {
         try {
-            Observable online = mDataStoreFactory.dynamically(getRequest.getUrl())
+            Observable online = mDataStoreFactory.cloud()
                     .dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
                             getRequest.getItemId(), getRequest.getDataClass(), getRequest.isPersist(),
                             getRequest.isShouldCache());
