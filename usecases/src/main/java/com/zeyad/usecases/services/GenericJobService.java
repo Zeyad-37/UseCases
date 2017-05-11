@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.R;
 import com.zeyad.usecases.network.ApiConnection;
 import com.zeyad.usecases.services.jobs.FileIO;
@@ -33,7 +34,7 @@ public class GenericJobService extends JobService {
         if (params.getExtras() != null && params.getExtras().containsKey(PAYLOAD)) {
             if (mCompositeSubscription == null || mCompositeSubscription.isUnsubscribed())
                 mCompositeSubscription = new CompositeSubscription();
-            ApiConnection instance = ApiConnection.getInstance();
+            ApiConnection instance = Config.getApiConnection();
             int trailCount = params.getExtras().getInt(TRIAL_COUNT);
             Utils utils = Utils.getInstance();
             switch (params.getExtras().getString(JOB_TYPE, "")) {
@@ -43,15 +44,13 @@ public class GenericJobService extends JobService {
                     Log.d(TAG, getString(R.string.job_started, POST));
                     break;
                 case DOWNLOAD_FILE:
-                    mCompositeSubscription.add(new FileIO(trailCount,
-                            params.getExtras().getParcelable(PAYLOAD), this, true, instance,
-                            utils).execute());
+                    mCompositeSubscription.add(new FileIO(trailCount, params.getExtras().getParcelable(PAYLOAD),
+                            this, true, instance, utils).execute());
                     Log.d(TAG, getString(R.string.job_started, DOWNLOAD_FILE));
                     break;
                 case UPLOAD_FILE:
-                    mCompositeSubscription.add(new FileIO(trailCount,
-                            params.getExtras().getParcelable(PAYLOAD), this, false, instance,
-                            utils).execute());
+                    mCompositeSubscription.add(new FileIO(trailCount, params.getExtras().getParcelable(PAYLOAD),
+                            this, false, instance, utils).execute());
                     Log.d(TAG, getString(R.string.job_started, UPLOAD_FILE));
                     break;
                 default:

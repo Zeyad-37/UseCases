@@ -8,12 +8,14 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.zeyad.usecases.network.ApiConnection;
 
 import java.util.concurrent.TimeUnit;
 
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
+import rx.Scheduler;
 
 public class Config {
     private static Config sInstance;
@@ -22,6 +24,8 @@ public class Config {
     private static boolean withCache, withRealm;
     private static int cacheAmount;
     private static TimeUnit cacheTimeUnit;
+    private static Scheduler backgroundThread;
+    private static ApiConnection apiConnection;
     private Context mContext;
     private boolean mUseApiWithCache;
 
@@ -109,6 +113,26 @@ public class Config {
         Config.withRealm = hasRealm;
     }
 
+    public static boolean isWithRealm() {
+        return withRealm;
+    }
+
+    public static Scheduler getBackgroundThread() {
+        return backgroundThread;
+    }
+
+    public static void setBackgroundThread(Scheduler backgroundThread) {
+        Config.backgroundThread = backgroundThread;
+    }
+
+    public static ApiConnection getApiConnection() {
+        return apiConnection;
+    }
+
+    public static void setApiConnection(ApiConnection apiConnection) {
+        Config.apiConnection = apiConnection;
+    }
+
     private void setupRealm() {
 //        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
 //                .name("library.realm")
@@ -133,9 +157,5 @@ public class Config {
 
     public void setUseApiWithCache(boolean useApiWithCache) {
         mUseApiWithCache = useApiWithCache;
-    }
-
-    public static boolean isWithRealm() {
-        return withRealm;
     }
 }

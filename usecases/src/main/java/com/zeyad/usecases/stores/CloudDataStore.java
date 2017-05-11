@@ -8,13 +8,10 @@ import android.os.BatteryManager;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.facebook.network.connectionclass.ConnectionClassManager;
-import com.facebook.network.connectionclass.ConnectionQuality;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.R;
-import com.zeyad.usecases.api.DataService;
 import com.zeyad.usecases.db.DataBaseManager;
 import com.zeyad.usecases.db.RealmManager;
 import com.zeyad.usecases.db.RealmQueryProvider;
@@ -24,7 +21,6 @@ import com.zeyad.usecases.network.ApiConnection;
 import com.zeyad.usecases.network.RestApi;
 import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.PostRequest;
-import com.zeyad.usecases.utils.ModelConverters;
 import com.zeyad.usecases.utils.Utils;
 
 import org.json.JSONArray;
@@ -256,7 +252,7 @@ public class CloudDataStore implements DataStore {
     public Observable<Object> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
                                                       Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
-            List<Long> ids = ModelConverters.convertToListOfId(jsonArray);
+            List<Long> ids = Utils.getInstance().convertToListOfId(jsonArray);
             if (willPersist(persist))
                 deleteFromPersistence(ids, idColumnName, dataClass);
             if (isQueuableIfOutOfNetwork(queuable)) {
@@ -376,14 +372,11 @@ public class CloudDataStore implements DataStore {
 
     private <T> Observable.Transformer<T, T> applyExponentialBackoff() {
         return observable -> observable.retryWhen(attempts -> {
-            if (ConnectionClassManager.getInstance().getCurrentBandwidthQuality()
-                    .compareTo(ConnectionQuality.MODERATE) >= 0)
-                return attempts.zipWith(Observable.range(COUNTER_START, ATTEMPTS), (n, i) -> i)
-                        .flatMap(i -> {
-                            Log.d(TAG, "delay retry by " + i + " second(s)");
-                            return Observable.timer(i, TimeUnit.SECONDS);
-                        });
-            else return null;
+            return attempts.zipWith(Observable.range(COUNTER_START, ATTEMPTS), (n, i) -> i)
+                    .flatMap(i -> {
+                        Log.d(TAG, "delay retry by " + i + " second(s)");
+                        return Observable.timer(i, TimeUnit.SECONDS);
+                    });
         });
     }
 
@@ -517,12 +510,12 @@ public class CloudDataStore implements DataStore {
                 }
         }
         if (observable != null)
-            observable.subscribeOn(DataService.getBackgroundThread()).subscribe(new SimpleSubscriber(object));
+            observable.subscribeOn(Config.getBackgroundThread()).subscribe(new SimpleSubscriber(object));
     }
 
     private void persistAllGenerics(List collection, Class dataClass) {
         mDataBaseManager.putAll(mEntityDataMapper.mapAllToRealm(collection, dataClass), dataClass)
-                .subscribeOn(DataService.getBackgroundThread())
+                .subscribeOn(Config.getBackgroundThread())
                 .subscribe(new SimpleSubscriber(collection));
     }
 

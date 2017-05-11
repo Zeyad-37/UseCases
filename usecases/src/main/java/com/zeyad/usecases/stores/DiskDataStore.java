@@ -6,7 +6,7 @@ import com.zeyad.usecases.Config;
 import com.zeyad.usecases.db.DataBaseManager;
 import com.zeyad.usecases.db.RealmQueryProvider;
 import com.zeyad.usecases.mapper.DAOMapper;
-import com.zeyad.usecases.utils.ModelConverters;
+import com.zeyad.usecases.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -81,7 +81,7 @@ public class DiskDataStore implements DataStore {
     @Override
     public Observable<?> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
                                                  Class dataClass, boolean persist, boolean queuable) {
-        List<Long> convertToListOfId = ModelConverters.convertToListOfId(jsonArray);
+        List<Long> convertToListOfId = Utils.getInstance().convertToListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
                 .doOnNext(object -> {
                     if (Config.isWithCache()) {

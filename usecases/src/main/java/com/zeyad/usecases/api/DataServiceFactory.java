@@ -1,11 +1,14 @@
 package com.zeyad.usecases.api;
 
-import android.support.annotation.VisibleForTesting;
+import android.os.HandlerThread;
 
 import com.zeyad.usecases.Config;
+import com.zeyad.usecases.db.RealmManager;
 import com.zeyad.usecases.network.ApiConnection;
+import com.zeyad.usecases.stores.DataStoreFactory;
 import com.zeyad.usecases.utils.Utils;
 
+import rx.android.schedulers.AndroidSchedulers;
 import st.lowlevel.storo.StoroBuilder;
 
 public class DataServiceFactory {
@@ -32,16 +35,25 @@ public class DataServiceFactory {
         Config.setBaseURL(config.getBaseUrl());
         Config.setWithCache(config.isWithCache());
         Config.setCacheExpiry(config.getCacheAmount(), config.getTimeUnit());
-        sDataUseCase = new DataService(new ApiConnection(ApiConnection.init(config.getOkHttpBuilder()),
-                ApiConnection.initWithCache(config.getOkHttpBuilder(), config.getOkHttpCache())),
-                config.getEntityMapper(), config.getPostExecutionThread(),
-                config.getHandlerThread(), config.isWithRealm());
         if (config.isWithCache())
             StoroBuilder.configure(config.getCacheSize())
                     .setDefaultCacheDirectory(config.getContext())
                     .setGsonInstance(Config.getGson())
                     .initialize();
-        sDataUseCase = DataService.getInstance();
+        HandlerThread backgroundThread = config.getHandlerThread();
+        if (config.isWithRealm()) {
+            if (!backgroundThread.isAlive())
+                backgroundThread.start();
+            Config.setBackgroundThread(AndroidSchedulers.from(backgroundThread.getLooper()));
+        }
+        ApiConnection apiConnection = new ApiConnection(ApiConnection.init(config.getOkHttpBuilder()),
+                ApiConnection.initWithCache(config.getOkHttpBuilder(), config.getOkHttpCache()));
+        sDataUseCase = new DataService(config.isWithCache() ?
+                new DataStoreFactory(new RealmManager(backgroundThread.getLooper()),
+                        apiConnection, config.getEntityMapper()) :
+                new DataStoreFactory(apiConnection, config.getEntityMapper()), config.getPostExecutionThread(),
+                Config.getBackgroundThread());
+        Config.setApiConnection(apiConnection);
     }
 
     /**
@@ -49,15 +61,5 @@ public class DataServiceFactory {
      */
     public static void destoryInstance() {
         sDataUseCase = null;
-    }
-
-    /**
-     * This method is meant for test purposes only. Use other versions of initRealm for production code.
-     *
-     * @param dataUseCase mocked generic use(expected) or any IDataService implementation
-     */
-    @VisibleForTesting
-    static void init(IDataService dataUseCase) {
-        sDataUseCase = dataUseCase;
     }
 }

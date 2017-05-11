@@ -1,8 +1,5 @@
 package com.zeyad.usecases.api;
 
-import android.os.HandlerThread;
-import android.os.Looper;
-
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.db.RealmQueryProvider;
 import com.zeyad.usecases.executors.PostExecutionThread;
@@ -23,6 +20,7 @@ import java.util.Collections;
 import java.util.HashMap;
 
 import rx.Observable;
+import rx.Scheduler;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -50,13 +48,11 @@ public class DataServiceTest {
         observable = Observable.just(true);
         postRequest = new PostRequest.PostRequestBuilder(Object.class, false).build();
         getRequest = new GetRequest.GetRequestBuilder(Object.class, false).build();
-        HandlerThread handlerThread = mock(HandlerThread.class);
-        when(handlerThread.getLooper()).thenReturn(mock(Looper.class));
         dataStoreFactory = mock(DataStoreFactory.class);
         when(dataStoreFactory.dynamically(anyString())).thenReturn(mock(CloudDataStore.class));
         when(dataStoreFactory.disk()).thenReturn(mock(DiskDataStore.class));
         when(dataStoreFactory.cloud()).thenReturn(mock(CloudDataStore.class));
-        dataService = new DataService(dataStoreFactory, mock(PostExecutionThread.class), handlerThread);
+        dataService = new DataService(dataStoreFactory, mock(PostExecutionThread.class), mock(Scheduler.class));
     }
 
     @Test
@@ -83,23 +79,31 @@ public class DataServiceTest {
 
     @Test
     public void getListOffLineFirst() throws Exception {
-        when(dataStoreFactory.dynamically(anyString()).dynamicGetList(anyString(), any(Class.class),
+        when(dataStoreFactory.cloud().dynamicGetList(anyString(), any(Class.class),
+                anyBoolean(), anyBoolean())).thenReturn(Observable.just(Collections.EMPTY_LIST));
+        when(dataStoreFactory.disk().dynamicGetList(anyString(), any(Class.class),
                 anyBoolean(), anyBoolean())).thenReturn(Observable.just(Collections.EMPTY_LIST));
 
-        dataService.getList(getRequest);
+        dataService.getListOffLineFirst(getRequest);
 
-        verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicGetList(anyString(),
-                any(Class.class), anyBoolean(), anyBoolean());
+        verify(dataStoreFactory.cloud(), times(1)).dynamicGetList(anyString(), any(Class.class),
+                anyBoolean(), anyBoolean());
+        verify(dataStoreFactory.disk(), times(1)).dynamicGetList(anyString(), any(Class.class),
+                anyBoolean(), anyBoolean());
     }
 
     @Test
     public void getObjectOffLineFirst() throws Exception {
-        when(dataStoreFactory.dynamically(anyString()).dynamicGetObject(anyString(), anyString(),
+        when(dataStoreFactory.cloud().dynamicGetObject(anyString(), anyString(),
+                anyInt(), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+        when(dataStoreFactory.disk().dynamicGetObject(anyString(), anyString(),
                 anyInt(), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        dataService.getObject(getRequest);
+        dataService.getObjectOffLineFirst(getRequest);
 
-        verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicGetObject(anyString(),
+        verify(dataStoreFactory.cloud(), times(1)).dynamicGetObject(anyString(),
+                anyString(), anyInt(), any(Class.class), anyBoolean(), anyBoolean());
+        verify(dataStoreFactory.disk(), times(1)).dynamicGetObject(anyString(),
                 anyString(), anyInt(), any(Class.class), anyBoolean(), anyBoolean());
     }
 

@@ -1,4 +1,4 @@
-package com.zeyad.usecases;
+package com.zeyad.usecases.utils;
 
 import rx.Observable;
 import rx.functions.Action1;

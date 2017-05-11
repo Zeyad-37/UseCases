@@ -41,8 +41,7 @@ public class RealmManager implements DataBaseManager {
     }
 
     RealmManager() {
-        if (backgroundHandler == null)
-            backgroundHandler = new Handler();
+        backgroundHandler = new Handler();
     }
 
     /**
@@ -199,32 +198,6 @@ public class RealmManager implements DataBaseManager {
             }
         });
     }
-
-//    /**
-//     * Puts and element into the DB.
-//     *
-//     * @param realmObjects Element to insert in the DB.
-//     * @param dataClass   Class type of the items to be put.
-//     */
-//    @Override
-//    public Observable<?> putAll(@NonNull List<RealmObject> realmObjects, @NonNull Class dataClass) {
-//        return Observable.defer(() -> {
-//            if (hasKitKat())
-//                try (Realm realm = Realm.getDefaultInstance()) {
-//                    executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmObjects));
-//                    return Observable.just(Boolean.TRUE);
-//                }
-//            else {
-//                Realm realm = Realm.getDefaultInstance();
-//                try {
-//                    executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmObjects));
-//                    return Observable.just(Boolean.TRUE);
-//                } finally {
-//                    closeRealm(realm);
-//                }
-//            }
-//        });
-//    }
 
     /**
      * Evict all elements of the DB.

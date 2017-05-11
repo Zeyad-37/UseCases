@@ -9,10 +9,9 @@ import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.facebook.network.connectionclass.ConnectionClassManager;
-import com.facebook.network.connectionclass.ConnectionQuality;
 import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.Lifetime;
@@ -22,12 +21,15 @@ import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.PostRequest;
 import com.zeyad.usecases.services.GenericJobService;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import io.realm.Realm;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import rx.Observable;
 
 public class Utils {
 
@@ -53,15 +55,6 @@ public class Utils {
         return getMaxId(clazz, column) + 1;
     }
 
-    public Observable.Transformer<?, ?> logSources(final String source) {
-        return observable -> observable.doOnNext(entities -> {
-            if (entities == null)
-                System.out.println(source + " does not have any data.");
-            else
-                System.out.println(source + " has the data you are looking for!");
-        });
-    }
-
     public boolean isNetworkAvailable(@NonNull Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context
                 .CONNECTIVITY_SERVICE);
@@ -80,17 +73,8 @@ public class Utils {
         return false;
     }
 
-    public boolean isNotEmpty(String text) {
-        return text != null && !text.isEmpty() && !text.equalsIgnoreCase("null");
-    }
-
     public boolean isNotEmpty(List list) {
         return list != null && !list.isEmpty();
-    }
-
-    public boolean isNetworkDecent() {
-        return ConnectionClassManager.getInstance().getCurrentBandwidthQuality()
-                .compareTo(ConnectionQuality.MODERATE) >= 0;
     }
 
     public boolean hasLollipop() {
@@ -131,8 +115,7 @@ public class Utils {
         Log.d("FBJDQ", postRequest.getMethod() + " request is queued successfully!");
     }
 
-    public void queueFileIOCore(FirebaseJobDispatcher dispatcher, boolean isDownload,
-                                FileIORequest fileIORequest) {
+    public void queueFileIOCore(FirebaseJobDispatcher dispatcher, boolean isDownload, FileIORequest fileIORequest) {
         Bundle extras = new Bundle(2);
         extras.putString(GenericJobService.JOB_TYPE, isDownload ? GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE);
         extras.putParcelable(GenericJobService.PAYLOAD, fileIORequest);
@@ -141,7 +124,6 @@ public class Utils {
                 .setTag(isDownload ? GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE)
                 .setRecurring(false)
                 .setLifetime(Lifetime.FOREVER)
-//                .setTrigger(Trigger.executionWindow(0, 60))
                 .setReplaceCurrent(false)
                 .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
                 .setConstraints(fileIORequest.onWifi() ? Constraint.ON_UNMETERED_NETWORK : Constraint.ON_ANY_NETWORK,
@@ -149,5 +131,25 @@ public class Utils {
                 .setExtras(extras)
                 .build());
         Log.d("FBJDQ", String.format("%s file request is queued successfully!", isDownload ? "Download" : "Upload"));
+    }
+
+    @Nullable
+    public List<Long> convertToListOfId(@Nullable JSONArray jsonArray) {
+        List<Long> idList = new ArrayList<>();
+        if (jsonArray != null && jsonArray.length() > 0) {
+            try {
+                jsonArray.getLong(0);
+            } catch (JSONException e) {
+                return null;
+            }
+            idList = new ArrayList<>(jsonArray.length());
+            for (int i = 0, length = jsonArray.length(); i < length; i++)
+                try {
+                    idList.add(jsonArray.getLong(i));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+        }
+        return idList;
     }
 }

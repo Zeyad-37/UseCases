@@ -1,54 +1,33 @@
 package com.zeyad.usecases.api;
 
-import android.os.HandlerThread;
-
-import com.zeyad.usecases.ReplayingShare;
-import com.zeyad.usecases.db.RealmManager;
 import com.zeyad.usecases.db.RealmQueryProvider;
 import com.zeyad.usecases.executors.PostExecutionThread;
-import com.zeyad.usecases.mapper.DAOMapper;
-import com.zeyad.usecases.network.ApiConnection;
 import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;
 import com.zeyad.usecases.stores.DataStoreFactory;
+import com.zeyad.usecases.utils.ReplayingShare;
 import com.zeyad.usecases.utils.Utils;
 
 import java.util.List;
 
 import rx.Observable;
 import rx.Scheduler;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 
 /**
  * @author by ZIaDo on 5/9/17.
  */
-public class DataService implements IDataService {
+class DataService implements IDataService {
 
     private static final String DEFAULT_ID_KEY = "id";
-    private static HandlerThread handlerThread;
     private static DataService sDataService;
     private final DataStoreFactory mDataStoreFactory;
     private final PostExecutionThread mPostExecutionThread;
+    private final Scheduler mBackgroundThread;
 
-    DataService(ApiConnection apiConnection, DAOMapper daoMapper, PostExecutionThread postExecutionThread,
-                HandlerThread thread, boolean withRealm) {
-        handlerThread = thread;
-        if (!handlerThread.isAlive())
-            handlerThread.start();
-        if (withRealm)
-            mDataStoreFactory = new DataStoreFactory(new RealmManager(handlerThread.getLooper()),
-                    apiConnection, daoMapper);
-        else mDataStoreFactory = new DataStoreFactory(apiConnection, daoMapper);
-        mPostExecutionThread = postExecutionThread;
-        sDataService = this;
-    }
-
-    DataService(DataStoreFactory dataStoreFactory, PostExecutionThread postExecutionThread, HandlerThread thread) {
-        handlerThread = thread;
-        if (!handlerThread.isAlive())
-            handlerThread.start();
+    DataService(DataStoreFactory dataStoreFactory, PostExecutionThread postExecutionThread, Scheduler backgroundThread) {
+        mBackgroundThread = backgroundThread;
         mDataStoreFactory = dataStoreFactory;
         mPostExecutionThread = postExecutionThread;
         sDataService = this;
@@ -58,10 +37,6 @@ public class DataService implements IDataService {
         if (sDataService == null)
             throw new NullPointerException("DataUseCase#initRealm must be called before calling getInstance()");
         return sDataService;
-    }
-
-    public static Scheduler getBackgroundThread() {
-        return AndroidSchedulers.from(handlerThread.getLooper());
     }
 
     @Override
@@ -256,12 +231,9 @@ public class DataService implements IDataService {
      * @return the transformed observable
      */
     private <T> Observable.Transformer<T, T> applySchedulers() {
-        if (!handlerThread.isAlive())
-            handlerThread.start();
-        Scheduler backgroundThread = AndroidSchedulers.from(handlerThread.getLooper());
-        return mPostExecutionThread != null ? observable -> observable.subscribeOn(backgroundThread)
+        return mPostExecutionThread != null ? observable -> observable.subscribeOn(mBackgroundThread)
                 .observeOn(mPostExecutionThread.getScheduler())
-                .unsubscribeOn(backgroundThread) : observable -> observable.subscribeOn(backgroundThread)
-                .unsubscribeOn(backgroundThread);
+                .unsubscribeOn(mBackgroundThread) : observable -> observable.subscribeOn(mBackgroundThread)
+                .unsubscribeOn(mBackgroundThread);
     }
 }

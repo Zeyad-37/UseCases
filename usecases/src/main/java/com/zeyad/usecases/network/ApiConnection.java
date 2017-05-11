@@ -49,13 +49,11 @@ public class ApiConnection {
     private static final String CACHING_DISABLED = "There would be no caching. Since caching module is disabled.",
             CACHE_CONTROL = "Cache-Control";
     private static final int TIME_OUT = 15;
-    private static ApiConnection sInstance;
     private final RestApi mRestApiWithoutCache, mRestApiWithCache;
 
     public ApiConnection(RestApi restApiWithoutCache, RestApi restApiWithCache) {
         mRestApiWithoutCache = restApiWithoutCache;
         mRestApiWithCache = restApiWithCache;
-        sInstance = this;
     }
 
     public static RestApi initWithCache(@Nullable OkHttpClient.Builder okHttpBuilder, @Nullable Cache cache) {
@@ -68,10 +66,6 @@ public class ApiConnection {
         if (okHttpBuilder == null)
             okHttpBuilder = getBuilderForOkHttp();
         return createRetro2Client(provideOkHttpClient(okHttpBuilder, null)).create(RestApi.class);
-    }
-
-    public static ApiConnection getInstance() {
-        return sInstance;
     }
 
     @NonNull
