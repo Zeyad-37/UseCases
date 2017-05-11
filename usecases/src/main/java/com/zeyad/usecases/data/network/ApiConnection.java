@@ -111,8 +111,8 @@ public class ApiConnection {
     private static OkHttpClient.Builder getBuilderForOkHttp() {
         return new OkHttpClient.Builder()
                 .addInterceptor(provideHttpLoggingInterceptor())
-                .addInterceptor(provideOfflineCacheInterceptor())
-                .addNetworkInterceptor(provideCacheInterceptor())
+//                .addInterceptor(provideOfflineCacheInterceptor())
+//                .addNetworkInterceptor(provideCacheInterceptor())
                 .connectTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .readTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .writeTimeout(TIME_OUT, TimeUnit.SECONDS);
