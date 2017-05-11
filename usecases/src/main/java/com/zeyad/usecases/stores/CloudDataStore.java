@@ -14,6 +14,7 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.R;
+import com.zeyad.usecases.api.DataService;
 import com.zeyad.usecases.db.DataBaseManager;
 import com.zeyad.usecases.db.RealmManager;
 import com.zeyad.usecases.db.RealmQueryProvider;
@@ -48,7 +49,6 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import rx.Observable;
 import rx.Subscriber;
-import rx.schedulers.Schedulers;
 import st.lowlevel.storo.Storo;
 
 import static com.zeyad.usecases.requests.PostRequest.DELETE;
@@ -77,7 +77,7 @@ public class CloudDataStore implements DataStore {
     /**
      * Construct a {@link DataStore} based on connections to the api (Cloud).
      *
-     * @param apiConnection         The {@link RestApi} implementation to use.
+     * @param apiConnection   The {@link RestApi} implementation to use.
      * @param dataBaseManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
     CloudDataStore(ApiConnection apiConnection, DataBaseManager dataBaseManager, DAOMapper entityDataMapper) {
@@ -517,13 +517,12 @@ public class CloudDataStore implements DataStore {
                 }
         }
         if (observable != null)
-            observable.subscribeOn(Schedulers.io())
-                    .subscribe(new SimpleSubscriber(object));
+            observable.subscribeOn(DataService.getBackgroundThread()).subscribe(new SimpleSubscriber(object));
     }
 
     private void persistAllGenerics(List collection, Class dataClass) {
         mDataBaseManager.putAll(mEntityDataMapper.mapAllToRealm(collection, dataClass), dataClass)
-                .subscribeOn(Schedulers.io())
+                .subscribeOn(DataService.getBackgroundThread())
                 .subscribe(new SimpleSubscriber(collection));
     }
 

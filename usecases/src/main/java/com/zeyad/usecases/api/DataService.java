@@ -24,7 +24,7 @@ import rx.functions.Func1;
 /**
  * @author by ZIaDo on 5/9/17.
  */
-class DataService implements IDataService {
+public class DataService implements IDataService {
 
     private static final String DEFAULT_ID_KEY = "id";
     private static HandlerThread handlerThread;
@@ -58,6 +58,10 @@ class DataService implements IDataService {
         if (sDataService == null)
             throw new NullPointerException("DataUseCase#initRealm must be called before calling getInstance()");
         return sDataService;
+    }
+
+    public static Scheduler getBackgroundThread() {
+        return AndroidSchedulers.from(handlerThread.getLooper());
     }
 
     @Override
