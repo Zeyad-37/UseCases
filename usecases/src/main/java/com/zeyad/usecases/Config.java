@@ -19,7 +19,7 @@ public class Config {
     private static Config sInstance;
     private static Gson mGson;
     private static String mBaseURL;
-    private static boolean withCache;
+    private static boolean withCache, withRealm;
     private static int cacheAmount;
     private static TimeUnit cacheTimeUnit;
     private Context mContext;
@@ -105,6 +105,10 @@ public class Config {
         return cacheTimeUnit;
     }
 
+    public static void setHasRealm(boolean hasRealm) {
+        Config.withRealm = hasRealm;
+    }
+
     private void setupRealm() {
 //        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
 //                .name("library.realm")
@@ -129,5 +133,9 @@ public class Config {
 
     public void setUseApiWithCache(boolean useApiWithCache) {
         mUseApiWithCache = useApiWithCache;
+    }
+
+    public static boolean isWithRealm() {
+        return withRealm;
     }
 }

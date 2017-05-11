@@ -4,8 +4,8 @@ import com.zeyad.usecases.app.components.redux.BaseEvent;
 import com.zeyad.usecases.app.components.redux.BaseViewModel;
 import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.utils.Utils;
-import com.zeyad.usecases.data.requests.GetRequest;
-import com.zeyad.usecases.domain.interactors.IDataUseCase;
+import com.zeyad.usecases.requests.GetRequest;
+import com.zeyad.usecases.api.IDataService;
 
 import rx.Observable;
 import rx.functions.Func1;
@@ -16,9 +16,9 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
  * @author zeyad on 1/10/17.
  */
 public class UserDetailVM extends BaseViewModel<UserDetailState> {
-    private final IDataUseCase dataUseCase;
+    private final IDataService dataUseCase;
 
-    public UserDetailVM(IDataUseCase dataUseCase, SuccessStateAccumulator<UserDetailState> successStateAccumulator,
+    public UserDetailVM(IDataService dataUseCase, SuccessStateAccumulator<UserDetailState> successStateAccumulator,
                         UserDetailState initialState) {
         super(successStateAccumulator, initialState);
         this.dataUseCase = dataUseCase;

@@ -6,9 +6,9 @@ import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.presentation.user_list.events.DeleteUsersEvent;
 import com.zeyad.usecases.app.presentation.user_list.events.GetPaginatedUsersEvent;
 import com.zeyad.usecases.app.presentation.user_list.events.SearchUsersEvent;
-import com.zeyad.usecases.data.requests.GetRequest;
-import com.zeyad.usecases.data.requests.PostRequest;
-import com.zeyad.usecases.domain.interactors.IDataUseCase;
+import com.zeyad.usecases.requests.GetRequest;
+import com.zeyad.usecases.requests.PostRequest;
+import com.zeyad.usecases.api.IDataService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,9 +28,9 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
  */
 public class UserListVM extends BaseViewModel<UserListState> {
 
-    private final IDataUseCase dataUseCase;
+    private final IDataService dataUseCase;
 
-    public UserListVM(IDataUseCase dataUseCase, SuccessStateAccumulator<UserListState> successStateAccumulator) {
+    public UserListVM(IDataService dataUseCase, SuccessStateAccumulator<UserListState> successStateAccumulator) {
         super(successStateAccumulator, null);
         this.dataUseCase = dataUseCase;
     }

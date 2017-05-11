@@ -11,8 +11,8 @@ import android.os.StrictMode;
 import android.util.Base64;
 import android.util.Log;
 
-import com.zeyad.usecases.domain.interactors.DataUseCaseConfig;
-import com.zeyad.usecases.domain.interactors.DataUseCaseFactory;
+import com.zeyad.usecases.api.DataServiceConfig;
+import com.zeyad.usecases.api.DataServiceFactory;
 
 import java.security.MessageDigest;
 import java.util.concurrent.TimeUnit;
@@ -28,6 +28,78 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.API_BASE_URL;
  * @author by ZIaDo on 9/24/16.
  */
 public class GenericApplication extends Application {
+
+    @Override
+    public void onCreate() {
+        initializeStrictMode();
+        super.onCreate();
+//        if (LeakCanary.isInAnalyzerProcess(this)) {
+//            // This process is dedicated to LeakCanary for heap analysis.
+//            // You should not init your app in this process.
+//            return;
+//        }
+//        LeakCanary.install(this);
+//        checkAppTampering(sInstance);
+        initializeRealm();
+        DataServiceFactory.init(new DataServiceConfig.Builder(this)
+                .baseUrl(API_BASE_URL)
+                .withCache(3, TimeUnit.MINUTES)
+                .withRealm()
+//                .postExecutionThread(AndroidSchedulers::mainThread)
+                .build());
+        initializeStetho();
+        initializeFlowUp();
+    }
+
+    private void initializeStrictMode() {
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build());
+            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
+                    .detectAll()
+                    .penaltyLog()
+                    .build());
+        }
+    }
+
+    private void initializeRealm() {
+        Realm.init(this);
+        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
+                .name("app.realm")
+                .modules(Realm.getDefaultModule(), new LibraryModule())
+                .rxFactory(new RealmObservableFactory())
+                .deleteRealmIfMigrationNeeded()
+                .build());
+    }
+
+    private void initializeStetho() {
+//        Stetho.initialize(Stetho.newInitializerBuilder(this)
+//                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+//                .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
+//                .build());
+//        RealmInspectorModulesProvider.builder(this)
+//                .withFolder(getCacheDir())
+////                .withEncryptionKey("encrypted.realm", key)
+//                .withMetaTables()
+//                .withDescendingOrder()
+//                .withLimit(1000)
+//                .databaseNamePattern(Pattern.compile(".+\\.realm"))
+//                .build();
+    }
+
+    private void initializeFlowUp() {
+        FlowUp.Builder.with(this)
+                .apiKey(getString(R.string.flow_up_api_key))
+                .forceReports(BuildConfig.DEBUG)
+                .start();
+    }
+
+    private boolean checkAppTampering(Context context) {
+        return checkAppSignature(context) && verifyInstaller(context) && checkEmulator()
+                && checkDebuggable(context);
+    }
 
     @TargetApi(value = 24)
     private static boolean checkAppSignature(Context context) {
@@ -77,77 +149,5 @@ public class GenericApplication extends Application {
 
     private static boolean checkDebuggable(Context context) {
         return (context.getApplicationInfo().flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-    }
-
-    @Override
-    public void onCreate() {
-        initializeStrickMode();
-        super.onCreate();
-//        if (LeakCanary.isInAnalyzerProcess(this)) {
-//            // This process is dedicated to LeakCanary for heap analysis.
-//            // You should not init your app in this process.
-//            return;
-//        }
-//        LeakCanary.install(this);
-//        checkAppTampering(sInstance);
-        initializeRealm();
-        DataUseCaseFactory.init(new DataUseCaseConfig.Builder(this)
-                .baseUrl(API_BASE_URL)
-                .withCache(3, TimeUnit.MINUTES)
-                .withRealm()
-//                .postExecutionThread(AndroidSchedulers::mainThread)
-                .build());
-        initializeStetho();
-        initializeFlowUp();
-    }
-
-    private void initializeStrickMode() {
-        if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build());
-        }
-    }
-
-    private void initializeRealm() {
-        Realm.init(this);
-        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
-                .name("app.realm")
-                .modules(Realm.getDefaultModule(), new LibraryModule())
-                .rxFactory(new RealmObservableFactory())
-                .deleteRealmIfMigrationNeeded()
-                .build());
-    }
-
-    private void initializeStetho() {
-//        Stetho.initialize(Stetho.newInitializerBuilder(this)
-//                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-//                .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-//                .build());
-//        RealmInspectorModulesProvider.builder(this)
-//                .withFolder(getCacheDir())
-////                .withEncryptionKey("encrypted.realm", key)
-//                .withMetaTables()
-//                .withDescendingOrder()
-//                .withLimit(1000)
-//                .databaseNamePattern(Pattern.compile(".+\\.realm"))
-//                .build();
-    }
-
-    private void initializeFlowUp() {
-        FlowUp.Builder.with(this)
-                .apiKey(getString(R.string.flow_up_api_key))
-                .forceReports(BuildConfig.DEBUG)
-                .start();
-    }
-
-    private boolean checkAppTampering(Context context) {
-        return checkAppSignature(context) && verifyInstaller(context) && checkEmulator()
-                && checkDebuggable(context);
     }
 }

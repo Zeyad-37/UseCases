@@ -1,11 +1,11 @@
 package com.zeyad.usecases.app.presentation.screens.user_detail;
 
+import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailState;
 import com.zeyad.usecases.app.presentation.user_detail.UserDetailVM;
 import com.zeyad.usecases.app.presentation.user_list.User;
-import com.zeyad.usecases.data.db.RealmManager;
-import com.zeyad.usecases.domain.interactors.IDataUseCase;
+import com.zeyad.usecases.db.RealmQueryProvider;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 
 public class UserDetailVMTest {
 
-    private IDataUseCase mockDataUseCase;
+    private IDataService mockDataUseCase;
     private User user;
     private UserDetailVM userDetailVM;
 
@@ -35,7 +35,7 @@ public class UserDetailVMTest {
 
     @Before
     public void setUp() throws Exception {
-        mockDataUseCase = mock(IDataUseCase.class);
+        mockDataUseCase = mock(IDataService.class);
         userDetailVM = new UserDetailVM(mockDataUseCase, mock(SuccessStateAccumulator.class),
                 mock(UserDetailState.class));
 
@@ -50,12 +50,12 @@ public class UserDetailVMTest {
         userList.add(user);
         Observable<List> observableUserRealm = Observable.just(userList);
 
-        when(mockDataUseCase.queryDisk(any(RealmManager.RealmQueryProvider.class)))
+        when(mockDataUseCase.queryDisk(any(RealmQueryProvider.class)))
                 .thenReturn(observableUserRealm);
 
         userDetailVM.getRepositories(user.getLogin());
 
         // Verify repository interactions
-        verify(mockDataUseCase, times(1)).queryDisk(any(RealmManager.RealmQueryProvider.class));
+        verify(mockDataUseCase, times(1)).queryDisk(any(RealmQueryProvider.class));
     }
 }
