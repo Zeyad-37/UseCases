@@ -189,6 +189,7 @@ public class RealmManager implements DataBaseManager {
     @Override
     public <T extends RealmModel> Observable<?> putAll(List<T> realmObjects, Class dataClass) {
         return Observable.defer(() -> {
+            Log.d("RealmManager putAll", "Thread name: " + Thread.currentThread().getName());
             Realm realm = Realm.getDefaultInstance();
             try {
                 executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmObjects));
@@ -306,6 +307,7 @@ public class RealmManager implements DataBaseManager {
 
     private void closeRealm(Realm realm) {
         backgroundHandler.post(() -> {
+            Log.d("RealmManager closeRealm", "Thread name: " + Thread.currentThread().getName());
             if (!realm.isClosed()) {
                 realm.close();
                 Log.d(RealmManager.class.getSimpleName(), "realm instance closed!");
