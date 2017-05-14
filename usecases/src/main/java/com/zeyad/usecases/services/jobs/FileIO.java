@@ -122,8 +122,4 @@ public class FileIO {
             mUtils.queueFileIOCore(mDispatcher, mIsDownload, mFileIORequest);
         }
     }
-
-    int getTrailCount() {
-        return mTrailCount;
-    }
 }

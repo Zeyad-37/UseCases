@@ -43,8 +43,9 @@ import io.realm.RealmObject;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import rx.CompletableSubscriber;
 import rx.Observable;
-import rx.Subscriber;
+import rx.Subscription;
 import st.lowlevel.storo.Storo;
 
 import static com.zeyad.usecases.requests.PostRequest.DELETE;
@@ -510,13 +511,16 @@ public class CloudDataStore implements DataStore {
                 }
         }
         if (observable != null)
-            observable.subscribeOn(Config.getBackgroundThread()).subscribe(new SimpleSubscriber(object));
+            observable.subscribeOn(Config.getBackgroundThread())
+                    .toCompletable()
+                    .subscribe(new SimpleSubscriber(dataClass));
     }
 
     private void persistAllGenerics(List collection, Class dataClass) {
         mDataBaseManager.putAll(mEntityDataMapper.mapAllToRealm(collection, dataClass), dataClass)
                 .subscribeOn(Config.getBackgroundThread())
-                .subscribe(new SimpleSubscriber(collection));
+                .toCompletable()
+                .subscribe(new SimpleSubscriber(dataClass));
     }
 
     private void deleteFromPersistence(List collection, String idColumnName, Class dataClass) {
@@ -527,28 +531,29 @@ public class CloudDataStore implements DataStore {
         }
     }
 
-    private static class SimpleSubscriber extends Subscriber<Object> {
-        private final Object mObject;
+    private static class SimpleSubscriber implements CompletableSubscriber {
+        private final Class mClass;
+        private Subscription subscription;
 
-        SimpleSubscriber(Object object) {
-            mObject = object;
+        SimpleSubscriber(Class aClass) {
+            mClass = aClass;
         }
 
         @Override
         public void onCompleted() {
-            unsubscribe();
-            Log.d(TAG, mObject.getClass().getName() + " completed!");
+            subscription.unsubscribe();
+            Log.d(TAG, mClass.getSimpleName() + " persisted!");
         }
 
         @Override
         public void onError(@NonNull Throwable e) {
             e.printStackTrace();
-            unsubscribe();
+            subscription.unsubscribe();
         }
 
         @Override
-        public void onNext(Object o) {
-            Log.d(TAG, mObject.getClass().getName() + " added!");
+        public void onSubscribe(Subscription d) {
+            subscription = d;
         }
     }
 }

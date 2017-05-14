@@ -6,7 +6,6 @@ import android.util.Log;
 
 import com.zeyad.usecases.BuildConfig;
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.executors.JobExecutor;
 import com.zeyad.usecases.utils.Utils;
 
 import java.io.File;
@@ -124,7 +123,6 @@ public class ApiConnection {
         return new Retrofit.Builder()
                 .baseUrl(Config.getBaseURL())
                 .client(okHttpClient)
-                .callbackExecutor(new JobExecutor())
                 .addConverterFactory(GsonConverterFactory.create(Config.getGson()))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .build();

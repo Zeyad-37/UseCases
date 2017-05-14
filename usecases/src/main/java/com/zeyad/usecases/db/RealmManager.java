@@ -18,9 +18,12 @@ import io.realm.Realm;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
+import rx.Completable;
+import rx.CompletableSubscriber;
 import rx.Observable;
-import rx.Subscriber;
-import rx.schedulers.Schedulers;
+import rx.Subscription;
+
+import static com.google.android.gms.internal.zzs.TAG;
 
 /**
  * {@link DataBaseManager} implementation.
@@ -188,7 +191,6 @@ public class RealmManager implements DataBaseManager {
     @Override
     public <T extends RealmModel> Observable<?> putAll(List<T> realmObjects, Class dataClass) {
         return Observable.defer(() -> {
-            Log.d("RealmManager putAll", "Thread name: " + Thread.currentThread().getName());
             Realm realm = Realm.getDefaultInstance();
             try {
                 executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmObjects));
@@ -226,16 +228,34 @@ public class RealmManager implements DataBaseManager {
      */
     @Override
     public void evict(@NonNull final RealmObject realmModel, @NonNull Class clazz) {
-        Observable.defer(() -> {
+        Completable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
             try {
                 executeWriteOperationInRealm(realm, (Executor) realmModel::deleteFromRealm);
-                return Observable.just(Boolean.TRUE);
+                return Completable.complete();
             } finally {
                 closeRealm(realm);
             }
-        }).subscribeOn(Schedulers.immediate())
-                .subscribe(new EvictSubscriberClass(clazz));
+        }).subscribe(new CompletableSubscriber() {
+            private Subscription subscription;
+
+            @Override
+            public void onCompleted() {
+                subscription.unsubscribe();
+                Log.d(TAG, clazz.getSimpleName() + " deleted!");
+            }
+
+            @Override
+            public void onError(@NonNull Throwable e) {
+                e.printStackTrace();
+                subscription.unsubscribe();
+            }
+
+            @Override
+            public void onSubscribe(Subscription d) {
+                subscription = d;
+            }
+        });
     }
 
     /**
@@ -280,7 +300,6 @@ public class RealmManager implements DataBaseManager {
 
     private void closeRealm(Realm realm) {
         backgroundHandler.post(() -> {
-            Log.d("RealmManager closeRealm", "Thread name: " + Thread.currentThread().getName());
             if (!realm.isClosed()) {
                 realm.close();
                 Log.d(RealmManager.class.getSimpleName(), "realm instance closed!");
@@ -334,30 +353,5 @@ public class RealmManager implements DataBaseManager {
     private interface ExecuteAndReturn<T> {
         @NonNull
         T run();
-    }
-
-    private static class EvictSubscriberClass extends Subscriber<Object> {
-
-        private final Class mClazz;
-
-        EvictSubscriberClass(Class clazz) {
-            mClazz = clazz;
-        }
-
-        @Override
-        public void onCompleted() {
-            unsubscribe();
-        }
-
-        @Override
-        public void onError(@NonNull Throwable e) {
-            e.printStackTrace();
-            unsubscribe();
-        }
-
-        @Override
-        public void onNext(Object o) {
-            Log.d(RealmManager.class.getName(), mClazz.getName() + " deleted!");
-        }
     }
 }
