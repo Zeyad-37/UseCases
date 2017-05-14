@@ -82,7 +82,7 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
     }
 
     /**
-     * Initialize any objects or any required dependencies.
+     * Initialize objects or any required dependencies.
      */
     public abstract void initialize();
 

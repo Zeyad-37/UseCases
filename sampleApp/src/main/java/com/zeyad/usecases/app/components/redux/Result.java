@@ -34,20 +34,20 @@ public class Result<B> {
         return new Result<>(SUCCESS, false, null, true, bundle);
     }
 
-    public boolean isLoading() {
+    boolean isLoading() {
         return isLoading;
     }
 
-    public Throwable getError() {
+    Throwable getError() {
         return error;
+    }
+
+    boolean isSuccessful() {
+        return isSuccessful;
     }
 
     public B getBundle() {
         return bundle;
-    }
-
-    public boolean isSuccessful() {
-        return isSuccessful;
     }
 
     @Override

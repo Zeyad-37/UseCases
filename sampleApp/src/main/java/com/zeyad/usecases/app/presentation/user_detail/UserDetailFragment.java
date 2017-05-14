@@ -24,6 +24,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.resource.drawable.GlideDrawable;
 import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
+import com.zeyad.usecases.api.DataServiceFactory;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
@@ -31,7 +32,6 @@ import com.zeyad.usecases.app.components.redux.BaseFragment;
 import com.zeyad.usecases.app.presentation.user_list.User;
 import com.zeyad.usecases.app.presentation.user_list.UserListActivity;
 import com.zeyad.usecases.app.utils.Utils;
-import com.zeyad.usecases.api.DataServiceFactory;
 
 import org.parceler.Parcels;
 
@@ -74,8 +74,9 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
 
     @Override
     public void initialize() {
-        if (getArguments() != null)
-            viewState = Parcels.unwrap(getArguments().getParcelable(UI_MODEL));
+        Bundle arguments = getArguments();
+        if (arguments != null)
+            viewState = Parcels.unwrap(arguments.getParcelable(UI_MODEL));
         viewModel = new UserDetailVM(DataServiceFactory.getInstance(), (newResult, currentStateBundle) -> UserDetailState.builder()
                 .setRepos((List<Repository>) newResult.getBundle())
                 .setUser(currentStateBundle.getUser())

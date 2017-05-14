@@ -3,7 +3,7 @@ package com.zeyad.usecases.app.components.redux;
 /**
  * @author zeyad on 1/24/17.
  */
-public class UIModel<S> {
+class UIModel<S> {
     static final String LOADING = "loading", ERROR = "error", SUCCESS = "success";
     private static final String IDLE = "idle";
     private final boolean isLoading, isSuccessful;
@@ -23,15 +23,15 @@ public class UIModel<S> {
         return new UIModel<>(IDLE, false, null, false, bundle);
     }
 
-    public static <B> UIModel<B> loadingState(B bundle) {
+    static <B> UIModel<B> loadingState(B bundle) {
         return new UIModel<>(LOADING, true, null, false, bundle);
     }
 
-    public static <B> UIModel<B> errorState(Throwable error) {
+    static <B> UIModel<B> errorState(Throwable error) {
         return new UIModel<>(ERROR, false, error, false, null);
     }
 
-    public static <B> UIModel<B> successState(B bundle) {
+    static <B> UIModel<B> successState(B bundle) {
         return new UIModel<>(SUCCESS, false, null, true, bundle);
     }
 
@@ -43,16 +43,12 @@ public class UIModel<S> {
         return error;
     }
 
-    public S getBundle() {
+    S getBundle() {
         return bundle;
     }
 
     boolean isSuccessful() {
         return isSuccessful;
-    }
-
-    String getState() {
-        return state;
     }
 
     @Override

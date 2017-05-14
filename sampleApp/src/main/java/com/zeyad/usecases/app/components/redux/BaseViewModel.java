@@ -11,8 +11,8 @@ import rx.schedulers.Schedulers;
  */
 public abstract class BaseViewModel<S> {
 
-    public final SuccessStateAccumulator<S> successStateAccumulator;
-    public final S initialState;
+    private final SuccessStateAccumulator<S> successStateAccumulator;
+    private final S initialState;
 
     /**
      * @param successStateAccumulator a success State Accumulator.
