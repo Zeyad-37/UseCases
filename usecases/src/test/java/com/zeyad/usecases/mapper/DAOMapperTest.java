@@ -45,4 +45,9 @@ public class DAOMapperTest {
         Assert.assertEquals(daoMapper.mapTo(Collections.singletonList(new TestRealmModel()),
                 TestRealmModel.class).getClass(), ArrayList.class);
     }
+
+    @Test
+    public void getInstance() throws Exception {
+        Assert.assertNotNull(DAOMapper.getInstance());
+    }
 }
