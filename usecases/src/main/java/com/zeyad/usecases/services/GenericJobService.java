@@ -8,9 +8,9 @@ import com.firebase.jobdispatcher.JobParameters;
 import com.firebase.jobdispatcher.JobService;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.R;
-import com.zeyad.usecases.network.ApiConnection;
 import com.zeyad.usecases.services.jobs.FileIO;
 import com.zeyad.usecases.services.jobs.Post;
+import com.zeyad.usecases.stores.CloudDataStore;
 import com.zeyad.usecases.utils.Utils;
 
 import rx.subscriptions.CompositeSubscription;
@@ -34,13 +34,13 @@ public class GenericJobService extends JobService {
         if (params.getExtras() != null && params.getExtras().containsKey(PAYLOAD)) {
             if (mCompositeSubscription == null || mCompositeSubscription.isUnsubscribed())
                 mCompositeSubscription = new CompositeSubscription();
-            ApiConnection instance = Config.getApiConnection();
+            CloudDataStore instance = Config.getCloudDataStore();
             int trailCount = params.getExtras().getInt(TRIAL_COUNT);
             Utils utils = Utils.getInstance();
             switch (params.getExtras().getString(JOB_TYPE, "")) {
                 case POST:
                     mCompositeSubscription.add(new Post(this, params.getExtras().getParcelable(PAYLOAD),
-                            instance, trailCount, utils).execute());
+                            Config.getApiConnection(), trailCount, utils).execute());
                     Log.d(TAG, getString(R.string.job_started, POST));
                     break;
                 case DOWNLOAD_FILE:

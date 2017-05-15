@@ -9,6 +9,7 @@ import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.zeyad.usecases.network.ApiConnection;
+import com.zeyad.usecases.stores.CloudDataStore;
 
 import java.util.concurrent.TimeUnit;
 
@@ -26,6 +27,7 @@ public class Config {
     private static TimeUnit cacheTimeUnit;
     private static Scheduler backgroundThread;
     private static ApiConnection apiConnection;
+    private static CloudDataStore cloudDataStore;
     private Context mContext;
     private boolean mUseApiWithCache;
 
@@ -131,6 +133,14 @@ public class Config {
 
     public static void setApiConnection(ApiConnection apiConnection) {
         Config.apiConnection = apiConnection;
+    }
+
+    public static CloudDataStore getCloudDataStore() {
+        return cloudDataStore;
+    }
+
+    public static void setCloudDataStore(CloudDataStore cloudDataStore) {
+        Config.cloudDataStore = cloudDataStore;
     }
 
     private void setupRealm() {

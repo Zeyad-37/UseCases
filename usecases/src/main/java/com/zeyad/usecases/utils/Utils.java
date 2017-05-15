@@ -31,9 +31,9 @@ import io.realm.Realm;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
-public class Utils {
+import static com.zeyad.usecases.stores.CloudDataStore.MULTIPART_FORM_DATA;
 
-    private static final String MULTIPART_FORM_DATA = "multipart/form-data";
+public class Utils {
 
     private static Utils instance;
 
