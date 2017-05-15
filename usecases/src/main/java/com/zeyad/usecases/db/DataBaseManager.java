@@ -9,6 +9,7 @@ import java.util.List;
 
 import io.realm.RealmModel;
 import io.realm.RealmObject;
+import rx.Completable;
 import rx.Observable;
 
 /**
@@ -41,7 +42,7 @@ public interface DataBaseManager {
      * @param dataClass  Class type of the items to be put.
      */
     @NonNull
-    <M extends RealmModel> Observable<?> put(M realmModel, Class dataClass);
+    <M extends RealmModel> Completable put(M realmModel, Class dataClass);
 
     /**
      * Puts and element into the DB.
@@ -50,7 +51,7 @@ public interface DataBaseManager {
      * @param dataClass  Class type of the items to be put.
      */
     @NonNull
-    Observable<?> put(JSONObject jsonObject, String idColumnName, Class dataClass);
+    Completable put(JSONObject jsonObject, String idColumnName, Class dataClass);
 
     /**
      * Puts and element into the DB.
@@ -58,7 +59,7 @@ public interface DataBaseManager {
      * @param realmObjects Element to insert in the DB.
      * @param dataClass    Class type of the items to be put.
      */
-    <M extends RealmModel> Observable<?> putAll(List<M> realmObjects, Class dataClass);
+    <M extends RealmModel> Completable putAll(List<M> realmObjects, Class dataClass);
 
     /**
      * Puts and element into the DB.
@@ -68,7 +69,7 @@ public interface DataBaseManager {
      * @param dataClass    Class type of the items to be put.
      */
     @NonNull
-    Observable<?> putAll(JSONArray jsonArray, String idColumnName, Class dataClass);
+    Completable putAll(JSONArray jsonArray, String idColumnName, Class dataClass);
 
     /**
      * Evict all elements of the DB.
@@ -76,7 +77,7 @@ public interface DataBaseManager {
      * @param clazz Class type of the items to be deleted.
      */
     @NonNull
-    Observable<Boolean> evictAll(Class clazz);
+    Completable evictAll(Class clazz);
 
     /**
      * Evict element of the DB.
@@ -103,7 +104,7 @@ public interface DataBaseManager {
      * @param dataClass   Class type of the items to be deleted.
      */
     @NonNull
-    Observable<Boolean> evictCollection(String idFieldName, List<Long> list, Class dataClass);
+    Completable evictCollection(String idFieldName, List<Long> list, Class dataClass);
 
     /**
      * Get list of items according to the query passed.

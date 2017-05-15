@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
+import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.test.rule.BuildConfig;
 
@@ -33,7 +34,9 @@ import io.realm.RealmModel;
 import io.realm.RealmObject;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import rx.Completable;
 import rx.Observable;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.observers.TestSubscriber;
 
 import static org.junit.Assert.assertEquals;
@@ -69,10 +72,13 @@ public class CloudDataStoreTest {
         mockApiConnection = mock(ApiConnection.class);
         mockDataBaseManager = mock(RealmManager.class);
         changeStateOfNetwork(mockContext, true);
-        when(mockDataBaseManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(observable);
-        when(mockDataBaseManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(observable);
-        when(mockDataBaseManager.putAll(anyList(), any(Class.class))).thenReturn(observable);
+        when(mockDataBaseManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
+        when(mockDataBaseManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
+        when(mockDataBaseManager.putAll(anyList(), any(Class.class))).thenReturn(Completable.complete());
         cloudDataStore = new CloudDataStore(mockApiConnection, mockDataBaseManager, mock(DAOMapper.class), mockContext);
+        HandlerThread backgroundThread = new HandlerThread("backgroundThread");
+        backgroundThread.start();
+        com.zeyad.usecases.Config.setBackgroundThread(AndroidSchedulers.from(backgroundThread.getLooper()));
     }
 
     @Test
@@ -151,7 +157,7 @@ public class CloudDataStoreTest {
         TestSubscriber testSubscriber = new TestSubscriber();
         cloudDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, true, false)
                 .subscribe(testSubscriber);
-
+        testSubscriber.getOnErrorEvents();
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicPatch(anyString(), any(RequestBody.class));
@@ -447,16 +453,16 @@ public class CloudDataStoreTest {
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
-    @Test(expected = IllegalStateException.class)
+    @Test//(expected = IllegalStateException.class)
     public void dynamicDeleteAll() throws Exception {
-        Observable observable = cloudDataStore.dynamicDeleteAll(Object.class);
+        Completable completable = cloudDataStore.dynamicDeleteAll(Object.class);
 
         // Verify repository interactions
         verifyZeroInteractions(mockApiConnection);
         verifyZeroInteractions(mockDataBaseManager);
 
         // Assert return type
-        assertEquals(new IllegalStateException("Can not IO file to local DB"), observable.toBlocking().first());
+        assertEquals(IllegalStateException.class, completable.get().getClass());
     }
 
     @Test

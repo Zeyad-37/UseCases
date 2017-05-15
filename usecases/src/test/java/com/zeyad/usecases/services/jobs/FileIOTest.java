@@ -121,8 +121,8 @@ public class FileIOTest {
 
     private ResponseBody getResponseBody() throws IOException {
         responseBody = mock(ResponseBody.class);
-//        Mockito.when(responseBody.byteStream()).thenReturn(getInputStreamReader());
-//        Mockito.when(responseBody.contentLength()).thenReturn((long) (1096 * 1096));
+        Mockito.when(responseBody.byteStream()).thenReturn(getInputStreamReader());
+        Mockito.when(responseBody.contentLength()).thenReturn((long) (1096 * 1096));
         return responseBody;
     }
 

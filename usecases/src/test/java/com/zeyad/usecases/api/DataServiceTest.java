@@ -19,8 +19,10 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 
+import rx.Completable;
 import rx.Observable;
 import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -52,7 +54,9 @@ public class DataServiceTest {
         when(dataStoreFactory.dynamically(anyString())).thenReturn(mock(CloudDataStore.class));
         when(dataStoreFactory.disk()).thenReturn(mock(DiskDataStore.class));
         when(dataStoreFactory.cloud()).thenReturn(mock(CloudDataStore.class));
-        dataService = new DataService(dataStoreFactory, mock(PostExecutionThread.class), mock(Scheduler.class));
+        PostExecutionThread postExecutionThread = mock(PostExecutionThread.class);
+        when(postExecutionThread.getScheduler()).thenReturn(AndroidSchedulers.mainThread());
+        dataService = new DataService(dataStoreFactory, postExecutionThread, mock(Scheduler.class));
     }
 
     @Test
@@ -175,7 +179,7 @@ public class DataServiceTest {
 
     @Test
     public void deleteAll() throws Exception {
-        when(dataStoreFactory.disk().dynamicDeleteAll(any(Class.class))).thenReturn(observable);
+        when(dataStoreFactory.disk().dynamicDeleteAll(any(Class.class))).thenReturn(Completable.complete());
 
         dataService.deleteAll(postRequest);
 

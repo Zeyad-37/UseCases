@@ -11,6 +11,7 @@ import com.zeyad.usecases.utils.Utils;
 
 import java.util.List;
 
+import rx.Completable;
 import rx.Observable;
 import rx.Scheduler;
 import rx.functions.Func1;
@@ -25,12 +26,14 @@ class DataService implements IDataService {
     private final DataStoreFactory mDataStoreFactory;
     private final PostExecutionThread mPostExecutionThread;
     private final Scheduler mBackgroundThread;
+    private final boolean mPostThreadExist;
 
     DataService(DataStoreFactory dataStoreFactory, PostExecutionThread postExecutionThread, Scheduler backgroundThread) {
         mBackgroundThread = backgroundThread;
         mDataStoreFactory = dataStoreFactory;
         mPostExecutionThread = postExecutionThread;
         sDataService = this;
+        mPostThreadExist = mPostExecutionThread != null;
     }
 
     public static DataService getInstance() {
@@ -144,12 +147,15 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable<Boolean> deleteAll(PostRequest deleteRequest) {
+    public Completable deleteAll(PostRequest deleteRequest) {
         try {
             return mDataStoreFactory.disk().dynamicDeleteAll(deleteRequest.getDataClass())
-                    .compose(applySchedulers());
+                    .compose(mPostThreadExist ? completable -> completable.subscribeOn(mBackgroundThread)
+                            .observeOn(mPostExecutionThread.getScheduler())
+                            .unsubscribeOn(mBackgroundThread) : completable -> completable.subscribeOn(mBackgroundThread)
+                            .unsubscribeOn(mBackgroundThread));
         } catch (IllegalAccessException e) {
-            return Observable.error(e);
+            return Completable.error(e);
         }
     }
 
@@ -231,7 +237,7 @@ class DataService implements IDataService {
      * @return the transformed observable
      */
     private <T> Observable.Transformer<T, T> applySchedulers() {
-        return mPostExecutionThread != null ? observable -> observable.subscribeOn(mBackgroundThread)
+        return mPostThreadExist ? observable -> observable.subscribeOn(mBackgroundThread)
                 .observeOn(mPostExecutionThread.getScheduler())
                 .unsubscribeOn(mBackgroundThread) : observable -> observable.subscribeOn(mBackgroundThread)
                 .unsubscribeOn(mBackgroundThread);

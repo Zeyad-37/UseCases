@@ -7,6 +7,7 @@ import com.zeyad.usecases.requests.PostRequest;
 
 import java.util.List;
 
+import rx.Completable;
 import rx.Observable;
 
 public interface IDataService {
@@ -79,9 +80,9 @@ public interface IDataService {
      * Deletes All.
      *
      * @param deleteRequest contains the attributes of the request.
-     * @return Observable with the list.
+     * @return Completable with the list.
      */
-    Observable<Boolean> deleteAll(PostRequest deleteRequest);
+    Completable deleteAll(PostRequest deleteRequest);
 
     /**
      * Get list of items according to the query passed.

@@ -16,6 +16,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
+import rx.Completable;
 import rx.Observable;
 import st.lowlevel.storo.Storo;
 
@@ -40,7 +41,7 @@ public class DiskDataStore implements DataStore {
                                           boolean persist, boolean shouldCache) {
         if (Config.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
             return Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
-                    .map(object -> mEntityDataMapper.mapToDomain(object, dataClass));
+                    .map(object -> mEntityDataMapper.mapTo(object, dataClass));
         else
             return mDataBaseManager.getById(idColumnName, itemId, dataClass)
                     .map(object -> {
@@ -65,10 +66,10 @@ public class DiskDataStore implements DataStore {
     public Observable<?> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
                                             Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnNext(object -> {
+                .doOnEach(object -> {
                     if (Config.isWithCache())
                         cacheObject(idColumnName, jsonObject, dataClass);
-                });
+                }).toObservable();
     }
 
     @NonNull
@@ -83,18 +84,18 @@ public class DiskDataStore implements DataStore {
                                                  Class dataClass, boolean persist, boolean queuable) {
         List<Long> convertToListOfId = Utils.getInstance().convertToListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
-                .doOnNext(object -> {
+                .doOnEach(object -> {
                     if (Config.isWithCache()) {
                         for (int i = 0, convertToListOfIdSize = convertToListOfId != null ? convertToListOfId.size() : 0;
                              i < convertToListOfIdSize; i++)
                             Storo.delete(dataClass.getSimpleName() + convertToListOfId.get(i));
                     }
-                });
+                }).toObservable();
     }
 
     @NonNull
     @Override
-    public Observable<Boolean> dynamicDeleteAll(Class dataClass) {
+    public Completable dynamicDeleteAll(Class dataClass) {
         return mDataBaseManager.evictAll(dataClass);
     }
 
@@ -103,17 +104,17 @@ public class DiskDataStore implements DataStore {
     public Observable<?> dynamicPostObject(String url, String idColumnName, JSONObject jsonObject,
                                            Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnNext(object -> {
+                .doOnEach(object -> {
                     if (Config.isWithCache())
                         cacheObject(idColumnName, jsonObject, dataClass);
-                });
+                }).toObservable();
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
                                          Class dataClass, boolean persist, boolean queuable) {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass);
+        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toObservable();
     }
 
     @NonNull
@@ -121,17 +122,17 @@ public class DiskDataStore implements DataStore {
     public Observable<?> dynamicPutObject(String url, String idColumnName, JSONObject jsonObject,
                                           Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnNext(object -> {
+                .doOnEach(object -> {
                     if (Config.isWithCache())
                         cacheObject(idColumnName, jsonObject, dataClass);
-                });
+                }).toObservable();
     }
 
     @NonNull
     @Override
     public Observable<?> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
                                         Class dataClass, boolean persist, boolean queuable) {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass);
+        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toObservable();
     }
 
     private void cacheObject(String idColumnName, JSONObject jsonObject, Class dataClass) {

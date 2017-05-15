@@ -42,8 +42,7 @@ public class DataServiceFactory {
                     .initialize();
         HandlerThread backgroundThread = config.getHandlerThread();
         if (config.isWithRealm()) {
-            if (!backgroundThread.isAlive())
-                backgroundThread.start();
+            backgroundThread.start();
             Config.setBackgroundThread(AndroidSchedulers.from(backgroundThread.getLooper()));
         }
         ApiConnection apiConnection = new ApiConnection(ApiConnection.init(config.getOkHttpBuilder()),

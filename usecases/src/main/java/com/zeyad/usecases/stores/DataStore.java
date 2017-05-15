@@ -13,6 +13,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
+import rx.Completable;
 import rx.Observable;
 
 /**
@@ -76,11 +77,11 @@ public interface DataStore {
                                           Class dataClass, boolean persist, boolean queuable);
 
     /**
-     * Delete all items of the same type from cloud or disk which returns an {@link Observable}
+     * Delete all items of the same type from cloud or disk which returns an {@link Completable}
      * that will emit a list of ?.
      */
     @NonNull
-    Observable<Boolean> dynamicDeleteAll(Class dataClass);
+    Completable dynamicDeleteAll(Class dataClass);
 
     /**
      * Search disk with a RealmQuery which returns an {@link Observable} that will emit a list of ?.

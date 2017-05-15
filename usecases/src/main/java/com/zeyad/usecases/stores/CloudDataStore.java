@@ -43,6 +43,7 @@ import io.realm.RealmObject;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import rx.Completable;
 import rx.CompletableSubscriber;
 import rx.Observable;
 import rx.Subscription;
@@ -109,7 +110,7 @@ public class CloudDataStore implements DataStore {
                     if (willPersist(persist))
                         persistGeneric(object, idColumnName, dataClass);
                 })
-                .map(entity -> mEntityDataMapper.mapToDomain(entity, dataClass));
+                .map(entity -> mEntityDataMapper.mapTo(entity, dataClass));
     }
 
     @NonNull
@@ -120,7 +121,7 @@ public class CloudDataStore implements DataStore {
                     if (willPersist(persist))
                         persistAllGenerics(list, dataClass);
                 })
-                .map(entities -> mEntityDataMapper.mapAllToDomain(entities, dataClass));
+                .map(entities -> mEntityDataMapper.mapAllTo(entities, dataClass));
     }
 
     @NonNull
@@ -137,7 +138,7 @@ public class CloudDataStore implements DataStore {
                 return mErrorObservableNotPersisted;
             return mApiConnection.dynamicPatch(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
-                    .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
+                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PATCH, url, idColumnName, jsonObject, persist);
@@ -162,7 +163,7 @@ public class CloudDataStore implements DataStore {
                 return mErrorObservableNotPersisted;
             return mApiConnection.dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
-                    .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
+                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(POST, url, idColumnName, jsonObject, persist);
@@ -187,7 +188,7 @@ public class CloudDataStore implements DataStore {
                 return mErrorObservableNotPersisted;
             return mApiConnection.dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
-                    .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
+                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(POST, url, idColumnName, jsonArray, persist);
@@ -212,7 +213,7 @@ public class CloudDataStore implements DataStore {
                 return mErrorObservableNotPersisted;
             return mApiConnection.dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
-                    .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
+                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PUT, url, idColumnName, jsonObject, persist);
@@ -237,7 +238,7 @@ public class CloudDataStore implements DataStore {
                 return mErrorObservableNotPersisted;
             return mApiConnection.dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
-                    .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
+                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PUT, url, idColumnName, jsonArray, persist);
@@ -263,7 +264,7 @@ public class CloudDataStore implements DataStore {
                 return mErrorObservableNotPersisted;
             return mApiConnection.dynamicDelete(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
-                    .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
+                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PostRequest.DELETE, url, idColumnName, jsonArray, persist);
@@ -276,8 +277,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Boolean> dynamicDeleteAll(Class dataClass) {
-        return Observable.error(new IllegalStateException(mContext.getString(R.string.delete_all_error_cloud)));
+    public Completable dynamicDeleteAll(Class dataClass) {
+        return Completable.error(new IllegalStateException(mContext.getString(R.string.delete_all_error_cloud)));
     }
 
     @NonNull
@@ -299,7 +300,7 @@ public class CloudDataStore implements DataStore {
                     map.put(entry.getKey(), utils.createPartFromString(entry.getValue()));
             return mApiConnection.dynamicUpload(url, map, MultipartBody.Part.createFormData(key,
                     file.getName(), requestFile))
-                    .map(object -> mEntityDataMapper.mapToDomain(object, dataClass))
+                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queueIOFile(url, file, true, whileCharging, false);
@@ -455,23 +456,24 @@ public class CloudDataStore implements DataStore {
         if (object instanceof File)
             return;
         Object mappedObject = null;
-        Observable<?> observable = null;
+        Completable completable
+                = null;
         if (mDataBaseManager instanceof RealmManager) {
             try {
                 if (!(object instanceof JSONArray) && !(object instanceof Map))
-                    mappedObject = mEntityDataMapper.mapToRealm(object, dataClass);
+                    mappedObject = mEntityDataMapper.mapTo(object, dataClass);
             } catch (Exception e) {
                 e.printStackTrace();
             }
             if (mappedObject instanceof RealmObject)
-                observable = mDataBaseManager.put((RealmObject) mappedObject, dataClass);
+                completable = mDataBaseManager.put((RealmObject) mappedObject, dataClass);
             else if (mappedObject instanceof RealmModel)
-                observable = mDataBaseManager.put((RealmModel) mappedObject, dataClass);
+                completable = mDataBaseManager.put((RealmModel) mappedObject, dataClass);
             else try {
                     if (object instanceof JSONArray) {
                         JSONArray jsonArray = (JSONArray) object;
-                        observable = mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
-                                .flatMap(o -> {
+                        completable = mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
+                                .doOnEach(objectNotification -> {
                                     JSONObject jsonObject;
                                     for (int i = 0, size = jsonArray.length(); i < size; i++) {
                                         jsonObject = jsonArray.optJSONObject(i);
@@ -479,11 +481,10 @@ public class CloudDataStore implements DataStore {
                                                         + jsonObject.optString(idColumnName),
                                                 gson.fromJson(jsonObject.toString(), dataClass)).execute();
                                     }
-                                    return Observable.just(true);
                                 });
                     } else if (object instanceof List) {
-                        observable = mDataBaseManager.putAll(mEntityDataMapper
-                                .mapAllToRealm((List) object, dataClass), dataClass);
+                        completable = mDataBaseManager.putAll(mEntityDataMapper
+                                .mapAllTo((List) object, dataClass), dataClass);
                     } else {
                         JSONObject jsonObject;
                         if (object instanceof Map) {
@@ -494,32 +495,28 @@ public class CloudDataStore implements DataStore {
                             jsonObject = ((JSONObject) object);
                         } else
                             jsonObject = new JSONObject(gson.toJson(object, dataClass));
-                        observable = mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                                .flatMap(o -> {
+                        completable = mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+                                .doOnEach(objectNotification -> {
                                     if (Config.isWithCache())
-                                        return Observable.just(Storo.put(dataClass.getSimpleName()
-                                                        + jsonObject.optString(idColumnName),
+                                        Storo.put(dataClass.getSimpleName() + jsonObject.optString(idColumnName),
                                                 gson.fromJson(jsonObject.toString(), dataClass))
                                                 .setExpiry(Config.getCacheAmount(), Config.getCacheTimeUnit())
-                                                .execute());
-                                    else return Observable.just(o);
+                                                .execute();
                                 });
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    observable = Observable.error(e);
+                    completable = Completable.error(e);
                 }
         }
-        if (observable != null)
-            observable.subscribeOn(Config.getBackgroundThread())
-                    .toCompletable()
+        if (completable != null)
+            completable.subscribeOn(Config.getBackgroundThread())
                     .subscribe(new SimpleSubscriber(dataClass));
     }
 
     private void persistAllGenerics(List collection, Class dataClass) {
-        mDataBaseManager.putAll(mEntityDataMapper.mapAllToRealm(collection, dataClass), dataClass)
+        mDataBaseManager.putAll(mEntityDataMapper.mapAllTo(collection, dataClass), dataClass)
                 .subscribeOn(Config.getBackgroundThread())
-                .toCompletable()
                 .subscribe(new SimpleSubscriber(dataClass));
     }
 

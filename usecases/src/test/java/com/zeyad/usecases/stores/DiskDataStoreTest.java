@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
+import rx.Completable;
 import rx.Observable;
 
 import static org.junit.Assert.assertEquals;
@@ -42,7 +43,7 @@ public class DiskDataStoreTest {
     public void setUp() throws Exception {
         dbManager = mock(DataBaseManager.class);
         DAOMapper mapper = mock(DAOMapper.class);
-        when(mapper.mapAllToDomain(any(List.class), any(Class.class))).thenReturn(new ArrayList());
+        when(mapper.mapAllTo(any(List.class), any(Class.class))).thenReturn(new ArrayList());
         Config.setWithCache(false);
         mDiskDataStore = new DiskDataStore(dbManager, mapper);
     }
@@ -80,8 +81,7 @@ public class DiskDataStoreTest {
 
     @Test
     public void testDynamicDeleteAll() {
-        Observable<Boolean> observable = Observable.just(true);
-        when(dbManager.evictAll(any(Class.class))).thenReturn(observable);
+        when(dbManager.evictAll(any(Class.class))).thenReturn(Completable.complete());
 
         mDiskDataStore.dynamicDeleteAll(TestRealmModel.class);
 
@@ -90,8 +90,7 @@ public class DiskDataStoreTest {
 
     @Test
     public void testDynamicDeleteCollection() {
-        Observable<Boolean> observable = Observable.just(true);
-        when(dbManager.evictCollection(anyString(), anyList(), any(Class.class))).thenReturn(observable);
+        when(dbManager.evictCollection(anyString(), anyList(), any(Class.class))).thenReturn(Completable.complete());
 
         mDiskDataStore.dynamicDeleteCollection("", "", new JSONArray(), Object.class, false, false);
 
@@ -100,8 +99,7 @@ public class DiskDataStoreTest {
 
     @Test
     public void testDynamicPatchObject() throws Exception {
-        Observable observable = Observable.just(true);
-        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(observable);
+        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
 
         mDiskDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, false, false);
 
@@ -110,8 +108,7 @@ public class DiskDataStoreTest {
 
     @Test
     public void testDynamicPostObject() throws Exception {
-        Observable observable = Observable.just(true);
-        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(observable);
+        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
 
         mDiskDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, false, false);
 
@@ -120,8 +117,7 @@ public class DiskDataStoreTest {
 
     @Test
     public void testDynamicPutObject() throws Exception {
-        Observable observable = Observable.just(true);
-        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(observable);
+        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
 
         mDiskDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, false, false);
 
@@ -130,8 +126,7 @@ public class DiskDataStoreTest {
 
     @Test
     public void testDynamicPostList() throws Exception {
-        Observable observable = Observable.just(true);
-        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(observable);
+        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
 
         mDiskDataStore.dynamicPostList("", "", new JSONArray(), Object.class, false, false);
 
@@ -140,8 +135,7 @@ public class DiskDataStoreTest {
 
     @Test
     public void testDynamicPutList() throws Exception {
-        Observable observable = Observable.just(true);
-        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(observable);
+        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
 
         mDiskDataStore.dynamicPutList("", "", new JSONArray(), Object.class, false, false);
 
