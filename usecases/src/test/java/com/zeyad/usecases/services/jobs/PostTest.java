@@ -198,7 +198,7 @@ public class PostTest {
 
 
     private PostRequest createPostRequestForHashmap(String method) {
-        return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
+        return new PostRequest.Builder(getValidDataClass(), false)
                 .payLoad(new HashMap<>())
                 .idColumnName(getValidColumnName())
                 .url(getValidUrl())
@@ -207,7 +207,7 @@ public class PostTest {
     }
 
     private PostRequest createPostRequestForJsonArray(String method) throws JSONException {
-        return new PostRequest.PostRequestBuilder(getValidDataClass(), false)
+        return new PostRequest.Builder(getValidDataClass(), false)
                 .payLoad(new JSONArray("[ \"Ford\", \"BMW\", \"Fiat\" ]"))
                 .idColumnName(getValidColumnName())
                 .url(getValidUrl())

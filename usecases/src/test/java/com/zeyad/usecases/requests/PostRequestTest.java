@@ -31,7 +31,7 @@ public class PostRequestTest {
 
     @Before
     public void setUp() throws Exception {
-        mPostRequest = new PostRequest.PostRequestBuilder(DATA_CLASS, TO_PERSIST)
+        mPostRequest = new PostRequest.Builder(DATA_CLASS, TO_PERSIST)
                 .payLoad(HASH_MAP)
                 .idColumnName(ID_COLUMN_NAME)
                 .payLoad(JSON_ARRAY)

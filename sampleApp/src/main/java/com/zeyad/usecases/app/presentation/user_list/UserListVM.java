@@ -1,5 +1,6 @@
 package com.zeyad.usecases.app.presentation.user_list;
 
+import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.components.redux.BaseEvent;
 import com.zeyad.usecases.app.components.redux.BaseViewModel;
 import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
@@ -8,7 +9,6 @@ import com.zeyad.usecases.app.presentation.user_list.events.GetPaginatedUsersEve
 import com.zeyad.usecases.app.presentation.user_list.events.SearchUsersEvent;
 import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;
-import com.zeyad.usecases.api.IDataService;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -50,19 +50,16 @@ public class UserListVM extends BaseViewModel<UserListState> {
     }
 
     public Observable<List> getUsers(long lastId) {
-        return lastId == 0 ? dataUseCase.getListOffLineFirst(new GetRequest
-                .GetRequestBuilder(User.class, true)
+        return lastId == 0 ? dataUseCase.getListOffLineFirst(new GetRequest.Builder(User.class, true)
                 .url(String.format(USERS, lastId))
-                .build()) : dataUseCase.getList(new GetRequest
-                .GetRequestBuilder(User.class, true)
+                .build()) : dataUseCase.getList(new GetRequest.Builder(User.class, true)
                 .url(String.format(USERS, lastId))
                 .build());
     }
 
     public Observable search(String query) {
         return dataUseCase.queryDisk(realm -> realm.where(User.class).beginsWith(User.LOGIN, query))
-                .zipWith(dataUseCase.getObject(new GetRequest
-                                .GetRequestBuilder(User.class, true)
+                .zipWith(dataUseCase.getObject(new GetRequest.Builder(User.class, true)
                                 .url(String.format(USER, query))
                                 .build())
                                 .onErrorReturn(o -> Collections.EMPTY_LIST)
@@ -75,8 +72,7 @@ public class UserListVM extends BaseViewModel<UserListState> {
     }
 
     public Observable<List<Long>> deleteCollection(List<Long> selectedItemsIds) {
-        return dataUseCase.deleteCollection(new PostRequest
-                .PostRequestBuilder(User.class, true)
+        return dataUseCase.deleteCollectionByIds(new PostRequest.Builder(User.class, true)
                 .payLoad(selectedItemsIds)
                 .build())
                 .map(o -> selectedItemsIds);

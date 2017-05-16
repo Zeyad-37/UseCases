@@ -16,7 +16,6 @@ import java.util.HashMap;
  * @author zeyad on 7/29/16.
  */
 public class PostRequest implements Parcelable {
-    private static final String DEFAULT_ID_KEY = "id";
     public static final String POST = "post", DELETE = "delete", PUT = "put", PATCH = "patch";
     public static final Parcelable.Creator<PostRequest> CREATOR = new Parcelable.Creator<PostRequest>() {
         @Override
@@ -29,6 +28,7 @@ public class PostRequest implements Parcelable {
             return new PostRequest[size];
         }
     };
+    private static final String DEFAULT_ID_KEY = "id";
     private String url, idColumnName, method;
     private Class dataClass;
     private boolean onWifi, whileCharging, persist, queuable;
@@ -37,45 +37,19 @@ public class PostRequest implements Parcelable {
     private HashMap<String, Object> keyValuePairs;
     private Object object;
 
-    public PostRequest(@NonNull PostRequestBuilder postRequestBuilder) {
-        url = postRequestBuilder.url;
-        dataClass = postRequestBuilder.dataClass;
-        persist = postRequestBuilder.persist;
-        onWifi = postRequestBuilder.onWifi;
-        whileCharging = postRequestBuilder.whileCharging;
-        queuable = postRequestBuilder.queuable;
-        keyValuePairs = postRequestBuilder.keyValuePairs;
-        jsonObject = postRequestBuilder.jsonObject;
-        jsonArray = postRequestBuilder.jsonArray;
-        idColumnName = postRequestBuilder.idColumnName;
-        method = postRequestBuilder.method;
-        object = postRequestBuilder.object;
-    }
-
-    public PostRequest(String idColumnName, String url, JSONObject keyValuePairs, Class dataClass, boolean persist) {
-        this.idColumnName = idColumnName;
-        jsonObject = keyValuePairs;
-        this.persist = persist;
-        this.dataClass = dataClass;
-        this.url = url;
-    }
-
-    // for test
-    public PostRequest(String idColumnName, String url, JSONArray keyValuePairs, Class dataClass, boolean persist) {
-        this.idColumnName = idColumnName;
-        jsonArray = keyValuePairs;
-        this.persist = persist;
-        this.dataClass = dataClass;
-        this.url = url;
-    }
-
-    public PostRequest(String idColumnName, String url, HashMap<String, Object> keyValuePairs,
-                       Class dataClass, boolean persist) {
-        this.idColumnName = idColumnName;
-        this.keyValuePairs = keyValuePairs;
-        this.persist = persist;
-        this.dataClass = dataClass;
-        this.url = url;
+    public PostRequest(@NonNull Builder builder) {
+        url = builder.url;
+        dataClass = builder.dataClass;
+        persist = builder.persist;
+        onWifi = builder.onWifi;
+        whileCharging = builder.whileCharging;
+        queuable = builder.queuable;
+        keyValuePairs = builder.keyValuePairs;
+        jsonObject = builder.jsonObject;
+        jsonArray = builder.jsonArray;
+        idColumnName = builder.idColumnName;
+        method = builder.method;
+        object = builder.object;
     }
 
     protected PostRequest(Parcel in) {
@@ -180,7 +154,7 @@ public class PostRequest implements Parcelable {
         dest.writeParcelable((Parcelable) this.object, flags);
     }
 
-    public static class PostRequestBuilder {
+    public static class Builder {
         Object object;
         JSONArray jsonArray;
         JSONObject jsonObject;
@@ -189,73 +163,73 @@ public class PostRequest implements Parcelable {
         Class dataClass;
         boolean persist, queuable, onWifi, whileCharging;
 
-        public PostRequestBuilder(Class dataClass, boolean persist) {
+        public Builder(Class dataClass, boolean persist) {
             this.dataClass = dataClass;
             this.persist = persist;
         }
 
         @NonNull
-        public PostRequestBuilder url(String url) {
+        public Builder url(String url) {
             this.url = Config.getBaseURL() + url;
             return this;
         }
 
         @NonNull
-        public PostRequestBuilder fullUrl(String url) {
+        public Builder fullUrl(String url) {
             this.url = url;
             return this;
         }
 
         @NonNull
-        public PostRequestBuilder queuable() {
+        public Builder queuable() {
             queuable = true;
             return this;
         }
 
         @NonNull
-        public PostRequestBuilder onWifi() {
+        public Builder onWifi() {
             onWifi = true;
             return this;
         }
 
         @NonNull
-        public PostRequestBuilder whileCharging() {
+        public Builder whileCharging() {
             whileCharging = true;
             return this;
         }
 
         @NonNull
-        public PostRequestBuilder idColumnName(String idColumnName) {
+        public Builder idColumnName(String idColumnName) {
             this.idColumnName = idColumnName;
             return this;
         }
 
         @NonNull
-        public PostRequestBuilder payLoad(Object object) {
+        public Builder payLoad(Object object) {
             this.object = object;
             return this;
         }
 
         @NonNull
-        public PostRequestBuilder payLoad(JSONObject jsonObject) {
+        public Builder payLoad(JSONObject jsonObject) {
             this.jsonObject = jsonObject;
             return this;
         }
 
         @NonNull
-        public PostRequestBuilder payLoad(JSONArray jsonArray) {
+        public Builder payLoad(JSONArray jsonArray) {
             this.jsonArray = jsonArray;
             return this;
         }
 
         @NonNull
-        public PostRequestBuilder payLoad(HashMap<String, Object> hashMap) {
+        public Builder payLoad(HashMap<String, Object> hashMap) {
             keyValuePairs = hashMap;
             return this;
         }
 
         @NonNull
-        public PostRequestBuilder method(String method) {
+        public Builder method(String method) {
             this.method = method;
             return this;
         }

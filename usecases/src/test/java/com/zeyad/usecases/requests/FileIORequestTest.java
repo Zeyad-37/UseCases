@@ -30,7 +30,7 @@ public class FileIORequestTest {
 
     @Before
     public void setUp() throws Exception {
-        mFileIORequest = new FileIORequest.FileIORequestBuilder(URL, FILE)
+        mFileIORequest = new FileIORequest.Builder(URL, FILE)
                 .onWifi(ON_WIFI)
                 .whileCharging(WHILE_CHARGING)
                 .dataClass(DATA_CLASS)

@@ -48,8 +48,8 @@ public class DataServiceTest {
     @Before
     public void setUp() throws Exception {
         observable = Observable.just(true);
-        postRequest = new PostRequest.PostRequestBuilder(Object.class, false).build();
-        getRequest = new GetRequest.GetRequestBuilder(Object.class, false).build();
+        postRequest = new PostRequest.Builder(Object.class, false).build();
+        getRequest = new GetRequest.Builder(Object.class, false).build();
         dataStoreFactory = mock(DataStoreFactory.class);
         when(dataStoreFactory.dynamically(anyString())).thenReturn(mock(CloudDataStore.class));
         when(dataStoreFactory.disk()).thenReturn(mock(DiskDataStore.class));
@@ -167,11 +167,22 @@ public class DataServiceTest {
     }
 
     @Test
+    public void deleteItemById() throws Exception {
+        when(dataStoreFactory.dynamically(anyString()).dynamicDeleteCollection(anyString(), anyString(),
+                any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+
+        dataService.deleteItemById(postRequest);
+
+        verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicDeleteCollection(anyString(),
+                anyString(), any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean());
+    }
+
+    @Test
     public void deleteCollection() throws Exception {
         when(dataStoreFactory.dynamically(anyString()).dynamicDeleteCollection(anyString(), anyString(),
                 any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
 
-        dataService.deleteCollection(postRequest);
+        dataService.deleteCollectionByIds(postRequest);
 
         verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicDeleteCollection(anyString(),
                 anyString(), any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean());

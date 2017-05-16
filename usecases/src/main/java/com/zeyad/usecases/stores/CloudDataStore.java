@@ -426,14 +426,14 @@ public class CloudDataStore implements DataStore {
     }
 
     private void queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload) {
-        utils.queueFileIOCore(mDispatcher, isDownload, new FileIORequest.FileIORequestBuilder(url, file)
+        utils.queueFileIOCore(mDispatcher, isDownload, new FileIORequest.Builder(url, file)
                 .onWifi(onWifi)
                 .whileCharging(whileCharging)
                 .build());
     }
 
     private void queuePost(String method, String url, String idColumnName, JSONArray jsonArray, boolean persist) {
-        queuePostCore(new PostRequest.PostRequestBuilder(null, persist)
+        queuePostCore(new PostRequest.Builder(null, persist)
                 .idColumnName(idColumnName)
                 .payLoad(jsonArray)
                 .url(url)
@@ -442,7 +442,7 @@ public class CloudDataStore implements DataStore {
     }
 
     private void queuePost(String method, String url, String idColumnName, JSONObject jsonObject, boolean persist) {
-        queuePostCore(new PostRequest.PostRequestBuilder(null, persist)
+        queuePostCore(new PostRequest.Builder(null, persist)
                 .idColumnName(idColumnName)
                 .payLoad(jsonObject)
                 .url(url)

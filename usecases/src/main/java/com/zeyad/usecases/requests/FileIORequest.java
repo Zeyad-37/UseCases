@@ -34,7 +34,7 @@ public class FileIORequest implements Parcelable {
     public FileIORequest() {
     }
 
-    private FileIORequest(@NonNull FileIORequestBuilder uploadRequestBuilder) {
+    private FileIORequest(@NonNull Builder uploadRequestBuilder) {
         url = uploadRequestBuilder.url;
         onWifi = uploadRequestBuilder.onWifi;
         whileCharging = uploadRequestBuilder.whileCharging;
@@ -105,7 +105,7 @@ public class FileIORequest implements Parcelable {
         dest.writeSerializable(this.parameters);
     }
 
-    public static class FileIORequestBuilder {
+    public static class Builder {
 
         private File file;
         private String url, key;
@@ -113,55 +113,55 @@ public class FileIORequest implements Parcelable {
         private Class dataClass;
         private HashMap<String, Object> parameters;
 
-        public FileIORequestBuilder(String url, File file) {
+        public Builder(String url, File file) {
             this.url = url;
             this.file = file;
         }
 
         @NonNull
-        public FileIORequestBuilder url(String url) {
+        public Builder url(String url) {
             this.url = Config.getBaseURL() + url;
             return this;
         }
 
         @NonNull
-        public FileIORequestBuilder fullUrl(String url) {
+        public Builder fullUrl(String url) {
             this.url = url;
             return this;
         }
 
         @NonNull
-        public FileIORequestBuilder dataClass(Class dataClass) {
+        public Builder dataClass(Class dataClass) {
             this.dataClass = dataClass;
             return this;
         }
 
         @NonNull
-        public FileIORequestBuilder onWifi(boolean onWifi) {
+        public Builder onWifi(boolean onWifi) {
             this.onWifi = onWifi;
             return this;
         }
 
         @NonNull
-        public FileIORequestBuilder key(String key) {
+        public Builder key(String key) {
             this.key = key;
             return this;
         }
 
         @NonNull
-        public FileIORequestBuilder payLoad(HashMap<String, Object> parameters) {
+        public Builder payLoad(HashMap<String, Object> parameters) {
             this.parameters = parameters;
             return this;
         }
 
         @NonNull
-        public FileIORequestBuilder queuable(boolean queuable) {
+        public Builder queuable(boolean queuable) {
             this.queuable = queuable;
             return this;
         }
 
         @NonNull
-        public FileIORequestBuilder whileCharging(boolean whileCharging) {
+        public Builder whileCharging(boolean whileCharging) {
             this.whileCharging = whileCharging;
             return this;
         }

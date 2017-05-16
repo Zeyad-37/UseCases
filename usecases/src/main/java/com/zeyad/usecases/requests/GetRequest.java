@@ -10,7 +10,6 @@ import com.zeyad.usecases.Config;
  * @author zeyad on 7/29/16.
  */
 public class GetRequest implements Parcelable {
-    private static final String DEFAULT_ID_KEY = "id";
     public static final Creator<GetRequest> CREATOR = new Creator<GetRequest>() {
         @Override
         public GetRequest createFromParcel(Parcel source) {
@@ -22,18 +21,19 @@ public class GetRequest implements Parcelable {
             return new GetRequest[size];
         }
     };
+    private static final String DEFAULT_ID_KEY = "id";
     private String url, idColumnName;
     private Class dataClass;
     private boolean persist, shouldCache;
     private int itemId;
 
-    private GetRequest(@NonNull GetRequestBuilder getRequestBuilder) {
-        url = getRequestBuilder.mUrl;
-        dataClass = getRequestBuilder.mDataClass;
-        persist = getRequestBuilder.mPersist;
-        idColumnName = getRequestBuilder.mIdColumnName;
-        itemId = getRequestBuilder.mItemId;
-        shouldCache = getRequestBuilder.mShouldCache;
+    private GetRequest(@NonNull Builder builder) {
+        url = builder.mUrl;
+        dataClass = builder.mDataClass;
+        persist = builder.mPersist;
+        idColumnName = builder.mIdColumnName;
+        itemId = builder.mItemId;
+        shouldCache = builder.mShouldCache;
     }
 
     protected GetRequest(Parcel in) {
@@ -84,43 +84,43 @@ public class GetRequest implements Parcelable {
         dest.writeInt(this.itemId);
     }
 
-    public static class GetRequestBuilder {
+    public static class Builder {
         private int mItemId;
         private boolean mShouldCache, mPersist;
         private String mIdColumnName, mUrl;
         private Class mDataClass;
 
-        public GetRequestBuilder(Class dataClass, boolean persist) {
+        public Builder(Class dataClass, boolean persist) {
             mDataClass = dataClass;
             mPersist = persist;
         }
 
         @NonNull
-        public GetRequestBuilder url(String url) {
+        public Builder url(String url) {
             mUrl = Config.getBaseURL() + url;
             return this;
         }
 
         @NonNull
-        public GetRequestBuilder fullUrl(String url) {
+        public Builder fullUrl(String url) {
             mUrl = url;
             return this;
         }
 
         @NonNull
-        public GetRequestBuilder shouldCache(boolean shouldCache) {
+        public Builder shouldCache(boolean shouldCache) {
             mShouldCache = shouldCache;
             return this;
         }
 
         @NonNull
-        public GetRequestBuilder idColumnName(String idColumnName) {
+        public Builder idColumnName(String idColumnName) {
             mIdColumnName = idColumnName;
             return this;
         }
 
         @NonNull
-        public GetRequestBuilder id(int id) {
+        public Builder id(int id) {
             mItemId = id;
             return this;
         }

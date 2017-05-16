@@ -61,13 +61,13 @@ public class UserListVMTest {
     public void deleteCollection() throws Exception {
         Observable<Boolean> observableUserRealm = Observable.just(true);
 
-        when(mockDataUseCase.deleteCollection(any(PostRequest.class)))
+        when(mockDataUseCase.deleteCollectionByIds(any(PostRequest.class)))
                 .thenReturn(observableUserRealm);
 
         userListVM.deleteCollection(new ArrayList<>());
 
         // Verify repository interactions
-        verify(mockDataUseCase, times(1)).deleteCollection(any(PostRequest.class));
+        verify(mockDataUseCase, times(1)).deleteCollectionByIds(any(PostRequest.class));
     }
 
     @Test

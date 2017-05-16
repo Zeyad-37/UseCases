@@ -1,11 +1,11 @@
 package com.zeyad.usecases.app.presentation.user_detail;
 
+import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.components.redux.BaseEvent;
 import com.zeyad.usecases.app.components.redux.BaseViewModel;
 import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.requests.GetRequest;
-import com.zeyad.usecases.api.IDataService;
 
 import rx.Observable;
 import rx.functions.Func1;
@@ -28,7 +28,7 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> {
         return Utils.isNotEmpty(userLogin) ? dataUseCase.queryDisk(realm -> realm.where(Repository.class)
                 .equalTo("owner.login", userLogin))
                 .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
-                        dataUseCase.getList(new GetRequest.GetRequestBuilder(Repository.class, true)
+                        dataUseCase.getList(new GetRequest.Builder(Repository.class, true)
                                 .url(String.format(REPOSITORIES, userLogin)).build())) :
                 Observable.error(new IllegalArgumentException("User name can not be empty"));
     }

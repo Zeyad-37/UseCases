@@ -26,7 +26,7 @@ public class GetRequestTest {
 
     @Before
     public void setUp() throws Exception {
-        mGetRequest = new GetRequest.GetRequestBuilder(DATA_CLASS, TO_PERSIST)
+        mGetRequest = new GetRequest.Builder(DATA_CLASS, TO_PERSIST)
                 .fullUrl(URL)
                 .shouldCache(SHOULD_CACHE)
                 .idColumnName(ID_COLUMN_NAME)

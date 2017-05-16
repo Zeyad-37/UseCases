@@ -9,6 +9,7 @@ import com.zeyad.usecases.stores.DataStoreFactory;
 import com.zeyad.usecases.utils.ReplayingShare;
 import com.zeyad.usecases.utils.Utils;
 
+import java.util.Collections;
 import java.util.List;
 
 import rx.Completable;
@@ -21,7 +22,6 @@ import rx.functions.Func1;
  */
 class DataService implements IDataService {
 
-    private static final String DEFAULT_ID_KEY = "id";
     private static DataService sDataService;
     private final DataStoreFactory mDataStoreFactory;
     private final PostExecutionThread mPostExecutionThread;
@@ -134,10 +134,22 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable deleteCollection(PostRequest deleteRequest) {
+    public Observable deleteItemById(PostRequest request) {
+        PostRequest.Builder builder = new PostRequest.Builder(request.getDataClass(), request.isPersist())
+                .payLoad(Collections.singleton((Long) request.getObject()))
+                .queuable()
+                .idColumnName(request.getIdColumnName())
+                .fullUrl(request.getUrl());
+        if (request.isQueuable())
+            builder.queuable();
+        return deleteCollectionByIds(builder.build());
+    }
+
+    @Override
+    public Observable deleteCollectionByIds(PostRequest deleteRequest) {
         try {
             return mDataStoreFactory.dynamically(deleteRequest.getUrl())
-                    .dynamicDeleteCollection(deleteRequest.getUrl(), DEFAULT_ID_KEY,
+                    .dynamicDeleteCollection(deleteRequest.getUrl(), deleteRequest.getIdColumnName(),
                             deleteRequest.getJsonArray(), deleteRequest.getDataClass(),
                             deleteRequest.isPersist(), deleteRequest.isQueuable())
                     .compose(applySchedulers());

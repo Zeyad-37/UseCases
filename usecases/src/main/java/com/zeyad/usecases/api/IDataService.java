@@ -69,12 +69,20 @@ public interface IDataService {
     Observable putList(PostRequest postRequest);
 
     /**
+     * Deletes item from postRequest.
+     *
+     * @param request contains the attributes of the request.
+     * @return Observable with the list.
+     */
+    Observable deleteItemById(PostRequest request);
+
+    /**
      * Deletes list from postRequest.
      *
      * @param deleteRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable deleteCollection(PostRequest deleteRequest);
+    Observable deleteCollectionByIds(PostRequest deleteRequest);
 
     /**
      * Deletes All.
