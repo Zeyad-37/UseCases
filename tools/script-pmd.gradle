@@ -1,12 +1,22 @@
 apply plugin: 'pmd'
 
-task pmd(type: Pmd) {
+def reportsDir = "${project.buildDir}/reports"
+check.dependsOn 'pmd'
+task pmd(type: Pmd, dependsOn: "assembleDebug") {
+    ignoreFailures = false
     ruleSetFiles = files("$project.rootDir/tools/rules-pmd.xml")
-    source = fileTree('src/main/java/')
-
+    ruleSets = []
+    source 'src/main/java'
+    include '**/*.java'
+    exclude '**/gen/**'
     reports {
-        xml.enabled = false
+        xml.enabled = true
         html.enabled = true
-        html.destination = "$project.buildDir/outputs/pmd/pmd.html"
+        xml {
+            destination "$reportsDir/pmd/pmd.xml"
+        }
+        html {
+            destination "$reportsDir/pmd/pmd.html"
+        }
     }
 }

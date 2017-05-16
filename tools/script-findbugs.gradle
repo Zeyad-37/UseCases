@@ -1,14 +1,25 @@
 apply plugin: 'findbugs'
 
-task findbugs(type: FindBugs) {
-    excludeFilter = file("../tools/rules-findbugs.xml")
-    classes = fileTree("$project.buildDir/intermediates/classes/dev/debug/com/dd")
-    source = fileTree('src/main/java/com/dd/')
-    classpath = files()
-
+def reportsDir = "${project.buildDir}/reports"
+check.dependsOn 'findbugs'
+task findbugs(type: FindBugs, dependsOn: "assembleDebug") {
+    ignoreFailures = false
+    effort = "max"
+    reportLevel = "high"
+    excludeFilter = new File("$project.rootDir/tools/rules-findbugs.xml")
+    classes = files("${buildDir}/intermediates/classes")
+    source 'src/main/java'
+    include '**/*.java'
+    exclude '**/gen/**'
     reports {
         xml.enabled = false
         html.enabled = true
-        html.destination = "$project.buildDir/outputs/findbugs/findbugs.html"
+        xml {
+            destination "$reportsDir/findbugs/findbugs.xml"
+        }
+        html {
+            destination "$reportsDir/findbugs/findbugs.html"
+        }
     }
+    classpath = files()
 }

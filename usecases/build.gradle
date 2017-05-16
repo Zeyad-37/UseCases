@@ -71,8 +71,13 @@ android {
     }
 
     lintOptions {
+        //lint rules of conduct
+        warningsAsErrors true
         abortOnError true
-        disable 'InvalidPackage'
+        htmlReport true
+        //locations for the rules and output
+        lintConfig file("${rootDir}/config/lint/lint-config.xml")
+        htmlOutput file("${buildDir}/reports/lint/lint.html")
     }
 
     testOptions {
@@ -209,9 +214,10 @@ bintray {
 //apply from: '../tools/quality/quality.gradle'
 apply from: "$project.rootDir/tools/script-git-version.gradle"
 apply from: "$project.rootDir/tools/script-findbugs.gradle"
-apply from: "$project.rootDir/tools/script-lint.gradle"
 apply from: "$project.rootDir/tools/script-pmd.gradle"
-//apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
+apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
+apply from: "$project.rootDir/tools/script-infer.gradle"
+apply from: "$project.rootDir/tools/script-check-style.gradle"
 
 //apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
 //apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'

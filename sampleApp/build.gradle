@@ -67,8 +67,13 @@ android {
     }
 
     lintOptions {
-        abortOnError false
-        disable 'InvalidPackage'
+        //lint rules of conduct
+        warningsAsErrors true
+        abortOnError true
+        htmlReport true
+        //locations for the rules and output
+        lintConfig file("${rootDir}/config/lint/lint-config.xml")
+        htmlOutput file("${buildDir}/reports/lint/lint.html")
     }
 
     configurations.all {
@@ -142,9 +147,10 @@ dependencies {
 //    testCompile 'org.mockito:mockito-core:2.0.57-beta'
 }
 
-//apply from: '../tools/quality/quality.gradle'
+//apply from: "$project.rootDir/tools/quality/quality.gradle"
 apply from: "$project.rootDir/tools/script-git-version.gradle"
 apply from: "$project.rootDir/tools/script-findbugs.gradle"
-apply from: "$project.rootDir/tools/script-lint.gradle"
 apply from: "$project.rootDir/tools/script-pmd.gradle"
 apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
+apply from: "$project.rootDir/tools/script-infer.gradle"
+apply from: "$project.rootDir/tools/script-check-style.gradle"
