@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.user_detail;
+package com.zeyad.usecases.app.screens.user_detail;
 
 import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.components.redux.BaseEvent;

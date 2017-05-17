@@ -105,8 +105,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicGetObject(String url, String idColumnName, int itemId, Class dataClass,
-                                          boolean persist, boolean shouldCache) {
+    public Observable<Object> dynamicGetObject(String url, String idColumnName, int itemId, Class dataClass,
+                                               boolean persist, boolean shouldCache) {
         return mApiConnection.dynamicGetObject(url, shouldCache)
                 .doOnNext(object -> {
                     if (willPersist(persist))
@@ -128,8 +128,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                            Class dataClass, boolean persist, boolean queuable) {
+    public Observable<Object> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                                 Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonObject, idColumnName, dataClass);
@@ -153,8 +153,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                           Class dataClass, boolean persist, boolean queuable) {
+    public Observable<Object> dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                                Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonObject, idColumnName, dataClass);
@@ -178,8 +178,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicPostList(String url, String idColumnName, @NonNull JSONArray jsonArray,
-                                         Class dataClass, boolean persist, boolean queuable) {
+    public Observable<Object> dynamicPostList(String url, String idColumnName, @NonNull JSONArray jsonArray,
+                                              Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonArray, idColumnName, dataClass);
@@ -203,8 +203,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                          Class dataClass, boolean persist, boolean queuable) {
+    public Observable<Object> dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                               Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonObject, idColumnName, dataClass);
@@ -228,8 +228,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicPutList(String url, String idColumnName, @NonNull JSONArray jsonArray,
-                                        Class dataClass, boolean persist, boolean queuable) {
+    public Observable<Object> dynamicPutList(String url, String idColumnName, @NonNull JSONArray jsonArray,
+                                             Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonArray, idColumnName, dataClass);
@@ -285,8 +285,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicUploadFile(String url, @NonNull File file, String key, HashMap<String, Object> parameters,
-                                           boolean onWifi, boolean whileCharging, boolean queuable, Class dataClass) {
+    public Observable<Object> dynamicUploadFile(String url, @NonNull File file, String key, HashMap<String, Object> parameters,
+                                                boolean onWifi, boolean whileCharging, boolean queuable, Class dataClass) {
         return Observable.defer(() -> {
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(mContext) == onWifi
                     && isChargingReqCompatible(isCharging(mContext), whileCharging)) {
@@ -315,8 +315,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<?> dynamicDownloadFile(String url, @NonNull File file, boolean onWifi,
-                                             boolean whileCharging, boolean queuable) {
+    public Observable<Object> dynamicDownloadFile(String url, @NonNull File file, boolean onWifi,
+                                                  boolean whileCharging, boolean queuable) {
         return Observable.defer(() -> {
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(mContext) == onWifi
                     && isChargingReqCompatible(isCharging(mContext), whileCharging)) {

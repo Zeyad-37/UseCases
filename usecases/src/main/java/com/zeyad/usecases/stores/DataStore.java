@@ -27,73 +27,73 @@ public interface DataStore {
                                     boolean shouldCache);
 
     /**
-     * Get an {@link Observable} which will emit a ? by its id.
+     * Get an {@link Observable} which will emit a Object by its id.
      */
     @NonNull
-    Observable<?> dynamicGetObject(String url, String idColumnName, int itemId,
-                                   Class dataClass, boolean persist, boolean shouldCache);
+    Observable<Object> dynamicGetObject(String url, String idColumnName, int itemId,
+                                        Class dataClass, boolean persist, boolean shouldCache);
 
     /**
-     * Patch a JSONObject which returns an {@link Observable} that will emit a ?.
+     * Patch a JSONObject which returns an {@link Observable} that will emit a Object.
      */
-    Observable<?> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                     Class dataClass, boolean persist, boolean queuable);
-
-    /**
-     * Post a JSONObject which returns an {@link Observable} that will emit a ?.
-     */
-    @NonNull
-    Observable<?> dynamicPostObject(String url, String idColumnName, JSONObject keyValuePairs,
-                                    Class dataClass, boolean persist, boolean queuable);
-
-    /**
-     * Post a HashMap<String, Object> which returns an {@link Observable} that will emit a list of ?.
-     */
-    @NonNull
-    Observable<?> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
-                                  Class dataClass, boolean persist, boolean queuable);
-
-    /**
-     * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Observable}
-     * that will emit a ?.
-     */
-    @NonNull
-    Observable<?> dynamicPutObject(String url, String idColumnName, JSONObject keyValuePairs,
-                                   Class dataClass, boolean persist, boolean queuable);
-
-    /**
-     * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Observable}
-     * that will emit a list of ?.
-     */
-    @NonNull
-    Observable<?> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
-                                 Class dataClass, boolean persist, boolean queuable);
-
-    /**
-     * Delete a HashMap<String, Object> from cloud which returns an {@link Observable} that will emit a ?.
-     */
-    @NonNull
-    Observable<?> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
+    Observable<Object> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
                                           Class dataClass, boolean persist, boolean queuable);
 
     /**
+     * Post a JSONObject which returns an {@link Observable} that will emit a Object.
+     */
+    @NonNull
+    Observable<Object> dynamicPostObject(String url, String idColumnName, JSONObject keyValuePairs,
+                                         Class dataClass, boolean persist, boolean queuable);
+
+    /**
+     * Post a HashMap<String, Object> which returns an {@link Observable} that will emit a list of Object.
+     */
+    @NonNull
+    Observable<Object> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
+                                       Class dataClass, boolean persist, boolean queuable);
+
+    /**
+     * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Observable}
+     * that will emit a Object.
+     */
+    @NonNull
+    Observable<Object> dynamicPutObject(String url, String idColumnName, JSONObject keyValuePairs,
+                                        Class dataClass, boolean persist, boolean queuable);
+
+    /**
+     * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Observable}
+     * that will emit a list of Object.
+     */
+    @NonNull
+    Observable<Object> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
+                                      Class dataClass, boolean persist, boolean queuable);
+
+    /**
+     * Delete a HashMap<String, Object> from cloud which returns an {@link Observable} that will emit a Object.
+     */
+    @NonNull
+    Observable<Object> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
+                                               Class dataClass, boolean persist, boolean queuable);
+
+    /**
      * Delete all items of the same type from cloud or disk which returns an {@link Completable}
-     * that will emit a list of ?.
+     * that will emit a list of Object.
      */
     @NonNull
     Completable dynamicDeleteAll(Class dataClass);
 
     /**
-     * Search disk with a RealmQuery which returns an {@link Observable} that will emit a list of ?.
+     * Search disk with a RealmQuery which returns an {@link Observable} that will emit a list of Object.
      */
     @NonNull
     Observable<List> queryDisk(RealmQueryProvider queryFactory);
 
     @NonNull
-    Observable<?> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,
-                                      boolean queuable);
+    Observable<Object> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,
+                                           boolean queuable);
 
     @NonNull
-    Observable<?> dynamicUploadFile(String url, File file, String key, HashMap<String, Object> parameter,
-                                    boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass);
+    Observable<Object> dynamicUploadFile(String url, File file, String key, HashMap<String, Object> parameter,
+                                         boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass);
 }

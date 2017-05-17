@@ -8,7 +8,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import retrofit2.adapter.rxjava.HttpException;
+import retrofit2.HttpException;
 
 /**
  * Factory used to create errorResult messages from an Exception as a condition.

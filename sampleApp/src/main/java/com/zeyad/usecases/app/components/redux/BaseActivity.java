@@ -32,8 +32,8 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
     public ErrorMessageFactory errorMessageFactory;
     public Observable<BaseEvent> events;
     public Observable.Transformer<BaseEvent, UIModel<S>> uiModelsTransformer;
-    public S viewState;
     public VM viewModel;
+    public S viewState;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -131,18 +131,18 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
     public void showSnackBarMessage(View view, String message, int duration) {
         if (view != null)
             SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_INFO, view, message, duration).show();
-        else throw new NullPointerException("view is null");
+        else throw new NullPointerException("View is null");
     }
 
     public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,
                                        String message, String actionText, View.OnClickListener onClickListener) {
         if (view != null)
             SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText, onClickListener).show();
-        else throw new NullPointerException("view is null");
+        else throw new NullPointerException("View is null");
     }
 
-    public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view, String message,
-                                       int actionText, View.OnClickListener onClickListener) {
+    public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,
+                                       String message, int actionText, View.OnClickListener onClickListener) {
         showSnackBarWithAction(typeSnackBar, view, message, getString(actionText), onClickListener);
     }
 
@@ -155,6 +155,6 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
     public void showErrorSnackBar(String message, View view, int duration) {
         if (view != null)
             SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_ERROR, view, message, duration).show();
-        else throw new NullPointerException("view is null");
+        else throw new NullPointerException("View is null");
     }
 }

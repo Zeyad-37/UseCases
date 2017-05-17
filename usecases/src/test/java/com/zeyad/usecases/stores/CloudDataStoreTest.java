@@ -96,7 +96,7 @@ public class CloudDataStoreTest {
         cloudDataStore.mCanPersist = true;
         when(mockApiConnection.dynamicGetObject(anyString(), anyBoolean())).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicGetObject("", "", 0, Object.class, true, false)
                 .subscribe(testSubscriber);
 
@@ -125,7 +125,7 @@ public class CloudDataStoreTest {
         Observable observable = Observable.from(new ArrayList<>());
         when(mockApiConnection.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicGetList("", Object.class, true, false)
                 .subscribe(testSubscriber);
 
@@ -139,7 +139,7 @@ public class CloudDataStoreTest {
     public void dynamicPatchObject() throws Exception {
         when(mockApiConnection.dynamicPatch(anyString(), any(RequestBody.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, false, false)
                 .subscribe(testSubscriber);
 
@@ -154,7 +154,7 @@ public class CloudDataStoreTest {
         cloudDataStore.mCanPersist = true;
         when(mockApiConnection.dynamicPatch(anyString(), any(RequestBody.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, true, false)
                 .subscribe(testSubscriber);
         testSubscriber.getOnErrorEvents();
@@ -168,7 +168,7 @@ public class CloudDataStoreTest {
     public void dynamicPatchObjectNoNetwork() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, false, true)
                 .subscribe(testSubscriber);
 
@@ -180,7 +180,7 @@ public class CloudDataStoreTest {
     public void dynamicPatchObjectNoNetworkNoQueue() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, false, false)
                 .subscribe(testSubscriber);
 
@@ -192,7 +192,7 @@ public class CloudDataStoreTest {
     public void dynamicPostObject() throws Exception {
         when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, false, false)
                 .subscribe(testSubscriber);
 
@@ -207,7 +207,7 @@ public class CloudDataStoreTest {
         cloudDataStore.mCanPersist = true;
         when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, true, false)
                 .subscribe(testSubscriber);
 
@@ -221,7 +221,7 @@ public class CloudDataStoreTest {
     public void dynamicPostObjectNoNetwork() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, false, true)
                 .subscribe(testSubscriber);
 
@@ -233,7 +233,7 @@ public class CloudDataStoreTest {
     public void dynamicPostObjectNoNetworkNoQueue() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, false, false)
                 .subscribe(testSubscriber);
 
@@ -245,7 +245,7 @@ public class CloudDataStoreTest {
     public void dynamicPostList() throws Exception {
         when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPostList("", "", new JSONArray(), Object.class, false, false)
                 .subscribe(testSubscriber);
 
@@ -260,7 +260,7 @@ public class CloudDataStoreTest {
         cloudDataStore.mCanPersist = true;
         when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPostList("", "", new JSONArray(), Object.class, true, false)
                 .subscribe(testSubscriber);
 
@@ -274,7 +274,7 @@ public class CloudDataStoreTest {
     public void dynamicPostListNoNetwork() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPostList("", "", new JSONArray(), Object.class, false, true)
                 .subscribe(testSubscriber);
 
@@ -286,7 +286,7 @@ public class CloudDataStoreTest {
     public void dynamicPostListNoNetworkNoQueue() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPostList("", "", new JSONArray(), Object.class, false, false)
                 .subscribe(testSubscriber);
 
@@ -298,7 +298,7 @@ public class CloudDataStoreTest {
     public void dynamicPutObject() throws Exception {
         when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, false, false)
                 .subscribe(testSubscriber);
 
@@ -313,7 +313,7 @@ public class CloudDataStoreTest {
         cloudDataStore.mCanPersist = true;
         when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, true, false)
                 .subscribe(testSubscriber);
 
@@ -327,7 +327,7 @@ public class CloudDataStoreTest {
     public void dynamicPutObjectNoNetwork() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, false, true)
                 .subscribe(testSubscriber);
 
@@ -339,7 +339,7 @@ public class CloudDataStoreTest {
     public void dynamicPutObjectNoNetworkNoQueue() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, false, false)
                 .subscribe(testSubscriber);
 
@@ -351,7 +351,7 @@ public class CloudDataStoreTest {
     public void dynamicPutList() throws Exception {
         when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPutList("", "", new JSONArray(), Object.class, false, false)
                 .subscribe(testSubscriber);
 
@@ -366,7 +366,7 @@ public class CloudDataStoreTest {
         cloudDataStore.mCanPersist = true;
         when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPutList("", "", new JSONArray(), Object.class, true, false)
                 .subscribe(testSubscriber);
 
@@ -380,7 +380,7 @@ public class CloudDataStoreTest {
     public void dynamicPutListNoNetwork() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPostList("", "", new JSONArray(), Object.class, false, true)
                 .subscribe(testSubscriber);
 
@@ -392,7 +392,7 @@ public class CloudDataStoreTest {
     public void dynamicPutListNoNetworkNoQueue() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPutList("", "", new JSONArray(), Object.class, false, false)
                 .subscribe(testSubscriber);
 
@@ -404,7 +404,7 @@ public class CloudDataStoreTest {
     public void dynamicDeleteCollection() throws Exception {
         when(mockApiConnection.dynamicDelete(anyString(), any(RequestBody.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicDeleteCollection("", "", new JSONArray(), Object.class, false, false)
                 .subscribe(testSubscriber);
 
@@ -419,7 +419,7 @@ public class CloudDataStoreTest {
         cloudDataStore.mCanPersist = true;
         when(mockApiConnection.dynamicDelete(anyString(), any(RequestBody.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicDeleteCollection("", "", new JSONArray(), Object.class, true, false)
                 .subscribe(testSubscriber);
 
@@ -433,7 +433,7 @@ public class CloudDataStoreTest {
     public void dynamicDeleteCollectionNoNetwork() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicDeleteCollection("", "", new JSONArray(), Object.class, false, true)
                 .subscribe(testSubscriber);
 
@@ -445,7 +445,7 @@ public class CloudDataStoreTest {
     public void dynamicDeleteCollectionNoNetworkNoQueue() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicDeleteCollection("", "", new JSONArray(), Object.class, false, false)
                 .subscribe(testSubscriber);
 
@@ -469,7 +469,7 @@ public class CloudDataStoreTest {
     public void dynamicUploadFile() throws Exception {
         when(mockApiConnection.dynamicUpload(anyString(), anyMap(), any(MultipartBody.Part.class))).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicUploadFile("", new File(""), "", new HashMap(), false, false, false, Object.class)
                 .subscribe(testSubscriber);
 
@@ -483,7 +483,7 @@ public class CloudDataStoreTest {
     public void dynamicUploadFileNoNetwork() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicUploadFile("", new File(""), "", new HashMap(), false, false, true, Object.class)
                 .subscribe(testSubscriber);
 
@@ -495,7 +495,7 @@ public class CloudDataStoreTest {
     public void dynamicUploadFileNoNetworkNoQueue() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicUploadFile("", new File(""), "", new HashMap(), false, false, false, Object.class)
                 .subscribe(testSubscriber);
 
@@ -507,7 +507,7 @@ public class CloudDataStoreTest {
     public void dynamicDownloadFile() throws Exception {
         when(mockApiConnection.dynamicDownload(anyString())).thenReturn(observable);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicDownloadFile("", new File(""), false, false, false)
                 .subscribe(testSubscriber);
 
@@ -521,7 +521,7 @@ public class CloudDataStoreTest {
     public void dynamicDownloadFileNoNetwork() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicDownloadFile("", new File(""), false, false, true)
                 .subscribe(testSubscriber);
 
@@ -533,7 +533,7 @@ public class CloudDataStoreTest {
     public void dynamicDownloadFileNoNetworkNoQueue() throws Exception {
         changeStateOfNetwork(mockContext, false);
 
-        TestSubscriber testSubscriber = new TestSubscriber();
+        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicDownloadFile("", new File(""), false, false, false)
                 .subscribe(testSubscriber);
 

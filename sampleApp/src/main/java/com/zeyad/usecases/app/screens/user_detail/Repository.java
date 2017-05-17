@@ -1,7 +1,7 @@
-package com.zeyad.usecases.app.presentation.user_detail;
+package com.zeyad.usecases.app.screens.user_detail;
 
 import com.google.gson.annotations.SerializedName;
-import com.zeyad.usecases.app.presentation.user_list.User;
+import com.zeyad.usecases.app.screens.user_list.User;
 
 import org.parceler.Parcel;
 

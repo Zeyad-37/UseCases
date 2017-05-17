@@ -1,12 +1,12 @@
-package com.zeyad.usecases.app.presentation.user_list;
+package com.zeyad.usecases.app.screens.user_list;
 
 import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.components.redux.BaseEvent;
 import com.zeyad.usecases.app.components.redux.BaseViewModel;
 import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
-import com.zeyad.usecases.app.presentation.user_list.events.DeleteUsersEvent;
-import com.zeyad.usecases.app.presentation.user_list.events.GetPaginatedUsersEvent;
-import com.zeyad.usecases.app.presentation.user_list.events.SearchUsersEvent;
+import com.zeyad.usecases.app.screens.user_list.events.DeleteUsersEvent;
+import com.zeyad.usecases.app.screens.user_list.events.GetPaginatedUsersEvent;
+import com.zeyad.usecases.app.screens.user_list.events.SearchUsersEvent;
 import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;
 

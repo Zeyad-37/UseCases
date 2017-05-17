@@ -8,7 +8,6 @@ import org.json.JSONObject;
 import java.util.List;
 
 import io.realm.RealmModel;
-import io.realm.RealmObject;
 import rx.Completable;
 import rx.Observable;
 
@@ -78,14 +77,6 @@ public interface DataBaseManager {
      */
     @NonNull
     Completable evictAll(Class clazz);
-
-    /**
-     * Evict element of the DB.
-     *
-     * @param realmModel Element to deleted from the DB.
-     * @param clazz      Class type of the items to be deleted.
-     */
-    void evict(RealmObject realmModel, Class clazz);
 
     /**
      * Evict element by id of the DB.

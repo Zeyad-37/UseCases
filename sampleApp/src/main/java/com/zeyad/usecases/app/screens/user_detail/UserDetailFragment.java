@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.user_detail;
+package com.zeyad.usecases.app.screens.user_detail;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -29,8 +29,8 @@ import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.redux.BaseFragment;
-import com.zeyad.usecases.app.presentation.user_list.User;
-import com.zeyad.usecases.app.presentation.user_list.UserListActivity;
+import com.zeyad.usecases.app.screens.user_list.User;
+import com.zeyad.usecases.app.screens.user_list.UserListActivity;
 import com.zeyad.usecases.app.utils.Utils;
 
 import org.parceler.Parcels;
@@ -77,11 +77,12 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
         Bundle arguments = getArguments();
         if (arguments != null)
             viewState = Parcels.unwrap(arguments.getParcelable(UI_MODEL));
-        viewModel = new UserDetailVM(DataServiceFactory.getInstance(), (newResult, currentStateBundle) -> UserDetailState.builder()
-                .setRepos((List<Repository>) newResult.getBundle())
-                .setUser(currentStateBundle.getUser())
-                .setIsTwoPane(currentStateBundle.isTwoPane())
-                .build(), viewState);
+        viewModel = new UserDetailVM(DataServiceFactory.getInstance(),
+                (newResult, currentStateBundle) -> UserDetailState.builder()
+                        .setRepos((List<Repository>) newResult.getBundle())
+                        .setUser(currentStateBundle.getUser())
+                        .setIsTwoPane(currentStateBundle.isTwoPane())
+                        .build(), viewState);
         events = Observable.just(new GetReposEvent(viewState.getUser().getLogin()));
     }
 

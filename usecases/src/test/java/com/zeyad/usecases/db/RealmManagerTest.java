@@ -1,7 +1,7 @@
 //package com.zeyad.usecases.db;
 //
-//import android.content.Context;
-//import android.support.test.rule.BuildConfig;
+//import android.support.test.InstrumentationRegistry;
+//import android.support.test.runner.AndroidJUnit4;
 //
 //import com.zeyad.usecases.TestRealmModel;
 //
@@ -10,22 +10,17 @@
 //import org.junit.Before;
 //import org.junit.Test;
 //import org.junit.runner.RunWith;
-//import org.powermock.core.classloader.annotations.PowerMockIgnore;
-//import org.powermock.core.classloader.annotations.PrepareForTest;
-//import org.powermock.core.classloader.annotations.SuppressStaticInitializationFor;
-//import org.robolectric.RobolectricTestRunner;
-//import org.robolectric.annotation.Config;
 //
 //import java.util.ArrayList;
 //
 //import io.realm.Realm;
 //import io.realm.RealmConfiguration;
-//import io.realm.log.RealmLog;
 //import io.realm.rx.RealmObservableFactory;
+//import rx.Completable;
 //import rx.Observable;
+//import rx.observers.TestSubscriber;
 //
 //import static org.junit.Assert.assertEquals;
-//import static org.mockito.Mockito.mock;
 //import static org.mockito.Mockito.times;
 //import static org.mockito.Mockito.verify;
 //import static org.mockito.Mockito.when;
@@ -33,11 +28,9 @@
 ///**
 // * @author by ZIaDo on 2/15/17.
 // */
-//@RunWith(RobolectricTestRunner.class)
-//@Config(constants = BuildConfig.class, sdk = 19)
-//@PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
-//@SuppressStaticInitializationFor("io.realm.internal.Util")
-//@PrepareForTest({Realm.class, RealmLog.class})
+////@RunWith(RobolectricTestRunner.class)
+////@Config(constants = BuildConfig.class, sdk = 19)
+//@RunWith(AndroidJUnit4.class)
 //public class RealmManagerTest {
 //    private RealmManager mRealmManager;
 //    private Realm mockRealm;
@@ -47,7 +40,8 @@
 //    public void before() {
 //        mRealmManager = new RealmManager();
 //
-//        Realm.init(mock(Context.class));
+////        Realm.init(mock(Context.class));
+//        Realm.init(InstrumentationRegistry.getContext());
 //        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
 //                .name("test.realm")
 //                .rxFactory(new RealmObservableFactory())
@@ -83,49 +77,54 @@
 //
 //    @Test
 //    public void putJSONObject() throws Exception {
-//        Observable observable = mRealmManager.put(new JSONObject(), "", TestRealmModel.class);
-//        assertEquals(observable.toBlocking().first().getClass(), TestRealmModel.class);
+//        Completable completable = mRealmManager.put(new JSONObject(), "", TestRealmModel.class);
+//        TestSubscriber testSubscriber = new TestSubscriber();
+//        completable.subscribe(testSubscriber);
+//        testSubscriber.assertCompleted();
 //    }
 //
 //    @Test
 //    public void putRealmModel() throws Exception {
-//        Observable observable = mRealmManager.put(new TestRealmModel(), TestRealmModel.class);
-//        assertEquals(observable.toBlocking().first().getClass(), TestRealmModel.class);
+//        Completable completable = mRealmManager.put(new TestRealmModel(), TestRealmModel.class);
+//        TestSubscriber testSubscriber = new TestSubscriber();
+//        completable.subscribe(testSubscriber);
+//        testSubscriber.assertCompleted();
 //    }
 //
 //    @Test
 //    public void putAllJSONArray() throws Exception {
-//        Observable observable = mRealmManager.putAll(new JSONArray(), "", TestRealmModel.class);
-//        assertEquals(observable.toBlocking().first().getClass(), TestRealmModel.class);
+//        Completable completable = mRealmManager.putAll(new JSONArray(), "", TestRealmModel.class);
+//        TestSubscriber testSubscriber = new TestSubscriber();
+//        completable.subscribe(testSubscriber);
+//        testSubscriber.assertCompleted();
 //    }
 //
 //    @Test
 //    public void putAllRealmObject() throws Exception {
-//        Observable observable = mRealmManager.putAll(new ArrayList<>(), TestRealmModel.class);
-//        assertEquals(observable.toBlocking().first().getClass(), TestRealmModel.class);
+//        Completable completable = mRealmManager.putAll(new ArrayList<>(), TestRealmModel.class);
+//        TestSubscriber testSubscriber = new TestSubscriber();
+//        completable.subscribe(testSubscriber);
+//        testSubscriber.assertCompleted();
 //    }
 //
 //    @Test
 //    public void evictAll() throws Exception {
-//        Observable observable = mRealmManager.evictAll(TestRealmModel.class);
-//        assertEquals(observable.toBlocking().first().getClass(), TestRealmModel.class);
+//        Completable completable = mRealmManager.evictAll(TestRealmModel.class);
+//        TestSubscriber testSubscriber = new TestSubscriber();
+//        completable.subscribe(testSubscriber);
+//        testSubscriber.assertCompleted();
 //    }
 //
 //    @Test
-//    public void evict() throws Exception {
-////        Observable observable = mRealmManager.evict(new TestRealmModel(), TestRealmModel.class);
-////        assertEquals(observable.toBlocking().first().getClass(),
-////                TestRealmModel.class);
+//    public void evictCollection() throws Exception {
+//        Completable completable = mRealmManager.evictCollection("", new ArrayList<>(), TestRealmModel.class);
+//        TestSubscriber testSubscriber = new TestSubscriber();
+//        completable.subscribe(testSubscriber);
+//        testSubscriber.assertCompleted();
 //    }
 //
 //    @Test
 //    public void evictById() throws Exception {
 //        assertEquals(mRealmManager.evictById(TestRealmModel.class, "", 0), true);
-//    }
-//
-//    @Test
-//    public void evictCollection() throws Exception {
-//        assertEquals(mRealmManager.evictCollection("", new ArrayList<>(), TestRealmModel.class)
-//                .toBlocking().first(), TestRealmModel.class);
 //    }
 //}

@@ -12,9 +12,23 @@
     <dimen name="four_dp">4dp</dimen>
     <dimen name="one_dp">1dp</dimen>
 
-    <dimen name="font_xlarge">22sp</dimen>
+    <!-- typical spacing between two views -->
+    <dimen name="spacing_huge">40dp</dimen>
+    <dimen name="spacing_large">24dp</dimen>
+    <dimen name="spacing_normal">14dp</dimen>
+    <dimen name="spacing_small">10dp</dimen>
+    <dimen name="spacing_tiny">4dp</dimen>
+
+    <!-- typical sizes of views -->
+    <dimen name="button_height_tall">60dp</dimen>
+    <dimen name="button_height_normal">40dp</dimen>
+    <dimen name="button_height_short">32dp</dimen>
+
+    <!-- font sizes -->
+    <dimen name="font_larger">22sp</dimen>
     <dimen name="font_large">18sp</dimen>
     <dimen name="font_normal">15sp</dimen>
+    <dimen name="font_small">12sp</dimen>
 
     <!--User Header stuff-->
     <dimen name="header_text_size">26sp</dimen>

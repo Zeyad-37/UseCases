@@ -1,6 +1,6 @@
-package com.zeyad.usecases.app.presentation.user_detail;
+package com.zeyad.usecases.app.screens.user_detail;
 
-import com.zeyad.usecases.app.presentation.user_list.User;
+import com.zeyad.usecases.app.screens.user_list.User;
 
 import org.parceler.Parcel;
 
@@ -11,9 +11,9 @@ import java.util.List;
  */
 @Parcel
 public class UserDetailState {
-    final boolean isTwoPane;
-    final User user;
-    final List<Repository> repos;
+    boolean isTwoPane;
+    User user;
+    List<Repository> repos;
 
     UserDetailState() {
         user = null;

@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.user_list.view_holders;
+package com.zeyad.usecases.app.screens.user_list.view_holders;
 
 import android.graphics.Color;
 import android.view.View;
@@ -8,7 +8,7 @@ import android.widget.TextView;
 import com.bumptech.glide.Glide;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
-import com.zeyad.usecases.app.presentation.user_list.User;
+import com.zeyad.usecases.app.screens.user_list.User;
 import com.zeyad.usecases.app.utils.Utils;
 
 import butterknife.BindView;

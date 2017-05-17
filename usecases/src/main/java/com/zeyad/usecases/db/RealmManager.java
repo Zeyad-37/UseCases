@@ -19,11 +19,7 @@ import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
 import rx.Completable;
-import rx.CompletableSubscriber;
 import rx.Observable;
-import rx.Subscription;
-
-import static com.google.android.gms.internal.zzs.TAG;
 
 /**
  * {@link DataBaseManager} implementation.
@@ -221,45 +217,6 @@ public class RealmManager implements DataBaseManager {
     }
 
     /**
-     * Evict element of the DB.
-     *
-     * @param realmModel Element to deleted from the DB.
-     * @param clazz      Class type of the items to be deleted.
-     */
-    // TODO: 5/14/17 remove?!
-    @Override
-    public void evict(@NonNull final RealmObject realmModel, @NonNull Class clazz) {
-        Completable.defer(() -> {
-            Realm realm = Realm.getDefaultInstance();
-            try {
-                executeWriteOperationInRealm(realm, (Executor) realmModel::deleteFromRealm);
-                return Completable.complete();
-            } finally {
-                closeRealm(realm);
-            }
-        }).subscribe(new CompletableSubscriber() {
-            private Subscription subscription;
-
-            @Override
-            public void onCompleted() {
-                subscription.unsubscribe();
-                Log.d(TAG, clazz.getSimpleName() + " deleted!");
-            }
-
-            @Override
-            public void onError(@NonNull Throwable e) {
-                e.printStackTrace();
-                subscription.unsubscribe();
-            }
-
-            @Override
-            public void onSubscribe(Subscription d) {
-                subscription = d;
-            }
-        });
-    }
-
-    /**
      * Evict element by id of the DB.
      *
      * @param clazz        Class type of the items to be deleted.
@@ -272,7 +229,13 @@ public class RealmManager implements DataBaseManager {
         try {
             RealmModel toDelete = realm.where(clazz).equalTo(idFieldName, idFieldValue).findFirst();
             if (toDelete != null) {
-                executeWriteOperationInRealm(realm, () -> RealmObject.deleteFromRealm(toDelete));
+//                executeWriteOperationInRealm(realm, () -> RealmObject.deleteFromRealm(toDelete));
+                executeWriteOperationInRealm(realm, new Executor() {
+                    @Override
+                    public void run() {
+                        RealmObject.deleteFromRealm(toDelete);
+                    }
+                });
                 return !RealmObject.isValid(toDelete);
             } else return false;
         } finally {

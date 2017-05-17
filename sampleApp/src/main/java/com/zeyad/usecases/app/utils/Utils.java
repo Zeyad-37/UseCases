@@ -18,7 +18,7 @@ public class Utils {
         return list != null && !list.isEmpty();
     }
 
-    public static List union(List first, List last) {
+    public static <T> List union(List<T> first, List<T> last) {
         if (isNotEmpty(first) && isNotEmpty(last)) {
             first.addAll(last);
             return first;

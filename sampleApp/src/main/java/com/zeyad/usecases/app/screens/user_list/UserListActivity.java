@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.user_list;
+package com.zeyad.usecases.app.screens.user_list;
 
 import android.app.ActivityOptions;
 import android.app.SearchManager;
@@ -24,22 +24,22 @@ import android.widget.TextView;
 import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
 import com.jakewharton.rxbinding.support.v7.widget.RxSearchView;
 import com.jakewharton.rxbinding.view.RxMenuItem;
+import com.zeyad.usecases.api.DataServiceFactory;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.redux.BaseActivity;
 import com.zeyad.usecases.app.components.redux.BaseEvent;
 import com.zeyad.usecases.app.components.redux.UISubscriber;
-import com.zeyad.usecases.app.presentation.user_detail.UserDetailActivity;
-import com.zeyad.usecases.app.presentation.user_detail.UserDetailFragment;
-import com.zeyad.usecases.app.presentation.user_detail.UserDetailState;
-import com.zeyad.usecases.app.presentation.user_list.events.DeleteUsersEvent;
-import com.zeyad.usecases.app.presentation.user_list.events.GetPaginatedUsersEvent;
-import com.zeyad.usecases.app.presentation.user_list.events.SearchUsersEvent;
-import com.zeyad.usecases.app.presentation.user_list.view_holders.EmptyViewHolder;
-import com.zeyad.usecases.app.presentation.user_list.view_holders.UserViewHolder;
+import com.zeyad.usecases.app.screens.user_detail.UserDetailActivity;
+import com.zeyad.usecases.app.screens.user_detail.UserDetailFragment;
+import com.zeyad.usecases.app.screens.user_detail.UserDetailState;
+import com.zeyad.usecases.app.screens.user_list.events.DeleteUsersEvent;
+import com.zeyad.usecases.app.screens.user_list.events.GetPaginatedUsersEvent;
+import com.zeyad.usecases.app.screens.user_list.events.SearchUsersEvent;
+import com.zeyad.usecases.app.screens.user_list.view_holders.EmptyViewHolder;
+import com.zeyad.usecases.app.screens.user_list.view_holders.UserViewHolder;
 import com.zeyad.usecases.app.utils.Utils;
-import com.zeyad.usecases.api.DataServiceFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;

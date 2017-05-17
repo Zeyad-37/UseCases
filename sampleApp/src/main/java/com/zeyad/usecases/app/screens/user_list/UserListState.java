@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.presentation.user_list;
+package com.zeyad.usecases.app.screens.user_list;
 
 import org.parceler.Parcel;
 
@@ -10,7 +10,7 @@ import java.util.List;
  */
 @Parcel
 public class UserListState {
-    final List<User> users;
+    List<User> users;
 
     UserListState() {
         users = new ArrayList<>();
@@ -34,7 +34,7 @@ public class UserListState {
         Builder() {
         }
 
-        public Builder setUsers(List<User> value) {
+        Builder setUsers(List<User> value) {
             users = value;
             return this;
         }
