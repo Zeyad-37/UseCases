@@ -5,12 +5,12 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.mapper.DAOMapper;
-import com.zeyad.usecases.executors.PostExecutionThread;
 
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
+import rx.Scheduler;
 
 /**
  * @author by ZIaDo on 12/9/16.
@@ -24,7 +24,7 @@ public class DataServiceConfig {
     private boolean withCache, withRealm;
     private int cacheSize, cacheAmount;
     private TimeUnit timeUnit;
-    private PostExecutionThread postExecutionThread;
+    private Scheduler postExecutionThread;
 
     private DataServiceConfig(Builder dataUseCaseConfigBuilder) {
         context = dataUseCaseConfigBuilder.context;
@@ -51,7 +51,7 @@ public class DataServiceConfig {
         return new DAOMapper();
     }
 
-    PostExecutionThread getPostExecutionThread() {
+    Scheduler getPostExecutionThread() {
         return postExecutionThread;
     }
 
@@ -99,14 +99,14 @@ public class DataServiceConfig {
         private boolean withCache, withRealm;
         private int cacheSize, cacheAmount;
         private TimeUnit timeUnit;
-        private PostExecutionThread postExecutionThread;
+        private Scheduler postExecutionThread;
 
         public Builder(Context context) {
             this.context = context;
         }
 
         @NonNull
-        public Builder postExecutionThread(PostExecutionThread postExecutionThread) {
+        public Builder postExecutionThread(Scheduler postExecutionThread) {
             this.postExecutionThread = postExecutionThread;
             return this;
         }

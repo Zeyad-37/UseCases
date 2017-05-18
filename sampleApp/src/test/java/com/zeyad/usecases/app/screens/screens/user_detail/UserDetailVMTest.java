@@ -48,9 +48,9 @@ public class UserDetailVMTest {
     public void getRepositories() throws Exception {
         List<User> userList = new ArrayList<>();
         userList.add(user);
-        Observable<List> observableUserRealm = Observable.just(userList);
+        Observable<List<User>> observableUserRealm = Observable.just(userList);
 
-        when(mockDataUseCase.queryDisk(any(RealmQueryProvider.class)))
+        when(mockDataUseCase.<User>queryDisk(any(RealmQueryProvider.class)))
                 .thenReturn(observableUserRealm);
 
         userDetailVM.getRepositories(user.getLogin());

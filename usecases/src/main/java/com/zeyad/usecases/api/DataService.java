@@ -1,7 +1,6 @@
 package com.zeyad.usecases.api;
 
 import com.zeyad.usecases.db.RealmQueryProvider;
-import com.zeyad.usecases.executors.PostExecutionThread;
 import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;
@@ -24,11 +23,11 @@ class DataService implements IDataService {
 
     private static DataService sDataService;
     private final DataStoreFactory mDataStoreFactory;
-    private final PostExecutionThread mPostExecutionThread;
+    private final Scheduler mPostExecutionThread;
     private final Scheduler mBackgroundThread;
     private final boolean mPostThreadExist;
 
-    DataService(DataStoreFactory dataStoreFactory, PostExecutionThread postExecutionThread, Scheduler backgroundThread) {
+    DataService(DataStoreFactory dataStoreFactory, Scheduler postExecutionThread, Scheduler backgroundThread) {
         mBackgroundThread = backgroundThread;
         mDataStoreFactory = dataStoreFactory;
         mPostExecutionThread = postExecutionThread;
@@ -56,7 +55,7 @@ class DataService implements IDataService {
     }
 
     @Override
-    public <M> Observable getObject(GetRequest getRequest) {
+    public <M> Observable<M> getObject(GetRequest getRequest) {
         try {
             return mDataStoreFactory.dynamically(getRequest.getUrl())
                     .<M>dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
@@ -163,7 +162,7 @@ class DataService implements IDataService {
         try {
             return mDataStoreFactory.disk().dynamicDeleteAll(deleteRequest.getDataClass())
                     .compose(mPostThreadExist ? completable -> completable.subscribeOn(mBackgroundThread)
-                            .observeOn(mPostExecutionThread.getScheduler())
+                            .observeOn(mPostExecutionThread)
                             .unsubscribeOn(mBackgroundThread) : completable -> completable.subscribeOn(mBackgroundThread)
                             .unsubscribeOn(mBackgroundThread));
         } catch (IllegalAccessException e) {
@@ -250,7 +249,7 @@ class DataService implements IDataService {
      */
     private <T> Observable.Transformer<T, T> applySchedulers() {
         return mPostThreadExist ? observable -> observable.subscribeOn(mBackgroundThread)
-                .observeOn(mPostExecutionThread.getScheduler())
+                .observeOn(mPostExecutionThread)
                 .unsubscribeOn(mBackgroundThread) : observable -> observable.subscribeOn(mBackgroundThread)
                 .unsubscribeOn(mBackgroundThread);
     }

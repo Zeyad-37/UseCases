@@ -2,7 +2,6 @@ package com.zeyad.usecases.api;
 
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.db.RealmQueryProvider;
-import com.zeyad.usecases.executors.PostExecutionThread;
 import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;
@@ -54,9 +53,7 @@ public class DataServiceTest {
         when(dataStoreFactory.dynamically(anyString())).thenReturn(mock(CloudDataStore.class));
         when(dataStoreFactory.disk()).thenReturn(mock(DiskDataStore.class));
         when(dataStoreFactory.cloud()).thenReturn(mock(CloudDataStore.class));
-        PostExecutionThread postExecutionThread = mock(PostExecutionThread.class);
-        when(postExecutionThread.getScheduler()).thenReturn(AndroidSchedulers.mainThread());
-        dataService = new DataService(dataStoreFactory, postExecutionThread, mock(Scheduler.class));
+        dataService = new DataService(dataStoreFactory, AndroidSchedulers.mainThread(), mock(Scheduler.class));
     }
 
     @Test

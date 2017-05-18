@@ -46,9 +46,9 @@ public class UserListVMTest {
         user.setId(1);
         userList = new ArrayList<>();
         userList.add(user);
-        Observable<List> observableUserRealm = Observable.just(userList);
+        Observable<List<User>> observableUserRealm = Observable.just(userList);
 
-        when(mockDataUseCase.getListOffLineFirst(any()))
+        when(mockDataUseCase.<User>getListOffLineFirst(any()))
                 .thenReturn(observableUserRealm);
 
         userListVM.getUsers(0);
@@ -77,11 +77,12 @@ public class UserListVMTest {
         user.setId(1);
         userList = new ArrayList<>();
         userList.add(user);
-        Observable<List> observableUserRealm = Observable.just(userList);
+        Observable<List<User>> listObservable = Observable.just(userList);
+        Observable<User> userObservable = Observable.just(user);
 
-        when(mockDataUseCase.getObject(any(GetRequest.class))).thenReturn(observableUserRealm);
-        when(mockDataUseCase.queryDisk(any(RealmQueryProvider.class)))
-                .thenReturn(observableUserRealm);
+        when(mockDataUseCase.<User>getObject(any(GetRequest.class))).thenReturn(userObservable);
+        when(mockDataUseCase.<User>queryDisk(any(RealmQueryProvider.class)))
+                .thenReturn(listObservable);
 
         userListVM.search("");
 

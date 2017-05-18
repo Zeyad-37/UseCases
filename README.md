@@ -31,10 +31,10 @@ Easiest way to start
 @RealmModule(library = true, allClasses = true)
 class LibraryModule {
 }
-
+```
+```
 // This should be in the application class
 
-// For Data Access
 Realm.init(this); // First initialize realm
 Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
             .name("app.realm")
@@ -44,40 +44,31 @@ Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
             .build());
 
 // Fastest start
-DataUseCaseFactory.init(new DataUseCaseConfig.Builder(applicationContext).build()); // all extra features are disabled
+DataServiceFactory.init(new DataUseCaseConfig.Builder(applicationContext).build()); // all extra features are disabled
                 
 // Advanced init
-DataUseCaseFactory.init(new DataUseCaseConfig.Builder(applicationContext)
+DataServiceFactory.init(new DataServiceConfig.Builder(applicationContext)
                 .baseUrl(API_BASE_URL) 
                 .withRealm() // if you want a DB
-                .withCache() // adds a cache layer above the server & DB if exists
+                .withCache(3, TimeUnit.MINUTES) // adds a cache layer above the server & DB if exists
                 .cacheSize(8192)  // maximum size to allocate in bytes
                 .okHttpBuilder(provideOkHttpClientBuilder()) 
                 .okhttpCache(provideCache()) // you can also provide a cache for okHttp
-                .threadExecutor(new JobExecutor()) // your implementation of background thread.
-                .postExecutionThread(new UIThread()) // your implementation of the post execution thread
+                .postExecutionThread(AndroidScheduler.mainThread()) // your implementation of the post execution thread
                 .build());
-DataUseCaseFactory.getInstance();
-
-// For File Access
-FileUseCaseFactory.init(applicationContext); 
-// or
-FileUseCaseFactory.init(applicationContext, threadExecutor, postExecutionThread);
-FileUseCaseFactory.getInstance();
+DataServiceFactory.getInstance();
 ```
-
 # Code Example
 
 Get Object From Server:
 ```
-mDataUseCase.getObject(new GetRequest
-        .GetRequestBuilder(OrderRealmModel.class, true) // true to save result to db, false otherwise.
-        .presentationClass(OrderViewModel.class)
-        .url(URL) // if you have provided the base url in the DataUseCaseConfig.Builder
-        .idColumnName(OrderRealmModel.ID)
+mDataService.<Order>getObject(new GetRequest
+        .GetRequestBuilder(Order.class, true) // true to save result to db, false otherwise.
+        .url(URL) // if you provided a base url in the DataServiceConfig.Builder
+        .idColumnName(Order.ID)
         .id(orderId)
         .build())
-        .subscribe(new Subscriber<OrderViewModel>() {
+        .subscribe(new Subscriber<Order>() {
             @Override
             public void onCompleted() {
             }
@@ -88,27 +79,25 @@ mDataUseCase.getObject(new GetRequest
             }
 
             @Override
-            public void onNext(OrderViewModel orderViewModel) {
+            public void onNext(Order order) {
             }
         });
 ```
 Get Object From DB:
 ```
-mDataUseCase.getObject(new GetRequest
-        .GetRequestBuilder(OrderRealmModel.class, true)
-        .presentationClass(OrderViewModel.class)
-        .idColumnName(OrderViewModel.ID)
+mDataService.<Order>getObject(new GetRequest
+        .GetRequestBuilder(Order.class, true)
+        .idColumnName(Order.ID)
         .id(mItemId)
         .build());
 ```
 Get List From Server:
 ```
-mDataUseCase.getList(new GetRequest
-        .GetRequestBuilder(OrdersRealmModel.class, false)
-        .presentationClass(OrderViewModel.class)
-        .fullUrl(FULL_URL)
+mDataService.<Order>getList(new GetRequest
+        .GetRequestBuilder(Order.class, false)
+        .fullUrl(FULL_URL) // for server access
         .build())
-        .subscribe(new Subscriber<List<OrderViewModel>>() {
+        .subscribe(new Subscriber<List<Order>>() {
             @Override
             public void onCompleted() {
             }
@@ -119,98 +108,77 @@ mDataUseCase.getList(new GetRequest
             }
 
             @Override
-            public void onNext(List<OrderViewModel> orderViewModel){
+            public void onNext(List<Order> order){
             }
         });
 ```
 Get List From DB:
 ```
-mDataUseCase.getList(new GetRequest
-        .GetRequestBuilder(OrdersRealmModel.class, false)
-        .presentationClass(OrderViewModel.class)
+mDataService.<Order>getList(new GetRequest
+        .GetRequestBuilder(Order.class, false)
         .build());
 ```
-Post/Put Object to Server:
+Post/Put Object:
 ```
-mDataUseCase.postObject(new PostRequest // putObject
-        .PostRequestBuilder(OrdersRealmModel.class, true)
-        .presentationClass(OrderViewModel.class)
-        .idColumnName(OrdersRealmModel.ID)
-        .url(URL)
-        .payLoad(OrderViewModel.toJSONObject()) // or HashMap 
+mDataService.postObject(new PostRequest // putObject
+        .PostRequestBuilder(MyResult.class, true) // Type of expected server response
+        .idColumnName(Order.ID) // for persistance
+        .url(URL) // remove for DB access
+        .payLoad(order) // or HashMap / JSONObject
         .build());
 ```
-Post/Put Object to DB:
+Post/Put List:
 ```
-mDataUseCase.postObject(new PostRequest // putObject
-        .PostRequestBuilder(OrdersRealmModel.class, true)
-        .idColumnName(OrderViewModel.ID)
-        .presentationClass(OrderViewModel.class)
-        .payLoad(OrderViewModel.toJSONObject()) // or HashMap 
-        .build());
-```
-Post/Put List to Server:
-```
-mDataUseCase.postList(new PostRequest // putList
-        .PostRequestBuilder(OrdersRealmModel.class, true)
-        .presentationClass(OrdersViewModel.class)
-        .payLoad(OrdersViewModel.toJSONArray())
-        .idColumnName(OrdersRealmModel.ID)
-        .url(URL)
+mDataService.postList(new PostRequest // putList
+        .PostRequestBuilder(MyResponse.class, true) // Type of expected server response
+        .payLoad(orders)
+        .idColumnName(Order.ID) // for persistance
+        .url(URL) // remove for DB access
         .build())
 ```
-Post/Put List to DB:
+Delete Collection
 ```
-mDataUseCase.postList(new PostRequest // putList
-        .PostRequestBuilder(OrdersRealmModel.class, true)
-        .presentationClass(OrdersViewModel.class)
-        .payLoad(OrdersViewModel.toJSONArray())
-        .idColumnName(OrdersRealmModel.ID)
+mDataService().deleteCollectionByIds(new PostRequest // putList
+        .PostRequestBuilder(Order.class, true)
+        .payLoad(ids)
+        .idColumnName(Order.ID) // for persistance
+        .url(URL) // remove for DB access
+        .build())
+```
+Delete Item:
+```
+mDataService().deleteCollectionByIds(new PostRequest // putList
+        .PostRequestBuilder(Order.class, true)
+        .payLoad(id)
+        .idColumnName(Order.ID) // for persistance
+        .url(URL) // remove for DB access
         .build())
 ```
 Delete All from DB:
 ```
-mDataUseCase().deleteAll(new PostRequest
-        .PostRequestBuilder(OrdersRealmModel.class, true)
-        .idColumnName(OrdersRealmModel.ID)
-        .build())
-```
-Delete Collection from Server
-```
-mDataUseCase().deleteCollection(new PostRequest // putList
-        .PostRequestBuilder(OrdersRealmModel.class, true)
-        .presentationClass(OrdersViewModel.class)
-        .payLoad(OrdersViewModel.toJSONArrayOfId())
-        .url(URL)
+mDataService.deleteAll(new PostRequest
+        .PostRequestBuilder(Order.class, true)
+        .idColumnName(Order.ID)
         .build())
 ```
 Upload File
 ```
-mFileUseCase.uploadFile(new FileIORequest
+mDataService.uploadFile(new FileIORequest
         .FileIORequestBuilder(FULL_URL, new File()) // always full url
         .onWifi(true)
         .whileCharging(false)
-        .dataClass(OrdersRealmModel.class)
-        .presentationClass(OrdersViewModel.class)
+        .dataClass(Order.class)
         .build())
 ```
 Download File
 ```
-mFileUseCase.downloadFile(new FileIORequest
+mDataService.downloadFile(new FileIORequest
         .FileIORequestBuilder(FULL_URL, new File())
         .onWifi(true)
         .whileCharging(false)
-        .dataClass(OrdersRealmModel.class)
-        .presentationClass(OrdersViewModel.class)
+        .dataClass(Order.class)
         .build())
 ```
-Initialization Example:
-```
- DataUseCaseFactory.init(new DataUseCaseConfig.Builder(applicationContext)
-                .withRealm()
-                .build());
-```
-
 # Contributors
 
 Just make pull request. You are in!
