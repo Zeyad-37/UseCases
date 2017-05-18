@@ -18,7 +18,7 @@ public interface IDataService {
      * @param getListRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable<List> getList(GetRequest getListRequest);
+    <M> Observable<List<M>> getList(GetRequest getListRequest);
 
     /**
      * Gets object from getRequest.
@@ -26,7 +26,7 @@ public interface IDataService {
      * @param getRequest contains the attributes of the request.
      * @return Observable with the Object.
      */
-    Observable getObject(GetRequest getRequest);
+    <M> Observable<M> getObject(GetRequest getRequest);
 
     /**
      * Gets object from getRequest.
@@ -98,7 +98,7 @@ public interface IDataService {
      * @param realmQueryProvider query tp select list of item(s).
      * @return
      */
-    Observable<List> queryDisk(RealmQueryProvider realmQueryProvider);
+    <M> Observable<List<M>> queryDisk(RealmQueryProvider realmQueryProvider);
 
     /**
      * Creates a repository pattern with live objects
@@ -106,7 +106,7 @@ public interface IDataService {
      * @param getRequest contains the attributes of the request.
      * @return {@link Observable<List>} with the data.
      */
-    Observable<List> getListOffLineFirst(GetRequest getRequest);
+    <M> Observable<List<M>> getListOffLineFirst(GetRequest getRequest);
 
     /**
      * Creates a repository pattern with live objects
@@ -114,7 +114,7 @@ public interface IDataService {
      * @param getRequest contains the attributes of the request.
      * @return {@link Observable>} with the data.
      */
-    Observable getObjectOffLineFirst(GetRequest getRequest);
+    <M> Observable<M> getObjectOffLineFirst(GetRequest getRequest);
 
     /**
      * Uploads a file to a url.

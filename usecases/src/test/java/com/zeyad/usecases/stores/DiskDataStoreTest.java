@@ -52,8 +52,8 @@ public class DiskDataStoreTest {
     public void testGetAll() {
         List<TestRealmModel> testRealmObjects = new ArrayList<>();
         testRealmObjects.add(new TestRealmModel());
-        Observable<List> observable = Observable.just(testRealmObjects);
-        when(dbManager.getAll(any(Class.class))).thenReturn(observable);
+        Observable<List<TestRealmModel>> observable = Observable.just(testRealmObjects);
+        when(dbManager.<TestRealmModel>getAll(any(Class.class))).thenReturn(observable);
 
         mDiskDataStore.dynamicGetList("", Object.class, false, false);
 

@@ -23,15 +23,15 @@ public interface DataStore {
     Gson gson = Config.getGson();
 
     @NonNull
-    Observable<List> dynamicGetList(String url, Class dataClass, boolean persist,
-                                    boolean shouldCache);
+    <M> Observable<List<M>> dynamicGetList(String url, Class dataClass, boolean persist,
+                                           boolean shouldCache);
 
     /**
      * Get an {@link Observable} which will emit a Object by its id.
      */
     @NonNull
-    Observable<Object> dynamicGetObject(String url, String idColumnName, int itemId,
-                                        Class dataClass, boolean persist, boolean shouldCache);
+    <M> Observable<M> dynamicGetObject(String url, String idColumnName, int itemId,
+                                       Class dataClass, boolean persist, boolean shouldCache);
 
     /**
      * Patch a JSONObject which returns an {@link Observable} that will emit a Object.
@@ -87,7 +87,7 @@ public interface DataStore {
      * Search disk with a RealmQuery which returns an {@link Observable} that will emit a list of Object.
      */
     @NonNull
-    Observable<List> queryDisk(RealmQueryProvider queryFactory);
+    <M> Observable<List<M>> queryDisk(RealmQueryProvider queryFactory);
 
     @NonNull
     Observable<Object> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,

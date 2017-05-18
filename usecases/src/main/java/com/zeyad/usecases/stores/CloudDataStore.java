@@ -117,7 +117,7 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<List> dynamicGetList(String url, Class dataClass, boolean persist, boolean shouldCache) {
+    public <M> Observable<List<M>> dynamicGetList(String url, Class dataClass, boolean persist, boolean shouldCache) {
         return mApiConnection.dynamicGetList(url, shouldCache)
                 .doOnNext(list -> {
                     if (willPersist(persist))
@@ -370,7 +370,7 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<List> queryDisk(RealmQueryProvider queryFactory) {
+    public <M> Observable<List<M>> queryDisk(RealmQueryProvider queryFactory) {
         return Observable.error(new IllegalAccessException(mContext.getString(R.string.search_disk_error_cloud)));
     }
 

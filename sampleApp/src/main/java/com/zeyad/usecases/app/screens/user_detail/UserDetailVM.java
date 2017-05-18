@@ -7,6 +7,8 @@ import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.requests.GetRequest;
 
+import java.util.List;
+
 import rx.Observable;
 import rx.functions.Func1;
 
@@ -24,11 +26,11 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> {
         this.dataUseCase = dataUseCase;
     }
 
-    public Observable getRepositories(String userLogin) {
-        return Utils.isNotEmpty(userLogin) ? dataUseCase.queryDisk(realm -> realm.where(Repository.class)
+    public Observable<List<Repository>> getRepositories(String userLogin) {
+        return Utils.isNotEmpty(userLogin) ? dataUseCase.<Repository>queryDisk(realm -> realm.where(Repository.class)
                 .equalTo("owner.login", userLogin))
                 .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
-                        dataUseCase.getList(new GetRequest.Builder(Repository.class, true)
+                        dataUseCase.<Repository>getList(new GetRequest.Builder(Repository.class, true)
                                 .url(String.format(REPOSITORIES, userLogin)).build())) :
                 Observable.error(new IllegalArgumentException("User name can not be empty"));
     }

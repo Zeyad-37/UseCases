@@ -52,7 +52,7 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public Observable<?> getById(@NonNull final String idColumnName, final int itemId, Class dataClass) {
+    public <M extends RealmModel> Observable<M> getById(@NonNull final String idColumnName, final int itemId, Class dataClass) {
         return Observable.defer(() -> {
             int finalItemId = itemId;
             if (finalItemId <= 0)
@@ -72,7 +72,7 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public Observable<List> getAll(Class clazz) {
+    public <M> Observable<List<M>> getAll(Class clazz) {
         return Observable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
             return realm.where(clazz).findAll().asObservable()
@@ -86,12 +86,12 @@ public class RealmManager implements DataBaseManager {
      * Takes a query to be executed and return a list of containing the result.
      *
      * @param queryFactory The query used to look for inside the DB.
-     * @param <T>          the return type from the query
-     * @return {@link List<T>} a result list that matches the given query.
+     * @param <M>          the return type from the query
+     * @return {@link List<M>} a result list that matches the given query.
      */
     @NonNull
     @Override
-    public <T extends RealmModel> Observable<List<T>> getQuery(RealmQueryProvider<T> queryFactory) {
+    public <M extends RealmModel> Observable<List<M>> getQuery(RealmQueryProvider<M> queryFactory) {
         return Observable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
             return queryFactory.create(realm).findAll().asObservable()

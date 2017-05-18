@@ -43,10 +43,10 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable<List> getList(GetRequest getListRequest) {
+    public <M> Observable<List<M>> getList(GetRequest getListRequest) {
         try {
             return mDataStoreFactory.dynamically(getListRequest.getUrl())
-                    .dynamicGetList(getListRequest.getUrl(), getListRequest.getDataClass(),
+                    .<M>dynamicGetList(getListRequest.getUrl(), getListRequest.getDataClass(),
                             getListRequest.isPersist(), getListRequest.isShouldCache())
                     .compose(ReplayingShare.instance())
                     .compose(applySchedulers());
@@ -56,10 +56,10 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable getObject(GetRequest getRequest) {
+    public <M> Observable getObject(GetRequest getRequest) {
         try {
             return mDataStoreFactory.dynamically(getRequest.getUrl())
-                    .dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
+                    .<M>dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
                             getRequest.getItemId(), getRequest.getDataClass(), getRequest.isPersist(),
                             getRequest.isShouldCache())
                     .compose(ReplayingShare.instance())
@@ -172,9 +172,9 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable<List> queryDisk(RealmQueryProvider realmQueryProvider) {
+    public <M> Observable<List<M>> queryDisk(RealmQueryProvider realmQueryProvider) {
         try {
-            return mDataStoreFactory.disk().queryDisk(realmQueryProvider)
+            return mDataStoreFactory.disk().<M>queryDisk(realmQueryProvider)
                     .compose(ReplayingShare.instance())
                     .compose(applySchedulers());
         } catch (IllegalAccessException e) {
@@ -183,17 +183,17 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable<List> getListOffLineFirst(GetRequest getRequest) {
+    public <M> Observable<List<M>> getListOffLineFirst(GetRequest getRequest) {
         try {
-            Observable<List> online = mDataStoreFactory.cloud()
+            Observable<List<M>> online = mDataStoreFactory.cloud()
                     .dynamicGetList(getRequest.getUrl(), getRequest.getDataClass(),
                             getRequest.isPersist(), getRequest.isShouldCache());
             return mDataStoreFactory.disk()
-                    .dynamicGetList("", getRequest.getDataClass(),
+                    .<M>dynamicGetList("", getRequest.getDataClass(),
                             getRequest.isPersist(), getRequest.isShouldCache())
-                    .flatMap(new Func1<List, Observable<List>>() {
+                    .flatMap(new Func1<List<M>, Observable<List<M>>>() {
                         @Override
-                        public Observable<List> call(List list) {
+                        public Observable<List<M>> call(List<M> list) {
                             if (Utils.getInstance().isNotEmpty(list))
                                 return Observable.just(list);
                             else return online;
@@ -207,14 +207,14 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable getObjectOffLineFirst(GetRequest getRequest) {
+    public <M> Observable<M> getObjectOffLineFirst(GetRequest getRequest) {
         try {
-            Observable online = mDataStoreFactory.cloud()
+            Observable<M> online = mDataStoreFactory.cloud()
                     .dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
                             getRequest.getItemId(), getRequest.getDataClass(), getRequest.isPersist(),
                             getRequest.isShouldCache());
             return mDataStoreFactory.disk()
-                    .dynamicGetObject("", getRequest.getIdColumnName(), getRequest.getItemId(),
+                    .<M>dynamicGetObject("", getRequest.getIdColumnName(), getRequest.getItemId(),
                             getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
                     .flatMap(object -> object != null ? Observable.just(object) : online)
                     .onErrorResumeNext(throwable -> online)

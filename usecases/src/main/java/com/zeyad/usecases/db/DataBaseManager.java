@@ -24,7 +24,7 @@ public interface DataBaseManager {
      * @param userId       The user id to retrieve data.
      */
     @NonNull
-    Observable<?> getById(String idColumnName, int userId, Class clazz);
+    <M extends RealmModel> Observable<M> getById(String idColumnName, int userId, Class clazz);
 
     /**
      * Gets an {@link Observable} which will emit a List of Objects.
@@ -32,7 +32,7 @@ public interface DataBaseManager {
      * @param clazz Class type of the items to get.
      */
     @NonNull
-    Observable<List> getAll(Class clazz);
+    <M> Observable<List<M>> getAll(Class clazz);
 
     /**
      * Puts and element into the DB.
@@ -103,5 +103,5 @@ public interface DataBaseManager {
      * @param queryFactory The query used to look for inside the DB.
      */
     @NonNull
-    <T extends RealmModel> Observable<List<T>> getQuery(RealmQueryProvider<T> queryFactory);
+    <M extends RealmModel> Observable<List<M>> getQuery(RealmQueryProvider<M> queryFactory);
 }

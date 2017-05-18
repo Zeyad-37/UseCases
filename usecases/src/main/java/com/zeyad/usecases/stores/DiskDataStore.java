@@ -37,28 +37,27 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicGetObject(String url, String idColumnName, int itemId, Class dataClass,
-                                               boolean persist, boolean shouldCache) {
+    public <M> Observable<M> dynamicGetObject(String url, String idColumnName, int itemId,
+                                              Class dataClass, boolean persist, boolean shouldCache) {
         if (Config.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
             return Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
                     .map(object -> mEntityDataMapper.mapTo(object, dataClass));
         else
-            return mDataBaseManager.getById(idColumnName, itemId, dataClass)
-                    .map(object -> {
+            return (Observable<M>) mDataBaseManager.getById(idColumnName, itemId, dataClass)
+                    .doOnEach(notification -> {
                         try {
                             if (Config.isWithCache() && !Storo.contains(dataClass.getSimpleName() + itemId))
-                                cacheObject(idColumnName, new JSONObject(gson.toJson(object)),
+                                cacheObject(idColumnName, new JSONObject(gson.toJson(notification.getValue())),
                                         dataClass);
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
-                        return object;
                     });
     }
 
     @NonNull
     @Override
-    public Observable<List> dynamicGetList(String url, Class dataClass, boolean persist, boolean shouldCache) {
+    public <M> Observable<List<M>> dynamicGetList(String url, Class dataClass, boolean persist, boolean shouldCache) {
         return mDataBaseManager.getAll(dataClass);
     }
 
@@ -74,7 +73,7 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<List> queryDisk(RealmQueryProvider queryFactory) {
+    public <M> Observable<List<M>> queryDisk(RealmQueryProvider queryFactory) {
         return mDataBaseManager.getQuery(queryFactory);
     }
 

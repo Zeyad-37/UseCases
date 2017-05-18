@@ -11,14 +11,13 @@ import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
 import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
+import rx.functions.Func2;
 
 import static com.zeyad.usecases.app.utils.Constants.URLS.USER;
 import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
@@ -49,7 +48,7 @@ public class UserListVM extends BaseViewModel<UserListState> {
         };
     }
 
-    public Observable<List> getUsers(long lastId) {
+    public Observable<List<User>> getUsers(long lastId) {
         return lastId == 0 ? dataUseCase.getListOffLineFirst(new GetRequest.Builder(User.class, true)
                 .url(String.format(USERS, lastId))
                 .build()) : dataUseCase.getList(new GetRequest.Builder(User.class, true)
@@ -57,18 +56,17 @@ public class UserListVM extends BaseViewModel<UserListState> {
                 .build());
     }
 
-    public Observable search(String query) {
-        return dataUseCase.queryDisk(realm -> realm.where(User.class).beginsWith(User.LOGIN, query))
-                .zipWith(dataUseCase.getObject(new GetRequest.Builder(User.class, true)
+    public Observable<List<User>> search(String query) {
+        return dataUseCase.<User>queryDisk(realm -> realm.where(User.class).beginsWith(User.LOGIN, query))
+                .zipWith(dataUseCase.<User>getObject(new GetRequest.Builder(User.class, true)
                                 .url(String.format(USER, query))
                                 .build())
-                                .onErrorReturn(o -> Collections.EMPTY_LIST)
-                                .map(Collections::singletonList),
-                        (list, singletonList) -> {
-                            list.addAll((Collection) singletonList);
-                            return new ArrayList<>(new HashSet<>(list));
-                        })
-                .observeOn(AndroidSchedulers.mainThread());
+                                .onErrorReturn(throwable -> null)
+                                .map(user -> user != null ? Collections.singletonList(user) : Collections.emptyList()),
+                        (Func2<List<User>, List<User>, List<User>>) (users, singleton) -> {
+                            users.addAll(singleton);
+                            return new ArrayList<>(new HashSet<>(users));
+                        });
     }
 
     public Observable<List<Long>> deleteCollection(List<Long> selectedItemsIds) {
