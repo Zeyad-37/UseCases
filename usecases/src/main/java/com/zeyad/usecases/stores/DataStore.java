@@ -36,45 +36,45 @@ public interface DataStore {
     /**
      * Patch a JSONObject which returns an {@link Observable} that will emit a Object.
      */
-    Observable<Object> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                          Class dataClass, boolean persist, boolean queuable);
+    <M> Observable<M> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                         Class dataClass, boolean persist, boolean queuable);
 
     /**
      * Post a JSONObject which returns an {@link Observable} that will emit a Object.
      */
     @NonNull
-    Observable<Object> dynamicPostObject(String url, String idColumnName, JSONObject keyValuePairs,
-                                         Class dataClass, boolean persist, boolean queuable);
+    <M> Observable<M> dynamicPostObject(String url, String idColumnName, JSONObject keyValuePairs,
+                                        Class dataClass, boolean persist, boolean queuable);
 
     /**
      * Post a HashMap<String, Object> which returns an {@link Observable} that will emit a list of Object.
      */
     @NonNull
-    Observable<Object> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
-                                       Class dataClass, boolean persist, boolean queuable);
+    <M> Observable<M> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
+                                      Class dataClass, boolean persist, boolean queuable);
 
     /**
      * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Observable}
      * that will emit a Object.
      */
     @NonNull
-    Observable<Object> dynamicPutObject(String url, String idColumnName, JSONObject keyValuePairs,
-                                        Class dataClass, boolean persist, boolean queuable);
+    <M> Observable<M> dynamicPutObject(String url, String idColumnName, JSONObject keyValuePairs,
+                                       Class dataClass, boolean persist, boolean queuable);
 
     /**
      * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Observable}
      * that will emit a list of Object.
      */
     @NonNull
-    Observable<Object> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
-                                      Class dataClass, boolean persist, boolean queuable);
+    <M> Observable<M> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
+                                     Class dataClass, boolean persist, boolean queuable);
 
     /**
      * Delete a HashMap<String, Object> from cloud which returns an {@link Observable} that will emit a Object.
      */
     @NonNull
-    Observable<Object> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
-                                               Class dataClass, boolean persist, boolean queuable);
+    <M> Observable<M> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
+                                              Class dataClass, boolean persist, boolean queuable);
 
     /**
      * Delete all items of the same type from cloud or disk which returns an {@link Completable}
@@ -90,10 +90,10 @@ public interface DataStore {
     <M> Observable<List<M>> queryDisk(RealmQueryProvider queryFactory);
 
     @NonNull
-    Observable<Object> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,
-                                           boolean queuable);
+    Observable<File> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,
+                                         boolean queuable);
 
     @NonNull
-    Observable<Object> dynamicUploadFile(String url, File file, String key, HashMap<String, Object> parameter,
-                                         boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass);
+    <M> Observable<M> dynamicUploadFile(String url, File file, String key, HashMap<String, Object> parameter,
+                                        boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass);
 }

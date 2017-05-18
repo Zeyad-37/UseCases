@@ -59,7 +59,7 @@ public class UserListVMTest {
 
     @Test
     public void deleteCollection() throws Exception {
-        Observable<Boolean> observableUserRealm = Observable.just(true);
+        Observable observableUserRealm = Observable.just(true);
 
         when(mockDataUseCase.deleteCollectionByIds(any(PostRequest.class)))
                 .thenReturn(observableUserRealm);

@@ -285,8 +285,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicUploadFile(String url, @NonNull File file, String key, HashMap<String, Object> parameters,
-                                                boolean onWifi, boolean whileCharging, boolean queuable, Class dataClass) {
+    public <M> Observable dynamicUploadFile(String url, @NonNull File file, String key, HashMap<String, Object> parameters,
+                                            boolean onWifi, boolean whileCharging, boolean queuable, Class dataClass) {
         return Observable.defer(() -> {
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(mContext) == onWifi
                     && isChargingReqCompatible(isCharging(mContext), whileCharging)) {
@@ -315,8 +315,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicDownloadFile(String url, @NonNull File file, boolean onWifi,
-                                                  boolean whileCharging, boolean queuable) {
+    public Observable dynamicDownloadFile(String url, @NonNull File file, boolean onWifi,
+                                          boolean whileCharging, boolean queuable) {
         return Observable.defer(() -> {
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(mContext) == onWifi
                     && isChargingReqCompatible(isCharging(mContext), whileCharging)) {

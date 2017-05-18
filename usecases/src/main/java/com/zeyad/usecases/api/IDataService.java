@@ -5,6 +5,7 @@ import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;
 
+import java.io.File;
 import java.util.List;
 
 import rx.Completable;
@@ -34,7 +35,7 @@ public interface IDataService {
      * @param postRequest contains the attributes of the request.
      * @return Observable with the Object.
      */
-    Observable patchObject(PostRequest postRequest);
+    <M> Observable<M> patchObject(PostRequest postRequest);
 
     /**
      * Post Object to postRequest.
@@ -42,7 +43,7 @@ public interface IDataService {
      * @param postRequest contains the attributes of the request.
      * @return Observable with the Object.
      */
-    Observable postObject(PostRequest postRequest);
+    <M> Observable<M> postObject(PostRequest postRequest);
 
     /**
      * Post list to postRequest.
@@ -50,7 +51,7 @@ public interface IDataService {
      * @param postRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable<?> postList(PostRequest postRequest);
+    <M> Observable<M> postList(PostRequest postRequest);
 
     /**
      * Put Object to postRequest.
@@ -58,7 +59,7 @@ public interface IDataService {
      * @param postRequest contains the attributes of the request.
      * @return Observable with the Object.
      */
-    Observable putObject(PostRequest postRequest);
+    <M> Observable<M> putObject(PostRequest postRequest);
 
     /**
      * Put list to postRequest.
@@ -66,7 +67,7 @@ public interface IDataService {
      * @param postRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable putList(PostRequest postRequest);
+    <M> Observable<M> putList(PostRequest postRequest);
 
     /**
      * Deletes item from postRequest.
@@ -74,7 +75,7 @@ public interface IDataService {
      * @param request contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable deleteItemById(PostRequest request);
+    <M> Observable<M> deleteItemById(PostRequest request);
 
     /**
      * Deletes list from postRequest.
@@ -82,7 +83,7 @@ public interface IDataService {
      * @param deleteRequest contains the attributes of the request.
      * @return Observable with the list.
      */
-    Observable deleteCollectionByIds(PostRequest deleteRequest);
+    <M> Observable<M> deleteCollectionByIds(PostRequest deleteRequest);
 
     /**
      * Deletes All.
@@ -122,7 +123,7 @@ public interface IDataService {
      * @param fileIORequest contains the attributes of the request,
      * @return Observable with the Object response.
      */
-    Observable uploadFile(FileIORequest fileIORequest);
+    <M> Observable<M> uploadFile(FileIORequest fileIORequest);
 
     /**
      * Downloads file from the give url.
@@ -130,5 +131,5 @@ public interface IDataService {
      * @param fileIORequest contains the attributes of the request,
      * @return Observable with the ResponseBody
      */
-    Observable downloadFile(FileIORequest fileIORequest);
+    Observable<File> downloadFile(FileIORequest fileIORequest);
 }

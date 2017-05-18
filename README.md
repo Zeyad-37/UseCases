@@ -120,7 +120,7 @@ mDataService.<Order>getList(new GetRequest
 ```
 Post/Put Object:
 ```
-mDataService.postObject(new PostRequest // putObject
+mDataService.<MyResponse>postObject(new PostRequest // putObject
         .PostRequestBuilder(MyResult.class, true) // Type of expected server response
         .idColumnName(Order.ID) // for persistance
         .url(URL) // remove for DB access
@@ -129,7 +129,7 @@ mDataService.postObject(new PostRequest // putObject
 ```
 Post/Put List:
 ```
-mDataService.postList(new PostRequest // putList
+mDataService.<MyResponse>postList(new PostRequest // putList
         .PostRequestBuilder(MyResponse.class, true) // Type of expected server response
         .payLoad(orders)
         .idColumnName(Order.ID) // for persistance
@@ -138,7 +138,7 @@ mDataService.postList(new PostRequest // putList
 ```
 Delete Collection
 ```
-mDataService().deleteCollectionByIds(new PostRequest // putList
+mDataService().<MyResponse>deleteCollectionByIds(new PostRequest // putList
         .PostRequestBuilder(Order.class, true)
         .payLoad(ids)
         .idColumnName(Order.ID) // for persistance
@@ -147,7 +147,7 @@ mDataService().deleteCollectionByIds(new PostRequest // putList
 ```
 Delete Item:
 ```
-mDataService().deleteCollectionByIds(new PostRequest // putList
+mDataService().<MyResponse>deleteCollectionByIds(new PostRequest // putList
         .PostRequestBuilder(Order.class, true)
         .payLoad(id)
         .idColumnName(Order.ID) // for persistance
@@ -163,7 +163,7 @@ mDataService.deleteAll(new PostRequest
 ```
 Upload File
 ```
-mDataService.uploadFile(new FileIORequest
+mDataService.<MyResponse>uploadFile(new FileIORequest
         .FileIORequestBuilder(FULL_URL, new File()) // always full url
         .onWifi(true)
         .whileCharging(false)

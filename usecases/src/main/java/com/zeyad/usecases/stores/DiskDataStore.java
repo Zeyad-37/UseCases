@@ -62,8 +62,8 @@ public class DiskDataStore implements DataStore {
     }
 
     @Override
-    public Observable<Object> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                                 Class dataClass, boolean persist, boolean queuable) {
+    public Observable dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                         Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnEach(object -> {
                     if (Config.isWithCache())
@@ -79,8 +79,8 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
-                                                      Class dataClass, boolean persist, boolean queuable) {
+    public Observable dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
+                                              Class dataClass, boolean persist, boolean queuable) {
         List<Long> convertToListOfId = Utils.getInstance().convertToListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
                 .doOnEach(object -> {
@@ -100,8 +100,8 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicPostObject(String url, String idColumnName, JSONObject jsonObject,
-                                                Class dataClass, boolean persist, boolean queuable) {
+    public Observable dynamicPostObject(String url, String idColumnName, JSONObject jsonObject,
+                                        Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnEach(object -> {
                     if (Config.isWithCache())
@@ -111,15 +111,15 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
-                                              Class dataClass, boolean persist, boolean queuable) {
+    public Observable dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
+                                      Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toObservable();
     }
 
     @NonNull
     @Override
-    public Observable<Object> dynamicPutObject(String url, String idColumnName, JSONObject jsonObject,
-                                               Class dataClass, boolean persist, boolean queuable) {
+    public Observable dynamicPutObject(String url, String idColumnName, JSONObject jsonObject,
+                                       Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnEach(object -> {
                     if (Config.isWithCache())
@@ -129,8 +129,8 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
-                                             Class dataClass, boolean persist, boolean queuable) {
+    public Observable dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
+                                     Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toObservable();
     }
 
@@ -149,15 +149,15 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicUploadFile(String url, File file, String key, HashMap<String, Object> parameters,
-                                                boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass) {
+    public <M> Observable dynamicUploadFile(String url, File file, String key, HashMap<String, Object> parameters,
+                                            boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass) {
         return Observable.error(new IllegalStateException(IO_DB_ERROR));
     }
 
     @NonNull
     @Override
-    public Observable<Object> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,
-                                                  boolean queuable) {
+    public Observable dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,
+                                          boolean queuable) {
         return Observable.error(new IllegalStateException(IO_DB_ERROR));
     }
 }

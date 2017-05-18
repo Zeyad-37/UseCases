@@ -8,6 +8,7 @@ import com.zeyad.usecases.stores.DataStoreFactory;
 import com.zeyad.usecases.utils.ReplayingShare;
 import com.zeyad.usecases.utils.Utils;
 
+import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
@@ -69,10 +70,10 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable patchObject(PostRequest postRequest) {
+    public <M> Observable<M> patchObject(PostRequest postRequest) {
         try {
             return mDataStoreFactory.dynamically(postRequest.getUrl())
-                    .dynamicPatchObject(postRequest.getUrl(), postRequest.getIdColumnName(),
+                    .<M>dynamicPatchObject(postRequest.getUrl(), postRequest.getIdColumnName(),
                             postRequest.getJsonObject(), postRequest.getDataClass(), postRequest.isPersist(),
                             postRequest.isQueuable())
                     .compose(applySchedulers());
@@ -82,10 +83,10 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable postObject(PostRequest postRequest) {
+    public <M> Observable<M> postObject(PostRequest postRequest) {
         try {
             return mDataStoreFactory.dynamically(postRequest.getUrl())
-                    .dynamicPostObject(postRequest.getUrl(), postRequest.getIdColumnName(),
+                    .<M>dynamicPostObject(postRequest.getUrl(), postRequest.getIdColumnName(),
                             postRequest.getJsonObject(), postRequest.getDataClass(), postRequest.isPersist(),
                             postRequest.isQueuable())
                     .compose(applySchedulers());
@@ -95,10 +96,10 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable<?> postList(PostRequest postRequest) {
+    public <M> Observable<M> postList(PostRequest postRequest) {
         try {
             return mDataStoreFactory.dynamically(postRequest.getUrl())
-                    .dynamicPostList(postRequest.getUrl(), postRequest.getIdColumnName(),
+                    .<M>dynamicPostList(postRequest.getUrl(), postRequest.getIdColumnName(),
                             postRequest.getJsonArray(), postRequest.getDataClass(), postRequest.isPersist(),
                             postRequest.isQueuable())
                     .compose(applySchedulers());
@@ -108,10 +109,10 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable putObject(PostRequest postRequest) {
+    public <M> Observable<M> putObject(PostRequest postRequest) {
         try {
             return mDataStoreFactory.dynamically(postRequest.getUrl())
-                    .dynamicPutObject(postRequest.getUrl(), postRequest.getIdColumnName(), postRequest.getJsonObject(),
+                    .<M>dynamicPutObject(postRequest.getUrl(), postRequest.getIdColumnName(), postRequest.getJsonObject(),
                             postRequest.getDataClass(), postRequest.isPersist(), postRequest.isQueuable())
                     .compose(applySchedulers());
         } catch (Exception e) {
@@ -120,10 +121,10 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable putList(PostRequest postRequest) {
+    public <M> Observable<M> putList(PostRequest postRequest) {
         try {
             return mDataStoreFactory.dynamically(postRequest.getUrl())
-                    .dynamicPutList(postRequest.getUrl(), postRequest.getIdColumnName(),
+                    .<M>dynamicPutList(postRequest.getUrl(), postRequest.getIdColumnName(),
                             postRequest.getJsonArray(), postRequest.getDataClass(), postRequest.isPersist(),
                             postRequest.isQueuable())
                     .compose(applySchedulers());
@@ -133,7 +134,7 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable deleteItemById(PostRequest request) {
+    public <M> Observable<M> deleteItemById(PostRequest request) {
         PostRequest.Builder builder = new PostRequest.Builder(request.getDataClass(), request.isPersist())
                 .payLoad(Collections.singleton((Long) request.getObject()))
                 .queuable()
@@ -145,10 +146,10 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable deleteCollectionByIds(PostRequest deleteRequest) {
+    public <M> Observable<M> deleteCollectionByIds(PostRequest deleteRequest) {
         try {
             return mDataStoreFactory.dynamically(deleteRequest.getUrl())
-                    .dynamicDeleteCollection(deleteRequest.getUrl(), deleteRequest.getIdColumnName(),
+                    .<M>dynamicDeleteCollection(deleteRequest.getUrl(), deleteRequest.getIdColumnName(),
                             deleteRequest.getJsonArray(), deleteRequest.getDataClass(),
                             deleteRequest.isPersist(), deleteRequest.isQueuable())
                     .compose(applySchedulers());
@@ -225,16 +226,16 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable uploadFile(FileIORequest fileIORequest) {
+    public <M> Observable<M> uploadFile(FileIORequest fileIORequest) {
         return mDataStoreFactory.cloud()
-                .dynamicUploadFile(fileIORequest.getUrl(), fileIORequest.getFile(), fileIORequest.getKey(),
+                .<M>dynamicUploadFile(fileIORequest.getUrl(), fileIORequest.getFile(), fileIORequest.getKey(),
                         fileIORequest.getParameters(), fileIORequest.onWifi(), fileIORequest.isWhileCharging(),
                         fileIORequest.isQueuable(), fileIORequest.getDataClass())
                 .compose(applySchedulers());
     }
 
     @Override
-    public Observable downloadFile(FileIORequest fileIORequest) {
+    public Observable<File> downloadFile(FileIORequest fileIORequest) {
         return mDataStoreFactory.cloud()
                 .dynamicDownloadFile(fileIORequest.getUrl(), fileIORequest.getFile(), fileIORequest.onWifi(),
                         fileIORequest.isWhileCharging(), fileIORequest.isQueuable())
@@ -244,10 +245,10 @@ class DataService implements IDataService {
     /**
      * Apply the default android schedulers to a observable
      *
-     * @param <T> the current observable
+     * @param <M> the current observable
      * @return the transformed observable
      */
-    private <T> Observable.Transformer<T, T> applySchedulers() {
+    private <M> Observable.Transformer<M, M> applySchedulers() {
         return mPostThreadExist ? observable -> observable.subscribeOn(mBackgroundThread)
                 .observeOn(mPostExecutionThread)
                 .unsubscribeOn(mBackgroundThread) : observable -> observable.subscribeOn(mBackgroundThread)
