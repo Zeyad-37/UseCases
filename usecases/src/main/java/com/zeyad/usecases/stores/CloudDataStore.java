@@ -56,12 +56,9 @@ import static com.zeyad.usecases.requests.PostRequest.PUT;
 
 public class CloudDataStore implements DataStore {
 
-    public static final String APPLICATION_JSON = "application/json";
-    public static final String MULTIPART_FORM_DATA = "multipart/form-data";
-    private static final String TAG = CloudDataStore.class.getSimpleName();
-    private static final String NO_INTERNET_NOT_PERSISTED = "Could not " +
-            "reach server and could not persist request to queue!\\nGoogle play services not " +
-            "available and android version less than 5.0!";
+    public static final String APPLICATION_JSON = "application/json", MULTIPART_FORM_DATA = "multipart/form-data";
+    private static final String TAG = CloudDataStore.class.getSimpleName(),
+            NO_INTERNET_NOT_PERSISTED = "Could not reach server and could not persist to queue!";
     private static final int COUNTER_START = 1, ATTEMPTS = 3;
     private final DataBaseManager mDataBaseManager;
     private final DAOMapper mEntityDataMapper;
@@ -348,8 +345,7 @@ public class CloudDataStore implements DataStore {
                                         break;
                                     outputStream.write(fileReader, 0, read);
                                     fileSizeDownloaded += read;
-                                    Log.d(TAG, "file download: " + fileSizeDownloaded + " of "
-                                            + fileSize);
+                                    Log.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
                                 }
                                 outputStream.flush();
                             } catch (IOException e) {

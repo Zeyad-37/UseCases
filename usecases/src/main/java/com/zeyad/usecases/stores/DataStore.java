@@ -34,6 +34,12 @@ public interface DataStore {
                                        Class dataClass, boolean persist, boolean shouldCache);
 
     /**
+     * Search disk with a RealmQuery which returns an {@link Observable} that will emit a list of Object.
+     */
+    @NonNull
+    <M> Observable<List<M>> queryDisk(RealmQueryProvider queryFactory);
+
+    /**
      * Patch a JSONObject which returns an {@link Observable} that will emit a Object.
      */
     <M> Observable<M> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
@@ -82,12 +88,6 @@ public interface DataStore {
      */
     @NonNull
     Completable dynamicDeleteAll(Class dataClass);
-
-    /**
-     * Search disk with a RealmQuery which returns an {@link Observable} that will emit a list of Object.
-     */
-    @NonNull
-    <M> Observable<List<M>> queryDisk(RealmQueryProvider queryFactory);
 
     @NonNull
     Observable<File> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,
