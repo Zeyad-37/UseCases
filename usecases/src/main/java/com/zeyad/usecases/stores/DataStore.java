@@ -23,8 +23,7 @@ public interface DataStore {
     Gson gson = Config.getGson();
 
     @NonNull
-    <M> Observable<List<M>> dynamicGetList(String url, Class dataClass, boolean persist,
-                                           boolean shouldCache);
+    <M> Observable<List<M>> dynamicGetList(String url, Class dataClass, boolean persist, boolean shouldCache);
 
     /**
      * Get an {@link Observable} which will emit a Object by its id.

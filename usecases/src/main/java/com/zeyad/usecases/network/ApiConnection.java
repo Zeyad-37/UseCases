@@ -136,15 +136,15 @@ public class ApiConnection {
         return Config.getInstance().isUseApiWithCache() ? mRestApiWithCache : mRestApiWithoutCache;
     }
 
-    public Observable<Object> dynamicGetObject(String url) {
-        return getRestApi().dynamicGetObject(url);
+    public <M> Observable<M> dynamicGetObject(String url) {
+        return (Observable<M>) getRestApi().dynamicGetObject(url);
     }
 
-    public Observable<Object> dynamicGetObject(String url, boolean shouldCache) {
+    public <M> Observable<M> dynamicGetObject(String url, boolean shouldCache) {
         if (shouldCache && !Config.getInstance().isUseApiWithCache()) {
             logNoCache();
         }
-        return getRestApi().dynamicGetObject(url);
+        return (Observable<M>) getRestApi().dynamicGetObject(url);
     }
 
     public Observable<List> dynamicGetList(String url) {
@@ -158,24 +158,24 @@ public class ApiConnection {
         return getRestApi().dynamicGetList(url);
     }
 
-    public Observable<Object> dynamicPost(String url, RequestBody requestBody) {
-        return getRestApi().dynamicPost(url, requestBody);
+    public <M> Observable<M> dynamicPost(String url, RequestBody requestBody) {
+        return (Observable<M>) getRestApi().dynamicPost(url, requestBody);
     }
 
-    public Observable<Object> dynamicPut(String url, RequestBody requestBody) {
-        return getRestApi().dynamicPut(url, requestBody);
+    public <M> Observable<M> dynamicPut(String url, RequestBody requestBody) {
+        return (Observable<M>) getRestApi().dynamicPut(url, requestBody);
     }
 
-    public Observable<Object> dynamicUpload(String url, Map<String, RequestBody> partMap, MultipartBody.Part file) {
-        return getRestApi().dynamicUpload(url, partMap, file);
+    public <M> Observable<M> dynamicUpload(String url, Map<String, RequestBody> partMap, MultipartBody.Part file) {
+        return (Observable<M>) getRestApi().dynamicUpload(url, partMap, file);
     }
 
-    public Observable<Object> dynamicDelete(String url, RequestBody body) {
-        return getRestApi().dynamicDelete(url, body);
+    public <M> Observable<M> dynamicDelete(String url, RequestBody body) {
+        return (Observable<M>) getRestApi().dynamicDelete(url, body);
     }
 
-    public Observable<Object> dynamicPatch(String url, RequestBody body) {
-        return getRestApi().dynamicPatch(url, body);
+    public <M> Observable<M> dynamicPatch(String url, RequestBody body) {
+        return (Observable<M>) getRestApi().dynamicPatch(url, body);
     }
 
     RestApi getRestApiWithoutCache() {

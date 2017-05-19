@@ -63,7 +63,6 @@ public class CloudDataStore implements DataStore {
     private final DataBaseManager mDataBaseManager;
     private final DAOMapper mEntityDataMapper;
     private final Context mContext;
-    private final Observable<Object> mErrorObservableNotPersisted;
     private final ApiConnection mApiConnection;
     private final FirebaseJobDispatcher mDispatcher;
     private final Utils utils;
@@ -80,7 +79,6 @@ public class CloudDataStore implements DataStore {
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
         mContext = Config.getInstance().getContext();
-        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException(NO_INTERNET_NOT_PERSISTED));
         mCanPersist = Config.isWithRealm();
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
         utils = Utils.getInstance();
@@ -93,23 +91,26 @@ public class CloudDataStore implements DataStore {
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
         mContext = context;
-        mErrorObservableNotPersisted = Observable.error(new NetworkConnectionException(NO_INTERNET_NOT_PERSISTED));
         mCanPersist = Config.isWithRealm();
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
         utils = Utils.getInstance();
         Config.setCloudDataStore(this);
     }
 
+    private <M> Observable<M> getErrorObservableNotPersisted() {
+        return Observable.error(new NetworkConnectionException(NO_INTERNET_NOT_PERSISTED));
+    }
+
     @NonNull
     @Override
-    public Observable<Object> dynamicGetObject(String url, String idColumnName, int itemId, Class dataClass,
-                                               boolean persist, boolean shouldCache) {
-        return mApiConnection.dynamicGetObject(url, shouldCache)
-                .doOnNext(object -> {
+    public <M> Observable<M> dynamicGetObject(String url, String idColumnName, int itemId, Class dataClass,
+                                              boolean persist, boolean shouldCache) {
+        return mApiConnection.<M>dynamicGetObject(url, shouldCache)
+                .doOnNext(m -> {
                     if (willPersist(persist))
-                        persistGeneric(object, idColumnName, dataClass);
+                        persistGeneric(m, idColumnName, dataClass);
                 })
-                .map(entity -> mEntityDataMapper.mapTo(entity, dataClass));
+                .map(entity -> (M) mEntityDataMapper.mapTo(entity, dataClass));
     }
 
     @NonNull
@@ -125,8 +126,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                                 Class dataClass, boolean persist, boolean queuable) {
+    public <M> Observable<M> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                                Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonObject, idColumnName, dataClass);
@@ -134,10 +135,10 @@ public class CloudDataStore implements DataStore {
                 queuePost(PATCH, url, idColumnName, jsonObject, persist);
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
-                return mErrorObservableNotPersisted;
-            return mApiConnection.dynamicPatch(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+                return getErrorObservableNotPersisted();
+            return mApiConnection.<M>dynamicPatch(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
-                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
+                    .map(object -> (M) mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PATCH, url, idColumnName, jsonObject, persist);
@@ -150,8 +151,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                                Class dataClass, boolean persist, boolean queuable) {
+    public <M> Observable<M> dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                               Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonObject, idColumnName, dataClass);
@@ -159,10 +160,10 @@ public class CloudDataStore implements DataStore {
                 queuePost(POST, url, idColumnName, jsonObject, persist);
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
-                return mErrorObservableNotPersisted;
-            return mApiConnection.dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+                return getErrorObservableNotPersisted();
+            return mApiConnection.<M>dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
-                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
+                    .map(object -> (M) mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(POST, url, idColumnName, jsonObject, persist);
@@ -175,8 +176,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicPostList(String url, String idColumnName, @NonNull JSONArray jsonArray,
-                                              Class dataClass, boolean persist, boolean queuable) {
+    public <M> Observable<M> dynamicPostList(String url, String idColumnName, @NonNull JSONArray jsonArray,
+                                             Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonArray, idColumnName, dataClass);
@@ -184,10 +185,10 @@ public class CloudDataStore implements DataStore {
                 queuePost(POST, url, idColumnName, jsonArray, persist);
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
-                return mErrorObservableNotPersisted;
-            return mApiConnection.dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+                return getErrorObservableNotPersisted();
+            return mApiConnection.<M>dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
-                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
+                    .map(object -> (M) mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(POST, url, idColumnName, jsonArray, persist);
@@ -200,8 +201,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                               Class dataClass, boolean persist, boolean queuable) {
+    public <M> Observable<M> dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                              Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonObject, idColumnName, dataClass);
@@ -209,10 +210,10 @@ public class CloudDataStore implements DataStore {
                 queuePost(PUT, url, idColumnName, jsonObject, persist);
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
-                return mErrorObservableNotPersisted;
-            return mApiConnection.dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+                return getErrorObservableNotPersisted();
+            return mApiConnection.<M>dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
-                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
+                    .map(object -> (M) mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PUT, url, idColumnName, jsonObject, persist);
@@ -225,8 +226,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicPutList(String url, String idColumnName, @NonNull JSONArray jsonArray,
-                                             Class dataClass, boolean persist, boolean queuable) {
+    public <M> Observable<M> dynamicPutList(String url, String idColumnName, @NonNull JSONArray jsonArray,
+                                            Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonArray, idColumnName, dataClass);
@@ -234,10 +235,10 @@ public class CloudDataStore implements DataStore {
                 queuePost(PUT, url, idColumnName, jsonArray, persist);
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
-                return mErrorObservableNotPersisted;
-            return mApiConnection.dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+                return getErrorObservableNotPersisted();
+            return mApiConnection.<M>dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
-                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
+                    .map(object -> (M) mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PUT, url, idColumnName, jsonArray, persist);
@@ -250,8 +251,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable<Object> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
-                                                      Class dataClass, boolean persist, boolean queuable) {
+    public <M> Observable<M> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
+                                                     Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             List<Long> ids = Utils.getInstance().convertToListOfId(jsonArray);
             if (willPersist(persist))
@@ -260,10 +261,10 @@ public class CloudDataStore implements DataStore {
                 queuePost(DELETE, url, idColumnName, jsonArray, persist);
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
-                return mErrorObservableNotPersisted;
-            return mApiConnection.dynamicDelete(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+                return getErrorObservableNotPersisted();
+            return mApiConnection.<M>dynamicDelete(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
-                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
+                    .map(object -> (M) mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PostRequest.DELETE, url, idColumnName, jsonArray, persist);
@@ -282,24 +283,24 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Observable dynamicUploadFile(String url, @NonNull File file, String key, HashMap<String, Object> parameters,
-                                            boolean onWifi, boolean whileCharging, boolean queuable, Class dataClass) {
+    public <M> Observable<M> dynamicUploadFile(String url, @NonNull File file, String key, HashMap<String, Object> parameters,
+                                               boolean onWifi, boolean whileCharging, boolean queuable, Class dataClass) {
         return Observable.defer(() -> {
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(mContext) == onWifi
                     && isChargingReqCompatible(isCharging(mContext), whileCharging)) {
                 queueIOFile(url, file, true, whileCharging, false);
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
-                return mErrorObservableNotPersisted;
+                return getErrorObservableNotPersisted();
             RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
             HashMap<String, RequestBody> map = new HashMap<>();
             map.put(key, requestFile);
             if (parameters != null && !parameters.isEmpty())
                 for (Map.Entry<String, Object> entry : parameters.entrySet())
                     map.put(entry.getKey(), utils.createPartFromString(entry.getValue()));
-            return mApiConnection.dynamicUpload(url, map, MultipartBody.Part.createFormData(key,
+            return mApiConnection.<M>dynamicUpload(url, map, MultipartBody.Part.createFormData(key,
                     file.getName(), requestFile))
-                    .map(object -> mEntityDataMapper.mapTo(object, dataClass))
+                    .map(object -> (M) mEntityDataMapper.mapTo(object, dataClass))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queueIOFile(url, file, true, whileCharging, false);
@@ -312,15 +313,15 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable dynamicDownloadFile(String url, @NonNull File file, boolean onWifi,
-                                          boolean whileCharging, boolean queuable) {
+    public Observable<File> dynamicDownloadFile(String url, @NonNull File file, boolean onWifi,
+                                                boolean whileCharging, boolean queuable) {
         return Observable.defer(() -> {
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(mContext) == onWifi
                     && isChargingReqCompatible(isCharging(mContext), whileCharging)) {
                 queueIOFile(url, file, onWifi, whileCharging, true);
                 return Observable.empty();
             } else if (!utils.isNetworkAvailable(mContext))
-                return mErrorObservableNotPersisted;
+                return getErrorObservableNotPersisted();
             return mApiConnection.dynamicDownload(url)
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
