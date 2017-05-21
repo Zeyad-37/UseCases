@@ -38,15 +38,6 @@ public class DAOMapperTest {
     }
 
     @Test
-    public void mapToList() throws Exception {
-        Assert.assertEquals(daoMapper.mapTo(Collections.EMPTY_LIST, Object.class).getClass(), ArrayList.class);
-        Assert.assertEquals(daoMapper.mapTo(Collections.singletonList(new Object()), Object.class).getClass(),
-                ArrayList.class);
-        Assert.assertEquals(daoMapper.mapTo(Collections.singletonList(new TestRealmModel()),
-                TestRealmModel.class).getClass(), ArrayList.class);
-    }
-
-    @Test
     public void getInstance() throws Exception {
         Assert.assertNotNull(DAOMapper.getInstance());
     }

@@ -24,10 +24,8 @@ public class DAOMapper {
     }
 
     @Nullable
-    public Object mapTo(@Nullable Object object, @NonNull Class domainClass) {
-        if (object instanceof List)
-            return mapAllTo((List) object, domainClass);
-        else return gson.fromJson(gson.toJson(object), domainClass);
+    public <M> M mapTo(@Nullable Object object, @NonNull Class domainClass) {
+        return (M) gson.fromJson(gson.toJson(object), domainClass);
     }
 
     /**
@@ -37,10 +35,10 @@ public class DAOMapper {
      * @return {Model} if valid {Entity} otherwise empty Object.
      */
     @NonNull
-    public List mapAllTo(@NonNull List list, @NonNull Class domainClass) {
+    public <M> M mapAllTo(@NonNull List list, @NonNull Class domainClass) {
         List<Object> objects = new ArrayList<>(list.size());
         for (int i = 0, size = list.size(); i < size; i++)
             objects.add(mapTo(list.get(i), domainClass));
-        return objects;
+        return (M) objects;
     }
 }

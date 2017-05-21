@@ -86,7 +86,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
         viewModel = new UserListVM(DataServiceFactory.getInstance(), (newResult, currentStateBundle) -> {
             List resultList = (List) newResult.getBundle();
             List<User> users = currentStateBundle == null ? new ArrayList<>() : currentStateBundle.getUsers();
-            if (resultList.get(0).getClass().equals(User.class)) {
+            if (resultList.size() > 0 && resultList.get(0).getClass().equals(User.class)) {
                 users.addAll(resultList);
             } else {
                 final Iterator<User> each = users.iterator();
