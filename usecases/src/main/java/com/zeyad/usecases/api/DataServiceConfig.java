@@ -26,7 +26,7 @@ public class DataServiceConfig {
     private TimeUnit timeUnit;
     private Scheduler postExecutionThread;
 
-    private DataServiceConfig(Builder dataUseCaseConfigBuilder) {
+    private DataServiceConfig(@NonNull Builder dataUseCaseConfigBuilder) {
         context = dataUseCaseConfigBuilder.context;
         okHttpBuilder = dataUseCaseConfigBuilder.okHttpBuilder;
         okHttpCache = dataUseCaseConfigBuilder.okHttpCache;
@@ -47,6 +47,7 @@ public class DataServiceConfig {
         this.context = context;
     }
 
+    @NonNull
     DAOMapper getEntityMapper() {
         return new DAOMapper();
     }
@@ -63,6 +64,7 @@ public class DataServiceConfig {
         return okHttpCache;
     }
 
+    @NonNull
     String getBaseUrl() {
         return baseUrl != null ? baseUrl : "";
     }
@@ -87,6 +89,7 @@ public class DataServiceConfig {
         return timeUnit;
     }
 
+    @NonNull
     HandlerThread getHandlerThread() {
         return new HandlerThread("backgroundThread");
     }

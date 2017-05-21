@@ -38,7 +38,7 @@ public class DiskDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Observable<M> dynamicGetObject(String url, String idColumnName, int itemId,
-                                              Class dataClass, boolean persist, boolean shouldCache) {
+                                              @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         if (Config.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
             return Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
                     .map(object -> mEntityDataMapper.mapTo(object, dataClass));
@@ -61,9 +61,10 @@ public class DiskDataStore implements DataStore {
         return mDataBaseManager.getAll(dataClass);
     }
 
+    @NonNull
     @Override
     public Observable dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                         Class dataClass, boolean persist, boolean queuable) {
+                                         @NonNull Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnEach(object -> {
                     if (Config.isWithCache())
@@ -80,7 +81,7 @@ public class DiskDataStore implements DataStore {
     @NonNull
     @Override
     public Observable dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
-                                              Class dataClass, boolean persist, boolean queuable) {
+                                              @NonNull Class dataClass, boolean persist, boolean queuable) {
         List<Long> convertToListOfId = Utils.getInstance().convertToListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
                 .doOnEach(object -> {
@@ -100,8 +101,8 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable dynamicPostObject(String url, String idColumnName, JSONObject jsonObject,
-                                        Class dataClass, boolean persist, boolean queuable) {
+    public Observable dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                        @NonNull Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnEach(object -> {
                     if (Config.isWithCache())
@@ -118,8 +119,8 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable dynamicPutObject(String url, String idColumnName, JSONObject jsonObject,
-                                       Class dataClass, boolean persist, boolean queuable) {
+    public Observable dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                       @NonNull Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnEach(object -> {
                     if (Config.isWithCache())
@@ -134,14 +135,14 @@ public class DiskDataStore implements DataStore {
         return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toObservable();
     }
 
-    private void cacheObject(String idColumnName, JSONObject jsonObject, Class dataClass) {
+    private void cacheObject(String idColumnName, @NonNull JSONObject jsonObject, @NonNull Class dataClass) {
         Storo.put(dataClass.getSimpleName() + jsonObject.optString(idColumnName), gson
                 .fromJson(jsonObject.toString(), dataClass))
                 .setExpiry(Config.getCacheAmount(), Config.getCacheTimeUnit())
                 .execute();
     }
 
-    private void cacheList(String idColumnName, JSONArray jsonArray, Class dataClass) {
+    private void cacheList(String idColumnName, @NonNull JSONArray jsonArray, @NonNull Class dataClass) {
         for (int i = 0, size = jsonArray.length(); i < size; i++) {
             cacheObject(idColumnName, jsonArray.optJSONObject(i), dataClass);
         }

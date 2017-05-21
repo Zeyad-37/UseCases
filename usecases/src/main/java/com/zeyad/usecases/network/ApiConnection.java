@@ -128,6 +128,7 @@ public class ApiConnection {
                 .build();
     }
 
+    @NonNull
     public Observable<ResponseBody> dynamicDownload(String url) {
         return getRestApi().dynamicDownload(url);
     }
@@ -136,10 +137,12 @@ public class ApiConnection {
         return Config.getInstance().isUseApiWithCache() ? mRestApiWithCache : mRestApiWithoutCache;
     }
 
+    @NonNull
     public <M> Observable<M> dynamicGetObject(String url) {
         return (Observable<M>) getRestApi().dynamicGetObject(url);
     }
 
+    @NonNull
     public <M> Observable<M> dynamicGetObject(String url, boolean shouldCache) {
         if (shouldCache && !Config.getInstance().isUseApiWithCache()) {
             logNoCache();
@@ -147,10 +150,12 @@ public class ApiConnection {
         return (Observable<M>) getRestApi().dynamicGetObject(url);
     }
 
+    @NonNull
     public Observable<List> dynamicGetList(String url) {
         return getRestApi().dynamicGetList(url);
     }
 
+    @NonNull
     public Observable<List> dynamicGetList(String url, boolean shouldCache) {
         if (shouldCache && !Config.getInstance().isUseApiWithCache()) {
             logNoCache();
@@ -158,22 +163,27 @@ public class ApiConnection {
         return getRestApi().dynamicGetList(url);
     }
 
+    @NonNull
     public <M> Observable<M> dynamicPost(String url, RequestBody requestBody) {
         return (Observable<M>) getRestApi().dynamicPost(url, requestBody);
     }
 
+    @NonNull
     public <M> Observable<M> dynamicPut(String url, RequestBody requestBody) {
         return (Observable<M>) getRestApi().dynamicPut(url, requestBody);
     }
 
+    @NonNull
     public <M> Observable<M> dynamicUpload(String url, Map<String, RequestBody> partMap, MultipartBody.Part file) {
         return (Observable<M>) getRestApi().dynamicUpload(url, partMap, file);
     }
 
+    @NonNull
     public <M> Observable<M> dynamicDelete(String url, RequestBody body) {
         return (Observable<M>) getRestApi().dynamicDelete(url, body);
     }
 
+    @NonNull
     public <M> Observable<M> dynamicPatch(String url, RequestBody body) {
         return (Observable<M>) getRestApi().dynamicPatch(url, body);
     }

@@ -15,11 +15,13 @@ import java.util.HashMap;
 public class FileIORequest implements Parcelable {
 
     public static final Parcelable.Creator<FileIORequest> CREATOR = new Parcelable.Creator<FileIORequest>() {
+        @NonNull
         @Override
-        public FileIORequest createFromParcel(Parcel source) {
+        public FileIORequest createFromParcel(@NonNull Parcel source) {
             return new FileIORequest(source);
         }
 
+        @NonNull
         @Override
         public FileIORequest[] newArray(int size) {
             return new FileIORequest[size];
@@ -45,7 +47,7 @@ public class FileIORequest implements Parcelable {
         dataClass = uploadRequestBuilder.dataClass;
     }
 
-    private FileIORequest(Parcel in) {
+    private FileIORequest(@NonNull Parcel in) {
         this.file = (File) in.readSerializable();
         this.url = in.readString();
         this.key = in.readString();
@@ -80,10 +82,12 @@ public class FileIORequest implements Parcelable {
         return file;
     }
 
+    @NonNull
     public String getKey() {
         return key != null ? key : "";
     }
 
+    @NonNull
     public HashMap<String, Object> getParameters() {
         return parameters != null ? parameters : new HashMap<>();
     }
@@ -94,7 +98,7 @@ public class FileIORequest implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeSerializable(this.file);
         dest.writeString(this.url);
         dest.writeString(this.key);

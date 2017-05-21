@@ -18,11 +18,13 @@ import java.util.HashMap;
 public class PostRequest implements Parcelable {
     public static final String POST = "post", DELETE = "delete", PUT = "put", PATCH = "patch";
     public static final Parcelable.Creator<PostRequest> CREATOR = new Parcelable.Creator<PostRequest>() {
+        @NonNull
         @Override
-        public PostRequest createFromParcel(Parcel source) {
+        public PostRequest createFromParcel(@NonNull Parcel source) {
             return new PostRequest(source);
         }
 
+        @NonNull
         @Override
         public PostRequest[] newArray(int size) {
             return new PostRequest[size];
@@ -52,7 +54,7 @@ public class PostRequest implements Parcelable {
         object = builder.object;
     }
 
-    protected PostRequest(Parcel in) {
+    protected PostRequest(@NonNull Parcel in) {
         this.url = in.readString();
         this.idColumnName = in.readString();
         this.method = in.readString();
@@ -93,6 +95,7 @@ public class PostRequest implements Parcelable {
         } else return new JSONArray();
     }
 
+    @NonNull
     public String getUrl() {
         return url != null ? url : "";
     }
@@ -125,6 +128,7 @@ public class PostRequest implements Parcelable {
         return object;
     }
 
+    @NonNull
     public String getIdColumnName() {
         return idColumnName != null ? idColumnName : DEFAULT_ID_KEY;
     }
@@ -139,7 +143,7 @@ public class PostRequest implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(this.url);
         dest.writeString(this.idColumnName);
         dest.writeString(this.method);

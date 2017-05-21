@@ -1,5 +1,7 @@
 package com.zeyad.usecases.network;
 
+import android.support.annotation.NonNull;
+
 import java.util.List;
 import java.util.Map;
 
@@ -24,36 +26,46 @@ import rx.Observable;
  */
 public interface RestApi {
 
+    @NonNull
     @GET
     Observable<Object> dynamicGetObject(@Url String url);
 
+    @NonNull
     @GET
     Observable<Object> dynamicGetObject(@Url String url, boolean shouldCache);
 
+    @NonNull
     @GET
     Observable<List> dynamicGetList(@Url String url);
 
+    @NonNull
     @GET
     Observable<List> dynamicGetList(@Url String url, boolean shouldCache);
 
+    @NonNull
     @POST
     Observable<Object> dynamicPost(@Url String url, @Body RequestBody body);
 
+    @NonNull
     @PUT
     Observable<Object> dynamicPut(@Url String url, @Body RequestBody body);
 
+    @NonNull
     @DELETE
     Observable<Object> dynamicDelete(@Url String url, @Body RequestBody body);
 
+    @NonNull
     @Streaming
     @GET
     Observable<ResponseBody> dynamicDownload(@Url String fileUrl);
 
+    @NonNull
     @Multipart
     @POST
     Observable<Object> dynamicUpload(@Url String url, @PartMap() Map<String, RequestBody> partMap,
                                      @Part MultipartBody.Part file);
 
+    @NonNull
     @PATCH
     Observable<Object> dynamicPatch(@Url String url, @Body RequestBody requestBody);
 }

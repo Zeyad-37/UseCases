@@ -11,11 +11,13 @@ import com.zeyad.usecases.Config;
  */
 public class GetRequest implements Parcelable {
     public static final Creator<GetRequest> CREATOR = new Creator<GetRequest>() {
+        @NonNull
         @Override
-        public GetRequest createFromParcel(Parcel source) {
+        public GetRequest createFromParcel(@NonNull Parcel source) {
             return new GetRequest(source);
         }
 
+        @NonNull
         @Override
         public GetRequest[] newArray(int size) {
             return new GetRequest[size];
@@ -36,7 +38,7 @@ public class GetRequest implements Parcelable {
         shouldCache = builder.mShouldCache;
     }
 
-    protected GetRequest(Parcel in) {
+    protected GetRequest(@NonNull Parcel in) {
         this.url = in.readString();
         this.idColumnName = in.readString();
         this.dataClass = (Class) in.readSerializable();
@@ -45,6 +47,7 @@ public class GetRequest implements Parcelable {
         this.itemId = in.readInt();
     }
 
+    @NonNull
     public String getUrl() {
         return url != null ? url : "";
     }
@@ -61,6 +64,7 @@ public class GetRequest implements Parcelable {
         return shouldCache;
     }
 
+    @NonNull
     public String getIdColumnName() {
         return idColumnName != null ? idColumnName : DEFAULT_ID_KEY;
     }
@@ -75,7 +79,7 @@ public class GetRequest implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(Parcel dest, int flags) {
+    public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeString(this.url);
         dest.writeString(this.idColumnName);
         dest.writeSerializable(this.dataClass);

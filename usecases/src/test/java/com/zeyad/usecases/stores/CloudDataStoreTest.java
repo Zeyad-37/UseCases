@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
 import android.net.NetworkInfo;
+import android.os.Build;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.test.rule.BuildConfig;
@@ -14,7 +15,6 @@ import com.zeyad.usecases.db.RealmManager;
 import com.zeyad.usecases.exceptions.NetworkConnectionException;
 import com.zeyad.usecases.mapper.DAOMapper;
 import com.zeyad.usecases.network.ApiConnection;
-import com.zeyad.usecases.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -562,10 +562,11 @@ public class CloudDataStoreTest {
         verify(mockDataBaseManager, atLeast(evict)).evictById(any(Class.class), anyString(), anyLong());
     }
 
+    @NonNull
     private Context changeStateOfNetwork(@NonNull Context mockedContext, boolean toEnable) {
         ConnectivityManager connectivityManager = Mockito.mock(ConnectivityManager.class);
         Mockito.when(mockedContext.getSystemService(Context.CONNECTIVITY_SERVICE)).thenReturn(connectivityManager);
-        if (Utils.getInstance().hasLollipop()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Network network = Mockito.mock(Network.class);
             Network[] networks = new Network[]{network};
             Mockito.when(connectivityManager.getAllNetworks()).thenReturn(networks);

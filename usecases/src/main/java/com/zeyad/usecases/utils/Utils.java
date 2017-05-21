@@ -1,7 +1,5 @@
 package com.zeyad.usecases.utils;
 
-import android.app.Activity;
-import android.app.Service;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -27,12 +25,6 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.realm.Realm;
-import okhttp3.MediaType;
-import okhttp3.RequestBody;
-
-import static com.zeyad.usecases.stores.CloudDataStore.MULTIPART_FORM_DATA;
-
 public class Utils {
 
     private static Utils instance;
@@ -47,18 +39,10 @@ public class Utils {
         return instance;
     }
 
-    public boolean doesContextBelongsToApplication(Context mContext) {
-        return !(mContext instanceof Activity || mContext instanceof Service);
-    }
-
-    public int getNextId(Class clazz, String column) {
-        return getMaxId(clazz, column) + 1;
-    }
-
     public boolean isNetworkAvailable(@NonNull Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context
                 .CONNECTIVITY_SERVICE);
-        if (hasLollipop()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Network[] networks = connectivityManager.getAllNetworks();
             for (Network network : networks)
                 if (connectivityManager.getNetworkInfo(network).getState().equals(NetworkInfo.State.CONNECTED))
@@ -73,31 +57,7 @@ public class Utils {
         return false;
     }
 
-    public boolean isNotEmpty(List list) {
-        return list != null && !list.isEmpty();
-    }
-
-    public boolean hasLollipop() {
-        return Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP;
-    }
-
-    public int getMaxId(Class clazz, String column) {
-        Realm realm = Realm.getDefaultInstance();
-        try {
-            Number currentMax = realm.where(clazz).max(column);
-            if (currentMax != null)
-                return currentMax.intValue();
-            else return 0;
-        } finally {
-            realm.close();
-        }
-    }
-
-    public RequestBody createPartFromString(Object descriptionString) {
-        return RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), String.valueOf(descriptionString));
-    }
-
-    public void queuePostCore(FirebaseJobDispatcher dispatcher, PostRequest postRequest) {
+    public void queuePostCore(@NonNull FirebaseJobDispatcher dispatcher, @NonNull PostRequest postRequest) {
         Bundle extras = new Bundle(2);
         extras.putString(GenericJobService.JOB_TYPE, GenericJobService.POST);
         extras.putParcelable(GenericJobService.PAYLOAD, postRequest);
@@ -112,10 +72,10 @@ public class Utils {
                 .setConstraints(Constraint.ON_ANY_NETWORK, Constraint.DEVICE_CHARGING)
                 .setExtras(extras)
                 .build());
-        Log.d("FBJDQ", postRequest.getMethod() + " request is queued successfully!");
+        Log.d("FBJD", postRequest.getMethod() + " request is queued successfully!");
     }
 
-    public void queueFileIOCore(FirebaseJobDispatcher dispatcher, boolean isDownload, FileIORequest fileIORequest) {
+    public void queueFileIOCore(@NonNull FirebaseJobDispatcher dispatcher, boolean isDownload, @NonNull FileIORequest fileIORequest) {
         Bundle extras = new Bundle(2);
         extras.putString(GenericJobService.JOB_TYPE, isDownload ? GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE);
         extras.putParcelable(GenericJobService.PAYLOAD, fileIORequest);
@@ -130,7 +90,7 @@ public class Utils {
                         fileIORequest.isWhileCharging() ? Constraint.DEVICE_CHARGING : 0)
                 .setExtras(extras)
                 .build());
-        Log.d("FBJDQ", String.format("%s file request is queued successfully!", isDownload ? "Download" : "Upload"));
+        Log.d("FBJD", String.format("%s file request is queued successfully!", isDownload ? "Download" : "Upload"));
     }
 
     @Nullable

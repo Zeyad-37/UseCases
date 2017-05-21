@@ -6,6 +6,7 @@ import android.content.IntentFilter;
 import android.net.ConnectivityManager;
 import android.os.BatteryManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
@@ -62,8 +63,10 @@ public class CloudDataStore implements DataStore {
     private static final int COUNTER_START = 1, ATTEMPTS = 3;
     private final DataBaseManager mDataBaseManager;
     private final DAOMapper mEntityDataMapper;
+    @Nullable
     private final Context mContext;
     private final ApiConnection mApiConnection;
+    @NonNull
     private final FirebaseJobDispatcher mDispatcher;
     private final Utils utils;
     boolean mCanPersist;
@@ -103,7 +106,7 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Observable<M> dynamicGetObject(String url, String idColumnName, int itemId, Class dataClass,
+    public <M> Observable<M> dynamicGetObject(String url, String idColumnName, int itemId, @NonNull Class dataClass,
                                               boolean persist, boolean shouldCache) {
         return mApiConnection.<M>dynamicGetObject(url, shouldCache)
                 .doOnNext(m -> {
@@ -115,7 +118,7 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Observable<List<M>> dynamicGetList(String url, Class dataClass, boolean persist, boolean shouldCache) {
+    public <M> Observable<List<M>> dynamicGetList(String url, @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         return mApiConnection.dynamicGetList(url, shouldCache)
                 .map(entities -> mEntityDataMapper.<List<M>>mapAllTo(entities, dataClass))
                 .doOnNext(list -> {
@@ -127,7 +130,7 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Observable<M> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                                Class dataClass, boolean persist, boolean queuable) {
+                                                @NonNull Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonObject, idColumnName, dataClass);
@@ -152,7 +155,7 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Observable<M> dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                               Class dataClass, boolean persist, boolean queuable) {
+                                               @NonNull Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonObject, idColumnName, dataClass);
@@ -177,7 +180,7 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Observable<M> dynamicPostList(String url, String idColumnName, @NonNull JSONArray jsonArray,
-                                             Class dataClass, boolean persist, boolean queuable) {
+                                             @NonNull Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonArray, idColumnName, dataClass);
@@ -202,7 +205,7 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Observable<M> dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                              Class dataClass, boolean persist, boolean queuable) {
+                                              @NonNull Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonObject, idColumnName, dataClass);
@@ -227,7 +230,7 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Observable<M> dynamicPutList(String url, String idColumnName, @NonNull JSONArray jsonArray,
-                                            Class dataClass, boolean persist, boolean queuable) {
+                                            @NonNull Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonArray, idColumnName, dataClass);
@@ -251,8 +254,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Observable<M> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
-                                                     Class dataClass, boolean persist, boolean queuable) {
+    public <M> Observable<M> dynamicDeleteCollection(String url, String idColumnName, @NonNull JSONArray jsonArray,
+                                                     @NonNull Class dataClass, boolean persist, boolean queuable) {
         return Observable.defer(() -> {
             List<Long> ids = Utils.getInstance().convertToListOfId(jsonArray);
             if (willPersist(persist))
@@ -283,8 +286,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Observable<M> dynamicUploadFile(String url, @NonNull File file, String key, HashMap<String, Object> parameters,
-                                               boolean onWifi, boolean whileCharging, boolean queuable, Class dataClass) {
+    public <M> Observable<M> dynamicUploadFile(String url, @NonNull File file, @NonNull String key, @Nullable HashMap<String, Object> parameters,
+                                               boolean onWifi, boolean whileCharging, boolean queuable, @NonNull Class dataClass) {
         return Observable.defer(() -> {
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(mContext) == onWifi
                     && isChargingReqCompatible(isCharging(mContext), whileCharging)) {
@@ -297,7 +300,8 @@ public class CloudDataStore implements DataStore {
             map.put(key, requestFile);
             if (parameters != null && !parameters.isEmpty())
                 for (Map.Entry<String, Object> entry : parameters.entrySet())
-                    map.put(entry.getKey(), utils.createPartFromString(entry.getValue()));
+                    map.put(entry.getKey(), RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA),
+                            String.valueOf(entry.getValue())));
             return mApiConnection.<M>dynamicUpload(url, map, MultipartBody.Part.createFormData(key,
                     file.getName(), requestFile))
                     .map(object -> daoMapHelper(dataClass, object))
@@ -381,7 +385,8 @@ public class CloudDataStore implements DataStore {
         });
     }
 
-    private <M> M daoMapHelper(Class dataClass, M object) {
+    @Nullable
+    private <M> M daoMapHelper(@NonNull Class dataClass, M object) {
         if (object instanceof List)
             return mEntityDataMapper.mapAllTo((List) object, dataClass);
         else
@@ -405,7 +410,7 @@ public class CloudDataStore implements DataStore {
         return !doWhileCharging || isChargingCurrently;
     }
 
-    private boolean isCharging(Context context) {
+    private boolean isCharging(@NonNull Context context) {
         boolean charging = false;
         final Intent batteryIntent = context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
         if (batteryIntent != null) {
@@ -424,7 +429,7 @@ public class CloudDataStore implements DataStore {
 //        return plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB;
     }
 
-    private boolean isOnWifi(Context context) {
+    private boolean isOnWifi(@NonNull Context context) {
         return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE))
                 .getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI;
     }
@@ -454,11 +459,11 @@ public class CloudDataStore implements DataStore {
                 .build());
     }
 
-    private void queuePostCore(PostRequest postRequest) {
+    private void queuePostCore(@NonNull PostRequest postRequest) {
         utils.queuePostCore(mDispatcher, postRequest);
     }
 
-    private void persistGeneric(Object object, String idColumnName, Class dataClass) {
+    private void persistGeneric(Object object, String idColumnName, @NonNull Class dataClass) {
         if (object instanceof File)
             return;
         Object mappedObject = null;
@@ -526,7 +531,7 @@ public class CloudDataStore implements DataStore {
                 .subscribe(new SimpleSubscriber(dataClass));
     }
 
-    private void deleteFromPersistence(List collection, String idColumnName, Class dataClass) {
+    private void deleteFromPersistence(@NonNull List collection, String idColumnName, @NonNull Class dataClass) {
         for (int i = 0, collectionSize = collection.size(); i < collectionSize; i++) {
             mDataBaseManager.evictById(dataClass, idColumnName, (long) collection.get(i));
             if (Config.isWithCache())

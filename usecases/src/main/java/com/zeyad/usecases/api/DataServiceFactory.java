@@ -1,22 +1,28 @@
 package com.zeyad.usecases.api;
 
+import android.app.Activity;
+import android.app.Service;
+import android.content.Context;
 import android.os.HandlerThread;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.db.RealmManager;
 import com.zeyad.usecases.network.ApiConnection;
 import com.zeyad.usecases.stores.DataStoreFactory;
-import com.zeyad.usecases.utils.Utils;
 
 import rx.android.schedulers.AndroidSchedulers;
 import st.lowlevel.storo.StoroBuilder;
 
 public class DataServiceFactory {
+    @Nullable
     private static IDataService sDataUseCase;
 
     /**
      * @return IDataService the implementation instance of IDataService, throws NullPointerException if null.
      */
+    @Nullable
     public static IDataService getInstance() {
         if (sDataUseCase == null)
             throw new NullPointerException("DataServiceFactory#init must be called before calling getInstance()");
@@ -28,8 +34,8 @@ public class DataServiceFactory {
      *
      * @param config configuration object to DataUseCase.
      */
-    public static void init(DataServiceConfig config) {
-        if (!Utils.getInstance().doesContextBelongsToApplication(config.getContext()))
+    public static void init(@NonNull DataServiceConfig config) {
+        if (!doesContextBelongsToApplication(config.getContext()))
             throw new IllegalArgumentException("Context should be application context only.");
         Config.init(config.getContext());
         Config.setBaseURL(config.getBaseUrl());
@@ -60,5 +66,9 @@ public class DataServiceFactory {
      */
     public static void destoryInstance() {
         sDataUseCase = null;
+    }
+
+    private static boolean doesContextBelongsToApplication(Context mContext) {
+        return !(mContext instanceof Activity || mContext instanceof Service);
     }
 }

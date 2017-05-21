@@ -21,7 +21,7 @@ public class DataStoreFactory {
         mDAOMapper = daoMapper;
     }
 
-    public DataStoreFactory(DataBaseManager dataBaseManager, ApiConnection restApi, DAOMapper daoMapper) {
+    public DataStoreFactory(@Nullable DataBaseManager dataBaseManager, ApiConnection restApi, DAOMapper daoMapper) {
         if (dataBaseManager == null)
             throw new IllegalArgumentException(DB_MANAGER_NULL);
         Config.setHasRealm(true);

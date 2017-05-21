@@ -118,7 +118,6 @@ ext {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:multidex:1.0.1'
     //Job Dispatcher
     compile 'com.firebase:firebase-jobdispatcher-with-gcm-dep:0.6.0'
     // Network
@@ -127,7 +126,7 @@ dependencies {
     compile "com.squareup.retrofit2:adapter-rxjava:$retrofitVersion"
     compile "com.squareup.okhttp3:okhttp:$okhttpVersion"
     compile "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
-    compile 'com.facebook.network.connectionclass:connectionclass:1.0.1'
+    compile "com.android.support:support-annotations:$supportLibraryVersion"
     // Rx
     compile 'io.reactivex:rxandroid:1.2.1'
     compile 'io.reactivex:rxjava:1.3.0'
@@ -143,10 +142,6 @@ dependencies {
     testCompile "org.mockito:mockito-core:1.10.19"
     testCompile "org.robolectric:robolectric:$robolectric"
     testCompile "org.robolectric:shadows-support-v4:$robolectric"
-    testCompile "org.powermock:powermock-module-junit4:$powerMock"
-    testCompile "org.powermock:powermock-module-junit4-rule:$powerMock"
-    testCompile "org.powermock:powermock-api-mockito:$powerMock"
-    testCompile "org.powermock:powermock-classloading-xstream:$powerMock"
 }
 
 task createPom {

@@ -1,5 +1,7 @@
 package com.zeyad.usecases.requests;
 
+import android.support.annotation.Nullable;
+
 import com.zeyad.usecases.TestRealmModel;
 
 import org.json.JSONArray;
@@ -27,6 +29,7 @@ public class PostRequestTest {
     private final JSONArray JSON_ARRAY = new JSONArray();
     private final JSONObject JSON_OBJECT = new JSONObject();
     private final HashMap<String, Object> HASH_MAP = new HashMap<>();
+    @Nullable
     private PostRequest mPostRequest;
 
     @Before

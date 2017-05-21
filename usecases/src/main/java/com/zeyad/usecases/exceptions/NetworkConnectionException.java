@@ -1,5 +1,7 @@
 package com.zeyad.usecases.exceptions;
 
+import android.support.annotation.NonNull;
+
 /**
  * Exception throw by the application when a there is a network connection exception.
  */
@@ -21,6 +23,7 @@ public class NetworkConnectionException extends Exception implements IErrorBundl
         super(cause);
     }
 
+    @NonNull
     @Override
     public Exception getException() {
         return this;

@@ -219,6 +219,7 @@ public class PostTest {
         return Observable.fromCallable(this::getResponseBody);
     }
 
+    @Nullable
     private ResponseBody getResponseBody() throws IOException {
         when(RESPONSE_BODY.byteStream()).thenReturn(getInputStreamReader());
         when(RESPONSE_BODY.contentLength()).thenReturn((long) (1096 * 1096));

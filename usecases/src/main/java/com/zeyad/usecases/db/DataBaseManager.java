@@ -58,6 +58,7 @@ public interface DataBaseManager {
      * @param realmObjects Element to insert in the DB.
      * @param dataClass    Class type of the items to be put.
      */
+    @NonNull
     <M extends RealmModel> Completable putAll(List<M> realmObjects, Class dataClass);
 
     /**

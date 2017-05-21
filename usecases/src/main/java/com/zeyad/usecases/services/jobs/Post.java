@@ -26,6 +26,7 @@ import static com.zeyad.usecases.stores.CloudDataStore.APPLICATION_JSON;
 public class Post {
     private static final String TAG = Post.class.getSimpleName();
     private static int mTrailCount;
+    @NonNull
     private final FirebaseJobDispatcher mDispatcher;
     private final PostRequest mPostRequest;
     private final ApiConnection mRestApi;
@@ -38,7 +39,7 @@ public class Post {
         }
 
         @Override
-        public void onError(Throwable e) {
+        public void onError(@NonNull Throwable e) {
             queuePost();
             e.printStackTrace();
         }
@@ -115,7 +116,7 @@ public class Post {
 
     void queuePost() {
         mTrailCount++;
-        if (mTrailCount < 3) { // inject value at initRealm!
+        if (mTrailCount < 3) { // inject value at init!
             mUtils.queuePostCore(mDispatcher, mPostRequest);
         }
     }

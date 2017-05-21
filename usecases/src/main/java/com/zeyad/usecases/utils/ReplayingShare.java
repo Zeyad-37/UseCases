@@ -1,5 +1,7 @@
 package com.zeyad.usecases.utils;
 
+import android.support.annotation.NonNull;
+
 import rx.Observable;
 import rx.functions.Action1;
 import rx.functions.Func0;
@@ -13,13 +15,14 @@ public final class ReplayingShare<T> implements Observable.Transformer<T, T> {
     /**
      * The singleton instance of this transformer.
      */
+    @NonNull
     @SuppressWarnings("unchecked") // Safe because of erasure.
     public static <T> ReplayingShare<T> instance() {
         return (ReplayingShare<T>) INSTANCE;
     }
 
     @Override
-    public Observable<T> call(Observable<T> upstream) {
+    public Observable<T> call(@NonNull Observable<T> upstream) {
         LastSeen<T> lastSeen = new LastSeen<>();
         return upstream.doOnNext(lastSeen).share().startWith(Observable.defer(lastSeen));
     }
@@ -38,6 +41,7 @@ public final class ReplayingShare<T> implements Observable.Transformer<T, T> {
             last = latest;
         }
 
+        @NonNull
         @Override
         public Observable<T> call() {
             T value = last;

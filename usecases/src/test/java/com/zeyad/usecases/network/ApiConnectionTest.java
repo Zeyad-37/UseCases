@@ -41,6 +41,7 @@ public class ApiConnectionTest {
         mApiConnection = getApiImplementation(mRestApiWithoutCache, mRestApiWithCache);
     }
 
+    @NonNull
     String getValidUrl() {
         return "http://www.google.com";
     }
@@ -154,6 +155,7 @@ public class ApiConnectionTest {
         return apiConnection.getRestApiWithCache();
     }
 
+    @NonNull
     private ApiConnection getApiImplementation(RestApi restApiWithoutCache, RestApi restApiWithCache) {
         return new ApiConnection(restApiWithoutCache, restApiWithCache);
     }

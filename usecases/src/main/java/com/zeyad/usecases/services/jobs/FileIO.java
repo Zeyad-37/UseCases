@@ -1,6 +1,7 @@
 package com.zeyad.usecases.services.jobs;
 
 import android.content.Context;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
@@ -19,6 +20,7 @@ import rx.Subscription;
 public class FileIO {
     private static final String TAG = FileIO.class.getSimpleName();
     private static int mTrailCount;
+    @NonNull
     private final FirebaseJobDispatcher mDispatcher;
     private final FileIORequest mFileIORequest;
     private final CloudDataStore mCloudDataStore;
@@ -35,6 +37,7 @@ public class FileIO {
         mUtils = utils;
     }
 
+    @NonNull
     public Subscription execute() {
         File file = mFileIORequest.getFile();
         return mIsDownload ? mCloudDataStore.dynamicDownloadFile(mFileIORequest.getUrl(), file, mFileIORequest.onWifi(),

@@ -6,8 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.zeyad.usecases.utils.Utils;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -56,7 +54,7 @@ public class RealmManager implements DataBaseManager {
         return Observable.defer(() -> {
             int finalItemId = itemId;
             if (finalItemId <= 0)
-                finalItemId = Utils.getInstance().getMaxId(dataClass, idColumnName);
+                finalItemId = getMaxId(dataClass, idColumnName);
             Realm realm = Realm.getDefaultInstance();
             return realm.where(dataClass).equalTo(idColumnName, finalItemId).findAll().asObservable()
                     .filter(results -> ((RealmResults) results).isLoaded())
@@ -91,7 +89,7 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public <M extends RealmModel> Observable<List<M>> getQuery(RealmQueryProvider<M> queryFactory) {
+    public <M extends RealmModel> Observable<List<M>> getQuery(@NonNull RealmQueryProvider<M> queryFactory) {
         return Observable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
             return queryFactory.create(realm).findAll().asObservable()
@@ -184,6 +182,7 @@ public class RealmManager implements DataBaseManager {
         });
     }
 
+    @NonNull
     @Override
     public <T extends RealmModel> Completable putAll(List<T> realmObjects, Class dataClass) {
         return Completable.defer(() -> {
@@ -262,7 +261,7 @@ public class RealmManager implements DataBaseManager {
         });
     }
 
-    private void closeRealm(Realm realm) {
+    private void closeRealm(@NonNull Realm realm) {
         backgroundHandler.post(() -> {
             if (!realm.isClosed()) {
                 realm.close();
@@ -306,8 +305,24 @@ public class RealmManager implements DataBaseManager {
         if (idColumnName == null || idColumnName.isEmpty())
             throw new IllegalArgumentException(NO_ID);
         if (jsonObject.optInt(idColumnName) == 0)
-            jsonObject.put(idColumnName, Utils.getInstance().getNextId(dataClass, idColumnName));
+            jsonObject.put(idColumnName, getNextId(dataClass, idColumnName));
         return jsonObject;
+    }
+
+    private int getMaxId(Class clazz, String column) {
+        Realm realm = Realm.getDefaultInstance();
+        try {
+            Number currentMax = realm.where(clazz).max(column);
+            if (currentMax != null)
+                return currentMax.intValue();
+            else return 0;
+        } finally {
+            realm.close();
+        }
+    }
+
+    private int getNextId(Class clazz, String column) {
+        return getMaxId(clazz, column) + 1;
     }
 
     private interface Executor {
