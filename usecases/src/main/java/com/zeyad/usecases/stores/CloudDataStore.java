@@ -380,7 +380,7 @@ public class CloudDataStore implements DataStore {
             return attempts.zipWith(Observable.range(COUNTER_START, ATTEMPTS), (n, i) -> i)
                     .flatMap(i -> {
                         Log.d(TAG, "delay retry by " + i + " second(s)");
-                        return Observable.timer(i, TimeUnit.SECONDS);
+                        return Observable.timer(5 * i, TimeUnit.SECONDS);
                     });
         });
     }

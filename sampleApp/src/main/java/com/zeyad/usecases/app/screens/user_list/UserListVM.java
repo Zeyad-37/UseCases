@@ -27,11 +27,14 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
  */
 public class UserListVM extends BaseViewModel<UserListState> {
 
-    private final IDataService dataUseCase;
+    private IDataService dataUseCase;
 
-    public UserListVM(IDataService dataUseCase, SuccessStateAccumulator<UserListState> successStateAccumulator) {
-        super(successStateAccumulator, null);
-        this.dataUseCase = dataUseCase;
+    @Override
+    public void init(SuccessStateAccumulator<UserListState> successStateAccumulator, UserListState initialState,
+                     Object... otherDependencies) {
+        dataUseCase = (IDataService) otherDependencies[0];
+        this.successStateAccumulator = successStateAccumulator;
+        this.initialState = initialState;
     }
 
     @Override

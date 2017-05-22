@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
+import rx.observers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -34,10 +35,9 @@ public class UserListVMTest {
     @Before
     public void setUp() throws Exception {
         mockDataUseCase = mock(IDataService.class);
-        userListVM = new UserListVM(mockDataUseCase, mock(SuccessStateAccumulator.class));
+        userListVM = new UserListVM();
+        userListVM.init(mock(SuccessStateAccumulator.class), null, mockDataUseCase);
     }
-
-    // TODO: 3/31/17 Add value assertions!
 
     @Test
     public void returnUserListStateObservableWhenGetUserIsCalled() {
@@ -51,23 +51,36 @@ public class UserListVMTest {
         when(mockDataUseCase.<User>getListOffLineFirst(any()))
                 .thenReturn(observableUserRealm);
 
-        userListVM.getUsers(0);
+        TestSubscriber<List<User>> subscriber = new TestSubscriber<>();
+        userListVM.getUsers(0).subscribe(subscriber);
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).getListOffLineFirst(any(GetRequest.class));
+
+        subscriber.assertCompleted();
+        subscriber.assertNoErrors();
+        subscriber.assertValue(userList);
     }
 
     @Test
     public void deleteCollection() throws Exception {
-        Observable observableUserRealm = Observable.just(true);
+        List<Long> ids = new ArrayList<>();
+        ids.add(1L);
+        ids.add(2L);
+        Observable<List<Long>> observableUserRealm = Observable.just(ids);
 
         when(mockDataUseCase.deleteCollectionByIds(any(PostRequest.class)))
-                .thenReturn(observableUserRealm);
+                .thenReturn(Observable.just(true));
 
-        userListVM.deleteCollection(new ArrayList<>());
+        TestSubscriber<List<Long>> subscriber = new TestSubscriber<>();
+        userListVM.deleteCollection(ids).subscribe(subscriber);
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).deleteCollectionByIds(any(PostRequest.class));
+
+        subscriber.assertCompleted();
+        subscriber.assertNoErrors();
+        subscriber.assertValue(ids);
     }
 
     @Test
@@ -84,9 +97,14 @@ public class UserListVMTest {
         when(mockDataUseCase.<User>queryDisk(any(RealmQueryProvider.class)))
                 .thenReturn(listObservable);
 
-        userListVM.search("");
+        TestSubscriber<List<User>> subscriber = new TestSubscriber<>();
+        userListVM.search("Zoz").subscribe(subscriber);
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).queryDisk(any(RealmQueryProvider.class));
+
+        subscriber.assertCompleted();
+        subscriber.assertNoErrors();
+//        subscriber.assertValue(userList);
     }
 }

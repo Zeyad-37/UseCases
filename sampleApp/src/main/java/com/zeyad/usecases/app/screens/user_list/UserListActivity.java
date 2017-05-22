@@ -2,6 +2,7 @@ package com.zeyad.usecases.app.screens.user_list;
 
 import android.app.ActivityOptions;
 import android.app.SearchManager;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
@@ -83,10 +84,11 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     @Override
     public void initialize() {
         errorMessageFactory = Throwable::getMessage;
-        viewModel = new UserListVM(DataServiceFactory.getInstance(), (newResult, currentStateBundle) -> {
+        viewModel = ViewModelProviders.of(this).get(UserListVM.class);
+        viewModel.init((newResult, currentStateBundle) -> {
             List resultList = (List) newResult.getBundle();
             List<User> users = currentStateBundle == null ? new ArrayList<>() : currentStateBundle.getUsers();
-            if (resultList.size() > 0 && resultList.get(0).getClass().equals(User.class)) {
+            if (resultList.size() > 0 && resultList.get(0) instanceof User) {
                 users.addAll(resultList);
             } else {
                 final Iterator<User> each = users.iterator();
@@ -98,7 +100,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
             Collections.sort(users, (user1, user2) -> String.valueOf(user1.getId())
                     .compareTo(String.valueOf(user2.getId())));
             return UserListState.builder().setUsers(users).build();
-        });
+        }, null, DataServiceFactory.getInstance());
         events = Observable.<BaseEvent>just(new GetPaginatedUsersEvent(0))
                 .doOnEach(notification -> Log.d("GetUsersEvent", "fired!"));
         rxEventBus.toObserverable()

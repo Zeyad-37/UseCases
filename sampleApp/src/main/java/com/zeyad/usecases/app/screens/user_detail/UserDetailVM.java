@@ -18,12 +18,15 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
  * @author zeyad on 1/10/17.
  */
 public class UserDetailVM extends BaseViewModel<UserDetailState> {
-    private final IDataService dataUseCase;
 
-    public UserDetailVM(IDataService dataUseCase, SuccessStateAccumulator<UserDetailState> successStateAccumulator,
-                        UserDetailState initialState) {
-        super(successStateAccumulator, initialState);
-        this.dataUseCase = dataUseCase;
+    private IDataService dataUseCase;
+
+    @Override
+    public void init(SuccessStateAccumulator<UserDetailState> successStateAccumulator, UserDetailState initialState,
+                     Object... otherDependencies) {
+        dataUseCase = (IDataService) otherDependencies[0];
+        this.successStateAccumulator = successStateAccumulator;
+        this.initialState = initialState;
     }
 
     public Observable<List<Repository>> getRepositories(String userLogin) {

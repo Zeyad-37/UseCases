@@ -49,7 +49,6 @@ class DataService implements IDataService {
             return mDataStoreFactory.dynamically(getListRequest.getUrl())
                     .<M>dynamicGetList(getListRequest.getUrl(), getListRequest.getDataClass(),
                             getListRequest.isPersist(), getListRequest.isShouldCache())
-                    .compose(ReplayingShare.instance())
                     .compose(applySchedulers());
         } catch (Exception e) {
             return Observable.error(e);
@@ -63,7 +62,6 @@ class DataService implements IDataService {
                     .<M>dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
                             getRequest.getItemId(), getRequest.getDataClass(), getRequest.isPersist(),
                             getRequest.isShouldCache())
-                    .compose(ReplayingShare.instance())
                     .compose(applySchedulers());
         } catch (Exception e) {
             return Observable.error(e);

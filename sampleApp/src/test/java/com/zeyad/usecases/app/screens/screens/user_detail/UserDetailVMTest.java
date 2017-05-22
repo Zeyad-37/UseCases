@@ -2,9 +2,9 @@ package com.zeyad.usecases.app.screens.screens.user_detail;
 
 import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
+import com.zeyad.usecases.app.screens.user_detail.Repository;
 import com.zeyad.usecases.app.screens.user_detail.UserDetailState;
 import com.zeyad.usecases.app.screens.user_detail.UserDetailVM;
-import com.zeyad.usecases.app.screens.user_list.User;
 import com.zeyad.usecases.db.RealmQueryProvider;
 
 import org.junit.Before;
@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
+import rx.observers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -28,34 +29,37 @@ import static org.mockito.Mockito.when;
 public class UserDetailVMTest {
 
     private IDataService mockDataUseCase;
-    private User user;
+    private Repository repository;
     private UserDetailVM userDetailVM;
-
-    // TODO: 3/31/17 Add value assertions!
 
     @Before
     public void setUp() throws Exception {
         mockDataUseCase = mock(IDataService.class);
-        userDetailVM = new UserDetailVM(mockDataUseCase, mock(SuccessStateAccumulator.class),
-                mock(UserDetailState.class));
+        userDetailVM = new UserDetailVM();
+        userDetailVM.init(mock(SuccessStateAccumulator.class), mock(UserDetailState.class), mockDataUseCase);
 
-        user = new User();
-        user.setLogin("testUser");
-        user.setId(1);
+        repository = new Repository();
+        repository.setFullName("testUser");
+        repository.setId(1);
     }
 
     @Test
     public void getRepositories() throws Exception {
-        List<User> userList = new ArrayList<>();
-        userList.add(user);
-        Observable<List<User>> observableUserRealm = Observable.just(userList);
+        List<Repository> repositories = new ArrayList<>();
+        repositories.add(repository);
+        Observable<List<Repository>> observableUserRealm = Observable.just(repositories);
 
-        when(mockDataUseCase.<User>queryDisk(any(RealmQueryProvider.class)))
+        when(mockDataUseCase.<Repository>queryDisk(any(RealmQueryProvider.class)))
                 .thenReturn(observableUserRealm);
 
-        userDetailVM.getRepositories(user.getLogin());
+        TestSubscriber<List<Repository>> subscriber = new TestSubscriber<>();
+        userDetailVM.getRepositories("Zoz").subscribe(subscriber);
 
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).queryDisk(any(RealmQueryProvider.class));
+
+        subscriber.assertCompleted();
+        subscriber.assertNoErrors();
+        subscriber.assertValue(repositories);
     }
 }

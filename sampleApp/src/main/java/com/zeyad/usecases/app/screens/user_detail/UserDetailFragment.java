@@ -1,5 +1,6 @@
 package com.zeyad.usecases.app.screens.user_detail;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -77,12 +78,12 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
         Bundle arguments = getArguments();
         if (arguments != null)
             viewState = Parcels.unwrap(arguments.getParcelable(UI_MODEL));
-        viewModel = new UserDetailVM(DataServiceFactory.getInstance(),
-                (newResult, currentStateBundle) -> UserDetailState.builder()
-                        .setRepos((List<Repository>) newResult.getBundle())
-                        .setUser(currentStateBundle.getUser())
-                        .setIsTwoPane(currentStateBundle.isTwoPane())
-                        .build(), viewState);
+        viewModel = ViewModelProviders.of(this).get(UserDetailVM.class);
+        viewModel.init((newResult, currentStateBundle) -> UserDetailState.builder()
+                .setRepos((List<Repository>) newResult.getBundle())
+                .setUser(currentStateBundle.getUser())
+                .setIsTwoPane(currentStateBundle.isTwoPane())
+                .build(), viewState, DataServiceFactory.getInstance());
         events = Observable.just(new GetReposEvent(viewState.getUser().getLogin()));
     }
 

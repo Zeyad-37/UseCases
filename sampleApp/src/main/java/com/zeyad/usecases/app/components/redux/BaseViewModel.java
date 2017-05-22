@@ -1,5 +1,9 @@
 package com.zeyad.usecases.app.components.redux;
 
+import android.arch.lifecycle.ViewModel;
+
+import com.zeyad.usecases.utils.ReplayingShare;
+
 import rx.Observable;
 import rx.Observable.Transformer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -9,24 +13,22 @@ import rx.schedulers.Schedulers;
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseViewModel<S> {
+public abstract class BaseViewModel<S> extends ViewModel {
 
-    private final SuccessStateAccumulator<S> successStateAccumulator;
-    private final S initialState;
+    public SuccessStateAccumulator<S> successStateAccumulator;
+    public S initialState;
 
     /**
      * @param successStateAccumulator a success State Accumulator.
      * @param initialState            Initial state to start with.
      */
-    protected BaseViewModel(SuccessStateAccumulator<S> successStateAccumulator, S initialState) {
-        this.successStateAccumulator = successStateAccumulator;
-        this.initialState = initialState;
-    }
+    public abstract void init(SuccessStateAccumulator<S> successStateAccumulator, S initialState,
+                              Object... otherDependencies);
 
     /**
      * A Transformer, given events returns UIModels by applying the redux pattern.
      *
-     * @return {@link Transformer} the redux pattern transformer.
+     * @return {@link Transformer} the Redux pattern transformer.
      */
     Transformer<BaseEvent, UIModel<S>> uiModels() {
         return events -> events.observeOn(Schedulers.io())
@@ -45,6 +47,7 @@ public abstract class BaseViewModel<S> {
                     else currentUIModel = UIModel.errorState(result.getError());
                     return currentUIModel;
                 })
+                .compose(ReplayingShare.instance())
                 .observeOn(AndroidSchedulers.mainThread());
     }
 
