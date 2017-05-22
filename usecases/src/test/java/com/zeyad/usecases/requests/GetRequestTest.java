@@ -1,7 +1,5 @@
 package com.zeyad.usecases.requests;
 
-import android.support.annotation.Nullable;
-
 import com.zeyad.usecases.TestRealmModel;
 
 import org.junit.After;
@@ -20,11 +18,9 @@ public class GetRequestTest {
     private final Class DATA_CLASS = TestRealmModel.class;
     private final boolean TO_PERSIST = false;
     private final String ID_COLUMN_NAME = "id";
-    private final Class PRESENTATION_CLASS = Object.class;
     private final String URL = "www.google.com";
     private final boolean SHOULD_CACHE = true;
     private final Integer ID_COLUMN_ID = 1;
-    @Nullable
     private GetRequest mGetRequest;
 
     @Before

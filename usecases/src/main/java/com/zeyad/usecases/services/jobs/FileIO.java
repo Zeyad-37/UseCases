@@ -12,7 +12,7 @@ import com.zeyad.usecases.utils.Utils;
 
 import java.io.File;
 
-import rx.Subscription;
+import rx.Completable;
 
 /**
  * @author Zeyad on 6/05/16.
@@ -38,14 +38,13 @@ public class FileIO {
     }
 
     @NonNull
-    public Subscription execute() {
+    public Completable execute() {
         File file = mFileIORequest.getFile();
         return mIsDownload ? mCloudDataStore.dynamicDownloadFile(mFileIORequest.getUrl(), file, mFileIORequest.onWifi(),
                 mFileIORequest.isWhileCharging(), mFileIORequest.isQueuable())
                 .doOnSubscribe(() -> Log.d(TAG, "Downloading " + file.getName()))
                 .toCompletable()
-                .subscribe(() -> {
-                }, throwable -> {
+                .doOnError(throwable -> {
                     queueIOFile();
                     throwable.printStackTrace();
                 }) : mCloudDataStore.dynamicUploadFile(mFileIORequest.getUrl(), file, mFileIORequest.getKey(),
@@ -53,8 +52,7 @@ public class FileIO {
                 mFileIORequest.isQueuable(), mFileIORequest.getDataClass())
                 .doOnSubscribe(() -> Log.d(TAG, "Uploading " + file.getName()))
                 .toCompletable()
-                .subscribe(() -> {
-                }, throwable -> {
+                .doOnError(throwable -> {
                     queueIOFile();
                     throwable.printStackTrace();
                 });

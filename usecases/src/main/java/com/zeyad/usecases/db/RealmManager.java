@@ -28,17 +28,14 @@ public class RealmManager implements DataBaseManager {
             JSON_INVALID = "JSONObject is invalid", NO_ID = "Could not find id!";
     private static Handler backgroundHandler;
 
-    public RealmManager(Handler backgroundHandler) {
-        RealmManager.backgroundHandler = backgroundHandler;
+    public RealmManager(Handler handler) {
+        if (backgroundHandler == null)
+            backgroundHandler = handler;
     }
 
     public RealmManager(Looper backgroundLooper) {
         if (backgroundHandler == null)
             backgroundHandler = new Handler(backgroundLooper);
-    }
-
-    RealmManager() {
-        backgroundHandler = new Handler();
     }
 
     /**
@@ -50,7 +47,8 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public <M extends RealmModel> Observable<M> getById(@NonNull final String idColumnName, final int itemId, Class dataClass) {
+    public <M extends RealmModel> Observable<M> getById(@NonNull final String idColumnName,
+                                                        final int itemId, Class dataClass) {
         return Observable.defer(() -> {
             int finalItemId = itemId;
             if (finalItemId <= 0)
