@@ -6,13 +6,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
+import com.zeyad.usecases.utils.Utils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
 
-import hu.akarnokd.rxjava.interop.RxJavaInterop;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.realm.Realm;
@@ -55,7 +56,7 @@ public class RealmManager implements DataBaseManager {
             if (finalItemId <= 0)
                 finalItemId = getMaxId(dataClass, idColumnName);
             Realm realm = Realm.getDefaultInstance();
-            return RxJavaInterop.toV2Flowable(realm.where(dataClass).equalTo(idColumnName, finalItemId)
+            return Utils.getInstance().toV2Flowable(realm.where(dataClass).equalTo(idColumnName, finalItemId)
                     .findAll().asObservable()
                     .filter(results -> ((RealmResults) results).isLoaded())
                     .map(o -> realm.copyFromRealm((RealmResults) o))
@@ -73,7 +74,8 @@ public class RealmManager implements DataBaseManager {
     public <M> Flowable<List<M>> getAll(Class clazz) {
         return Flowable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
-            return RxJavaInterop.toV2Flowable(realm.where(clazz).findAll().asObservable()
+            return Utils.getInstance().toV2Flowable(realm.where(clazz).findAll()
+                    .asObservable()
                     .filter(results -> ((RealmResults) results).isLoaded())
                     .map(o -> realm.copyFromRealm((RealmResults) o))
                     .doOnUnsubscribe(() -> closeRealm(realm)));
@@ -92,7 +94,7 @@ public class RealmManager implements DataBaseManager {
     public <M extends RealmModel> Flowable<List<M>> getQuery(@NonNull RealmQueryProvider<M> queryFactory) {
         return Flowable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
-            return RxJavaInterop.toV2Flowable(queryFactory.create(realm).findAll().asObservable()
+            return Utils.getInstance().toV2Flowable(queryFactory.create(realm).findAll().asObservable()
                     .filter(RealmResults::isLoaded)
                     .map(realm::copyFromRealm)
                     .doOnUnsubscribe(() -> closeRealm(realm)));

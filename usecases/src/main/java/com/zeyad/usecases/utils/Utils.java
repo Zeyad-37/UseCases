@@ -25,6 +25,8 @@ import org.json.JSONException;
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Flowable;
+
 public class Utils {
 
     private static Utils instance;
@@ -111,5 +113,11 @@ public class Utils {
                 }
         }
         return idList;
+    }
+
+    public <T> Flowable<T> toV2Flowable(rx.Observable<T> source) {
+        if (source == null) {
+            throw new NullPointerException("source is null");
+        } else return new ObservableV1ToFlowableV2<>(source);
     }
 }

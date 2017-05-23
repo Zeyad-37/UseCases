@@ -16,7 +16,6 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-import hu.akarnokd.rxjava.interop.RxJavaInterop;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import st.lowlevel.storo.Storo;
@@ -41,7 +40,7 @@ public class DiskDataStore implements DataStore {
     public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, int itemId,
                                             @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         if (Config.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
-            return RxJavaInterop.toV2Flowable(Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
+            return Utils.getInstance().toV2Flowable(Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
                     .map(object -> mEntityDataMapper.mapTo(object, dataClass)));
         else
             return (Flowable<M>) mDataBaseManager.getById(idColumnName, itemId, dataClass)
