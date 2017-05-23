@@ -40,10 +40,10 @@ public class DiskDataStore implements DataStore {
     public <M> Observable<M> dynamicGetObject(String url, String idColumnName, int itemId,
                                               @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         if (Config.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
-            return Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
+            return Storo.<M>get(dataClass.getSimpleName() + itemId, dataClass).async()
                     .map(object -> mEntityDataMapper.mapTo(object, dataClass));
         else
-            return (Observable<M>) mDataBaseManager.getById(idColumnName, itemId, dataClass)
+            return mDataBaseManager.<M>getById(idColumnName, itemId, dataClass)
                     .doOnEach(notification -> {
                         try {
                             if (Config.isWithCache() && !Storo.contains(dataClass.getSimpleName() + itemId))

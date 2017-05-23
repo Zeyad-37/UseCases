@@ -24,7 +24,7 @@ public interface DataBaseManager {
      * @param userId       The user id to retrieve data.
      */
     @NonNull
-    <M extends RealmModel> Observable<M> getById(String idColumnName, int userId, Class clazz);
+    <M> Observable<M> getById(String idColumnName, int userId, Class clazz);
 
     /**
      * Gets an {@link Observable} which will emit a List of Objects.

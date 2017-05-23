@@ -43,10 +43,6 @@ public class DataServiceConfig {
         return context;
     }
 
-    public void setContext(Context context) {
-        this.context = context;
-    }
-
     @NonNull
     DAOMapper getEntityMapper() {
         return new DAOMapper();
