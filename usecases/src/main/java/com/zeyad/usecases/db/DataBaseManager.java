@@ -7,9 +7,9 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.realm.RealmModel;
-import rx.Completable;
-import rx.Observable;
 
 /**
  * Interface for the Database modules.
@@ -17,22 +17,22 @@ import rx.Observable;
 public interface DataBaseManager {
 
     /**
-     * Gets an {@link Observable} which will emit an Object.
+     * Gets an {@link Flowable} which will emit an Object.
      *
      * @param clazz        Class type of the items to get.
      * @param idColumnName Name of the id field.
      * @param userId       The user id to retrieve data.
      */
     @NonNull
-    <M extends RealmModel> Observable<M> getById(String idColumnName, int userId, Class clazz);
+    <M extends RealmModel> Flowable<M> getById(String idColumnName, int userId, Class clazz);
 
     /**
-     * Gets an {@link Observable} which will emit a List of Objects.
+     * Gets an {@link Flowable} which will emit a List of Objects.
      *
      * @param clazz Class type of the items to get.
      */
     @NonNull
-    <M> Observable<List<M>> getAll(Class clazz);
+    <M> Flowable<List<M>> getAll(Class clazz);
 
     /**
      * Puts and element into the DB.
@@ -104,5 +104,5 @@ public interface DataBaseManager {
      * @param queryFactory The query used to look for inside the DB.
      */
     @NonNull
-    <M extends RealmModel> Observable<List<M>> getQuery(RealmQueryProvider<M> queryFactory);
+    <M extends RealmModel> Flowable<List<M>> getQuery(RealmQueryProvider<M> queryFactory);
 }

@@ -15,9 +15,9 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
-import rx.Observable;
-import rx.functions.Func1;
-import rx.functions.Func2;
+import io.reactivex.Flowable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Function;
 
 import static com.zeyad.usecases.app.utils.Constants.URLS.USER;
 import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
@@ -38,9 +38,9 @@ public class UserListVM extends BaseViewModel<UserListState> {
     }
 
     @Override
-    public Func1<BaseEvent, Observable<?>> mapEventsToExecutables() {
+    public Function<BaseEvent, Flowable<?>> mapEventsToExecutables() {
         return event -> {
-            Observable executable = Observable.empty();
+            Flowable executable = Flowable.empty();
             if (event instanceof GetPaginatedUsersEvent)
                 executable = getUsers(((GetPaginatedUsersEvent) event).getLastId());
             else if (event instanceof DeleteUsersEvent)
@@ -51,7 +51,7 @@ public class UserListVM extends BaseViewModel<UserListState> {
         };
     }
 
-    public Observable<List<User>> getUsers(long lastId) {
+    public Flowable<List<User>> getUsers(long lastId) {
         return lastId == 0 ? dataUseCase.getListOffLineFirst(new GetRequest.Builder(User.class, true)
                 .url(String.format(USERS, lastId))
                 .build()) : dataUseCase.getList(new GetRequest.Builder(User.class, true)
@@ -59,20 +59,20 @@ public class UserListVM extends BaseViewModel<UserListState> {
                 .build());
     }
 
-    public Observable<List<User>> search(String query) {
+    public Flowable<List<User>> search(String query) {
         return dataUseCase.<User>queryDisk(realm -> realm.where(User.class).beginsWith(User.LOGIN, query))
                 .zipWith(dataUseCase.<User>getObject(new GetRequest.Builder(User.class, true)
                                 .url(String.format(USER, query))
                                 .build())
                                 .onErrorReturn(throwable -> null)
                                 .map(user -> user != null ? Collections.singletonList(user) : Collections.emptyList()),
-                        (Func2<List<User>, List<User>, List<User>>) (users, singleton) -> {
+                        (BiFunction<List<User>, List<User>, List<User>>) (users, singleton) -> {
                             users.addAll(singleton);
                             return new ArrayList<>(new HashSet<>(users));
                         });
     }
 
-    public Observable<List<Long>> deleteCollection(List<Long> selectedItemsIds) {
+    public Flowable<List<Long>> deleteCollection(List<Long> selectedItemsIds) {
         return dataUseCase.deleteCollectionByIds(new PostRequest.Builder(User.class, true)
                 .payLoad(selectedItemsIds)
                 .build())

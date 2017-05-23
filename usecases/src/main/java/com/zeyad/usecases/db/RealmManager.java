@@ -12,12 +12,13 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import hu.akarnokd.rxjava.interop.RxJavaInterop;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import io.realm.Realm;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
-import rx.Completable;
-import rx.Observable;
 
 /**
  * {@link DataBaseManager} implementation.
@@ -39,7 +40,7 @@ public class RealmManager implements DataBaseManager {
     }
 
     /**
-     * Gets an {@link Observable} which will emit an Object.
+     * Gets an {@link Flowable} which will emit an Object.
      *
      * @param dataClass    Class type of the items to get.
      * @param idColumnName Name of the id field.
@@ -47,34 +48,35 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public <M extends RealmModel> Observable<M> getById(@NonNull final String idColumnName,
-                                                        final int itemId, Class dataClass) {
-        return Observable.defer(() -> {
+    public <M extends RealmModel> Flowable<M> getById(@NonNull final String idColumnName,
+                                                      final int itemId, Class dataClass) {
+        return Flowable.defer(() -> {
             int finalItemId = itemId;
             if (finalItemId <= 0)
                 finalItemId = getMaxId(dataClass, idColumnName);
             Realm realm = Realm.getDefaultInstance();
-            return realm.where(dataClass).equalTo(idColumnName, finalItemId).findAll().asObservable()
+            return RxJavaInterop.toV2Flowable(realm.where(dataClass).equalTo(idColumnName, finalItemId)
+                    .findAll().asObservable()
                     .filter(results -> ((RealmResults) results).isLoaded())
                     .map(o -> realm.copyFromRealm((RealmResults) o))
-                    .doOnUnsubscribe(() -> closeRealm(realm));
+                    .doOnUnsubscribe(() -> closeRealm(realm)));
         });
     }
 
     /**
-     * Gets an {@link Observable} which will emit a List of Objects.
+     * Gets an {@link Flowable} which will emit a List of Objects.
      *
      * @param clazz Class type of the items to get.
      */
     @NonNull
     @Override
-    public <M> Observable<List<M>> getAll(Class clazz) {
-        return Observable.defer(() -> {
+    public <M> Flowable<List<M>> getAll(Class clazz) {
+        return Flowable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
-            return realm.where(clazz).findAll().asObservable()
+            return RxJavaInterop.toV2Flowable(realm.where(clazz).findAll().asObservable()
                     .filter(results -> ((RealmResults) results).isLoaded())
                     .map(o -> realm.copyFromRealm((RealmResults) o))
-                    .doOnUnsubscribe(() -> closeRealm(realm));
+                    .doOnUnsubscribe(() -> closeRealm(realm)));
         });
     }
 
@@ -87,13 +89,13 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public <M extends RealmModel> Observable<List<M>> getQuery(@NonNull RealmQueryProvider<M> queryFactory) {
-        return Observable.defer(() -> {
+    public <M extends RealmModel> Flowable<List<M>> getQuery(@NonNull RealmQueryProvider<M> queryFactory) {
+        return Flowable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
-            return queryFactory.create(realm).findAll().asObservable()
+            return RxJavaInterop.toV2Flowable(queryFactory.create(realm).findAll().asObservable()
                     .filter(RealmResults::isLoaded)
                     .map(realm::copyFromRealm)
-                    .doOnUnsubscribe(() -> closeRealm(realm));
+                    .doOnUnsubscribe(() -> closeRealm(realm)));
         });
     }
 

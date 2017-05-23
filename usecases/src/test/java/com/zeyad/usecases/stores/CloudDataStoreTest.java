@@ -27,19 +27,20 @@ import org.robolectric.annotation.Config;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.subscribers.TestSubscriber;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import rx.Completable;
-import rx.Observable;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.observers.TestSubscriber;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
@@ -63,11 +64,11 @@ public class CloudDataStoreTest {
     private Context mockContext;
     private ApiConnection mockApiConnection;
     private DataBaseManager mockDataBaseManager;
-    private Observable observable;
+    private Flowable observable;
 
     @Before
     public void setUp() throws Exception {
-        observable = Observable.just(new Object());
+        observable = Flowable.just(new Object());
         mockContext = mock(Context.class);
         mockApiConnection = mock(ApiConnection.class);
         mockDataBaseManager = mock(RealmManager.class);
@@ -75,7 +76,7 @@ public class CloudDataStoreTest {
         when(mockDataBaseManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
         when(mockDataBaseManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
         when(mockDataBaseManager.putAll(anyList(), any(Class.class))).thenReturn(Completable.complete());
-        cloudDataStore = new CloudDataStore(mockApiConnection, mockDataBaseManager, mock(DAOMapper.class), mockContext);
+        cloudDataStore = new CloudDataStore(mockApiConnection, mockDataBaseManager, new DAOMapper(), mockContext);
         HandlerThread backgroundThread = new HandlerThread("backgroundThread");
         backgroundThread.start();
         com.zeyad.usecases.Config.setBackgroundThread(AndroidSchedulers.from(backgroundThread.getLooper()));
@@ -110,7 +111,7 @@ public class CloudDataStoreTest {
     public void dynamicGetList() throws Exception {
         List<TestRealmModel> testRealmObjects = new ArrayList<>();
         testRealmObjects.add(new TestRealmModel());
-        Observable<List> observable = Observable.just(testRealmObjects);
+        Flowable<List> observable = Flowable.just(testRealmObjects);
         when(mockApiConnection.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
 
         cloudDataStore.dynamicGetList("", Object.class, false, false);
@@ -122,10 +123,10 @@ public class CloudDataStoreTest {
     @Test
     public void dynamicGetListCanWillPersist() throws Exception {
         cloudDataStore.mCanPersist = true;
-        Observable observable = Observable.from(new ArrayList<>());
+        Flowable<List> observable = Flowable.just(Collections.singletonList(new TestRealmModel()));
         when(mockApiConnection.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
 
-        TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
+        TestSubscriber<List> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicGetList("", Object.class, true, false)
                 .subscribe(testSubscriber);
 
@@ -157,7 +158,7 @@ public class CloudDataStoreTest {
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, true, false)
                 .subscribe(testSubscriber);
-        testSubscriber.getOnErrorEvents();
+
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicPatch(anyString(), any(RequestBody.class));
@@ -462,7 +463,7 @@ public class CloudDataStoreTest {
         verifyZeroInteractions(mockDataBaseManager);
 
         // Assert return type
-        assertEquals(IllegalStateException.class, completable.get().getClass());
+        assertEquals(IllegalStateException.class, completable.blockingGet().getClass());
     }
 
     @Test
@@ -543,14 +544,15 @@ public class CloudDataStoreTest {
 
     @Test(expected = RuntimeException.class)
     public void queryDisk() throws Exception {
-        Observable observable = cloudDataStore.queryDisk(realm -> realm.where(TestRealmModel.class));
+        Flowable observable = cloudDataStore.queryDisk(realm -> realm.where(TestRealmModel.class));
 
         // Verify repository interactions
         verifyZeroInteractions(mockApiConnection);
         verifyZeroInteractions(mockDataBaseManager);
 
         // Assert return type
-        assertEquals(new RuntimeException(), observable.toBlocking().first());
+        RuntimeException expected = new RuntimeException();
+        assertEquals(expected.getClass(), observable.first(expected).blockingGet().getClass());
     }
 
     private void verifyDBInteractions(int putAllJ, int putAllL, int putJ, int putO, int putM, int evict) {

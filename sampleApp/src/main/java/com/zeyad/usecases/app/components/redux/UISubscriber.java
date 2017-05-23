@@ -2,13 +2,13 @@ package com.zeyad.usecases.app.components.redux;
 
 import android.util.Log;
 
-import rx.Subscriber;
+import io.reactivex.subscribers.DisposableSubscriber;
 import rx.exceptions.OnErrorNotImplementedException;
 
 /**
  * @author zeyad on 11/28/16.
  */
-public class UISubscriber<V extends LoadDataView<S>, S> extends Subscriber<UIModel<S>> {
+public class UISubscriber<V extends LoadDataView<S>, S> extends DisposableSubscriber<UIModel<S>> {
     private ErrorMessageFactory errorMessageFactory;
     private V view;
 
@@ -18,11 +18,12 @@ public class UISubscriber<V extends LoadDataView<S>, S> extends Subscriber<UIMod
     }
 
     @Override
-    public void onCompleted() {
+    public void onComplete() {
     }
 
     @Override
     public void onError(Throwable throwable) {
+        throwable.printStackTrace();
         throw new OnErrorNotImplementedException(throwable);
     }
 

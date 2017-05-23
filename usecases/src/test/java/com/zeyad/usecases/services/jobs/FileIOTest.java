@@ -22,7 +22,7 @@ import org.robolectric.annotation.Config;
 import java.io.File;
 import java.util.HashMap;
 
-import rx.Observable;
+import io.reactivex.Flowable;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -107,10 +107,10 @@ public class FileIOTest {
     private CloudDataStore createCloudDataStore() {
         final CloudDataStore cloudDataStore = mock(CloudDataStore.class);
         Mockito.when(cloudDataStore.dynamicDownloadFile(Mockito.anyString(), any(), anyBoolean(),
-                anyBoolean(), anyBoolean())).thenReturn(Observable.empty());
+                anyBoolean(), anyBoolean())).thenReturn(Flowable.empty());
         Mockito.when(cloudDataStore.dynamicUploadFile(Mockito.anyString(), any(), anyString(),
                 (HashMap<String, Object>) anyMap(), anyBoolean(), anyBoolean(), anyBoolean(), any()))
-                .thenReturn(Observable.empty());
+                .thenReturn(Flowable.empty());
         return cloudDataStore;
     }
 }

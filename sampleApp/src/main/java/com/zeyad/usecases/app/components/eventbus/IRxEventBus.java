@@ -2,13 +2,13 @@ package com.zeyad.usecases.app.components.eventbus;
 
 import android.support.annotation.NonNull;
 
-import rx.Observable;
+import io.reactivex.Flowable;
 
 public interface IRxEventBus {
     void send(Object o);
 
     @NonNull
-    Observable<Object> toObserverable();
+    Flowable<Object> toFlowable();
 
-    boolean hasObservers();
+    boolean hasFlowables();
 }

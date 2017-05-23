@@ -12,7 +12,7 @@ import com.zeyad.usecases.db.RealmManager;
 import com.zeyad.usecases.network.ApiConnection;
 import com.zeyad.usecases.stores.DataStoreFactory;
 
-import rx.android.schedulers.AndroidSchedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import st.lowlevel.storo.StoroBuilder;
 
 public class DataServiceFactory {

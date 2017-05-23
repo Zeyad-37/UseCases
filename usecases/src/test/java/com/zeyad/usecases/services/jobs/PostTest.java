@@ -27,10 +27,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Flowable;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
-import rx.Observable;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -166,7 +166,7 @@ public class PostTest {
     }
 
     private ApiConnection createRestApi() {
-        final Observable<Object> OBJECT_OBSERVABLE = getObjectObservable();
+        final Flowable<Object> OBJECT_OBSERVABLE = getObjectObservable();
         apiConnection = mock(ApiConnection.class);
         when(apiConnection.dynamicDownload(anyString())).thenReturn(getResponseBodyObservable());
         when(apiConnection.dynamicDelete(anyString(), any())).thenReturn(OBJECT_OBSERVABLE);
@@ -182,13 +182,13 @@ public class PostTest {
     }
 
     @NonNull
-    private Observable<List> getListObservable() {
-        return Observable.just(Collections.singletonList(createTestModel()));
+    private Flowable<List> getListObservable() {
+        return Flowable.just(Collections.singletonList(createTestModel()));
     }
 
     @NonNull
-    private Observable<Object> getObjectObservable() {
-        return Observable.just(createTestModel());
+    private Flowable<Object> getObjectObservable() {
+        return Flowable.just(createTestModel());
     }
 
     @NonNull
@@ -215,8 +215,8 @@ public class PostTest {
                 .build();
     }
 
-    private Observable<ResponseBody> getResponseBodyObservable() {
-        return Observable.fromCallable(this::getResponseBody);
+    private Flowable<ResponseBody> getResponseBodyObservable() {
+        return Flowable.fromCallable(this::getResponseBody);
     }
 
     @Nullable

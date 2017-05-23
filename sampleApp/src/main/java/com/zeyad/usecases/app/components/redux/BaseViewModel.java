@@ -4,11 +4,11 @@ import android.arch.lifecycle.ViewModel;
 
 import com.zeyad.usecases.utils.ReplayingShare;
 
-import rx.Observable;
-import rx.Observable.Transformer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.functions.Func1;
-import rx.schedulers.Schedulers;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableTransformer;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 
 /**
  * @author zeyad on 11/28/16.
@@ -28,11 +28,11 @@ public abstract class BaseViewModel<S> extends ViewModel {
     /**
      * A Transformer, given events returns UIModels by applying the redux pattern.
      *
-     * @return {@link Transformer} the Redux pattern transformer.
+     * @return {@link FlowableTransformer} the Redux pattern transformer.
      */
-    Transformer<BaseEvent, UIModel<S>> uiModels() {
+    FlowableTransformer<BaseEvent, UIModel<S>> uiModels() {
         return events -> events.observeOn(Schedulers.io())
-                .flatMap(event -> Observable.just(event)
+                .flatMap(event -> Flowable.just(event)
                         .flatMap(mapEventsToExecutables())
                         .map(Result::successResult)
                         .onErrorReturn(Result::errorResult)
@@ -54,7 +54,7 @@ public abstract class BaseViewModel<S> extends ViewModel {
     /**
      * A Function that given an event maps it to the correct executable logic.
      *
-     * @return a {@link Func1} the mapping function.
+     * @return a {@link Function} the mapping function.
      */
-    public abstract Func1<BaseEvent, Observable<?>> mapEventsToExecutables();
+    public abstract Function<BaseEvent, Flowable<?>> mapEventsToExecutables();
 }

@@ -13,10 +13,10 @@ import com.zeyad.usecases.stores.CloudDataStore;
 
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Scheduler;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
-import rx.Scheduler;
 
 public class Config {
     private static Config sInstance;

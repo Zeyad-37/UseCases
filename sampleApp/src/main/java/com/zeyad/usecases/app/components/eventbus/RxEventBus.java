@@ -2,9 +2,10 @@ package com.zeyad.usecases.app.components.eventbus;
 
 import android.support.annotation.NonNull;
 
-import rx.Observable;
-import rx.subjects.PublishSubject;
-import rx.subjects.SerializedSubject;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Flowable;
+import io.reactivex.subjects.PublishSubject;
+
 
 /**
  * Small wrapper on top of the EventBus to allow consumption of events as
@@ -15,10 +16,10 @@ import rx.subjects.SerializedSubject;
 class RxEventBus implements IRxEventBus {
 
     private static IRxEventBus mInstance;
-    private final SerializedSubject<Object, Object> rxBus;
+    private final PublishSubject<Object> rxBus;
 
     private RxEventBus() {
-        rxBus = new SerializedSubject<>(PublishSubject.create());
+        rxBus = PublishSubject.create();
     }
 
     static IRxEventBus getInstance() {
@@ -34,12 +35,12 @@ class RxEventBus implements IRxEventBus {
 
     @Override
     @NonNull
-    public Observable<Object> toObserverable() {
-        return rxBus;
+    public Flowable<Object> toFlowable() {
+        return rxBus.toFlowable(BackpressureStrategy.BUFFER);
     }
 
     @Override
-    public boolean hasObservers() {
+    public boolean hasFlowables() {
         return rxBus.hasObservers();
     }
 }

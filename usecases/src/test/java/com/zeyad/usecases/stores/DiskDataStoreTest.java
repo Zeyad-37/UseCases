@@ -19,10 +19,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import rx.Completable;
-import rx.Observable;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
 
-import static org.junit.Assert.assertEquals;
+import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
@@ -52,7 +52,7 @@ public class DiskDataStoreTest {
     public void testGetAll() {
         List<TestRealmModel> testRealmObjects = new ArrayList<>();
         testRealmObjects.add(new TestRealmModel());
-        Observable<List<TestRealmModel>> observable = Observable.just(testRealmObjects);
+        Flowable<List<TestRealmModel>> observable = Flowable.just(testRealmObjects);
         when(dbManager.<TestRealmModel>getAll(any(Class.class))).thenReturn(observable);
 
         mDiskDataStore.dynamicGetList("", Object.class, false, false);
@@ -62,7 +62,7 @@ public class DiskDataStoreTest {
 
     @Test
     public void testGetObject() {
-        Observable observable = Observable.just(new TestRealmModel());
+        Flowable observable = Flowable.just(new TestRealmModel());
         when(dbManager.getById(anyString(), anyInt(), any(Class.class))).thenReturn(observable);
 
         mDiskDataStore.dynamicGetObject("", "", 0, Object.class, false, false);
@@ -72,7 +72,7 @@ public class DiskDataStoreTest {
 
     @Test
     public void testSearchDiskRealmQuery() {
-        when(dbManager.getQuery(any(RealmQueryProvider.class))).thenReturn(any(Observable.class));
+        when(dbManager.getQuery(any(RealmQueryProvider.class))).thenReturn(any(Flowable.class));
 
         mDiskDataStore.queryDisk(realm -> realm.where(TestRealmModel.class));
 
@@ -144,25 +144,29 @@ public class DiskDataStoreTest {
 
     @Test(expected = IllegalStateException.class)
     public void testDynamicDownloadFile() throws Exception {
-        Observable observable = mDiskDataStore.dynamicDownloadFile("", new File(""), false, false, false);
+        Flowable observable = mDiskDataStore.dynamicDownloadFile("", new File(""), false, false, false);
 
         // Verify repository interactions
         verifyZeroInteractions(dbManager);
 
         // Assert return type
-        assertEquals(new IllegalStateException("Can not IO file to local DB"), observable.toBlocking().first());
+        IllegalStateException expected = new IllegalStateException("Can not IO file to local DB");
+        assertEquals(expected.getMessage(),
+                ((IllegalStateException) observable.first(expected).blockingGet()).getMessage());
     }
 
     @Test(expected = IllegalStateException.class)
     public void testDynamicUploadFile() throws Exception {
-        Observable observable = mDiskDataStore.dynamicUploadFile("", new File(""), "", new HashMap<>(),
+        Flowable observable = mDiskDataStore.dynamicUploadFile("", new File(""), "", new HashMap<>(),
                 false, false, false, Object.class);
 
         // Verify repository interactions
         verifyZeroInteractions(dbManager);
 
         // Assert return type
-        assertEquals(new IllegalStateException("Can not IO file to local DB"), observable.toBlocking().first());
+        IllegalStateException expected = new IllegalStateException("Can not IO file to local DB");
+        assertEquals(expected.getMessage(),
+                ((IllegalStateException) observable.first(expected).blockingGet()).getMessage());
     }
 
 }

@@ -8,9 +8,9 @@ import com.zeyad.usecases.mapper.DAOMapper;
 
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Scheduler;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
-import rx.Scheduler;
 
 /**
  * @author by ZIaDo on 12/9/16.

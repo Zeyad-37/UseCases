@@ -16,8 +16,9 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
-import rx.Completable;
-import rx.Observable;
+import hu.akarnokd.rxjava.interop.RxJavaInterop;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
 import st.lowlevel.storo.Storo;
 
 public class DiskDataStore implements DataStore {
@@ -37,13 +38,13 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Observable<M> dynamicGetObject(String url, String idColumnName, int itemId,
-                                              @NonNull Class dataClass, boolean persist, boolean shouldCache) {
+    public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, int itemId,
+                                            @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         if (Config.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
-            return Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
-                    .map(object -> mEntityDataMapper.mapTo(object, dataClass));
+            return RxJavaInterop.toV2Flowable(Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
+                    .map(object -> mEntityDataMapper.mapTo(object, dataClass)));
         else
-            return (Observable<M>) mDataBaseManager.getById(idColumnName, itemId, dataClass)
+            return (Flowable<M>) mDataBaseManager.getById(idColumnName, itemId, dataClass)
                     .doOnEach(notification -> {
                         try {
                             if (Config.isWithCache() && !Storo.contains(dataClass.getSimpleName() + itemId))
@@ -57,40 +58,40 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Observable<List<M>> dynamicGetList(String url, Class dataClass, boolean persist, boolean shouldCache) {
+    public <M> Flowable<List<M>> dynamicGetList(String url, Class dataClass, boolean persist, boolean shouldCache) {
         return mDataBaseManager.getAll(dataClass);
     }
 
     @NonNull
     @Override
-    public Observable dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                         @NonNull Class dataClass, boolean persist, boolean queuable) {
+    public Flowable dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                       @NonNull Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnEach(object -> {
+                .doOnEvent(object -> {
                     if (Config.isWithCache())
                         cacheObject(idColumnName, jsonObject, dataClass);
-                }).toObservable();
+                }).toFlowable();
     }
 
     @NonNull
     @Override
-    public <M> Observable<List<M>> queryDisk(RealmQueryProvider queryFactory) {
+    public <M> Flowable<List<M>> queryDisk(RealmQueryProvider queryFactory) {
         return mDataBaseManager.getQuery(queryFactory);
     }
 
     @NonNull
     @Override
-    public Observable dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
-                                              @NonNull Class dataClass, boolean persist, boolean queuable) {
+    public Flowable dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
+                                            @NonNull Class dataClass, boolean persist, boolean queuable) {
         List<Long> convertToListOfId = Utils.getInstance().convertToListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
-                .doOnEach(object -> {
+                .doOnEvent(object -> {
                     if (Config.isWithCache()) {
                         for (int i = 0, convertToListOfIdSize = convertToListOfId != null ? convertToListOfId.size() : 0;
                              i < convertToListOfIdSize; i++)
                             Storo.delete(dataClass.getSimpleName() + convertToListOfId.get(i));
                     }
-                }).toObservable();
+                }).toFlowable();
     }
 
     @NonNull
@@ -101,38 +102,38 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Observable dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                        @NonNull Class dataClass, boolean persist, boolean queuable) {
+    public Flowable dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                      @NonNull Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnEach(object -> {
+                .doOnEvent(object -> {
                     if (Config.isWithCache())
                         cacheObject(idColumnName, jsonObject, dataClass);
-                }).toObservable();
+                }).toFlowable();
     }
 
     @NonNull
     @Override
-    public Observable dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
-                                      Class dataClass, boolean persist, boolean queuable) {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toObservable();
+    public Flowable dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
+                                    Class dataClass, boolean persist, boolean queuable) {
+        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toFlowable();
     }
 
     @NonNull
     @Override
-    public Observable dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                       @NonNull Class dataClass, boolean persist, boolean queuable) {
+    public Flowable dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                     @NonNull Class dataClass, boolean persist, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnEach(object -> {
+                .doOnEvent(object -> {
                     if (Config.isWithCache())
                         cacheObject(idColumnName, jsonObject, dataClass);
-                }).toObservable();
+                }).toFlowable();
     }
 
     @NonNull
     @Override
-    public Observable dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
-                                     Class dataClass, boolean persist, boolean queuable) {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toObservable();
+    public Flowable dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
+                                   Class dataClass, boolean persist, boolean queuable) {
+        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toFlowable();
     }
 
     private void cacheObject(String idColumnName, @NonNull JSONObject jsonObject, @NonNull Class dataClass) {
@@ -150,15 +151,15 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Observable dynamicUploadFile(String url, File file, String key, HashMap<String, Object> parameters,
-                                            boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass) {
-        return Observable.error(new IllegalStateException(IO_DB_ERROR));
+    public <M> Flowable dynamicUploadFile(String url, File file, String key, HashMap<String, Object> parameters,
+                                          boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass) {
+        return Flowable.error(new IllegalStateException(IO_DB_ERROR));
     }
 
     @NonNull
     @Override
-    public Observable dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,
-                                          boolean queuable) {
-        return Observable.error(new IllegalStateException(IO_DB_ERROR));
+    public Flowable dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,
+                                        boolean queuable) {
+        return Flowable.error(new IllegalStateException(IO_DB_ERROR));
     }
 }

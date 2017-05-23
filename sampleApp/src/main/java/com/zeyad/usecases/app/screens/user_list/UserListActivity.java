@@ -22,9 +22,9 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.jakewharton.rxbinding.support.v7.widget.RxRecyclerView;
-import com.jakewharton.rxbinding.support.v7.widget.RxSearchView;
-import com.jakewharton.rxbinding.view.RxMenuItem;
+import com.jakewharton.rxbinding2.support.v7.widget.RxRecyclerView;
+import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
+import com.jakewharton.rxbinding2.view.RxMenuItem;
 import com.zeyad.usecases.api.DataServiceFactory;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
@@ -51,7 +51,8 @@ import java.util.concurrent.TimeUnit;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Observable;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.Observable;
 
 /**
  * An activity representing a list of Repos. This activity
@@ -83,7 +84,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
 
     @Override
     public void initialize() {
-        errorMessageFactory = Throwable::getMessage;
+        errorMessageFactory = Throwable::getLocalizedMessage;
         viewModel = ViewModelProviders.of(this).get(UserListVM.class);
         viewModel.init((newResult, currentStateBundle) -> {
             List resultList = (List) newResult.getBundle();
@@ -103,9 +104,10 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
         }, null, DataServiceFactory.getInstance());
         events = Observable.<BaseEvent>just(new GetPaginatedUsersEvent(0))
                 .doOnEach(notification -> Log.d("GetUsersEvent", "fired!"));
-        rxEventBus.toObserverable()
+        rxEventBus.toFlowable()
                 .compose(bindToLifecycle())
                 .subscribe(stream -> events.mergeWith((Observable<DeleteUsersEvent>) stream)
+                        .toFlowable(BackpressureStrategy.BUFFER)
                         .compose(uiModelsTransformer)
                         .compose(bindToLifecycle())
                         .subscribe(new UISubscriber<>(this, errorMessageFactory)));
@@ -205,16 +207,16 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
         userRecycler.setAdapter(usersAdapter);
         usersAdapter.setAllowSelection(true);
         events = events.mergeWith(Observable.defer(() -> RxRecyclerView.scrollStateChanges(userRecycler)
-                .map(recyclerViewScrollEvent -> {
+                .map(integer -> {
                     int totalItemCount = layoutManager.getItemCount();
                     int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                     return (layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                             && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE ?
-                            new GetPaginatedUsersEvent(lastId) : null;
-                }).filter(usersNextPageEvent -> usersNextPageEvent != null)
+                            new GetPaginatedUsersEvent(lastId) : new GetPaginatedUsersEvent(-1);
+                })
+                .filter(usersNextPageEvent -> usersNextPageEvent.getLastId() != -1)
                 .throttleLast(200, TimeUnit.MILLISECONDS)
                 .debounce(300, TimeUnit.MILLISECONDS)
-                .onBackpressureLatest()
                 .doOnNext(searchUsersEvent -> Log.d("nextPageEvent", "fired!"))));
     }
 
@@ -240,8 +242,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                 .map(query -> new SearchUsersEvent(query.toString()))
                 .doOnNext(searchUsersEvent -> Log.d("searchEvent", "eventFired")))
                 .throttleLast(100, TimeUnit.MILLISECONDS)
-                .debounce(200, TimeUnit.MILLISECONDS)
-                .onBackpressureLatest();
+                .debounce(200, TimeUnit.MILLISECONDS);
         return super.onCreateOptionsMenu(menu);
     }
 

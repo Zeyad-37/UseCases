@@ -13,10 +13,11 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-import rx.Completable;
-import rx.Observable;
-import rx.Scheduler;
-import rx.functions.Func1;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableTransformer;
+import io.reactivex.Scheduler;
+import io.reactivex.functions.Function;
 
 /**
  * @author by ZIaDo on 5/9/17.
@@ -44,19 +45,19 @@ class DataService implements IDataService {
     }
 
     @Override
-    public <M> Observable<List<M>> getList(@NonNull GetRequest getListRequest) {
+    public <M> Flowable<List<M>> getList(@NonNull GetRequest getListRequest) {
         try {
             return mDataStoreFactory.dynamically(getListRequest.getUrl())
                     .<M>dynamicGetList(getListRequest.getUrl(), getListRequest.getDataClass(),
                             getListRequest.isPersist(), getListRequest.isShouldCache())
                     .compose(applySchedulers());
         } catch (Exception e) {
-            return Observable.error(e);
+            return Flowable.error(e);
         }
     }
 
     @Override
-    public <M> Observable<M> getObject(@NonNull GetRequest getRequest) {
+    public <M> Flowable<M> getObject(@NonNull GetRequest getRequest) {
         try {
             return mDataStoreFactory.dynamically(getRequest.getUrl())
                     .<M>dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
@@ -64,12 +65,12 @@ class DataService implements IDataService {
                             getRequest.isShouldCache())
                     .compose(applySchedulers());
         } catch (Exception e) {
-            return Observable.error(e);
+            return Flowable.error(e);
         }
     }
 
     @Override
-    public <M> Observable<M> patchObject(@NonNull PostRequest postRequest) {
+    public <M> Flowable<M> patchObject(@NonNull PostRequest postRequest) {
         try {
             return mDataStoreFactory.dynamically(postRequest.getUrl())
                     .<M>dynamicPatchObject(postRequest.getUrl(), postRequest.getIdColumnName(),
@@ -77,12 +78,12 @@ class DataService implements IDataService {
                             postRequest.isQueuable())
                     .compose(applySchedulers());
         } catch (Exception e) {
-            return Observable.error(e);
+            return Flowable.error(e);
         }
     }
 
     @Override
-    public <M> Observable<M> postObject(@NonNull PostRequest postRequest) {
+    public <M> Flowable<M> postObject(@NonNull PostRequest postRequest) {
         try {
             return mDataStoreFactory.dynamically(postRequest.getUrl())
                     .<M>dynamicPostObject(postRequest.getUrl(), postRequest.getIdColumnName(),
@@ -90,12 +91,12 @@ class DataService implements IDataService {
                             postRequest.isQueuable())
                     .compose(applySchedulers());
         } catch (Exception e) {
-            return Observable.error(e);
+            return Flowable.error(e);
         }
     }
 
     @Override
-    public <M> Observable<M> postList(@NonNull PostRequest postRequest) {
+    public <M> Flowable<M> postList(@NonNull PostRequest postRequest) {
         try {
             return mDataStoreFactory.dynamically(postRequest.getUrl())
                     .<M>dynamicPostList(postRequest.getUrl(), postRequest.getIdColumnName(),
@@ -103,24 +104,24 @@ class DataService implements IDataService {
                             postRequest.isQueuable())
                     .compose(applySchedulers());
         } catch (Exception e) {
-            return Observable.error(e);
+            return Flowable.error(e);
         }
     }
 
     @Override
-    public <M> Observable<M> putObject(@NonNull PostRequest postRequest) {
+    public <M> Flowable<M> putObject(@NonNull PostRequest postRequest) {
         try {
             return mDataStoreFactory.dynamically(postRequest.getUrl())
                     .<M>dynamicPutObject(postRequest.getUrl(), postRequest.getIdColumnName(), postRequest.getJsonObject(),
                             postRequest.getDataClass(), postRequest.isPersist(), postRequest.isQueuable())
                     .compose(applySchedulers());
         } catch (Exception e) {
-            return Observable.error(e);
+            return Flowable.error(e);
         }
     }
 
     @Override
-    public <M> Observable<M> putList(@NonNull PostRequest postRequest) {
+    public <M> Flowable<M> putList(@NonNull PostRequest postRequest) {
         try {
             return mDataStoreFactory.dynamically(postRequest.getUrl())
                     .<M>dynamicPutList(postRequest.getUrl(), postRequest.getIdColumnName(),
@@ -128,12 +129,12 @@ class DataService implements IDataService {
                             postRequest.isQueuable())
                     .compose(applySchedulers());
         } catch (Exception e) {
-            return Observable.error(e);
+            return Flowable.error(e);
         }
     }
 
     @Override
-    public <M> Observable<M> deleteItemById(@NonNull PostRequest request) {
+    public <M> Flowable<M> deleteItemById(@NonNull PostRequest request) {
         PostRequest.Builder builder = new PostRequest.Builder(request.getDataClass(), request.isPersist())
                 .payLoad(Collections.singleton((Long) request.getObject()))
                 .queuable()
@@ -145,7 +146,7 @@ class DataService implements IDataService {
     }
 
     @Override
-    public <M> Observable<M> deleteCollectionByIds(@NonNull PostRequest deleteRequest) {
+    public <M> Flowable<M> deleteCollectionByIds(@NonNull PostRequest deleteRequest) {
         try {
             return mDataStoreFactory.dynamically(deleteRequest.getUrl())
                     .<M>dynamicDeleteCollection(deleteRequest.getUrl(), deleteRequest.getIdColumnName(),
@@ -153,7 +154,7 @@ class DataService implements IDataService {
                             deleteRequest.isPersist(), deleteRequest.isQueuable())
                     .compose(applySchedulers());
         } catch (Exception e) {
-            return Observable.error(e);
+            return Flowable.error(e);
         }
     }
 
@@ -171,62 +172,61 @@ class DataService implements IDataService {
     }
 
     @Override
-    public <M> Observable<List<M>> queryDisk(RealmQueryProvider realmQueryProvider) {
+    public <M> Flowable<List<M>> queryDisk(RealmQueryProvider realmQueryProvider) {
         try {
             return mDataStoreFactory.disk().<M>queryDisk(realmQueryProvider)
                     .compose(ReplayingShare.instance())
                     .compose(applySchedulers());
         } catch (IllegalAccessException e) {
-            return Observable.error(e);
+            return Flowable.error(e);
         }
     }
 
     @Override
-    public <M> Observable<List<M>> getListOffLineFirst(@NonNull GetRequest getRequest) {
+    public <M> Flowable<List<M>> getListOffLineFirst(@NonNull GetRequest getRequest) {
         try {
-            Observable<List<M>> online = mDataStoreFactory.cloud()
+            Flowable<List<M>> online = mDataStoreFactory.cloud()
                     .dynamicGetList(getRequest.getUrl(), getRequest.getDataClass(),
                             getRequest.isPersist(), getRequest.isShouldCache());
             return mDataStoreFactory.disk()
                     .<M>dynamicGetList("", getRequest.getDataClass(),
                             getRequest.isPersist(), getRequest.isShouldCache())
-                    .flatMap(new Func1<List<M>, Observable<List<M>>>() {
-                        @NonNull
+                    .flatMap(new Function<List<M>, Flowable<List<M>>>() {
                         @Override
-                        public Observable<List<M>> call(List<M> list) {
+                        public Flowable<List<M>> apply(@io.reactivex.annotations.NonNull List<M> list) throws Exception {
                             if (list != null && !list.isEmpty())
-                                return Observable.just(list);
+                                return Flowable.just(list);
                             else return online;
                         }
                     })
                     .compose(ReplayingShare.instance())
                     .compose(applySchedulers());
         } catch (Exception e) {
-            return Observable.error(e);
+            return Flowable.error(e);
         }
     }
 
     @Override
-    public <M> Observable<M> getObjectOffLineFirst(@NonNull GetRequest getRequest) {
+    public <M> Flowable<M> getObjectOffLineFirst(@NonNull GetRequest getRequest) {
         try {
-            Observable<M> online = mDataStoreFactory.cloud()
+            Flowable<M> online = mDataStoreFactory.cloud()
                     .dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
                             getRequest.getItemId(), getRequest.getDataClass(), getRequest.isPersist(),
                             getRequest.isShouldCache());
             return mDataStoreFactory.disk()
                     .<M>dynamicGetObject("", getRequest.getIdColumnName(), getRequest.getItemId(),
                             getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
-                    .flatMap(object -> object != null ? Observable.just(object) : online)
+                    .flatMap(object -> object != null ? Flowable.just(object) : online)
                     .onErrorResumeNext(throwable -> online)
                     .compose(ReplayingShare.instance())
                     .compose(applySchedulers());
         } catch (Exception e) {
-            return Observable.error(e);
+            return Flowable.error(e);
         }
     }
 
     @Override
-    public <M> Observable<M> uploadFile(@NonNull FileIORequest fileIORequest) {
+    public <M> Flowable<M> uploadFile(@NonNull FileIORequest fileIORequest) {
         return mDataStoreFactory.cloud()
                 .<M>dynamicUploadFile(fileIORequest.getUrl(), fileIORequest.getFile(), fileIORequest.getKey(),
                         fileIORequest.getParameters(), fileIORequest.onWifi(), fileIORequest.isWhileCharging(),
@@ -235,7 +235,7 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Observable<File> downloadFile(@NonNull FileIORequest fileIORequest) {
+    public Flowable<File> downloadFile(@NonNull FileIORequest fileIORequest) {
         return mDataStoreFactory.cloud()
                 .dynamicDownloadFile(fileIORequest.getUrl(), fileIORequest.getFile(), fileIORequest.onWifi(),
                         fileIORequest.isWhileCharging(), fileIORequest.isQueuable())
@@ -249,7 +249,7 @@ class DataService implements IDataService {
      * @return the transformed observable
      */
     @NonNull
-    private <M> Observable.Transformer<M, M> applySchedulers() {
+    private <M> FlowableTransformer<M, M> applySchedulers() {
         return mPostThreadExist ? observable -> observable.subscribeOn(mBackgroundThread)
                 .observeOn(mPostExecutionThread)
                 .unsubscribeOn(mBackgroundThread) : observable -> observable.subscribeOn(mBackgroundThread)

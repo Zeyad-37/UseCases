@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import com.trello.rxlifecycle.components.support.RxFragment;
+import com.trello.rxlifecycle2.components.support.RxFragment;
 import com.zeyad.usecases.app.components.eventbus.IRxEventBus;
 import com.zeyad.usecases.app.components.eventbus.RxEventBusFactory;
 import com.zeyad.usecases.app.components.navigation.INavigator;
@@ -13,7 +13,9 @@ import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
 import org.parceler.Parcels;
 
-import rx.Observable;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.FlowableTransformer;
+import io.reactivex.Observable;
 
 import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
 
@@ -26,7 +28,7 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
     public IRxEventBus rxEventBus;
     public ErrorMessageFactory errorMessageFactory;
     public Observable<BaseEvent> events;
-    public Observable.Transformer<BaseEvent, UIModel<S>> uiModelsTransformer;
+    public FlowableTransformer<BaseEvent, UIModel<S>> uiModelsTransformer;
     public VM viewModel;
     public S viewState;
 
@@ -49,7 +51,8 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
     public void onStart() {
         super.onStart();
         uiModelsTransformer = viewModel.uiModels();
-        events.compose(uiModelsTransformer)
+        events.toFlowable(BackpressureStrategy.BUFFER)
+                .compose(uiModelsTransformer)
                 .compose(bindToLifecycle())
                 .subscribe(new UISubscriber<>(this, errorMessageFactory));
     }

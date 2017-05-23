@@ -9,8 +9,8 @@ import com.zeyad.usecases.requests.GetRequest;
 
 import java.util.List;
 
-import rx.Observable;
-import rx.functions.Func1;
+import io.reactivex.Flowable;
+import io.reactivex.functions.Function;
 
 import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
 
@@ -29,17 +29,17 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> {
         this.initialState = initialState;
     }
 
-    public Observable<List<Repository>> getRepositories(String userLogin) {
+    public Flowable<List<Repository>> getRepositories(String userLogin) {
         return Utils.isNotEmpty(userLogin) ? dataUseCase.<Repository>queryDisk(realm -> realm.where(Repository.class)
                 .equalTo("owner.login", userLogin))
-                .flatMap(list -> Utils.isNotEmpty(list) ? Observable.just(list) :
+                .flatMap(list -> Utils.isNotEmpty(list) ? Flowable.just(list) :
                         dataUseCase.<Repository>getList(new GetRequest.Builder(Repository.class, true)
                                 .url(String.format(REPOSITORIES, userLogin)).build())) :
-                Observable.error(new IllegalArgumentException("User name can not be empty"));
+                Flowable.error(new IllegalArgumentException("User name can not be empty"));
     }
 
     @Override
-    public Func1<BaseEvent, Observable<?>> mapEventsToExecutables() {
+    public Function<BaseEvent, Flowable<?>> mapEventsToExecutables() {
         return event -> getRepositories(((GetReposEvent) event).getLogin());
     }
 }

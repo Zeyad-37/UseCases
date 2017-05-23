@@ -90,6 +90,9 @@ android {
 
     packagingOptions {
         exclude 'META-INF/services/javax.annotation.processing.Processor'  // butterknife
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/rxjava.properties'
     }
 }
 
@@ -97,7 +100,8 @@ ext {
     supportLibraryVersion = '25.3.1'
     googlePlayVersion = '10.0.1'
     butterKnifeVersion = '8.4.0'
-    rxbindingVersion = '1.0.1'
+//    rxbindingVersion = '1.0.1'
+    rxbindingVersion = '2.0.0'
     parcelerVersion = '1.1.1'
     leakCanaryVersion = '1.5.1'
     androidSupportTest = '0.5'
@@ -124,12 +128,19 @@ dependencies {
     // Network
     compile 'com.github.bumptech.glide:glide:3.7.0'
     // Rx
-    compile "com.jakewharton.rxbinding:rxbinding:$rxbindingVersion"
-    compile "com.jakewharton.rxbinding:rxbinding-appcompat-v7:$rxbindingVersion"
-    compile "com.jakewharton.rxbinding:rxbinding-design:$rxbindingVersion"
-    compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$rxbindingVersion"
-    compile 'com.trello:rxlifecycle:1.0'
-    compile 'com.trello:rxlifecycle-components:1.0'
+    compile "com.jakewharton.rxbinding2:rxbinding:$rxbindingVersion"
+    compile "com.jakewharton.rxbinding2:rxbinding-appcompat-v7:$rxbindingVersion"
+    compile "com.jakewharton.rxbinding2:rxbinding-design:$rxbindingVersion"
+    compile "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7:$rxbindingVersion"
+//    compile "com.jakewharton.rxbinding:rxbinding:$rxbindingVersion"
+//    compile "com.jakewharton.rxbinding:rxbinding-appcompat-v7:$rxbindingVersion"
+//    compile "com.jakewharton.rxbinding:rxbinding-design:$rxbindingVersion"
+//    compile "com.jakewharton.rxbinding:rxbinding-recyclerview-v7:$rxbindingVersion"
+
+    compile 'com.trello.rxlifecycle2:rxlifecycle:2.0.1'
+    compile 'com.trello.rxlifecycle2:rxlifecycle-components:2.0.1'
+//    compile 'com.trello:rxlifecycle:1.0'
+//    compile 'com.trello:rxlifecycle-components:1.0'
     // Injection
     compile "com.jakewharton:butterknife:$butterKnifeVersion"
     apt "com.jakewharton:butterknife-compiler:$butterKnifeVersion"

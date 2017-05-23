@@ -41,7 +41,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import rx.Observable;
+import io.reactivex.Observable;
 
 import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
 

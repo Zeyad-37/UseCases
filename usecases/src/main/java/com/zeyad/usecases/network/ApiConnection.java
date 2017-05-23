@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Flowable;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.CertificatePinner;
@@ -35,9 +36,8 @@ import okio.BufferedSink;
 import okio.GzipSink;
 import okio.Okio;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
 
 /**
  * Api Connection class used to retrieve data from the cloud.
@@ -124,12 +124,12 @@ public class ApiConnection {
                 .baseUrl(Config.getBaseURL())
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create(Config.getGson()))
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
     }
 
     @NonNull
-    public Observable<ResponseBody> dynamicDownload(String url) {
+    public Flowable<ResponseBody> dynamicDownload(String url) {
         return getRestApi().dynamicDownload(url);
     }
 
@@ -138,25 +138,25 @@ public class ApiConnection {
     }
 
     @NonNull
-    public <M> Observable<M> dynamicGetObject(String url) {
-        return (Observable<M>) getRestApi().dynamicGetObject(url);
+    public <M> Flowable<M> dynamicGetObject(String url) {
+        return (Flowable<M>) getRestApi().dynamicGetObject(url);
     }
 
     @NonNull
-    public <M> Observable<M> dynamicGetObject(String url, boolean shouldCache) {
+    public <M> Flowable<M> dynamicGetObject(String url, boolean shouldCache) {
         if (shouldCache && !Config.getInstance().isUseApiWithCache()) {
             logNoCache();
         }
-        return (Observable<M>) getRestApi().dynamicGetObject(url);
+        return (Flowable<M>) getRestApi().dynamicGetObject(url);
     }
 
     @NonNull
-    public Observable<List> dynamicGetList(String url) {
+    public Flowable<List> dynamicGetList(String url) {
         return getRestApi().dynamicGetList(url);
     }
 
     @NonNull
-    public Observable<List> dynamicGetList(String url, boolean shouldCache) {
+    public Flowable<List> dynamicGetList(String url, boolean shouldCache) {
         if (shouldCache && !Config.getInstance().isUseApiWithCache()) {
             logNoCache();
         }
@@ -164,28 +164,28 @@ public class ApiConnection {
     }
 
     @NonNull
-    public <M> Observable<M> dynamicPost(String url, RequestBody requestBody) {
-        return (Observable<M>) getRestApi().dynamicPost(url, requestBody);
+    public <M> Flowable<M> dynamicPost(String url, RequestBody requestBody) {
+        return (Flowable<M>) getRestApi().dynamicPost(url, requestBody);
     }
 
     @NonNull
-    public <M> Observable<M> dynamicPut(String url, RequestBody requestBody) {
-        return (Observable<M>) getRestApi().dynamicPut(url, requestBody);
+    public <M> Flowable<M> dynamicPut(String url, RequestBody requestBody) {
+        return (Flowable<M>) getRestApi().dynamicPut(url, requestBody);
     }
 
     @NonNull
-    public <M> Observable<M> dynamicUpload(String url, Map<String, RequestBody> partMap, MultipartBody.Part file) {
-        return (Observable<M>) getRestApi().dynamicUpload(url, partMap, file);
+    public <M> Flowable<M> dynamicUpload(String url, Map<String, RequestBody> partMap, MultipartBody.Part file) {
+        return (Flowable<M>) getRestApi().dynamicUpload(url, partMap, file);
     }
 
     @NonNull
-    public <M> Observable<M> dynamicDelete(String url, RequestBody body) {
-        return (Observable<M>) getRestApi().dynamicDelete(url, body);
+    public <M> Flowable<M> dynamicDelete(String url, RequestBody body) {
+        return (Flowable<M>) getRestApi().dynamicDelete(url, body);
     }
 
     @NonNull
-    public <M> Observable<M> dynamicPatch(String url, RequestBody body) {
-        return (Observable<M>) getRestApi().dynamicPatch(url, body);
+    public <M> Flowable<M> dynamicPatch(String url, RequestBody body) {
+        return (Flowable<M>) getRestApi().dynamicPatch(url, body);
     }
 
     RestApi getRestApiWithoutCache() {

@@ -12,7 +12,7 @@ import com.zeyad.usecases.utils.Utils;
 
 import java.io.File;
 
-import rx.Completable;
+import io.reactivex.Completable;
 
 /**
  * @author Zeyad on 6/05/16.
@@ -40,22 +40,22 @@ public class FileIO {
     @NonNull
     public Completable execute() {
         File file = mFileIORequest.getFile();
-        return mIsDownload ? mCloudDataStore.dynamicDownloadFile(mFileIORequest.getUrl(), file, mFileIORequest.onWifi(),
-                mFileIORequest.isWhileCharging(), mFileIORequest.isQueuable())
-                .doOnSubscribe(() -> Log.d(TAG, "Downloading " + file.getName()))
-                .toCompletable()
+        return mIsDownload ? Completable.fromObservable(mCloudDataStore
+                .dynamicDownloadFile(mFileIORequest.getUrl(), file, mFileIORequest.onWifi(),
+                        mFileIORequest.isWhileCharging(), mFileIORequest.isQueuable())
+                .doOnSubscribe(subscription -> Log.d(TAG, "Downloading " + file.getName()))
                 .doOnError(throwable -> {
                     queueIOFile();
                     throwable.printStackTrace();
-                }) : mCloudDataStore.dynamicUploadFile(mFileIORequest.getUrl(), file, mFileIORequest.getKey(),
-                mFileIORequest.getParameters(), mFileIORequest.onWifi(), mFileIORequest.isWhileCharging(),
-                mFileIORequest.isQueuable(), mFileIORequest.getDataClass())
-                .doOnSubscribe(() -> Log.d(TAG, "Uploading " + file.getName()))
-                .toCompletable()
+                }).toObservable()) : Completable.fromObservable(mCloudDataStore
+                .dynamicUploadFile(mFileIORequest.getUrl(), file, mFileIORequest.getKey(),
+                        mFileIORequest.getParameters(), mFileIORequest.onWifi(), mFileIORequest.isWhileCharging(),
+                        mFileIORequest.isQueuable(), mFileIORequest.getDataClass())
+                .doOnSubscribe(subscription -> Log.d(TAG, "Uploading " + file.getName()))
                 .doOnError(throwable -> {
                     queueIOFile();
                     throwable.printStackTrace();
-                });
+                }).toObservable());
     }
 
     void queueIOFile() {

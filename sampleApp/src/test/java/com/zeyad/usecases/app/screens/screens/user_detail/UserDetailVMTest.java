@@ -13,8 +13,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.observers.TestSubscriber;
+import io.reactivex.Flowable;
+import io.reactivex.subscribers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -25,7 +25,6 @@ import static org.mockito.Mockito.when;
 /**
  * @author by ZIaDo on 2/9/17.
  */
-
 public class UserDetailVMTest {
 
     private IDataService mockDataUseCase;
@@ -47,7 +46,7 @@ public class UserDetailVMTest {
     public void getRepositories() throws Exception {
         List<Repository> repositories = new ArrayList<>();
         repositories.add(repository);
-        Observable<List<Repository>> observableUserRealm = Observable.just(repositories);
+        Flowable<List<Repository>> observableUserRealm = Flowable.just(repositories);
 
         when(mockDataUseCase.<Repository>queryDisk(any(RealmQueryProvider.class)))
                 .thenReturn(observableUserRealm);
@@ -58,7 +57,7 @@ public class UserDetailVMTest {
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).queryDisk(any(RealmQueryProvider.class));
 
-        subscriber.assertCompleted();
+        subscriber.assertComplete();
         subscriber.assertNoErrors();
         subscriber.assertValue(repositories);
     }

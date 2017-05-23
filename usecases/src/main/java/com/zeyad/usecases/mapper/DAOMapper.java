@@ -23,7 +23,7 @@ public class DAOMapper {
         return sDAOMapper;
     }
 
-    @Nullable
+    @NonNull
     public <M> M mapTo(@Nullable Object object, @NonNull Class domainClass) {
         return (M) gson.fromJson(gson.toJson(object), domainClass);
     }

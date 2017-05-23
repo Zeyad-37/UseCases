@@ -10,7 +10,7 @@ import com.zeyad.usecases.services.jobs.Post;
 import com.zeyad.usecases.stores.CloudDataStore;
 import com.zeyad.usecases.utils.Utils;
 
-import rx.Completable;
+import io.reactivex.Completable;
 
 class GenericJobServiceLogic {
     GenericJobServiceLogic() {

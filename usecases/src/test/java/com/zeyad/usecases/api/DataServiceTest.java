@@ -18,10 +18,10 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 
-import rx.Completable;
-import rx.Observable;
-import rx.Scheduler;
-import rx.android.schedulers.AndroidSchedulers;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.Scheduler;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -42,11 +42,11 @@ public class DataServiceTest {
     private DataStoreFactory dataStoreFactory;
     private GetRequest getRequest;
     private PostRequest postRequest;
-    private Observable observable;
+    private Flowable observable;
 
     @Before
     public void setUp() throws Exception {
-        observable = Observable.just(true);
+        observable = Flowable.just(true);
         postRequest = new PostRequest.Builder(Object.class, false).build();
         getRequest = new GetRequest.Builder(Object.class, false).build();
         dataStoreFactory = mock(DataStoreFactory.class);
@@ -59,7 +59,7 @@ public class DataServiceTest {
     @Test
     public void getList() throws Exception {
         when(dataStoreFactory.dynamically(anyString()).dynamicGetList(anyString(), any(Class.class),
-                anyBoolean(), anyBoolean())).thenReturn(Observable.just(Collections.EMPTY_LIST));
+                anyBoolean(), anyBoolean())).thenReturn(Flowable.just(Collections.EMPTY_LIST));
 
         dataService.getList(getRequest);
 
@@ -81,9 +81,9 @@ public class DataServiceTest {
     @Test
     public void getListOffLineFirst() throws Exception {
         when(dataStoreFactory.cloud().dynamicGetList(anyString(), any(Class.class),
-                anyBoolean(), anyBoolean())).thenReturn(Observable.just(Collections.EMPTY_LIST));
+                anyBoolean(), anyBoolean())).thenReturn(Flowable.just(Collections.EMPTY_LIST));
         when(dataStoreFactory.disk().dynamicGetList(anyString(), any(Class.class),
-                anyBoolean(), anyBoolean())).thenReturn(Observable.just(Collections.EMPTY_LIST));
+                anyBoolean(), anyBoolean())).thenReturn(Flowable.just(Collections.EMPTY_LIST));
 
         dataService.getListOffLineFirst(getRequest);
 
