@@ -49,14 +49,12 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public <M extends RealmModel> Flowable<M> getById(@NonNull final String idColumnName,
-                                                      final int itemId, Class dataClass) {
+    public <M> Flowable<M> getById(@NonNull final String idColumnName, final int itemId, Class dataClass) {
         return Flowable.defer(() -> {
-            int finalItemId = itemId;
-            if (finalItemId <= 0)
-                finalItemId = getMaxId(dataClass, idColumnName);
+            if (itemId <= 0)
+                return Flowable.error(new IllegalArgumentException("Id can not be less than Zero."));
             Realm realm = Realm.getDefaultInstance();
-            return Utils.getInstance().toV2Flowable(realm.where(dataClass).equalTo(idColumnName, finalItemId)
+            return Utils.getInstance().toFlowable(realm.where(dataClass).equalTo(idColumnName, itemId)
                     .findAll().asObservable()
                     .filter(results -> ((RealmResults) results).isLoaded())
                     .map(o -> realm.copyFromRealm((RealmResults) o))
@@ -74,7 +72,7 @@ public class RealmManager implements DataBaseManager {
     public <M> Flowable<List<M>> getAll(Class clazz) {
         return Flowable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
-            return Utils.getInstance().toV2Flowable(realm.where(clazz).findAll()
+            return Utils.getInstance().toFlowable(realm.where(clazz).findAll()
                     .asObservable()
                     .filter(results -> ((RealmResults) results).isLoaded())
                     .map(o -> realm.copyFromRealm((RealmResults) o))
@@ -94,7 +92,7 @@ public class RealmManager implements DataBaseManager {
     public <M extends RealmModel> Flowable<List<M>> getQuery(@NonNull RealmQueryProvider<M> queryFactory) {
         return Flowable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
-            return Utils.getInstance().toV2Flowable(queryFactory.create(realm).findAll().asObservable()
+            return Utils.getInstance().toFlowable(queryFactory.create(realm).findAll().asObservable()
                     .filter(RealmResults::isLoaded)
                     .map(realm::copyFromRealm)
                     .doOnUnsubscribe(() -> closeRealm(realm)));
@@ -231,7 +229,7 @@ public class RealmManager implements DataBaseManager {
             RealmModel toDelete = realm.where(clazz).equalTo(idFieldName, idFieldValue).findFirst();
             if (toDelete != null) {
 //                executeWriteOperationInRealm(realm, () -> RealmObject.deleteFromRealm(toDelete));
-                executeWriteOperationInRealm(realm, new Executor() {
+                executeWriteOperationInRealm(realm, new Execute() {
                     @Override
                     public void run() {
                         RealmObject.deleteFromRealm(toDelete);
@@ -272,11 +270,11 @@ public class RealmManager implements DataBaseManager {
         });
     }
 
-    private void executeWriteOperationInRealm(@NonNull Realm realm, @NonNull Executor executor) {
+    private void executeWriteOperationInRealm(@NonNull Realm realm, @NonNull Execute execute) {
         if (realm.isInTransaction())
             realm.cancelTransaction();
         realm.beginTransaction();
-        executor.run();
+        execute.run();
         realm.commitTransaction();
     }
 
@@ -311,23 +309,19 @@ public class RealmManager implements DataBaseManager {
         return jsonObject;
     }
 
-    private int getMaxId(Class clazz, String column) {
+    private int getNextId(Class clazz, String column) {
         Realm realm = Realm.getDefaultInstance();
         try {
             Number currentMax = realm.where(clazz).max(column);
             if (currentMax != null)
-                return currentMax.intValue();
-            else return 0;
+                return currentMax.intValue() + 1;
+            else return 1;
         } finally {
             realm.close();
         }
     }
 
-    private int getNextId(Class clazz, String column) {
-        return getMaxId(clazz, column) + 1;
-    }
-
-    private interface Executor {
+    private interface Execute {
         void run();
     }
 

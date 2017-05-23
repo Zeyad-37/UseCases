@@ -40,10 +40,10 @@ public class DiskDataStore implements DataStore {
     public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, int itemId,
                                             @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         if (Config.isWithCache() && Storo.contains(dataClass.getSimpleName() + itemId))
-            return Utils.getInstance().toV2Flowable(Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
+            return Utils.getInstance().toFlowable(Storo.get(dataClass.getSimpleName() + itemId, dataClass).async()
                     .map(object -> mEntityDataMapper.mapTo(object, dataClass)));
         else
-            return (Flowable<M>) mDataBaseManager.getById(idColumnName, itemId, dataClass)
+            return mDataBaseManager.<M>getById(idColumnName, itemId, dataClass)
                     .doOnEach(notification -> {
                         try {
                             if (Config.isWithCache() && !Storo.contains(dataClass.getSimpleName() + itemId))
