@@ -114,7 +114,7 @@ ext {
     androidSupportTest = '0.5'
     espressoCore = '2.2.2'
     powerMock = '1.6.6'
-    robolectric = '3.2.2'
+    robolectric = '3.3.2'
 }
 
 dependencies {
