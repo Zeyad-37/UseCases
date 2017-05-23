@@ -49,8 +49,8 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public <M extends RealmModel> Flowable<M> getById(@NonNull final String idColumnName,
-                                                      final int itemId, Class dataClass) {
+    public <M> Flowable<M> getById(@NonNull final String idColumnName,
+                                   final int itemId, Class dataClass) {
         return Flowable.defer(() -> {
             int finalItemId = itemId;
             if (finalItemId <= 0)

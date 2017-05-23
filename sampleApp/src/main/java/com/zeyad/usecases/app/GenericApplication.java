@@ -15,7 +15,6 @@ import com.zeyad.usecases.api.DataServiceConfig;
 import com.zeyad.usecases.api.DataServiceFactory;
 
 import java.security.MessageDigest;
-import java.util.concurrent.TimeUnit;
 
 import io.flowup.FlowUp;
 import io.realm.Realm;
@@ -90,11 +89,13 @@ public class GenericApplication extends Application {
 //        }
 //        LeakCanary.install(this);
 //        checkAppTampering(sInstance);
-        initializeRealm();
+//        initializeRealm();
+
         DataServiceFactory.init(new DataServiceConfig.Builder(this)
                 .baseUrl(API_BASE_URL)
-                .withCache(3, TimeUnit.MINUTES)
-                .withRealm()
+//                .withCache(3, TimeUnit.MINUTES)
+//                .withRealm()
+                .withRoom()
                 .build());
         initializeStetho();
         initializeFlowUp();
@@ -117,7 +118,7 @@ public class GenericApplication extends Application {
         Realm.init(this);
         Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
                 .name("app.realm")
-                .modules(Realm.getDefaultModule(), new LibraryModule())
+//                .modules(Realm.getDefaultModule(), new LibraryModule())
                 .rxFactory(new RealmObservableFactory())
                 .deleteRealmIfMigrationNeeded()
                 .build());

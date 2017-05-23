@@ -79,7 +79,7 @@ public class CloudDataStore implements DataStore {
      * @param apiConnection   The {@link RestApi} implementation to use.
      * @param dataBaseManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    CloudDataStore(ApiConnection apiConnection, DataBaseManager dataBaseManager, DAOMapper entityDataMapper) {
+    CloudDataStore(ApiConnection apiConnection, DataBaseManager dataBaseManager, @NonNull DAOMapper entityDataMapper) {
         mApiConnection = apiConnection;
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
@@ -90,7 +90,7 @@ public class CloudDataStore implements DataStore {
         Config.setCloudDataStore(this);
     }
 
-    CloudDataStore(ApiConnection apiConnection, DataBaseManager dataBaseManager, DAOMapper entityDataMapper,
+    CloudDataStore(ApiConnection apiConnection, DataBaseManager dataBaseManager, @NonNull DAOMapper entityDataMapper,
                    Context context) {
         mApiConnection = apiConnection;
         mEntityDataMapper = entityDataMapper;

@@ -10,13 +10,9 @@ import com.zeyad.usecases.app.screens.user_list.events.SearchUsersEvent;
 import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 
 import io.reactivex.Flowable;
-import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 
 import static com.zeyad.usecases.app.utils.Constants.URLS.USER;
@@ -52,24 +48,17 @@ public class UserListVM extends BaseViewModel<UserListState> {
     }
 
     public Flowable<List<User>> getUsers(long lastId) {
-        return lastId == 0 ? dataUseCase.getListOffLineFirst(new GetRequest.Builder(User.class, true)
-                .url(String.format(USERS, lastId))
-                .build()) : dataUseCase.getList(new GetRequest.Builder(User.class, true)
-                .url(String.format(USERS, lastId))
-                .build());
+        return lastId == 0 ? dataUseCase.<User>getList(new GetRequest.Builder(User.class, true)
+                .url(String.format(USERS, lastId)).build())
+                .doOnEach(listNotification -> dataUseCase.putListRoom(listNotification.getValue())) :
+                dataUseCase.getListRoom(User.class);
     }
 
     public Flowable<List<User>> search(String query) {
-        return dataUseCase.<User>queryDisk(realm -> realm.where(User.class).beginsWith(User.LOGIN, query))
-                .zipWith(dataUseCase.<User>getObject(new GetRequest.Builder(User.class, true)
-                                .url(String.format(USER, query))
-                                .build())
-                                .onErrorReturn(throwable -> null)
-                                .map(user -> user != null ? Collections.singletonList(user) : Collections.emptyList()),
-                        (BiFunction<List<User>, List<User>, List<User>>) (users, singleton) -> {
-                            users.addAll(singleton);
-                            return new ArrayList<>(new HashSet<>(users));
-                        });
+        return dataUseCase.<User>getList(new GetRequest.Builder(User.class, true)
+                .url(String.format(USER, query))
+                .build())
+                .onErrorReturn(throwable -> null);
     }
 
     public Flowable<List<Long>> deleteCollection(List<Long> selectedItemsIds) {

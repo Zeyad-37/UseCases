@@ -1,9 +1,11 @@
 package com.zeyad.usecases.api;
 
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
+import com.zeyad.usecases.db.room.GenericDatabase;
 import com.zeyad.usecases.mapper.DAOMapper;
 
 import java.util.concurrent.TimeUnit;
@@ -25,6 +27,7 @@ public class DataServiceConfig {
     private int cacheSize, cacheAmount;
     private TimeUnit timeUnit;
     private Scheduler postExecutionThread;
+    private GenericDatabase genericDatabase;
 
     private DataServiceConfig(@NonNull Builder dataUseCaseConfigBuilder) {
         context = dataUseCaseConfigBuilder.context;
@@ -37,14 +40,11 @@ public class DataServiceConfig {
         cacheAmount = dataUseCaseConfigBuilder.cacheAmount;
         timeUnit = dataUseCaseConfigBuilder.timeUnit;
         postExecutionThread = dataUseCaseConfigBuilder.postExecutionThread;
+        genericDatabase = dataUseCaseConfigBuilder.genericDatabase;
     }
 
     public Context getContext() {
         return context;
-    }
-
-    public void setContext(Context context) {
-        this.context = context;
     }
 
     @NonNull
@@ -89,6 +89,10 @@ public class DataServiceConfig {
         return timeUnit;
     }
 
+    GenericDatabase getGenericDatabase() {
+        return genericDatabase;
+    }
+
     @NonNull
     HandlerThread getHandlerThread() {
         return new HandlerThread("backgroundThread");
@@ -103,6 +107,7 @@ public class DataServiceConfig {
         private int cacheSize, cacheAmount;
         private TimeUnit timeUnit;
         private Scheduler postExecutionThread;
+        private GenericDatabase genericDatabase;
 
         public Builder(Context context) {
             this.context = context;
@@ -149,6 +154,11 @@ public class DataServiceConfig {
         @NonNull
         public Builder cacheSize(int cacheSize) {
             this.cacheSize = cacheSize;
+            return this;
+        }
+
+        public Builder withRoom() {
+            this.genericDatabase = Room.databaseBuilder(context, GenericDatabase.class, "test-db").build();
             return this;
         }
 

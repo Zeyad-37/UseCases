@@ -5,13 +5,11 @@ import com.zeyad.usecases.app.screens.user_list.User;
 
 import org.parceler.Parcel;
 
-import io.realm.RealmObject;
-
 /**
  * @author zeyad on 1/25/17.
  */
 @Parcel
-public class Repository extends RealmObject {
+public class Repository {
     @SerializedName("id")
     int id;
     @SerializedName("name")

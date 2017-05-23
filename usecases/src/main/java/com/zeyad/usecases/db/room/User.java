@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.screens.user_list;
+package com.zeyad.usecases.db.room;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
@@ -6,12 +6,9 @@ import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 /**
  * @author zeyad on 1/10/17.
  */
-@Parcel
 @Entity
 public class User {
 

@@ -2,7 +2,10 @@ package com.zeyad.usecases.api;
 
 import android.support.annotation.NonNull;
 
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.db.RealmQueryProvider;
+import com.zeyad.usecases.db.room.RoomManager;
+import com.zeyad.usecases.mapper.DAOMapper;
 import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;
@@ -42,6 +45,21 @@ class DataService implements IDataService {
         if (sDataService == null)
             throw new NullPointerException("DataUseCase#initRealm must be called before calling getInstance()");
         return sDataService;
+    }
+
+    @Override
+    public <M> Flowable<List<M>> getListRoom(Class dataClass) {
+        return new RoomManager(Config.getAppDatabase(), new DAOMapper()).getAll(dataClass)
+                .compose(applySchedulers());
+    }
+
+    @Override
+    public <M> Completable putListRoom(List<M> items) {
+        return new RoomManager(Config.getAppDatabase(), new DAOMapper()).putAll(items)
+                .compose(mPostThreadExist ? completable -> completable.subscribeOn(mBackgroundThread)
+                        .observeOn(mPostExecutionThread)
+                        .unsubscribeOn(mBackgroundThread) : completable -> completable.subscribeOn(mBackgroundThread)
+                        .unsubscribeOn(mBackgroundThread));
     }
 
     @Override

@@ -13,6 +13,10 @@ import io.reactivex.Flowable;
 
 public interface IDataService {
 
+    <M> Flowable<List<M>> getListRoom(Class dataClass);
+
+    <M> Completable putListRoom(List<M> items);
+
     /**
      * Gets list from getRequest.
      *
