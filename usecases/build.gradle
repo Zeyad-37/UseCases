@@ -49,7 +49,7 @@ buildscript {
 
     dependencies {
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'me.tatarka:gradle-retrolambda:3.4.0'
+        classpath 'me.tatarka:gradle-retrolambda:3.6.1'
         classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.10"
     }
 }
@@ -62,7 +62,7 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
-        multiDexEnabled true
+//        multiDexEnabled true
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
@@ -216,7 +216,6 @@ bintray {
     }
 }
 
-//apply from: '../tools/quality/quality.gradle'
 apply from: "$project.rootDir/tools/script-git-version.gradle"
 apply from: "$project.rootDir/tools/script-findbugs.gradle"
 apply from: "$project.rootDir/tools/script-pmd.gradle"
