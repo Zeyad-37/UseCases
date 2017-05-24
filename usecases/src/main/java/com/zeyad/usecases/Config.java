@@ -8,7 +8,6 @@ import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.zeyad.usecases.db.room.GenericDatabase;
 import com.zeyad.usecases.network.ApiConnection;
 import com.zeyad.usecases.stores.CloudDataStore;
 
@@ -29,7 +28,7 @@ public class Config {
     private static Scheduler backgroundThread;
     private static ApiConnection apiConnection;
     private static CloudDataStore cloudDataStore;
-    private static GenericDatabase appDatabase;
+    //    private static GenericDatabase appDatabase;
     private Context mContext;
     private boolean mUseApiWithCache;
 
@@ -145,13 +144,13 @@ public class Config {
         Config.cloudDataStore = cloudDataStore;
     }
 
-    public static GenericDatabase getAppDatabase() {
-        return appDatabase;
-    }
-
-    public static void setAppDatabase(GenericDatabase appDatabase) {
-        Config.appDatabase = appDatabase;
-    }
+//    public static GenericDatabase getAppDatabase() {
+//        return appDatabase;
+//    }
+//
+//    public static void setAppDatabase(GenericDatabase appDatabase) {
+//        Config.appDatabase = appDatabase;
+//    }
 
     private void setupRealm() {
 //        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()

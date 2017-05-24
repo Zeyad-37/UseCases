@@ -41,7 +41,7 @@ public class DataServiceFactory {
         Config.setBaseURL(config.getBaseUrl());
         Config.setWithCache(config.isWithCache());
         Config.setCacheExpiry(config.getCacheAmount(), config.getTimeUnit());
-        Config.setAppDatabase(config.getGenericDatabase());
+//        Config.setAppDatabase(config.getGenericDatabase());
         if (config.isWithCache())
             StoroBuilder.configure(config.getCacheSize())
                     .setDefaultCacheDirectory(config.getContext())

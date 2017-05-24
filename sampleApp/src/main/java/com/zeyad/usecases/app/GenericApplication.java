@@ -2,6 +2,7 @@ package com.zeyad.usecases.app;
 
 import android.annotation.TargetApi;
 import android.app.Application;
+import android.arch.persistence.room.Room;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -90,12 +91,12 @@ public class GenericApplication extends Application {
 //        LeakCanary.install(this);
 //        checkAppTampering(sInstance);
 //        initializeRealm();
-
+        UserDatabase gDb = Room.databaseBuilder(this, UserDatabase.class, "test-db").build();
         DataServiceFactory.init(new DataServiceConfig.Builder(this)
                 .baseUrl(API_BASE_URL)
 //                .withCache(3, TimeUnit.MINUTES)
 //                .withRealm()
-                .withRoom()
+//                .withRoom()
                 .build());
         initializeStetho();
         initializeFlowUp();

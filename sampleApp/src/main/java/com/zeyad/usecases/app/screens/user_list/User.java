@@ -6,13 +6,11 @@ import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
-import org.parceler.Parcel;
-
 /**
  * @author zeyad on 1/10/17.
  */
-@Parcel
-@Entity
+//@Parcel
+@Entity(tableName = "User")
 public class User {
 
     static final String LOGIN = "login";
@@ -31,6 +29,12 @@ public class User {
     String avatarUrl;
 
     public User() {
+    }
+
+    public User(String login, int id, String avatarUrl) {
+        this.login = login;
+        this.id = id;
+        this.avatarUrl = avatarUrl;
     }
 
     public static boolean isEmpty(User user) {
