@@ -30,11 +30,6 @@ public class RealmManager implements DataBaseManager {
             JSON_INVALID = "JSONObject is invalid", NO_ID = "Could not find id!";
     private static Handler backgroundHandler;
 
-    public RealmManager(Handler handler) {
-        if (backgroundHandler == null)
-            backgroundHandler = handler;
-    }
-
     public RealmManager(Looper backgroundLooper) {
         if (backgroundHandler == null)
             backgroundHandler = new Handler(backgroundLooper);
@@ -112,7 +107,8 @@ public class RealmManager implements DataBaseManager {
             return Completable.defer(() -> {
                 Realm realm = Realm.getDefaultInstance();
                 try {
-                    RealmModel result = executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmModel));
+                    RealmModel result = executeWriteOperationInRealm(realm,
+                            () -> realm.copyToRealmOrUpdate(realmModel));
                     if (RealmObject.isValid(result)) {
                         return Completable.complete();
                     } else
@@ -143,7 +139,8 @@ public class RealmManager implements DataBaseManager {
                 }
                 Realm realm = Realm.getDefaultInstance();
                 try {
-                    RealmModel result = executeWriteOperationInRealm(realm, () -> realm.createOrUpdateObjectFromJson(dataClass, jsonObject));
+                    RealmModel result = executeWriteOperationInRealm(realm,
+                            () -> realm.createOrUpdateObjectFromJson(dataClass, jsonObject));
                     if (RealmObject.isValid(result)) {
                         return Completable.complete();
                     } else
