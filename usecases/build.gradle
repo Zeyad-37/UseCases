@@ -63,12 +63,6 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
-    dexOptions {
-        preDexLibraries true
-        maxProcessCount 8
-        javaMaxHeapSize "3g"
-    }
-
     buildTypes {
         debug {
             debuggable true
@@ -76,23 +70,6 @@ android {
         }
         release {
 //            consumerProguardFiles 'proguard-project.txt'
-        }
-    }
-
-    productFlavors {
-        dev {
-            minSdkVersion 21 // To avoid using legacy multidex, set minSdkVersion to 21 or higher.
-//            versionNameSuffix "-dev"
-//            applicationIdSuffix '.dev'
-            resConfigs "en", "xxhdpi"
-            ext.alwaysUpdateBuildId = false
-        }
-
-        prod {
-            // If you've configured the defaultConfig block for the release version of
-            // your app, you can leave this block empty and Gradle uses configurations in
-            // the defaultConfig block instead. You still need to create this flavor.
-            // Otherwise, all variants use the "dev" flavor configurations.
         }
     }
 
