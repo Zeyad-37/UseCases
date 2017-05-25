@@ -35,12 +35,6 @@ android {
         testInstrumentationRunner "com.zeyad.usecases.integration.AndroidRobolectricRunner"
     }
 
-    dexOptions {
-        preDexLibraries true
-        maxProcessCount 8
-        javaMaxHeapSize "3g"
-    }
-
     buildTypes {
         debug {
             debuggable true
