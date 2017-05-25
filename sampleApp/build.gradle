@@ -5,7 +5,6 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'me.tatarka:gradle-retrolambda:3.6.1'
     }
 }
@@ -15,7 +14,6 @@ repositories {
 }
 
 apply plugin: 'com.android.application'
-apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'realm-android'
 
@@ -123,7 +121,7 @@ android {
 ext {
     supportLibraryVersion = '25.3.1'
     googlePlayVersion = '10.0.1'
-    butterKnifeVersion = '8.4.0'
+    butterKnifeVersion = '8.6.0'
     rxbindingVersion = '2.0.0'
     rxLifeCycle = '2.0.1'
     parcelerVersion = '1.1.1'
