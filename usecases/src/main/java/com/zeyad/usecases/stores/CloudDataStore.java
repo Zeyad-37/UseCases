@@ -79,24 +79,13 @@ public class CloudDataStore implements DataStore {
      * @param apiConnection   The {@link RestApi} implementation to use.
      * @param dataBaseManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    CloudDataStore(ApiConnection apiConnection, DataBaseManager dataBaseManager, DAOMapper entityDataMapper) {
-        mApiConnection = apiConnection;
-        mEntityDataMapper = entityDataMapper;
-        mDataBaseManager = dataBaseManager;
-        mContext = Config.getInstance().getContext();
-        mCanPersist = Config.isWithRealm();
-        mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
-        utils = Utils.getInstance();
-        Config.setCloudDataStore(this);
-    }
-
-    CloudDataStore(ApiConnection apiConnection, DataBaseManager dataBaseManager, DAOMapper entityDataMapper,
-                   Context context) {
+    CloudDataStore(ApiConnection apiConnection, DataBaseManager dataBaseManager, @NonNull DAOMapper entityDataMapper,
+                   @Nullable Context context) {
         mApiConnection = apiConnection;
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
         mContext = context;
-        mCanPersist = Config.isWithRealm();
+        mCanPersist = Config.isWithRealm() || Config.isWithSQLite();
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(mContext));
         utils = Utils.getInstance();
         Config.setCloudDataStore(this);

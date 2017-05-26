@@ -13,7 +13,7 @@ public class DAOMapper {
     private static DAOMapper sDAOMapper;
     public Gson gson;
 
-    public DAOMapper() {
+    private DAOMapper() {
         gson = Config.getGson();
     }
 

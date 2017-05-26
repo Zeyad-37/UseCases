@@ -42,189 +42,189 @@ public class DataServiceTest {
     private DataStoreFactory dataStoreFactory;
     private GetRequest getRequest;
     private PostRequest postRequest;
-    private Flowable observable;
+    private Flowable flowable;
 
     @Before
     public void setUp() throws Exception {
-        observable = Flowable.just(true);
+        flowable = Flowable.just(true);
         postRequest = new PostRequest.Builder(Object.class, false).build();
         getRequest = new GetRequest.Builder(Object.class, false).build();
         dataStoreFactory = mock(DataStoreFactory.class);
-        when(dataStoreFactory.dynamically(anyString())).thenReturn(mock(CloudDataStore.class));
-        when(dataStoreFactory.disk()).thenReturn(mock(DiskDataStore.class));
-        when(dataStoreFactory.cloud()).thenReturn(mock(CloudDataStore.class));
+        when(dataStoreFactory.dynamically(anyString(), Object.class)).thenReturn(mock(CloudDataStore.class));
+        when(dataStoreFactory.disk(Object.class)).thenReturn(mock(DiskDataStore.class));
+        when(dataStoreFactory.cloud(Object.class)).thenReturn(mock(CloudDataStore.class));
         dataService = new DataService(dataStoreFactory, AndroidSchedulers.mainThread(), mock(Scheduler.class));
     }
 
     @Test
     public void getList() throws Exception {
-        when(dataStoreFactory.dynamically(anyString()).dynamicGetList(anyString(), any(Class.class),
+        when(dataStoreFactory.dynamically(anyString(), Object.class).dynamicGetList(anyString(), any(Class.class),
                 anyBoolean(), anyBoolean())).thenReturn(Flowable.just(Collections.EMPTY_LIST));
 
         dataService.getList(getRequest);
 
-        verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicGetList(anyString(),
+        verify(dataStoreFactory.dynamically(anyString(), Object.class), times(1)).dynamicGetList(anyString(),
                 any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void getObject() throws Exception {
-        when(dataStoreFactory.dynamically(anyString()).dynamicGetObject(anyString(), anyString(),
-                anyInt(), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+        when(dataStoreFactory.dynamically(anyString(), Object.class).dynamicGetObject(anyString(), anyString(),
+                anyInt(), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(flowable);
 
         dataService.getObject(getRequest);
 
-        verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicGetObject(anyString(),
+        verify(dataStoreFactory.dynamically(anyString(), Object.class), times(1)).dynamicGetObject(anyString(),
                 anyString(), anyInt(), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void getListOffLineFirst() throws Exception {
-        when(dataStoreFactory.cloud().dynamicGetList(anyString(), any(Class.class),
+        when(dataStoreFactory.cloud(Object.class).dynamicGetList(anyString(), any(Class.class),
                 anyBoolean(), anyBoolean())).thenReturn(Flowable.just(Collections.EMPTY_LIST));
-        when(dataStoreFactory.disk().dynamicGetList(anyString(), any(Class.class),
+        when(dataStoreFactory.disk(Object.class).dynamicGetList(anyString(), any(Class.class),
                 anyBoolean(), anyBoolean())).thenReturn(Flowable.just(Collections.EMPTY_LIST));
 
         dataService.getListOffLineFirst(getRequest);
 
-        verify(dataStoreFactory.cloud(), times(1)).dynamicGetList(anyString(), any(Class.class),
+        verify(dataStoreFactory.cloud(Object.class), times(1)).dynamicGetList(anyString(), any(Class.class),
                 anyBoolean(), anyBoolean());
-        verify(dataStoreFactory.disk(), times(1)).dynamicGetList(anyString(), any(Class.class),
+        verify(dataStoreFactory.disk(Object.class), times(1)).dynamicGetList(anyString(), any(Class.class),
                 anyBoolean(), anyBoolean());
     }
 
     @Test
     public void getObjectOffLineFirst() throws Exception {
-        when(dataStoreFactory.cloud().dynamicGetObject(anyString(), anyString(),
-                anyInt(), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
-        when(dataStoreFactory.disk().dynamicGetObject(anyString(), anyString(),
-                anyInt(), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+        when(dataStoreFactory.cloud(Object.class).dynamicGetObject(anyString(), anyString(),
+                anyInt(), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(flowable);
+        when(dataStoreFactory.disk(Object.class).dynamicGetObject(anyString(), anyString(),
+                anyInt(), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(flowable);
 
         dataService.getObjectOffLineFirst(getRequest);
 
-        verify(dataStoreFactory.cloud(), times(1)).dynamicGetObject(anyString(),
+        verify(dataStoreFactory.cloud(Object.class), times(1)).dynamicGetObject(anyString(),
                 anyString(), anyInt(), any(Class.class), anyBoolean(), anyBoolean());
-        verify(dataStoreFactory.disk(), times(1)).dynamicGetObject(anyString(),
+        verify(dataStoreFactory.disk(Object.class), times(1)).dynamicGetObject(anyString(),
                 anyString(), anyInt(), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void patchObject() throws Exception {
-        when(dataStoreFactory.dynamically(anyString()).dynamicPatchObject(anyString(), anyString(),
-                any(JSONObject.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+        when(dataStoreFactory.dynamically(anyString(), Object.class).dynamicPatchObject(anyString(), anyString(),
+                any(JSONObject.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(flowable);
 
         dataService.patchObject(postRequest);
 
-        verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicPatchObject(anyString(),
+        verify(dataStoreFactory.dynamically(anyString(), Object.class), times(1)).dynamicPatchObject(anyString(),
                 anyString(), any(JSONObject.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void postObject() throws Exception {
-        when(dataStoreFactory.dynamically(anyString()).dynamicPostObject(anyString(), anyString(),
-                any(JSONObject.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+        when(dataStoreFactory.dynamically(anyString(), Object.class).dynamicPostObject(anyString(), anyString(),
+                any(JSONObject.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(flowable);
 
         dataService.postObject(postRequest);
 
-        verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicPostObject(anyString(),
+        verify(dataStoreFactory.dynamically(anyString(), Object.class), times(1)).dynamicPostObject(anyString(),
                 anyString(), any(JSONObject.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void postList() throws Exception {
-        when(dataStoreFactory.dynamically(anyString()).dynamicPostList(anyString(), anyString(),
-                any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+        when(dataStoreFactory.dynamically(anyString(), Object.class).dynamicPostList(anyString(), anyString(),
+                any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(flowable);
 
         dataService.postList(postRequest);
 
-        verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicPostList(anyString(),
+        verify(dataStoreFactory.dynamically(anyString(), Object.class), times(1)).dynamicPostList(anyString(),
                 anyString(), any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void putObject() throws Exception {
-        when(dataStoreFactory.dynamically(anyString()).dynamicPutObject(anyString(), anyString(),
-                any(JSONObject.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+        when(dataStoreFactory.dynamically(anyString(), Object.class).dynamicPutObject(anyString(), anyString(),
+                any(JSONObject.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(flowable);
 
         dataService.putObject(postRequest);
 
-        verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicPutObject(anyString(),
+        verify(dataStoreFactory.dynamically(anyString(), Object.class), times(1)).dynamicPutObject(anyString(),
                 anyString(), any(JSONObject.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void putList() throws Exception {
-        when(dataStoreFactory.dynamically(anyString()).dynamicPutList(anyString(), anyString(),
-                any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+        when(dataStoreFactory.dynamically(anyString(), Object.class).dynamicPutList(anyString(), anyString(),
+                any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(flowable);
 
         dataService.putList(postRequest);
 
-        verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicPutList(anyString(),
+        verify(dataStoreFactory.dynamically(anyString(), Object.class), times(1)).dynamicPutList(anyString(),
                 anyString(), any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void deleteItemById() throws Exception {
-        when(dataStoreFactory.dynamically(anyString()).dynamicDeleteCollection(anyString(), anyString(),
-                any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+        when(dataStoreFactory.dynamically(anyString(), Object.class).dynamicDeleteCollection(anyString(), anyString(),
+                any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(flowable);
 
         dataService.deleteItemById(postRequest);
 
-        verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicDeleteCollection(anyString(),
+        verify(dataStoreFactory.dynamically(anyString(), Object.class), times(1)).dynamicDeleteCollection(anyString(),
                 anyString(), any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void deleteCollection() throws Exception {
-        when(dataStoreFactory.dynamically(anyString()).dynamicDeleteCollection(anyString(), anyString(),
-                any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(observable);
+        when(dataStoreFactory.dynamically(anyString(), Object.class).dynamicDeleteCollection(anyString(), anyString(),
+                any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean())).thenReturn(flowable);
 
         dataService.deleteCollectionByIds(postRequest);
 
-        verify(dataStoreFactory.dynamically(anyString()), times(1)).dynamicDeleteCollection(anyString(),
+        verify(dataStoreFactory.dynamically(anyString(), Object.class), times(1)).dynamicDeleteCollection(anyString(),
                 anyString(), any(JSONArray.class), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void deleteAll() throws Exception {
-        when(dataStoreFactory.disk().dynamicDeleteAll(any(Class.class))).thenReturn(Completable.complete());
+        when(dataStoreFactory.disk(Object.class).dynamicDeleteAll(any(Class.class))).thenReturn(Completable.complete());
 
         dataService.deleteAll(postRequest);
 
-        verify(dataStoreFactory.disk(), times(1)).dynamicDeleteAll(any(Class.class));
+        verify(dataStoreFactory.disk(Object.class), times(1)).dynamicDeleteAll(any(Class.class));
     }
 
     @Test
     public void queryDisk() throws Exception {
-        when(dataStoreFactory.disk().queryDisk(any(RealmQueryProvider.class)))
-                .thenReturn(observable);
+        when(dataStoreFactory.disk(Object.class).queryDisk(any(RealmQueryProvider.class)))
+                .thenReturn(flowable);
 
         dataService.queryDisk(realm -> realm.where(TestRealmModel.class));
 
-        verify(dataStoreFactory.disk(), times(1)).queryDisk(any(RealmQueryProvider.class));
+        verify(dataStoreFactory.disk(Object.class), times(1)).queryDisk(any(RealmQueryProvider.class));
     }
 
     @Test
     public void uploadFile() throws Exception {
-        when(dataStoreFactory.cloud().dynamicUploadFile(anyString(), any(File.class),
+        when(dataStoreFactory.cloud(Object.class).dynamicUploadFile(anyString(), any(File.class),
                 anyString(), (HashMap<String, Object>) anyMap(), anyBoolean(), anyBoolean(),
-                anyBoolean(), any(Class.class))).thenReturn(observable);
+                anyBoolean(), any(Class.class))).thenReturn(flowable);
 
         dataService.uploadFile(new FileIORequest());
 
-        verify(dataStoreFactory.cloud(), times(1)).dynamicUploadFile(anyString(),
+        verify(dataStoreFactory.cloud(Object.class), times(1)).dynamicUploadFile(anyString(),
                 any(File.class), anyString(), (HashMap<String, Object>) anyMap(), anyBoolean(),
                 anyBoolean(), anyBoolean(), any(Class.class));
     }
 
     @Test
     public void downloadFile() throws Exception {
-        when(dataStoreFactory.cloud().dynamicDownloadFile(anyString(), any(File.class),
-                anyBoolean(), anyBoolean(), anyBoolean())).thenReturn(observable);
+        when(dataStoreFactory.cloud(Object.class).dynamicDownloadFile(anyString(), any(File.class),
+                anyBoolean(), anyBoolean(), anyBoolean())).thenReturn(flowable);
 
         dataService.downloadFile(new FileIORequest());
 
-        verify(dataStoreFactory.cloud(), times(1)).dynamicDownloadFile(anyString(),
+        verify(dataStoreFactory.cloud(Object.class), times(1)).dynamicDownloadFile(anyString(),
                 any(File.class), anyBoolean(), anyBoolean(), anyBoolean());
     }
 }

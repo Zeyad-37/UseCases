@@ -2,27 +2,25 @@ package com.zeyad.usecases.utils;
 
 import io.reactivex.Flowable;
 
-public final class ObservableV1ToFlowableV2<T> extends Flowable<T> {
+final class ObservableV1ToFlowableV2<T> extends Flowable<T> {
 
-    final rx.Observable<T> source;
+    private final rx.Observable<T> source;
 
-    public ObservableV1ToFlowableV2(rx.Observable<T> source) {
+    ObservableV1ToFlowableV2(rx.Observable<T> source) {
         this.source = source;
     }
 
     @Override
     protected void subscribeActual(org.reactivestreams.Subscriber<? super T> s) {
-        ObservableSubscriber<T> parent = new ObservableSubscriber<T>(s);
+        ObservableSubscriber<T> parent = new ObservableSubscriber<>(s);
         ObservableSubscriberSubscription parentSubscription = new ObservableSubscriberSubscription(parent);
         s.onSubscribe(parentSubscription);
-
         source.unsafeSubscribe(parent);
     }
 
-    static final class ObservableSubscriber<T> extends rx.Subscriber<T> {
+    private static final class ObservableSubscriber<T> extends rx.Subscriber<T> {
 
         final org.reactivestreams.Subscriber<? super T> actual;
-
         boolean done;
 
         ObservableSubscriber(org.reactivestreams.Subscriber<? super T> actual) {
@@ -68,7 +66,7 @@ public final class ObservableV1ToFlowableV2<T> extends Flowable<T> {
         }
     }
 
-    static final class ObservableSubscriberSubscription implements org.reactivestreams.Subscription {
+    private static final class ObservableSubscriberSubscription implements org.reactivestreams.Subscription {
 
         final ObservableSubscriber<?> parent;
 

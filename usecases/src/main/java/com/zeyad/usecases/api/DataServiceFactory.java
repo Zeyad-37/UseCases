@@ -11,6 +11,7 @@ import com.zeyad.usecases.Config;
 import com.zeyad.usecases.db.RealmManager;
 import com.zeyad.usecases.network.ApiConnection;
 import com.zeyad.usecases.stores.DataStoreFactory;
+import com.zeyad.usecases.utils.DataBaseManagerUtil;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import st.lowlevel.storo.StoroBuilder;
@@ -37,10 +38,14 @@ public class DataServiceFactory {
     public static void init(@NonNull DataServiceConfig config) {
         if (!doesContextBelongsToApplication(config.getContext()))
             throw new IllegalArgumentException("Context should be application context only.");
+        DataBaseManagerUtil dataBaseManagerUtil = config.getDataBaseManagerUtil();
+        boolean isSQLite = dataBaseManagerUtil != null;
         Config.init(config.getContext());
         Config.setBaseURL(config.getBaseUrl());
         Config.setWithCache(config.isWithCache());
         Config.setCacheExpiry(config.getCacheAmount(), config.getTimeUnit());
+        Config.setWithSQLite(isSQLite);
+        Config.setHasRealm(config.isWithRealm());
         if (config.isWithCache())
             StoroBuilder.configure(config.getCacheSize())
                     .setDefaultCacheDirectory(config.getContext())
@@ -53,9 +58,9 @@ public class DataServiceFactory {
         }
         ApiConnection apiConnection = new ApiConnection(ApiConnection.init(config.getOkHttpBuilder()),
                 ApiConnection.initWithCache(config.getOkHttpBuilder(), config.getOkHttpCache()));
-        sDataUseCase = new DataService(config.isWithCache() ?
-                new DataStoreFactory(new RealmManager(backgroundThread.getLooper()),
-                        apiConnection, config.getEntityMapper()) :
+        sDataUseCase = new DataService(config.isWithRealm() || isSQLite ?
+                new DataStoreFactory(isSQLite ? dataBaseManagerUtil : dataClass ->
+                        new RealmManager(backgroundThread.getLooper()), apiConnection, config.getEntityMapper()) :
                 new DataStoreFactory(apiConnection, config.getEntityMapper()), config.getPostExecutionThread(),
                 Config.getBackgroundThread());
         Config.setApiConnection(apiConnection);

@@ -5,6 +5,7 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.mapper.DAOMapper;
+import com.zeyad.usecases.utils.DataBaseManagerUtil;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,6 +26,7 @@ public class DataServiceConfig {
     private int cacheSize, cacheAmount;
     private TimeUnit timeUnit;
     private Scheduler postExecutionThread;
+    private DataBaseManagerUtil dataBaseManagerUtil;
 
     private DataServiceConfig(@NonNull Builder dataUseCaseConfigBuilder) {
         context = dataUseCaseConfigBuilder.context;
@@ -37,6 +39,7 @@ public class DataServiceConfig {
         cacheAmount = dataUseCaseConfigBuilder.cacheAmount;
         timeUnit = dataUseCaseConfigBuilder.timeUnit;
         postExecutionThread = dataUseCaseConfigBuilder.postExecutionThread;
+        dataBaseManagerUtil = dataUseCaseConfigBuilder.dataBaseManagerUtil;
     }
 
     public Context getContext() {
@@ -45,7 +48,7 @@ public class DataServiceConfig {
 
     @NonNull
     DAOMapper getEntityMapper() {
-        return new DAOMapper();
+        return DAOMapper.getInstance();
     }
 
     Scheduler getPostExecutionThread() {
@@ -85,6 +88,10 @@ public class DataServiceConfig {
         return timeUnit;
     }
 
+    DataBaseManagerUtil getDataBaseManagerUtil() {
+        return dataBaseManagerUtil;
+    }
+
     @NonNull
     HandlerThread getHandlerThread() {
         return new HandlerThread("backgroundThread");
@@ -99,6 +106,7 @@ public class DataServiceConfig {
         private int cacheSize, cacheAmount;
         private TimeUnit timeUnit;
         private Scheduler postExecutionThread;
+        private DataBaseManagerUtil dataBaseManagerUtil;
 
         public Builder(Context context) {
             this.context = context;
@@ -131,6 +139,7 @@ public class DataServiceConfig {
         @NonNull
         public Builder withRealm() {
             this.withRealm = true;
+            this.dataBaseManagerUtil = null;
             return this;
         }
 
@@ -145,6 +154,13 @@ public class DataServiceConfig {
         @NonNull
         public Builder cacheSize(int cacheSize) {
             this.cacheSize = cacheSize;
+            return this;
+        }
+
+        @NonNull
+        public Builder withSQLite(DataBaseManagerUtil dataBaseManagerUtil) {
+            this.dataBaseManagerUtil = dataBaseManagerUtil;
+            this.withRealm = false;
             return this;
         }
 

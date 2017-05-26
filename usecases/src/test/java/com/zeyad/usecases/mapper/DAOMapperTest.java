@@ -19,7 +19,7 @@ public class DAOMapperTest {
 
     @Before
     public void setUp() throws Exception {
-        daoMapper = new DAOMapper();
+        daoMapper = DAOMapper.getInstance();
     }
 
     @Test

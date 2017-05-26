@@ -4,14 +4,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.db.DataBaseManager;
 import com.zeyad.usecases.mapper.DAOMapper;
 import com.zeyad.usecases.network.ApiConnection;
+import com.zeyad.usecases.utils.DataBaseManagerUtil;
 
 public class DataStoreFactory {
     private final static String DB_NOT_ENABLED = "Database not enabled!", DB_MANAGER_NULL = "DataBaseManager cannot be null!";
     @Nullable
-    private DataBaseManager mDataBaseManager;
+    private DataBaseManagerUtil mDataBaseManager;
     private ApiConnection mApiConnection;
     private DAOMapper mDAOMapper;
 
@@ -21,7 +21,7 @@ public class DataStoreFactory {
         mDAOMapper = daoMapper;
     }
 
-    public DataStoreFactory(@Nullable DataBaseManager dataBaseManager, ApiConnection restApi, DAOMapper daoMapper) {
+    public DataStoreFactory(@Nullable DataBaseManagerUtil dataBaseManager, ApiConnection restApi, DAOMapper daoMapper) {
         if (dataBaseManager == null)
             throw new IllegalArgumentException(DB_MANAGER_NULL);
         Config.setHasRealm(true);
@@ -34,31 +34,32 @@ public class DataStoreFactory {
      * Create {@link DataStore} .
      */
     @NonNull
-    public DataStore dynamically(@NonNull String url) throws Exception {
+    public DataStore dynamically(@NonNull String url, Class dataClass) throws Exception {
         if (!url.isEmpty())
-            return cloud();
+            return cloud(dataClass);
         else if (mDataBaseManager == null)
             throw new IllegalAccessException(DB_NOT_ENABLED);
         else
-            return disk();
+            return disk(dataClass);
     }
 
     /**
      * Creates a disk {@link DataStore}.
      */
     @NonNull
-    public DataStore disk() throws IllegalAccessException {
+    public DataStore disk(Class dataClass) throws IllegalAccessException {
         if (!Config.isWithRealm() || mDataBaseManager == null) {
             throw new IllegalAccessException(DB_NOT_ENABLED);
         }
-        return new DiskDataStore(mDataBaseManager, mDAOMapper);
+        return new DiskDataStore(mDataBaseManager.getDataBaseManager(dataClass), mDAOMapper);
     }
 
     /**
      * Creates a cloud {@link DataStore}.
      */
     @NonNull
-    public DataStore cloud() {
-        return new CloudDataStore(mApiConnection, mDataBaseManager, mDAOMapper);
+    public DataStore cloud(Class dataClass) {
+        return new CloudDataStore(mApiConnection, mDataBaseManager.getDataBaseManager(dataClass),
+                mDAOMapper, Config.getInstance().getContext());
     }
 }

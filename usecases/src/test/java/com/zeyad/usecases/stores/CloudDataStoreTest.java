@@ -76,7 +76,7 @@ public class CloudDataStoreTest {
         when(mockDataBaseManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
         when(mockDataBaseManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
         when(mockDataBaseManager.putAll(anyList(), any(Class.class))).thenReturn(Completable.complete());
-        cloudDataStore = new CloudDataStore(mockApiConnection, mockDataBaseManager, new DAOMapper(), mockContext);
+        cloudDataStore = new CloudDataStore(mockApiConnection, mockDataBaseManager, DAOMapper.getInstance(), mockContext);
         HandlerThread backgroundThread = new HandlerThread("backgroundThread");
         backgroundThread.start();
         com.zeyad.usecases.Config.setBackgroundThread(AndroidSchedulers.from(backgroundThread.getLooper()));

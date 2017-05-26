@@ -32,7 +32,7 @@ public class Utils {
 
     private static Utils instance;
 
-    public Utils() {
+    private Utils() {
         instance = this;
     }
 

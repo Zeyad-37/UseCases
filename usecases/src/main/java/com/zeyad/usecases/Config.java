@@ -30,6 +30,7 @@ public class Config {
     private static CloudDataStore cloudDataStore;
     private Context mContext;
     private boolean mUseApiWithCache;
+    private static boolean withSQLite;
 
     private Config(@NonNull Context context) {
         mContext = context;
@@ -141,6 +142,14 @@ public class Config {
 
     public static void setCloudDataStore(CloudDataStore cloudDataStore) {
         Config.cloudDataStore = cloudDataStore;
+    }
+
+    public static boolean isWithSQLite() {
+        return withSQLite;
+    }
+
+    public static void setWithSQLite(boolean withSQLite) {
+        Config.withSQLite = withSQLite;
     }
 
     private void setupRealm() {
