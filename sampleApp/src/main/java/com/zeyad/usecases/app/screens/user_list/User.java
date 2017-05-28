@@ -2,14 +2,17 @@ package com.zeyad.usecases.app.screens.user_list;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
 import com.google.gson.annotations.SerializedName;
 
+import org.parceler.Parcel;
+
 /**
  * @author zeyad on 1/10/17.
  */
-//@Parcel
+@Parcel
 @Entity(tableName = "User")
 public class User {
 
@@ -28,6 +31,7 @@ public class User {
     @ColumnInfo(name = AVATAR_URL)
     String avatarUrl;
 
+    @Ignore
     public User() {
     }
 

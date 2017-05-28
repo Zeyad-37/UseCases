@@ -1,5 +1,4 @@
 apply plugin: 'com.android.library'
-apply plugin: 'com.neenbedankt.android-apt'
 apply plugin: 'me.tatarka.retrolambda'
 apply plugin: 'android-apt'
 apply plugin: 'maven'
@@ -10,8 +9,6 @@ apply plugin: 'com.github.dcendents.android-maven'
 
 apply plugin: "net.ltgt.errorprone"
 
-//def siteUrl = "https://github.com/Zeyad-37/UseCases"
-//def gitUrl = "https://github.com/Zeyad-37/UseCases.git"
 version = "1.0.1"
 group = "com.github.zeyad-37"
 
@@ -48,7 +45,6 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
         classpath 'me.tatarka:gradle-retrolambda:3.6.1'
         classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.10"
     }
