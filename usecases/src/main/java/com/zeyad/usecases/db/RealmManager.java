@@ -19,7 +19,6 @@ import io.reactivex.Flowable;
 import io.realm.Realm;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
-import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 /**
@@ -52,16 +51,18 @@ public class RealmManager implements DataBaseManager {
             if (itemIdL <= 0 && itemIdS == null)
                 return Flowable.error(new IllegalArgumentException("Id can not be less than Zero."));
             Realm realm = Realm.getDefaultInstance();
-            RealmQuery where = realm.where(dataClass);
-            RealmQuery realmQuery;
             if (itemIdS == null)
-                realmQuery = where.equalTo(idColumnName, itemIdL);
-            else realmQuery = where.equalTo(idColumnName, itemIdS);
-            return Utils.getInstance().toFlowable(realmQuery
-                    .findAll().asObservable()
-                    .filter(results -> ((RealmResults) results).isLoaded())
-                    .map(o -> realm.copyFromRealm((RealmResults) o))
-                    .doOnUnsubscribe(() -> closeRealm(realm)));
+                return Utils.getInstance().toFlowable(realm.where(dataClass).equalTo(idColumnName, itemIdL)
+                        .findAll().asObservable()
+                        .filter(results -> ((RealmResults) results).isLoaded())
+                        .map(o -> realm.copyFromRealm((RealmResults) o))
+                        .doOnUnsubscribe(() -> closeRealm(realm)));
+            else
+                return Utils.getInstance().toFlowable(realm.where(dataClass).equalTo(idColumnName, itemIdS)
+                        .findAll().asObservable()
+                        .filter(results -> ((RealmResults) results).isLoaded())
+                        .map(o -> realm.copyFromRealm((RealmResults) o))
+                        .doOnUnsubscribe(() -> closeRealm(realm)));
         });
     }
 

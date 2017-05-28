@@ -52,8 +52,8 @@ public class RealmManagerTest {
         RealmResults<TestRealmModel> realmResults = mock(RealmResults.class);
         Observable observable = Observable.just(realmResults);
         PowerMockito.when(mockRealm.where(TestRealmModel.class)).thenReturn(realmQuery);
-        PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", 1)).thenReturn(realmQuery);
-        PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", 1).findFirst()).thenReturn(new TestRealmModel());
+        PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", 1L)).thenReturn(realmQuery);
+        PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", 1L).findFirst()).thenReturn(new TestRealmModel());
         PowerMockito.when(mockRealm.where(TestRealmModel.class).findAll()).thenReturn(realmResults);
         PowerMockito.when(mockRealm.where(TestRealmModel.class).findAll().asObservable()).thenReturn(observable);
         PowerMockito.when(Realm.getDefaultInstance()).thenReturn(mockRealm);
@@ -70,7 +70,7 @@ public class RealmManagerTest {
 
     @Test
     public void getByIdLessThanOne() throws Exception {
-        Flowable flowable = mRealmManager.getById("id", 0, TestRealmModel.class);
+        Flowable flowable = mRealmManager.getById("id", 0L, null, TestRealmModel.class);
 
         TestSubscriber testSubscriber = new TestSubscriber();
         flowable.subscribe(testSubscriber);
@@ -81,7 +81,7 @@ public class RealmManagerTest {
 
     @Test
     public void getById() throws Exception {
-        Flowable flowable = mRealmManager.getById("id", 1, TestRealmModel.class);
+        Flowable flowable = mRealmManager.getById("id", 1L, null, TestRealmModel.class);
 
         applyTestSubscriber(flowable);
 

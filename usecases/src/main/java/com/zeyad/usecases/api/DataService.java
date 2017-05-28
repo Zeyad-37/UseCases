@@ -219,7 +219,7 @@ class DataService implements IDataService {
     @Override
     public <M> Flowable<List<M>> queryDisk(RealmQueryProvider realmQueryProvider) {
         try {
-            return mDataStoreFactory.disk(null).<M>queryDisk(realmQueryProvider) // FIXME: 5/25/17 pass correct parameter
+            return mDataStoreFactory.disk(Object.class).<M>queryDisk(realmQueryProvider)
                     .compose(ReplayingShare.instance())
                     .compose(applySchedulers());
         } catch (IllegalAccessException e) {
