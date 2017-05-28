@@ -16,6 +16,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.realm.Realm;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -41,7 +42,7 @@ public class RealmManager implements DataBaseManager {
     }
 
     /**
-     * Gets an {@link Flowable} which will emit an Object.
+     * Gets an {@link Observable} which will emit an Object.
      *
      * @param dataClass    Class type of the items to get.
      * @param idColumnName Name of the id field.
@@ -49,15 +50,13 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public <M> Flowable<M> getById(@NonNull final String idColumnName,
-                                   final int itemId, Class dataClass) {
+    public <M> Flowable<M> getById(@NonNull final String idColumnName, final int itemId, Class dataClass) {
         return Flowable.defer(() -> {
             int finalItemId = itemId;
             if (finalItemId <= 0)
                 finalItemId = getMaxId(dataClass, idColumnName);
             Realm realm = Realm.getDefaultInstance();
-            return Utils.getInstance().toV2Flowable(realm.where(dataClass).equalTo(idColumnName, finalItemId)
-                    .findAll().asObservable()
+            return Utils.getInstance().toV2Flowable(realm.where(dataClass).equalTo(idColumnName, finalItemId).findAll().asObservable()
                     .filter(results -> ((RealmResults) results).isLoaded())
                     .map(o -> realm.copyFromRealm((RealmResults) o))
                     .doOnUnsubscribe(() -> closeRealm(realm)));
@@ -65,7 +64,7 @@ public class RealmManager implements DataBaseManager {
     }
 
     /**
-     * Gets an {@link Flowable} which will emit a List of Objects.
+     * Gets an {@link Observable} which will emit a List of Objects.
      *
      * @param clazz Class type of the items to get.
      */
@@ -74,8 +73,7 @@ public class RealmManager implements DataBaseManager {
     public <M> Flowable<List<M>> getAll(Class clazz) {
         return Flowable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
-            return Utils.getInstance().toV2Flowable(realm.where(clazz).findAll()
-                    .asObservable()
+            return Utils.getInstance().toV2Flowable(realm.where(clazz).findAll().asObservable()
                     .filter(results -> ((RealmResults) results).isLoaded())
                     .map(o -> realm.copyFromRealm((RealmResults) o))
                     .doOnUnsubscribe(() -> closeRealm(realm)));
