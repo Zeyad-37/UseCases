@@ -47,7 +47,7 @@ public final class ReplayingShare<T>
         return new LastSeenFlowable<>(upstream.doOnNext(lastSeen).share(), lastSeen);
     }
 
-    static final class LastSeen<T> implements Consumer<T> {
+    private static final class LastSeen<T> implements Consumer<T> {
         volatile T value;
 
         @Override
@@ -56,7 +56,7 @@ public final class ReplayingShare<T>
         }
     }
 
-    static final class LastSeenObservable<T> extends Observable<T> {
+    private static final class LastSeenObservable<T> extends Observable<T> {
         private final Observable<T> upstream;
         private final LastSeen<T> lastSeen;
 
@@ -67,11 +67,11 @@ public final class ReplayingShare<T>
 
         @Override
         protected void subscribeActual(Observer<? super T> observer) {
-            upstream.subscribe(new LastSeenObserver<T>(observer, lastSeen));
+            upstream.subscribe(new LastSeenObserver<>(observer, lastSeen));
         }
     }
 
-    static final class LastSeenObserver<T> implements Observer<T> {
+    private static final class LastSeenObserver<T> implements Observer<T> {
         private final Observer<? super T> downstream;
         private final LastSeen<T> lastSeen;
 
@@ -106,7 +106,7 @@ public final class ReplayingShare<T>
         }
     }
 
-    static final class LastSeenFlowable<T> extends Flowable<T> {
+    private static final class LastSeenFlowable<T> extends Flowable<T> {
         private final Flowable<T> upstream;
         private final LastSeen<T> lastSeen;
 
@@ -117,11 +117,11 @@ public final class ReplayingShare<T>
 
         @Override
         protected void subscribeActual(Subscriber<? super T> subscriber) {
-            upstream.subscribe(new LastSeenSubscriber<T>(subscriber, lastSeen));
+            upstream.subscribe(new LastSeenSubscriber<>(subscriber, lastSeen));
         }
     }
 
-    static final class LastSeenSubscriber<T> implements Subscriber<T>, Subscription {
+    private static final class LastSeenSubscriber<T> implements Subscriber<T>, Subscription {
         private final Subscriber<? super T> downstream;
         private final LastSeen<T> lastSeen;
 

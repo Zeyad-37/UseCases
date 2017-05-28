@@ -58,14 +58,13 @@ import static com.zeyad.usecases.requests.PostRequest.PUT;
 
 public class CloudDataStore implements DataStore {
 
-    public static final String APPLICATION_JSON = "application/json", MULTIPART_FORM_DATA = "multipart/form-data";
-    private static final String TAG = CloudDataStore.class.getSimpleName(),
+    public static final String APPLICATION_JSON = "application/json";
+    private static final String TAG = CloudDataStore.class.getSimpleName(), MULTIPART_FORM_DATA = "multipart/form-data",
             NO_INTERNET_NOT_PERSISTED = "Could not reach server and could not persist to queue!";
     private static final int COUNTER_START = 1, ATTEMPTS = 3;
     private final DataBaseManager mDataBaseManager;
     @NonNull
     private final DAOMapper mEntityDataMapper;
-    @Nullable
     private final Context mContext;
     private final ApiConnection mApiConnection;
     @NonNull
@@ -80,7 +79,7 @@ public class CloudDataStore implements DataStore {
      * @param dataBaseManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
     CloudDataStore(ApiConnection apiConnection, DataBaseManager dataBaseManager, @NonNull DAOMapper entityDataMapper,
-                   @Nullable Context context) {
+                   Context context) {
         mApiConnection = apiConnection;
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
@@ -97,8 +96,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, int itemId, @NonNull Class dataClass,
-                                            boolean persist, boolean shouldCache) {
+    public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Long itemIdL, String itemIdS,
+                                            @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         return mApiConnection.<M>dynamicGetObject(url, shouldCache)
                 .doOnNext(m -> {
                     if (willPersist(persist))
@@ -109,7 +108,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<List<M>> dynamicGetList(String url, @NonNull Class dataClass, boolean persist, boolean shouldCache) {
+    public <M> Flowable<List<M>> dynamicGetList(String url, @NonNull Class dataClass, boolean persist,
+                                                boolean shouldCache) {
         return mApiConnection.dynamicGetList(url, shouldCache)
                 .map(entities -> mEntityDataMapper.<List<M>>mapAllTo(entities, dataClass))
                 .doOnNext(list -> {
@@ -121,7 +121,8 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Flowable<M> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                              @NonNull Class dataClass, boolean persist, boolean queuable) {
+                                              @NonNull Class dataClass, Class responseType, boolean persist,
+                                              boolean queuable) {
         return Flowable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonObject, idColumnName, dataClass);
@@ -132,7 +133,7 @@ public class CloudDataStore implements DataStore {
                 return getErrorFlowableNotPersisted();
             return mApiConnection.<M>dynamicPatch(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
-                    .map(object -> daoMapHelper(dataClass, object))
+                    .map(object -> daoMapHelper(responseType, object))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PATCH, url, idColumnName, jsonObject, persist);
@@ -146,7 +147,8 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Flowable<M> dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                             @NonNull Class dataClass, boolean persist, boolean queuable) {
+                                             @NonNull Class dataClass, Class responseType, boolean persist,
+                                             boolean queuable) {
         return Flowable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonObject, idColumnName, dataClass);
@@ -157,7 +159,7 @@ public class CloudDataStore implements DataStore {
                 return getErrorFlowableNotPersisted();
             return mApiConnection.<M>dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
-                    .map(object -> daoMapHelper(dataClass, object))
+                    .map(object -> daoMapHelper(responseType, object))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(POST, url, idColumnName, jsonObject, persist);
@@ -171,7 +173,8 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Flowable<M> dynamicPostList(String url, String idColumnName, @NonNull JSONArray jsonArray,
-                                           @NonNull Class dataClass, boolean persist, boolean queuable) {
+                                           @NonNull Class dataClass, Class responseType,
+                                           boolean persist, boolean queuable) {
         return Flowable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonArray, idColumnName, dataClass);
@@ -182,7 +185,7 @@ public class CloudDataStore implements DataStore {
                 return getErrorFlowableNotPersisted();
             return mApiConnection.<M>dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
-                    .map(object -> daoMapHelper(dataClass, object))
+                    .map(object -> daoMapHelper(responseType, object))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(POST, url, idColumnName, jsonArray, persist);
@@ -196,7 +199,8 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Flowable<M> dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                            @NonNull Class dataClass, boolean persist, boolean queuable) {
+                                            @NonNull Class dataClass, Class responseType,
+                                            boolean persist, boolean queuable) {
         return Flowable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonObject, idColumnName, dataClass);
@@ -207,7 +211,7 @@ public class CloudDataStore implements DataStore {
                 return getErrorFlowableNotPersisted();
             return mApiConnection.<M>dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
-                    .map(object -> daoMapHelper(dataClass, object))
+                    .map(object -> daoMapHelper(responseType, object))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PUT, url, idColumnName, jsonObject, persist);
@@ -221,7 +225,8 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Flowable<M> dynamicPutList(String url, String idColumnName, @NonNull JSONArray jsonArray,
-                                          @NonNull Class dataClass, boolean persist, boolean queuable) {
+                                          @NonNull Class dataClass, Class responseType,
+                                          boolean persist, boolean queuable) {
         return Flowable.defer(() -> {
             if (willPersist(persist))
                 persistGeneric(jsonArray, idColumnName, dataClass);
@@ -232,7 +237,7 @@ public class CloudDataStore implements DataStore {
                 return getErrorFlowableNotPersisted();
             return mApiConnection.<M>dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
-                    .map(object -> daoMapHelper(dataClass, object))
+                    .map(object -> daoMapHelper(responseType, object))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PUT, url, idColumnName, jsonArray, persist);
@@ -246,7 +251,8 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Flowable<M> dynamicDeleteCollection(String url, String idColumnName, @NonNull JSONArray jsonArray,
-                                                   @NonNull Class dataClass, boolean persist, boolean queuable) {
+                                                   @NonNull Class dataClass, Class responseType,
+                                                   boolean persist, boolean queuable) {
         return Flowable.defer(() -> {
             List<Long> ids = Utils.getInstance().convertToListOfId(jsonArray);
             if (willPersist(persist))
@@ -258,7 +264,7 @@ public class CloudDataStore implements DataStore {
                 return getErrorFlowableNotPersisted();
             return mApiConnection.<M>dynamicDelete(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
-                    .map(object -> daoMapHelper(dataClass, object))
+                    .map(object -> daoMapHelper(responseType, object))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
                             queuePost(PostRequest.DELETE, url, idColumnName, jsonArray, persist);

@@ -3,6 +3,7 @@ package com.zeyad.usecases.requests;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.zeyad.usecases.Config;
 
@@ -24,17 +25,18 @@ public class GetRequest implements Parcelable {
         }
     };
     private static final String DEFAULT_ID_KEY = "id";
-    private String url, idColumnName;
+    private String url, idColumnName, itemIdS;
     private Class dataClass;
     private boolean persist, shouldCache;
-    private int itemId;
+    private long itemIdL;
 
     private GetRequest(@NonNull Builder builder) {
         url = builder.mUrl;
         dataClass = builder.mDataClass;
         persist = builder.mPersist;
         idColumnName = builder.mIdColumnName;
-        itemId = builder.mItemId;
+        itemIdL = builder.mItemId;
+        itemIdS = builder.mItemIdS;
         shouldCache = builder.mShouldCache;
     }
 
@@ -44,7 +46,7 @@ public class GetRequest implements Parcelable {
         this.dataClass = (Class) in.readSerializable();
         this.persist = in.readByte() != 0;
         this.shouldCache = in.readByte() != 0;
-        this.itemId = in.readInt();
+        this.itemIdL = in.readInt();
     }
 
     @NonNull
@@ -69,8 +71,13 @@ public class GetRequest implements Parcelable {
         return idColumnName != null ? idColumnName : DEFAULT_ID_KEY;
     }
 
-    public int getItemId() {
-        return itemId;
+    public long getItemIdL() {
+        return itemIdL;
+    }
+
+    @Nullable
+    public String getItemIdS() {
+        return itemIdS;
     }
 
     @Override
@@ -85,13 +92,13 @@ public class GetRequest implements Parcelable {
         dest.writeSerializable(this.dataClass);
         dest.writeByte(this.persist ? (byte) 1 : (byte) 0);
         dest.writeByte(this.shouldCache ? (byte) 1 : (byte) 0);
-        dest.writeInt(this.itemId);
+        dest.writeLong(this.itemIdL);
     }
 
     public static class Builder {
-        private int mItemId;
+        private long mItemId;
         private boolean mShouldCache, mPersist;
-        private String mIdColumnName, mUrl;
+        private String mIdColumnName, mUrl, mItemIdS;
         private Class mDataClass;
 
         public Builder(Class dataClass, boolean persist) {
@@ -124,8 +131,14 @@ public class GetRequest implements Parcelable {
         }
 
         @NonNull
-        public Builder id(int id) {
+        public Builder id(long id) {
             mItemId = id;
+            return this;
+        }
+
+        @NonNull
+        public Builder id(String id) {
+            mItemIdS = id;
             return this;
         }
 

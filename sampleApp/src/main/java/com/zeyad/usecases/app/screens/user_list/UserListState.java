@@ -11,6 +11,7 @@ import java.util.List;
 @Parcel
 public class UserListState {
     List<User> users;
+    long lastId;
 
     UserListState() {
         users = new ArrayList<>();
@@ -18,6 +19,7 @@ public class UserListState {
 
     private UserListState(Builder builder) {
         users = builder.users;
+        lastId = builder.lastId;
     }
 
     static Builder builder() {
@@ -28,14 +30,24 @@ public class UserListState {
         return users;
     }
 
+    long getLastId() {
+        return lastId;
+    }
+
     static class Builder {
         List<User> users;
+        long lastId;
 
         Builder() {
         }
 
         Builder setUsers(List<User> value) {
             users = value;
+            return this;
+        }
+
+        Builder lastId(long value) {
+            lastId = value;
             return this;
         }
 

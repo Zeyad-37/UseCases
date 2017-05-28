@@ -42,7 +42,7 @@ public class ApiConnectionTest {
     }
 
     @NonNull
-    String getValidUrl() {
+    private String getValidUrl() {
         return "http://www.google.com";
     }
 

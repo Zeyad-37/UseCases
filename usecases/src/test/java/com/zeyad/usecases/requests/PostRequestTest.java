@@ -51,7 +51,7 @@ public class PostRequestTest {
 
     @Test
     public void testGetDataClass() throws Exception {
-        assertThat(mPostRequest.getDataClass(), is(equalTo(DATA_CLASS)));
+        assertThat(mPostRequest.getRequestType(), is(equalTo(DATA_CLASS)));
     }
 
     @Test

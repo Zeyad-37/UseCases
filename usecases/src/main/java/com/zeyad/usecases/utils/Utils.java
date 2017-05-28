@@ -96,7 +96,6 @@ public class Utils {
         Log.d("FBJD", String.format("%s file request is queued successfully!", isDownload ? "Download" : "Upload"));
     }
 
-    @Nullable
     public List<Long> convertToListOfId(@Nullable JSONArray jsonArray) {
         List<Long> idList = new ArrayList<>();
         if (jsonArray != null && jsonArray.length() > 0) {

@@ -54,7 +54,7 @@ public class Post {
         switch (mPostRequest.getMethod()) {
             case PostRequest.PATCH:
                 return Completable.fromObservable(mRestApi.dynamicPatch(mPostRequest.getUrl(), requestBody)
-                        .doOnSubscribe(subscription -> Log.d(TAG, "Patching " + mPostRequest.getDataClass()
+                        .doOnSubscribe(subscription -> Log.d(TAG, "Patching " + mPostRequest.getRequestType()
                                 .getSimpleName()))
                         .doOnError(throwable -> {
                             queuePost();
@@ -65,7 +65,7 @@ public class Post {
             case PostRequest.POST:
                 if (isObject)
                     return Completable.fromObservable(mRestApi.dynamicPost(mPostRequest.getUrl(), requestBody)
-                            .doOnSubscribe(subscription -> Log.d(TAG, "Posting " + mPostRequest.getDataClass()
+                            .doOnSubscribe(subscription -> Log.d(TAG, "Posting " + mPostRequest.getRequestType()
                                     .getSimpleName()))
                             .doOnError(throwable -> {
                                 queuePost();
@@ -76,7 +76,7 @@ public class Post {
                 else
                     return Completable.fromObservable(mRestApi.dynamicPost(mPostRequest.getUrl(), listRequestBody)
                             .doOnSubscribe(subscription -> Log.d(TAG, "Posting List of " + mPostRequest
-                                    .getDataClass().getSimpleName()))
+                                    .getRequestType().getSimpleName()))
                             .doOnError(throwable -> {
                                 queuePost();
                                 throwable.printStackTrace();
@@ -86,7 +86,7 @@ public class Post {
             case PostRequest.PUT:
                 if (isObject)
                     return Completable.fromObservable(mRestApi.dynamicPut(mPostRequest.getUrl(), requestBody)
-                            .doOnSubscribe(subscription -> Log.d(TAG, "Putting " + mPostRequest.getDataClass()
+                            .doOnSubscribe(subscription -> Log.d(TAG, "Putting " + mPostRequest.getRequestType()
                                     .getSimpleName()))
                             .doOnError(throwable -> {
                                 queuePost();
@@ -96,7 +96,7 @@ public class Post {
                             .toObservable());
                 else
                     return Completable.fromObservable(mRestApi.dynamicPut(mPostRequest.getUrl(), listRequestBody)
-                            .doOnSubscribe(subscription -> Log.d(TAG, "Putting List of " + mPostRequest.getDataClass()
+                            .doOnSubscribe(subscription -> Log.d(TAG, "Putting List of " + mPostRequest.getRequestType()
                                     .getSimpleName()))
                             .doOnError(throwable -> {
                                 queuePost();
@@ -107,7 +107,7 @@ public class Post {
             case PostRequest.DELETE:
                 if (isObject)
                     return Completable.fromObservable(mRestApi.dynamicDelete(mPostRequest.getUrl(), requestBody)
-                            .doOnSubscribe(subscription -> Log.d(TAG, "Deleting " + mPostRequest.getDataClass()
+                            .doOnSubscribe(subscription -> Log.d(TAG, "Deleting " + mPostRequest.getRequestType()
                                     .getSimpleName()))
                             .doOnError(throwable -> {
                                 queuePost();
@@ -118,7 +118,7 @@ public class Post {
                 else
                     return Completable.fromObservable(mRestApi.dynamicDelete(mPostRequest.getUrl(), listRequestBody)
                             .doOnSubscribe(subscription -> Log.d(TAG, "Deleting List of " + mPostRequest
-                                    .getDataClass().getSimpleName()))
+                                    .getRequestType().getSimpleName()))
                             .doOnError(throwable -> {
                                 queuePost();
                                 throwable.printStackTrace();

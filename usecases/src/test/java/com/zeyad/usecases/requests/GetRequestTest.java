@@ -65,6 +65,6 @@ public class GetRequestTest {
 
     @Test
     public void testGetItemId() throws Exception {
-        assertThat(mGetRequest.getItemId(), is(equalTo(ID_COLUMN_ID)));
+        assertThat(mGetRequest.getItemIdL(), is(equalTo(ID_COLUMN_ID)));
     }
 }

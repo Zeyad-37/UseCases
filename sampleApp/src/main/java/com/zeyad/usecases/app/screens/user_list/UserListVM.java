@@ -61,10 +61,11 @@ public class UserListVM extends BaseViewModel<UserListState> {
 
     public Flowable<List<User>> search(String query) {
         return dataUseCase.<User>queryDisk(realm -> realm.where(User.class).beginsWith(User.LOGIN, query))
-                .zipWith(dataUseCase.<User>getObject(new GetRequest.Builder(User.class, true)
+                .zipWith(dataUseCase.<User>getObject(new GetRequest.Builder(User.class, false)
                                 .url(String.format(USER, query))
                                 .build())
-                                .onErrorReturn(throwable -> null)
+                                .onErrorReturnItem(new User())
+                                .filter(user -> user.getId() != 0)
                                 .map(user -> user != null ? Collections.singletonList(user) : Collections.emptyList()),
                         (BiFunction<List<User>, List<User>, List<User>>) (users, singleton) -> {
                             users.addAll(singleton);

@@ -19,6 +19,7 @@ import io.reactivex.Flowable;
 import io.realm.Realm;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
+import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
 /**
@@ -40,16 +41,23 @@ public class RealmManager implements DataBaseManager {
      *
      * @param dataClass    Class type of the items to get.
      * @param idColumnName Name of the id field.
-     * @param itemId       The user id to retrieve data.
+     * @param itemIdL      The item id to retrieve data.
+     * @param itemIdS      The item id to retrieve data.
      */
     @NonNull
     @Override
-    public <M> Flowable<M> getById(@NonNull final String idColumnName, final int itemId, Class dataClass) {
+    public <M> Flowable<M> getById(@NonNull final String idColumnName, final Long itemIdL, final String itemIdS,
+                                   Class dataClass) {
         return Flowable.defer(() -> {
-            if (itemId <= 0)
+            if (itemIdL <= 0 && itemIdS == null)
                 return Flowable.error(new IllegalArgumentException("Id can not be less than Zero."));
             Realm realm = Realm.getDefaultInstance();
-            return Utils.getInstance().toFlowable(realm.where(dataClass).equalTo(idColumnName, itemId)
+            RealmQuery where = realm.where(dataClass);
+            RealmQuery realmQuery;
+            if (itemIdS == null)
+                realmQuery = where.equalTo(idColumnName, itemIdL);
+            else realmQuery = where.equalTo(idColumnName, itemIdS);
+            return Utils.getInstance().toFlowable(realmQuery
                     .findAll().asObservable()
                     .filter(results -> ((RealmResults) results).isLoaded())
                     .map(o -> realm.copyFromRealm((RealmResults) o))
@@ -171,7 +179,8 @@ public class RealmManager implements DataBaseManager {
             }
             Realm realm = Realm.getDefaultInstance();
             try {
-                executeWriteOperationInRealm(realm, () -> realm.createOrUpdateAllFromJson(dataClass, jsonArray));
+                executeWriteOperationInRealm(realm,
+                        () -> realm.createOrUpdateAllFromJson(dataClass, jsonArray));
                 return Completable.complete();
             } finally {
                 closeRealm(realm);

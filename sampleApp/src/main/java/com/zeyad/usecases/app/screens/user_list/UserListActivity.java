@@ -53,6 +53,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 /**
  * An activity representing a list of Repos. This activity
@@ -76,7 +77,6 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     private ActionMode actionMode;
     private String currentFragTag;
     private boolean twoPane;
-    private long lastId;
 
     public static Intent getCallingIntent(Context context) {
         return new Intent(context, UserListActivity.class);
@@ -96,14 +96,18 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                 while (each.hasNext()) if (resultList.contains((long) each.next().getId()))
                     each.remove();
             }
-            lastId = users.get(users.size() - 1).getId();
             users = new ArrayList<>(new HashSet<>(users));
+            int lastId = users.get(users.size() - 1).getId();
             Collections.sort(users, (user1, user2) -> String.valueOf(user1.getId())
                     .compareTo(String.valueOf(user2.getId())));
-            return UserListState.builder().setUsers(users).build();
+            return UserListState.builder()
+                    .setUsers(users)
+                    .lastId(lastId)
+                    .build();
         }, null, DataServiceFactory.getInstance());
-        events = Observable.<BaseEvent>just(new GetPaginatedUsersEvent(0))
-                .doOnEach(notification -> Log.d("GetUsersEvent", "fired!"));
+        events = Single.<BaseEvent>just(new GetPaginatedUsersEvent(0))
+                .doOnSuccess(event -> Log.d("GetUsersEvent", "fired!"))
+                .toObservable();
         rxEventBus.toFlowable()
                 .compose(bindToLifecycle())
                 .subscribe(stream -> events.mergeWith((Observable<DeleteUsersEvent>) stream)
@@ -212,12 +216,12 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                     int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
                     return (layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount
                             && firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE ?
-                            new GetPaginatedUsersEvent(lastId) : new GetPaginatedUsersEvent(-1);
+                            new GetPaginatedUsersEvent(viewState.getLastId()) : new GetPaginatedUsersEvent(-1);
                 })
                 .filter(usersNextPageEvent -> usersNextPageEvent.getLastId() != -1)
                 .throttleLast(200, TimeUnit.MILLISECONDS)
                 .debounce(300, TimeUnit.MILLISECONDS)
-                .doOnNext(searchUsersEvent -> Log.d("nextPageEvent", "fired!"))));
+                .doOnNext(searchUsersEvent -> Log.d("NextPageEvent", "fired!"))));
     }
 
     @Override
@@ -240,9 +244,9 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
         events = events.mergeWith(RxSearchView.queryTextChanges(mSearchView)
                 .filter(charSequence -> !charSequence.toString().isEmpty())
                 .map(query -> new SearchUsersEvent(query.toString()))
-                .doOnNext(searchUsersEvent -> Log.d("searchEvent", "eventFired")))
                 .throttleLast(100, TimeUnit.MILLISECONDS)
-                .debounce(200, TimeUnit.MILLISECONDS);
+                .debounce(200, TimeUnit.MILLISECONDS)
+                .doOnNext(searchUsersEvent -> Log.d("SearchEvent", "eventFired")));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -273,7 +277,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                 .map(click -> new DeleteUsersEvent(usersAdapter.getSelectedItemsIds()))
                 .doOnEach(notification -> {
                     actionMode.finish();
-                    Log.d("deleteEvent", "fired!");
+                    Log.d("DeleteEvent", "fired!");
                 })));
         rxEventBus.send(events);
         return true;

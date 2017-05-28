@@ -121,37 +121,41 @@ mDataService.<Order>getList(new GetRequest
 Post/Put Object:
 ```
 mDataService.<MyResponse>postObject(new PostRequest // putObject
-        .PostRequestBuilder(MyResult.class, true) // Type of expected server response
+        .PostRequestBuilder(Payload.class, true) // Type of expected server response
         .idColumnName(Order.ID) // for persistance
         .url(URL) // remove for DB access
         .payLoad(order) // or HashMap / JSONObject
+        .responseType(MyResponse.class)
         .build());
 ```
 Post/Put List:
 ```
 mDataService.<MyResponse>postList(new PostRequest // putList
-        .PostRequestBuilder(MyResponse.class, true) // Type of expected server response
+        .PostRequestBuilder(Payload.class, true) // Type of expected server response
         .payLoad(orders)
         .idColumnName(Order.ID) // for persistance
         .url(URL) // remove for DB access
+        .responseType(MyResponse.class)
         .build())
 ```
 Delete Collection
 ```
 mDataService().<MyResponse>deleteCollectionByIds(new PostRequest // putList
-        .PostRequestBuilder(Order.class, true)
+        .PostRequestBuilder(Payload.class, true)
         .payLoad(ids)
         .idColumnName(Order.ID) // for persistance
         .url(URL) // remove for DB access
+        .responseType(MyResponse.class)
         .build())
 ```
 Delete Item:
 ```
 mDataService().<MyResponse>deleteCollectionByIds(new PostRequest // putList
-        .PostRequestBuilder(Order.class, true)
+        .PostRequestBuilder(Payload.class, true)
         .payLoad(id)
         .idColumnName(Order.ID) // for persistance
         .url(URL) // remove for DB access
+        .responseType(MyResponse.class)
         .build())
 ```
 Delete All from DB:
@@ -167,7 +171,7 @@ mDataService.<MyResponse>uploadFile(new FileIORequest
         .FileIORequestBuilder(FULL_URL, new File()) // always full url
         .onWifi(true)
         .whileCharging(false)
-        .dataClass(Order.class)
+        .responseType(MyResponse.class)
         .build())
 ```
 Download File
@@ -176,7 +180,7 @@ mDataService.downloadFile(new FileIORequest
         .FileIORequestBuilder(FULL_URL, new File())
         .onWifi(true)
         .whileCharging(false)
-        .dataClass(Order.class)
+        .requestType(Order.class)
         .build())
 ```
 # Contributors

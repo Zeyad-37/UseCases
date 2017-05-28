@@ -21,10 +21,11 @@ public interface DataBaseManager {
      *
      * @param clazz        Class type of the items to get.
      * @param idColumnName Name of the id field.
-     * @param userId       The user id to retrieve data.
+     * @param itemIdL      The item id to retrieve data.
+     * @param itemIdS      The item id to retrieve data.
      */
     @NonNull
-    <M> Flowable<M> getById(String idColumnName, int userId, Class clazz);
+    <M> Flowable<M> getById(String idColumnName, Long itemIdL, String itemIdS, Class clazz);
 
     /**
      * Gets an {@link Flowable} which will emit a List of Objects.

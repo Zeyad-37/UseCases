@@ -24,9 +24,9 @@ import io.reactivex.Flowable;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyListOf;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -63,11 +63,11 @@ public class DiskDataStoreTest {
     @Test
     public void testGetObject() {
         Flowable observable = Flowable.just(new TestRealmModel());
-        when(dbManager.getById(anyString(), anyInt(), any(Class.class))).thenReturn(observable);
+        when(dbManager.getById(anyString(), anyLong(), anyString(), any(Class.class))).thenReturn(observable);
 
-        mDiskDataStore.dynamicGetObject("", "", 0, Object.class, false, false);
+        mDiskDataStore.dynamicGetObject("", "", 0L, "", Object.class, false, false);
 
-        Mockito.verify(dbManager, times(1)).getById(anyString(), anyInt(), any(Class.class));
+        Mockito.verify(dbManager, times(1)).getById(anyString(), anyLong(), anyString(), any(Class.class));
     }
 
     @Test
@@ -92,7 +92,7 @@ public class DiskDataStoreTest {
     public void testDynamicDeleteCollection() {
         when(dbManager.evictCollection(anyString(), anyList(), any(Class.class))).thenReturn(Completable.complete());
 
-        mDiskDataStore.dynamicDeleteCollection("", "", new JSONArray(), Object.class, false, false);
+        mDiskDataStore.dynamicDeleteCollection("", "", new JSONArray(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).evictCollection(anyString(), anyListOf(Long.class), any(Class.class));
     }
@@ -101,7 +101,7 @@ public class DiskDataStoreTest {
     public void testDynamicPatchObject() throws Exception {
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
 
-        mDiskDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, false, false);
+        mDiskDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).put(any(JSONObject.class), anyString(), any(Class.class));
     }
@@ -110,7 +110,7 @@ public class DiskDataStoreTest {
     public void testDynamicPostObject() throws Exception {
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
 
-        mDiskDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, false, false);
+        mDiskDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).put(any(JSONObject.class), anyString(), any(Class.class));
     }
@@ -119,7 +119,7 @@ public class DiskDataStoreTest {
     public void testDynamicPutObject() throws Exception {
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
 
-        mDiskDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, false, false);
+        mDiskDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).put(any(JSONObject.class), anyString(), any(Class.class));
     }
@@ -128,7 +128,7 @@ public class DiskDataStoreTest {
     public void testDynamicPostList() throws Exception {
         when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
 
-        mDiskDataStore.dynamicPostList("", "", new JSONArray(), Object.class, false, false);
+        mDiskDataStore.dynamicPostList("", "", new JSONArray(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).putAll(any(JSONArray.class), anyString(), any(Class.class));
     }
@@ -137,7 +137,7 @@ public class DiskDataStoreTest {
     public void testDynamicPutList() throws Exception {
         when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
 
-        mDiskDataStore.dynamicPutList("", "", new JSONArray(), Object.class, false, false);
+        mDiskDataStore.dynamicPutList("", "", new JSONArray(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).putAll(any(JSONArray.class), anyString(), any(Class.class));
     }
