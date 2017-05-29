@@ -70,7 +70,7 @@ public class ApiConnection {
     @NonNull
     static HttpLoggingInterceptor provideHttpLoggingInterceptor() {
         return new HttpLoggingInterceptor(message -> Log.d("NetworkInfo", message))
-                .setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.HEADERS);
+                .setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE);
     }
 
     private static Interceptor provideCacheInterceptor() {

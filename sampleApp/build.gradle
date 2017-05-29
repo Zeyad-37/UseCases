@@ -157,9 +157,9 @@ dependencies {
 //    testCompile 'org.mockito:mockito-core:2.0.57-beta'
 }
 
-//apply from: "$project.rootDir/tools/script-git-version.gradle"
-//apply from: "$project.rootDir/tools/script-findbugs.gradle"
-//apply from: "$project.rootDir/tools/script-pmd.gradle"
-//apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
-//apply from: "$project.rootDir/tools/script-infer.gradle"
-//apply from: "$project.rootDir/tools/script-check-style.gradle"
+apply from: "$project.rootDir/tools/script-git-version.gradle"
+apply from: "$project.rootDir/tools/script-findbugs.gradle"
+apply from: "$project.rootDir/tools/script-pmd.gradle"
+apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
+apply from: "$project.rootDir/tools/script-infer.gradle"
+apply from: "$project.rootDir/tools/script-check-style.gradle"

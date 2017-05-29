@@ -11,6 +11,7 @@ import android.os.StrictMode;
 import android.util.Base64;
 import android.util.Log;
 
+import com.rollbar.android.Rollbar;
 import com.zeyad.usecases.api.DataServiceConfig;
 import com.zeyad.usecases.api.DataServiceFactory;
 
@@ -18,6 +19,8 @@ import java.security.MessageDigest;
 import java.util.concurrent.TimeUnit;
 
 import io.flowup.FlowUp;
+import io.reactivex.Completable;
+import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.rx.RealmObservableFactory;
@@ -83,21 +86,18 @@ public class GenericApplication extends Application {
     public void onCreate() {
         initializeStrictMode();
         super.onCreate();
-//        if (LeakCanary.isInAnalyzerProcess(this)) {
-//            // This process is dedicated to LeakCanary for heap analysis.
-//            // You should not init your app in this process.
-//            return;
-//        }
-//        LeakCanary.install(this);
-//        checkAppTampering(sInstance);
+        Completable.fromAction(() -> {
+            checkAppTampering(this);
+            initializeFlowUp();
+            Rollbar.init(this, "c8c8b4cb1d4f4650a77ae1558865ca87", "production");
+        }).subscribeOn(Schedulers.io()).subscribe(() -> {
+        }, Throwable::printStackTrace);
         initializeRealm();
         DataServiceFactory.init(new DataServiceConfig.Builder(this)
                 .baseUrl(API_BASE_URL)
                 .withCache(3, TimeUnit.MINUTES)
                 .withRealm()
                 .build());
-        initializeStetho();
-        initializeFlowUp();
     }
 
     private void initializeStrictMode() {
@@ -121,21 +121,6 @@ public class GenericApplication extends Application {
                 .rxFactory(new RealmObservableFactory())
                 .deleteRealmIfMigrationNeeded()
                 .build());
-    }
-
-    private void initializeStetho() {
-//        Stetho.initialize(Stetho.newInitializerBuilder(this)
-//                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-//                .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-//                .build());
-//        RealmInspectorModulesProvider.builder(this)
-//                .withFolder(getCacheDir())
-////                .withEncryptionKey("encrypted.realm", key)
-//                .withMetaTables()
-//                .withDescendingOrder()
-//                .withLimit(1000)
-//                .databaseNamePattern(Pattern.compile(".+\\.realm"))
-//                .build();
     }
 
     private void initializeFlowUp() {
