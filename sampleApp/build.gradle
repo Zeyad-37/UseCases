@@ -71,7 +71,7 @@ android {
     lintOptions {
         //lint rules of conduct
         warningsAsErrors true
-        abortOnError true
+        abortOnError false
         htmlReport true
         //locations for the rules and output
         lintConfig file("${rootDir}/config/lint/lint-config.xml")

@@ -71,7 +71,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         else if (position == mDataList.size() - 1 && !mIsLoadingFooterAdded && hasFooter())
             return ItemInfo.FOOTER;
         else
-            return mDataList != null ? mDataList.get(position).getLayoutId() : 0;
+            return mDataList.get(position).getLayoutId();
     }
 
     @Override

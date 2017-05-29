@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.screens.user_list.events;
+package com.zeyad.usecases.app.screens.userList.events;
 
 import com.zeyad.usecases.app.components.redux.BaseEvent;
 

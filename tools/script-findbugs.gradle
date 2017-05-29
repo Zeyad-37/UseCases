@@ -2,7 +2,7 @@ apply plugin: 'findbugs'
 
 def reportsDir = "${project.buildDir}/reports"
 check.dependsOn 'findbugs'
-task findbugs(type: FindBugs, dependsOn: "assembleDebug") {
+task findbugs(type: FindBugs, group: 'Verification', dependsOn: "assembleDebug") {
     ignoreFailures = false
     effort = "max"
     reportLevel = "high"

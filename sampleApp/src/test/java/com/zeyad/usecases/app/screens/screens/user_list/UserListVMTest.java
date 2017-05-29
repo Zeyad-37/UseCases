@@ -2,8 +2,8 @@ package com.zeyad.usecases.app.screens.screens.user_list;
 
 import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
-import com.zeyad.usecases.app.screens.user_list.User;
-import com.zeyad.usecases.app.screens.user_list.UserListVM;
+import com.zeyad.usecases.app.screens.userList.User;
+import com.zeyad.usecases.app.screens.userList.UserListVM;
 import com.zeyad.usecases.db.RealmQueryProvider;
 import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;

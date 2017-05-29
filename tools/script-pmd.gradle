@@ -2,7 +2,7 @@ apply plugin: 'pmd'
 
 def reportsDir = "${project.buildDir}/reports"
 check.dependsOn 'pmd'
-task pmd(type: Pmd, dependsOn: "assembleDebug") {
+task pmd(type: Pmd, group: 'Verification', description: 'Runs code pmd checks', dependsOn: "assembleDebug") {
     ignoreFailures = false
     ruleSetFiles = files("$project.rootDir/tools/rules-pmd.xml")
     ruleSets = []

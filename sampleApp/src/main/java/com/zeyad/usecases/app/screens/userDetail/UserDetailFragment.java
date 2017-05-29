@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.screens.user_detail;
+package com.zeyad.usecases.app.screens.userDetail;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -30,8 +30,8 @@ import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.redux.BaseFragment;
-import com.zeyad.usecases.app.screens.user_list.User;
-import com.zeyad.usecases.app.screens.user_list.UserListActivity;
+import com.zeyad.usecases.app.screens.userList.User;
+import com.zeyad.usecases.app.screens.userList.UserListActivity;
 import com.zeyad.usecases.app.utils.Utils;
 
 import org.parceler.Parcels;

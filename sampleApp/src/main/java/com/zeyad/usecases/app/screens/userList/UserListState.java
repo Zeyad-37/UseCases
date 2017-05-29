@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.screens.user_list;
+package com.zeyad.usecases.app.screens.userList;
 
 import org.parceler.Parcel;
 

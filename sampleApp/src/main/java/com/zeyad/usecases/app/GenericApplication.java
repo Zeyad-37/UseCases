@@ -44,7 +44,7 @@ public class GenericApplication extends Application {
                 final String currentSignature = Base64.encodeToString(md.digest(), Base64.DEFAULT);
                 Log.d("REMOVE_ME", "Include this string as a value for SIGNATURE:" + currentSignature);
                 //compare signatures
-                if (java.security.CryptoPrimitive.SIGNATURE.equals(currentSignature)) {
+                if (java.security.CryptoPrimitive.SIGNATURE.toString().equals(currentSignature)) {
                     return true;
                 }
             }

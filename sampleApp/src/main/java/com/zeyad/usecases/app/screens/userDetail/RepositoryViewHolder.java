@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.screens.user_detail;
+package com.zeyad.usecases.app.screens.userDetail;
 
 import android.view.View;
 import android.widget.TextView;

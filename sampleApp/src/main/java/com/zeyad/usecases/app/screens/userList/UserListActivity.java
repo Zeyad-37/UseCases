@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.screens.user_list;
+package com.zeyad.usecases.app.screens.userList;
 
 import android.app.ActivityOptions;
 import android.app.SearchManager;
@@ -32,14 +32,14 @@ import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.redux.BaseActivity;
 import com.zeyad.usecases.app.components.redux.BaseEvent;
 import com.zeyad.usecases.app.components.redux.UISubscriber;
-import com.zeyad.usecases.app.screens.user_detail.UserDetailActivity;
-import com.zeyad.usecases.app.screens.user_detail.UserDetailFragment;
-import com.zeyad.usecases.app.screens.user_detail.UserDetailState;
-import com.zeyad.usecases.app.screens.user_list.events.DeleteUsersEvent;
-import com.zeyad.usecases.app.screens.user_list.events.GetPaginatedUsersEvent;
-import com.zeyad.usecases.app.screens.user_list.events.SearchUsersEvent;
-import com.zeyad.usecases.app.screens.user_list.view_holders.EmptyViewHolder;
-import com.zeyad.usecases.app.screens.user_list.view_holders.UserViewHolder;
+import com.zeyad.usecases.app.screens.userDetail.UserDetailActivity;
+import com.zeyad.usecases.app.screens.userDetail.UserDetailFragment;
+import com.zeyad.usecases.app.screens.userDetail.UserDetailState;
+import com.zeyad.usecases.app.screens.userList.events.DeleteUsersEvent;
+import com.zeyad.usecases.app.screens.userList.events.GetPaginatedUsersEvent;
+import com.zeyad.usecases.app.screens.userList.events.SearchUsersEvent;
+import com.zeyad.usecases.app.screens.userList.viewHolders.EmptyViewHolder;
+import com.zeyad.usecases.app.screens.userList.viewHolders.UserViewHolder;
 import com.zeyad.usecases.app.utils.Utils;
 
 import java.util.ArrayList;

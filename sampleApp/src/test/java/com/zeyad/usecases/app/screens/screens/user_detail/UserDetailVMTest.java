@@ -2,9 +2,9 @@ package com.zeyad.usecases.app.screens.screens.user_detail;
 
 import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
-import com.zeyad.usecases.app.screens.user_detail.Repository;
-import com.zeyad.usecases.app.screens.user_detail.UserDetailState;
-import com.zeyad.usecases.app.screens.user_detail.UserDetailVM;
+import com.zeyad.usecases.app.screens.userDetail.Repository;
+import com.zeyad.usecases.app.screens.userDetail.UserDetailState;
+import com.zeyad.usecases.app.screens.userDetail.UserDetailVM;
 import com.zeyad.usecases.db.RealmQueryProvider;
 
 import org.junit.Before;
