@@ -18,7 +18,7 @@ import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 
-public class Config {
+public final class Config {
     private static Config sInstance;
     private static Gson mGson;
     private static String mBaseURL;
@@ -28,9 +28,9 @@ public class Config {
     private static Scheduler backgroundThread;
     private static ApiConnection apiConnection;
     private static CloudDataStore cloudDataStore;
+    private static boolean withSQLite;
     private Context mContext;
     private boolean mUseApiWithCache;
-    private static boolean withSQLite;
 
     private Config(@NonNull Context context) {
         mContext = context;
@@ -61,8 +61,9 @@ public class Config {
     }
 
     public static Config getInstance() {
-        if (sInstance == null)
+        if (sInstance == null) {
             init();
+        }
         return sInstance;
     }
 
@@ -83,8 +84,9 @@ public class Config {
     }
 
     public static Gson getGson() {
-        if (mGson == null)
+        if (mGson == null) {
             mGson = createGson();
+        }
         return mGson;
     }
 

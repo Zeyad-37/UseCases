@@ -22,6 +22,7 @@ import st.lowlevel.storo.Storo;
 
 public class DiskDataStore implements DataStore {
     private static final String IO_DB_ERROR = "Can not file IO to local DB";
+    private final boolean withCache;
     private DataBaseManager mDataBaseManager;
     private DAOMapper mEntityDataMapper;
 
@@ -33,6 +34,7 @@ public class DiskDataStore implements DataStore {
     DiskDataStore(DataBaseManager realmManager, DAOMapper entityDataMapper) {
         mDataBaseManager = realmManager;
         mEntityDataMapper = entityDataMapper;
+        withCache = Config.isWithCache();
     }
 
     @NonNull
@@ -40,20 +42,19 @@ public class DiskDataStore implements DataStore {
     public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Long itemIdL, String itemIdS,
                                             @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         String key = dataClass.getSimpleName() + (itemIdL == null ? itemIdS : String.valueOf(itemIdL));
-        if (Config.isWithCache() && Storo.contains(key))
-            return Utils.getInstance().toFlowable(Storo.get(key, dataClass).async()
-                    .map(object -> mEntityDataMapper.mapTo(object, dataClass)));
-        else
-            return mDataBaseManager.<M>getById(idColumnName, itemIdL, itemIdS, dataClass)
-                    .doOnEach(notification -> {
-                        try {
-                            if (Config.isWithCache() && !Storo.contains(key))
-                                cacheObject(idColumnName, new JSONObject(gson.toJson(notification.getValue())),
-                                        dataClass);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    });
+        return withCache && Storo.contains(key) ? Utils.getInstance().toFlowable(Storo.get(key, dataClass).async()
+                .map(object -> mEntityDataMapper.mapTo(object, dataClass))) :
+                mDataBaseManager.<M>getById(idColumnName, itemIdL, itemIdS, dataClass)
+                        .doOnEach(notification -> {
+                            try {
+                                if (withCache && !Storo.contains(key)) {
+                                    cacheObject(idColumnName, new JSONObject(gson.toJson(notification.getValue())),
+                                            dataClass);
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        });
     }
 
     @NonNull
@@ -82,10 +83,11 @@ public class DiskDataStore implements DataStore {
         List<Long> convertToListOfId = Utils.getInstance().convertToListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
                 .doOnEvent(object -> {
-                    if (Config.isWithCache()) {
+                    if (withCache) {
                         for (int i = 0, convertToListOfIdSize = convertToListOfId != null ? convertToListOfId.size() : 0;
-                             i < convertToListOfIdSize; i++)
+                             i < convertToListOfIdSize; i++) {
                             Storo.delete(dataClass.getSimpleName() + convertToListOfId.get(i));
+                        }
                     }
                 }).toFlowable();
     }
@@ -97,8 +99,9 @@ public class DiskDataStore implements DataStore {
                                        boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnEvent(object -> {
-                    if (Config.isWithCache())
+                    if (withCache) {
                         cacheObject(idColumnName, jsonObject, dataClass);
+                    }
                 }).toFlowable();
     }
 
@@ -109,8 +112,9 @@ public class DiskDataStore implements DataStore {
                                       boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnEvent(object -> {
-                    if (Config.isWithCache())
+                    if (withCache) {
                         cacheObject(idColumnName, jsonObject, dataClass);
+                    }
                 }).toFlowable();
     }
 
@@ -128,8 +132,9 @@ public class DiskDataStore implements DataStore {
                                      boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnEvent(object -> {
-                    if (Config.isWithCache())
+                    if (withCache) {
                         cacheObject(idColumnName, jsonObject, dataClass);
+                    }
                 }).toFlowable();
     }
 

@@ -18,14 +18,14 @@ import io.reactivex.Completable;
  * @author Zeyad on 6/05/16.
  */
 public class FileIO {
-    private static final String TAG = FileIO.class.getSimpleName();
+    private static final String TAG = FileIO.class.getSimpleName(), ON_ERROR = "onError";
     private static int mTrailCount;
     @NonNull
     private final FirebaseJobDispatcher mDispatcher;
     private final FileIORequest mFileIORequest;
     private final CloudDataStore mCloudDataStore;
     private final Utils mUtils;
-    private boolean mIsDownload;
+    private final boolean mIsDownload;
 
     public FileIO(int trailCount, FileIORequest payLoad, Context context, boolean isDownload,
                   CloudDataStore cloudDataStore, Utils utils) {
@@ -44,18 +44,17 @@ public class FileIO {
                 .dynamicDownloadFile(mFileIORequest.getUrl(), file, mFileIORequest.onWifi(),
                         mFileIORequest.isWhileCharging(), mFileIORequest.isQueuable())
                 .doOnSubscribe(subscription -> Log.d(TAG, "Downloading " + file.getName()))
-                .doOnError(throwable -> {
-                    queueIOFile();
-                    throwable.printStackTrace();
-                }).toObservable()) : Completable.fromObservable(mCloudDataStore
+                .doOnError(this::onError).toObservable()) : Completable.fromObservable(mCloudDataStore
                 .dynamicUploadFile(mFileIORequest.getUrl(), file, mFileIORequest.getKey(),
                         mFileIORequest.getParameters(), mFileIORequest.onWifi(), mFileIORequest.isWhileCharging(),
                         mFileIORequest.isQueuable(), mFileIORequest.getDataClass())
                 .doOnSubscribe(subscription -> Log.d(TAG, "Uploading " + file.getName()))
-                .doOnError(throwable -> {
-                    queueIOFile();
-                    throwable.printStackTrace();
-                }).toObservable());
+                .doOnError(this::onError).toObservable());
+    }
+
+    private void onError(Throwable throwable) {
+        queueIOFile();
+        Log.e(TAG, ON_ERROR, throwable);
     }
 
     void queueIOFile() {

@@ -24,10 +24,9 @@ import javax.net.ssl.X509TrustManager;
  */
 public class TLSSocketFactory extends SSLSocketFactory {
 
-    private SSLSocketFactory internalSSLSocketFactory;
+    private final SSLSocketFactory internalSSLSocketFactory;
 
     public TLSSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
-
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(null, new TrustManager[]{systemDefaultTrustManager()}, null);
         internalSSLSocketFactory = sslContext.getSocketFactory();
@@ -75,8 +74,9 @@ public class TLSSocketFactory extends SSLSocketFactory {
 
     @Nullable
     private Socket enableTLSOnSocket(@Nullable Socket socket) {
-        if (socket != null && (socket instanceof SSLSocket))
+        if (socket != null && (socket instanceof SSLSocket)) {
             ((SSLSocket) socket).setEnabledProtocols(new String[]{"TLSv1.1", "TLSv1.2"});
+        }
         return socket;
     }
 
@@ -87,9 +87,10 @@ public class TLSSocketFactory extends SSLSocketFactory {
                     .getDefaultAlgorithm());
             trustManagerFactory.init((KeyStore) null);
             TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-            if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager))
+            if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
                 throw new IllegalStateException("Unexpected default trust managers:"
                         + Arrays.toString(trustManagers));
+            }
             return (X509TrustManager) trustManagers[0];
         } catch (GeneralSecurityException e) {
             throw new AssertionError(); // The system has no TLS. Just give up.

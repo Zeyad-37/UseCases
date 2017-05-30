@@ -141,7 +141,9 @@ public final class ReplayingShare<T>
 
         @Override
         public void request(long amount) {
-            if (amount == 0) return;
+            if (amount == 0) {
+                return;
+            }
 
             if (first) {
                 first = false;

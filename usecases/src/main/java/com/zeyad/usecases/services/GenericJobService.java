@@ -35,16 +35,18 @@ public class GenericJobService extends JobService {
 
     @Override
     public boolean onStopJob(@NonNull JobParameters params) {
-        if (disposable != null && !disposable.isDisposed())
+        if (disposable != null && !disposable.isDisposed()) {
             disposable.dispose();
+        }
         Log.i(TAG, "on stop job: " + params.getTag());
         return true; // Answers the question: "Should this job be retried?"
     }
 
     @Override
     public void onDestroy() {
-        if (disposable != null && !disposable.isDisposed())
+        if (disposable != null && !disposable.isDisposed()) {
             disposable.dispose();
+        }
         super.onDestroy();
     }
 }

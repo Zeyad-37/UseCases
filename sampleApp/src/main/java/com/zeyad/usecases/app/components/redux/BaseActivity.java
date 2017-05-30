@@ -106,12 +106,16 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
     public void addFragment(int containerViewId, Fragment fragment, String currentFragTag,
                             List<Pair<View, String>> sharedElements) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        if (sharedElements != null)
-            for (Pair<View, String> pair : sharedElements)
+        if (sharedElements != null) {
+            for (Pair<View, String> pair : sharedElements) {
                 fragmentTransaction.addSharedElement(pair.first, pair.second);
-        if (currentFragTag == null || currentFragTag.isEmpty())
+            }
+        }
+        if (currentFragTag == null || currentFragTag.isEmpty()) {
             fragmentTransaction.addToBackStack(fragment.getTag());
-        else fragmentTransaction.addToBackStack(currentFragTag);
+        } else {
+            fragmentTransaction.addToBackStack(currentFragTag);
+        }
         fragmentTransaction.add(containerViewId, fragment, fragment.getTag()).commit();
     }
 
@@ -137,7 +141,9 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends RxApp
     public void showSnackBarMessage(View view, String message, int duration) {
         if (view != null) {
             SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_INFO, view, message, duration).show();
-        } else throw new NullPointerException("View is null");
+        } else {
+            throw new IllegalArgumentException("View is null");
+        }
     }
 
     public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,

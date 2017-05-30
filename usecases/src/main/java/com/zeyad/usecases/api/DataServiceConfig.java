@@ -18,15 +18,15 @@ import okhttp3.OkHttpClient;
  */
 public class DataServiceConfig {
 
-    private Context context;
-    private OkHttpClient.Builder okHttpBuilder;
-    private Cache okHttpCache;
-    private String baseUrl;
-    private boolean withCache, withRealm;
-    private int cacheSize, cacheAmount;
-    private TimeUnit timeUnit;
-    private Scheduler postExecutionThread;
-    private DataBaseManagerUtil dataBaseManagerUtil;
+    private final Context context;
+    private final OkHttpClient.Builder okHttpBuilder;
+    private final Cache okHttpCache;
+    private final String baseUrl;
+    private final boolean withCache, withRealm;
+    private final int cacheSize, cacheAmount;
+    private final TimeUnit timeUnit;
+    private final Scheduler postExecutionThread;
+    private final DataBaseManagerUtil dataBaseManagerUtil;
 
     private DataServiceConfig(@NonNull Builder dataUseCaseConfigBuilder) {
         context = dataUseCaseConfigBuilder.context;

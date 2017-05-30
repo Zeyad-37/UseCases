@@ -101,8 +101,9 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         ArrayList<Long> integers = new ArrayList<>();
         for (int i = 0; i < mDataList.size(); i++) {
             try {
-                if (getSelectedItems().contains(i))
+                if (getSelectedItems().contains(i)) {
                     integers.add(mDataList.get(i).getId());
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -368,9 +369,11 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
 
     @SuppressWarnings("unused")
     public void removeSectionHeader(int index) throws IllegalAccessException {
-        if (mDataList.get(index).getData() instanceof String)
+        if (mDataList.get(index).getData() instanceof String) {
             removeItem(index);
-        else throw new IllegalAccessException("item at given index is not a section header!");
+        } else {
+            throw new IllegalAccessException("item at given index is not a section header!");
+        }
     }
 
     @SuppressWarnings("unused")
@@ -585,7 +588,7 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
     }
 
     @SuppressWarnings("unused")
-    public void reloadData(ArrayList<ItemInfo> newModels) {
+    public void reloadData(List<ItemInfo> newModels) {
         for (ItemInfo item : mDataList) {
             if (newModels.contains(item)) {
                 newModels.remove(item);

@@ -135,8 +135,9 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
                 public boolean onException(Exception e, String model, Target<GlideDrawable> target,
                                            boolean isFirstResource) {
                     FragmentActivity activity = getActivity();
-                    if (activity != null)
+                    if (activity != null) {
                         activity.supportStartPostponedEnterTransition();
+                    }
                     return false;
                 }
 
@@ -144,8 +145,9 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
                 public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target,
                                                boolean isFromMemoryCache, boolean isFirstResource) {
                     FragmentActivity activity = getActivity();
-                    if (activity != null)
+                    if (activity != null) {
                         activity.supportStartPostponedEnterTransition();
+                    }
                     return false;
                 }
             };

@@ -68,9 +68,7 @@ class DataService implements IDataService {
                     .flatMap(new Function<List<M>, Flowable<List<M>>>() {
                         @Override
                         public Flowable<List<M>> apply(@io.reactivex.annotations.NonNull List<M> list) throws Exception {
-                            if (list != null && !list.isEmpty())
-                                return Flowable.just(list);
-                            else return online;
+                            return list != null && !list.isEmpty() ? Flowable.just(list) : online;
                         }
                     })
                     .compose(ReplayingShare.instance())

@@ -26,12 +26,14 @@ public class ErrorMessageFactory {
     public static String create(Exception exception) {
         if (exception instanceof NetworkConnectionException) {
             NetworkConnectionException networkConnectionException = (NetworkConnectionException) exception;
-            if (networkConnectionException.getMessage().isEmpty())
+            if (networkConnectionException.getMessage().isEmpty()) {
                 return NO_INTERNET;
-            else return networkConnectionException.getMessage();
-        } else if (exception instanceof UnknownHostException)
+            } else {
+                return networkConnectionException.getMessage();
+            }
+        } else if (exception instanceof UnknownHostException) {
             return NO_INTERNET;
-        else if (exception instanceof HttpException) {
+        } else if (exception instanceof HttpException) {
             JSONObject jsonObject = new JSONObject();
             try {
                 jsonObject = new JSONObject(((HttpException) exception).response().errorBody().string());
@@ -41,18 +43,27 @@ public class ErrorMessageFactory {
                     if (jsonObject.has("errorResult")) {
                         jsonObject = new JSONObject(((HttpException) exception).response().errorBody().string());
                         if (jsonObject.get("errorResult") instanceof JSONObject) {
-                            if (jsonObject.getJSONObject("errorResult").has("message"))
+                            if (jsonObject.getJSONObject("errorResult").has("message")) {
                                 return jsonObject.getJSONObject("errorResult").getString("message");
-                            else if (jsonObject.getJSONObject("errorResult").has("error_description"))
-                                return jsonObject.getJSONObject("errorResult").getString("error_description");
-                            else if (jsonObject.getJSONObject("errorResult").has("errorResult"))
-                                return jsonObject.getJSONObject("errorResult").getString("errorResult");
-                        } else if (jsonObject.has("error_description"))
-                            return jsonObject.getString("error_description");
-                        else if (jsonObject.get("errorResult") instanceof String)
-                            return jsonObject.getString("errorResult");
+                            } else {
+                                if (jsonObject.getJSONObject("errorResult").has("error_description")) {
+                                    return jsonObject.getJSONObject("errorResult").getString("error_description");
+                                } else {
+                                    if (jsonObject.getJSONObject("errorResult").has("errorResult"))
+                                        return jsonObject.getJSONObject("errorResult").getString("errorResult");
+                                }
+                            }
+                        } else {
+                            if (jsonObject.has("error_description")) {
+                                return jsonObject.getString("error_description");
+                            } else {
+                                if (jsonObject.get("errorResult") instanceof String)
+                                    return jsonObject.getString("errorResult");
+                            }
+                        }
                     }
                 } catch (JSONException | IOException ignored) {
+                    ignored.printStackTrace();
                 }
                 return exception.getMessage();
             }

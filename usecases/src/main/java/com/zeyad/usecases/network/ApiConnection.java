@@ -56,14 +56,16 @@ public class ApiConnection {
     }
 
     public static RestApi initWithCache(@Nullable OkHttpClient.Builder okHttpBuilder, @Nullable Cache cache) {
-        if (okHttpBuilder == null)
+        if (okHttpBuilder == null) {
             okHttpBuilder = getBuilderForOkHttp();
+        }
         return createRetro2Client(provideOkHttpClient(okHttpBuilder, cache)).create(RestApi.class);
     }
 
     public static RestApi init(@Nullable OkHttpClient.Builder okHttpBuilder) {
-        if (okHttpBuilder == null)
+        if (okHttpBuilder == null) {
             okHttpBuilder = getBuilderForOkHttp();
+        }
         return createRetro2Client(provideOkHttpClient(okHttpBuilder, null)).create(RestApi.class);
     }
 
@@ -114,8 +116,9 @@ public class ApiConnection {
     private static OkHttpClient provideOkHttpClient(@NonNull OkHttpClient.Builder okHttpBuilder, @Nullable Cache cache) {
         boolean useApiWithCache = cache != null;
         Config.getInstance().setUseApiWithCache(useApiWithCache);
-        if (useApiWithCache)
+        if (useApiWithCache) {
             okHttpBuilder.cache(cache);
+        }
         return okHttpBuilder.build();
     }
 
@@ -200,13 +203,11 @@ public class ApiConnection {
     private Interceptor provideGzipRequestInterceptor() {
         return chain -> {
             Request originalRequest = chain.request();
-            if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null)
-                return chain.proceed(originalRequest);
-            Request compressedRequest = originalRequest.newBuilder()
+            return originalRequest.body() == null || originalRequest.header("Content-Encoding") != null ?
+                    chain.proceed(originalRequest) : chain.proceed(originalRequest.newBuilder()
                     .header("Content-Encoding", "gzip")
                     .method(originalRequest.method(), forceContentLength(gzip(originalRequest.body())))
-                    .build();
-            return chain.proceed(compressedRequest);
+                    .build());
         };
     }
 

@@ -31,17 +31,18 @@ public class PostRequest implements Parcelable {
         }
     };
     private static final String DEFAULT_ID_KEY = "id";
-    private String url, idColumnName, method;
-    private Class requestType, responseType;
-    private boolean onWifi, whileCharging, persist, queuable;
-    private JSONObject jsonObject;
-    private JSONArray jsonArray;
-    private HashMap<String, Object> keyValuePairs;
-    private Object object;
+    private final String url, idColumnName, method;
+    private final Class requestType, responseType;
+    private final boolean onWifi, whileCharging, persist, queuable;
+    private final JSONObject jsonObject;
+    private final JSONArray jsonArray;
+    private final HashMap<String, Object> keyValuePairs;
+    private final Object object;
 
     public PostRequest(@NonNull Builder builder) {
         url = builder.url;
         requestType = builder.requestType;
+        responseType = builder.responseType;
         persist = builder.persist;
         onWifi = builder.onWifi;
         whileCharging = builder.whileCharging;
@@ -59,6 +60,7 @@ public class PostRequest implements Parcelable {
         this.idColumnName = in.readString();
         this.method = in.readString();
         this.requestType = (Class) in.readSerializable();
+        this.responseType = (Class) in.readSerializable();
         this.persist = in.readByte() != 0;
         this.whileCharging = in.readByte() != 0;
         this.onWifi = in.readByte() != 0;
@@ -71,28 +73,32 @@ public class PostRequest implements Parcelable {
 
     public JSONObject getObjectBundle() {
         JSONObject jsonObject = new JSONObject();
-        if (object != null)
+        if (object != null) {
             try {
                 return new JSONObject(Config.getGson().toJson(object));
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-        else if (this.jsonObject != null)
+        } else if (this.jsonObject != null) {
             jsonObject = this.jsonObject;
-        else if (keyValuePairs != null)
+        } else if (keyValuePairs != null) {
             jsonObject = new JSONObject(keyValuePairs);
+        }
         return jsonObject;
     }
 
     public JSONArray getArrayBundle() {
-        if (jsonArray != null)
+        if (jsonArray != null) {
             return jsonArray;
-        else if (keyValuePairs != null) {
+        } else if (keyValuePairs != null) {
             final JSONArray jsonArray = new JSONArray();
-            for (Object object : keyValuePairs.values())
+            for (Object object : keyValuePairs.values()) {
                 jsonArray.put(object);
+            }
             return jsonArray;
-        } else return new JSONArray();
+        } else {
+            return new JSONArray();
+        }
     }
 
     @NonNull
@@ -201,6 +207,12 @@ public class PostRequest implements Parcelable {
         @NonNull
         public Builder responseType(Class responseType) {
             this.responseType = responseType;
+            return this;
+        }
+
+        @NonNull
+        public Builder requestType(Class requestType) {
+            this.requestType = requestType;
             return this;
         }
 

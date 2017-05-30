@@ -25,8 +25,9 @@ public class DataServiceFactory {
      */
     @Nullable
     public static IDataService getInstance() {
-        if (sDataUseCase == null)
+        if (sDataUseCase == null) {
             throw new NullPointerException("DataServiceFactory#init must be called before calling getInstance()");
+        }
         return sDataUseCase;
     }
 
@@ -36,8 +37,9 @@ public class DataServiceFactory {
      * @param config configuration object to DataUseCase.
      */
     public static void init(@NonNull DataServiceConfig config) {
-        if (!doesContextBelongsToApplication(config.getContext()))
+        if (!doesContextBelongsToApplication(config.getContext())) {
             throw new IllegalArgumentException("Context should be application context only.");
+        }
         DataBaseManagerUtil dataBaseManagerUtil = config.getDataBaseManagerUtil();
         boolean isSQLite = dataBaseManagerUtil != null;
         Config.init(config.getContext());
@@ -46,11 +48,12 @@ public class DataServiceFactory {
         Config.setCacheExpiry(config.getCacheAmount(), config.getTimeUnit());
         Config.setWithSQLite(isSQLite);
         Config.setHasRealm(config.isWithRealm());
-        if (config.isWithCache())
+        if (config.isWithCache()) {
             StoroBuilder.configure(config.getCacheSize())
                     .setDefaultCacheDirectory(config.getContext())
                     .setGsonInstance(Config.getGson())
                     .initialize();
+        }
         HandlerThread backgroundThread = config.getHandlerThread();
         if (config.isWithRealm()) {
             backgroundThread.start();

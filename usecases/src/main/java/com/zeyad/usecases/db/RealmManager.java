@@ -48,21 +48,20 @@ public class RealmManager implements DataBaseManager {
     public <M> Flowable<M> getById(@NonNull final String idColumnName, final Long itemIdL, final String itemIdS,
                                    Class dataClass) {
         return Flowable.defer(() -> {
-            if (itemIdL <= 0 && itemIdS == null)
+            if (itemIdL <= 0 && itemIdS == null) {
                 return Flowable.error(new IllegalArgumentException("Id can not be less than Zero."));
+            }
             Realm realm = Realm.getDefaultInstance();
-            if (itemIdS == null)
-                return Utils.getInstance().toFlowable(realm.where(dataClass).equalTo(idColumnName, itemIdL)
-                        .findAll().asObservable()
-                        .filter(results -> ((RealmResults) results).isLoaded())
-                        .map(o -> realm.copyFromRealm((RealmResults) o))
-                        .doOnUnsubscribe(() -> closeRealm(realm)));
-            else
-                return Utils.getInstance().toFlowable(realm.where(dataClass).equalTo(idColumnName, itemIdS)
-                        .findAll().asObservable()
-                        .filter(results -> ((RealmResults) results).isLoaded())
-                        .map(o -> realm.copyFromRealm((RealmResults) o))
-                        .doOnUnsubscribe(() -> closeRealm(realm)));
+            return itemIdS == null ? Utils.getInstance().toFlowable(realm.where(dataClass).equalTo(idColumnName, itemIdL)
+                    .findAll().asObservable()
+                    .filter(results -> ((RealmResults) results).isLoaded())
+                    .map(o -> realm.copyFromRealm((RealmResults) o))
+                    .doOnUnsubscribe(() -> closeRealm(realm))) : Utils.getInstance()
+                    .toFlowable(realm.where(dataClass).equalTo(idColumnName, itemIdS)
+                            .findAll().asObservable()
+                            .filter(results -> ((RealmResults) results).isLoaded())
+                            .map(o -> realm.copyFromRealm((RealmResults) o))
+                            .doOnUnsubscribe(() -> closeRealm(realm)));
         });
     }
 
@@ -120,8 +119,9 @@ public class RealmManager implements DataBaseManager {
                             () -> realm.copyToRealmOrUpdate(realmModel));
                     if (RealmObject.isValid(result)) {
                         return Completable.complete();
-                    } else
+                    } else {
                         return Completable.error(new IllegalArgumentException(REALM_OBJECT_INVALID));
+                    }
                 } finally {
                     closeRealm(realm);
                 }
@@ -152,8 +152,9 @@ public class RealmManager implements DataBaseManager {
                             () -> realm.createOrUpdateObjectFromJson(dataClass, jsonObject));
                     if (RealmObject.isValid(result)) {
                         return Completable.complete();
-                    } else
+                    } else {
                         return Completable.error(new IllegalArgumentException(REALM_OBJECT_INVALID));
+                    }
                 } finally {
                     closeRealm(realm);
                 }
@@ -262,8 +263,9 @@ public class RealmManager implements DataBaseManager {
                                        @NonNull Class dataClass) {
         return Completable.defer(() -> {
             boolean isDeleted = true;
-            for (int i = 0, size = list.size(); i < size; i++)
+            for (int i = 0, size = list.size(); i < size; i++) {
                 isDeleted = isDeleted && evictById(dataClass, idFieldName, list.get(i));
+            }
             return Completable.complete();
         });
     }
@@ -298,21 +300,26 @@ public class RealmManager implements DataBaseManager {
     @NonNull
     private JSONArray updateJsonArrayWithIdValue(@NonNull JSONArray jsonArray, @Nullable String idColumnName,
                                                  Class dataClass) throws JSONException {
-        if (idColumnName == null || idColumnName.isEmpty())
+        if (idColumnName == null || idColumnName.isEmpty()) {
             throw new IllegalArgumentException(NO_ID);
-        for (int i = 0, length = jsonArray.length(); i < length; i++)
-            if (jsonArray.opt(i) instanceof JSONObject)
+        }
+        for (int i = 0, length = jsonArray.length(); i < length; i++) {
+            if (jsonArray.opt(i) instanceof JSONObject) {
                 updateJsonObjectWithIdValue(jsonArray.optJSONObject(i), idColumnName, dataClass);
+            }
+        }
         return jsonArray;
     }
 
     @NonNull
     private JSONObject updateJsonObjectWithIdValue(@NonNull JSONObject jsonObject, @Nullable String idColumnName,
                                                    Class dataClass) throws JSONException {
-        if (idColumnName == null || idColumnName.isEmpty())
+        if (idColumnName == null || idColumnName.isEmpty()) {
             throw new IllegalArgumentException(NO_ID);
-        if (jsonObject.optInt(idColumnName) == 0)
+        }
+        if (jsonObject.optInt(idColumnName) == 0) {
             jsonObject.put(idColumnName, getNextId(dataClass, idColumnName));
+        }
         return jsonObject;
     }
 
@@ -320,9 +327,7 @@ public class RealmManager implements DataBaseManager {
         Realm realm = Realm.getDefaultInstance();
         try {
             Number currentMax = realm.where(clazz).max(column);
-            if (currentMax != null)
-                return currentMax.intValue() + 1;
-            else return 1;
+            return currentMax != null ? currentMax.intValue() + 1 : 1;
         } finally {
             realm.close();
         }

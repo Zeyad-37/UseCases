@@ -32,9 +32,9 @@ public class UISubscriber<V extends LoadDataView<S>, S> extends DisposableSubscr
         Log.d("onNext", "UIModel: " + uiModel.toString());
         view.toggleViews(uiModel.isLoading());
         if (!uiModel.isLoading()) {
-            if (uiModel.isSuccessful())
+            if (uiModel.isSuccessful()) {
                 view.renderState(uiModel.getBundle());
-            else if (uiModel.getError() != null) {
+            } else if (uiModel.getError() != null) {
                 Throwable throwable = uiModel.getError();
                 Log.e("UISubscriber", throwable.getMessage(), throwable);
                 throwable.printStackTrace();

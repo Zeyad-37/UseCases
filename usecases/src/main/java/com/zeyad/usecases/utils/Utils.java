@@ -37,8 +37,9 @@ public class Utils {
     }
 
     public static Utils getInstance() {
-        if (instance == null)
+        if (instance == null) {
             instance = new Utils();
+        }
         return instance;
     }
 
@@ -47,15 +48,20 @@ public class Utils {
                 .CONNECTIVITY_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Network[] networks = connectivityManager.getAllNetworks();
-            for (Network network : networks)
-                if (connectivityManager.getNetworkInfo(network).getState().equals(NetworkInfo.State.CONNECTED))
+            for (Network network : networks) {
+                if (connectivityManager.getNetworkInfo(network).getState().equals(NetworkInfo.State.CONNECTED)) {
                     return true;
+                }
+            }
         } else if (connectivityManager != null) {
             NetworkInfo[] info = connectivityManager.getAllNetworkInfo();
-            if (info != null)
-                for (NetworkInfo anInfo : info)
-                    if (anInfo.getState() == NetworkInfo.State.CONNECTED)
+            if (info != null) {
+                for (NetworkInfo anInfo : info) {
+                    if (anInfo.getState() == NetworkInfo.State.CONNECTED) {
                         return true;
+                    }
+                }
+            }
         }
         return false;
     }
@@ -105,19 +111,22 @@ public class Utils {
                 return null;
             }
             idList = new ArrayList<>(jsonArray.length());
-            for (int i = 0, length = jsonArray.length(); i < length; i++)
+            for (int i = 0, length = jsonArray.length(); i < length; i++) {
                 try {
                     idList.add(jsonArray.getLong(i));
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
+            }
         }
         return idList;
     }
 
     public <T> Flowable<T> toFlowable(Observable<T> source) {
         if (source == null) {
-            throw new NullPointerException("source is null");
-        } else return new ObservableV1ToFlowableV2<>(source);
+            throw new IllegalArgumentException("Source observable is null");
+        } else {
+            return new ObservableV1ToFlowableV2<>(source);
+        }
     }
 }

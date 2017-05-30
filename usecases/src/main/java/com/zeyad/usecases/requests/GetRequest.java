@@ -25,10 +25,10 @@ public class GetRequest implements Parcelable {
         }
     };
     private static final String DEFAULT_ID_KEY = "id";
-    private String url, idColumnName, itemIdS;
-    private Class dataClass;
-    private boolean persist, shouldCache;
-    private long itemIdL;
+    private final String url, idColumnName, itemIdS;
+    private final Class dataClass;
+    private final boolean persist, shouldCache;
+    private final long itemIdL;
 
     private GetRequest(@NonNull Builder builder) {
         url = builder.mUrl;
@@ -47,6 +47,7 @@ public class GetRequest implements Parcelable {
         this.persist = in.readByte() != 0;
         this.shouldCache = in.readByte() != 0;
         this.itemIdL = in.readInt();
+        this.itemIdS = in.readString();
     }
 
     @NonNull

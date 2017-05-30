@@ -100,8 +100,9 @@ public class CloudDataStore implements DataStore {
                                             @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         return mApiConnection.<M>dynamicGetObject(url, shouldCache)
                 .doOnNext(m -> {
-                    if (willPersist(persist))
+                    if (willPersist(persist)) {
                         persistGeneric(m, idColumnName, dataClass);
+                    }
                 })
                 .map(entity -> mEntityDataMapper.<M>mapTo(entity, dataClass));
     }
@@ -113,8 +114,9 @@ public class CloudDataStore implements DataStore {
         return mApiConnection.dynamicGetList(url, shouldCache)
                 .map(entities -> mEntityDataMapper.<List<M>>mapAllTo(entities, dataClass))
                 .doOnNext(list -> {
-                    if (willPersist(persist))
+                    if (willPersist(persist)) {
                         persistAllGenerics(list, dataClass);
+                    }
                 });
     }
 
@@ -124,13 +126,15 @@ public class CloudDataStore implements DataStore {
                                               @NonNull Class dataClass, Class responseType, boolean persist,
                                               boolean queuable) {
         return Flowable.defer(() -> {
-            if (willPersist(persist))
+            if (willPersist(persist)) {
                 persistGeneric(jsonObject, idColumnName, dataClass);
+            }
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(PATCH, url, idColumnName, jsonObject, persist);
                 return Flowable.empty();
-            } else if (!utils.isNetworkAvailable(mContext))
+            } else if (!utils.isNetworkAvailable(mContext)) {
                 return getErrorFlowableNotPersisted();
+            }
             return mApiConnection.<M>dynamicPatch(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
                     .map(object -> daoMapHelper(responseType, object))
@@ -150,13 +154,15 @@ public class CloudDataStore implements DataStore {
                                              @NonNull Class dataClass, Class responseType, boolean persist,
                                              boolean queuable) {
         return Flowable.defer(() -> {
-            if (willPersist(persist))
+            if (willPersist(persist)) {
                 persistGeneric(jsonObject, idColumnName, dataClass);
+            }
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(POST, url, idColumnName, jsonObject, persist);
                 return Flowable.empty();
-            } else if (!utils.isNetworkAvailable(mContext))
+            } else if (!utils.isNetworkAvailable(mContext)) {
                 return getErrorFlowableNotPersisted();
+            }
             return mApiConnection.<M>dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
                     .map(object -> daoMapHelper(responseType, object))
@@ -176,8 +182,9 @@ public class CloudDataStore implements DataStore {
                                            @NonNull Class dataClass, Class responseType,
                                            boolean persist, boolean queuable) {
         return Flowable.defer(() -> {
-            if (willPersist(persist))
+            if (willPersist(persist)) {
                 persistGeneric(jsonArray, idColumnName, dataClass);
+            }
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(POST, url, idColumnName, jsonArray, persist);
                 return Flowable.empty();
@@ -202,13 +209,15 @@ public class CloudDataStore implements DataStore {
                                             @NonNull Class dataClass, Class responseType,
                                             boolean persist, boolean queuable) {
         return Flowable.defer(() -> {
-            if (willPersist(persist))
+            if (willPersist(persist)) {
                 persistGeneric(jsonObject, idColumnName, dataClass);
+            }
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(PUT, url, idColumnName, jsonObject, persist);
                 return Flowable.empty();
-            } else if (!utils.isNetworkAvailable(mContext))
+            } else if (!utils.isNetworkAvailable(mContext)) {
                 return getErrorFlowableNotPersisted();
+            }
             return mApiConnection.<M>dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonObject.toString()))
                     .map(object -> daoMapHelper(responseType, object))
@@ -228,13 +237,15 @@ public class CloudDataStore implements DataStore {
                                           @NonNull Class dataClass, Class responseType,
                                           boolean persist, boolean queuable) {
         return Flowable.defer(() -> {
-            if (willPersist(persist))
+            if (willPersist(persist)) {
                 persistGeneric(jsonArray, idColumnName, dataClass);
+            }
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(PUT, url, idColumnName, jsonArray, persist);
                 return Flowable.empty();
-            } else if (!utils.isNetworkAvailable(mContext))
+            } else if (!utils.isNetworkAvailable(mContext)) {
                 return getErrorFlowableNotPersisted();
+            }
             return mApiConnection.<M>dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
                     .map(object -> daoMapHelper(responseType, object))
@@ -255,13 +266,15 @@ public class CloudDataStore implements DataStore {
                                                    boolean persist, boolean queuable) {
         return Flowable.defer(() -> {
             List<Long> ids = Utils.getInstance().convertToListOfId(jsonArray);
-            if (willPersist(persist))
+            if (willPersist(persist)) {
                 deleteFromPersistence(ids, idColumnName, dataClass);
+            }
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(DELETE, url, idColumnName, jsonArray, persist);
                 return Flowable.empty();
-            } else if (!utils.isNetworkAvailable(mContext))
+            } else if (!utils.isNetworkAvailable(mContext)) {
                 return getErrorFlowableNotPersisted();
+            }
             return mApiConnection.<M>dynamicDelete(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
                     .map(object -> daoMapHelper(responseType, object))
@@ -290,15 +303,18 @@ public class CloudDataStore implements DataStore {
                     && isChargingReqCompatible(isCharging(mContext), whileCharging)) {
                 queueIOFile(url, file, true, whileCharging, false);
                 return Flowable.empty();
-            } else if (!utils.isNetworkAvailable(mContext))
+            } else if (!utils.isNetworkAvailable(mContext)) {
                 return getErrorFlowableNotPersisted();
+            }
             RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
             HashMap<String, RequestBody> map = new HashMap<>();
             map.put(key, requestFile);
-            if (parameters != null && !parameters.isEmpty())
-                for (Map.Entry<String, Object> entry : parameters.entrySet())
+            if (parameters != null && !parameters.isEmpty()) {
+                for (Map.Entry<String, Object> entry : parameters.entrySet()) {
                     map.put(entry.getKey(), RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA),
                             String.valueOf(entry.getValue())));
+                }
+            }
             return mApiConnection.<M>dynamicUpload(url, map, MultipartBody.Part.createFormData(key,
                     file.getName(), requestFile))
                     .map(object -> daoMapHelper(dataClass, object))
@@ -321,8 +337,9 @@ public class CloudDataStore implements DataStore {
                     && isChargingReqCompatible(isCharging(mContext), whileCharging)) {
                 queueIOFile(url, file, onWifi, whileCharging, true);
                 return Flowable.empty();
-            } else if (!utils.isNetworkAvailable(mContext))
+            } else if (!utils.isNetworkAvailable(mContext)) {
                 return getErrorFlowableNotPersisted();
+            }
             return mApiConnection.dynamicDownload(url)
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
@@ -343,8 +360,9 @@ public class CloudDataStore implements DataStore {
                                 outputStream = new FileOutputStream(file);
                                 while (true) {
                                     int read = inputStream.read(fileReader);
-                                    if (read == -1)
+                                    if (read == -1) {
                                         break;
+                                    }
                                     outputStream.write(fileReader, 0, read);
                                     fileSizeDownloaded += read;
                                     Log.d(TAG, "file download: " + fileSizeDownloaded + " of " + fileSize);
@@ -353,10 +371,12 @@ public class CloudDataStore implements DataStore {
                             } catch (IOException e) {
                                 e.printStackTrace();
                             } finally {
-                                if (inputStream != null)
+                                if (inputStream != null) {
                                     inputStream.close();
-                                if (outputStream != null)
+                                }
+                                if (outputStream != null) {
                                     outputStream.close();
+                                }
                             }
                         } catch (IOException e) {
                             e.printStackTrace();
@@ -384,10 +404,8 @@ public class CloudDataStore implements DataStore {
 
     @Nullable
     private <M> M daoMapHelper(@NonNull Class dataClass, M object) {
-        if (object instanceof List)
-            return mEntityDataMapper.mapAllTo((List) object, dataClass);
-        else
-            return mEntityDataMapper.mapTo(object, dataClass);
+        return object instanceof List ? mEntityDataMapper.mapAllTo((List) object, dataClass) :
+                mEntityDataMapper.mapTo(object, dataClass);
     }
 
     private boolean willPersist(boolean persist) {
@@ -461,23 +479,26 @@ public class CloudDataStore implements DataStore {
     }
 
     private void persistGeneric(Object object, String idColumnName, @NonNull Class dataClass) {
-        if (object instanceof File)
+        if (object instanceof File) {
             return;
+        }
         Object mappedObject = null;
         Completable completable
                 = null;
         if (mDataBaseManager instanceof RealmManager) {
             try {
-                if (!(object instanceof JSONArray) && !(object instanceof Map))
+                if (!(object instanceof JSONArray) && !(object instanceof Map)) {
                     mappedObject = mEntityDataMapper.mapTo(object, dataClass);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            if (mappedObject instanceof RealmObject)
+            if (mappedObject instanceof RealmObject) {
                 completable = mDataBaseManager.put((RealmObject) mappedObject, dataClass);
-            else if (mappedObject instanceof RealmModel)
+            } else if (mappedObject instanceof RealmModel) {
                 completable = mDataBaseManager.put((RealmModel) mappedObject, dataClass);
-            else try {
+            } else {
+                try {
                     if (object instanceof JSONArray) {
                         JSONArray jsonArray = (JSONArray) object;
                         completable = mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
@@ -501,25 +522,29 @@ public class CloudDataStore implements DataStore {
                             jsonObject = new JSONObject((String) object);
                         } else if (object instanceof JSONObject) {
                             jsonObject = ((JSONObject) object);
-                        } else
+                        } else {
                             jsonObject = new JSONObject(gson.toJson(object, dataClass));
+                        }
                         completable = mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                                 .doOnEvent(objectNotification -> {
-                                    if (Config.isWithCache())
+                                    if (Config.isWithCache()) {
                                         Storo.put(dataClass.getSimpleName() + jsonObject.optString(idColumnName),
                                                 gson.fromJson(jsonObject.toString(), dataClass))
                                                 .setExpiry(Config.getCacheAmount(), Config.getCacheTimeUnit())
                                                 .execute();
+                                    }
                                 });
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
                     completable = Completable.error(e);
                 }
+            }
         }
-        if (completable != null)
+        if (completable != null) {
             completable.subscribeOn(Config.getBackgroundThread())
                     .subscribe(new SimpleSubscriber(dataClass));
+        }
     }
 
     private void persistAllGenerics(List collection, Class dataClass) {
@@ -531,8 +556,9 @@ public class CloudDataStore implements DataStore {
     private void deleteFromPersistence(@NonNull List collection, String idColumnName, @NonNull Class dataClass) {
         for (int i = 0, collectionSize = collection.size(); i < collectionSize; i++) {
             mDataBaseManager.evictById(dataClass, idColumnName, (long) collection.get(i));
-            if (Config.isWithCache())
+            if (Config.isWithCache()) {
                 Storo.delete(dataClass.getSimpleName() + (long) collection.get(i));
+            }
         }
     }
 

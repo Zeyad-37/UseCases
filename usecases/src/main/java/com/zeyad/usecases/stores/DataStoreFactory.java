@@ -11,9 +11,9 @@ import com.zeyad.usecases.utils.DataBaseManagerUtil;
 public class DataStoreFactory {
     private final static String DB_NOT_ENABLED = "Database not enabled!", DB_MANAGER_NULL = "DataBaseManager cannot be null!";
     @Nullable
-    private DataBaseManagerUtil mDataBaseManager;
-    private ApiConnection mApiConnection;
-    private DAOMapper mDAOMapper;
+    private final DataBaseManagerUtil mDataBaseManager;
+    private final ApiConnection mApiConnection;
+    private final DAOMapper mDAOMapper;
 
     public DataStoreFactory(ApiConnection restApi, DAOMapper daoMapper) {
         mDataBaseManager = null;
@@ -22,8 +22,9 @@ public class DataStoreFactory {
     }
 
     public DataStoreFactory(@Nullable DataBaseManagerUtil dataBaseManager, ApiConnection restApi, DAOMapper daoMapper) {
-        if (dataBaseManager == null)
+        if (dataBaseManager == null) {
             throw new IllegalArgumentException(DB_MANAGER_NULL);
+        }
         Config.setHasRealm(true);
         mDataBaseManager = dataBaseManager;
         mApiConnection = restApi;
@@ -35,12 +36,13 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore dynamically(@NonNull String url, Class dataClass) throws Exception {
-        if (!url.isEmpty())
+        if (!url.isEmpty()) {
             return cloud(dataClass);
-        else if (mDataBaseManager == null)
+        } else if (mDataBaseManager == null) {
             throw new IllegalAccessException(DB_NOT_ENABLED);
-        else
+        } else {
             return disk(dataClass);
+        }
     }
 
     /**

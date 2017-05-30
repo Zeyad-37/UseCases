@@ -127,8 +127,8 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
         setupRecyclerView();
-        if (findViewById(R.id.user_detail_container) != null)
-            twoPane = true;
+        twoPane = findViewById(R.id.user_detail_container) != null;
+
     }
 
     @Override
@@ -138,7 +138,8 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
         if (Utils.isNotEmpty(users)) {
             List<ItemInfo> itemInfoList = new ArrayList<>(users.size());
             User user;
-            for (int i = 0, usersListSize = users.size(); i < usersListSize; i++) {
+            int usersListSize = users.size();
+            for (int i = 0; i < usersListSize; i++) {
                 user = users.get(i);
                 itemInfoList.add(new ItemInfo<>(user, R.layout.user_item_layout).setId(user.getId()));
             }
@@ -296,12 +297,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
 
     @Override
     public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.delete_item:
-                return true;
-            default:
-                return false;
-        }
+        return item.getItemId() == R.id.delete_item;
     }
 
     @Override

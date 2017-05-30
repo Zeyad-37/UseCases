@@ -35,7 +35,7 @@ final class ObservableV1ToFlowableV2<T> extends Flowable<T> {
             }
             if (t == null) {
                 unsubscribe();
-                onError(new NullPointerException(
+                onError(new IllegalArgumentException(
                         "The upstream 1.x Observable signalled a null value which is not supported in 2.x"));
             } else {
                 actual.onNext(t);
