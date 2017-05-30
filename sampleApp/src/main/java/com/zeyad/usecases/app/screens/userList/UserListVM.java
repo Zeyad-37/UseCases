@@ -41,12 +41,13 @@ public class UserListVM extends BaseViewModel<UserListState> {
     public Function<BaseEvent, Flowable<?>> mapEventsToExecutables() {
         return event -> {
             Flowable executable = Flowable.empty();
-            if (event instanceof GetPaginatedUsersEvent)
+            if (event instanceof GetPaginatedUsersEvent) {
                 executable = getUsers(((GetPaginatedUsersEvent) event).getLastId());
-            else if (event instanceof DeleteUsersEvent)
+            } else if (event instanceof DeleteUsersEvent) {
                 executable = deleteCollection(((DeleteUsersEvent) event).getSelectedItemsIds());
-            else if (event instanceof SearchUsersEvent)
+            } else if (event instanceof SearchUsersEvent) {
                 executable = search(((SearchUsersEvent) event).getQuery());
+            }
             return executable;
         };
     }

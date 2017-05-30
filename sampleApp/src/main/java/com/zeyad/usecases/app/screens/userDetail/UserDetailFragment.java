@@ -76,8 +76,9 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
     @Override
     public void initialize() {
         Bundle arguments = getArguments();
-        if (arguments != null)
+        if (arguments != null) {
             viewState = Parcels.unwrap(arguments.getParcelable(UI_MODEL));
+        }
         viewModel = ViewModelProviders.of(this).get(UserDetailVM.class);
         viewModel.init((newResult, currentStateBundle) -> UserDetailState.builder()
                 .setRepos((List<Repository>) newResult.getBundle())
@@ -91,9 +92,10 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         postponeEnterTransition();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             setSharedElementEnterTransition(TransitionInflater.from(getContext())
                     .inflateTransition(android.R.transition.move));
+        }
 //        setSharedElementReturnTransition(null); // supply the correct element for return transition
     }
 
@@ -122,9 +124,11 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
         viewState = userDetailState;
         User user = viewState.getUser();
         List<Repository> repoModels = viewState.getRepos();
-        if (Utils.isNotEmpty(repoModels))
-            for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++)
+        if (Utils.isNotEmpty(repoModels)) {
+            for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++) {
                 repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
+            }
+        }
         if (user != null) {
             RequestListener<String, GlideDrawable> requestListener = new RequestListener<String, GlideDrawable>() {
                 @Override
@@ -149,27 +153,31 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
                 UserListActivity activity = (UserListActivity) getActivity();
                 if (activity != null) {
                     Toolbar appBarLayout = (Toolbar) activity.findViewById(R.id.toolbar);
-                    if (appBarLayout != null)
+                    if (appBarLayout != null) {
                         appBarLayout.setTitle(user.getLogin());
-                    if (Utils.isNotEmpty(user.getAvatarUrl()))
+                    }
+                    if (Utils.isNotEmpty(user.getAvatarUrl())) {
                         Glide.with(getContext())
                                 .load(user.getAvatarUrl())
                                 .dontAnimate()
                                 .listener(requestListener)
                                 .into(activity.imageViewAvatar);
+                    }
                 }
             } else {
                 UserDetailActivity activity = (UserDetailActivity) getActivity();
                 if (activity != null) {
                     CollapsingToolbarLayout appBarLayout = activity.collapsingToolbarLayout;
-                    if (appBarLayout != null)
+                    if (appBarLayout != null) {
                         appBarLayout.setTitle(user.getLogin());
-                    if (Utils.isNotEmpty(user.getAvatarUrl()))
+                    }
+                    if (Utils.isNotEmpty(user.getAvatarUrl())) {
                         Glide.with(getContext())
                                 .load(user.getAvatarUrl())
                                 .dontAnimate()
                                 .listener(requestListener)
                                 .into(activity.imageViewAvatar);
+                    }
                 }
             }
         }

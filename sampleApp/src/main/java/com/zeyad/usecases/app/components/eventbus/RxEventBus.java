@@ -13,7 +13,7 @@ import io.reactivex.subjects.PublishSubject;
  *
  * @author Zeyad
  */
-class RxEventBus implements IRxEventBus {
+final class RxEventBus implements IRxEventBus {
 
     private static IRxEventBus mInstance;
     private final PublishSubject<Object> rxBus;
@@ -23,8 +23,9 @@ class RxEventBus implements IRxEventBus {
     }
 
     static IRxEventBus getInstance() {
-        if (mInstance == null)
+        if (mInstance == null) {
             mInstance = new RxEventBus();
+        }
         return mInstance;
     }
 

@@ -26,13 +26,13 @@ class RepositoryViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     public void bindData(Object data, boolean isItemSelected, int position, boolean isEnabled) {
         if (data != null && data instanceof Repository) {
             Repository repoModel = (Repository) data;
-            if (Utils.isNotEmpty(repoModel.getName()))
+            if (Utils.isNotEmpty(repoModel.getName())) {
                 textView_repo_title.setText(repoModel.getName());
+            }
         }
     }
 
     @Override
     public void expand(boolean isExpanded) {
-
     }
 }

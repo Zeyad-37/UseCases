@@ -3,7 +3,7 @@ package com.zeyad.usecases.app.components.redux;
 /**
  * @author zeyad on 1/24/17.
  */
-class UIModel<S> {
+final class UIModel<S> {
     static final String LOADING = "loading", ERROR = "error", SUCCESS = "success";
     private static final String IDLE = "idle";
     private final boolean isLoading, isSuccessful;

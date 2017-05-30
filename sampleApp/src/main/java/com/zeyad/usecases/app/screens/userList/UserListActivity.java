@@ -93,8 +93,11 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                 users.addAll(resultList);
             } else {
                 final Iterator<User> each = users.iterator();
-                while (each.hasNext()) if (resultList.contains((long) each.next().getId()))
-                    each.remove();
+                while (each.hasNext()) {
+                    if (resultList.contains((long) each.next().getId())) {
+                        each.remove();
+                    }
+                }
             }
             users = new ArrayList<>(new HashSet<>(users));
             int lastId = users.get(users.size() - 1).getId();
@@ -194,8 +197,9 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                                 pair, secondPair);
                         navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this,
                                 userDetailState), options);
-                    } else
+                    } else {
                         navigator.navigateTo(this, UserDetailActivity.getCallingIntent(this, userDetailState));
+                    }
                 }
             }
         });

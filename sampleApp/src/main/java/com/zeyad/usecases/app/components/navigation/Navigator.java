@@ -8,7 +8,7 @@ import android.content.Intent;
 /**
  * Class used to navigate through the application.
  */
-class Navigator implements INavigator {
+final class Navigator implements INavigator {
 
     private static INavigator mInstance;
 

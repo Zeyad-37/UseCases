@@ -5,8 +5,8 @@ package com.zeyad.usecases.app.components.adapter;
  */
 public class ItemInfo<M> {
     public static final int HEADER = 1, FOOTER = 2, LOADING = 3, SECTION_HEADER = 4, CARD_SECTION_HEADER = 5;
+    private final int layoutId;
     private M data;
-    private int layoutId;
     private long id;
     private boolean isEnabled = true;
 

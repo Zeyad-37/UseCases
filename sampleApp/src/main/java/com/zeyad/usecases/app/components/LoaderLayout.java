@@ -59,7 +59,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         mTxvStatus = (TextView) findViewById(R.id.txv_status);
         // set click listener
         mTxvStatus.setOnClickListener(this);
-        showProgress();
+//        showProgress();
     }
 
     /**
@@ -76,12 +76,8 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
      */
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.txv_status:
-                if (mStatusTextListener != null) {
-                    mStatusTextListener.onStatusTextClick();
-                }
-                break;
+        if (view.getId() == R.id.txv_status && mStatusTextListener != null) {
+            mStatusTextListener.onStatusTextClick();
         }
     }
 
@@ -158,7 +154,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         int childCount = getChildCount();
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
-            if (view != mProgressBar && view != mTxvStatus) {
+            if (!view.equals(mProgressBar) && !view.equals(mTxvStatus)) {
                 view.setVisibility(visibility);
             }
         }
@@ -173,7 +169,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         int childCount = getChildCount();
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
-            if (view != mProgressBar && view != mTxvStatus) {
+            if (!view.equals(mProgressBar) && !view.equals(mTxvStatus)) {
                 view.setAlpha(alpha);
             }
         }

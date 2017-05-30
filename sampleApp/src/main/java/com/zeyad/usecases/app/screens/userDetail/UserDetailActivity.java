@@ -60,20 +60,25 @@ public class UserDetailActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setTitle("");
         }
-        if (savedInstanceState == null)
+        if (savedInstanceState == null) {
             addFragment(R.id.user_detail_container, UserDetailFragment.newInstance(Parcels.unwrap(getIntent()
                     .getParcelableExtra(UI_MODEL))), "", null);
+        }
     }
 
     private void addFragment(int containerViewId, Fragment fragment, String currentFragTag,
                              List<Pair<View, String>> sharedElements) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        if (sharedElements != null)
-            for (Pair<View, String> pair : sharedElements)
+        if (sharedElements != null) {
+            for (Pair<View, String> pair : sharedElements) {
                 fragmentTransaction.addSharedElement(pair.first, pair.second);
-        if (currentFragTag == null || currentFragTag.isEmpty())
+            }
+        }
+        if (currentFragTag == null || currentFragTag.isEmpty()) {
             fragmentTransaction.addToBackStack(fragment.getTag());
-        else fragmentTransaction.addToBackStack(currentFragTag);
+        } else {
+            fragmentTransaction.addToBackStack(currentFragTag);
+        }
         fragmentTransaction.add(containerViewId, fragment, fragment.getTag()).commit();
     }
 

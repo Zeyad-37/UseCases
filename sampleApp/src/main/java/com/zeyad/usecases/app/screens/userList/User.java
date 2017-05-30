@@ -27,8 +27,7 @@ public class User extends RealmObject {
     }
 
     public static boolean isEmpty(User automapUsermodel) {
-        return automapUsermodel == null ||
-                (automapUsermodel.login == null && automapUsermodel.avatarUrl == null);
+        return automapUsermodel == null || automapUsermodel.login == null && automapUsermodel.avatarUrl == null;
     }
 
     public String getLogin() {
@@ -57,11 +56,13 @@ public class User extends RealmObject {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         User user = (User) o;
-
         return id == user.id && (login != null ? login.equals(user.login) : user.login == null
                 && (avatarUrl != null ? avatarUrl.equals(user.avatarUrl) : user.avatarUrl == null));
     }

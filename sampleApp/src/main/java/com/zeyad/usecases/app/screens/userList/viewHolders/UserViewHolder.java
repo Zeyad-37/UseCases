@@ -32,23 +32,25 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     public void bindData(Object data, boolean isItemSelected, int position, boolean isEnabled) {
         if (data != null) {
             User userModel = (User) data;
-            if (Utils.isNotEmpty(userModel.getAvatarUrl()))
+            if (Utils.isNotEmpty(userModel.getAvatarUrl())) {
                 Glide.with(itemView.getContext())
                         .load(userModel.getAvatarUrl())
                         .into(avatar);
-            else Glide.with(itemView.getContext())
-                    .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
-                            "https://help.github.com/assets/images/help/profile/identicon.png")
-                    .into(avatar);
-            if (Utils.isNotEmpty(userModel.getLogin()))
+            } else {
+                Glide.with(itemView.getContext())
+                        .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
+                                "https://help.github.com/assets/images/help/profile/identicon.png")
+                        .into(avatar);
+            }
+            if (Utils.isNotEmpty(userModel.getLogin())) {
                 textViewTitle.setText(userModel.getLogin());
+            }
         }
         itemView.setBackgroundColor(isItemSelected ? Color.GRAY : Color.WHITE);
     }
 
     @Override
     public void expand(boolean isExpanded) {
-
     }
 
     public TextView getTextViewTitle() {

@@ -39,12 +39,14 @@ public abstract class BaseViewModel<S> extends ViewModel {
                         .startWith(Result.loadingResult()))
                 .scan(UIModel.idleState(initialState), (currentUIModel, result) -> {
                     S bundle = currentUIModel.getBundle();
-                    if (result.isLoading())
+                    if (result.isLoading()) {
                         currentUIModel = UIModel.loadingState(bundle);
-                    else if (result.isSuccessful())
+                    } else if (result.isSuccessful()) {
                         currentUIModel = UIModel.successState(successStateAccumulator
                                 .accumulateSuccessStates(result, bundle));
-                    else currentUIModel = UIModel.errorState(result.getError());
+                    } else {
+                        currentUIModel = UIModel.errorState(result.getError());
+                    }
                     return currentUIModel;
                 })
                 .compose(ReplayingShare.instance())

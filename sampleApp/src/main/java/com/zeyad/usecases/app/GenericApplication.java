@@ -40,7 +40,7 @@ public class GenericApplication extends Application {
             for (Signature signature : packageInfo.signatures) {
                 byte[] signatureBytes = signature.toByteArray();
                 MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
+                md.update(signatureBytes);
                 final String currentSignature = Base64.encodeToString(md.digest(), Base64.DEFAULT);
                 Log.d("REMOVE_ME", "Include this string as a value for SIGNATURE:" + currentSignature);
                 //compare signatures
@@ -68,6 +68,7 @@ public class GenericApplication extends Application {
                 return true;
             }
         } catch (Exception ignored) {
+            ignored.printStackTrace();
         }
         return false;
     }

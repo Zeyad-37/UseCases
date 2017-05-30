@@ -9,8 +9,8 @@ import rx.exceptions.OnErrorNotImplementedException;
  * @author zeyad on 11/28/16.
  */
 public class UISubscriber<V extends LoadDataView<S>, S> extends DisposableSubscriber<UIModel<S>> {
-    private ErrorMessageFactory errorMessageFactory;
-    private V view;
+    private final ErrorMessageFactory errorMessageFactory;
+    private final V view;
 
     public UISubscriber(V view, ErrorMessageFactory errorMessageFactory) {
         this.view = view;
@@ -36,6 +36,7 @@ public class UISubscriber<V extends LoadDataView<S>, S> extends DisposableSubscr
                 view.renderState(uiModel.getBundle());
             else if (uiModel.getError() != null) {
                 Throwable throwable = uiModel.getError();
+                Log.e("UISubscriber", throwable.getMessage(), throwable);
                 throwable.printStackTrace();
                 view.showError(errorMessageFactory.getErrorMessage(throwable));
             }

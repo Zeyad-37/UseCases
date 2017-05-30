@@ -13,7 +13,7 @@ public class VerticalDividerItemDecoration extends RecyclerView.ItemDecoration {
 
     private static final int[] ATTRS = new int[]{android.R.attr.listDivider};
 
-    private Drawable mDivider;
+    private final Drawable mDivider;
 
     /**
      * Default divider will be used

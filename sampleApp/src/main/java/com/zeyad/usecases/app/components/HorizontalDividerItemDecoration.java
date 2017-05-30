@@ -9,7 +9,7 @@ import android.view.View;
 
 public class HorizontalDividerItemDecoration extends RecyclerView.ItemDecoration {
 
-    private Drawable mDivider;
+    private final Drawable mDivider;
 
     /**
      * Custom divider will be used
