@@ -24,7 +24,7 @@ public class DataStoreFactoryTest {
     @Before
     public void setUp() throws Exception {
         mDataStoreFactory = new DataStoreFactory(dataClass -> mock(RealmManager.class),
-                mock(ApiConnection.class), mock(DAOMapper.class));
+                mock(ApiConnection.class), DAOMapper.getInstance());
     }
 
     private String getSomeValidUrl() {

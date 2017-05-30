@@ -42,8 +42,7 @@ public class DiskDataStoreTest {
     @Before
     public void setUp() throws Exception {
         dbManager = mock(DataBaseManager.class);
-        DAOMapper mapper = mock(DAOMapper.class);
-        when(mapper.mapAllTo(any(List.class), any(Class.class))).thenReturn(new ArrayList());
+        DAOMapper mapper = DAOMapper.getInstance();
         Config.setWithCache(false);
         mDiskDataStore = new DiskDataStore(dbManager, mapper);
     }
