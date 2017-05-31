@@ -488,7 +488,8 @@ public class CloudDataStore implements DataStore {
             return;
         }
         Object mappedObject = null;
-        Completable completable = null;
+        Completable completable
+                = null;
         if (mDataBaseManager instanceof RealmManager) {
             try {
                 if (!(object instanceof JSONArray) && !(object instanceof Map)) {

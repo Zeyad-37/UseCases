@@ -163,7 +163,8 @@ public class DiskDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Flowable dynamicUploadFile(String url, File file, String key, Map<String, Object> parameters,
-                                          boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass) {
+                                          boolean onWifi, boolean whileCharging, boolean queuable,
+                                          Class domainClass) {
         return Flowable.error(new IllegalStateException(IO_DB_ERROR));
     }
 
