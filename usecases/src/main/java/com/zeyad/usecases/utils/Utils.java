@@ -28,7 +28,7 @@ import java.util.List;
 import io.reactivex.Flowable;
 import rx.Observable;
 
-public class Utils {
+public final class Utils {
 
     private static Utils instance;
 
@@ -111,10 +111,12 @@ public class Utils {
                 return null;
             }
             idList = new ArrayList<>(jsonArray.length());
-            for (int i = 0, length = jsonArray.length(); i < length; i++) {
+            int length = jsonArray.length();
+            for (int i = 0; i < length; i++) {
                 try {
                     idList.add(jsonArray.getLong(i));
                 } catch (JSONException e) {
+                    Log.e("Utils", "convertToListOfId", e);
                     e.printStackTrace();
                 }
             }

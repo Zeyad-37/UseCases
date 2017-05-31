@@ -97,6 +97,8 @@ public class Post {
                         .doOnError(this::onError)
                         .doOnComplete(() -> Log.d(TAG, "Completed"))
                         .toObservable());
+            default:
+                break;
         }
         return Completable.complete();
     }

@@ -17,7 +17,7 @@ public final class DAOMapper {
         gson = Config.getGson();
     }
 
-    public static DAOMapper getInstance() {
+    public static synchronized DAOMapper getInstance() {
         if (sDAOMapper == null) {
             sDAOMapper = new DAOMapper();
         }

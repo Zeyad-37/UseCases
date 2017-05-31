@@ -34,17 +34,15 @@ public final class Config {
 
     private Config(@NonNull Context context) {
         mContext = context;
-        mGson = createGson();
-        setupRealm();
+        setup();
     }
 
     private Config() {
-        mGson = createGson();
-        setupRealm();
+        setup();
     }
 
-    private static Gson createGson() {
-        mGson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
+    private static GsonBuilder createGson() {
+        return new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
             @Override
             public boolean shouldSkipField(@NonNull FieldAttributes f) {
                 return f.getDeclaringClass().equals(RealmObject.class)
@@ -56,8 +54,7 @@ public final class Config {
             public boolean shouldSkipClass(Class<?> clazz) {
                 return false;
             }
-        }).create();
-        return mGson;
+        });
     }
 
     public static Config getInstance() {
@@ -84,9 +81,6 @@ public final class Config {
     }
 
     public static Gson getGson() {
-        if (mGson == null) {
-            mGson = createGson();
-        }
         return mGson;
     }
 
@@ -152,6 +146,11 @@ public final class Config {
 
     public static void setWithSQLite(boolean withSQLite) {
         Config.withSQLite = withSQLite;
+    }
+
+    private void setup() {
+        mGson = createGson().create();
+        setupRealm();
     }
 
     private void setupRealm() {

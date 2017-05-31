@@ -31,8 +31,9 @@ public class RealmManager implements DataBaseManager {
     private static Handler backgroundHandler;
 
     public RealmManager(Looper backgroundLooper) {
-        if (backgroundHandler == null)
+        if (backgroundHandler == null) {
             backgroundHandler = new Handler(backgroundLooper);
+        }
     }
 
     /**
@@ -159,8 +160,9 @@ public class RealmManager implements DataBaseManager {
                     closeRealm(realm);
                 }
             });
-        } else
+        } else {
             return Completable.error(new IllegalArgumentException(JSON_INVALID));
+        }
     }
 
     /**
@@ -244,7 +246,9 @@ public class RealmManager implements DataBaseManager {
                     }
                 });
                 return !RealmObject.isValid(toDelete);
-            } else return false;
+            } else {
+                return false;
+            }
         } finally {
             closeRealm(realm);
         }

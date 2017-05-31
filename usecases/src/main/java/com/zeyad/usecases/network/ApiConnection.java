@@ -277,6 +277,7 @@ public class ApiConnection {
             cache = new Cache(new File(Config.getInstance().getContext().getCacheDir(), "http-cache"),
                     10 * 1024 * 1024); // 10 MB
         } catch (Exception e) {
+            Log.e("ApiConnection", "", e);
             e.printStackTrace();
         }
         return cache;

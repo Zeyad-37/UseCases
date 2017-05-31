@@ -20,6 +20,9 @@ public class DataServiceFactory {
     @Nullable
     private static IDataService sDataUseCase;
 
+    private DataServiceFactory() {
+    }
+
     /**
      * @return IDataService the implementation instance of IDataService, throws NullPointerException if null.
      */

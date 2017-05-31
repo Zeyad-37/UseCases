@@ -1,6 +1,7 @@
 package com.zeyad.usecases.stores;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.db.DataBaseManager;
@@ -13,8 +14,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -23,8 +24,8 @@ import st.lowlevel.storo.Storo;
 public class DiskDataStore implements DataStore {
     private static final String IO_DB_ERROR = "Can not file IO to local DB";
     private final boolean withCache;
-    private DataBaseManager mDataBaseManager;
-    private DAOMapper mEntityDataMapper;
+    private final DataBaseManager mDataBaseManager;
+    private final DAOMapper mEntityDataMapper;
 
     /**
      * Construct a {@link DataStore} based file system data store.
@@ -52,7 +53,7 @@ public class DiskDataStore implements DataStore {
                                             dataClass);
                                 }
                             } catch (JSONException e) {
-                                e.printStackTrace();
+                                Log.e("DiskDataStore", "", e);
                             }
                         });
     }
@@ -84,8 +85,8 @@ public class DiskDataStore implements DataStore {
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
                 .doOnEvent(object -> {
                     if (withCache) {
-                        for (int i = 0, convertToListOfIdSize = convertToListOfId != null ? convertToListOfId.size() : 0;
-                             i < convertToListOfIdSize; i++) {
+                        int convertToListOfIdSize = convertToListOfId != null ? convertToListOfId.size() : 0;
+                        for (int i = 0; i < convertToListOfIdSize; i++) {
                             Storo.delete(dataClass.getSimpleName() + convertToListOfId.get(i));
                         }
                     }
@@ -153,14 +154,15 @@ public class DiskDataStore implements DataStore {
     }
 
     private void cacheList(String idColumnName, @NonNull JSONArray jsonArray, @NonNull Class dataClass) {
-        for (int i = 0, size = jsonArray.length(); i < size; i++) {
+        int size = jsonArray.length();
+        for (int i = 0; i < size; i++) {
             cacheObject(idColumnName, jsonArray.optJSONObject(i), dataClass);
         }
     }
 
     @NonNull
     @Override
-    public <M> Flowable dynamicUploadFile(String url, File file, String key, HashMap<String, Object> parameters,
+    public <M> Flowable dynamicUploadFile(String url, File file, String key, Map<String, Object> parameters,
                                           boolean onWifi, boolean whileCharging, boolean queuable, Class domainClass) {
         return Flowable.error(new IllegalStateException(IO_DB_ERROR));
     }

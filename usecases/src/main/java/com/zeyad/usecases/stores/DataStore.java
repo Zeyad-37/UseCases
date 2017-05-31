@@ -11,8 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -95,6 +95,6 @@ public interface DataStore {
                                        boolean queuable);
 
     @NonNull
-    <M> Flowable<M> dynamicUploadFile(String url, File file, String key, HashMap<String, Object> parameter,
+    <M> Flowable<M> dynamicUploadFile(String url, File file, String key, Map<String, Object> parameter,
                                       boolean onWifi, boolean whileCharging, boolean queuable, Class responseType);
 }

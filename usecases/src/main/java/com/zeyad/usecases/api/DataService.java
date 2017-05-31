@@ -38,12 +38,6 @@ class DataService implements IDataService {
         mPostThreadExist = mPostExecutionThread != null;
     }
 
-    public static DataService getInstance() {
-        if (sDataService == null)
-            throw new NullPointerException("DataUseCase#initRealm must be called before calling getInstance()");
-        return sDataService;
-    }
-
     @Override
     public <M> Flowable<List<M>> getList(@NonNull GetRequest getListRequest) {
         try {
@@ -183,8 +177,9 @@ class DataService implements IDataService {
                 .queuable()
                 .idColumnName(request.getIdColumnName())
                 .fullUrl(request.getUrl());
-        if (request.isQueuable())
+        if (request.isQueuable()) {
             builder.queuable();
+        }
         return deleteCollectionByIds(builder.build());
     }
 

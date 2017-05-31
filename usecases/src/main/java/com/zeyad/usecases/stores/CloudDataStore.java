@@ -188,8 +188,9 @@ public class CloudDataStore implements DataStore {
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(POST, url, idColumnName, jsonArray, persist);
                 return Flowable.empty();
-            } else if (!utils.isNetworkAvailable(mContext))
+            } else if (!utils.isNetworkAvailable(mContext)) {
                 return getErrorFlowableNotPersisted();
+            }
             return mApiConnection.<M>dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
                     jsonArray.toString()))
                     .map(object -> daoMapHelper(responseType, object))
@@ -280,7 +281,7 @@ public class CloudDataStore implements DataStore {
                     .map(object -> daoMapHelper(responseType, object))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                            queuePost(PostRequest.DELETE, url, idColumnName, jsonArray, persist);
+                            queuePost(DELETE, url, idColumnName, jsonArray, persist);
                             return Flowable.empty();
                         }
                         return Flowable.error(throwable);
@@ -296,7 +297,7 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<M> dynamicUploadFile(String url, @NonNull File file, @NonNull String key, @Nullable HashMap<String, Object> parameters,
+    public <M> Flowable<M> dynamicUploadFile(String url, @NonNull File file, @NonNull String key, @Nullable Map<String, Object> parameters,
                                              boolean onWifi, boolean whileCharging, boolean queuable, @NonNull Class dataClass) {
         return Flowable.defer(() -> {
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(mContext) == onWifi
@@ -369,7 +370,7 @@ public class CloudDataStore implements DataStore {
                                 }
                                 outputStream.flush();
                             } catch (IOException e) {
-                                e.printStackTrace();
+                                Log.e(TAG, "", e);
                             } finally {
                                 if (inputStream != null) {
                                     inputStream.close();
@@ -379,7 +380,7 @@ public class CloudDataStore implements DataStore {
                                 }
                             }
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            Log.e(TAG, "", e);
                         }
                         return file;
                     });
@@ -434,9 +435,15 @@ public class CloudDataStore implements DataStore {
             int chargePlug = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
             boolean usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB;
             boolean acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC;
-            if (batteryCharge) charging = true;
-            if (usbCharge) charging = true;
-            if (acCharge) charging = true;
+            if (batteryCharge) {
+                charging = true;
+            }
+            if (usbCharge) {
+                charging = true;
+            }
+            if (acCharge) {
+                charging = true;
+            }
         }
         return charging;
 //        Intent intent = Config.getInstance().getContext().registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
@@ -483,8 +490,7 @@ public class CloudDataStore implements DataStore {
             return;
         }
         Object mappedObject = null;
-        Completable completable
-                = null;
+        Completable completable = null;
         if (mDataBaseManager instanceof RealmManager) {
             try {
                 if (!(object instanceof JSONArray) && !(object instanceof Map)) {
@@ -583,7 +589,7 @@ public class CloudDataStore implements DataStore {
 
         @Override
         public void onError(@NonNull Throwable e) {
-            e.printStackTrace();
+            Log.e(TAG, "", e);
             subscription.dispose();
         }
     }
