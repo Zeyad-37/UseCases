@@ -4,10 +4,7 @@ import com.zeyad.usecases.app.components.redux.BaseEvent;
 
 import java.util.List;
 
-/**
- * @author by ZIaDo on 3/27/17.
- */
-
+/** @author by ZIaDo on 3/27/17. */
 public final class DeleteUsersEvent extends BaseEvent {
 
     private final List<Long> selectedItemsIds;

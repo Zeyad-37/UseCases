@@ -15,9 +15,7 @@ import static com.zeyad.usecases.requests.PostRequest.POST;
 import static com.zeyad.usecases.services.GenericJobService.PAYLOAD;
 import static org.mockito.Mockito.mock;
 
-/**
- * @author by ZIaDo on 5/20/17.
- */
+/** @author by ZIaDo on 5/20/17. */
 public class GenericJobServiceLogicTest {
     @Test
     public void startJob() throws Exception {
@@ -26,16 +24,20 @@ public class GenericJobServiceLogicTest {
 
         Bundle extras = new Bundle(2);
         extras.putString(GenericJobService.JOB_TYPE, GenericJobService.POST);
-        extras.putParcelable(PAYLOAD, new PostRequest.Builder(null, true)
-                .idColumnName("id")
-                .payLoad(new JSONArray())
-                .url("")
-                .method(POST)
-                .build());
+        extras.putParcelable(
+                PAYLOAD,
+                new PostRequest.Builder(null, true)
+                        .idColumnName("id")
+                        .payLoad(new JSONArray())
+                        .url("")
+                        .method(POST)
+                        .build());
 
-        genericJobServiceLogic.startJob(extras, mock(CloudDataStore.class),
-                mock(Utils.class), "").subscribe(new TestObserver<>());
+        genericJobServiceLogic
+                .startJob(extras, mock(CloudDataStore.class), mock(Utils.class), "")
+                .subscribe(new TestObserver<>());
         testSubscriber.assertNoErrors();
-//        testSubscriber.assertComplete();
+        //        testSubscriber.assertComplete();
     }
 }
+

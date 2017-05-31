@@ -22,16 +22,16 @@ import io.reactivex.functions.Function;
 import static com.zeyad.usecases.app.utils.Constants.URLS.USER;
 import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
 
-/**
- * @author zeyad on 11/1/16.
- */
+/** @author zeyad on 11/1/16. */
 public class UserListVM extends BaseViewModel<UserListState> {
 
     private IDataService dataUseCase;
 
     @Override
-    public void init(SuccessStateAccumulator<UserListState> successStateAccumulator, UserListState initialState,
-                     Object... otherDependencies) {
+    public void init(
+            SuccessStateAccumulator<UserListState> successStateAccumulator,
+            UserListState initialState,
+            Object... otherDependencies) {
         dataUseCase = (IDataService) otherDependencies[0];
         this.successStateAccumulator = successStateAccumulator;
         this.initialState = initialState;
@@ -53,31 +53,44 @@ public class UserListVM extends BaseViewModel<UserListState> {
     }
 
     public Flowable<List<User>> getUsers(long lastId) {
-        return lastId == 0 ? dataUseCase.getListOffLineFirst(new GetRequest.Builder(User.class, true)
-                .url(String.format(USERS, lastId))
-                .build()) : dataUseCase.getList(new GetRequest.Builder(User.class, true)
-                .url(String.format(USERS, lastId))
-                .build());
+        return lastId == 0
+                ? dataUseCase.getListOffLineFirst(
+                        new GetRequest.Builder(User.class, true)
+                                .url(String.format(USERS, lastId))
+                                .build())
+                : dataUseCase.getList(
+                        new GetRequest.Builder(User.class, true)
+                                .url(String.format(USERS, lastId))
+                                .build());
     }
 
     public Flowable<List<User>> search(String query) {
-        return dataUseCase.<User>queryDisk(realm -> realm.where(User.class).beginsWith(User.LOGIN, query))
-                .zipWith(dataUseCase.<User>getObject(new GetRequest.Builder(User.class, false)
-                                .url(String.format(USER, query))
-                                .build())
+        return dataUseCase
+                .<User>queryDisk(realm -> realm.where(User.class).beginsWith(User.LOGIN, query))
+                .zipWith(
+                        dataUseCase
+                                .<User>getObject(
+                                        new GetRequest.Builder(User.class, false)
+                                                .url(String.format(USER, query))
+                                                .build())
                                 .onErrorReturnItem(new User())
                                 .filter(user -> user.getId() != 0)
-                                .map(user -> user != null ? Collections.singletonList(user) : Collections.emptyList()),
-                        (BiFunction<List<User>, List<User>, List<User>>) (users, singleton) -> {
-                            users.addAll(singleton);
-                            return new ArrayList<>(new HashSet<>(users));
-                        });
+                                .map(
+                                        user ->
+                                                user != null
+                                                        ? Collections.singletonList(user)
+                                                        : Collections.emptyList()),
+                        (BiFunction<List<User>, List<User>, List<User>>)
+                                (users, singleton) -> {
+                                    users.addAll(singleton);
+                                    return new ArrayList<>(new HashSet<>(users));
+                                });
     }
 
     public Flowable<List<Long>> deleteCollection(List<Long> selectedItemsIds) {
-        return dataUseCase.deleteCollectionByIds(new PostRequest.Builder(User.class, true)
-                .payLoad(selectedItemsIds)
-                .build())
+        return dataUseCase
+                .deleteCollectionByIds(
+                        new PostRequest.Builder(User.class, true).payLoad(selectedItemsIds).build())
                 .map(o -> selectedItemsIds);
     }
 }

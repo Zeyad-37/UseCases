@@ -7,172 +7,267 @@ import org.parceler.Parcel;
 
 import io.realm.RealmObject;
 
-/**
- * @author zeyad on 1/25/17.
- */
+/** @author zeyad on 1/25/17. */
 @Parcel
 public class Repository extends RealmObject {
     @SerializedName("id")
     int id;
+
     @SerializedName("name")
     String name;
+
     @SerializedName("full_name")
     String fullName;
+
     @SerializedName("owner")
     User owner;
+
     @SerializedName("html_url")
     String htmlUrl;
+
     @SerializedName("description")
     String description;
+
     @SerializedName("fork")
     boolean fork;
+
     @SerializedName("url")
     String url;
+
     @SerializedName("forks_url")
     String forksUrl;
+
     @SerializedName("keys_url")
     String keysUrl;
+
     @SerializedName("collaborators_url")
     String collaboratorsUrl;
+
     @SerializedName("teams_url")
     String teamsUrl;
+
     @SerializedName("hooks_url")
     String hooksUrl;
+
     @SerializedName("issue_events_url")
     String issueEventsUrl;
+
     @SerializedName("events_url")
     String eventsUrl;
+
     @SerializedName("assignees_url")
     String assigneesUrl;
+
     @SerializedName("branches_url")
     String branchesUrl;
+
     @SerializedName("tags_url")
     String tagsUrl;
+
     @SerializedName("blobs_url")
     String blobsUrl;
+
     @SerializedName("git_tags_url")
     String gitTagsUrl;
+
     @SerializedName("git_refs_url")
     String gitRefsUrl;
+
     @SerializedName("trees_url")
     String treesUrl;
+
     @SerializedName("statuses_url")
     String statusesUrl;
+
     @SerializedName("languages_url")
     String languagesUrl;
+
     @SerializedName("stargazers_url")
     String stargazersUrl;
+
     @SerializedName("contributors_url")
     String contributorsUrl;
+
     @SerializedName("subscribers_url")
     String subscribersUrl;
+
     @SerializedName("subscription_url")
     String subscriptionUrl;
+
     @SerializedName("commits_url")
     String commitsUrl;
+
     @SerializedName("git_commits_url")
     String gitCommitsUrl;
+
     @SerializedName("comments_url")
     String commentsUrl;
+
     @SerializedName("issue_comment_url")
     String issueCommentUrl;
+
     @SerializedName("contents_url")
     String contentsUrl;
+
     @SerializedName("compare_url")
     String compareUrl;
+
     @SerializedName("merges_url")
     String mergesUrl;
+
     @SerializedName("archive_url")
     String archiveUrl;
+
     @SerializedName("downloads_url")
     String downloadsUrl;
+
     @SerializedName("issues_url")
     String issuesUrl;
+
     @SerializedName("pulls_url")
     String pullsUrl;
+
     @SerializedName("milestones_url")
     String milestonesUrl;
+
     @SerializedName("notifications_url")
     String notificationsUrl;
+
     @SerializedName("labels_url")
     String labelsUrl;
+
     @SerializedName("releases_url")
     String releasesUrl;
+
     @SerializedName("deployments_url")
     String deploymentsUrl;
+
     @SerializedName("created_at")
     String createdAt;
+
     @SerializedName("updated_at")
     String updatedAt;
+
     @SerializedName("pushed_at")
     String pushedAt;
+
     @SerializedName("git_url")
     String gitUrl;
+
     @SerializedName("ssh_url")
     String sshUrl;
+
     @SerializedName("clone_url")
     String cloneUrl;
+
     @SerializedName("svn_url")
     String svnUrl;
+
     @SerializedName("homepage")
     String homepage;
+
     @SerializedName("size")
     int size;
+
     @SerializedName("stargazers_count")
     int stargazersCount;
+
     @SerializedName("watchers_count")
     int watchersCount;
+
     @SerializedName("language")
     String language;
+
     @SerializedName("has_issues")
     boolean hasIssues;
+
     @SerializedName("has_downloads")
     boolean hasDownloads;
+
     @SerializedName("has_wiki")
     boolean hasWiki;
+
     @SerializedName("has_pages")
     boolean hasPages;
+
     @SerializedName("forks_count")
     int forksCount;
+
     @SerializedName("mirror_url")
     String mirrorUrl;
+
     @SerializedName("open_issues_count")
     int openIssuesCount;
+
     @SerializedName("forks")
     int forks;
+
     @SerializedName("open_issues")
     int openIssues;
+
     @SerializedName("watchers")
     int watchers;
+
     @SerializedName("default_branch")
     String defaultBranch;
 
-    public Repository() {
-    }
+    public Repository() {}
 
     public static boolean isEmpty(Repository repository) {
-        return repository == null || (repository.name == null && repository.fullName == null &&
-                repository.owner == null && repository.htmlUrl == null && repository.description == null &&
-                repository.url == null && repository.forksUrl == null && repository.keysUrl == null &&
-                repository.collaboratorsUrl == null && repository.teamsUrl == null &&
-                repository.hooksUrl == null && repository.issueEventsUrl == null && repository.eventsUrl == null &&
-                repository.assigneesUrl == null && repository.branchesUrl == null && repository.tagsUrl == null &&
-                repository.blobsUrl == null && repository.gitTagsUrl == null && repository.gitRefsUrl == null &&
-                repository.treesUrl == null && repository.statusesUrl == null && repository.languagesUrl == null &&
-                repository.stargazersUrl == null && repository.contributorsUrl == null &&
-                repository.subscribersUrl == null && repository.subscriptionUrl == null &&
-                repository.commitsUrl == null && repository.gitCommitsUrl == null &&
-                repository.commentsUrl == null && repository.issueCommentUrl == null &&
-                repository.contentsUrl == null && repository.compareUrl == null &&
-                repository.mergesUrl == null && repository.archiveUrl == null &&
-                repository.downloadsUrl == null && repository.issuesUrl == null &&
-                repository.pullsUrl == null && repository.milestonesUrl == null &&
-                repository.notificationsUrl == null && repository.labelsUrl == null &&
-                repository.releasesUrl == null && repository.deploymentsUrl == null &&
-                repository.createdAt == null && repository.updatedAt == null && repository.pushedAt == null &&
-                repository.gitUrl == null && repository.sshUrl == null && repository.cloneUrl == null &&
-                repository.svnUrl == null && repository.homepage == null && repository.language == null &&
-                repository.mirrorUrl == null && repository.defaultBranch == null);
+        return repository == null
+                || (repository.name == null
+                        && repository.fullName == null
+                        && repository.owner == null
+                        && repository.htmlUrl == null
+                        && repository.description == null
+                        && repository.url == null
+                        && repository.forksUrl == null
+                        && repository.keysUrl == null
+                        && repository.collaboratorsUrl == null
+                        && repository.teamsUrl == null
+                        && repository.hooksUrl == null
+                        && repository.issueEventsUrl == null
+                        && repository.eventsUrl == null
+                        && repository.assigneesUrl == null
+                        && repository.branchesUrl == null
+                        && repository.tagsUrl == null
+                        && repository.blobsUrl == null
+                        && repository.gitTagsUrl == null
+                        && repository.gitRefsUrl == null
+                        && repository.treesUrl == null
+                        && repository.statusesUrl == null
+                        && repository.languagesUrl == null
+                        && repository.stargazersUrl == null
+                        && repository.contributorsUrl == null
+                        && repository.subscribersUrl == null
+                        && repository.subscriptionUrl == null
+                        && repository.commitsUrl == null
+                        && repository.gitCommitsUrl == null
+                        && repository.commentsUrl == null
+                        && repository.issueCommentUrl == null
+                        && repository.contentsUrl == null
+                        && repository.compareUrl == null
+                        && repository.mergesUrl == null
+                        && repository.archiveUrl == null
+                        && repository.downloadsUrl == null
+                        && repository.issuesUrl == null
+                        && repository.pullsUrl == null
+                        && repository.milestonesUrl == null
+                        && repository.notificationsUrl == null
+                        && repository.labelsUrl == null
+                        && repository.releasesUrl == null
+                        && repository.deploymentsUrl == null
+                        && repository.createdAt == null
+                        && repository.updatedAt == null
+                        && repository.pushedAt == null
+                        && repository.gitUrl == null
+                        && repository.sshUrl == null
+                        && repository.cloneUrl == null
+                        && repository.svnUrl == null
+                        && repository.homepage == null
+                        && repository.language == null
+                        && repository.mirrorUrl == null
+                        && repository.defaultBranch == null);
     }
 
     public int getId() {

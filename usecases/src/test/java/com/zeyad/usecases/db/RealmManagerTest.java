@@ -33,16 +33,13 @@ import rx.Observable;
 import static org.junit.Assert.assertEquals;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
-/**
- * @author by ZIaDo on 2/15/17.
- */
+/** @author by ZIaDo on 2/15/17. */
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @PrepareForTest({Realm.class, RealmQuery.class, RealmResults.class})
 public class RealmManagerTest {
-    @Rule
-    public PowerMockRule rule = new PowerMockRule();
+    @Rule public PowerMockRule rule = new PowerMockRule();
     private RealmManager mRealmManager;
 
     public Realm mockRealm() {
@@ -52,10 +49,13 @@ public class RealmManagerTest {
         RealmResults<TestRealmModel> realmResults = mock(RealmResults.class);
         Observable observable = Observable.just(realmResults);
         PowerMockito.when(mockRealm.where(TestRealmModel.class)).thenReturn(realmQuery);
-        PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", 1L)).thenReturn(realmQuery);
-        PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", 1L).findFirst()).thenReturn(new TestRealmModel());
+        PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", 1L))
+                .thenReturn(realmQuery);
+        PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", 1L).findFirst())
+                .thenReturn(new TestRealmModel());
         PowerMockito.when(mockRealm.where(TestRealmModel.class).findAll()).thenReturn(realmResults);
-        PowerMockito.when(mockRealm.where(TestRealmModel.class).findAll().asObservable()).thenReturn(observable);
+        PowerMockito.when(mockRealm.where(TestRealmModel.class).findAll().asObservable())
+                .thenReturn(observable);
         PowerMockito.when(Realm.getDefaultInstance()).thenReturn(mockRealm);
         return mockRealm;
     }
@@ -85,8 +85,10 @@ public class RealmManagerTest {
 
         applyTestSubscriber(flowable);
 
-        assertEquals(flowable.first(new TestRealmModel()).blockingGet().getClass(), TestRealmModel.class);
-//        verify(mockRealm, times(1)).where(TestRealmModel.class).equalTo("id", 1).findAll().asObservable();
+        assertEquals(
+                flowable.first(new TestRealmModel()).blockingGet().getClass(),
+                TestRealmModel.class);
+        //        verify(mockRealm, times(1)).where(TestRealmModel.class).equalTo("id", 1).findAll().asObservable();
     }
 
     @Test
@@ -95,7 +97,9 @@ public class RealmManagerTest {
 
         applyTestSubscriber(flowable);
 
-        assertEquals(flowable.first(new TestRealmModel()).blockingGet().getClass(), TestRealmModel.class);
+        assertEquals(
+                flowable.first(new TestRealmModel()).blockingGet().getClass(),
+                TestRealmModel.class);
     }
 
     private void applyTestSubscriber(Flowable flowable) {
@@ -111,13 +115,18 @@ public class RealmManagerTest {
 
         applyTestSubscriber(flowable);
 
-        assertEquals(flowable.first(new TestRealmModel()).blockingGet().getClass(), TestRealmModel.class);
+        assertEquals(
+                flowable.first(new TestRealmModel()).blockingGet().getClass(),
+                TestRealmModel.class);
     }
 
     @Test
     public void putJSONObject() throws Exception {
-        Completable completable = mRealmManager.put(new JSONObject(new Gson().toJson(new TestRealmModel())),
-                "id", TestRealmModel.class);
+        Completable completable =
+                mRealmManager.put(
+                        new JSONObject(new Gson().toJson(new TestRealmModel())),
+                        "id",
+                        TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 
@@ -153,12 +162,13 @@ public class RealmManagerTest {
 
     @Test
     public void evictCollection() throws Exception {
-        Completable completable = mRealmManager.evictCollection("id", new ArrayList<>(), TestRealmModel.class);
+        Completable completable =
+                mRealmManager.evictCollection("id", new ArrayList<>(), TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 
     @Test
     public void evictById() throws Exception {
-//        assertEquals(mRealmManager.evictById(TestRealmModel.class, "id", 1), true);
+        //        assertEquals(mRealmManager.evictById(TestRealmModel.class, "id", 1), true);
     }
 }

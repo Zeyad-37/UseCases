@@ -44,19 +44,23 @@ public final class Config {
     }
 
     private static Gson createGson() {
-        mGson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
-            @Override
-            public boolean shouldSkipField(@NonNull FieldAttributes f) {
-                return f.getDeclaringClass().equals(RealmObject.class)
-                        && f.getDeclaredClass().equals(RealmModel.class)
-                        && f.getDeclaringClass().equals(RealmList.class);
-            }
+        mGson =
+                new GsonBuilder()
+                        .setExclusionStrategies(
+                                new ExclusionStrategy() {
+                                    @Override
+                                    public boolean shouldSkipField(@NonNull FieldAttributes f) {
+                                        return f.getDeclaringClass().equals(RealmObject.class)
+                                                && f.getDeclaredClass().equals(RealmModel.class)
+                                                && f.getDeclaringClass().equals(RealmList.class);
+                                    }
 
-            @Override
-            public boolean shouldSkipClass(Class<?> clazz) {
-                return false;
-            }
-        }).create();
+                                    @Override
+                                    public boolean shouldSkipClass(Class<?> clazz) {
+                                        return false;
+                                    }
+                                })
+                        .create();
         return mGson;
     }
 
@@ -90,9 +94,7 @@ public final class Config {
         return mGson;
     }
 
-    /**
-     * @return withCache, whether DataUseCase is using caching or not.
-     */
+    /** @return withCache, whether DataUseCase is using caching or not. */
     public static boolean isWithCache() {
         return withCache;
     }
@@ -155,12 +157,12 @@ public final class Config {
     }
 
     private void setupRealm() {
-//        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
-//                .name("library.realm")
-//                .modules(new LibraryModule())
-//                .rxFactory(new RealmObservableFactory())
-//                .deleteRealmIfMigrationNeeded()
-//                .build());
+        //        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
+        //                .name("library.realm")
+        //                .modules(new LibraryModule())
+        //                .rxFactory(new RealmObservableFactory())
+        //                .deleteRealmIfMigrationNeeded()
+        //                .build());
     }
 
     @Nullable

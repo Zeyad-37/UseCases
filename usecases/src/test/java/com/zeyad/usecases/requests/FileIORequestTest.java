@@ -25,16 +25,16 @@ public class FileIORequestTest {
     private final String URL = "www.google.com";
     private final File FILE = Mockito.mock(File.class);
     private final Class DATA_CLASS = TestRealmModel.class;
-    @Nullable
-    private FileIORequest mFileIORequest;
+    @Nullable private FileIORequest mFileIORequest;
 
     @Before
     public void setUp() throws Exception {
-        mFileIORequest = new FileIORequest.Builder(URL, FILE)
-                .onWifi(ON_WIFI)
-                .whileCharging(WHILE_CHARGING)
-                .dataClass(DATA_CLASS)
-                .build();
+        mFileIORequest =
+                new FileIORequest.Builder(URL, FILE)
+                        .onWifi(ON_WIFI)
+                        .whileCharging(WHILE_CHARGING)
+                        .dataClass(DATA_CLASS)
+                        .build();
     }
 
     @After
@@ -67,3 +67,4 @@ public class FileIORequestTest {
         assertThat(mFileIORequest.isWhileCharging(), is(equalTo(WHILE_CHARGING)));
     }
 }
+

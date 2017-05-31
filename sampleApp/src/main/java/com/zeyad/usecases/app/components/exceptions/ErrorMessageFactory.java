@@ -10,9 +10,7 @@ import java.net.UnknownHostException;
 
 import retrofit2.HttpException;
 
-/**
- * Factory used to create errorResult messages from an Exception as a condition.
- */
+/** Factory used to create errorResult messages from an Exception as a condition. */
 public class ErrorMessageFactory {
     private static final String NO_INTERNET = "Please check your internet connection",
             UNKNOWN_ERROR = "Unknown errorResult";
@@ -20,12 +18,14 @@ public class ErrorMessageFactory {
     /**
      * Creates a String representing an errorResult message.
      *
-     * @param exception An exception used as a condition to retrieve the correct errorResult message.
+     * @param exception An exception used as a condition to retrieve the correct errorResult
+     *     message.
      * @return {@link String} an errorResult message.
      */
     public static String create(Exception exception) {
         if (exception instanceof NetworkConnectionException) {
-            NetworkConnectionException networkConnectionException = (NetworkConnectionException) exception;
+            NetworkConnectionException networkConnectionException =
+                    (NetworkConnectionException) exception;
             if (networkConnectionException.getMessage().isEmpty()) {
                 return NO_INTERNET;
             } else {
@@ -36,21 +36,33 @@ public class ErrorMessageFactory {
         } else if (exception instanceof HttpException) {
             JSONObject jsonObject = new JSONObject();
             try {
-                jsonObject = new JSONObject(((HttpException) exception).response().errorBody().string());
+                jsonObject =
+                        new JSONObject(((HttpException) exception).response().errorBody().string());
                 return jsonObject.getJSONObject("errorResult").getString("message");
             } catch (IOException | JSONException e) {
                 try {
                     if (jsonObject.has("errorResult")) {
-                        jsonObject = new JSONObject(((HttpException) exception).response().errorBody().string());
+                        jsonObject =
+                                new JSONObject(
+                                        ((HttpException) exception)
+                                                .response()
+                                                .errorBody()
+                                                .string());
                         if (jsonObject.get("errorResult") instanceof JSONObject) {
                             if (jsonObject.getJSONObject("errorResult").has("message")) {
                                 return jsonObject.getJSONObject("errorResult").getString("message");
                             } else {
-                                if (jsonObject.getJSONObject("errorResult").has("error_description")) {
-                                    return jsonObject.getJSONObject("errorResult").getString("error_description");
+                                if (jsonObject
+                                        .getJSONObject("errorResult")
+                                        .has("error_description")) {
+                                    return jsonObject
+                                            .getJSONObject("errorResult")
+                                            .getString("error_description");
                                 } else {
                                     if (jsonObject.getJSONObject("errorResult").has("errorResult"))
-                                        return jsonObject.getJSONObject("errorResult").getString("errorResult");
+                                        return jsonObject
+                                                .getJSONObject("errorResult")
+                                                .getString("errorResult");
                                 }
                             }
                         } else {

@@ -46,24 +46,24 @@ import io.reactivex.Observable;
 import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
 
 /**
- * A fragment representing a single Repository detail screen.
- * This fragment is either contained in a {@link UserListActivity}
- * in two-pane mode (on tablets) or a {@link UserDetailActivity}
- * on handsets.
+ * A fragment representing a single Repository detail screen. This fragment is either contained in a
+ * {@link UserListActivity} in two-pane mode (on tablets) or a {@link UserDetailActivity} on
+ * handsets.
  */
 public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetailVM> {
     @BindView(R.id.linear_layout_loader)
     LinearLayout loaderLayout;
+
     @BindView(R.id.recyclerView_repositories)
     RecyclerView recyclerViewRepositories;
+
     private GenericRecyclerViewAdapter repositoriesAdapter;
 
     /**
-     * Mandatory empty constructor for the fragment manager to instantiate the
-     * fragment (e.g. upon screen orientation changes).
+     * Mandatory empty constructor for the fragment manager to instantiate the fragment (e.g. upon
+     * screen orientation changes).
      */
-    public UserDetailFragment() {
-    }
+    public UserDetailFragment() {}
 
     public static UserDetailFragment newInstance(UserDetailState userDetailState) {
         UserDetailFragment userDetailFragment = new UserDetailFragment();
@@ -80,11 +80,15 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
             viewState = Parcels.unwrap(arguments.getParcelable(UI_MODEL));
         }
         viewModel = ViewModelProviders.of(this).get(UserDetailVM.class);
-        viewModel.init((newResult, currentStateBundle) -> UserDetailState.builder()
-                .setRepos((List<Repository>) newResult.getBundle())
-                .setUser(currentStateBundle.getUser())
-                .setIsTwoPane(currentStateBundle.isTwoPane())
-                .build(), viewState, DataServiceFactory.getInstance());
+        viewModel.init(
+                (newResult, currentStateBundle) ->
+                        UserDetailState.builder()
+                                .setRepos((List<Repository>) newResult.getBundle())
+                                .setUser(currentStateBundle.getUser())
+                                .setIsTwoPane(currentStateBundle.isTwoPane())
+                                .build(),
+                viewState,
+                DataServiceFactory.getInstance());
         events = Observable.just(new GetReposEvent(viewState.getUser().getLogin()));
     }
 
@@ -93,14 +97,16 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
         super.onCreate(savedInstanceState);
         postponeEnterTransition();
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setSharedElementEnterTransition(TransitionInflater.from(getContext())
-                    .inflateTransition(android.R.transition.move));
+            setSharedElementEnterTransition(
+                    TransitionInflater.from(getContext())
+                            .inflateTransition(android.R.transition.move));
         }
-//        setSharedElementReturnTransition(null); // supply the correct element for return transition
+        //        setSharedElementReturnTransition(null); // supply the correct element for return transition
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.user_detail, container, false);
         ButterKnife.bind(this, rootView);
         setupRecyclerView();
@@ -109,13 +115,17 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
 
     private void setupRecyclerView() {
         recyclerViewRepositories.setLayoutManager(new LinearLayoutManager(getContext()));
-        repositoriesAdapter = new GenericRecyclerViewAdapter((LayoutInflater) getContext()
-                .getSystemService(Context.LAYOUT_INFLATER_SERVICE), new ArrayList<>()) {
-            @Override
-            public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                return new RepositoryViewHolder(mLayoutInflater.inflate(viewType, parent, false));
-            }
-        };
+        repositoriesAdapter =
+                new GenericRecyclerViewAdapter(
+                        (LayoutInflater)
+                                getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE),
+                        new ArrayList<>()) {
+                    @Override
+                    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                        return new RepositoryViewHolder(
+                                mLayoutInflater.inflate(viewType, parent, false));
+                    }
+                };
         recyclerViewRepositories.setAdapter(repositoriesAdapter);
     }
 
@@ -126,31 +136,40 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
         List<Repository> repoModels = viewState.getRepos();
         if (Utils.isNotEmpty(repoModels)) {
             for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++) {
-                repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
+                repositoriesAdapter.appendItem(
+                        new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
             }
         }
         if (user != null) {
-            RequestListener<String, GlideDrawable> requestListener = new RequestListener<String, GlideDrawable>() {
-                @Override
-                public boolean onException(Exception e, String model, Target<GlideDrawable> target,
-                                           boolean isFirstResource) {
-                    FragmentActivity activity = getActivity();
-                    if (activity != null) {
-                        activity.supportStartPostponedEnterTransition();
-                    }
-                    return false;
-                }
+            RequestListener<String, GlideDrawable> requestListener =
+                    new RequestListener<String, GlideDrawable>() {
+                        @Override
+                        public boolean onException(
+                                Exception e,
+                                String model,
+                                Target<GlideDrawable> target,
+                                boolean isFirstResource) {
+                            FragmentActivity activity = getActivity();
+                            if (activity != null) {
+                                activity.supportStartPostponedEnterTransition();
+                            }
+                            return false;
+                        }
 
-                @Override
-                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target,
-                                               boolean isFromMemoryCache, boolean isFirstResource) {
-                    FragmentActivity activity = getActivity();
-                    if (activity != null) {
-                        activity.supportStartPostponedEnterTransition();
-                    }
-                    return false;
-                }
-            };
+                        @Override
+                        public boolean onResourceReady(
+                                GlideDrawable resource,
+                                String model,
+                                Target<GlideDrawable> target,
+                                boolean isFromMemoryCache,
+                                boolean isFirstResource) {
+                            FragmentActivity activity = getActivity();
+                            if (activity != null) {
+                                activity.supportStartPostponedEnterTransition();
+                            }
+                            return false;
+                        }
+                    };
             if (userDetailState.isTwoPane()) {
                 UserListActivity activity = (UserListActivity) getActivity();
                 if (activity != null) {
@@ -183,7 +202,7 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
                 }
             }
         }
-//        applyPalette();
+        //        applyPalette();
     }
 
     @Override
@@ -202,19 +221,31 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
             UserDetailActivity activity = (UserDetailActivity) getActivity();
             BitmapDrawable drawable = (BitmapDrawable) activity.imageViewAvatar.getDrawable();
             Bitmap bitmap = drawable.getBitmap();
-            Palette.from(bitmap).generate(palette -> activity.findViewById(R.id.coordinator_detail)
-                    .setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
-                        if (v.getHeight() == scrollX) {
-                            activity.toolbar
-                                    .setTitleTextColor(palette.getLightVibrantColor(Color.TRANSPARENT));
-                            activity.toolbar.
-                                    setBackground(new ColorDrawable(palette
-                                            .getLightVibrantColor(Color.TRANSPARENT)));
-                        } else if (scrollY == 0) {
-                            activity.toolbar.setTitleTextColor(0);
-                            activity.toolbar.setBackground(null);
-                        }
-                    }));
+            Palette.from(bitmap)
+                    .generate(
+                            palette ->
+                                    activity.findViewById(R.id.coordinator_detail)
+                                            .setOnScrollChangeListener(
+                                                    (v,
+                                                            scrollX,
+                                                            scrollY,
+                                                            oldScrollX,
+                                                            oldScrollY) -> {
+                                                        if (v.getHeight() == scrollX) {
+                                                            activity.toolbar.setTitleTextColor(
+                                                                    palette.getLightVibrantColor(
+                                                                            Color.TRANSPARENT));
+                                                            activity.toolbar.setBackground(
+                                                                    new ColorDrawable(
+                                                                            palette
+                                                                                    .getLightVibrantColor(
+                                                                                            Color
+                                                                                                    .TRANSPARENT)));
+                                                        } else if (scrollY == 0) {
+                                                            activity.toolbar.setTitleTextColor(0);
+                                                            activity.toolbar.setBackground(null);
+                                                        }
+                                                    }));
         }
     }
 }

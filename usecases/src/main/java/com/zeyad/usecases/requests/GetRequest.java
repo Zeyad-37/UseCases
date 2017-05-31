@@ -7,23 +7,22 @@ import android.support.annotation.Nullable;
 
 import com.zeyad.usecases.Config;
 
-/**
- * @author zeyad on 7/29/16.
- */
+/** @author zeyad on 7/29/16. */
 public class GetRequest implements Parcelable {
-    public static final Creator<GetRequest> CREATOR = new Creator<GetRequest>() {
-        @NonNull
-        @Override
-        public GetRequest createFromParcel(@NonNull Parcel source) {
-            return new GetRequest(source);
-        }
+    public static final Creator<GetRequest> CREATOR =
+            new Creator<GetRequest>() {
+                @NonNull
+                @Override
+                public GetRequest createFromParcel(@NonNull Parcel source) {
+                    return new GetRequest(source);
+                }
 
-        @NonNull
-        @Override
-        public GetRequest[] newArray(int size) {
-            return new GetRequest[size];
-        }
-    };
+                @NonNull
+                @Override
+                public GetRequest[] newArray(int size) {
+                    return new GetRequest[size];
+                }
+            };
     private static final String DEFAULT_ID_KEY = "id";
     private final String url, idColumnName, itemIdS;
     private final Class dataClass;
@@ -149,3 +148,4 @@ public class GetRequest implements Parcelable {
         }
     }
 }
+

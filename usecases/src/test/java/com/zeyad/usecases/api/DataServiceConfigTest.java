@@ -23,9 +23,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 
-/**
- * @author by ZIaDo on 5/14/17.
- */
+/** @author by ZIaDo on 5/14/17. */
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 public class DataServiceConfigTest {
@@ -39,20 +37,22 @@ public class DataServiceConfigTest {
     @Before
     public void setUp() throws Exception {
         mockContext = mock(Context.class);
-        builder = new OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS);
+        builder =
+                new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .writeTimeout(15, TimeUnit.SECONDS);
         cache = new Cache(new File("", "http-cache"), 10 * 1024 * 1024);
-        mDataServiceConfig = new DataServiceConfig.Builder(mockContext)
-                .baseUrl(URL)
-                .cacheSize(cacheSize)
-                .okHttpBuilder(builder)
-                .okhttpCache(cache)
-                .postExecutionThread(null)
-                .withCache(3, TimeUnit.MINUTES)
-                .withRealm()
-                .build();
+        mDataServiceConfig =
+                new DataServiceConfig.Builder(mockContext)
+                        .baseUrl(URL)
+                        .cacheSize(cacheSize)
+                        .okHttpBuilder(builder)
+                        .okhttpCache(cache)
+                        .postExecutionThread(null)
+                        .withCache(3, TimeUnit.MINUTES)
+                        .withRealm()
+                        .build();
     }
 
     @Test
@@ -112,6 +112,7 @@ public class DataServiceConfigTest {
 
     @Test
     public void getHandlerThread() throws Exception {
-        assertThat(mDataServiceConfig.getHandlerThread().getClass(), is(equalTo(HandlerThread.class)));
+        assertThat(
+                mDataServiceConfig.getHandlerThread().getClass(), is(equalTo(HandlerThread.class)));
     }
 }

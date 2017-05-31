@@ -19,9 +19,7 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
-/**
- * @author by ZIaDo on 5/14/17.
- */
+/** @author by ZIaDo on 5/14/17. */
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 public class DataServiceFactoryTest {
@@ -35,19 +33,24 @@ public class DataServiceFactoryTest {
     @Before
     public void setUp() throws Exception {
         mockContext = mock(Context.class);
-        builder = new OkHttpClient.Builder()
-                .connectTimeout(15, TimeUnit.SECONDS)
-                .readTimeout(15, TimeUnit.SECONDS)
-                .writeTimeout(15, TimeUnit.SECONDS);
-        cache = new Cache(new File("/data/data/com/zeyad/usecases/cache/", "http-cache"), 10 * 1024 * 1024);
-        mDataServiceConfig = new DataServiceConfig.Builder(mockContext)
-                .baseUrl(URL)
-                .cacheSize(cacheSize)
-                .okHttpBuilder(builder)
-                .okhttpCache(cache)
-                .postExecutionThread(null)
-                .withRealm()
-                .build();
+        builder =
+                new OkHttpClient.Builder()
+                        .connectTimeout(15, TimeUnit.SECONDS)
+                        .readTimeout(15, TimeUnit.SECONDS)
+                        .writeTimeout(15, TimeUnit.SECONDS);
+        cache =
+                new Cache(
+                        new File("/data/data/com/zeyad/usecases/cache/", "http-cache"),
+                        10 * 1024 * 1024);
+        mDataServiceConfig =
+                new DataServiceConfig.Builder(mockContext)
+                        .baseUrl(URL)
+                        .cacheSize(cacheSize)
+                        .okHttpBuilder(builder)
+                        .okhttpCache(cache)
+                        .postExecutionThread(null)
+                        .withRealm()
+                        .build();
     }
 
     @Test

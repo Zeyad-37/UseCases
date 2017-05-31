@@ -12,24 +12,23 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-/**
- * @author zeyad on 7/29/16.
- */
+/** @author zeyad on 7/29/16. */
 public class PostRequest implements Parcelable {
     public static final String POST = "post", DELETE = "delete", PUT = "put", PATCH = "patch";
-    public static final Parcelable.Creator<PostRequest> CREATOR = new Parcelable.Creator<PostRequest>() {
-        @NonNull
-        @Override
-        public PostRequest createFromParcel(@NonNull Parcel source) {
-            return new PostRequest(source);
-        }
+    public static final Parcelable.Creator<PostRequest> CREATOR =
+            new Parcelable.Creator<PostRequest>() {
+                @NonNull
+                @Override
+                public PostRequest createFromParcel(@NonNull Parcel source) {
+                    return new PostRequest(source);
+                }
 
-        @NonNull
-        @Override
-        public PostRequest[] newArray(int size) {
-            return new PostRequest[size];
-        }
-    };
+                @NonNull
+                @Override
+                public PostRequest[] newArray(int size) {
+                    return new PostRequest[size];
+                }
+            };
     private static final String DEFAULT_ID_KEY = "id";
     private final String url, idColumnName, method;
     private final Class requestType, responseType;

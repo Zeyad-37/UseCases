@@ -19,22 +19,35 @@ public class SnackBarFactory {
     public static final String TYPE_INFO = "typeInfo";
     public static final String TYPE_ERROR = "typeError";
 
-    public static Snackbar getSnackBar(@SnackBarType String snackBarType, @NonNull View view,
-                                       @StringRes int stringId, int duration) {
+    public static Snackbar getSnackBar(
+            @SnackBarType String snackBarType,
+            @NonNull View view,
+            @StringRes int stringId,
+            int duration) {
         return createSnackBar(snackBarType, Snackbar.make(view, stringId, duration));
     }
 
-    public static Snackbar getSnackBar(@SnackBarType String snackBarType, @NonNull View view,
-                                       @NonNull CharSequence text, int duration) {
+    public static Snackbar getSnackBar(
+            @SnackBarType String snackBarType,
+            @NonNull View view,
+            @NonNull CharSequence text,
+            int duration) {
         return createSnackBar(snackBarType, Snackbar.make(view, text, duration));
     }
 
-    public static Snackbar getSnackBarWithAction(@SnackBarType String snackBarType, @NonNull View view,
-                                                 @NonNull CharSequence text, String actionText,
-                                                 View.OnClickListener onClickListener) {
-        return createSnackBar(snackBarType, Snackbar.make(view, text, LENGTH_INDEFINITE)
-                .setAction(Utils.isNotEmpty(actionText) ? actionText : "RETRY", onClickListener)
-                .setActionTextColor(Color.BLACK));
+    public static Snackbar getSnackBarWithAction(
+            @SnackBarType String snackBarType,
+            @NonNull View view,
+            @NonNull CharSequence text,
+            String actionText,
+            View.OnClickListener onClickListener) {
+        return createSnackBar(
+                snackBarType,
+                Snackbar.make(view, text, LENGTH_INDEFINITE)
+                        .setAction(
+                                Utils.isNotEmpty(actionText) ? actionText : "RETRY",
+                                onClickListener)
+                        .setActionTextColor(Color.BLACK));
     }
 
     private static Snackbar createSnackBar(@SnackBarType String snackBarType, Snackbar snackbar) {
@@ -50,6 +63,6 @@ public class SnackBarFactory {
 
     @Retention(SOURCE)
     @StringDef({TYPE_INFO, TYPE_ERROR})
-    public @interface SnackBarType {
-    }
+    public @interface SnackBarType {}
 }
+

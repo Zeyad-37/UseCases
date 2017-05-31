@@ -22,9 +22,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * @author by ZIaDo on 2/9/17.
- */
+/** @author by ZIaDo on 2/9/17. */
 public class UserDetailVMTest {
 
     private IDataService mockDataUseCase;
@@ -35,7 +33,8 @@ public class UserDetailVMTest {
     public void setUp() throws Exception {
         mockDataUseCase = mock(IDataService.class);
         userDetailVM = new UserDetailVM();
-        userDetailVM.init(mock(SuccessStateAccumulator.class), mock(UserDetailState.class), mockDataUseCase);
+        userDetailVM.init(
+                mock(SuccessStateAccumulator.class), mock(UserDetailState.class), mockDataUseCase);
 
         repository = new Repository();
         repository.setFullName("testUser");

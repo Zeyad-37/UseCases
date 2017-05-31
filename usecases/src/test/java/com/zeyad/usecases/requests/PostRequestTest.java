@@ -30,13 +30,14 @@ public class PostRequestTest {
 
     @Before
     public void setUp() throws Exception {
-        mPostRequest = new PostRequest.Builder(DATA_CLASS, TO_PERSIST)
-                .payLoad(HASH_MAP)
-                .idColumnName(ID_COLUMN_NAME)
-                .payLoad(JSON_ARRAY)
-                .payLoad(JSON_OBJECT)
-                .fullUrl(URL)
-                .build();
+        mPostRequest =
+                new PostRequest.Builder(DATA_CLASS, TO_PERSIST)
+                        .payLoad(HASH_MAP)
+                        .idColumnName(ID_COLUMN_NAME)
+                        .payLoad(JSON_ARRAY)
+                        .payLoad(JSON_OBJECT)
+                        .fullUrl(URL)
+                        .build();
     }
 
     @After
@@ -64,3 +65,4 @@ public class PostRequestTest {
         assertThat(mPostRequest.getIdColumnName(), is(equalTo(ID_COLUMN_NAME)));
     }
 }
+

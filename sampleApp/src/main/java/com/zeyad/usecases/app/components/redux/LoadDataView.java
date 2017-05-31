@@ -1,8 +1,6 @@
 package com.zeyad.usecases.app.components.redux;
 
-/**
- * Interface representing a View that will use to load data.
- */
+/** Interface representing a View that will use to load data. */
 interface LoadDataView<S> {
     /**
      * Renders the model of the view

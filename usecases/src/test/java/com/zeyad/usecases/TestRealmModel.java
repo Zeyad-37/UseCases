@@ -8,26 +8,23 @@ import io.realm.RealmModel;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.RealmModule;
 
-/**
- * @author by ZIaDo on 2/13/17.
- */
+/** @author by ZIaDo on 2/13/17. */
 @RealmModule
 public class TestRealmModel implements RealmModel {
     @SerializedName("id")
     @PrimaryKey
     private int id;
+
     @SerializedName("value")
     private String value;
 
     public TestRealmModel(int id, String value) {
         this.id = id;
         this.value = value;
-        if (id <= 0)
-            throw new IllegalArgumentException("id should be greater than 0");
+        if (id <= 0) throw new IllegalArgumentException("id should be greater than 0");
     }
 
-    public TestRealmModel() {
-    }
+    public TestRealmModel() {}
 
     public int getId() {
         return id;
@@ -48,10 +45,7 @@ public class TestRealmModel implements RealmModel {
     @NonNull
     @Override
     public String toString() {
-        return "TestRealmModel{" +
-                "id=" + id +
-                ", value='" + value + '\'' +
-                '}';
+        return "TestRealmModel{" + "id=" + id + ", value='" + value + '\'' + '}';
     }
 
     @Override

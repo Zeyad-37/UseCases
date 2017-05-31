@@ -62,11 +62,13 @@ public class DiskDataStoreTest {
     @Test
     public void testGetObject() {
         Flowable observable = Flowable.just(new TestRealmModel());
-        when(dbManager.getById(anyString(), anyLong(), anyString(), any(Class.class))).thenReturn(observable);
+        when(dbManager.getById(anyString(), anyLong(), anyString(), any(Class.class)))
+                .thenReturn(observable);
 
         mDiskDataStore.dynamicGetObject("", "", 0L, "", Object.class, false, false);
 
-        Mockito.verify(dbManager, times(1)).getById(anyString(), anyLong(), anyString(), any(Class.class));
+        Mockito.verify(dbManager, times(1))
+                .getById(anyString(), anyLong(), anyString(), any(Class.class));
     }
 
     @Test
@@ -89,83 +91,105 @@ public class DiskDataStoreTest {
 
     @Test
     public void testDynamicDeleteCollection() {
-        when(dbManager.evictCollection(anyString(), anyList(), any(Class.class))).thenReturn(Completable.complete());
+        when(dbManager.evictCollection(anyString(), anyList(), any(Class.class)))
+                .thenReturn(Completable.complete());
 
-        mDiskDataStore.dynamicDeleteCollection("", "", new JSONArray(), Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicDeleteCollection(
+                "", "", new JSONArray(), Object.class, Object.class, false, false);
 
-        Mockito.verify(dbManager, times(1)).evictCollection(anyString(), anyListOf(Long.class), any(Class.class));
+        Mockito.verify(dbManager, times(1))
+                .evictCollection(anyString(), anyListOf(Long.class), any(Class.class));
     }
 
     @Test
     public void testDynamicPatchObject() throws Exception {
-        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
+        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class)))
+                .thenReturn(Completable.complete());
 
-        mDiskDataStore.dynamicPatchObject("", "", new JSONObject(), Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicPatchObject(
+                "", "", new JSONObject(), Object.class, Object.class, false, false);
 
-        Mockito.verify(dbManager, times(1)).put(any(JSONObject.class), anyString(), any(Class.class));
+        Mockito.verify(dbManager, times(1))
+                .put(any(JSONObject.class), anyString(), any(Class.class));
     }
 
     @Test
     public void testDynamicPostObject() throws Exception {
-        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
+        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class)))
+                .thenReturn(Completable.complete());
 
-        mDiskDataStore.dynamicPostObject("", "", new JSONObject(), Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicPostObject(
+                "", "", new JSONObject(), Object.class, Object.class, false, false);
 
-        Mockito.verify(dbManager, times(1)).put(any(JSONObject.class), anyString(), any(Class.class));
+        Mockito.verify(dbManager, times(1))
+                .put(any(JSONObject.class), anyString(), any(Class.class));
     }
 
     @Test
     public void testDynamicPutObject() throws Exception {
-        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
+        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class)))
+                .thenReturn(Completable.complete());
 
-        mDiskDataStore.dynamicPutObject("", "", new JSONObject(), Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicPutObject(
+                "", "", new JSONObject(), Object.class, Object.class, false, false);
 
-        Mockito.verify(dbManager, times(1)).put(any(JSONObject.class), anyString(), any(Class.class));
+        Mockito.verify(dbManager, times(1))
+                .put(any(JSONObject.class), anyString(), any(Class.class));
     }
 
     @Test
     public void testDynamicPostList() throws Exception {
-        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
+        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class)))
+                .thenReturn(Completable.complete());
 
-        mDiskDataStore.dynamicPostList("", "", new JSONArray(), Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicPostList(
+                "", "", new JSONArray(), Object.class, Object.class, false, false);
 
-        Mockito.verify(dbManager, times(1)).putAll(any(JSONArray.class), anyString(), any(Class.class));
+        Mockito.verify(dbManager, times(1))
+                .putAll(any(JSONArray.class), anyString(), any(Class.class));
     }
 
     @Test
     public void testDynamicPutList() throws Exception {
-        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class))).thenReturn(Completable.complete());
+        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class)))
+                .thenReturn(Completable.complete());
 
-        mDiskDataStore.dynamicPutList("", "", new JSONArray(), Object.class, Object.class, false, false);
+        mDiskDataStore.dynamicPutList(
+                "", "", new JSONArray(), Object.class, Object.class, false, false);
 
-        Mockito.verify(dbManager, times(1)).putAll(any(JSONArray.class), anyString(), any(Class.class));
+        Mockito.verify(dbManager, times(1))
+                .putAll(any(JSONArray.class), anyString(), any(Class.class));
     }
 
     @Test(expected = IllegalStateException.class)
     public void testDynamicDownloadFile() throws Exception {
-        Flowable observable = mDiskDataStore.dynamicDownloadFile("", new File(""), false, false, false);
+        Flowable observable =
+                mDiskDataStore.dynamicDownloadFile("", new File(""), false, false, false);
 
         // Verify repository interactions
         verifyZeroInteractions(dbManager);
 
         // Assert return type
         IllegalStateException expected = new IllegalStateException("Can not IO file to local DB");
-        assertEquals(expected.getMessage(),
+        assertEquals(
+                expected.getMessage(),
                 ((IllegalStateException) observable.first(expected).blockingGet()).getMessage());
     }
 
     @Test(expected = IllegalStateException.class)
     public void testDynamicUploadFile() throws Exception {
-        Flowable observable = mDiskDataStore.dynamicUploadFile("", new File(""), "", new HashMap<>(),
-                false, false, false, Object.class);
+        Flowable observable =
+                mDiskDataStore.dynamicUploadFile(
+                        "", new File(""), "", new HashMap<>(), false, false, false, Object.class);
 
         // Verify repository interactions
         verifyZeroInteractions(dbManager);
 
         // Assert return type
         IllegalStateException expected = new IllegalStateException("Can not IO file to local DB");
-        assertEquals(expected.getMessage(),
+        assertEquals(
+                expected.getMessage(),
                 ((IllegalStateException) observable.first(expected).blockingGet()).getMessage());
     }
-
 }
+

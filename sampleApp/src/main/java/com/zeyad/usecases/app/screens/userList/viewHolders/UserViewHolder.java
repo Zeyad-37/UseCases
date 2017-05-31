@@ -14,12 +14,11 @@ import com.zeyad.usecases.app.utils.Utils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/**
- * @author zeyad on 12/1/16.
- */
+/** @author zeyad on 12/1/16. */
 public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     @BindView(R.id.title)
     TextView textViewTitle;
+
     @BindView(R.id.avatar)
     ImageView avatar;
 
@@ -33,13 +32,13 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
         if (data != null) {
             User userModel = (User) data;
             if (Utils.isNotEmpty(userModel.getAvatarUrl())) {
-                Glide.with(itemView.getContext())
-                        .load(userModel.getAvatarUrl())
-                        .into(avatar);
+                Glide.with(itemView.getContext()).load(userModel.getAvatarUrl()).into(avatar);
             } else {
                 Glide.with(itemView.getContext())
-                        .load(((int) (Math.random() * 10)) % 2 == 0 ? "https://github.com/identicons/jasonlong.png" :
-                                "https://help.github.com/assets/images/help/profile/identicon.png")
+                        .load(
+                                ((int) (Math.random() * 10)) % 2 == 0
+                                        ? "https://github.com/identicons/jasonlong.png"
+                                        : "https://help.github.com/assets/images/help/profile/identicon.png")
                         .into(avatar);
             }
             if (Utils.isNotEmpty(userModel.getLogin())) {
@@ -50,8 +49,7 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     }
 
     @Override
-    public void expand(boolean isExpanded) {
-    }
+    public void expand(boolean isExpanded) {}
 
     public TextView getTextViewTitle() {
         return textViewTitle;

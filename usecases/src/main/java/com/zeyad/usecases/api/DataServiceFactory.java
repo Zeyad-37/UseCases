@@ -17,22 +17,24 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import st.lowlevel.storo.StoroBuilder;
 
 public class DataServiceFactory {
-    @Nullable
-    private static IDataService sDataUseCase;
+    @Nullable private static IDataService sDataUseCase;
 
     /**
-     * @return IDataService the implementation instance of IDataService, throws NullPointerException if null.
+     * @return IDataService the implementation instance of IDataService, throws NullPointerException
+     *     if null.
      */
     @Nullable
     public static IDataService getInstance() {
         if (sDataUseCase == null) {
-            throw new NullPointerException("DataServiceFactory#init must be called before calling getInstance()");
+            throw new NullPointerException(
+                    "DataServiceFactory#init must be called before calling getInstance()");
         }
         return sDataUseCase;
     }
 
     /**
-     * Initialization method, that takes a DataServiceConfig object to setup DataUseCase Singleton instance.
+     * Initialization method, that takes a DataServiceConfig object to setup DataUseCase Singleton
+     * instance.
      *
      * @param config configuration object to DataUseCase.
      */
@@ -59,19 +61,29 @@ public class DataServiceFactory {
             backgroundThread.start();
             Config.setBackgroundThread(AndroidSchedulers.from(backgroundThread.getLooper()));
         }
-        ApiConnection apiConnection = new ApiConnection(ApiConnection.init(config.getOkHttpBuilder()),
-                ApiConnection.initWithCache(config.getOkHttpBuilder(), config.getOkHttpCache()));
-        sDataUseCase = new DataService(config.isWithRealm() || isSQLite ?
-                new DataStoreFactory(isSQLite ? dataBaseManagerUtil : dataClass ->
-                        new RealmManager(backgroundThread.getLooper()), apiConnection, config.getEntityMapper()) :
-                new DataStoreFactory(apiConnection, config.getEntityMapper()), config.getPostExecutionThread(),
-                Config.getBackgroundThread());
+        ApiConnection apiConnection =
+                new ApiConnection(
+                        ApiConnection.init(config.getOkHttpBuilder()),
+                        ApiConnection.initWithCache(
+                                config.getOkHttpBuilder(), config.getOkHttpCache()));
+        sDataUseCase =
+                new DataService(
+                        config.isWithRealm() || isSQLite
+                                ? new DataStoreFactory(
+                                        isSQLite
+                                                ? dataBaseManagerUtil
+                                                : dataClass ->
+                                                        new RealmManager(
+                                                                backgroundThread.getLooper()),
+                                        apiConnection,
+                                        config.getEntityMapper())
+                                : new DataStoreFactory(apiConnection, config.getEntityMapper()),
+                        config.getPostExecutionThread(),
+                        Config.getBackgroundThread());
         Config.setApiConnection(apiConnection);
     }
 
-    /**
-     * Destroys the singleton instance of DataUseCase.
-     */
+    /** Destroys the singleton instance of DataUseCase. */
     public static void destoryInstance() {
         sDataUseCase = null;
     }

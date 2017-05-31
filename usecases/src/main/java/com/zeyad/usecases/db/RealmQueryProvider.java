@@ -8,5 +8,5 @@ import io.realm.RealmQuery;
 
 public interface RealmQueryProvider<T extends RealmModel> {
     @NonNull
-        RealmQuery<T> create(Realm realm);
-    }
+    RealmQuery<T> create(Realm realm);
+}
