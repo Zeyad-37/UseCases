@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.screens.userDetail;
+package com.zeyad.usecases.app.screens.user.detail;
 
 import android.view.View;
 import android.widget.TextView;
@@ -24,7 +24,7 @@ class RepositoryViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
 
     @Override
     public void bindData(Object data, boolean isItemSelected, int position, boolean isEnabled) {
-        if (data != null && data instanceof Repository) {
+        if (data instanceof Repository) {
             Repository repoModel = (Repository) data;
             if (Utils.isNotEmpty(repoModel.getName())) {
                 textView_repo_title.setText(repoModel.getName());

@@ -21,19 +21,21 @@ import com.zeyad.usecases.services.GenericJobService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import retrofit2.HttpException;
 import rx.Observable;
 
-public final class Utils {
+public class Utils {
 
     private static Utils instance;
 
     private Utils() {
-        instance = this;
     }
 
     public static Utils getInstance() {
@@ -117,7 +119,6 @@ public final class Utils {
                     idList.add(jsonArray.getLong(i));
                 } catch (JSONException e) {
                     Log.e("Utils", "convertToListOfId", e);
-                    e.printStackTrace();
                 }
             }
         }
@@ -130,5 +131,10 @@ public final class Utils {
         } else {
             return new ObservableV1ToFlowableV2<>(source);
         }
+    }
+
+    @NonNull
+    public JSONObject getErrorJsonObject(HttpException exception) throws JSONException, IOException {
+        return new JSONObject(exception.response().errorBody().string());
     }
 }

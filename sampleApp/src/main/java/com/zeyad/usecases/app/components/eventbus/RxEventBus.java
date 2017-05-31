@@ -23,10 +23,12 @@ final class RxEventBus implements IRxEventBus {
     }
 
     static IRxEventBus getInstance() {
-        if (mInstance == null) {
-            mInstance = new RxEventBus();
+        synchronized (mInstance) {
+            if (mInstance == null) {
+                mInstance = new RxEventBus();
+            }
+            return mInstance;
         }
-        return mInstance;
     }
 
     @Override

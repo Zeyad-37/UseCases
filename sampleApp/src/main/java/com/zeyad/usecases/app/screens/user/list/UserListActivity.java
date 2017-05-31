@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.screens.userList;
+package com.zeyad.usecases.app.screens.user.list;
 
 import android.app.ActivityOptions;
 import android.app.SearchManager;
@@ -32,14 +32,14 @@ import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.redux.BaseActivity;
 import com.zeyad.usecases.app.components.redux.BaseEvent;
 import com.zeyad.usecases.app.components.redux.UISubscriber;
-import com.zeyad.usecases.app.screens.userDetail.UserDetailActivity;
-import com.zeyad.usecases.app.screens.userDetail.UserDetailFragment;
-import com.zeyad.usecases.app.screens.userDetail.UserDetailState;
-import com.zeyad.usecases.app.screens.userList.events.DeleteUsersEvent;
-import com.zeyad.usecases.app.screens.userList.events.GetPaginatedUsersEvent;
-import com.zeyad.usecases.app.screens.userList.events.SearchUsersEvent;
-import com.zeyad.usecases.app.screens.userList.viewHolders.EmptyViewHolder;
-import com.zeyad.usecases.app.screens.userList.viewHolders.UserViewHolder;
+import com.zeyad.usecases.app.screens.user.detail.UserDetailActivity;
+import com.zeyad.usecases.app.screens.user.detail.UserDetailFragment;
+import com.zeyad.usecases.app.screens.user.detail.UserDetailState;
+import com.zeyad.usecases.app.screens.user.list.events.DeleteUsersEvent;
+import com.zeyad.usecases.app.screens.user.list.events.GetPaginatedUsersEvent;
+import com.zeyad.usecases.app.screens.user.list.events.SearchUsersEvent;
+import com.zeyad.usecases.app.screens.user.list.viewHolders.EmptyViewHolder;
+import com.zeyad.usecases.app.screens.user.list.viewHolders.UserViewHolder;
 import com.zeyad.usecases.app.utils.Utils;
 
 import java.util.ArrayList;
@@ -187,8 +187,9 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                     List<Pair<View, String>> pairs = new ArrayList<>();
                     pairs.add(pair);
                     pairs.add(secondPair);
-                    if (Utils.isNotEmpty(currentFragTag))
+                    if (Utils.isNotEmpty(currentFragTag)) {
                         removeFragment(currentFragTag);
+                    }
                     UserDetailFragment orderDetailFragment = UserDetailFragment.newInstance(userDetailState);
                     currentFragTag = orderDetailFragment.getClass().getSimpleName() + userModel.getId();
                     addFragment(R.id.user_detail_container, orderDetailFragment, currentFragTag, pairs);

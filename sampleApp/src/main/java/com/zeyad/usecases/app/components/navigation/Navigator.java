@@ -13,10 +13,12 @@ final class Navigator implements INavigator {
     private static INavigator mInstance;
 
     static INavigator getInstance() {
-        if (mInstance == null) {
-            mInstance = new Navigator();
+        synchronized (mInstance) {
+            if (mInstance == null) {
+                mInstance = new Navigator();
+            }
+            return mInstance;
         }
-        return mInstance;
     }
 
     @Override

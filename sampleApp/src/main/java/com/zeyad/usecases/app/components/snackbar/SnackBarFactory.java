@@ -19,6 +19,9 @@ public class SnackBarFactory {
     public static final String TYPE_INFO = "typeInfo";
     public static final String TYPE_ERROR = "typeError";
 
+    private SnackBarFactory() {
+    }
+
     public static Snackbar getSnackBar(@SnackBarType String snackBarType, @NonNull View view,
                                        @StringRes int stringId, int duration) {
         return createSnackBar(snackBarType, Snackbar.make(view, stringId, duration));
@@ -40,9 +43,9 @@ public class SnackBarFactory {
     private static Snackbar createSnackBar(@SnackBarType String snackBarType, Snackbar snackbar) {
         switch (snackBarType) {
             case TYPE_INFO:
-                return ColoredSnackbar.info(snackbar, Color.parseColor("#45d482"));
+                return ColoredSnackBar.info(snackbar, Color.parseColor("#45d482"));
             case TYPE_ERROR:
-                return ColoredSnackbar.error(snackbar, Color.parseColor("#e15D50"));
+                return ColoredSnackBar.error(snackbar, Color.parseColor("#e15D50"));
             default:
                 return snackbar;
         }

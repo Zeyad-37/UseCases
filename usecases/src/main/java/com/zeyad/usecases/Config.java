@@ -59,17 +59,13 @@ public final class Config {
 
     public static Config getInstance() {
         if (sInstance == null) {
-            init();
+            sInstance = new Config();
         }
         return sInstance;
     }
 
     public static void init(@NonNull Context context) {
         sInstance = new Config(context);
-    }
-
-    public static void init() {
-        sInstance = new Config();
     }
 
     public static String getBaseURL() {
@@ -148,6 +144,10 @@ public final class Config {
         Config.withSQLite = withSQLite;
     }
 
+    public static void setGson() {
+        mGson = createGson().create();
+    }
+
     private void setup() {
         mGson = createGson().create();
         setupRealm();
@@ -165,10 +165,6 @@ public final class Config {
     @Nullable
     public Context getContext() {
         return mContext;
-    }
-
-    public void setContext(Context context) {
-        mContext = context;
     }
 
     public boolean isUseApiWithCache() {

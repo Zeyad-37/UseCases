@@ -24,7 +24,6 @@ import io.reactivex.functions.Function;
  */
 class DataService implements IDataService {
 
-    private static DataService sDataService;
     private final DataStoreFactory mDataStoreFactory;
     private final Scheduler mPostExecutionThread;
     private final Scheduler mBackgroundThread;
@@ -34,7 +33,6 @@ class DataService implements IDataService {
         mBackgroundThread = backgroundThread;
         mDataStoreFactory = dataStoreFactory;
         mPostExecutionThread = postExecutionThread;
-        sDataService = this;
         mPostThreadExist = mPostExecutionThread != null;
     }
 

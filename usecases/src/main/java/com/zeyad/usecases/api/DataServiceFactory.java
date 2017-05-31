@@ -16,7 +16,7 @@ import com.zeyad.usecases.utils.DataBaseManagerUtil;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import st.lowlevel.storo.StoroBuilder;
 
-public class DataServiceFactory {
+public final class DataServiceFactory {
     @Nullable
     private static IDataService sDataUseCase;
 
@@ -64,11 +64,10 @@ public class DataServiceFactory {
         }
         ApiConnection apiConnection = new ApiConnection(ApiConnection.init(config.getOkHttpBuilder()),
                 ApiConnection.initWithCache(config.getOkHttpBuilder(), config.getOkHttpCache()));
-        sDataUseCase = new DataService(config.isWithRealm() || isSQLite ?
-                new DataStoreFactory(isSQLite ? dataBaseManagerUtil : dataClass ->
-                        new RealmManager(backgroundThread.getLooper()), apiConnection, config.getEntityMapper()) :
-                new DataStoreFactory(apiConnection, config.getEntityMapper()), config.getPostExecutionThread(),
-                Config.getBackgroundThread());
+        dataBaseManagerUtil = config.isWithRealm() || isSQLite ? isSQLite ? dataBaseManagerUtil :
+                dataClass -> new RealmManager(backgroundThread.getLooper()) : null;
+        sDataUseCase = new DataService(new DataStoreFactory(dataBaseManagerUtil, apiConnection,
+                config.getEntityMapper()), config.getPostExecutionThread(), Config.getBackgroundThread());
         Config.setApiConnection(apiConnection);
     }
 

@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.screens.userList.viewHolders;
+package com.zeyad.usecases.app.screens.user.list.viewHolders;
 
 import android.view.View;
 

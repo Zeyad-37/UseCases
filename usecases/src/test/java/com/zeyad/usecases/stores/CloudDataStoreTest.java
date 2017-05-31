@@ -68,6 +68,7 @@ public class CloudDataStoreTest {
 
     @Before
     public void setUp() throws Exception {
+        com.zeyad.usecases.Config.setGson();
         observable = Flowable.just(new Object());
         mockContext = mock(Context.class);
         mockApiConnection = mock(ApiConnection.class);

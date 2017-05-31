@@ -12,7 +12,6 @@ import android.util.Log;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.R;
 import com.zeyad.usecases.db.DataBaseManager;
 import com.zeyad.usecases.db.RealmManager;
 import com.zeyad.usecases.db.RealmQueryProvider;
@@ -59,8 +58,7 @@ import static com.zeyad.usecases.requests.PostRequest.PUT;
 public class CloudDataStore implements DataStore {
 
     public static final String APPLICATION_JSON = "application/json";
-    private static final String TAG = CloudDataStore.class.getSimpleName(), MULTIPART_FORM_DATA = "multipart/form-data",
-            NO_INTERNET_NOT_PERSISTED = "Could not reach server and could not persist to queue!";
+    private static final String TAG = CloudDataStore.class.getSimpleName(), MULTIPART_FORM_DATA = "multipart/form-data";
     private static final int COUNTER_START = 1, ATTEMPTS = 3;
     private final DataBaseManager mDataBaseManager;
     @NonNull
@@ -91,7 +89,7 @@ public class CloudDataStore implements DataStore {
     }
 
     private <M> Flowable<M> getErrorFlowableNotPersisted() {
-        return Flowable.error(new NetworkConnectionException(NO_INTERNET_NOT_PERSISTED));
+        return Flowable.error(new NetworkConnectionException("Could not reach server and could not persist to queue!"));
     }
 
     @NonNull
@@ -292,7 +290,7 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public Completable dynamicDeleteAll(Class dataClass) {
-        return Completable.error(new IllegalStateException(mContext.getString(R.string.delete_all_error_cloud)));
+        return Completable.error(new IllegalStateException("Can not delete all from cloud data store!"));
     }
 
     @NonNull
@@ -390,7 +388,7 @@ public class CloudDataStore implements DataStore {
     @NonNull
     @Override
     public <M> Flowable<List<M>> queryDisk(RealmQueryProvider queryFactory) {
-        return Flowable.error(new IllegalAccessException(mContext.getString(R.string.search_disk_error_cloud)));
+        return Flowable.error(new IllegalAccessException("Can not search disk in cloud data store!"));
     }
 
     private <M> FlowableTransformer<M, M> applyExponentialBackoff() {
@@ -497,7 +495,7 @@ public class CloudDataStore implements DataStore {
                     mappedObject = mEntityDataMapper.mapTo(object, dataClass);
                 }
             } catch (Exception e) {
-                e.printStackTrace();
+                Log.e(TAG, "persistGeneric", e);
             }
             if (mappedObject instanceof RealmObject) {
                 completable = mDataBaseManager.put((RealmObject) mappedObject, dataClass);
@@ -510,7 +508,8 @@ public class CloudDataStore implements DataStore {
                         completable = mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
                                 .doOnEvent(objectNotification -> {
                                     JSONObject jsonObject;
-                                    for (int i = 0, size = jsonArray.length(); i < size; i++) {
+                                    int size = jsonArray.length();
+                                    for (int i = 0; i < size; i++) {
                                         jsonObject = jsonArray.optJSONObject(i);
                                         Storo.put(dataClass.getSimpleName()
                                                         + jsonObject.optString(idColumnName),
@@ -542,7 +541,7 @@ public class CloudDataStore implements DataStore {
                                 });
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "persistGeneric", e);
                     completable = Completable.error(e);
                 }
             }
@@ -560,7 +559,8 @@ public class CloudDataStore implements DataStore {
     }
 
     private void deleteFromPersistence(@NonNull List collection, String idColumnName, @NonNull Class dataClass) {
-        for (int i = 0, collectionSize = collection.size(); i < collectionSize; i++) {
+        int collectionSize = collection.size();
+        for (int i = 0; i < collectionSize; i++) {
             mDataBaseManager.evictById(dataClass, idColumnName, (long) collection.get(i));
             if (Config.isWithCache()) {
                 Storo.delete(dataClass.getSimpleName() + (long) collection.get(i));

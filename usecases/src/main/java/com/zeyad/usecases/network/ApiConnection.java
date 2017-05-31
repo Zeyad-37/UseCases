@@ -278,7 +278,6 @@ public class ApiConnection {
                     10 * 1024 * 1024); // 10 MB
         } catch (Exception e) {
             Log.e("ApiConnection", "", e);
-            e.printStackTrace();
         }
         return cache;
     }

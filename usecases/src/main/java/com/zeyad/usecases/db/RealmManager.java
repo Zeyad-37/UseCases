@@ -28,12 +28,10 @@ public class RealmManager implements DataBaseManager {
 
     private static final String REALM_OBJECT_INVALID = "RealmObject is invalid",
             JSON_INVALID = "JSONObject is invalid", NO_ID = "Could not find id!";
-    private static Handler backgroundHandler;
+    private final Handler backgroundHandler;
 
     public RealmManager(Looper backgroundLooper) {
-        if (backgroundHandler == null) {
-            backgroundHandler = new Handler(backgroundLooper);
-        }
+        backgroundHandler = new Handler(backgroundLooper);
     }
 
     /**
@@ -267,7 +265,8 @@ public class RealmManager implements DataBaseManager {
                                        @NonNull Class dataClass) {
         return Completable.defer(() -> {
             boolean isDeleted = true;
-            for (int i = 0, size = list.size(); i < size; i++) {
+            int size = list.size();
+            for (int i = 0; i < size; i++) {
                 isDeleted = isDeleted && evictById(dataClass, idFieldName, list.get(i));
             }
             return Completable.complete();
@@ -284,8 +283,9 @@ public class RealmManager implements DataBaseManager {
     }
 
     private void executeWriteOperationInRealm(@NonNull Realm realm, @NonNull Execute execute) {
-        if (realm.isInTransaction())
+        if (realm.isInTransaction()) {
             realm.cancelTransaction();
+        }
         realm.beginTransaction();
         execute.run();
         realm.commitTransaction();
@@ -293,8 +293,9 @@ public class RealmManager implements DataBaseManager {
 
     private <T> T executeWriteOperationInRealm(@NonNull Realm realm, @NonNull ExecuteAndReturn<T> executor) {
         T toReturnValue;
-        if (realm.isInTransaction())
+        if (realm.isInTransaction()) {
             realm.cancelTransaction();
+        }
         realm.beginTransaction();
         toReturnValue = executor.run();
         realm.commitTransaction();
@@ -307,7 +308,8 @@ public class RealmManager implements DataBaseManager {
         if (idColumnName == null || idColumnName.isEmpty()) {
             throw new IllegalArgumentException(NO_ID);
         }
-        for (int i = 0, length = jsonArray.length(); i < length; i++) {
+        int length = jsonArray.length();
+        for (int i = 0; i < length; i++) {
             if (jsonArray.opt(i) instanceof JSONObject) {
                 updateJsonObjectWithIdValue(jsonArray.optJSONObject(i), idColumnName, dataClass);
             }

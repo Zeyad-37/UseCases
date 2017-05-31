@@ -1,7 +1,0 @@
-<resources>
-    <!-- Exception Messages -->
-    <string name="delete_all_error_cloud">Can not delete all from cloud data store</string>
-    <string name="search_disk_error_cloud">Can not search disk in cloud data store</string>
-    <string name="job_started">%1$s Job started!</string>
-
-</resources>

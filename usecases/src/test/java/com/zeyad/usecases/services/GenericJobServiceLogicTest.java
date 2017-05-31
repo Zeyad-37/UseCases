@@ -33,8 +33,8 @@ public class GenericJobServiceLogicTest {
                 .method(POST)
                 .build());
 
-        genericJobServiceLogic.startJob(extras, mock(CloudDataStore.class),
-                mock(Utils.class), "").subscribe(new TestObserver<>());
+        genericJobServiceLogic.startJob(extras, mock(CloudDataStore.class), Utils.getInstance(), "")
+                .subscribe(new TestObserver<>());
         testSubscriber.assertNoErrors();
 //        testSubscriber.assertComplete();
     }

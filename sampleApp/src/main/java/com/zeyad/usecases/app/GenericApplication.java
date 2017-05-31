@@ -49,6 +49,7 @@ public class GenericApplication extends Application {
                 }
             }
         } catch (Exception e) {
+            Log.e("GenericApplication", "checkAppSignature", e);
             //assumes an issue in checking signature., but we let the caller decide on what to do.
         }
         return false;
@@ -68,7 +69,7 @@ public class GenericApplication extends Application {
                 return true;
             }
         } catch (Exception ignored) {
-            ignored.printStackTrace();
+            Log.e("GenericApplication", "checkEmulator", ignored);
         }
         return false;
     }

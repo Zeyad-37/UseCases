@@ -4,7 +4,9 @@ import android.support.annotation.ColorInt;
 import android.support.design.widget.Snackbar;
 import android.view.View;
 
-public class ColoredSnackbar {
+public final class ColoredSnackBar {
+    private ColoredSnackBar() {
+    }
 
     private static View getSnackBarLayout(Snackbar snackbar) {
         return snackbar != null ? snackbar.getView() : null;

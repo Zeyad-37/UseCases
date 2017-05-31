@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.screens.userDetail;
+package com.zeyad.usecases.app.screens.user.detail;
 
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -30,8 +30,8 @@ import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.redux.BaseFragment;
-import com.zeyad.usecases.app.screens.userList.User;
-import com.zeyad.usecases.app.screens.userList.UserListActivity;
+import com.zeyad.usecases.app.screens.user.list.User;
+import com.zeyad.usecases.app.screens.user.list.UserListActivity;
 import com.zeyad.usecases.app.utils.Utils;
 
 import org.parceler.Parcels;
@@ -125,7 +125,8 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
         User user = viewState.getUser();
         List<Repository> repoModels = viewState.getRepos();
         if (Utils.isNotEmpty(repoModels)) {
-            for (int i = 0, repoModelSize = repoModels.size(); i < repoModelSize; i++) {
+            int repoModelSize = repoModels.size();
+            for (int i = 0; i < repoModelSize; i++) {
                 repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
             }
         }

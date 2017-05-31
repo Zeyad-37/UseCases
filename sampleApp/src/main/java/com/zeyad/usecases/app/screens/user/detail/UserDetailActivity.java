@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.screens.userDetail;
+package com.zeyad.usecases.app.screens.user.detail;
 
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +16,7 @@ import android.view.View;
 import android.widget.ImageView;
 
 import com.zeyad.usecases.app.R;
-import com.zeyad.usecases.app.screens.userList.UserListActivity;
+import com.zeyad.usecases.app.screens.user.list.UserListActivity;
 
 import org.parceler.Parcels;
 

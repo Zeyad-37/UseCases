@@ -11,13 +11,13 @@ import java.util.List;
 
 public final class DAOMapper {
     private static DAOMapper sDAOMapper;
-    public Gson gson;
+    private final Gson gson;
 
     private DAOMapper() {
         gson = Config.getGson();
     }
 
-    public static synchronized DAOMapper getInstance() {
+    public static DAOMapper getInstance() {
         if (sDAOMapper == null) {
             sDAOMapper = new DAOMapper();
         }

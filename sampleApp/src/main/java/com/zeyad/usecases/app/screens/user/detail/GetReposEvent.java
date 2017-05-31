@@ -1,4 +1,4 @@
-package com.zeyad.usecases.app.screens.userDetail;
+package com.zeyad.usecases.app.screens.user.detail;
 
 import com.zeyad.usecases.app.components.redux.BaseEvent;
 

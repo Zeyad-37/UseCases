@@ -25,16 +25,16 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".screens.userList.UserListActivity"
+            android:name=".screens.user.list.UserListActivity"
             android:label="@string/title_user_list"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".screens.userDetail.UserDetailActivity"
-            android:parentActivityName=".screens.userList.UserListActivity"
+            android:name=".screens.user.detail.UserDetailActivity"
+            android:parentActivityName=".screens.user.list.UserListActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".screens.userList.UserListActivity" />
+                android:value=".screens.user.list.UserListActivity" />
         </activity>
     </application>
 </manifest>

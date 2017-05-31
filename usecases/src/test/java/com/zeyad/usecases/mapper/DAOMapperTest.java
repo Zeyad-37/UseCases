@@ -1,6 +1,7 @@
 package com.zeyad.usecases.mapper;
 
 import com.google.gson.internal.LinkedTreeMap;
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.TestRealmModel;
 
 import junit.framework.Assert;
@@ -19,6 +20,7 @@ public class DAOMapperTest {
 
     @Before
     public void setUp() throws Exception {
+        Config.setGson();
         daoMapper = DAOMapper.getInstance();
     }
 
