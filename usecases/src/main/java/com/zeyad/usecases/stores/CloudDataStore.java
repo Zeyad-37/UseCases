@@ -76,11 +76,8 @@ public class CloudDataStore implements DataStore {
      * @param apiConnection   The {@link RestApi} implementation to use.
      * @param dataBaseManager A {@link DataBaseManager} to cache data retrieved from the api.
      */
-    CloudDataStore(
-            ApiConnection apiConnection,
-            DataBaseManager dataBaseManager,
-            @NonNull DAOMapper entityDataMapper,
-            Context context) {
+    CloudDataStore(ApiConnection apiConnection, DataBaseManager dataBaseManager, @NonNull DAOMapper entityDataMapper,
+                   Context context) {
         mApiConnection = apiConnection;
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
@@ -97,119 +94,86 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<M> dynamicGetObject(
-            String url,
-            String idColumnName,
-            Long itemIdL,
-            String itemIdS,
-            @NonNull Class dataClass,
-            boolean persist,
-            boolean shouldCache) {
-        return mApiConnection
-                .<M>dynamicGetObject(url, shouldCache)
-                .doOnNext(
-                        m -> {
-                            if (willPersist(persist)) {
-                                persistGeneric(m, idColumnName, dataClass);
-                            }
-                        })
-                .map(entity -> mEntityDataMapper.<M>mapTo(entity, dataClass));
+    public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Long itemIdL, String itemIdS,
+                                            @NonNull Class dataClass, boolean persist, boolean shouldCache) {
+        return mApiConnection.<M>dynamicGetObject(url, shouldCache)
+                .doOnNext(m -> {
+                    if (willPersist(persist)) {
+                        persistGeneric(m, idColumnName, dataClass);
+                    }
+                }).map(entity -> mEntityDataMapper.<M>mapTo(entity, dataClass));
     }
 
     @NonNull
     @Override
-    public <M> Flowable<List<M>> dynamicGetList(
-            String url, @NonNull Class dataClass, boolean persist, boolean shouldCache) {
-        return mApiConnection
-                .dynamicGetList(url, shouldCache)
+    public <M> Flowable<List<M>> dynamicGetList(String url, @NonNull Class dataClass, boolean persist,
+                                                boolean shouldCache) {
+        return mApiConnection.dynamicGetList(url, shouldCache)
                 .map(entities -> mEntityDataMapper.<List<M>>mapAllTo(entities, dataClass))
-                .doOnNext(
-                        list -> {
-                            if (willPersist(persist)) {
-                                persistAllGenerics(list, dataClass);
-                            }
-                        });
-    }
-
-    @NonNull
-    @Override
-    public <M> Flowable<M> dynamicPatchObject(
-            String url,
-            String idColumnName,
-            @NonNull JSONObject jsonObject,
-            @NonNull Class dataClass,
-            Class responseType,
-            boolean persist,
-            boolean queuable) {
-        return Flowable.defer(
-                () -> {
+                .doOnNext(list -> {
                     if (willPersist(persist)) {
-                        persistGeneric(jsonObject, idColumnName, dataClass);
+                        persistAllGenerics(list, dataClass);
                     }
-                    if (isQueuableIfOutOfNetwork(queuable)) {
-                        queuePost(PATCH, url, idColumnName, jsonObject, persist);
-                        return Flowable.empty();
-                    } else if (!utils.isNetworkAvailable(mContext)) {
-                        return getErrorFlowableNotPersisted();
-                    }
-                    return mApiConnection
-                            .<M>dynamicPatch(
-                                    url,
-                                    RequestBody.create(
-                                            MediaType.parse(APPLICATION_JSON),
-                                            jsonObject.toString()))
-                            .map(object -> daoMapHelper(responseType, object))
-                            .onErrorResumeNext(
-                                    throwable -> {
-                                        if (isQueuableIfOutOfNetwork(queuable)
-                                                && isNetworkFailure(throwable)) {
-                                            queuePost(
-                                                    PATCH, url, idColumnName, jsonObject, persist);
-                                            return Flowable.empty();
-                                        }
-                                        return Flowable.error(throwable);
-                                    });
                 });
     }
 
     @NonNull
     @Override
-    public <M> Flowable<M> dynamicPostObject(
-            String url,
-            String idColumnName,
-            @NonNull JSONObject jsonObject,
-            @NonNull Class dataClass,
-            Class responseType,
-            boolean persist,
-            boolean queuable) {
-        return Flowable.defer(
-                () -> {
-                    if (willPersist(persist)) {
-                        persistGeneric(jsonObject, idColumnName, dataClass);
-                    }
-                    if (isQueuableIfOutOfNetwork(queuable)) {
-                        queuePost(POST, url, idColumnName, jsonObject, persist);
-                        return Flowable.empty();
-                    } else if (!utils.isNetworkAvailable(mContext)) {
-                        return getErrorFlowableNotPersisted();
-                    }
-                    return mApiConnection
-                            .<M>dynamicPost(
-                                    url,
-                                    RequestBody.create(
-                                            MediaType.parse(APPLICATION_JSON),
-                                            jsonObject.toString()))
-                            .map(object -> daoMapHelper(responseType, object))
-                            .onErrorResumeNext(
-                                    throwable -> {
-                                        if (isQueuableIfOutOfNetwork(queuable)
-                                                && isNetworkFailure(throwable)) {
-                                            queuePost(POST, url, idColumnName, jsonObject, persist);
-                                            return Flowable.empty();
-                                        }
-                                        return Flowable.error(throwable);
-                                    });
-                });
+    public <M> Flowable<M> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                              @NonNull Class dataClass, Class responseType, boolean persist,
+                                              boolean queuable) {
+        return Flowable.defer(() -> {
+            if (willPersist(persist)) {
+                persistGeneric(jsonObject, idColumnName, dataClass);
+            }
+            if (isQueuableIfOutOfNetwork(queuable)) {
+                queuePost(PATCH, url, idColumnName, jsonObject, persist);
+                return Flowable.empty();
+            } else if (!utils.isNetworkAvailable(mContext)) {
+                return getErrorFlowableNotPersisted();
+            }
+            return mApiConnection.<M>dynamicPatch(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+                    jsonObject.toString()))
+                    .map(object -> daoMapHelper(responseType, object))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable)
+                                && isNetworkFailure(throwable)) {
+                            queuePost(
+                                    PATCH, url, idColumnName, jsonObject, persist);
+                            return Flowable.empty();
+                        }
+                        return Flowable.error(throwable);
+                    });
+        });
+    }
+
+    @NonNull
+    @Override
+    public <M> Flowable<M> dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                             @NonNull Class dataClass, Class responseType, boolean persist,
+                                             boolean queuable) {
+        return Flowable.defer(() -> {
+            if (willPersist(persist)) {
+                persistGeneric(jsonObject, idColumnName, dataClass);
+            }
+            if (isQueuableIfOutOfNetwork(queuable)) {
+                queuePost(POST, url, idColumnName, jsonObject, persist);
+                return Flowable.empty();
+            } else if (!utils.isNetworkAvailable(mContext)) {
+                return getErrorFlowableNotPersisted();
+            }
+            return mApiConnection.<M>dynamicPost(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+                    jsonObject.toString()))
+                    .map(object -> daoMapHelper(responseType, object))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable)
+                                && isNetworkFailure(throwable)) {
+                            queuePost(POST, url, idColumnName, jsonObject, persist);
+                            return Flowable.empty();
+                        }
+                        return Flowable.error(throwable);
+                    });
+        });
     }
 
     @NonNull
@@ -242,82 +206,60 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<M> dynamicPutObject(
-            String url,
-            String idColumnName,
-            @NonNull JSONObject jsonObject,
-            @NonNull Class dataClass,
-            Class responseType,
-            boolean persist,
-            boolean queuable) {
-        return Flowable.defer(
-                () -> {
-                    if (willPersist(persist)) {
-                        persistGeneric(jsonObject, idColumnName, dataClass);
-                    }
-                    if (isQueuableIfOutOfNetwork(queuable)) {
-                        queuePost(PUT, url, idColumnName, jsonObject, persist);
-                        return Flowable.empty();
-                    } else if (!utils.isNetworkAvailable(mContext)) {
-                        return getErrorFlowableNotPersisted();
-                    }
-                    return mApiConnection
-                            .<M>dynamicPut(
-                                    url,
-                                    RequestBody.create(
-                                            MediaType.parse(APPLICATION_JSON),
-                                            jsonObject.toString()))
-                            .map(object -> daoMapHelper(responseType, object))
-                            .onErrorResumeNext(
-                                    throwable -> {
-                                        if (isQueuableIfOutOfNetwork(queuable)
-                                                && isNetworkFailure(throwable)) {
-                                            queuePost(PUT, url, idColumnName, jsonObject, persist);
-                                            return Flowable.empty();
-                                        }
-                                        return Flowable.error(throwable);
-                                    });
-                });
+    public <M> Flowable<M> dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                            @NonNull Class dataClass, Class responseType, boolean persist,
+                                            boolean queuable) {
+        return Flowable.defer(() -> {
+            if (willPersist(persist)) {
+                persistGeneric(jsonObject, idColumnName, dataClass);
+            }
+            if (isQueuableIfOutOfNetwork(queuable)) {
+                queuePost(PUT, url, idColumnName, jsonObject, persist);
+                return Flowable.empty();
+            } else if (!utils.isNetworkAvailable(mContext)) {
+                return getErrorFlowableNotPersisted();
+            }
+            return mApiConnection.<M>dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+                    jsonObject.toString()))
+                    .map(object -> daoMapHelper(responseType, object))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable)
+                                && isNetworkFailure(throwable)) {
+                            queuePost(PUT, url, idColumnName, jsonObject, persist);
+                            return Flowable.empty();
+                        }
+                        return Flowable.error(throwable);
+                    });
+        });
     }
 
     @NonNull
     @Override
-    public <M> Flowable<M> dynamicPutList(
-            String url,
-            String idColumnName,
-            @NonNull JSONArray jsonArray,
-            @NonNull Class dataClass,
-            Class responseType,
-            boolean persist,
-            boolean queuable) {
-        return Flowable.defer(
-                () -> {
-                    if (willPersist(persist)) {
-                        persistGeneric(jsonArray, idColumnName, dataClass);
-                    }
-                    if (isQueuableIfOutOfNetwork(queuable)) {
-                        queuePost(PUT, url, idColumnName, jsonArray, persist);
-                        return Flowable.empty();
-                    } else if (!utils.isNetworkAvailable(mContext)) {
-                        return getErrorFlowableNotPersisted();
-                    }
-                    return mApiConnection
-                            .<M>dynamicPut(
-                                    url,
-                                    RequestBody.create(
-                                            MediaType.parse(APPLICATION_JSON),
-                                            jsonArray.toString()))
-                            .map(object -> daoMapHelper(responseType, object))
-                            .onErrorResumeNext(
-                                    throwable -> {
-                                        if (isQueuableIfOutOfNetwork(queuable)
-                                                && isNetworkFailure(throwable)) {
-                                            queuePost(PUT, url, idColumnName, jsonArray, persist);
-                                            return Flowable.empty();
-                                        }
-                                        return Flowable.error(throwable);
-                                    });
-                });
+    public <M> Flowable<M> dynamicPutList(String url, String idColumnName, @NonNull JSONArray jsonArray,
+                                          @NonNull Class dataClass, Class responseType, boolean persist,
+                                          boolean queuable) {
+        return Flowable.defer(() -> {
+            if (willPersist(persist)) {
+                persistGeneric(jsonArray, idColumnName, dataClass);
+            }
+            if (isQueuableIfOutOfNetwork(queuable)) {
+                queuePost(PUT, url, idColumnName, jsonArray, persist);
+                return Flowable.empty();
+            } else if (!utils.isNetworkAvailable(mContext)) {
+                return getErrorFlowableNotPersisted();
+            }
+            return mApiConnection.<M>dynamicPut(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
+                    jsonArray.toString()))
+                    .map(object -> daoMapHelper(responseType, object))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable)
+                                && isNetworkFailure(throwable)) {
+                            queuePost(PUT, url, idColumnName, jsonArray, persist);
+                            return Flowable.empty();
+                        }
+                        return Flowable.error(throwable);
+                    });
+        });
     }
 
     @NonNull
@@ -454,24 +396,21 @@ public class CloudDataStore implements DataStore {
     }
 
     private <M> FlowableTransformer<M, M> applyExponentialBackoff() {
-        return observable ->
-                observable.retryWhen(
-                        attempts -> {
-                            return attempts.zipWith(
-                                    Flowable.range(COUNTER_START, ATTEMPTS), (n, i) -> i)
-                                    .flatMap(
-                                            i -> {
-                                                Log.d(TAG, "delay retry by " + i + " second(s)");
-                                                return Flowable.timer(5 * i, TimeUnit.SECONDS);
-                                            });
-                        });
+        return observable -> observable.retryWhen(attempts -> {
+            return attempts.zipWith(
+                    Flowable.range(COUNTER_START, ATTEMPTS), (n, i) -> i)
+                    .flatMap(i -> {
+                        Log.d(TAG, "delay retry by " + i + " second(s)");
+                        return Flowable.timer(5 * i, TimeUnit.SECONDS);
+                    });
+        });
     }
 
     @Nullable
     private <M> M daoMapHelper(@NonNull Class dataClass, M object) {
-        return object instanceof List
-                ? mEntityDataMapper.mapAllTo((List) object, dataClass)
-                : mEntityDataMapper.mapTo(object, dataClass);
+        return object instanceof List ?
+                mEntityDataMapper.mapAllTo((List) object, dataClass) :
+                mEntityDataMapper.mapTo(object, dataClass);
     }
 
     private boolean willPersist(boolean persist) {
@@ -525,41 +464,29 @@ public class CloudDataStore implements DataStore {
                 == ConnectivityManager.TYPE_WIFI;
     }
 
-    private void queueIOFile(
-            String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload) {
-        utils.queueFileIOCore(
-                mDispatcher,
-                isDownload,
-                new FileIORequest.Builder(url, file)
-                        .onWifi(onWifi)
-                        .whileCharging(whileCharging)
-                        .build());
+    private void queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload) {
+        utils.queueFileIOCore(mDispatcher, isDownload, new FileIORequest.Builder(url, file)
+                .onWifi(onWifi)
+                .whileCharging(whileCharging)
+                .build());
     }
 
-    private void queuePost(
-            String method, String url, String idColumnName, JSONArray jsonArray, boolean persist) {
-        queuePostCore(
-                new PostRequest.Builder(null, persist)
-                        .idColumnName(idColumnName)
-                        .payLoad(jsonArray)
-                        .url(url)
-                        .method(method)
-                        .build());
+    private void queuePost(String method, String url, String idColumnName, JSONArray jsonArray, boolean persist) {
+        queuePostCore(new PostRequest.Builder(null, persist)
+                .idColumnName(idColumnName)
+                .payLoad(jsonArray)
+                .url(url)
+                .method(method)
+                .build());
     }
 
-    private void queuePost(
-            String method,
-            String url,
-            String idColumnName,
-            JSONObject jsonObject,
-            boolean persist) {
-        queuePostCore(
-                new PostRequest.Builder(null, persist)
-                        .idColumnName(idColumnName)
-                        .payLoad(jsonObject)
-                        .url(url)
-                        .method(method)
-                        .build());
+    private void queuePost(String method, String url, String idColumnName, JSONObject jsonObject, boolean persist) {
+        queuePostCore(new PostRequest.Builder(null, persist)
+                .idColumnName(idColumnName)
+                .payLoad(jsonObject)
+                .url(url)
+                .method(method)
+                .build());
     }
 
     private void queuePostCore(@NonNull PostRequest postRequest) {
@@ -615,27 +542,15 @@ public class CloudDataStore implements DataStore {
                         } else {
                             jsonObject = new JSONObject(gson.toJson(object, dataClass));
                         }
-                        completable =
-                                mDataBaseManager
-                                        .put(jsonObject, idColumnName, dataClass)
-                                        .doOnEvent(
-                                                objectNotification -> {
-                                                    if (Config.isWithCache()) {
-                                                        Storo.put(
-                                                                dataClass.getSimpleName()
-                                                                        + jsonObject
-                                                                        .optString(
-                                                                                idColumnName),
-                                                                gson.fromJson(
-                                                                        jsonObject
-                                                                                .toString(),
-                                                                        dataClass))
-                                                                .setExpiry(
-                                                                        Config.getCacheAmount(),
-                                                                        Config.getCacheTimeUnit())
-                                                                .execute();
-                                                    }
-                                                });
+                        completable = mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+                                .doOnEvent(objectNotification -> {
+                                    if (Config.isWithCache()) {
+                                        Storo.put(dataClass.getSimpleName() + jsonObject.optString(idColumnName),
+                                                gson.fromJson(jsonObject.toString(), dataClass))
+                                                .setExpiry(Config.getCacheAmount(), Config.getCacheTimeUnit())
+                                                .execute();
+                                    }
+                                });
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "persistGeneric", e);
@@ -644,8 +559,7 @@ public class CloudDataStore implements DataStore {
             }
         }
         if (completable != null) {
-            completable
-                    .subscribeOn(Config.getBackgroundThread())
+            completable.subscribeOn(Config.getBackgroundThread())
                     .subscribe(new SimpleSubscriber(dataClass));
         }
     }

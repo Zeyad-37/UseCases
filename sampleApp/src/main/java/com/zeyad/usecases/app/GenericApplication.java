@@ -27,24 +27,22 @@ import io.realm.rx.RealmObservableFactory;
 
 import static com.zeyad.usecases.app.utils.Constants.URLS.API_BASE_URL;
 
-/** @author by ZIaDo on 9/24/16. */
+/**
+ * @author by ZIaDo on 9/24/16.
+ */
 public class GenericApplication extends Application {
 
     @TargetApi(value = 24)
     private static boolean checkAppSignature(Context context) {
         try {
-            PackageInfo packageInfo =
-                    context.getPackageManager()
-                            .getPackageInfo(
-                                    context.getPackageName(), PackageManager.GET_SIGNATURES);
+            PackageInfo packageInfo = context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
             for (Signature signature : packageInfo.signatures) {
                 byte[] signatureBytes = signature.toByteArray();
                 MessageDigest md = MessageDigest.getInstance("SHA");
                 md.update(signatureBytes);
                 final String currentSignature = Base64.encodeToString(md.digest(), Base64.DEFAULT);
-                Log.d(
-                        "REMOVE_ME",
-                        "Include this string as a value for SIGNATURE:" + currentSignature);
+                Log.d("REMOVE_ME", "Include this string as a value for SIGNATURE:" + currentSignature);
                 //compare signatures
                 if (java.security.CryptoPrimitive.SIGNATURE.toString().equals(currentSignature)) {
                     return true;
@@ -79,10 +77,8 @@ public class GenericApplication extends Application {
 
     private static String getSystemProperty(String name) throws Exception {
         Class systemPropertyClazz = Class.forName("android.os.SystemProperties");
-        return (String)
-                systemPropertyClazz
-                        .getMethod("get", new Class[] {String.class})
-                        .invoke(systemPropertyClazz, name);
+        return (String) systemPropertyClazz.getMethod("get", new Class[]{String.class})
+                .invoke(systemPropertyClazz, name);
     }
 
     private static boolean checkDebuggable(Context context) {
@@ -93,21 +89,19 @@ public class GenericApplication extends Application {
     public void onCreate() {
         initializeStrictMode();
         super.onCreate();
-        Completable.fromAction(
-                        () -> {
-                            checkAppTampering(this);
-                            initializeFlowUp();
-                            Rollbar.init(this, "c8c8b4cb1d4f4650a77ae1558865ca87", "production");
-                        })
-                .subscribeOn(Schedulers.io())
-                .subscribe(() -> {}, Throwable::printStackTrace);
+        Completable.fromAction(() -> {
+            checkAppTampering(this);
+            initializeFlowUp();
+            Rollbar.init(this, "c8c8b4cb1d4f4650a77ae1558865ca87", "production");
+        }).subscribeOn(Schedulers.io())
+                .subscribe(() -> {
+                }, Throwable::printStackTrace);
         initializeRealm();
-        DataServiceFactory.init(
-                new DataServiceConfig.Builder(this)
-                        .baseUrl(API_BASE_URL)
-                        .withCache(3, TimeUnit.MINUTES)
-                        .withRealm()
-                        .build());
+        DataServiceFactory.init(new DataServiceConfig.Builder(this)
+                .baseUrl(API_BASE_URL)
+                .withCache(3, TimeUnit.MINUTES)
+                .withRealm()
+                .build());
     }
 
     private void initializeStrictMode() {
@@ -121,13 +115,12 @@ public class GenericApplication extends Application {
 
     private void initializeRealm() {
         Realm.init(this);
-        Realm.setDefaultConfiguration(
-                new RealmConfiguration.Builder()
-                        .name("app.realm")
-                        .modules(Realm.getDefaultModule(), new LibraryModule())
-                        .rxFactory(new RealmObservableFactory())
-                        .deleteRealmIfMigrationNeeded()
-                        .build());
+        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
+                .name("app.realm")
+                .modules(Realm.getDefaultModule(), new LibraryModule())
+                .rxFactory(new RealmObservableFactory())
+                .deleteRealmIfMigrationNeeded()
+                .build());
     }
 
     private void initializeFlowUp() {

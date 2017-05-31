@@ -43,8 +43,9 @@ public class DiskDataStore implements DataStore {
     public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Long itemIdL, String itemIdS,
                                             @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         String key = dataClass.getSimpleName() + (itemIdL == null ? itemIdS : String.valueOf(itemIdL));
-        return withCache && Storo.contains(key) ? Utils.getInstance().toFlowable(Storo.get(key, dataClass).async()
-                .map(object -> mEntityDataMapper.mapTo(object, dataClass))) :
+        return withCache && Storo.contains(key) ?
+                Utils.getInstance().toFlowable(Storo.get(key, dataClass).async()
+                        .map(object -> mEntityDataMapper.mapTo(object, dataClass))) :
                 mDataBaseManager.<M>getById(idColumnName, itemIdL, itemIdS, dataClass)
                         .doOnEach(notification -> {
                             try {
@@ -79,14 +80,9 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Flowable dynamicDeleteCollection(
-            String url,
-            String idColumnName,
-            JSONArray jsonArray,
-            @NonNull Class dataClass,
-            Class responseType,
-            boolean persist,
-            boolean queuable) {
+    public Flowable dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
+                                            @NonNull Class dataClass, Class responseType, boolean persist,
+                                            boolean queuable) {
         List<Long> convertToListOfId = Utils.getInstance().convertToListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
                 .doOnEvent(object -> {
@@ -101,97 +97,62 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Flowable dynamicPatchObject(
-            String url,
-            String idColumnName,
-            @NonNull JSONObject jsonObject,
-            @NonNull Class dataClass,
-            Class responseType,
-            boolean persist,
-            boolean queuable) {
-        return mDataBaseManager
-                .put(jsonObject, idColumnName, dataClass)
-                .doOnEvent(
-                        object -> {
-                            if (withCache) {
-                                cacheObject(idColumnName, jsonObject, dataClass);
-                            }
-                        })
+    public Flowable dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                       @NonNull Class dataClass, Class responseType, boolean persist,
+                                       boolean queuable) {
+        return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+                .doOnEvent(object -> {
+                    if (withCache) {
+                        cacheObject(idColumnName, jsonObject, dataClass);
+                    }
+                })
                 .toFlowable();
     }
 
     @NonNull
     @Override
-    public Flowable dynamicPostObject(
-            String url,
-            String idColumnName,
-            @NonNull JSONObject jsonObject,
-            @NonNull Class dataClass,
-            Class responseType,
-            boolean persist,
-            boolean queuable) {
-        return mDataBaseManager
-                .put(jsonObject, idColumnName, dataClass)
-                .doOnEvent(
-                        object -> {
-                            if (withCache) {
-                                cacheObject(idColumnName, jsonObject, dataClass);
-                            }
-                        })
+    public Flowable dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                      @NonNull Class dataClass, Class responseType, boolean persist,
+                                      boolean queuable) {
+        return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+                .doOnEvent(object -> {
+                    if (withCache) {
+                        cacheObject(idColumnName, jsonObject, dataClass);
+                    }
+                })
                 .toFlowable();
     }
 
     @NonNull
     @Override
-    public Flowable dynamicPostList(
-            String url,
-            String idColumnName,
-            JSONArray jsonArray,
-            Class dataClass,
-            Class responseType,
-            boolean persist,
-            boolean queuable) {
+    public Flowable dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
+                                    Class dataClass, Class responseType, boolean persist, boolean queuable) {
         return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toFlowable();
     }
 
     @NonNull
     @Override
-    public Flowable dynamicPutObject(
-            String url,
-            String idColumnName,
-            @NonNull JSONObject jsonObject,
-            @NonNull Class dataClass,
-            Class responseType,
-            boolean persist,
-            boolean queuable) {
-        return mDataBaseManager
-                .put(jsonObject, idColumnName, dataClass)
-                .doOnEvent(
-                        object -> {
-                            if (withCache) {
-                                cacheObject(idColumnName, jsonObject, dataClass);
-                            }
-                        })
+    public Flowable dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
+                                     @NonNull Class dataClass, Class responseType, boolean persist,
+                                     boolean queuable) {
+        return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+                .doOnEvent(object -> {
+                    if (withCache) {
+                        cacheObject(idColumnName, jsonObject, dataClass);
+                    }
+                })
                 .toFlowable();
     }
 
     @NonNull
     @Override
-    public Flowable dynamicPutList(
-            String url,
-            String idColumnName,
-            JSONArray jsonArray,
-            Class dataClass,
-            Class responseType,
-            boolean persist,
-            boolean queuable) {
+    public Flowable dynamicPutList(String url, String idColumnName, JSONArray jsonArray, Class dataClass,
+                                   Class responseType, boolean persist, boolean queuable) {
         return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toFlowable();
     }
 
-    private void cacheObject(
-            String idColumnName, @NonNull JSONObject jsonObject, @NonNull Class dataClass) {
-        Storo.put(
-                dataClass.getSimpleName() + jsonObject.optString(idColumnName),
+    private void cacheObject(String idColumnName, @NonNull JSONObject jsonObject, @NonNull Class dataClass) {
+        Storo.put(dataClass.getSimpleName() + jsonObject.optString(idColumnName),
                 gson.fromJson(jsonObject.toString(), dataClass))
                 .setExpiry(Config.getCacheAmount(), Config.getCacheTimeUnit())
                 .execute();

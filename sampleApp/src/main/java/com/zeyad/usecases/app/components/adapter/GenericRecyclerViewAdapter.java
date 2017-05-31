@@ -54,31 +54,26 @@ public abstract class GenericRecyclerViewAdapter
                 mSelectedItems.get(position, false),
                 position,
                 itemInfo.isEnabled());
-        if (areItemsClickable
-                && !(hasHeader() && position == 0
-                || hasFooter() && position == mDataList.size() - 1)) {
+        if (areItemsClickable &&
+                !(hasHeader() && position == 0 || hasFooter() && position == mDataList.size() - 1)) {
             if (mOnItemClickListener != null) {
-                holder.itemView.setOnClickListener(
-                        view ->
-                                mOnItemClickListener.onItemClicked(
-                                        holder.getAdapterPosition(), itemInfo, holder));
+                holder.itemView.setOnClickListener(view ->
+                        mOnItemClickListener.onItemClicked(holder.getAdapterPosition(), itemInfo, holder));
             }
             if (mOnItemLongClickListener != null) {
-                holder.itemView.setOnLongClickListener(
-                        view ->
-                                mOnItemLongClickListener.onItemLongClicked(
-                                        holder.getAdapterPosition(), itemInfo, holder));
+                holder.itemView.setOnLongClickListener(view ->
+                        mOnItemLongClickListener.onItemLongClicked(holder.getAdapterPosition(),
+                                itemInfo, holder));
             }
         }
         if (areItemsExpandable) {
             final boolean isExpanded = position == expandedPosition;
             holder.expand(isExpanded);
             holder.itemView.setActivated(true);
-            holder.itemView.setOnClickListener(
-                    view -> {
-                        expandedPosition = isExpanded ? -1 : position;
-                        notifyDataSetChanged();
-                    });
+            holder.itemView.setOnClickListener(view -> {
+                expandedPosition = isExpanded ? -1 : position;
+                notifyDataSetChanged();
+            });
         }
     }
 

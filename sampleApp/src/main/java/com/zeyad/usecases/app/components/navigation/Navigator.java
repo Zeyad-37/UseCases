@@ -5,18 +5,18 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 
-/** Class used to navigate through the application. */
+/**
+ * Class used to navigate through the application.
+ */
 final class Navigator implements INavigator {
 
     private static INavigator mInstance;
 
     static INavigator getInstance() {
-        synchronized (mInstance) {
-            if (mInstance == null) {
-                mInstance = new Navigator();
-            }
-            return mInstance;
+        if (mInstance == null) {
+            mInstance = new Navigator();
         }
+        return mInstance;
     }
 
     @Override

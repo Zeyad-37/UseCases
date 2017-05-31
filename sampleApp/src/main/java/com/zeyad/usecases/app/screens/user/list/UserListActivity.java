@@ -61,8 +61,7 @@ import io.reactivex.Single;
  * lead to a {@link UserDetailActivity} representing item details. On tablets, the activity presents
  * the list of items and item details side-by-side using two vertical panes.
  */
-public class UserListActivity extends BaseActivity<UserListState, UserListVM>
-        implements ActionMode.Callback {
+public class UserListActivity extends BaseActivity<UserListState, UserListVM> implements ActionMode.Callback {
     public static final int PAGE_SIZE = 6;
 
     @BindView(R.id.imageView_avatar)
@@ -90,48 +89,36 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM>
     public void initialize() {
         errorMessageFactory = Throwable::getLocalizedMessage;
         viewModel = ViewModelProviders.of(this).get(UserListVM.class);
-        viewModel.init(
-                (newResult, currentStateBundle) -> {
-                    List resultList = (List) newResult.getBundle();
-                    List<User> users =
-                            currentStateBundle == null
-                                    ? new ArrayList<>()
-                                    : currentStateBundle.getUsers();
-                    if (resultList.size() > 0 && resultList.get(0) instanceof User) {
-                        users.addAll(resultList);
-                    } else {
-                        final Iterator<User> each = users.iterator();
-                        while (each.hasNext()) {
-                            if (resultList.contains((long) each.next().getId())) {
-                                each.remove();
-                            }
-                        }
+        viewModel.init((newResult, currentStateBundle) -> {
+            List resultList = (List) newResult.getBundle();
+            List<User> users = currentStateBundle == null ? new ArrayList<>() :
+                    currentStateBundle.getUsers();
+            if (resultList.size() > 0 && resultList.get(0) instanceof User) {
+                users.addAll(resultList);
+            } else {
+                final Iterator<User> each = users.iterator();
+                while (each.hasNext()) {
+                    if (resultList.contains((long) each.next().getId())) {
+                        each.remove();
                     }
-                    users = new ArrayList<>(new HashSet<>(users));
-                    int lastId = users.get(users.size() - 1).getId();
-                    Collections.sort(
-                            users,
-                            (user1, user2) ->
-                                    String.valueOf(user1.getId())
-                                            .compareTo(String.valueOf(user2.getId())));
-                    return UserListState.builder().setUsers(users).lastId(lastId).build();
-                },
-                null,
-                DataServiceFactory.getInstance());
-        events =
-                Single.<BaseEvent>just(new GetPaginatedUsersEvent(0))
-                        .doOnSuccess(event -> Log.d("GetUsersEvent", "fired!"))
-                        .toObservable();
-        rxEventBus
-                .toFlowable()
+                }
+            }
+            users = new ArrayList<>(new HashSet<>(users));
+            int lastId = users.get(users.size() - 1).getId();
+            Collections.sort(users, (user1, user2) ->
+                    String.valueOf(user1.getId()).compareTo(String.valueOf(user2.getId())));
+            return UserListState.builder().setUsers(users).lastId(lastId).build();
+        }, null, DataServiceFactory.getInstance());
+        events = Single.<BaseEvent>just(new GetPaginatedUsersEvent(0))
+                .doOnSuccess(event -> Log.d("GetUsersEvent", "fired!"))
+                .toObservable();
+        rxEventBus.toFlowable()
                 .compose(bindToLifecycle())
-                .subscribe(
-                        stream ->
-                                events.mergeWith((Observable<DeleteUsersEvent>) stream)
-                                        .toFlowable(BackpressureStrategy.BUFFER)
-                                        .compose(uiModelsTransformer)
-                                        .compose(bindToLifecycle())
-                                        .subscribe(new UISubscriber<>(this, errorMessageFactory)));
+                .subscribe(stream -> events.mergeWith((Observable<DeleteUsersEvent>) stream)
+                        .toFlowable(BackpressureStrategy.BUFFER)
+                        .compose(uiModelsTransformer)
+                        .compose(bindToLifecycle())
+                        .subscribe(new UISubscriber<>(this, errorMessageFactory)));
     }
 
     @Override
@@ -163,19 +150,16 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM>
 
     private void setupRecyclerView() {
         usersAdapter = new GenericRecyclerViewAdapter(
-                (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE),
-                new ArrayList<>()) {
+                (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE), new ArrayList<>()) {
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 switch (viewType) {
                     case R.layout.empty_view:
-                        return new EmptyViewHolder(
-                                mLayoutInflater.inflate(
-                                        R.layout.empty_view, parent, false));
+                        return new EmptyViewHolder(mLayoutInflater.inflate(R.layout.empty_view,
+                                parent, false));
                     case R.layout.user_item_layout:
-                        return new UserViewHolder(
-                                mLayoutInflater.inflate(
-                                        R.layout.user_item_layout, parent, false));
+                        return new UserViewHolder(mLayoutInflater.inflate(R.layout.user_item_layout,
+                                parent, false));
                     default:
                         return null;
                 }
@@ -234,39 +218,19 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM>
         userRecycler.setLayoutManager(layoutManager);
         userRecycler.setAdapter(usersAdapter);
         usersAdapter.setAllowSelection(true);
-        events =
-                events.mergeWith(
-                        Observable.defer(
-                                () ->
-                                        RxRecyclerView.scrollStateChanges(userRecycler)
-                                                .map(
-                                                        integer -> {
-                                                            int totalItemCount =
-                                                                    layoutManager.getItemCount();
-                                                            int firstVisibleItemPosition =
-                                                                    layoutManager
-                                                                            .findFirstVisibleItemPosition();
-                                                            return (layoutManager.getChildCount()
-                                                                    + firstVisibleItemPosition)
-                                                                    >= totalItemCount
-                                                                    && firstVisibleItemPosition
-                                                                    >= 0
-                                                                    && totalItemCount
-                                                                    >= PAGE_SIZE
-                                                                    ? new GetPaginatedUsersEvent(
-                                                                    viewState.getLastId())
-                                                                    : new GetPaginatedUsersEvent(
-                                                                    -1);
-                                                        })
-                                                .filter(
-                                                        usersNextPageEvent ->
-                                                                usersNextPageEvent.getLastId()
-                                                                        != -1)
-                                                .throttleLast(200, TimeUnit.MILLISECONDS)
-                                                .debounce(300, TimeUnit.MILLISECONDS)
-                                                .doOnNext(
-                                                        searchUsersEvent ->
-                                                                Log.d("NextPageEvent", "fired!"))));
+        events = events.mergeWith(Observable.defer(() -> RxRecyclerView.scrollStateChanges(userRecycler)
+                .map(integer -> {
+                    int totalItemCount = layoutManager.getItemCount();
+                    int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                    return (layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount &&
+                            firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE ?
+                            new GetPaginatedUsersEvent(viewState.getLastId()) :
+                            new GetPaginatedUsersEvent(-1);
+                })
+                .filter(usersNextPageEvent -> usersNextPageEvent.getLastId() != -1)
+                .throttleLast(200, TimeUnit.MILLISECONDS)
+                .debounce(300, TimeUnit.MILLISECONDS)
+                .doOnNext(searchUsersEvent -> Log.d("NextPageEvent", "fired!"))));
     }
 
     @Override
@@ -286,14 +250,12 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM>
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
         SearchView mSearchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
         mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        events =
-                events.mergeWith(
-                        RxSearchView.queryTextChanges(mSearchView)
-                                .filter(charSequence -> !charSequence.toString().isEmpty())
-                                .map(query -> new SearchUsersEvent(query.toString()))
-                                .throttleLast(100, TimeUnit.MILLISECONDS)
-                                .debounce(200, TimeUnit.MILLISECONDS)
-                                .doOnNext(searchUsersEvent -> Log.d("SearchEvent", "eventFired")));
+        events = events.mergeWith(RxSearchView.queryTextChanges(mSearchView)
+                .filter(charSequence -> !charSequence.toString().isEmpty())
+                .map(query -> new SearchUsersEvent(query.toString()))
+                .throttleLast(100, TimeUnit.MILLISECONDS)
+                .debounce(200, TimeUnit.MILLISECONDS)
+                .doOnNext(searchUsersEvent -> Log.d("SearchEvent", "eventFired")));
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -321,21 +283,12 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM>
     @Override
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         mode.getMenuInflater().inflate(R.menu.selected_list_menu, menu);
-        events =
-                events.mergeWith(
-                        Observable.defer(
-                                () ->
-                                        RxMenuItem.clicks(menu.findItem(R.id.delete_item))
-                                                .map(
-                                                        click ->
-                                                                new DeleteUsersEvent(
-                                                                        usersAdapter
-                                                                                .getSelectedItemsIds()))
-                                                .doOnEach(
-                                                        notification -> {
-                                                            actionMode.finish();
-                                                            Log.d("DeleteEvent", "fired!");
-                                                        })));
+        events = events.mergeWith(Observable.defer(() -> RxMenuItem.clicks(menu.findItem(R.id.delete_item))
+                .map(click -> new DeleteUsersEvent(usersAdapter.getSelectedItemsIds()))
+                .doOnEach(notification -> {
+                    actionMode.finish();
+                    Log.d("DeleteEvent", "fired!");
+                })));
         rxEventBus.send(events);
         return true;
     }

@@ -29,10 +29,7 @@ class DataService implements IDataService {
     private final Scheduler mBackgroundThread;
     private final boolean mPostThreadExist;
 
-    DataService(
-            DataStoreFactory dataStoreFactory,
-            Scheduler postExecutionThread,
-            Scheduler backgroundThread) {
+    DataService(DataStoreFactory dataStoreFactory, Scheduler postExecutionThread, Scheduler backgroundThread) {
         mBackgroundThread = backgroundThread;
         mDataStoreFactory = dataStoreFactory;
         mPostExecutionThread = postExecutionThread;
@@ -43,11 +40,8 @@ class DataService implements IDataService {
     public <M> Flowable<List<M>> getList(@NonNull GetRequest getListRequest) {
         try {
             return mDataStoreFactory.dynamically(getListRequest.getUrl(), getListRequest.getDataClass())
-                    .<M>dynamicGetList(
-                            getListRequest.getUrl(),
-                            getListRequest.getDataClass(),
-                            getListRequest.isPersist(),
-                            getListRequest.isShouldCache())
+                    .<M>dynamicGetList(getListRequest.getUrl(), getListRequest.getDataClass(),
+                            getListRequest.isPersist(), getListRequest.isShouldCache())
                     .compose(applySchedulers());
         } catch (Exception e) {
             return Flowable.error(e);
@@ -201,8 +195,7 @@ class DataService implements IDataService {
     @Override
     public Completable deleteAll(@NonNull PostRequest deleteRequest) {
         try {
-            return mDataStoreFactory
-                    .disk(deleteRequest.getRequestType())
+            return mDataStoreFactory.disk(deleteRequest.getRequestType())
                     .dynamicDeleteAll(deleteRequest.getRequestType())
                     .compose(mPostThreadExist ? completable -> completable.subscribeOn(mBackgroundThread)
                             .observeOn(mPostExecutionThread).unsubscribeOn(mBackgroundThread) :
@@ -250,10 +243,8 @@ class DataService implements IDataService {
      */
     @NonNull
     private <M> FlowableTransformer<M, M> applySchedulers() {
-        return mPostThreadExist ? observable -> observable
-                .subscribeOn(mBackgroundThread)
-                .observeOn(mPostExecutionThread)
-                .unsubscribeOn(mBackgroundThread) :
+        return mPostThreadExist ? observable -> observable.subscribeOn(mBackgroundThread)
+                .observeOn(mPostExecutionThread).unsubscribeOn(mBackgroundThread) :
                 observable -> observable.subscribeOn(mBackgroundThread).unsubscribeOn(mBackgroundThread);
     }
 }

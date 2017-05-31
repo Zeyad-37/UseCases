@@ -12,8 +12,7 @@ public final class Result<B> {
     private final String state;
     private final B bundle;
 
-    private Result(
-            String state, boolean isLoading, Throwable error, boolean isSuccessful, B bundle) {
+    private Result(String state, boolean isLoading, Throwable error, boolean isSuccessful, B bundle) {
         this.isLoading = isLoading;
         this.error = error;
         this.isSuccessful = isSuccessful;
@@ -51,14 +50,9 @@ public final class Result<B> {
 
     @Override
     public String toString() {
-        return "State: "
-                + state
-                + ", Error: "
-                + (error != null ? error.toString() : "null")
-                + ", Bundle type: "
-                + (bundle != null ? bundle.getClass().getSimpleName() : "null")
-                + ", Key Selector: "
-                + state
-                + (bundle != null ? bundle.toString() : "");
+        return "State: " + state
+                + ", Error: " + (error != null ? error.toString() : "null")
+                + ", Bundle type: " + (bundle != null ? bundle.getClass().getSimpleName() : "null")
+                + ", Key Selector: " + state + (bundle != null ? bundle.toString() : "");
     }
 }

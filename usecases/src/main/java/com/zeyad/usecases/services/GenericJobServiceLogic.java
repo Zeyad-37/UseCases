@@ -13,47 +13,30 @@ import com.zeyad.usecases.utils.Utils;
 import io.reactivex.Completable;
 
 class GenericJobServiceLogic {
-    GenericJobServiceLogic() {}
+    GenericJobServiceLogic() {
+    }
 
-    Completable startJob(
-            @NonNull Bundle extras, CloudDataStore cloudDataStore, Utils utils, String log) {
+    Completable startJob(@NonNull Bundle extras, CloudDataStore cloudDataStore, Utils utils, String log) {
         if (extras.containsKey(GenericJobService.PAYLOAD)) {
             int trailCount = extras.getInt(GenericJobService.TRIAL_COUNT);
             switch (extras.getString(GenericJobService.JOB_TYPE, "")) {
                 case GenericJobService.POST:
-                    Log.d(
-                            GenericJobServiceLogic.class.getSimpleName(),
+                    Log.d(GenericJobServiceLogic.class.getSimpleName(),
                             String.format(log, GenericJobService.POST));
-                    return new Post(
-                                    null,
-                                    extras.getParcelable(GenericJobService.PAYLOAD),
-                                    Config.getApiConnection(),
-                                    trailCount,
-                                    utils)
+                    return new Post(null, extras.getParcelable(GenericJobService.PAYLOAD),
+                            Config.getApiConnection(), trailCount, utils)
                             .execute();
                 case GenericJobService.DOWNLOAD_FILE:
-                    Log.d(
-                            GenericJobServiceLogic.class.getSimpleName(),
+                    Log.d(GenericJobServiceLogic.class.getSimpleName(),
                             String.format(log, GenericJobService.DOWNLOAD_FILE));
-                    return new FileIO(
-                                    trailCount,
-                                    extras.getParcelable(GenericJobService.PAYLOAD),
-                                    null,
-                                    true,
-                                    cloudDataStore,
-                                    utils)
+                    return new FileIO(trailCount, extras.getParcelable(GenericJobService.PAYLOAD),
+                            null, true, cloudDataStore, utils)
                             .execute();
                 case GenericJobService.UPLOAD_FILE:
-                    Log.d(
-                            GenericJobServiceLogic.class.getSimpleName(),
+                    Log.d(GenericJobServiceLogic.class.getSimpleName(),
                             String.format(log, GenericJobService.UPLOAD_FILE));
-                    return new FileIO(
-                                    trailCount,
-                                    extras.getParcelable(GenericJobService.PAYLOAD),
-                                    null,
-                                    false,
-                                    cloudDataStore,
-                                    utils)
+                    return new FileIO(trailCount, extras.getParcelable(GenericJobService.PAYLOAD),
+                            null, false, cloudDataStore, utils)
                             .execute();
                 default:
                     return Completable.complete();

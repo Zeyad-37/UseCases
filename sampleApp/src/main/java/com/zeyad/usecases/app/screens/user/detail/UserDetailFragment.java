@@ -81,15 +81,11 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
             viewState = Parcels.unwrap(arguments.getParcelable(UI_MODEL));
         }
         viewModel = ViewModelProviders.of(this).get(UserDetailVM.class);
-        viewModel.init(
-                (newResult, currentStateBundle) ->
-                        UserDetailState.builder()
-                                .setRepos((List<Repository>) newResult.getBundle())
-                                .setUser(currentStateBundle.getUser())
-                                .setIsTwoPane(currentStateBundle.isTwoPane())
-                                .build(),
-                viewState,
-                DataServiceFactory.getInstance());
+        viewModel.init((newResult, currentStateBundle) -> UserDetailState.builder()
+                .setRepos((List<Repository>) newResult.getBundle())
+                .setUser(currentStateBundle.getUser())
+                .setIsTwoPane(currentStateBundle.isTwoPane())
+                .build(), viewState, DataServiceFactory.getInstance());
         events = Observable.just(new GetReposEvent(viewState.getUser().getLogin()));
     }
 
@@ -116,17 +112,14 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
 
     private void setupRecyclerView() {
         recyclerViewRepositories.setLayoutManager(new LinearLayoutManager(getContext()));
-        repositoriesAdapter =
-                new GenericRecyclerViewAdapter(
-                        (LayoutInflater)
-                                getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE),
-                        new ArrayList<>()) {
-                    @Override
-                    public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                        return new RepositoryViewHolder(
-                                mLayoutInflater.inflate(viewType, parent, false));
-                    }
-                };
+        repositoriesAdapter = new GenericRecyclerViewAdapter((LayoutInflater)
+                getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE), new ArrayList<>()) {
+            @Override
+            public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+                return new RepositoryViewHolder(
+                        mLayoutInflater.inflate(viewType, parent, false));
+            }
+        };
         recyclerViewRepositories.setAdapter(repositoriesAdapter);
     }
 
@@ -142,35 +135,27 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
             }
         }
         if (user != null) {
-            RequestListener<String, GlideDrawable> requestListener =
-                    new RequestListener<String, GlideDrawable>() {
-                        @Override
-                        public boolean onException(
-                                Exception e,
-                                String model,
-                                Target<GlideDrawable> target,
-                                boolean isFirstResource) {
-                            FragmentActivity activity = getActivity();
-                            if (activity != null) {
-                                activity.supportStartPostponedEnterTransition();
-                            }
-                            return false;
-                        }
+            RequestListener<String, GlideDrawable> requestListener = new RequestListener<String, GlideDrawable>() {
+                @Override
+                public boolean onException(Exception e, String model, Target<GlideDrawable> target,
+                                           boolean isFirstResource) {
+                    FragmentActivity activity = getActivity();
+                    if (activity != null) {
+                        activity.supportStartPostponedEnterTransition();
+                    }
+                    return false;
+                }
 
-                        @Override
-                        public boolean onResourceReady(
-                                GlideDrawable resource,
-                                String model,
-                                Target<GlideDrawable> target,
-                                boolean isFromMemoryCache,
-                                boolean isFirstResource) {
-                            FragmentActivity activity = getActivity();
-                            if (activity != null) {
-                                activity.supportStartPostponedEnterTransition();
-                            }
-                            return false;
-                        }
-                    };
+                @Override
+                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target,
+                                               boolean isFromMemoryCache, boolean isFirstResource) {
+                    FragmentActivity activity = getActivity();
+                    if (activity != null) {
+                        activity.supportStartPostponedEnterTransition();
+                    }
+                    return false;
+                }
+            };
             if (userDetailState.isTwoPane()) {
                 UserListActivity activity = (UserListActivity) getActivity();
                 if (activity != null) {
@@ -222,31 +207,17 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
             UserDetailActivity activity = (UserDetailActivity) getActivity();
             BitmapDrawable drawable = (BitmapDrawable) activity.imageViewAvatar.getDrawable();
             Bitmap bitmap = drawable.getBitmap();
-            Palette.from(bitmap)
-                    .generate(
-                            palette ->
-                                    activity.findViewById(R.id.coordinator_detail)
-                                            .setOnScrollChangeListener(
-                                                    (v,
-                                                     scrollX,
-                                                     scrollY,
-                                                     oldScrollX,
-                                                     oldScrollY) -> {
-                                                        if (v.getHeight() == scrollX) {
-                                                            activity.toolbar.setTitleTextColor(
-                                                                    palette.getLightVibrantColor(
-                                                                            Color.TRANSPARENT));
-                                                            activity.toolbar.setBackground(
-                                                                    new ColorDrawable(
-                                                                            palette
-                                                                                    .getLightVibrantColor(
-                                                                                            Color
-                                                                                                    .TRANSPARENT)));
-                                                        } else if (scrollY == 0) {
-                                                            activity.toolbar.setTitleTextColor(0);
-                                                            activity.toolbar.setBackground(null);
-                                                        }
-                                                    }));
+            Palette.from(bitmap).generate(palette -> activity.findViewById(R.id.coordinator_detail)
+                    .setOnScrollChangeListener((v, scrollX, scrollY, oldScrollX, oldScrollY) -> {
+                        if (v.getHeight() == scrollX) {
+                            activity.toolbar.setTitleTextColor(palette.getLightVibrantColor(Color.TRANSPARENT));
+                            activity.toolbar
+                                    .setBackground(new ColorDrawable(palette.getLightVibrantColor(Color.TRANSPARENT)));
+                        } else if (scrollY == 0) {
+                            activity.toolbar.setTitleTextColor(0);
+                            activity.toolbar.setBackground(null);
+                        }
+                    }));
         }
     }
 }

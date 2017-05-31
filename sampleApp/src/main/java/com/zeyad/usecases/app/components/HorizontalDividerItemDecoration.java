@@ -24,10 +24,7 @@ public class HorizontalDividerItemDecoration extends RecyclerView.ItemDecoration
             RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
             int top = child.getBottom() + params.bottomMargin;
             int bottom = top + mDivider.getIntrinsicHeight();
-            mDivider.setBounds(
-                    parent.getPaddingLeft(),
-                    top,
-                    parent.getWidth() - parent.getPaddingRight(),
+            mDivider.setBounds(parent.getPaddingLeft(), top, parent.getWidth() - parent.getPaddingRight(),
                     bottom);
             mDivider.draw(c);
         }

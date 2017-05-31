@@ -93,13 +93,11 @@ public class ApiConnection {
         return chain -> {
             Request request = chain.request();
             if (!Utils.getInstance().isNetworkAvailable(Config.getInstance().getContext())) {
-                request =
-                        request.newBuilder()
-                                .cacheControl(
-                                        new CacheControl.Builder()
-                                                .maxStale(1, TimeUnit.DAYS)
-                                                .build())
-                                .build();
+                request = request.newBuilder()
+                        .cacheControl(new CacheControl.Builder()
+                                .maxStale(1, TimeUnit.DAYS)
+                                .build())
+                        .build();
             }
             return chain.proceed(request);
         };
@@ -208,17 +206,11 @@ public class ApiConnection {
     private Interceptor provideGzipRequestInterceptor() {
         return chain -> {
             Request originalRequest = chain.request();
-            return originalRequest.body() == null
-                            || originalRequest.header("Content-Encoding") != null
-                    ? chain.proceed(originalRequest)
-                    : chain.proceed(
-                            originalRequest
-                                    .newBuilder()
-                                    .header("Content-Encoding", "gzip")
-                                    .method(
-                                            originalRequest.method(),
-                                            forceContentLength(gzip(originalRequest.body())))
-                                    .build());
+            return originalRequest.body() == null || originalRequest.header("Content-Encoding") != null ?
+                    chain.proceed(originalRequest) :
+                    chain.proceed(originalRequest.newBuilder().header("Content-Encoding", "gzip")
+                            .method(originalRequest.method(), forceContentLength(gzip(originalRequest.body())))
+                            .build());
         };
     }
 
@@ -231,15 +223,13 @@ public class ApiConnection {
 
     @SuppressWarnings("unused")
     private List<ConnectionSpec> provideConnectionSpecsList() {
-        return Collections.singletonList(
-                new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
-                        .tlsVersions(TlsVersion.TLS_1_2)
-                        .build());
+        return Collections.singletonList(new ConnectionSpec.Builder(ConnectionSpec.MODERN_TLS)
+                .tlsVersions(TlsVersion.TLS_1_2)
+                .build());
     }
 
     @NonNull
-    private RequestBody forceContentLength(@NonNull final RequestBody requestBody)
-            throws IOException {
+    private RequestBody forceContentLength(@NonNull final RequestBody requestBody) throws IOException {
         final Buffer buffer = new Buffer();
         requestBody.writeTo(buffer);
         return new RequestBody() {
@@ -287,10 +277,8 @@ public class ApiConnection {
     private Cache provideCache() {
         Cache cache = null;
         try {
-            cache =
-                    new Cache(
-                            new File(Config.getInstance().getContext().getCacheDir(), "http-cache"),
-                            10 * 1024 * 1024); // 10 MB
+            cache = new Cache(new File(Config.getInstance().getContext().getCacheDir(), "http-cache"),
+                    10 * 1024 * 1024); // 10 MB
         } catch (Exception e) {
             Log.e("ApiConnection", "", e);
         }

@@ -10,7 +10,9 @@ import com.zeyad.usecases.app.utils.Utils;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-/** @author zeyad on 1/12/17. */
+/**
+ * @author zeyad on 1/12/17.
+ */
 class RepositoryViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     @BindView(R.id.textView_repo_title)
     TextView textView_repo_title;
@@ -31,5 +33,6 @@ class RepositoryViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     }
 
     @Override
-    public void expand(boolean isExpanded) {}
+    public void expand(boolean isExpanded) {
+    }
 }

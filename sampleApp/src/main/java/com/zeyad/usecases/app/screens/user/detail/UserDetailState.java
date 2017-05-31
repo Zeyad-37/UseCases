@@ -6,7 +6,9 @@ import org.parceler.Parcel;
 
 import java.util.List;
 
-/** @author zeyad on 1/25/17. */
+/**
+ * @author zeyad on 1/25/17.
+ */
 @Parcel
 public class UserDetailState {
     boolean isTwoPane;
@@ -46,7 +48,8 @@ public class UserDetailState {
         User user;
         boolean isTwoPane;
 
-        Builder() {}
+        Builder() {
+        }
 
         public Builder setRepos(List<Repository> value) {
             repos = value;

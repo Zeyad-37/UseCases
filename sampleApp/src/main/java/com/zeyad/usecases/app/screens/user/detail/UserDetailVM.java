@@ -14,7 +14,9 @@ import io.reactivex.functions.Function;
 
 import static com.zeyad.usecases.app.utils.Constants.URLS.REPOSITORIES;
 
-/** @author zeyad on 1/10/17. */
+/**
+ * @author zeyad on 1/10/17.
+ */
 public class UserDetailVM extends BaseViewModel<UserDetailState> {
 
     private IDataService dataUseCase;
@@ -30,25 +32,13 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> {
     }
 
     public Flowable<List<Repository>> getRepositories(String userLogin) {
-        return Utils.isNotEmpty(userLogin)
-                ? dataUseCase
-                        .<Repository>queryDisk(
-                                realm ->
-                                        realm.where(Repository.class)
-                                                .equalTo("owner.login", userLogin))
-                        .flatMap(
-                                list ->
-                                        Utils.isNotEmpty(list)
-                                                ? Flowable.just(list)
-                                                : dataUseCase.<Repository>getList(
-                                                        new GetRequest.Builder(
-                                                                        Repository.class, true)
-                                                                .url(
-                                                                        String.format(
-                                                                                REPOSITORIES,
-                                                                                userLogin))
-                                                                .build()))
-                : Flowable.error(new IllegalArgumentException("User name can not be empty"));
+        return Utils.isNotEmpty(userLogin) ? dataUseCase.<Repository>queryDisk(realm ->
+                realm.where(Repository.class).equalTo("owner.login", userLogin))
+                .flatMap(list -> Utils.isNotEmpty(list) ? Flowable.just(list) :
+                        dataUseCase.<Repository>getList(new GetRequest.Builder(Repository.class, true)
+                                .url(String.format(REPOSITORIES, userLogin))
+                                .build())) :
+                Flowable.error(new IllegalArgumentException("User name can not be empty"));
     }
 
     @Override

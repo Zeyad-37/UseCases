@@ -20,7 +20,6 @@ final class ObservableV1ToFlowableV2<T> extends Flowable<T> {
     }
 
     private static final class ObservableSubscriber<T> extends rx.Subscriber<T> {
-
         final org.reactivestreams.Subscriber<? super T> actual;
         boolean done;
 
@@ -68,8 +67,7 @@ final class ObservableV1ToFlowableV2<T> extends Flowable<T> {
         }
     }
 
-    private static final class ObservableSubscriberSubscription
-            implements org.reactivestreams.Subscription {
+    private static final class ObservableSubscriberSubscription implements org.reactivestreams.Subscription {
 
         final ObservableSubscriber<?> parent;
 
