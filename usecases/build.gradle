@@ -218,12 +218,12 @@ bintray {
     }
 }
 
-apply from: "$project.rootDir/tools/script-git-version.gradle"
+//apply from: "$project.rootDir/tools/script-git-version.gradle"
 apply from: "$project.rootDir/tools/script-findbugs.gradle"
 apply from: "$project.rootDir/tools/script-pmd.gradle"
-apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
+//apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
 apply from: "$project.rootDir/tools/script-infer.gradle"
-apply from: "$project.rootDir/tools/script-check-style.gradle"
+//apply from: "$project.rootDir/tools/script-check-style.gradle"
 
 //apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
 //apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'
