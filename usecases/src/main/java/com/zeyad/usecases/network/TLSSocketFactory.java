@@ -19,16 +19,14 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 import javax.net.ssl.X509TrustManager;
 
-/**
- * @author zeyad on 8/30/16.
- */
+/** @author zeyad on 8/30/16. */
 public class TLSSocketFactory extends SSLSocketFactory {
 
     private final SSLSocketFactory internalSSLSocketFactory;
 
     public TLSSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
         SSLContext sslContext = SSLContext.getInstance("TLS");
-        sslContext.init(null, new TrustManager[]{systemDefaultTrustManager()}, null);
+        sslContext.init(null, new TrustManager[] {systemDefaultTrustManager()}, null);
         internalSSLSocketFactory = sslContext.getSocketFactory();
     }
 
@@ -44,7 +42,8 @@ public class TLSSocketFactory extends SSLSocketFactory {
 
     @Nullable
     @Override
-    public Socket createSocket(Socket s, String host, int port, boolean autoClose) throws IOException {
+    public Socket createSocket(Socket s, String host, int port, boolean autoClose)
+            throws IOException {
         return enableTLSOnSocket(internalSSLSocketFactory.createSocket(s, host, port, autoClose));
     }
 
@@ -56,8 +55,10 @@ public class TLSSocketFactory extends SSLSocketFactory {
 
     @Nullable
     @Override
-    public Socket createSocket(String host, int port, InetAddress localHost, int localPort) throws IOException {
-        return enableTLSOnSocket(internalSSLSocketFactory.createSocket(host, port, localHost, localPort));
+    public Socket createSocket(String host, int port, InetAddress localHost, int localPort)
+            throws IOException {
+        return enableTLSOnSocket(
+                internalSSLSocketFactory.createSocket(host, port, localHost, localPort));
     }
 
     @Nullable
@@ -68,14 +69,17 @@ public class TLSSocketFactory extends SSLSocketFactory {
 
     @Nullable
     @Override
-    public Socket createSocket(InetAddress address, int port, InetAddress localAddress, int localPort) throws IOException {
-        return enableTLSOnSocket(internalSSLSocketFactory.createSocket(address, port, localAddress, localPort));
+    public Socket createSocket(
+            InetAddress address, int port, InetAddress localAddress, int localPort)
+            throws IOException {
+        return enableTLSOnSocket(
+                internalSSLSocketFactory.createSocket(address, port, localAddress, localPort));
     }
 
     @Nullable
     private Socket enableTLSOnSocket(@Nullable Socket socket) {
         if (socket != null && (socket instanceof SSLSocket)) {
-            ((SSLSocket) socket).setEnabledProtocols(new String[]{"TLSv1.1", "TLSv1.2"});
+            ((SSLSocket) socket).setEnabledProtocols(new String[] {"TLSv1.1", "TLSv1.2"});
         }
         return socket;
     }
@@ -83,13 +87,13 @@ public class TLSSocketFactory extends SSLSocketFactory {
     @NonNull
     private X509TrustManager systemDefaultTrustManager() {
         try {
-            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance(TrustManagerFactory
-                    .getDefaultAlgorithm());
+            TrustManagerFactory trustManagerFactory =
+                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             trustManagerFactory.init((KeyStore) null);
             TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
             if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
-                throw new IllegalStateException("Unexpected default trust managers:"
-                        + Arrays.toString(trustManagers));
+                throw new IllegalStateException(
+                        "Unexpected default trust managers:" + Arrays.toString(trustManagers));
             }
             return (X509TrustManager) trustManagers[0];
         } catch (GeneralSecurityException e) {

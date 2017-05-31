@@ -12,8 +12,12 @@ import io.reactivex.disposables.Disposable;
 
 public class GenericJobService extends JobService {
 
-    public static final String DOWNLOAD_FILE = "DOWNLOAD_FILE", UPLOAD_FILE = "UPLOAD_FILE",
-            JOB_TYPE = "JOB_TYPE", POST = "POST", PAYLOAD = "payload", TRIAL_COUNT = "trialCount";
+    public static final String DOWNLOAD_FILE = "DOWNLOAD_FILE",
+            UPLOAD_FILE = "UPLOAD_FILE",
+            JOB_TYPE = "JOB_TYPE",
+            POST = "POST",
+            PAYLOAD = "payload",
+            TRIAL_COUNT = "trialCount";
     private static final String TAG = GenericJobService.class.getSimpleName();
     private final GenericJobServiceLogic genericJobServiceLogic = new GenericJobServiceLogic();
     private Disposable disposable;

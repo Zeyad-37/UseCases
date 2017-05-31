@@ -12,9 +12,7 @@ import android.widget.TextView;
 
 import com.zeyad.usecases.app.R;
 
-/**
- * Layout used to wrap another content layout and to show status text and progress bar.
- */
+/** Layout used to wrap another content layout and to show status text and progress bar. */
 public class LoaderLayout extends FrameLayout implements View.OnClickListener {
 
     private ProgressBar mProgressBar;
@@ -22,25 +20,19 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
     private StatusTextListener mStatusTextListener;
     private boolean mBlockTouch;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public LoaderLayout(Context context) {
         super(context);
         initView(context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public LoaderLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         initView(context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public LoaderLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView(context);
@@ -59,7 +51,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         mTxvStatus = (TextView) findViewById(R.id.txv_status);
         // set click listener
         mTxvStatus.setOnClickListener(this);
-//        showProgress();
+        //        showProgress();
     }
 
     /**
@@ -71,9 +63,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         this.mStatusTextListener = mStatusTextListener;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.txv_status && mStatusTextListener != null) {
@@ -81,25 +71,19 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         return mBlockTouch;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean onInterceptHoverEvent(MotionEvent event) {
         return mBlockTouch;
     }
 
-    /**
-     * Show progress bar and hide another views.
-     */
+    /** Show progress bar and hide another views. */
     public void showProgress() {
         mProgressBar.bringToFront();
         mProgressBar.setVisibility(VISIBLE);
@@ -108,9 +92,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         mBlockTouch = true;
     }
 
-    /**
-     * Show progress bar over a semi transparent content.
-     */
+    /** Show progress bar over a semi transparent content. */
     public void showProgressOverContent() {
         mProgressBar.bringToFront();
         mProgressBar.setVisibility(VISIBLE);
@@ -121,9 +103,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         mBlockTouch = true;
     }
 
-    /**
-     * Show content views.
-     */
+    /** Show content views. */
     public void showContents() {
         mProgressBar.setVisibility(GONE);
         mTxvStatus.setVisibility(GONE);
@@ -175,13 +155,9 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         }
     }
 
-    /**
-     * Interface to listen event of status text click.
-     */
+    /** Interface to listen event of status text click. */
     public interface StatusTextListener {
-        /**
-         * Called when status text clicked.
-         */
+        /** Called when status text clicked. */
         void onStatusTextClick();
     }
 }

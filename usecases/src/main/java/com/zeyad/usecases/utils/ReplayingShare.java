@@ -14,22 +14,19 @@ import io.reactivex.functions.Consumer;
 /**
  * A transformer which combines the {@code replay(1)}, {@code publish()}, and {@code refCount()}
  * operators.
- * <p>
- * Unlike traditional combinations of these operators, `ReplayingShare` caches the last emitted
- * value from the upstream observable or flowable *only* when one or more downstream subscribers
- * are connected. This allows expensive upstream sources to be shut down when no one is listening
- * while also replaying the last value seen by *any* subscriber to new ones.
+ *
+ * <p>Unlike traditional combinations of these operators, `ReplayingShare` caches the last emitted
+ * value from the upstream observable or flowable *only* when one or more downstream subscribers are
+ * connected. This allows expensive upstream sources to be shut down when no one is listening while
+ * also replaying the last value seen by *any* subscriber to new ones.
  */
 public final class ReplayingShare<T>
         implements ObservableTransformer<T, T>, FlowableTransformer<T, T> {
     private static final ReplayingShare<Object> INSTANCE = new ReplayingShare<>();
 
-    private ReplayingShare() {
-    }
+    private ReplayingShare() {}
 
-    /**
-     * The singleton instance of this transformer.
-     */
+    /** The singleton instance of this transformer. */
     @SuppressWarnings("unchecked") // Safe because of erasure.
     public static <T> ReplayingShare<T> instance() {
         return (ReplayingShare<T>) INSTANCE;
@@ -181,3 +178,4 @@ public final class ReplayingShare<T>
         }
     }
 }
+

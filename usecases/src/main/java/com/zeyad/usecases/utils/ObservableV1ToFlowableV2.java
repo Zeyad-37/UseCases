@@ -13,7 +13,8 @@ final class ObservableV1ToFlowableV2<T> extends Flowable<T> {
     @Override
     protected void subscribeActual(org.reactivestreams.Subscriber<? super T> s) {
         ObservableSubscriber<T> parent = new ObservableSubscriber<>(s);
-        ObservableSubscriberSubscription parentSubscription = new ObservableSubscriberSubscription(parent);
+        ObservableSubscriberSubscription parentSubscription =
+                new ObservableSubscriberSubscription(parent);
         s.onSubscribe(parentSubscription);
         source.unsafeSubscribe(parent);
     }
@@ -35,8 +36,9 @@ final class ObservableV1ToFlowableV2<T> extends Flowable<T> {
             }
             if (t == null) {
                 unsubscribe();
-                onError(new IllegalArgumentException(
-                        "The upstream 1.x Observable signalled a null value which is not supported in 2.x"));
+                onError(
+                        new IllegalArgumentException(
+                                "The upstream 1.x Observable signalled a null value which is not supported in 2.x"));
             } else {
                 actual.onNext(t);
             }
@@ -66,7 +68,8 @@ final class ObservableV1ToFlowableV2<T> extends Flowable<T> {
         }
     }
 
-    private static final class ObservableSubscriberSubscription implements org.reactivestreams.Subscription {
+    private static final class ObservableSubscriberSubscription
+            implements org.reactivestreams.Subscription {
 
         final ObservableSubscriber<?> parent;
 
@@ -84,5 +87,5 @@ final class ObservableV1ToFlowableV2<T> extends Flowable<T> {
             parent.unsubscribe();
         }
     }
-
 }
+

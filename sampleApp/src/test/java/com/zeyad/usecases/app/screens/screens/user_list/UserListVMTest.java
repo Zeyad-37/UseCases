@@ -23,9 +23,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/**
- * @author by ZIaDo on 2/7/17.
- */
+/** @author by ZIaDo on 2/7/17. */
 public class UserListVMTest {
 
     private IDataService mockDataUseCase;
@@ -48,8 +46,7 @@ public class UserListVMTest {
         userList.add(user);
         Flowable<List<User>> observableUserRealm = Flowable.just(userList);
 
-        when(mockDataUseCase.<User>getListOffLineFirst(any()))
-                .thenReturn(observableUserRealm);
+        when(mockDataUseCase.<User>getListOffLineFirst(any())).thenReturn(observableUserRealm);
 
         TestSubscriber<List<User>> subscriber = new TestSubscriber<>();
         userListVM.getUsers(0).subscribe(subscriber);
@@ -105,6 +102,6 @@ public class UserListVMTest {
 
         subscriber.assertComplete();
         subscriber.assertNoErrors();
-//        subscriber.assertValue(userList);
+        //        subscriber.assertValue(userList);
     }
 }

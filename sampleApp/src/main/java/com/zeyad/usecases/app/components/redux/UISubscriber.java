@@ -5,9 +5,7 @@ import android.util.Log;
 import io.reactivex.subscribers.DisposableSubscriber;
 import rx.exceptions.OnErrorNotImplementedException;
 
-/**
- * @author zeyad on 11/28/16.
- */
+/** @author zeyad on 11/28/16. */
 public class UISubscriber<V extends LoadDataView<S>, S> extends DisposableSubscriber<UIModel<S>> {
     private final ErrorMessageFactory errorMessageFactory;
     private final V view;
@@ -18,8 +16,7 @@ public class UISubscriber<V extends LoadDataView<S>, S> extends DisposableSubscr
     }
 
     @Override
-    public void onComplete() {
-    }
+    public void onComplete() {}
 
     @Override
     public void onError(Throwable throwable) {

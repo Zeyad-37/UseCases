@@ -19,10 +19,9 @@ import io.reactivex.Observable;
 
 import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
 
-/**
- * @author zeyad on 11/28/16.
- */
-public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFragment implements LoadDataView<S> {
+/** @author zeyad on 11/28/16. */
+public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFragment
+        implements LoadDataView<S> {
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
@@ -77,9 +76,7 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
         return bundle;
     }
 
-    /**
-     * Initialize any objects or any required dependencies.
-     */
+    /** Initialize any objects or any required dependencies. */
     public abstract void initialize();
 
     public void showToastMessage(String message) {
@@ -103,25 +100,34 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
         }
     }
 
-    public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,
-                                       String message, String actionText, View.OnClickListener onClickListener) {
+    public void showSnackBarWithAction(
+            @SnackBarFactory.SnackBarType String typeSnackBar,
+            View view,
+            String message,
+            String actionText,
+            View.OnClickListener onClickListener) {
         if (view != null) {
-            SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText,
-                    onClickListener).show();
+            SnackBarFactory.getSnackBarWithAction(
+                            typeSnackBar, view, message, actionText, onClickListener)
+                    .show();
         } else {
             throw new IllegalArgumentException("View is null");
         }
     }
 
-    public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,
-                                       String message, int actionText, View.OnClickListener onClickListener) {
+    public void showSnackBarWithAction(
+            @SnackBarFactory.SnackBarType String typeSnackBar,
+            View view,
+            String message,
+            int actionText,
+            View.OnClickListener onClickListener) {
         showSnackBarWithAction(typeSnackBar, view, message, getString(actionText), onClickListener);
     }
 
     /**
      * Shows a {@link android.support.design.widget.Snackbar} errorResult message.
      *
-     * @param message  An string representing a message to be shown.
+     * @param message An string representing a message to be shown.
      * @param duration Visibility duration.
      */
     public void showErrorSnackBar(String message, View view, int duration) {

@@ -18,19 +18,21 @@ import okhttp3.RequestBody;
 
 import static com.zeyad.usecases.stores.CloudDataStore.APPLICATION_JSON;
 
-/**
- * @author Zeyad on 6/05/16.
- */
+/** @author Zeyad on 6/05/16. */
 public class Post {
     private static final String TAG = Post.class.getSimpleName(), ON_ERROR = "onError", COMPLETED = "Completed";
     private static int mTrailCount;
-    @NonNull
-    private final FirebaseJobDispatcher mDispatcher;
+    @NonNull private final FirebaseJobDispatcher mDispatcher;
     private final PostRequest mPostRequest;
     private final ApiConnection mRestApi;
     private final Utils mUtils;
 
-    public Post(Context context, PostRequest postRequest, ApiConnection restApi, int trailCount, Utils utils) {
+    public Post(
+            Context context,
+            PostRequest postRequest,
+            ApiConnection restApi,
+            int trailCount,
+            Utils utils) {
         mPostRequest = postRequest;
         mRestApi = restApi;
         mTrailCount = trailCount;
@@ -51,8 +53,10 @@ public class Post {
             bundle = mPostRequest.getArrayBundle().toString();
         }
         RequestBody requestBody = RequestBody.create(MediaType.parse(APPLICATION_JSON), bundle);
-        RequestBody listRequestBody = RequestBody.create(MediaType
-                .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString());
+        RequestBody listRequestBody =
+                RequestBody.create(
+                        MediaType.parse(APPLICATION_JSON),
+                        mPostRequest.getArrayBundle().toString());
         switch (mPostRequest.getMethod()) {
             case PostRequest.PATCH:
                 return Completable.fromObservable(mRestApi.dynamicPatch(mPostRequest.getUrl(), requestBody)

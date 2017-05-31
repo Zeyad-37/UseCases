@@ -21,9 +21,7 @@ import retrofit2.http.PartMap;
 import retrofit2.http.Streaming;
 import retrofit2.http.Url;
 
-/**
- * RestApi for retrieving data from the network.
- */
+/** RestApi for retrieving data from the network. */
 public interface RestApi {
 
     @NonNull
@@ -62,8 +60,10 @@ public interface RestApi {
     @NonNull
     @Multipart
     @POST
-    Flowable<Object> dynamicUpload(@Url String url, @PartMap() Map<String, RequestBody> partMap,
-                                   @Part MultipartBody.Part file);
+    Flowable<Object> dynamicUpload(
+            @Url String url,
+            @PartMap() Map<String, RequestBody> partMap,
+            @Part MultipartBody.Part file);
 
     @NonNull
     @PATCH

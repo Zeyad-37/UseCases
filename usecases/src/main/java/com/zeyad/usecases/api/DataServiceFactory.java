@@ -24,18 +24,21 @@ public final class DataServiceFactory {
     }
 
     /**
-     * @return IDataService the implementation instance of IDataService, throws NullPointerException if null.
+     * @return IDataService the implementation instance of IDataService, throws NullPointerException
+     * if null.
      */
     @Nullable
     public static IDataService getInstance() {
         if (sDataUseCase == null) {
-            throw new NullPointerException("DataServiceFactory#init must be called before calling getInstance()");
+            throw new NullPointerException(
+                    "DataServiceFactory#init must be called before calling getInstance()");
         }
         return sDataUseCase;
     }
 
     /**
-     * Initialization method, that takes a DataServiceConfig object to setup DataUseCase Singleton instance.
+     * Initialization method, that takes a DataServiceConfig object to setup DataUseCase Singleton
+     * instance.
      *
      * @param config configuration object to DataUseCase.
      */

@@ -35,6 +35,7 @@ public class GenericJobServiceLogicTest {
         genericJobServiceLogic.startJob(extras, mock(CloudDataStore.class), Utils.getInstance(), "")
                 .subscribe(new TestObserver<>());
         testSubscriber.assertNoErrors();
-//        testSubscriber.assertComplete();
+        //        testSubscriber.assertComplete();
     }
 }
+

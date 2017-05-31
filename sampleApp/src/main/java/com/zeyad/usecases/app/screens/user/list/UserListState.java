@@ -5,9 +5,7 @@ import org.parceler.Parcel;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * @author by ZIaDo on 1/28/17.
- */
+/** @author by ZIaDo on 1/28/17. */
 @Parcel
 public class UserListState {
     List<User> users;
@@ -38,8 +36,7 @@ public class UserListState {
         List<User> users;
         long lastId;
 
-        Builder() {
-        }
+        Builder() {}
 
         Builder setUsers(List<User> value) {
             users = value;

@@ -7,27 +7,28 @@ import org.parceler.Parcel;
 import io.realm.RealmObject;
 import io.realm.annotations.PrimaryKey;
 
-/**
- * @author zeyad on 1/10/17.
- */
+/** @author zeyad on 1/10/17. */
 @Parcel
 public class User extends RealmObject {
 
     static final String LOGIN = "login";
     private static final String ID = "id", AVATAR_URL = "avatar_url";
+
     @PrimaryKey
     @SerializedName(LOGIN)
     String login;
+
     @SerializedName(ID)
     int id;
+
     @SerializedName(AVATAR_URL)
     String avatarUrl;
 
-    public User() {
-    }
+    public User() {}
 
     public static boolean isEmpty(User automapUsermodel) {
-        return automapUsermodel == null || automapUsermodel.login == null && automapUsermodel.avatarUrl == null;
+        return automapUsermodel == null
+                || automapUsermodel.login == null && automapUsermodel.avatarUrl == null;
     }
 
     public String getLogin() {
@@ -63,8 +64,13 @@ public class User extends RealmObject {
             return false;
         }
         User user = (User) o;
-        return id == user.id && (login != null ? login.equals(user.login) : user.login == null
-                && (avatarUrl != null ? avatarUrl.equals(user.avatarUrl) : user.avatarUrl == null));
+        return id == user.id
+                && (login != null
+                        ? login.equals(user.login)
+                        : user.login == null
+                                && (avatarUrl != null
+                                        ? avatarUrl.equals(user.avatarUrl)
+                                        : user.avatarUrl == null));
     }
 
     @Override

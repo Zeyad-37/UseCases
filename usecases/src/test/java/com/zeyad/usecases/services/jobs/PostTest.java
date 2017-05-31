@@ -44,8 +44,7 @@ import static org.mockito.Mockito.when;
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 public class PostTest {
-    @Nullable
-    private final ResponseBody RESPONSE_BODY = mock(ResponseBody.class);
+    @Nullable private final ResponseBody RESPONSE_BODY = mock(ResponseBody.class);
     private final InputStream INPUT_STREAM = mock(InputStream.class);
     private final TestRealmModel TEST_MODEL = new TestRealmModel(1, "123");
     private Context mockedContext;
@@ -66,80 +65,96 @@ public class PostTest {
 
     @Test
     public void testPatchObject() {
-        Post post = createPost(mockedContext
-                , createPostRequestForHashmap(PostRequest.PATCH)
-                , apiConnection
-                , 3);
+        Post post =
+                createPost(
+                        mockedContext,
+                        createPostRequestForHashmap(PostRequest.PATCH),
+                        apiConnection,
+                        3);
         post.execute();
         verify(apiConnection).dynamicPatch(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testPostObject() {
-        Post post = createPost(mockedContext
-                , createPostRequestForHashmap(PostRequest.POST)
-                , apiConnection
-                , 3);
+        Post post =
+                createPost(
+                        mockedContext,
+                        createPostRequestForHashmap(PostRequest.POST),
+                        apiConnection,
+                        3);
         post.execute();
         verify(apiConnection).dynamicPost(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testPostList() throws JSONException {
-        Post post = createPost(mockedContext
-                , createPostRequestForJsonArray(PostRequest.POST)
-                , apiConnection
-                , 3);
+        Post post =
+                createPost(
+                        mockedContext,
+                        createPostRequestForJsonArray(PostRequest.POST),
+                        apiConnection,
+                        3);
         post.execute();
         verify(apiConnection).dynamicPost(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testPutObject() {
-        Post post = createPost(mockedContext
-                , createPostRequestForHashmap(PostRequest.PUT)
-                , apiConnection
-                , 3);
+        Post post =
+                createPost(
+                        mockedContext,
+                        createPostRequestForHashmap(PostRequest.PUT),
+                        apiConnection,
+                        3);
         post.execute();
         verify(apiConnection).dynamicPut(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testPutList() throws JSONException {
-        Post post = createPost(mockedContext
-                , createPostRequestForJsonArray(PostRequest.PUT)
-                , apiConnection
-                , 3);
+        Post post =
+                createPost(
+                        mockedContext,
+                        createPostRequestForJsonArray(PostRequest.PUT),
+                        apiConnection,
+                        3);
         post.execute();
         verify(apiConnection).dynamicPut(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testDeleteObject() {
-        Post post = createPost(mockedContext
-                , createPostRequestForHashmap(PostRequest.DELETE)
-                , apiConnection
-                , 3);
+        Post post =
+                createPost(
+                        mockedContext,
+                        createPostRequestForHashmap(PostRequest.DELETE),
+                        apiConnection,
+                        3);
         post.execute();
         verify(apiConnection).dynamicDelete(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testDeleteList() throws JSONException {
-        Post post = createPost(mockedContext
-                , createPostRequestForJsonArray(PostRequest.DELETE)
-                , apiConnection
-                , 3);
+        Post post =
+                createPost(
+                        mockedContext,
+                        createPostRequestForJsonArray(PostRequest.DELETE),
+                        apiConnection,
+                        3);
         post.execute();
         verify(apiConnection).dynamicDelete(anyString(), any(RequestBody.class));
     }
 
     @Test
     public void testReQueue() throws JSONException {
-        Post post = createPost(mockedContext
-                , createPostRequestForJsonArray(PostRequest.DELETE)
-                , apiConnection
-                , 0);
+        Post post =
+                createPost(
+                        mockedContext,
+                        createPostRequestForJsonArray(PostRequest.DELETE),
+                        apiConnection,
+                        0);
         Mockito.doNothing().when(utils).queuePostCore(any(), any(PostRequest.class));
         post.queuePost();
         verify(utils, times(1)).queuePostCore(any(), any(PostRequest.class));
@@ -148,7 +163,8 @@ public class PostTest {
     //--------------------------------------------------------------------------------------------//
 
     @NonNull
-    private Post createPost(Context context, PostRequest postRequest, ApiConnection apiConnection, int trailCount) {
+    private Post createPost(
+            Context context, PostRequest postRequest, ApiConnection apiConnection, int trailCount) {
         return new Post(context, postRequest, apiConnection, trailCount, utils);
     }
 
@@ -177,7 +193,8 @@ public class PostTest {
         when(apiConnection.dynamicPost(any(), any())).thenReturn(OBJECT_OBSERVABLE);
         when(apiConnection.dynamicPut(any(), any())).thenReturn(OBJECT_OBSERVABLE);
         when(apiConnection.dynamicPatch(any(), any())).thenReturn(OBJECT_OBSERVABLE);
-        when(apiConnection.dynamicUpload(any(), any(Map.class), any(MultipartBody.Part.class))).thenReturn(OBJECT_OBSERVABLE);
+        when(apiConnection.dynamicUpload(any(), any(Map.class), any(MultipartBody.Part.class)))
+                .thenReturn(OBJECT_OBSERVABLE);
         return apiConnection;
     }
 
@@ -195,7 +212,6 @@ public class PostTest {
     private TestRealmModel createTestModel() {
         return TEST_MODEL;
     }
-
 
     private PostRequest createPostRequestForHashmap(String method) {
         return new PostRequest.Builder(getValidDataClass(), false)

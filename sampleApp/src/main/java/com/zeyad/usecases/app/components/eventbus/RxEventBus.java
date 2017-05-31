@@ -6,10 +6,8 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.subjects.PublishSubject;
 
-
 /**
- * Small wrapper on top of the EventBus to allow consumption of events as
- * Rx streams.
+ * Small wrapper on top of the EventBus to allow consumption of events as Rx streams.
  *
  * @author Zeyad
  */
@@ -47,3 +45,4 @@ final class RxEventBus implements IRxEventBus {
         return rxBus.hasObservers();
     }
 }
+

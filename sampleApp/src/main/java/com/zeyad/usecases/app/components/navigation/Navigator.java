@@ -5,9 +5,7 @@ import android.app.ActivityOptions;
 import android.content.Context;
 import android.content.Intent;
 
-/**
- * Class used to navigate through the application.
- */
+/** Class used to navigate through the application. */
 final class Navigator implements INavigator {
 
     private static INavigator mInstance;
@@ -36,3 +34,4 @@ final class Navigator implements INavigator {
         activity.startActivityForResult(intent, requestCode);
     }
 }
+

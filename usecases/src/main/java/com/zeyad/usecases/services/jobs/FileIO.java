@@ -14,21 +14,23 @@ import java.io.File;
 
 import io.reactivex.Completable;
 
-/**
- * @author Zeyad on 6/05/16.
- */
+/** @author Zeyad on 6/05/16. */
 public class FileIO {
     private static final String TAG = FileIO.class.getSimpleName(), ON_ERROR = "onError";
     private static int mTrailCount;
-    @NonNull
-    private final FirebaseJobDispatcher mDispatcher;
+    @NonNull private final FirebaseJobDispatcher mDispatcher;
     private final FileIORequest mFileIORequest;
     private final CloudDataStore mCloudDataStore;
     private final Utils mUtils;
     private final boolean mIsDownload;
 
-    public FileIO(int trailCount, FileIORequest payLoad, Context context, boolean isDownload,
-                  CloudDataStore cloudDataStore, Utils utils) {
+    public FileIO(
+            int trailCount,
+            FileIORequest payLoad,
+            Context context,
+            boolean isDownload,
+            CloudDataStore cloudDataStore,
+            Utils utils) {
         mCloudDataStore = cloudDataStore;
         mTrailCount = trailCount;
         mFileIORequest = payLoad;
@@ -40,16 +42,34 @@ public class FileIO {
     @NonNull
     public Completable execute() {
         File file = mFileIORequest.getFile();
-        return mIsDownload ? Completable.fromObservable(mCloudDataStore
-                .dynamicDownloadFile(mFileIORequest.getUrl(), file, mFileIORequest.onWifi(),
-                        mFileIORequest.isWhileCharging(), mFileIORequest.isQueuable())
-                .doOnSubscribe(subscription -> Log.d(TAG, "Downloading " + file.getName()))
-                .doOnError(this::onError).toObservable()) : Completable.fromObservable(mCloudDataStore
-                .dynamicUploadFile(mFileIORequest.getUrl(), file, mFileIORequest.getKey(),
-                        mFileIORequest.getParameters(), mFileIORequest.onWifi(), mFileIORequest.isWhileCharging(),
-                        mFileIORequest.isQueuable(), mFileIORequest.getDataClass())
-                .doOnSubscribe(subscription -> Log.d(TAG, "Uploading " + file.getName()))
-                .doOnError(this::onError).toObservable());
+        return mIsDownload
+                ? Completable.fromObservable(
+                        mCloudDataStore
+                                .dynamicDownloadFile(
+                                        mFileIORequest.getUrl(),
+                                        file,
+                                        mFileIORequest.onWifi(),
+                                        mFileIORequest.isWhileCharging(),
+                                        mFileIORequest.isQueuable())
+                                .doOnSubscribe(
+                                        subscription -> Log.d(TAG, "Downloading " + file.getName()))
+                                .doOnError(this::onError)
+                                .toObservable())
+                : Completable.fromObservable(
+                        mCloudDataStore
+                                .dynamicUploadFile(
+                                        mFileIORequest.getUrl(),
+                                        file,
+                                        mFileIORequest.getKey(),
+                                        mFileIORequest.getParameters(),
+                                        mFileIORequest.onWifi(),
+                                        mFileIORequest.isWhileCharging(),
+                                        mFileIORequest.isQueuable(),
+                                        mFileIORequest.getDataClass())
+                                .doOnSubscribe(
+                                        subscription -> Log.d(TAG, "Uploading " + file.getName()))
+                                .doOnError(this::onError)
+                                .toObservable());
     }
 
     private void onError(Throwable throwable) {

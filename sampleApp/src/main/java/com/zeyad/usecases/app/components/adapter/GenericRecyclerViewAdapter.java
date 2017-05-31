@@ -19,7 +19,8 @@ import static android.os.Build.VERSION_CODES.M;
 /**
  * @author by zeyad on 19/05/16.
  */
-public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<GenericRecyclerViewAdapter.ViewHolder> {
+public abstract class GenericRecyclerViewAdapter
+        extends RecyclerView.Adapter<GenericRecyclerViewAdapter.ViewHolder> {
 
     private static final String UNUSED = "unused", SELECTION_DISABLED = "Selection mode is disabled!";
     public final LayoutInflater mLayoutInflater;
@@ -27,7 +28,11 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
     private List<ItemInfo> mDataList;
     private OnItemClickListener mOnItemClickListener;
     private OnItemLongClickListener mOnItemLongClickListener;
-    private boolean mIsLoadingFooterAdded, mHasHeader, mHasFooter, allowSelection, areItemsExpandable,
+    private boolean mIsLoadingFooterAdded,
+            mHasHeader,
+            mHasFooter,
+            allowSelection,
+            areItemsExpandable,
             areItemsClickable = true;
     private int expandedPosition = -1;
 
@@ -44,25 +49,36 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         ItemInfo itemInfo = mDataList.get(position);
-        holder.bindData(itemInfo.getData(), mSelectedItems.get(position, false), position, itemInfo.isEnabled());
-        if (areItemsClickable && !(hasHeader() && position == 0 || hasFooter() && position == mDataList.size() - 1)) {
+        holder.bindData(
+                itemInfo.getData(),
+                mSelectedItems.get(position, false),
+                position,
+                itemInfo.isEnabled());
+        if (areItemsClickable
+                && !(hasHeader() && position == 0
+                || hasFooter() && position == mDataList.size() - 1)) {
             if (mOnItemClickListener != null) {
-                holder.itemView.setOnClickListener(view -> mOnItemClickListener.onItemClicked(holder
-                        .getAdapterPosition(), itemInfo, holder));
+                holder.itemView.setOnClickListener(
+                        view ->
+                                mOnItemClickListener.onItemClicked(
+                                        holder.getAdapterPosition(), itemInfo, holder));
             }
             if (mOnItemLongClickListener != null) {
-                holder.itemView.setOnLongClickListener(view -> mOnItemLongClickListener
-                        .onItemLongClicked(holder.getAdapterPosition(), itemInfo, holder));
+                holder.itemView.setOnLongClickListener(
+                        view ->
+                                mOnItemLongClickListener.onItemLongClicked(
+                                        holder.getAdapterPosition(), itemInfo, holder));
             }
         }
         if (areItemsExpandable) {
             final boolean isExpanded = position == expandedPosition;
             holder.expand(isExpanded);
             holder.itemView.setActivated(true);
-            holder.itemView.setOnClickListener(view -> {
-                expandedPosition = isExpanded ? -1 : position;
-                notifyDataSetChanged();
-            });
+            holder.itemView.setOnClickListener(
+                    view -> {
+                        expandedPosition = isExpanded ? -1 : position;
+                        notifyDataSetChanged();
+                    });
         }
     }
 
@@ -352,12 +368,17 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
 
     @SuppressWarnings(UNUSED)
     public void addSectionHeader(int index, String title) {
-        addItem(index, new ItemInfo<>(title, ItemInfo.SECTION_HEADER).setId(ItemInfo.SECTION_HEADER));
+        addItem(
+                index,
+                new ItemInfo<>(title, ItemInfo.SECTION_HEADER).setId(ItemInfo.SECTION_HEADER));
     }
 
     @SuppressWarnings(UNUSED)
     public void addCardSectionHeader(int index, String title) {
-        addItem(index, new ItemInfo<>(title, ItemInfo.CARD_SECTION_HEADER).setId(ItemInfo.CARD_SECTION_HEADER));
+        addItem(
+                index,
+                new ItemInfo<>(title, ItemInfo.CARD_SECTION_HEADER)
+                        .setId(ItemInfo.CARD_SECTION_HEADER));
     }
 
     @SuppressWarnings(UNUSED)
@@ -395,8 +416,10 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
         ItemInfo item;
         for (int i = 0; i < pureSet.size(); i++) {
             item = pureSet.get(i);
-            if (item.getId() == ItemInfo.SECTION_HEADER || item.getId() == ItemInfo.CARD_SECTION_HEADER
-                    || item.getId() == ItemInfo.FOOTER || item.getId() == ItemInfo.HEADER
+            if (item.getId() == ItemInfo.SECTION_HEADER
+                    || item.getId() == ItemInfo.CARD_SECTION_HEADER
+                    || item.getId() == ItemInfo.FOOTER
+                    || item.getId() == ItemInfo.HEADER
                     || item.getId() == ItemInfo.LOADING) {
                 pureSet.remove(item);
             }
@@ -555,7 +578,8 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
                 positions.remove(0);
             } else {
                 int count = 1;
-                while (positions.size() > count && positions.get(count).equals(positions.get(count - 1) - 1)) {
+                while (positions.size() > count
+                        && positions.get(count).equals(positions.get(count - 1) - 1)) {
                     ++count;
                 }
                 if (count == 1) {
@@ -681,7 +705,8 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
     }
 
     public interface OnItemLongClickListener {
-        boolean onItemLongClicked(int position, ItemInfo itemInfo, GenericRecyclerViewAdapter.ViewHolder holder);
+        boolean onItemLongClicked(
+                int position, ItemInfo itemInfo, GenericRecyclerViewAdapter.ViewHolder holder);
     }
 
     public abstract static class ViewHolder extends RecyclerView.ViewHolder {
@@ -690,8 +715,10 @@ public abstract class GenericRecyclerViewAdapter extends RecyclerView.Adapter<Ge
             super(itemView);
         }
 
-        public abstract void bindData(Object data, boolean itemSelected, int position, boolean isEnabled);
+        public abstract void bindData(
+                Object data, boolean itemSelected, int position, boolean isEnabled);
 
         public abstract void expand(boolean isExpanded);
     }
 }
+

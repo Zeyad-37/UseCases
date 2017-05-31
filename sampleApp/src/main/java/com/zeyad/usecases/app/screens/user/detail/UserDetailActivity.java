@@ -29,18 +29,20 @@ import butterknife.Unbinder;
 import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
 
 /**
- * An activity representing a single Repository detail screen. This
- * activity is only used narrow width devices. On tablet-size devices,
- * item details are presented side-by-side with a list of items
- * in a {@link UserListActivity}.
+ * An activity representing a single Repository detail screen. This activity is only used narrow
+ * width devices. On tablet-size devices, item details are presented side-by-side with a list of
+ * items in a {@link UserListActivity}.
  */
 public class UserDetailActivity extends AppCompatActivity {
     @BindView(R.id.detail_toolbar)
     Toolbar toolbar;
+
     @BindView(R.id.imageView_avatar)
     ImageView imageViewAvatar;
+
     @BindView(R.id.toolbar_layout)
     CollapsingToolbarLayout collapsingToolbarLayout;
+
     Unbinder unbinder;
 
     public static Intent getCallingIntent(Context context, UserDetailState userDetailModel) {
@@ -61,13 +63,20 @@ public class UserDetailActivity extends AppCompatActivity {
             actionBar.setTitle("");
         }
         if (savedInstanceState == null) {
-            addFragment(R.id.user_detail_container, UserDetailFragment.newInstance(Parcels.unwrap(getIntent()
-                    .getParcelableExtra(UI_MODEL))), "", null);
+            addFragment(
+                    R.id.user_detail_container,
+                    UserDetailFragment.newInstance(
+                            Parcels.unwrap(getIntent().getParcelableExtra(UI_MODEL))),
+                    "",
+                    null);
         }
     }
 
-    private void addFragment(int containerViewId, Fragment fragment, String currentFragTag,
-                             List<Pair<View, String>> sharedElements) {
+    private void addFragment(
+            int containerViewId,
+            Fragment fragment,
+            String currentFragTag,
+            List<Pair<View, String>> sharedElements) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         if (sharedElements != null) {
             for (Pair<View, String> pair : sharedElements) {
@@ -84,7 +93,7 @@ public class UserDetailActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-//        navigateUpTo(new Intent(this, UserListActivity.class));
+        //        navigateUpTo(new Intent(this, UserListActivity.class));
         supportFinishAfterTransition(); // exit animation
     }
 

@@ -80,9 +80,7 @@ public final class Config {
         return mGson;
     }
 
-    /**
-     * @return withCache, whether DataUseCase is using caching or not.
-     */
+    /** @return withCache, whether DataUseCase is using caching or not. */
     public static boolean isWithCache() {
         return withCache;
     }
@@ -154,12 +152,12 @@ public final class Config {
     }
 
     private void setupRealm() {
-//        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
-//                .name("library.realm")
-//                .modules(new LibraryModule())
-//                .rxFactory(new RealmObservableFactory())
-//                .deleteRealmIfMigrationNeeded()
-//                .build());
+        //        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
+        //                .name("library.realm")
+        //                .modules(new LibraryModule())
+        //                .rxFactory(new RealmObservableFactory())
+        //                .deleteRealmIfMigrationNeeded()
+        //                .build());
     }
 
     @Nullable

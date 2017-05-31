@@ -4,10 +4,7 @@ import android.os.Build;
 
 import java.util.List;
 
-/**
- * @author by ZIaDo on 10/1/16.
- */
-
+/** @author by ZIaDo on 10/1/16. */
 public class Utils {
 
     public static boolean isNotEmpty(String text) {

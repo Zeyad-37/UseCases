@@ -22,9 +22,7 @@ public class DataStoreFactory {
         mDAOMapper = daoMapper;
     }
 
-    /**
-     * Create {@link DataStore} .
-     */
+    /** Create {@link DataStore} . */
     @NonNull
     public DataStore dynamically(@NonNull String url, Class dataClass) throws Exception {
         if (!url.isEmpty()) {
@@ -36,9 +34,7 @@ public class DataStoreFactory {
         }
     }
 
-    /**
-     * Creates a disk {@link DataStore}.
-     */
+    /** Creates a disk {@link DataStore}. */
     @NonNull
     public DataStore disk(Class dataClass) throws IllegalAccessException {
         if (!Config.isWithRealm() || mDataBaseManagerUtil == null) {
@@ -47,9 +43,7 @@ public class DataStoreFactory {
         return new DiskDataStore(mDataBaseManagerUtil.getDataBaseManager(dataClass), mDAOMapper);
     }
 
-    /**
-     * Creates a cloud {@link DataStore}.
-     */
+    /** Creates a cloud {@link DataStore}. */
     @NonNull
     public DataStore cloud(Class dataClass) {
         return new CloudDataStore(mApiConnection, mDataBaseManagerUtil.getDataBaseManager(dataClass),
