@@ -10,18 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class DAOMapper {
-    private static DAOMapper sDAOMapper;
     private final Gson gson;
 
-    private DAOMapper() {
+    public DAOMapper() {
         gson = Config.getGson();
-    }
-
-    public static DAOMapper getInstance() {
-        if (sDAOMapper == null) {
-            sDAOMapper = new DAOMapper();
-        }
-        return sDAOMapper;
     }
 
     @NonNull

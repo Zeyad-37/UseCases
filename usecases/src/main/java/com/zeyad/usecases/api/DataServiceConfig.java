@@ -46,7 +46,7 @@ public class DataServiceConfig {
 
     @NonNull
     DAOMapper getEntityMapper() {
-        return DAOMapper.getInstance();
+        return new DAOMapper();
     }
 
     Scheduler getPostExecutionThread() {

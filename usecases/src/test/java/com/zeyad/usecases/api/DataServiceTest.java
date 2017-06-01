@@ -18,9 +18,9 @@ import java.io.File;
 import java.util.Collections;
 import java.util.HashMap;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 
 import static org.mockito.Matchers.any;
@@ -355,7 +355,7 @@ public class DataServiceTest {
     @Test
     public void deleteAll() throws Exception {
         when(dataStoreFactory.disk(Object.class).dynamicDeleteAll(any(Class.class)))
-                .thenReturn(Completable.complete());
+                .thenReturn(Single.just(true));
 
         dataService.deleteAll(postRequest);
 

@@ -17,8 +17,8 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import st.lowlevel.storo.Storo;
 
 public class DiskDataStore implements DataStore {
@@ -74,7 +74,7 @@ public class DiskDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Completable dynamicDeleteAll(Class dataClass) {
+    public Single<Boolean> dynamicDeleteAll(Class dataClass) {
         return mDataBaseManager.evictAll(dataClass);
     }
 
@@ -85,14 +85,14 @@ public class DiskDataStore implements DataStore {
                                             boolean queuable) {
         List<Long> convertToListOfId = Utils.getInstance().convertToListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
-                .doOnEvent(object -> {
+                .doOnEach(object -> {
                     if (withCache) {
                         int convertToListOfIdSize = convertToListOfId != null ? convertToListOfId.size() : 0;
                         for (int i = 0; i < convertToListOfIdSize; i++) {
                             Storo.delete(dataClass.getSimpleName() + convertToListOfId.get(i));
                         }
                     }
-                }).toFlowable();
+                });
     }
 
     @NonNull
@@ -101,7 +101,7 @@ public class DiskDataStore implements DataStore {
                                        @NonNull Class dataClass, Class responseType, boolean persist,
                                        boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnEvent(object -> {
+                .doOnSuccess(object -> {
                     if (withCache) {
                         cacheObject(idColumnName, jsonObject, dataClass);
                     }
@@ -115,7 +115,7 @@ public class DiskDataStore implements DataStore {
                                       @NonNull Class dataClass, Class responseType, boolean persist,
                                       boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnEvent(object -> {
+                .doOnSuccess(object -> {
                     if (withCache) {
                         cacheObject(idColumnName, jsonObject, dataClass);
                     }
@@ -136,7 +136,7 @@ public class DiskDataStore implements DataStore {
                                      @NonNull Class dataClass, Class responseType, boolean persist,
                                      boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .doOnEvent(object -> {
+                .doOnSuccess(object -> {
                     if (withCache) {
                         cacheObject(idColumnName, jsonObject, dataClass);
                     }

@@ -90,7 +90,7 @@ public class GenericApplication extends Application {
         initializeStrictMode();
         super.onCreate();
         Completable.fromAction(() -> {
-            checkAppTampering(this);
+//            checkAppTampering(this);
             initializeFlowUp();
             Rollbar.init(this, "c8c8b4cb1d4f4650a77ae1558865ca87", "production");
         }).subscribeOn(Schedulers.io())

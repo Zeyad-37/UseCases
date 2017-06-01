@@ -16,6 +16,7 @@ import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 /**
  * Interface that represents a data store from where data is retrieved.
@@ -93,7 +94,7 @@ public interface DataStore {
      * that will emit a list of Object.
      */
     @NonNull
-    Completable dynamicDeleteAll(Class requestType);
+    Single<Boolean> dynamicDeleteAll(Class requestType);
 
     @NonNull
     Flowable<File> dynamicDownloadFile(String url, File file, boolean onWifi, boolean whileCharging,

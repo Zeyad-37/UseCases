@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
@@ -42,9 +42,8 @@ public class DiskDataStoreTest {
     @Before
     public void setUp() throws Exception {
         dbManager = mock(DataBaseManager.class);
-        DAOMapper mapper = DAOMapper.getInstance();
         Config.setWithCache(false);
-        mDiskDataStore = new DiskDataStore(dbManager, mapper);
+        mDiskDataStore = new DiskDataStore(dbManager, new DAOMapper());
     }
 
     @Test
@@ -82,7 +81,7 @@ public class DiskDataStoreTest {
 
     @Test
     public void testDynamicDeleteAll() {
-        when(dbManager.evictAll(any(Class.class))).thenReturn(Completable.complete());
+        when(dbManager.evictAll(any(Class.class))).thenReturn(Single.just(true));
 
         mDiskDataStore.dynamicDeleteAll(TestRealmModel.class);
 
@@ -92,7 +91,7 @@ public class DiskDataStoreTest {
     @Test
     public void testDynamicDeleteCollection() {
         when(dbManager.evictCollection(anyString(), anyList(), any(Class.class)))
-                .thenReturn(Completable.complete());
+                .thenReturn(Flowable.just(true));
 
         mDiskDataStore.dynamicDeleteCollection(
                 "", "", new JSONArray(), Object.class, Object.class, false, false);
@@ -104,7 +103,7 @@ public class DiskDataStoreTest {
     @Test
     public void testDynamicPatchObject() throws Exception {
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class)))
-                .thenReturn(Completable.complete());
+                .thenReturn(Single.just(true));
 
         mDiskDataStore.dynamicPatchObject(
                 "", "", new JSONObject(), Object.class, Object.class, false, false);
@@ -116,7 +115,7 @@ public class DiskDataStoreTest {
     @Test
     public void testDynamicPostObject() throws Exception {
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class)))
-                .thenReturn(Completable.complete());
+                .thenReturn(Single.just(true));
 
         mDiskDataStore.dynamicPostObject(
                 "", "", new JSONObject(), Object.class, Object.class, false, false);
@@ -128,7 +127,7 @@ public class DiskDataStoreTest {
     @Test
     public void testDynamicPutObject() throws Exception {
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class)))
-                .thenReturn(Completable.complete());
+                .thenReturn(Single.just(true));
 
         mDiskDataStore.dynamicPutObject(
                 "", "", new JSONObject(), Object.class, Object.class, false, false);
@@ -140,7 +139,7 @@ public class DiskDataStoreTest {
     @Test
     public void testDynamicPostList() throws Exception {
         when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class)))
-                .thenReturn(Completable.complete());
+                .thenReturn(Single.just(true));
 
         mDiskDataStore.dynamicPostList(
                 "", "", new JSONArray(), Object.class, Object.class, false, false);
@@ -152,7 +151,7 @@ public class DiskDataStoreTest {
     @Test
     public void testDynamicPutList() throws Exception {
         when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class)))
-                .thenReturn(Completable.complete());
+                .thenReturn(Single.just(true));
 
         mDiskDataStore.dynamicPutList(
                 "", "", new JSONArray(), Object.class, Object.class, false, false);

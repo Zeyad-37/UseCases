@@ -38,10 +38,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import io.reactivex.Completable;
-import io.reactivex.CompletableObserver;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableTransformer;
+import io.reactivex.Single;
+import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -293,8 +293,8 @@ public class CloudDataStore implements DataStore {
 
     @NonNull
     @Override
-    public Completable dynamicDeleteAll(Class dataClass) {
-        return Completable.error(new IllegalStateException("Can not delete all from cloud data store!"));
+    public Single<Boolean> dynamicDeleteAll(Class dataClass) {
+        return Single.error(new IllegalStateException("Can not delete all from cloud data store!"));
     }
 
     @NonNull
@@ -498,7 +498,7 @@ public class CloudDataStore implements DataStore {
             return;
         }
         Object mappedObject = null;
-        Completable completable = null;
+        Single single = null;
         if (mDataBaseManager instanceof RealmManager) {
             try {
                 if (!(object instanceof JSONArray) && !(object instanceof Map)) {
@@ -508,15 +508,15 @@ public class CloudDataStore implements DataStore {
                 Log.e(TAG, "persistGeneric", e);
             }
             if (mappedObject instanceof RealmObject) {
-                completable = mDataBaseManager.put((RealmObject) mappedObject, dataClass);
+                single = mDataBaseManager.put((RealmObject) mappedObject, dataClass);
             } else if (mappedObject instanceof RealmModel) {
-                completable = mDataBaseManager.put((RealmModel) mappedObject, dataClass);
+                single = mDataBaseManager.put((RealmModel) mappedObject, dataClass);
             } else {
                 try {
                     if (object instanceof JSONArray) {
                         JSONArray jsonArray = (JSONArray) object;
-                        completable = mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
-                                .doOnEvent(objectNotification -> {
+                        single = mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
+                                .doOnSuccess(aBoolean -> {
                                     JSONObject jsonObject;
                                     int size = jsonArray.length();
                                     for (int i = 0; i < size; i++) {
@@ -527,7 +527,7 @@ public class CloudDataStore implements DataStore {
                                     }
                                 });
                     } else if (object instanceof List) {
-                        completable =
+                        single =
                                 mDataBaseManager.putAll(
                                         mEntityDataMapper.mapAllTo((List) object, dataClass),
                                         dataClass);
@@ -542,8 +542,8 @@ public class CloudDataStore implements DataStore {
                         } else {
                             jsonObject = new JSONObject(gson.toJson(object, dataClass));
                         }
-                        completable = mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                                .doOnEvent(objectNotification -> {
+                        single = mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+                                .doOnSuccess(objectNotification -> {
                                     if (Config.isWithCache()) {
                                         Storo.put(dataClass.getSimpleName() + jsonObject.optString(idColumnName),
                                                 gson.fromJson(jsonObject.toString(), dataClass))
@@ -554,19 +554,18 @@ public class CloudDataStore implements DataStore {
                     }
                 } catch (Exception e) {
                     Log.e(TAG, "persistGeneric", e);
-                    completable = Completable.error(e);
+                    single = Single.error(e);
                 }
             }
         }
-        if (completable != null) {
-            completable.subscribeOn(Config.getBackgroundThread())
+        if (single != null) {
+            single.subscribeOn(Config.getBackgroundThread())
                     .subscribe(new SimpleSubscriber(dataClass));
         }
     }
 
     private void persistAllGenerics(List collection, Class dataClass) {
-        mDataBaseManager
-                .putAll(collection, dataClass)
+        mDataBaseManager.putAll(collection, dataClass)
                 .subscribeOn(Config.getBackgroundThread())
                 .subscribe(new SimpleSubscriber(dataClass));
     }
@@ -581,7 +580,7 @@ public class CloudDataStore implements DataStore {
         }
     }
 
-    private static class SimpleSubscriber implements CompletableObserver {
+    private static class SimpleSubscriber implements SingleObserver {
         private final Class mClass;
         private Disposable subscription;
 
@@ -595,7 +594,7 @@ public class CloudDataStore implements DataStore {
         }
 
         @Override
-        public void onComplete() {
+        public void onSuccess(Object o) {
             subscription.dispose();
             Log.d(TAG, mClass.getSimpleName() + " persisted!");
         }

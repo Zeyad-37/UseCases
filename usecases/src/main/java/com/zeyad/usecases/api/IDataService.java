@@ -8,8 +8,8 @@ import com.zeyad.usecases.requests.PostRequest;
 import java.io.File;
 import java.util.List;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 public interface IDataService {
 
@@ -91,7 +91,7 @@ public interface IDataService {
      * @param deleteRequest contains the attributes of the request.
      * @return Completable with the list.
      */
-    Completable deleteAll(PostRequest deleteRequest);
+    Single<Boolean> deleteAll(PostRequest deleteRequest);
 
     /**
      * Get list of items according to the query passed.

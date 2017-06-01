@@ -31,8 +31,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subscribers.TestSubscriber;
 import io.realm.RealmModel;
@@ -54,7 +54,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-/** @author by ZIaDo on 2/14/17. */
+/**
+ * @author by ZIaDo on 2/14/17.
+ */
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 public class CloudDataStoreTest {
@@ -73,21 +75,17 @@ public class CloudDataStoreTest {
         mockDataBaseManager = mock(RealmManager.class);
         changeStateOfNetwork(mockContext, true);
         when(mockDataBaseManager.put(any(JSONObject.class), anyString(), any(Class.class)))
-                .thenReturn(Completable.complete());
+                .thenReturn(Single.just(true));
         when(mockDataBaseManager.putAll(any(JSONArray.class), anyString(), any(Class.class)))
-                .thenReturn(Completable.complete());
+                .thenReturn(Single.just(true));
         when(mockDataBaseManager.putAll(anyList(), any(Class.class)))
-                .thenReturn(Completable.complete());
-        cloudDataStore =
-                new CloudDataStore(
-                        mockApiConnection,
-                        mockDataBaseManager,
-                        DAOMapper.getInstance(),
-                        mockContext);
+                .thenReturn(Single.just(true));
+        cloudDataStore = new CloudDataStore(mockApiConnection, mockDataBaseManager, new DAOMapper(),
+                mockContext);
         HandlerThread backgroundThread = new HandlerThread("backgroundThread");
         backgroundThread.start();
-        com.zeyad.usecases.Config.setBackgroundThread(
-                AndroidSchedulers.from(backgroundThread.getLooper()));
+        com.zeyad.usecases.Config
+                .setBackgroundThread(AndroidSchedulers.from(backgroundThread.getLooper()));
     }
 
     @Test
@@ -512,9 +510,9 @@ public class CloudDataStoreTest {
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
-    @Test //(expected = IllegalStateException.class)
+    @Test(expected = IllegalStateException.class)
     public void dynamicDeleteAll() throws Exception {
-        Completable completable = cloudDataStore.dynamicDeleteAll(Object.class);
+        Single completable = cloudDataStore.dynamicDeleteAll(Object.class);
 
         // Verify repository interactions
         verifyZeroInteractions(mockApiConnection);
@@ -644,7 +642,7 @@ public class CloudDataStoreTest {
                 .thenReturn(connectivityManager);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Network network = Mockito.mock(Network.class);
-            Network[] networks = new Network[] {network};
+            Network[] networks = new Network[]{network};
             Mockito.when(connectivityManager.getAllNetworks()).thenReturn(networks);
             NetworkInfo networkInfo = Mockito.mock(NetworkInfo.class);
             Mockito.when(connectivityManager.getNetworkInfo(network)).thenReturn(networkInfo);
@@ -656,7 +654,7 @@ public class CloudDataStoreTest {
         } else {
             NetworkInfo networkInfo = Mockito.mock(NetworkInfo.class);
             Mockito.when(connectivityManager.getAllNetworkInfo())
-                    .thenReturn(new NetworkInfo[] {networkInfo});
+                    .thenReturn(new NetworkInfo[]{networkInfo});
             Mockito.when(networkInfo.getState())
                     .thenReturn(
                             toEnable

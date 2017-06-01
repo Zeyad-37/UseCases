@@ -6,20 +6,28 @@ import com.zeyad.usecases.TestRealmModel;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.Collections;
 
-/** @author by ZIaDo on 5/14/17. */
+/**
+ * @author by ZIaDo on 5/14/17.
+ */
 public class DAOMapperTest {
     private DAOMapper daoMapper;
 
     @Before
     public void setUp() throws Exception {
         Config.setGson();
-        daoMapper = DAOMapper.getInstance();
+        daoMapper = new DAOMapper();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        daoMapper = null;
     }
 
     @Test
@@ -48,10 +56,5 @@ public class DAOMapperTest {
                                 TestRealmModel.class)
                         .getClass(),
                 ArrayList.class);
-    }
-
-    @Test
-    public void getInstance() throws Exception {
-        Assert.assertNotNull(DAOMapper.getInstance());
     }
 }

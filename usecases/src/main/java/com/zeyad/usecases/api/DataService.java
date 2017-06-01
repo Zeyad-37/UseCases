@@ -13,10 +13,10 @@ import java.io.File;
 import java.util.Collections;
 import java.util.List;
 
-import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableTransformer;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import io.reactivex.functions.Function;
 
 /**
@@ -193,16 +193,15 @@ class DataService implements IDataService {
     }
 
     @Override
-    public Completable deleteAll(@NonNull PostRequest deleteRequest) {
+    public Single<Boolean> deleteAll(@NonNull PostRequest deleteRequest) {
         try {
             return mDataStoreFactory.disk(deleteRequest.getRequestType())
                     .dynamicDeleteAll(deleteRequest.getRequestType())
-                    .compose(mPostThreadExist ? completable -> completable.subscribeOn(mBackgroundThread)
+                    .compose(upstream -> mPostThreadExist ? upstream.subscribeOn(mBackgroundThread)
                             .observeOn(mPostExecutionThread).unsubscribeOn(mBackgroundThread) :
-                            completable -> completable.subscribeOn(mBackgroundThread)
-                                    .unsubscribeOn(mBackgroundThread));
+                            upstream.subscribeOn(mBackgroundThread).unsubscribeOn(mBackgroundThread));
         } catch (IllegalAccessException e) {
-            return Completable.error(e);
+            return Single.error(e);
         }
     }
 
@@ -230,8 +229,9 @@ class DataService implements IDataService {
     @Override
     public Flowable<File> downloadFile(@NonNull FileIORequest fileIORequest) {
         return mDataStoreFactory.cloud(fileIORequest.getDataClass())
-                .dynamicDownloadFile(fileIORequest.getUrl(), fileIORequest.getFile(), fileIORequest.onWifi(),
-                        fileIORequest.isWhileCharging(), fileIORequest.isQueuable())
+                .dynamicDownloadFile(fileIORequest.getUrl(), fileIORequest.getFile(),
+                        fileIORequest.onWifi(), fileIORequest.isWhileCharging(),
+                        fileIORequest.isQueuable())
                 .compose(applySchedulers());
     }
 

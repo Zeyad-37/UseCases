@@ -23,6 +23,7 @@ import java.util.ArrayList;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
 import io.realm.Realm;
@@ -122,11 +123,8 @@ public class RealmManagerTest {
 
     @Test
     public void putJSONObject() throws Exception {
-        Completable completable =
-                mRealmManager.put(
-                        new JSONObject(new Gson().toJson(new TestRealmModel())),
-                        "id",
-                        TestRealmModel.class);
+        Single<Boolean> completable = mRealmManager.put(new JSONObject(new Gson().toJson(new TestRealmModel())),
+                "id", TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 
@@ -136,33 +134,39 @@ public class RealmManagerTest {
         testSubscriber.assertComplete();
     }
 
+    private void applyTestSubscriber(Single<Boolean> single) {
+        TestObserver<Boolean> testSubscriber = new TestObserver<>();
+        single.subscribe(testSubscriber);
+        testSubscriber.assertComplete();
+    }
+
     @Test
     public void putRealmModel() throws Exception {
-        Completable completable = mRealmManager.put(new TestRealmModel(), TestRealmModel.class);
+        Single<Boolean> completable = mRealmManager.put(new TestRealmModel(), TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 
     @Test
     public void putAllJSONArray() throws Exception {
-        Completable completable = mRealmManager.putAll(new JSONArray(), "id", TestRealmModel.class);
+        Single<Boolean> completable = mRealmManager.putAll(new JSONArray(), "id", TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 
     @Test
     public void putAllRealmObject() throws Exception {
-        Completable completable = mRealmManager.putAll(new ArrayList<>(), TestRealmModel.class);
+        Single<Boolean> completable = mRealmManager.putAll(new ArrayList<>(), TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 
     @Test
     public void evictAll() throws Exception {
-        Completable completable = mRealmManager.evictAll(TestRealmModel.class);
+        Single<Boolean> completable = mRealmManager.evictAll(TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 
     @Test
     public void evictCollection() throws Exception {
-        Completable completable =
+        Flowable<Boolean> completable =
                 mRealmManager.evictCollection("id", new ArrayList<>(), TestRealmModel.class);
         applyTestSubscriber(completable);
     }
