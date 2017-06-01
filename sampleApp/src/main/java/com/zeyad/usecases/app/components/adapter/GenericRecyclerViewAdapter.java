@@ -192,7 +192,7 @@ public abstract class GenericRecyclerViewAdapter
     public void setHasHeader(boolean hasHeader, String label) {
         if (!mHasHeader && hasHeader) {
             mHasHeader = true;
-            mDataList.add(0, new ItemInfo<>(label, ItemInfo.HEADER).setId(ItemInfo.HEADER));
+            mDataList.add(0, new ItemInfo(label, ItemInfo.HEADER).setId(ItemInfo.HEADER));
             notifyDataSetChanged();
         }
     }
@@ -207,7 +207,7 @@ public abstract class GenericRecyclerViewAdapter
             mHasFooter = true;
             int position;
             position = mDataList.size();
-            mDataList.add(position, new ItemInfo<>(label, ItemInfo.FOOTER).setId(ItemInfo.FOOTER));
+            mDataList.add(position, new ItemInfo(label, ItemInfo.FOOTER).setId(ItemInfo.FOOTER));
             notifyItemInserted(position);
         }
     }
@@ -217,7 +217,7 @@ public abstract class GenericRecyclerViewAdapter
         mIsLoadingFooterAdded = true;
         if (!mDataList.isEmpty()) {
             int index = mDataList.size() - 1;
-            mDataList.add(index, new ItemInfo<Void>(null, ItemInfo.LOADING).setId(ItemInfo.LOADING));
+            mDataList.add(index, new ItemInfo(null, ItemInfo.LOADING).setId(ItemInfo.LOADING));
             notifyItemInserted(index);
         }
     }
@@ -363,27 +363,23 @@ public abstract class GenericRecyclerViewAdapter
 
     @SuppressWarnings(UNUSED)
     public void addSectionHeader(int index, String title) {
-        addItem(
-                index,
-                new ItemInfo<>(title, ItemInfo.SECTION_HEADER).setId(ItemInfo.SECTION_HEADER));
+        addItem(index, new ItemInfo(title, ItemInfo.SECTION_HEADER).setId(ItemInfo.SECTION_HEADER));
     }
 
     @SuppressWarnings(UNUSED)
     public void addCardSectionHeader(int index, String title) {
-        addItem(
-                index,
-                new ItemInfo<>(title, ItemInfo.CARD_SECTION_HEADER)
-                        .setId(ItemInfo.CARD_SECTION_HEADER));
+        addItem(index, new ItemInfo(title, ItemInfo.CARD_SECTION_HEADER)
+                .setId(ItemInfo.CARD_SECTION_HEADER));
     }
 
     @SuppressWarnings(UNUSED)
     public void addSectionHeaderWithId(int index, String title, long id) {
-        addItem(index, new ItemInfo<>(title, ItemInfo.SECTION_HEADER).setId(id));
+        addItem(index, new ItemInfo(title, ItemInfo.SECTION_HEADER).setId(id));
     }
 
     @SuppressWarnings(UNUSED)
     public void addCardSectionHeaderWithId(int index, String title, long id) {
-        addItem(index, new ItemInfo<>(title, ItemInfo.CARD_SECTION_HEADER).setId(id));
+        addItem(index, new ItemInfo(title, ItemInfo.CARD_SECTION_HEADER).setId(id));
     }
 
     @SuppressWarnings(UNUSED)

@@ -3,14 +3,14 @@ package com.zeyad.usecases.app.components.adapter;
 /**
  * @author by zeyad on 20/05/16.
  */
-public class ItemInfo<M> {
+public class ItemInfo {
     public static final int HEADER = 1, FOOTER = 2, LOADING = 3, SECTION_HEADER = 4, CARD_SECTION_HEADER = 5;
     private final int layoutId;
-    private M data;
+    private Object data;
     private long id;
     private boolean isEnabled = true;
 
-    public ItemInfo(M data, int layoutId) {
+    public ItemInfo(Object data, int layoutId) {
         this.data = data;
         this.layoutId = layoutId;
     }
@@ -19,16 +19,16 @@ public class ItemInfo<M> {
         return id;
     }
 
-    public ItemInfo<M> setId(long id) {
+    public ItemInfo setId(long id) {
         this.id = id;
         return this;
     }
 
-    public M getData() {
+    public Object getData() {
         return data;
     }
 
-    public void setData(M data) {
+    public void setData(Object data) {
         this.data = data;
     }
 
@@ -40,7 +40,7 @@ public class ItemInfo<M> {
         return isEnabled;
     }
 
-    public ItemInfo<M> setEnabled(boolean enabled) {
+    public ItemInfo setEnabled(boolean enabled) {
         isEnabled = enabled;
         return this;
     }

@@ -116,8 +116,7 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
                 getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE), new ArrayList<>()) {
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-                return new RepositoryViewHolder(
-                        mLayoutInflater.inflate(viewType, parent, false));
+                return new RepositoryViewHolder(mLayoutInflater.inflate(viewType, parent, false));
             }
         };
         recyclerViewRepositories.setAdapter(repositoriesAdapter);
@@ -129,10 +128,9 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
         User user = viewState.getUser();
         List<Repository> repoModels = viewState.getRepos();
         if (Utils.isNotEmpty(repoModels)) {
-            int repoModelSize = repoModels.size();
-            for (int i = 0; i < repoModelSize; i++) {
-                repositoriesAdapter.appendItem(new ItemInfo<>(repoModels.get(i), R.layout.repo_item_layout));
-            }
+            repositoriesAdapter.setDataList(Observable.fromIterable(repoModels)
+                    .map(repository -> new ItemInfo(repository, R.layout.repo_item_layout))
+                    .toList(repoModels.size()).blockingGet());
         }
         if (user != null) {
             RequestListener<String, GlideDrawable> requestListener = new RequestListener<String, GlideDrawable>() {

@@ -45,7 +45,6 @@ import com.zeyad.usecases.app.utils.Utils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -96,12 +95,11 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
             if (resultList.size() > 0 && resultList.get(0) instanceof User) {
                 users.addAll(resultList);
             } else {
-                final Iterator<User> each = users.iterator();
-                while (each.hasNext()) {
-                    if (resultList.contains((long) each.next().getId())) {
-                        each.remove();
-                    }
-                }
+                users = Observable.fromIterable(users)
+                        .filter(user -> !resultList.contains((long) user.getId()))
+                        .distinct()
+                        .toList()
+                        .blockingGet();
             }
             users = new ArrayList<>(new HashSet<>(users));
             int lastId = users.get(users.size() - 1).getId();
@@ -136,15 +134,9 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
         viewState = state;
         List<User> users = viewState.getUsers();
         if (Utils.isNotEmpty(users)) {
-            List<ItemInfo> itemInfoList = new ArrayList<>(users.size());
-            User user;
-            int usersListSize = users.size();
-            for (int i = 0; i < usersListSize; i++) {
-                user = users.get(i);
-                itemInfoList.add(
-                        new ItemInfo<>(user, R.layout.user_item_layout).setId(user.getId()));
-            }
-            usersAdapter.setDataList(itemInfoList);
+            usersAdapter.setDataList(Observable.fromIterable(users)
+                    .map(user -> new ItemInfo(user, R.layout.user_item_layout).setId(user.getId()))
+                    .toList(users.size()).blockingGet());
         }
     }
 
