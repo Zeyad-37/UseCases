@@ -1,6 +1,7 @@
 package com.zeyad.usecases.app.components.snackbar;
 
 import android.graphics.Color;
+import android.support.annotation.ColorInt;
 import android.support.annotation.NonNull;
 import android.support.annotation.StringDef;
 import android.support.annotation.StringRes;
@@ -14,7 +15,7 @@ import java.lang.annotation.Retention;
 import static android.support.design.widget.Snackbar.LENGTH_INDEFINITE;
 import static java.lang.annotation.RetentionPolicy.SOURCE;
 
-public class SnackBarFactory {
+public final class SnackBarFactory {
 
     public static final String TYPE_INFO = "typeInfo";
     public static final String TYPE_ERROR = "typeError";
@@ -24,31 +25,38 @@ public class SnackBarFactory {
 
     public static Snackbar getSnackBar(@SnackBarType String snackBarType, @NonNull View view,
                                        @StringRes int stringId, int duration) {
-        return createSnackBar(snackBarType, Snackbar.make(view, stringId, duration));
+        return getSnackBar(view, stringId, duration, getColorId(snackBarType));
     }
 
     public static Snackbar getSnackBar(@SnackBarType String snackBarType, @NonNull View view,
                                        @NonNull CharSequence text, int duration) {
-        return createSnackBar(snackBarType, Snackbar.make(view, text, duration));
+        return getSnackBar(view, text, duration, getColorId(snackBarType));
+    }
+
+    public static Snackbar getSnackBar(@NonNull View view, @StringRes int stringId, int duration,
+                                       @ColorInt int colorId) {
+        return createSnackBar(Snackbar.make(view, stringId, duration), colorId);
+    }
+
+    public static Snackbar getSnackBar(@NonNull View view, @NonNull CharSequence text, int duration,
+                                       @ColorInt int colorId) {
+        return createSnackBar(Snackbar.make(view, text, duration), colorId);
     }
 
     public static Snackbar getSnackBarWithAction(@SnackBarType String snackBarType, @NonNull View view,
                                                  @NonNull CharSequence text, String actionText,
                                                  View.OnClickListener onClickListener) {
-        return createSnackBar(snackBarType, Snackbar.make(view, text, LENGTH_INDEFINITE)
+        return createSnackBar(Snackbar.make(view, text, LENGTH_INDEFINITE)
                 .setAction(Utils.isNotEmpty(actionText) ? actionText : "RETRY", onClickListener)
-                .setActionTextColor(Color.BLACK));
+                .setActionTextColor(Color.BLACK), getColorId(snackBarType));
     }
 
-    private static Snackbar createSnackBar(@SnackBarType String snackBarType, Snackbar snackbar) {
-        switch (snackBarType) {
-            case TYPE_INFO:
-                return ColoredSnackBar.info(snackbar, Color.parseColor("#45d482"));
-            case TYPE_ERROR:
-                return ColoredSnackBar.error(snackbar, Color.parseColor("#e15D50"));
-            default:
-                return snackbar;
-        }
+    private static Snackbar createSnackBar(Snackbar snackbar, @ColorInt int colorId) {
+        return ColoredSnackBar.info(snackbar, colorId);
+    }
+
+    private static int getColorId(@SnackBarType String snackBarType) {
+        return snackBarType.equals(TYPE_INFO) ? Color.parseColor("#45d482") : Color.parseColor("#e15D50");
     }
 
     @Retention(SOURCE)
