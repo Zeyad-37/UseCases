@@ -30,11 +30,11 @@ public class UserListVM extends BaseViewModel<UserListState> {
     private IDataService dataUseCase;
 
     @Override
-    public void init(SuccessStateAccumulator<UserListState> successStateAccumulator, UserListState initialState,
-                     Object... otherDependencies) {
+    public void init(SuccessStateAccumulator<UserListState> successStateAccumulator,
+                     UserListState initialState, Object... otherDependencies) {
         dataUseCase = (IDataService) otherDependencies[0];
-        this.successStateAccumulator = successStateAccumulator;
-        this.initialState = initialState;
+        setSuccessStateAccumulator(successStateAccumulator);
+        setInitialState(initialState);
     }
 
     @Override
@@ -53,11 +53,13 @@ public class UserListVM extends BaseViewModel<UserListState> {
     }
 
     public Flowable<List<User>> getUsers(long lastId) {
-        return lastId == 0 ? dataUseCase.getListOffLineFirst(new GetRequest.Builder(User.class, true)
-                .url(String.format(USERS, lastId))
-                .build()) : dataUseCase.getList(new GetRequest.Builder(User.class, true)
-                .url(String.format(USERS, lastId))
-                .build());
+        return lastId == 0 ?
+                dataUseCase.getListOffLineFirst(new GetRequest.Builder(User.class, true)
+                        .url(String.format(USERS, lastId))
+                        .build()) :
+                dataUseCase.getList(new GetRequest.Builder(User.class, true)
+                        .url(String.format(USERS, lastId))
+                        .build());
     }
 
     public Flowable<List<User>> search(String query) {

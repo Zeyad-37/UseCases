@@ -27,8 +27,8 @@ final class UIModel<S> {
         return new UIModel<>(LOADING, true, null, false, bundle);
     }
 
-    static <B> UIModel<B> errorState(Throwable error) {
-        return new UIModel<>(ERROR, false, error, false, null);
+    static <B> UIModel<B> errorState(Throwable error, B bundle) {
+        return new UIModel<>(ERROR, false, error, false, bundle);
     }
 
     static <B> UIModel<B> successState(B bundle) {
@@ -53,9 +53,9 @@ final class UIModel<S> {
 
     @Override
     public String toString() {
-        return "State: " + state
-                + ", Error: " + (error != null ? error.toString() : "null")
-                + ", Bundle type: " + (bundle != null ? bundle.getClass().getSimpleName() : "null")
-                + ", Key Selector: " + state + (bundle != null ? bundle.toString() : "");
+        return String.format("State: %s, Error: %s, Bundle type: %s, Key Selector: %s", state,
+                (error != null ? error.toString() : "null"),
+                (bundle != null ? bundle.getClass().getSimpleName() : "null"),
+                state + (bundle != null ? bundle.toString() : ""));
     }
 }

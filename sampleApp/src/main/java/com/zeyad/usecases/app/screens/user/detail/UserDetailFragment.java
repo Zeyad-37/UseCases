@@ -81,8 +81,8 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
             viewState = Parcels.unwrap(arguments.getParcelable(UI_MODEL));
         }
         viewModel = ViewModelProviders.of(this).get(UserDetailVM.class);
-        viewModel.init((newResult, currentStateBundle) -> UserDetailState.builder()
-                .setRepos((List<Repository>) newResult.getBundle())
+        viewModel.init((newResult, event, currentStateBundle) -> UserDetailState.builder()
+                .setRepos((List<Repository>) newResult)
                 .setUser(currentStateBundle.getUser())
                 .setIsTwoPane(currentStateBundle.isTwoPane())
                 .build(), viewState, DataServiceFactory.getInstance());

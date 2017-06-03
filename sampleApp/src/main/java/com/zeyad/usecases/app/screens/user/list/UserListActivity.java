@@ -5,6 +5,7 @@ import android.app.SearchManager;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.view.ActionMode;
 import android.support.v7.widget.LinearLayoutManager;
@@ -31,6 +32,7 @@ import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.components.adapter.ItemInfo;
 import com.zeyad.usecases.app.components.redux.BaseActivity;
 import com.zeyad.usecases.app.components.redux.BaseEvent;
+import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.components.redux.UISubscriber;
 import com.zeyad.usecases.app.screens.user.detail.UserDetailActivity;
 import com.zeyad.usecases.app.screens.user.detail.UserDetailFragment;
@@ -88,25 +90,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     public void initialize() {
         errorMessageFactory = Throwable::getLocalizedMessage;
         viewModel = ViewModelProviders.of(this).get(UserListVM.class);
-        viewModel.init((newResult, currentStateBundle) -> {
-            List resultList = (List) newResult.getBundle();
-            List<User> users = currentStateBundle == null ? new ArrayList<>() :
-                    currentStateBundle.getUsers();
-            if (resultList.size() > 0 && resultList.get(0) instanceof User) {
-                users.addAll(resultList);
-            } else {
-                users = Observable.fromIterable(users)
-                        .filter(user -> !resultList.contains((long) user.getId()))
-                        .distinct()
-                        .toList()
-                        .blockingGet();
-            }
-            users = new ArrayList<>(new HashSet<>(users));
-            int lastId = users.get(users.size() - 1).getId();
-            Collections.sort(users, (user1, user2) ->
-                    String.valueOf(user1.getId()).compareTo(String.valueOf(user2.getId())));
-            return UserListState.builder().setUsers(users).lastId(lastId).build();
-        }, null, DataServiceFactory.getInstance());
+        viewModel.init(getUserListStateSuccessStateAccumulator(), null, DataServiceFactory.getInstance());
         events = Single.<BaseEvent>just(new GetPaginatedUsersEvent(0))
                 .doOnSuccess(event -> Log.d("GetUsersEvent", "fired!"))
                 .toObservable();
@@ -117,6 +101,37 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                         .compose(uiModelsTransformer)
                         .compose(bindToLifecycle())
                         .subscribe(new UISubscriber<>(this, errorMessageFactory)));
+    }
+
+    @NonNull
+    private SuccessStateAccumulator<UserListState> getUserListStateSuccessStateAccumulator() {
+        return (newResult, event, currentStateBundle) -> {
+            List resultList = (List) newResult;
+            List<User> users = currentStateBundle == null ? new ArrayList<>() :
+                    currentStateBundle.getUsers();
+            List<User> searchList = new ArrayList<>();
+            switch (event) {
+                case "GetPaginatedUsersEvent":
+                    users.addAll(resultList);
+                    break;
+                case "SearchUsersEvent":
+                    searchList.clear();
+                    searchList.addAll(resultList);
+                    break;
+                case "DeleteUsersEvent":
+                    users = Observable.fromIterable(users)
+                            .filter(user -> !resultList.contains((long) user.getId()))
+                            .distinct()
+                            .toList()
+                            .blockingGet();
+                    break;
+            }
+            int lastId = users.get(users.size() - 1).getId();
+            users = new ArrayList<>(new HashSet<>(users));
+            Collections.sort(users, (user1, user2) ->
+                    String.valueOf(user1.getId()).compareTo(String.valueOf(user2.getId())));
+            return UserListState.builder().users(users).searchList(searchList).lastId(lastId).build();
+        };
     }
 
     @Override
@@ -133,7 +148,12 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     public void renderState(UserListState state) {
         viewState = state;
         List<User> users = viewState.getUsers();
-        if (Utils.isNotEmpty(users)) {
+        List<User> searchList = viewState.getSearchList();
+        if (Utils.isNotEmpty(searchList)) {
+            usersAdapter.setDataList(Observable.fromIterable(searchList)
+                    .map(user -> new ItemInfo(user, R.layout.user_item_layout).setId(user.getId()))
+                    .toList(users.size()).blockingGet());
+        } else if (Utils.isNotEmpty(users)) {
             usersAdapter.setDataList(Observable.fromIterable(users)
                     .map(user -> new ItemInfo(user, R.layout.user_item_layout).setId(user.getId()))
                     .toList(users.size()).blockingGet());
@@ -240,9 +260,16 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.list_menu, menu);
         SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-        SearchView mSearchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-        mSearchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-        events = events.mergeWith(RxSearchView.queryTextChanges(mSearchView)
+        SearchView searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
+        searchView.setOnCloseListener(() -> {
+            events = events.mergeWith(Single.<BaseEvent>just(new GetPaginatedUsersEvent(viewState.getLastId()))
+                    .doOnSuccess(event -> Log.d("CloseSearchViewEvent", "fired!"))
+                    .toObservable());
+            rxEventBus.send(events);
+            return false;
+        });
+        events = events.mergeWith(RxSearchView.queryTextChanges(searchView)
                 .filter(charSequence -> !charSequence.toString().isEmpty())
                 .map(query -> new SearchUsersEvent(query.toString()))
                 .throttleLast(100, TimeUnit.MILLISECONDS)

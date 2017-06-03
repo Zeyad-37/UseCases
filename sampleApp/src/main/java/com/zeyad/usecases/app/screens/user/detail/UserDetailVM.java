@@ -22,13 +22,11 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> {
     private IDataService dataUseCase;
 
     @Override
-    public void init(
-            SuccessStateAccumulator<UserDetailState> successStateAccumulator,
-            UserDetailState initialState,
-            Object... otherDependencies) {
+    public void init(SuccessStateAccumulator<UserDetailState> successStateAccumulator,
+                     UserDetailState initialState, Object... otherDependencies) {
+        setSuccessStateAccumulator(successStateAccumulator);
+        setInitialState(initialState);
         dataUseCase = (IDataService) otherDependencies[0];
-        this.successStateAccumulator = successStateAccumulator;
-        this.initialState = initialState;
     }
 
     public Flowable<List<Repository>> getRepositories(String userLogin) {

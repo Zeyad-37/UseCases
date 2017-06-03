@@ -4,15 +4,18 @@ import static com.zeyad.usecases.app.components.redux.UIModel.ERROR;
 import static com.zeyad.usecases.app.components.redux.UIModel.LOADING;
 import static com.zeyad.usecases.app.components.redux.UIModel.SUCCESS;
 
-/** @author by ZIaDo on 4/19/17. */
+/**
+ * @author by ZIaDo on 4/19/17.
+ */
 public final class Result<B> {
 
     private final boolean isLoading, isSuccessful;
     private final Throwable error;
     private final String state;
-    private final B bundle;
+    private final ResultBundle<?, B> bundle;
 
-    private Result(String state, boolean isLoading, Throwable error, boolean isSuccessful, B bundle) {
+    private Result(String state, boolean isLoading, Throwable error, boolean isSuccessful,
+                   ResultBundle<?, B> bundle) {
         this.isLoading = isLoading;
         this.error = error;
         this.isSuccessful = isSuccessful;
@@ -28,7 +31,7 @@ public final class Result<B> {
         return new Result<>(ERROR, false, error, false, null);
     }
 
-    static <B> Result<B> successResult(B bundle) {
+    static <B> Result<B> successResult(ResultBundle<?, B> bundle) {
         return new Result<>(SUCCESS, false, null, true, bundle);
     }
 
@@ -44,15 +47,19 @@ public final class Result<B> {
         return isSuccessful;
     }
 
-    public B getBundle() {
-        return bundle;
+    B getBundle() {
+        return bundle.getBundle();
+    }
+
+    String getEvent() {
+        return bundle.getEvent();
     }
 
     @Override
     public String toString() {
-        return "State: " + state
-                + ", Error: " + (error != null ? error.toString() : "null")
-                + ", Bundle type: " + (bundle != null ? bundle.getClass().getSimpleName() : "null")
-                + ", Key Selector: " + state + (bundle != null ? bundle.toString() : "");
+        return String.format("State: %s, Error: %s, Bundle type: %s, Key Selector: %s", state,
+                (error != null ? error.toString() : "null"),
+                (bundle != null ? bundle.getClass().getSimpleName() : "null"),
+                state + (bundle != null ? bundle.toString() : ""));
     }
 }

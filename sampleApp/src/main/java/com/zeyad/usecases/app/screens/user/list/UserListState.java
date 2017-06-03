@@ -5,10 +5,13 @@ import org.parceler.Parcel;
 import java.util.ArrayList;
 import java.util.List;
 
-/** @author by ZIaDo on 1/28/17. */
+/**
+ * @author by ZIaDo on 1/28/17.
+ */
 @Parcel
 public class UserListState {
     List<User> users;
+    List<User> searchList;
     long lastId;
 
     UserListState() {
@@ -17,6 +20,7 @@ public class UserListState {
 
     private UserListState(Builder builder) {
         users = builder.users;
+        searchList = builder.searchList;
         lastId = builder.lastId;
     }
 
@@ -28,18 +32,29 @@ public class UserListState {
         return users;
     }
 
+    List<User> getSearchList() {
+        return searchList;
+    }
+
     long getLastId() {
         return lastId;
     }
 
     static class Builder {
         List<User> users;
+        List<User> searchList;
         long lastId;
 
-        Builder() {}
+        Builder() {
+        }
 
-        Builder setUsers(List<User> value) {
+        Builder users(List<User> value) {
             users = value;
+            return this;
+        }
+
+        Builder searchList(List<User> value) {
+            searchList = value;
             return this;
         }
 
