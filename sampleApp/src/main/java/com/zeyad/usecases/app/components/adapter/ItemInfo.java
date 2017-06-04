@@ -45,4 +45,3 @@ public class ItemInfo {
         return this;
     }
 }
-

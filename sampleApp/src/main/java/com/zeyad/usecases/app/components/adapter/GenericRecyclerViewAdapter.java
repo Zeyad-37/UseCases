@@ -712,4 +712,3 @@ public abstract class GenericRecyclerViewAdapter
         public abstract void expand(boolean isExpanded);
     }
 }
-

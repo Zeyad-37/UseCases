@@ -34,4 +34,3 @@ final class Navigator implements INavigator {
         activity.startActivityForResult(intent, requestCode);
     }
 }
-
