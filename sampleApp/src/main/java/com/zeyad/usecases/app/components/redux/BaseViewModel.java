@@ -37,6 +37,9 @@ public abstract class BaseViewModel<S> extends ViewModel {
                         .map(result -> Result.successResult(new ResultBundle<>(event, result)))
                         .onErrorReturn(Result::errorResult)
                         .startWith(Result.loadingResult()))
+                .distinctUntilChanged((objectResult, objectResult2) ->
+                        objectResult.getBundle().equals(objectResult2.getBundle()) ||
+                                (objectResult.isLoading() && objectResult2.isLoading()))
                 .scan(UIModel.idleState(initialState), (currentUIModel, result) -> {
                     S bundle = currentUIModel.getBundle();
                     if (result.isLoading()) {

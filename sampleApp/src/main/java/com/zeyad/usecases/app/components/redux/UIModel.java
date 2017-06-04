@@ -56,6 +56,7 @@ final class UIModel<S> {
         return String.format("State: %s, Error: %s, Bundle type: %s, Key Selector: %s", state,
                 (error != null ? error.toString() : "null"),
                 (bundle != null ? bundle.getClass().getSimpleName() : "null"),
-                state + (bundle != null ? bundle.toString() : ""));
+                state.equalsIgnoreCase(LOADING) ? state : state + (bundle != null ?
+                        bundle.toString() : ""));
     }
 }
