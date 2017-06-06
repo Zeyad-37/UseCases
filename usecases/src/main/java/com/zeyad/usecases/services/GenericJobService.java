@@ -31,7 +31,7 @@ public class GenericJobService extends JobService {
     @Override
     public boolean onStartJob(@NonNull JobParameters params) {
         disposable = genericJobServiceLogic.startJob(params.getExtras().getBundle(PAYLOAD),
-                Config.getCloudDataStore(),
+                Config.getCloudStore(),
                 Utils.getInstance(), "Job Started").subscribe();
         return true; // Answers the question: "Is there still work going on?"
     }

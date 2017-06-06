@@ -8,7 +8,9 @@ import io.realm.RealmModel;
 import io.realm.annotations.PrimaryKey;
 import io.realm.annotations.RealmModule;
 
-/** @author by ZIaDo on 2/13/17. */
+/**
+ * @author by ZIaDo on 2/13/17.
+ */
 @RealmModule
 public class TestRealmModel implements RealmModel {
     @SerializedName("id")
@@ -24,7 +26,8 @@ public class TestRealmModel implements RealmModel {
         if (id <= 0) throw new IllegalArgumentException("id should be greater than 0");
     }
 
-    public TestRealmModel() {}
+    public TestRealmModel() {
+    }
 
     public int getId() {
         return id;

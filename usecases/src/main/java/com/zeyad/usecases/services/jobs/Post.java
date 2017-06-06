@@ -16,7 +16,7 @@ import io.reactivex.Completable;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 
-import static com.zeyad.usecases.stores.CloudDataStore.APPLICATION_JSON;
+import static com.zeyad.usecases.stores.CloudStore.APPLICATION_JSON;
 
 /**
  * @author Zeyad on 6/05/16.

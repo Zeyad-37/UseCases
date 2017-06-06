@@ -5,9 +5,9 @@ import com.zeyad.usecases.db.RealmQueryProvider;
 import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;
-import com.zeyad.usecases.stores.CloudDataStore;
+import com.zeyad.usecases.stores.CloudStore;
 import com.zeyad.usecases.stores.DataStoreFactory;
-import com.zeyad.usecases.stores.DiskDataStore;
+import com.zeyad.usecases.stores.DiskStore;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -33,7 +33,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** @author by ZIaDo on 5/9/17. */
+/**
+ * @author by ZIaDo on 5/9/17.
+ */
 public class DataServiceTest {
 
     private DataService dataService;
@@ -49,9 +51,9 @@ public class DataServiceTest {
         getRequest = new GetRequest.Builder(Object.class, false).build();
         dataStoreFactory = mock(DataStoreFactory.class);
         when(dataStoreFactory.dynamically(anyString(), any(Class.class)))
-                .thenReturn(mock(CloudDataStore.class));
-        when(dataStoreFactory.disk(Object.class)).thenReturn(mock(DiskDataStore.class));
-        when(dataStoreFactory.cloud(Object.class)).thenReturn(mock(CloudDataStore.class));
+                .thenReturn(mock(CloudStore.class));
+        when(dataStoreFactory.disk(Object.class)).thenReturn(mock(DiskStore.class));
+        when(dataStoreFactory.cloud(Object.class)).thenReturn(mock(CloudStore.class));
         dataService =
                 new DataService(
                         dataStoreFactory, AndroidSchedulers.mainThread(), mock(Scheduler.class));
@@ -60,8 +62,8 @@ public class DataServiceTest {
     @Test
     public void getList() throws Exception {
         when(dataStoreFactory
-                        .dynamically(anyString(), any(Class.class))
-                        .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+                .dynamically(anyString(), any(Class.class))
+                .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
                 .thenReturn(Flowable.just(Collections.EMPTY_LIST));
 
         dataService.getList(getRequest);
@@ -73,15 +75,15 @@ public class DataServiceTest {
     @Test
     public void getObject() throws Exception {
         when(dataStoreFactory
-                        .dynamically(anyString(), any(Class.class))
-                        .dynamicGetObject(
-                                anyString(),
-                                anyString(),
-                                anyLong(),
-                                anyString(),
-                                any(Class.class),
-                                anyBoolean(),
-                                anyBoolean()))
+                .dynamically(anyString(), any(Class.class))
+                .dynamicGetObject(
+                        anyString(),
+                        anyString(),
+                        anyLong(),
+                        anyString(),
+                        any(Class.class),
+                        anyBoolean(),
+                        anyBoolean()))
                 .thenReturn(flowable);
 
         dataService.getObject(getRequest);
@@ -100,12 +102,12 @@ public class DataServiceTest {
     @Test
     public void getListOffLineFirst() throws Exception {
         when(dataStoreFactory
-                        .cloud(Object.class)
-                        .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+                .cloud(Object.class)
+                .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
                 .thenReturn(Flowable.just(Collections.EMPTY_LIST));
         when(dataStoreFactory
-                        .disk(Object.class)
-                        .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+                .disk(Object.class)
+                .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
                 .thenReturn(Flowable.just(Collections.EMPTY_LIST));
 
         dataService.getListOffLineFirst(getRequest);
@@ -118,27 +120,26 @@ public class DataServiceTest {
 
     @Test
     public void getObjectOffLineFirst() throws Exception {
-        when(dataStoreFactory
-                        .cloud(Object.class)
-                        .dynamicGetObject(
-                                anyString(),
-                                anyString(),
-                                anyLong(),
-                                anyString(),
-                                any(Class.class),
-                                anyBoolean(),
-                                anyBoolean()))
+        when(dataStoreFactory.cloud(Object.class)
+                .dynamicGetObject(
+                        anyString(),
+                        anyString(),
+                        anyLong(),
+                        anyString(),
+                        any(Class.class),
+                        anyBoolean(),
+                        anyBoolean()))
                 .thenReturn(flowable);
         when(dataStoreFactory
-                        .disk(Object.class)
-                        .dynamicGetObject(
-                                anyString(),
-                                anyString(),
-                                anyLong(),
-                                anyString(),
-                                any(Class.class),
-                                anyBoolean(),
-                                anyBoolean()))
+                .disk(Object.class)
+                .dynamicGetObject(
+                        anyString(),
+                        anyString(),
+                        anyLong(),
+                        anyString(),
+                        any(Class.class),
+                        anyBoolean(),
+                        anyBoolean()))
                 .thenReturn(flowable);
 
         dataService.getObjectOffLineFirst(getRequest);
@@ -165,16 +166,16 @@ public class DataServiceTest {
 
     @Test
     public void patchObject() throws Exception {
-        when(dataStoreFactory
-                        .dynamically(anyString(), any(Class.class))
-                        .dynamicPatchObject(
-                                anyString(),
-                                anyString(),
-                                any(JSONObject.class),
-                                any(Class.class),
-                                any(Class.class),
-                                anyBoolean(),
-                                anyBoolean()))
+        when(dataStoreFactory.dynamically(anyString(), any(Class.class))
+                .dynamicPatchObject(
+                        anyString(),
+                        anyString(),
+                        any(JSONObject.class),
+                        any(Class.class),
+                        any(Class.class),
+                        anyBoolean(),
+                        anyBoolean(),
+                        anyBoolean()))
                 .thenReturn(flowable);
 
         dataService.patchObject(postRequest);
@@ -187,21 +188,23 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
+                        anyBoolean(),
                         anyBoolean());
     }
 
     @Test
     public void postObject() throws Exception {
         when(dataStoreFactory
-                        .dynamically(anyString(), any(Class.class))
-                        .dynamicPostObject(
-                                anyString(),
-                                anyString(),
-                                any(JSONObject.class),
-                                any(Class.class),
-                                any(Class.class),
-                                anyBoolean(),
-                                anyBoolean()))
+                .dynamically(anyString(), any(Class.class))
+                .dynamicPostObject(
+                        anyString(),
+                        anyString(),
+                        any(JSONObject.class),
+                        any(Class.class),
+                        any(Class.class),
+                        anyBoolean(),
+                        anyBoolean(),
+                        anyBoolean()))
                 .thenReturn(flowable);
 
         dataService.postObject(postRequest);
@@ -214,21 +217,22 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
+                        anyBoolean(),
                         anyBoolean());
     }
 
     @Test
     public void postList() throws Exception {
         when(dataStoreFactory
-                        .dynamically(anyString(), any(Class.class))
-                        .dynamicPostList(
-                                anyString(),
-                                anyString(),
-                                any(JSONArray.class),
-                                any(Class.class),
-                                any(Class.class),
-                                anyBoolean(),
-                                anyBoolean()))
+                .dynamically(anyString(), any(Class.class))
+                .dynamicPostList(
+                        anyString(),
+                        anyString(),
+                        any(JSONArray.class),
+                        any(Class.class),
+                        any(Class.class),
+                        anyBoolean(),
+                        anyBoolean()))
                 .thenReturn(flowable);
 
         dataService.postList(postRequest);
@@ -247,15 +251,16 @@ public class DataServiceTest {
     @Test
     public void putObject() throws Exception {
         when(dataStoreFactory
-                        .dynamically(anyString(), any(Class.class))
-                        .dynamicPutObject(
-                                anyString(),
-                                anyString(),
-                                any(JSONObject.class),
-                                any(Class.class),
-                                any(Class.class),
-                                anyBoolean(),
-                                anyBoolean()))
+                .dynamically(anyString(), any(Class.class))
+                .dynamicPutObject(
+                        anyString(),
+                        anyString(),
+                        any(JSONObject.class),
+                        any(Class.class),
+                        any(Class.class),
+                        anyBoolean(),
+                        anyBoolean(),
+                        anyBoolean()))
                 .thenReturn(flowable);
 
         dataService.putObject(postRequest);
@@ -268,21 +273,22 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
+                        anyBoolean(),
                         anyBoolean());
     }
 
     @Test
     public void putList() throws Exception {
         when(dataStoreFactory
-                        .dynamically(anyString(), any(Class.class))
-                        .dynamicPutList(
-                                anyString(),
-                                anyString(),
-                                any(JSONArray.class),
-                                any(Class.class),
-                                any(Class.class),
-                                anyBoolean(),
-                                anyBoolean()))
+                .dynamically(anyString(), any(Class.class))
+                .dynamicPutList(
+                        anyString(),
+                        anyString(),
+                        any(JSONArray.class),
+                        any(Class.class),
+                        any(Class.class),
+                        anyBoolean(),
+                        anyBoolean()))
                 .thenReturn(flowable);
 
         dataService.putList(postRequest);
@@ -301,15 +307,16 @@ public class DataServiceTest {
     @Test
     public void deleteItemById() throws Exception {
         when(dataStoreFactory
-                        .dynamically(anyString(), any(Class.class))
-                        .dynamicDeleteCollection(
-                                anyString(),
-                                anyString(),
-                                any(JSONArray.class),
-                                any(Class.class),
-                                any(Class.class),
-                                anyBoolean(),
-                                anyBoolean()))
+                .dynamically(anyString(), any(Class.class))
+                .dynamicDeleteCollection(
+                        anyString(),
+                        anyString(),
+                        any(JSONArray.class),
+                        any(Class.class),
+                        any(Class.class),
+                        anyBoolean(),
+                        anyBoolean(),
+                        anyBoolean()))
                 .thenReturn(flowable);
 
         dataService.deleteItemById(postRequest);
@@ -322,21 +329,23 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
+                        anyBoolean(),
                         anyBoolean());
     }
 
     @Test
     public void deleteCollection() throws Exception {
         when(dataStoreFactory
-                        .dynamically(anyString(), any(Class.class))
-                        .dynamicDeleteCollection(
-                                anyString(),
-                                anyString(),
-                                any(JSONArray.class),
-                                any(Class.class),
-                                any(Class.class),
-                                anyBoolean(),
-                                anyBoolean()))
+                .dynamically(anyString(), any(Class.class))
+                .dynamicDeleteCollection(
+                        anyString(),
+                        anyString(),
+                        any(JSONArray.class),
+                        any(Class.class),
+                        any(Class.class),
+                        anyBoolean(),
+                        anyBoolean(),
+                        anyBoolean()))
                 .thenReturn(flowable);
 
         dataService.deleteCollectionByIds(postRequest);
@@ -348,6 +357,7 @@ public class DataServiceTest {
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
+                        anyBoolean(),
                         anyBoolean(),
                         anyBoolean());
     }
@@ -376,16 +386,16 @@ public class DataServiceTest {
     @Test
     public void uploadFile() throws Exception {
         when(dataStoreFactory
-                        .cloud(Object.class)
-                        .dynamicUploadFile(
-                                anyString(),
-                                any(File.class),
-                                anyString(),
-                                (HashMap<String, Object>) anyMap(),
-                                anyBoolean(),
-                                anyBoolean(),
-                                anyBoolean(),
-                                any(Class.class)))
+                .cloud(Object.class)
+                .dynamicUploadFile(
+                        anyString(),
+                        any(File.class),
+                        anyString(),
+                        (HashMap<String, Object>) anyMap(),
+                        anyBoolean(),
+                        anyBoolean(),
+                        anyBoolean(),
+                        any(Class.class)))
                 .thenReturn(flowable);
 
         dataService.uploadFile(
@@ -406,13 +416,13 @@ public class DataServiceTest {
     @Test
     public void downloadFile() throws Exception {
         when(dataStoreFactory
-                        .cloud(Object.class)
-                        .dynamicDownloadFile(
-                                anyString(),
-                                any(File.class),
-                                anyBoolean(),
-                                anyBoolean(),
-                                anyBoolean()))
+                .cloud(Object.class)
+                .dynamicDownloadFile(
+                        anyString(),
+                        any(File.class),
+                        anyBoolean(),
+                        anyBoolean(),
+                        anyBoolean()))
                 .thenReturn(flowable);
 
         dataService.downloadFile(

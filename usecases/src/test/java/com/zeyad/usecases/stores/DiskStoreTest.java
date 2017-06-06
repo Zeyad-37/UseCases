@@ -4,7 +4,6 @@ import com.zeyad.usecases.Config;
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.db.DataBaseManager;
 import com.zeyad.usecases.db.RealmQueryProvider;
-import com.zeyad.usecases.mapper.DAOMapper;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -34,16 +33,17 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(JUnit4.class)
-public class DiskDataStoreTest {
+public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
 
-    private DiskDataStore mDiskDataStore;
+    private DiskStore mDiskStore;
     private DataBaseManager dbManager;
 
     @Before
     public void setUp() throws Exception {
         dbManager = mock(DataBaseManager.class);
         Config.setWithCache(false);
-        mDiskDataStore = new DiskDataStore(dbManager, new DAOMapper());
+        Config.setGson();
+        mDiskStore = new DiskStore(dbManager, new MemoryStore(Config.getGson()));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class DiskDataStoreTest {
         Flowable<List<TestRealmModel>> observable = Flowable.just(testRealmObjects);
         when(dbManager.<TestRealmModel>getAll(any(Class.class))).thenReturn(observable);
 
-        mDiskDataStore.dynamicGetList("", Object.class, false, false);
+        mDiskStore.dynamicGetList("", Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).getAll(any(Class.class));
     }
@@ -64,7 +64,7 @@ public class DiskDataStoreTest {
         when(dbManager.getById(anyString(), anyLong(), anyString(), any(Class.class)))
                 .thenReturn(observable);
 
-        mDiskDataStore.dynamicGetObject("", "", 0L, "", Object.class, false, false);
+        mDiskStore.dynamicGetObject("", "", 0L, "", Object.class, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .getById(anyString(), anyLong(), anyString(), any(Class.class));
@@ -74,7 +74,7 @@ public class DiskDataStoreTest {
     public void testSearchDiskRealmQuery() {
         when(dbManager.getQuery(any(RealmQueryProvider.class))).thenReturn(any(Flowable.class));
 
-        mDiskDataStore.queryDisk(realm -> realm.where(TestRealmModel.class));
+        mDiskStore.queryDisk(realm -> realm.where(TestRealmModel.class));
 
         Mockito.verify(dbManager, times(1)).getQuery(any(RealmQueryProvider.class));
     }
@@ -83,7 +83,7 @@ public class DiskDataStoreTest {
     public void testDynamicDeleteAll() {
         when(dbManager.evictAll(any(Class.class))).thenReturn(Single.just(true));
 
-        mDiskDataStore.dynamicDeleteAll(TestRealmModel.class);
+        mDiskStore.dynamicDeleteAll(TestRealmModel.class);
 
         Mockito.verify(dbManager, times(1)).evictAll(any(Class.class));
     }
@@ -93,8 +93,8 @@ public class DiskDataStoreTest {
         when(dbManager.evictCollection(anyString(), anyList(), any(Class.class)))
                 .thenReturn(Flowable.just(true));
 
-        mDiskDataStore.dynamicDeleteCollection(
-                "", "", new JSONArray(), Object.class, Object.class, false, false);
+        mDiskStore.dynamicDeleteCollection(
+                "", "", new JSONArray(), Object.class, Object.class, false, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .evictCollection(anyString(), anyListOf(Long.class), any(Class.class));
@@ -105,8 +105,8 @@ public class DiskDataStoreTest {
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class)))
                 .thenReturn(Single.just(true));
 
-        mDiskDataStore.dynamicPatchObject(
-                "", "", new JSONObject(), Object.class, Object.class, false, false);
+        mDiskStore.dynamicPatchObject(
+                "", "", new JSONObject(), Object.class, Object.class, false, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .put(any(JSONObject.class), anyString(), any(Class.class));
@@ -117,8 +117,8 @@ public class DiskDataStoreTest {
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class)))
                 .thenReturn(Single.just(true));
 
-        mDiskDataStore.dynamicPostObject(
-                "", "", new JSONObject(), Object.class, Object.class, false, false);
+        mDiskStore.dynamicPostObject(
+                "", "", new JSONObject(), Object.class, Object.class, false, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .put(any(JSONObject.class), anyString(), any(Class.class));
@@ -129,8 +129,8 @@ public class DiskDataStoreTest {
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class)))
                 .thenReturn(Single.just(true));
 
-        mDiskDataStore.dynamicPutObject(
-                "", "", new JSONObject(), Object.class, Object.class, false, false);
+        mDiskStore.dynamicPutObject(
+                "", "", new JSONObject(), Object.class, Object.class, false, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .put(any(JSONObject.class), anyString(), any(Class.class));
@@ -141,7 +141,7 @@ public class DiskDataStoreTest {
         when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class)))
                 .thenReturn(Single.just(true));
 
-        mDiskDataStore.dynamicPostList(
+        mDiskStore.dynamicPostList(
                 "", "", new JSONArray(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1))
@@ -153,7 +153,7 @@ public class DiskDataStoreTest {
         when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class)))
                 .thenReturn(Single.just(true));
 
-        mDiskDataStore.dynamicPutList(
+        mDiskStore.dynamicPutList(
                 "", "", new JSONArray(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1))
@@ -163,7 +163,7 @@ public class DiskDataStoreTest {
     @Test(expected = IllegalStateException.class)
     public void testDynamicDownloadFile() throws Exception {
         Flowable observable =
-                mDiskDataStore.dynamicDownloadFile("", new File(""), false, false, false);
+                mDiskStore.dynamicDownloadFile("", new File(""), false, false, false);
 
         // Verify repository interactions
         verifyZeroInteractions(dbManager);
@@ -178,7 +178,7 @@ public class DiskDataStoreTest {
     @Test(expected = IllegalStateException.class)
     public void testDynamicUploadFile() throws Exception {
         Flowable observable =
-                mDiskDataStore.dynamicUploadFile(
+                mDiskStore.dynamicUploadFile(
                         "", new File(""), "", new HashMap<>(), false, false, false, Object.class);
 
         // Verify repository interactions

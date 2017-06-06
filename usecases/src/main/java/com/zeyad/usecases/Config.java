@@ -2,14 +2,13 @@ package com.zeyad.usecases;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.zeyad.usecases.network.ApiConnection;
-import com.zeyad.usecases.stores.CloudDataStore;
+import com.zeyad.usecases.stores.CloudStore;
 
 import java.util.concurrent.TimeUnit;
 
@@ -27,7 +26,7 @@ public final class Config {
     private static TimeUnit cacheTimeUnit;
     private static Scheduler backgroundThread;
     private static ApiConnection apiConnection;
-    private static CloudDataStore cloudDataStore;
+    private static CloudStore cloudStore;
     private static boolean withSQLite;
     private Context mContext;
     private boolean mUseApiWithCache;
@@ -80,7 +79,9 @@ public final class Config {
         return mGson;
     }
 
-    /** @return withCache, whether DataUseCase is using caching or not. */
+    /**
+     * @return withCache, whether DataUseCase is using caching or not.
+     */
     public static boolean isWithCache() {
         return withCache;
     }
@@ -126,12 +127,12 @@ public final class Config {
         Config.apiConnection = apiConnection;
     }
 
-    public static CloudDataStore getCloudDataStore() {
-        return cloudDataStore;
+    public static CloudStore getCloudStore() {
+        return cloudStore;
     }
 
-    public static void setCloudDataStore(CloudDataStore cloudDataStore) {
-        Config.cloudDataStore = cloudDataStore;
+    public static void setCloudStore(CloudStore cloudStore) {
+        Config.cloudStore = cloudStore;
     }
 
     public static boolean isWithSQLite() {
@@ -160,7 +161,6 @@ public final class Config {
         //                .build());
     }
 
-    @Nullable
     public Context getContext() {
         return mContext;
     }

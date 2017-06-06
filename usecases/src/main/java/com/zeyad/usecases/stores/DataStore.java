@@ -47,14 +47,16 @@ public interface DataStore {
      */
     @NonNull
     <M> Flowable<M> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                       Class requestType, Class responseType, boolean persist, boolean queuable);
+                                       Class requestType, Class responseType, boolean persist,
+                                       boolean cache, boolean queuable);
 
     /**
      * Post a JSONObject which returns an {@link Flowable} that will emit a Object.
      */
     @NonNull
     <M> Flowable<M> dynamicPostObject(String url, String idColumnName, JSONObject keyValuePairs,
-                                      Class requestType, Class responseType, boolean persist, boolean queuable);
+                                      Class requestType, Class responseType, boolean persist,
+                                      boolean cache, boolean queuable);
 
     /**
      * Post a HashMap<String, Object> which returns an {@link Flowable} that will emit a list of
@@ -70,7 +72,8 @@ public interface DataStore {
      */
     @NonNull
     <M> Flowable<M> dynamicPutObject(String url, String idColumnName, JSONObject keyValuePairs,
-                                     Class requestType, Class responseType, boolean persist, boolean queuable);
+                                     Class requestType, Class responseType, boolean persist,
+                                     boolean cache, boolean queuable);
 
     /**
      * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Flowable} that
@@ -87,7 +90,7 @@ public interface DataStore {
     @NonNull
     <M> Flowable<M> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
                                             Class requestType, Class responseType, boolean persist,
-                                            boolean queuable);
+                                            boolean cache, boolean queuable);
 
     /**
      * Delete all items of the same type from cloud or disk which returns an {@link Completable}

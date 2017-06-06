@@ -7,7 +7,7 @@ import android.util.Log;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.GooglePlayDriver;
 import com.zeyad.usecases.requests.FileIORequest;
-import com.zeyad.usecases.stores.CloudDataStore;
+import com.zeyad.usecases.stores.CloudStore;
 import com.zeyad.usecases.utils.Utils;
 
 import java.io.File;
@@ -23,13 +23,13 @@ public class FileIO {
     @NonNull
     private final FirebaseJobDispatcher mDispatcher;
     private final FileIORequest mFileIORequest;
-    private final CloudDataStore mCloudDataStore;
+    private final CloudStore mCloudStore;
     private final Utils mUtils;
     private final boolean mIsDownload;
 
     public FileIO(int trailCount, FileIORequest payLoad, Context context, boolean isDownload,
-                  CloudDataStore cloudDataStore, Utils utils) {
-        mCloudDataStore = cloudDataStore;
+                  CloudStore cloudStore, Utils utils) {
+        mCloudStore = cloudStore;
         mTrailCount = trailCount;
         mFileIORequest = payLoad;
         mIsDownload = isDownload;
@@ -40,13 +40,13 @@ public class FileIO {
     @NonNull
     public Completable execute() {
         File file = mFileIORequest.getFile();
-        return mIsDownload ? Completable.fromObservable(mCloudDataStore
+        return mIsDownload ? Completable.fromObservable(mCloudStore
                 .dynamicDownloadFile(mFileIORequest.getUrl(), file, mFileIORequest.onWifi(),
                         mFileIORequest.isWhileCharging(), mFileIORequest.isQueuable())
                 .doOnSubscribe(subscription -> Log.d(TAG, "Downloading " + file.getName()))
                 .doOnError(this::onError)
                 .toObservable()) :
-                Completable.fromObservable(mCloudDataStore.dynamicUploadFile(mFileIORequest.getUrl(),
+                Completable.fromObservable(mCloudStore.dynamicUploadFile(mFileIORequest.getUrl(),
                         file, mFileIORequest.getKey(), mFileIORequest.getParameters(),
                         mFileIORequest.onWifi(), mFileIORequest.isWhileCharging(),
                         mFileIORequest.isQueuable(), mFileIORequest.getDataClass())

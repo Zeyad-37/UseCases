@@ -43,7 +43,7 @@ public class DataStoreFactoryTest {
             throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
-                is(instanceOf(DiskDataStore.class)));
+                is(instanceOf(DiskStore.class)));
     }
 
     @Test
@@ -52,7 +52,7 @@ public class DataStoreFactoryTest {
                     throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
-                is(instanceOf(DiskDataStore.class)));
+                is(instanceOf(DiskStore.class)));
     }
 
     @Test
@@ -61,7 +61,7 @@ public class DataStoreFactoryTest {
                     throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
-                is(instanceOf(DiskDataStore.class)));
+                is(instanceOf(DiskStore.class)));
     }
 
     @Test
@@ -70,14 +70,14 @@ public class DataStoreFactoryTest {
                     throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
-                is(instanceOf(DiskDataStore.class)));
+                is(instanceOf(DiskStore.class)));
     }
 
     @Test
     public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmpty() throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getSomeValidUrl(), Object.class),
-                is(instanceOf(CloudDataStore.class)));
+                is(instanceOf(CloudStore.class)));
     }
 
     @Test
@@ -86,7 +86,7 @@ public class DataStoreFactoryTest {
                     throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
-                is(instanceOf(DiskDataStore.class)));
+                is(instanceOf(DiskStore.class)));
     }
 
     @Test
@@ -95,7 +95,7 @@ public class DataStoreFactoryTest {
                     throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
-                is(instanceOf(DiskDataStore.class)));
+                is(instanceOf(DiskStore.class)));
     }
 
     @Test
@@ -104,7 +104,7 @@ public class DataStoreFactoryTest {
                     throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
-                is(instanceOf(DiskDataStore.class)));
+                is(instanceOf(DiskStore.class)));
     }
 
     @Test
@@ -113,7 +113,7 @@ public class DataStoreFactoryTest {
                     throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
-                is(instanceOf(DiskDataStore.class)));
+                is(instanceOf(DiskStore.class)));
     }
 
     @Test
@@ -121,7 +121,7 @@ public class DataStoreFactoryTest {
             throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getSomeValidUrl(), Object.class),
-                is(instanceOf(CloudDataStore.class)));
+                is(instanceOf(CloudStore.class)));
     }
 
     @Test
@@ -132,7 +132,7 @@ public class DataStoreFactoryTest {
     }
 
     @Test
-    public void testDiskMethod_ifExpectedCloudStoreIsReturned_whenMockedEntityMapperIsPassed() {
+    public void testDiskMethod_ifExpectedCloudStoreIsReturned_whenMockedEntityMapperIsPassed() throws IllegalAccessException {
         assertThat(mDataStoreFactory.cloud(Object.class), is(notNullValue()));
     }
 }

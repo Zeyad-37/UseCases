@@ -3,7 +3,7 @@ package com.zeyad.usecases.services;
 import android.os.Bundle;
 
 import com.zeyad.usecases.requests.PostRequest;
-import com.zeyad.usecases.stores.CloudDataStore;
+import com.zeyad.usecases.stores.CloudStore;
 import com.zeyad.usecases.utils.Utils;
 
 import org.json.JSONArray;
@@ -32,7 +32,7 @@ public class GenericJobServiceLogicTest {
                 .url("")
                 .method(POST)
                 .build());
-        genericJobServiceLogic.startJob(extras, mock(CloudDataStore.class), Utils.getInstance(), "")
+        genericJobServiceLogic.startJob(extras, mock(CloudStore.class), Utils.getInstance(), "")
                 .subscribe(new TestObserver<>());
         testSubscriber.assertNoErrors();
         //        testSubscriber.assertComplete();

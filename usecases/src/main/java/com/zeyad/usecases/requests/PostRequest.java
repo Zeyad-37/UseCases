@@ -13,7 +13,9 @@ import org.json.JSONObject;
 
 import java.util.HashMap;
 
-/** @author zeyad on 7/29/16. */
+/**
+ * @author zeyad on 7/29/16.
+ */
 public class PostRequest implements Parcelable {
     public static final String POST = "post", DELETE = "delete", PUT = "put", PATCH = "patch";
     public static final Parcelable.Creator<PostRequest> CREATOR =
@@ -33,7 +35,7 @@ public class PostRequest implements Parcelable {
     private static final String DEFAULT_ID_KEY = "id";
     private final String url, idColumnName, method;
     private final Class requestType, responseType;
-    private final boolean onWifi, whileCharging, persist, queuable;
+    private final boolean onWifi, whileCharging, persist, queuable, cache;
     private final JSONObject jsonObject;
     private final JSONArray jsonArray;
     private final HashMap<String, Object> keyValuePairs;
@@ -53,6 +55,7 @@ public class PostRequest implements Parcelable {
         idColumnName = builder.idColumnName;
         method = builder.method;
         object = builder.object;
+        cache = builder.cache;
     }
 
     protected PostRequest(@NonNull Parcel in) {
@@ -64,6 +67,7 @@ public class PostRequest implements Parcelable {
         this.persist = in.readByte() != 0;
         this.whileCharging = in.readByte() != 0;
         this.onWifi = in.readByte() != 0;
+        this.cache = in.readByte() != 0;
         this.queuable = in.readByte() != 0;
         this.jsonObject = in.readParcelable(JSONObject.class.getClassLoader());
         this.jsonArray = in.readParcelable(JSONArray.class.getClassLoader());
@@ -112,6 +116,10 @@ public class PostRequest implements Parcelable {
 
     public boolean isPersist() {
         return persist;
+    }
+
+    public boolean isCache() {
+        return cache;
     }
 
     public boolean isQueuable() {
@@ -171,6 +179,7 @@ public class PostRequest implements Parcelable {
         dest.writeByte(this.persist ? (byte) 1 : (byte) 0);
         dest.writeByte(this.whileCharging ? (byte) 1 : (byte) 0);
         dest.writeByte(this.onWifi ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.cache ? (byte) 1 : (byte) 0);
         dest.writeByte(this.queuable ? (byte) 1 : (byte) 0);
         dest.writeParcelable((Parcelable) this.jsonObject, flags);
         dest.writeParcelable((Parcelable) this.jsonArray, flags);
@@ -185,7 +194,7 @@ public class PostRequest implements Parcelable {
         HashMap<String, Object> keyValuePairs;
         String url, idColumnName, method;
         Class requestType, responseType;
-        boolean persist, queuable, onWifi, whileCharging;
+        boolean persist, queuable, cache, onWifi, whileCharging;
 
         public Builder(Class requestType, boolean persist) {
             this.requestType = requestType;
@@ -219,6 +228,12 @@ public class PostRequest implements Parcelable {
         @NonNull
         public Builder queuable() {
             queuable = true;
+            return this;
+        }
+
+        @NonNull
+        public Builder cache() {
+            cache = true;
             return this;
         }
 
