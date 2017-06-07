@@ -25,7 +25,6 @@ import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyListOf;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -61,13 +60,13 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     @Test
     public void testGetObject() {
         Flowable observable = Flowable.just(new TestRealmModel());
-        when(dbManager.getById(anyString(), anyLong(), anyString(), any(Class.class)))
+        when(dbManager.getById(anyString(), any(), any(Class.class), any(Class.class)))
                 .thenReturn(observable);
 
-        mDiskStore.dynamicGetObject("", "", 0L, "", Object.class, false, false);
+        mDiskStore.dynamicGetObject("", "", 0L, long.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1))
-                .getById(anyString(), anyLong(), anyString(), any(Class.class));
+                .getById(anyString(), any(), any(Class.class), any(Class.class));
     }
 
     @Test

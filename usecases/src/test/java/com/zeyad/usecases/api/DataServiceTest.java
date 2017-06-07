@@ -25,7 +25,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -79,8 +78,8 @@ public class DataServiceTest {
                 .dynamicGetObject(
                         anyString(),
                         anyString(),
-                        anyLong(),
-                        anyString(),
+                        any(),
+                        any(Class.class),
                         any(Class.class),
                         anyBoolean(),
                         anyBoolean()))
@@ -92,8 +91,8 @@ public class DataServiceTest {
                 .dynamicGetObject(
                         anyString(),
                         anyString(),
-                        anyLong(),
-                        anyString(),
+                        any(),
+                        any(Class.class),
                         any(Class.class),
                         anyBoolean(),
                         anyBoolean());
@@ -124,8 +123,8 @@ public class DataServiceTest {
                 .dynamicGetObject(
                         anyString(),
                         anyString(),
-                        anyLong(),
-                        anyString(),
+                        any(),
+                        any(Class.class),
                         any(Class.class),
                         anyBoolean(),
                         anyBoolean()))
@@ -135,8 +134,8 @@ public class DataServiceTest {
                 .dynamicGetObject(
                         anyString(),
                         anyString(),
-                        anyLong(),
-                        anyString(),
+                        any(),
+                        any(Class.class),
                         any(Class.class),
                         anyBoolean(),
                         anyBoolean()))
@@ -148,8 +147,8 @@ public class DataServiceTest {
                 .dynamicGetObject(
                         anyString(),
                         anyString(),
-                        anyLong(),
-                        anyString(),
+                        any(),
+                        any(Class.class),
                         any(Class.class),
                         anyBoolean(),
                         anyBoolean());
@@ -157,8 +156,8 @@ public class DataServiceTest {
                 .dynamicGetObject(
                         anyString(),
                         anyString(),
-                        anyLong(),
-                        anyString(),
+                        any(),
+                        any(Class.class),
                         any(Class.class),
                         anyBoolean(),
                         anyBoolean());

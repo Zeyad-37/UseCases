@@ -17,15 +17,17 @@ import io.realm.RealmModel;
 public interface DataBaseManager {
 
     /**
-     * Gets an {@link Flowable} which will emit an Object.
-     *
-     * @param clazz        Class type of the items to get.
-     * @param idColumnName Name of the id field.
-     * @param itemIdL      The item id to retrieve data.
-     * @param itemIdS      The item id to retrieve data.
+     * Gets an {@link Flowable} which will emit an Object
+     * @param idColumnName name of ID variable
+     * @param itemId ID value
+     * @param itemIdType type of the ID
+     * @param dataClass type of the data requested
+     * @param <M> type of the data requested
+     * @return a {@link Flowable} containing an object of type M.
      */
     @NonNull
-    <M> Flowable<M> getById(String idColumnName, Long itemIdL, String itemIdS, Class clazz);
+    <M> Flowable<M> getById(@NonNull final String idColumnName, final Object itemId,
+                            final Class itemIdType, Class dataClass);
 
     /**
      * Gets an {@link Flowable} which will emit a List of Objects.

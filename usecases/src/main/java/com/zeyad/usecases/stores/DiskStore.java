@@ -36,9 +36,9 @@ public class DiskStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Long itemIdL, String itemIdS,
+    public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Object itemId, Class itemIdType,
                                             @NonNull Class dataClass, boolean persist, boolean shouldCache) {
-        return mDataBaseManager.<M>getById(idColumnName, itemIdL, itemIdS, dataClass)
+        return mDataBaseManager.<M>getById(idColumnName, itemId, itemIdType, dataClass)
                 .doOnEach(notification -> {
                     if (cachable(shouldCache)) {
                         mMemoryStore.cacheObject(idColumnName,
@@ -75,7 +75,7 @@ public class DiskStore implements DataStore {
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
                 .doOnEach(object -> {
                     if (cachable(cache)) {
-                        mMemoryStore.deleteList(jsonArray, dataClass);
+                        mMemoryStore.deleteList(convertToListOfId, dataClass);
                     }
                 });
     }

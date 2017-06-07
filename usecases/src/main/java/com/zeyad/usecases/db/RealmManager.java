@@ -14,9 +14,13 @@ import org.json.JSONObject;
 
 import java.util.List;
 
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposables;
 import io.realm.Realm;
+import io.realm.RealmChangeListener;
+import io.realm.RealmConfiguration;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
 import io.realm.RealmResults;
@@ -26,8 +30,7 @@ import io.realm.RealmResults;
  */
 public class RealmManager implements DataBaseManager {
 
-    private static final String REALM_OBJECT_INVALID = "RealmObject is invalid",
-            JSON_INVALID = "JSONObject is invalid", NO_ID = "Could not find id!";
+    private static final String NO_ID = "Could not find id!";
     private final Handler backgroundHandler;
 
     public RealmManager(Looper backgroundLooper) {
@@ -35,33 +38,43 @@ public class RealmManager implements DataBaseManager {
     }
 
     /**
-     * Gets an {@link Flowable} which will emit an Object.
-     *
-     * @param dataClass    Class type of the items to get.
-     * @param idColumnName Name of the id field.
-     * @param itemIdL      The item id to retrieve data.
-     * @param itemIdS      The item id to retrieve data.
+     * Gets an {@link Flowable} which will emit an Object
+     * @param idColumnName name of ID variable
+     * @param itemId ID value
+     * @param itemIdType type of the ID
+     * @param dataClass type of the data requested
+     * @param <M> type of the data requested
+     * @return a {@link Flowable} containing an object of type M.
      */
     @NonNull
     @Override
-    public <M> Flowable<M> getById(@NonNull final String idColumnName, final Long itemIdL, final String itemIdS,
-                                   Class dataClass) {
+    public <M> Flowable<M> getById(@NonNull final String idColumnName, final Object itemId,
+                                   final Class itemIdType, Class dataClass) {
         return Flowable.defer(() -> {
-            if (itemIdL <= 0 && itemIdS == null) {
-                return Flowable.error(new IllegalArgumentException("Id can not be less than Zero."));
-            }
             Realm realm = Realm.getDefaultInstance();
-            return itemIdS == null ?
-                    Utils.getInstance().toFlowable(realm.where(dataClass)
-                            .equalTo(idColumnName, itemIdL).findAll().asObservable()
-                            .filter(results -> ((RealmResults) results).isLoaded())
-                            .map(o -> realm.copyFromRealm((RealmResults) o))
-                            .doOnUnsubscribe(() -> closeRealm(realm))) :
-                    Utils.getInstance().toFlowable(realm.where(dataClass)
-                            .equalTo(idColumnName, itemIdS).findAll().asObservable()
-                            .filter(results -> ((RealmResults) results).isLoaded())
-                            .map(o -> realm.copyFromRealm((RealmResults) o))
-                            .doOnUnsubscribe(() -> closeRealm(realm)));
+            rx.Observable chain = rx.Observable.empty();
+            if (itemIdType.equals(long.class) || itemIdType.equals(Long.class)) {
+                chain = realm.where(dataClass).equalTo(idColumnName, (long) itemId).findAll()
+                        .asObservable();
+            } else if (itemIdType.equals(int.class) || itemIdType.equals(Integer.class)) {
+                chain = realm.where(dataClass).equalTo(idColumnName, (int) itemId).findAll()
+                        .asObservable();
+            } else if (itemIdType.equals(short.class) || itemIdType.equals(Short.class)) {
+                chain = realm.where(dataClass).equalTo(idColumnName, (short) itemId).findAll()
+                        .asObservable();
+            } else if (itemIdType.equals(byte.class) || itemIdType.equals(Byte.class)) {
+                chain = realm.where(dataClass).equalTo(idColumnName, (byte) itemId).findAll()
+                        .asObservable();
+            } else if (itemIdType.equals(String.class)) {
+                chain = realm.where(dataClass).equalTo(idColumnName, String.valueOf(itemId)).findAll()
+                        .asObservable();
+            } else {
+                return Flowable.error(new IllegalArgumentException("Unsupported ID type!"));
+            }
+            chain = chain.filter(results -> ((RealmResults) results).isLoaded())
+                    .map(o -> realm.copyFromRealm((RealmResults) o).get(0))
+                    .doOnUnsubscribe(() -> closeRealm(realm));
+            return Utils.getInstance().toFlowable(chain);
         });
     }
 
@@ -112,7 +125,7 @@ public class RealmManager implements DataBaseManager {
     public <M extends RealmModel> Single<Boolean> put(@Nullable M realmModel, @NonNull Class dataClass) {
         return Single.fromCallable(() -> {
             if (realmModel == null) {
-                throw new IllegalArgumentException(REALM_OBJECT_INVALID);
+                throw new IllegalArgumentException("RealmObject is null");
             } else {
                 Realm realm = Realm.getDefaultInstance();
                 try {
@@ -139,7 +152,7 @@ public class RealmManager implements DataBaseManager {
                                @NonNull Class dataClass) {
         return Single.fromCallable(() -> {
             if (jsonObject == null) {
-                throw new IllegalArgumentException(JSON_INVALID);
+                throw new IllegalArgumentException("JSONObject is invalid");
             } else {
                 updateJsonObjectWithIdValue(jsonObject, idColumnName, dataClass);
                 Realm realm = Realm.getDefaultInstance();
@@ -308,6 +321,7 @@ public class RealmManager implements DataBaseManager {
         return jsonArray;
     }
 
+    // TODO: 6/6/17 Added String support
     @NonNull
     private JSONObject updateJsonObjectWithIdValue(@NonNull JSONObject jsonObject, @Nullable String idColumnName,
                                                    Class dataClass) throws JSONException {
@@ -328,6 +342,20 @@ public class RealmManager implements DataBaseManager {
         } finally {
             realm.close();
         }
+    }
+
+    private Flowable<Realm> getRealm(Realm realm) {
+        return io.reactivex.Flowable.create(emitter -> {
+            RealmConfiguration realmConfiguration = realm.getConfiguration();
+            Realm observableRealm = Realm.getInstance(realmConfiguration);
+            final RealmChangeListener<Realm> listener = emitter::onNext;
+            emitter.setDisposable(Disposables.fromRunnable(() -> {
+                observableRealm.removeChangeListener(listener);
+                observableRealm.close();
+            }));
+            observableRealm.addChangeListener(listener);
+            emitter.onNext(observableRealm);
+        }, BackpressureStrategy.BUFFER);
     }
 
     private interface Execute {

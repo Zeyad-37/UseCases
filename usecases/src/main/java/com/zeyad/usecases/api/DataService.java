@@ -1,7 +1,9 @@
 package com.zeyad.usecases.api;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.db.RealmQueryProvider;
 import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.GetRequest;
@@ -77,19 +79,16 @@ class DataService implements IDataService {
         try {
             Flowable<M> dynamicGetObject = mDataStoreFactory.dynamically(getRequest.getUrl(), getRequest.getDataClass())
                     .dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
-                            getRequest.getItemIdL(), getRequest.getItemIdS(), getRequest.getDataClass(),
+                            getRequest.getItemId(), getRequest.getIdType(), getRequest.getDataClass(),
                             getRequest.isPersist(), getRequest.isShouldCache());
-            result = getRequest.isShouldCache() ?
-                    Flowable.concat(mDataStoreFactory.memory().<M>getObject(getRequest.getItemIdL(),
-                            getRequest.getItemIdS(), getRequest.getDataClass()).toFlowable(),
-                            dynamicGetObject)
-                            .firstElement()
-                            .toFlowable() : dynamicGetObject;
-//            return mDataStoreFactory.dynamically(getRequest.getUrl(), getRequest.getDataClass())
-//                    .<M>dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
-//                            getRequest.getItemIdL(), getRequest.getItemIdS(), getRequest.getDataClass(),
-//                            getRequest.isPersist(), getRequest.isShouldCache())
-//                    .compose(applySchedulers());
+            if (Config.isWithCache()) {
+                result = mDataStoreFactory.memory()
+                        .<M>getObject(String.valueOf(getRequest.getItemId()), getRequest.getDataClass())
+                        .doOnSuccess(m -> Log.d("getObject", "cache Hit" + m.getClass().getSimpleName()))
+                        .doOnError(throwable -> Log.d("getObject", "cache Miss"))
+                        .toFlowable()
+                        .onErrorResumeNext(t -> dynamicGetObject);
+            } else result = dynamicGetObject;
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
         }
@@ -98,39 +97,37 @@ class DataService implements IDataService {
 
     @Override
     public <M> Flowable<M> getObjectOffLineFirst(@NonNull GetRequest getRequest) {
-        Flowable<M> result;
+        Flowable<M> result = Flowable.empty();
         try {
-            Flowable<M> online = mDataStoreFactory.cloud(getRequest.getDataClass())
-                    .dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
-                            getRequest.getItemIdL(), getRequest.getItemIdS(), getRequest.getDataClass(),
-                            getRequest.isPersist(), getRequest.isShouldCache());
-            Flowable<M> disk = mDataStoreFactory.disk(getRequest.getDataClass()).dynamicGetObject("",
-                    getRequest.getIdColumnName(), getRequest.getItemIdL(), getRequest.getItemIdS(),
-                    getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache());
-            Flowable<M> cache = getRequest.isShouldCache() ? mDataStoreFactory.memory()
-                    .<M>getObject(getRequest.getItemIdL(), getRequest.getItemIdS(),
-                            getRequest.getDataClass()).toFlowable() : null;
-            if (getRequest.isShouldCache()) {
-                result = Flowable.concat(cache, disk, online)
-                        .firstElement()
-                        .toFlowable()
-                        .compose(ReplayingShare.instance());
-            } else {
-                result = Flowable.concat(disk, online)
-                        .firstElement()
-                        .toFlowable()
-                        .compose(ReplayingShare.instance());
+            if (Config.isWithCache()) {
+                result = mDataStoreFactory.memory()
+                        .<M>getObject(String.valueOf(getRequest.getItemId()), getRequest.getDataClass())
+                        .doOnSuccess(m -> Log.d("getObjectOffLineFirst", "cache Hit" + m.getClass().getSimpleName()))
+                        .doOnError(throwable -> Log.d("getObjectOffLineFirst", "cache Miss"))
+                        .toFlowable();
             }
-//            result = mDataStoreFactory.disk(getRequest.getDataClass()).<M>dynamicGetObject("",
-//                    getRequest.getIdColumnName(), getRequest.getItemIdL(), getRequest.getItemIdS(),
-//                    getRequest.getDataClass(), getRequest.isPersist(), getRequest.isShouldCache())
-//                    .flatMap(object -> object != null ? Flowable.just(object) : online)
-//                    .onErrorResumeNext(throwable -> online)
-//                    .compose(ReplayingShare.instance());
+            if (Config.isWithDisk()) {
+                Flowable<M> disk = mDataStoreFactory.disk(getRequest.getDataClass())
+                        .<M>dynamicGetObject("", getRequest.getIdColumnName(), getRequest.getItemId(),
+                                getRequest.getIdType(), getRequest.getDataClass(), getRequest.isPersist(),
+                                getRequest.isShouldCache())
+                        .doOnNext(m -> Log.d("getObjectOffLineFirst", "Disk Hit " + m.getClass().getSimpleName()))
+                        .doOnError(throwable -> Log.e("getObjectOffLineFirst", "Disk Miss", throwable));
+                if (Config.isWithCache()) {
+                    result = result.onErrorResumeNext(t -> disk);
+                } else result = disk;
+            }
+            Flowable<M> online = mDataStoreFactory.cloud(getRequest.getDataClass())
+                    .<M>dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
+                            getRequest.getItemId(), getRequest.getIdType(), getRequest.getDataClass(),
+                            getRequest.isPersist(), getRequest.isShouldCache())
+                    .doOnNext(m -> Log.d("getObjectOffLineFirst", "Cloud Hit " + m.getClass().getSimpleName()));
+            result = result.flatMap(m -> m == null ? online : Flowable.just(m))
+                    .onErrorResumeNext(t -> online);
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
         }
-        return result.compose(applySchedulers());
+        return result.compose(ReplayingShare.instance()).compose(applySchedulers());
     }
 
     @Override
@@ -151,7 +148,7 @@ class DataService implements IDataService {
         try {
             result = mDataStoreFactory.dynamically(postRequest.getUrl(), postRequest.getRequestType())
                     .dynamicPatchObject(postRequest.getUrl(), postRequest.getIdColumnName(),
-                            postRequest.getJsonObject(), postRequest.getRequestType(),
+                            postRequest.getObjectBundle(), postRequest.getRequestType(),
                             postRequest.getResponseType(), postRequest.isPersist(), postRequest.isCache(),
                             postRequest.isQueuable());
         } catch (IllegalAccessException e) {
@@ -166,7 +163,7 @@ class DataService implements IDataService {
         try {
             result = mDataStoreFactory.dynamically(postRequest.getUrl(), postRequest.getRequestType())
                     .<M>dynamicPostObject(postRequest.getUrl(), postRequest.getIdColumnName(),
-                            postRequest.getJsonObject(), postRequest.getRequestType(),
+                            postRequest.getObjectBundle(), postRequest.getRequestType(),
                             postRequest.getResponseType(), postRequest.isPersist(), postRequest.isCache(),
                             postRequest.isQueuable())
                     .compose(applySchedulers());
@@ -182,7 +179,7 @@ class DataService implements IDataService {
         try {
             result = mDataStoreFactory.dynamically(postRequest.getUrl(), postRequest.getRequestType())
                     .<M>dynamicPostList(postRequest.getUrl(), postRequest.getIdColumnName(),
-                            postRequest.getJsonArray(), postRequest.getRequestType(),
+                            postRequest.getArrayBundle(), postRequest.getRequestType(),
                             postRequest.getResponseType(), postRequest.isPersist(),
                             postRequest.isQueuable())
                     .compose(applySchedulers());
@@ -198,7 +195,7 @@ class DataService implements IDataService {
         try {
             result = mDataStoreFactory.dynamically(postRequest.getUrl(), postRequest.getRequestType())
                     .<M>dynamicPutObject(postRequest.getUrl(), postRequest.getIdColumnName(),
-                            postRequest.getJsonObject(), postRequest.getRequestType(),
+                            postRequest.getObjectBundle(), postRequest.getRequestType(),
                             postRequest.getResponseType(), postRequest.isPersist(),
                             postRequest.isCache(), postRequest.isQueuable())
                     .compose(applySchedulers());
@@ -214,7 +211,7 @@ class DataService implements IDataService {
         try {
             result = mDataStoreFactory.dynamically(postRequest.getUrl(), postRequest.getRequestType())
                     .<M>dynamicPutList(postRequest.getUrl(), postRequest.getIdColumnName(),
-                            postRequest.getJsonArray(), postRequest.getRequestType(),
+                            postRequest.getArrayBundle(), postRequest.getRequestType(),
                             postRequest.getResponseType(), postRequest.isPersist(), postRequest.isQueuable())
                     .compose(applySchedulers());
         } catch (IllegalAccessException e) {
@@ -242,7 +239,7 @@ class DataService implements IDataService {
         try {
             result = mDataStoreFactory.dynamically(deleteRequest.getUrl(), deleteRequest.getRequestType())
                     .<M>dynamicDeleteCollection(deleteRequest.getUrl(), deleteRequest.getIdColumnName(),
-                            deleteRequest.getJsonArray(), deleteRequest.getRequestType(),
+                            deleteRequest.getArrayBundle(), deleteRequest.getRequestType(),
                             deleteRequest.getResponseType(), deleteRequest.isPersist(),
                             deleteRequest.isCache(), deleteRequest.isQueuable())
                     .compose(applySchedulers());
@@ -268,31 +265,20 @@ class DataService implements IDataService {
 
     @Override
     public <M> Flowable<M> uploadFile(@NonNull FileIORequest fileIORequest) {
-        Flowable<M> result;
-        try {
-            result = mDataStoreFactory.cloud(fileIORequest.getDataClass())
-                    .dynamicUploadFile(fileIORequest.getUrl(), fileIORequest.getFile(),
+        return mDataStoreFactory.cloud(fileIORequest.getDataClass())
+                .<M>dynamicUploadFile(fileIORequest.getUrl(), fileIORequest.getFile(),
                             fileIORequest.getKey(), fileIORequest.getParameters(),
                             fileIORequest.onWifi(), fileIORequest.isWhileCharging(),
-                            fileIORequest.isQueuable(), fileIORequest.getDataClass());
-        } catch (IllegalAccessException e) {
-            result = Flowable.error(e);
-        }
-        return result.compose(applySchedulers());
+                        fileIORequest.isQueuable(), fileIORequest.getDataClass())
+                .compose(applySchedulers());
     }
 
     @Override
     public Flowable<File> downloadFile(@NonNull FileIORequest fileIORequest) {
-        Flowable<File> result;
-        try {
-            result = mDataStoreFactory.cloud(fileIORequest.getDataClass())
+        return mDataStoreFactory.cloud(fileIORequest.getDataClass())
                     .dynamicDownloadFile(fileIORequest.getUrl(), fileIORequest.getFile(),
                             fileIORequest.onWifi(), fileIORequest.isWhileCharging(),
-                            fileIORequest.isQueuable());
-        } catch (IllegalAccessException e) {
-            result = Flowable.error(e);
-        }
-        return result.compose(applySchedulers());
+                            fileIORequest.isQueuable()).compose(applySchedulers());
     }
 
     /**

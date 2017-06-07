@@ -1,7 +1,6 @@
 package com.zeyad.usecases.stores;
 
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.zeyad.usecases.Config;
@@ -31,9 +30,8 @@ public interface DataStore {
      * Get an {@link Flowable} which will emit a Object by its id.
      */
     @NonNull
-    <M> Flowable<M> dynamicGetObject(String url, String idColumnName, @Nullable Long itemIdL,
-                                     @Nullable String itemIdS, Class requestType, boolean persist,
-                                     boolean shouldCache);
+    <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Object itemId, Class itemIdType,
+                                     Class requestType, boolean persist, boolean shouldCache);
 
     /**
      * Search disk with a RealmQuery which returns an {@link Flowable} that will emit a list of

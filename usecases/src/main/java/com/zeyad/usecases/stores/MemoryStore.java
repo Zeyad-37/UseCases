@@ -1,17 +1,18 @@
 package com.zeyad.usecases.stores;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.google.gson.Gson;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.utils.Utils;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
 
 import io.reactivex.Maybe;
+import io.reactivex.Observable;
 import st.lowlevel.storo.Storo;
 
 /**
@@ -24,27 +25,33 @@ public class MemoryStore {
         this.gson = gson;
     }
 
-    public <M> Maybe<M> getObject(Long itemIdL, String itemIdS, @NonNull Class dataClass) {
-        String key = dataClass.getSimpleName() + (itemIdL == null ? itemIdS : String.valueOf(itemIdL));
-        return Config.isWithCache() && Storo.contains(key) && !Storo.hasExpired(key).execute() ?
+    public <M> Maybe<M> getObject(String itemId, @NonNull Class dataClass) {
+        String key = dataClass.getSimpleName() + itemId;
+        return Maybe.defer(() -> Storo.contains(key) && !Storo.hasExpired(key).execute() ?
                 Utils.getInstance().<M>toFlowable(Storo.get(key, dataClass).async()).firstElement() :
-                Maybe.error(new IllegalAccessException("Cache Miss!"));
-//                Maybe.empty();
+                Maybe.error(new IllegalAccessException("Cache Miss!")));
     }
 
     void cacheObject(String idColumnName, @NonNull JSONObject jsonObject, @NonNull Class dataClass) {
-        Storo.put(dataClass.getSimpleName() + jsonObject.optString(idColumnName),
-                gson.fromJson(jsonObject.toString(), dataClass))
+        String className = dataClass.getSimpleName();
+        String key = className + jsonObject.optString(idColumnName);
+        Storo.put(key, gson.fromJson(jsonObject.toString(), dataClass))
                 .setExpiry(Config.getCacheAmount(), Config.getCacheTimeUnit())
                 .execute();
+        Log.d("MemoryStore", className + " cached!, id = " + key);
     }
 
-    void deleteList(JSONArray jsonArray, @NonNull Class dataClass) {
-        List<Long> convertToListOfId = Utils.getInstance().convertToListOfId(jsonArray);
-        int convertToListOfIdSize = convertToListOfId != null ? convertToListOfId.size() : 0;
-        for (int i = 0; i < convertToListOfIdSize; i++) {
-            Storo.delete(dataClass.getSimpleName() + convertToListOfId.get(i));
-        }
+    void deleteList(List<Long> ids, @NonNull Class dataClass) {
+        String className = dataClass.getSimpleName();
+        Observable.fromIterable(ids)
+                .map(id -> className + String.valueOf(id))
+                .filter(Storo::contains)
+                .doOnEach(stringNotification -> {
+                    String key = stringNotification.getValue();
+                    Log.d("MemoryStore", className + " " + (Storo.delete(key) ? "" : "not ") +
+                            "deleted!, id = " + key);
+                })
+                .blockingSubscribe();
     }
 
 //    public void cacheList(String idColumnName, @NonNull JSONArray jsonArray, @NonNull Class dataClass) {

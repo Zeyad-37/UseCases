@@ -111,6 +111,10 @@ public final class Config {
         return withRealm;
     }
 
+    public static boolean isWithDisk() {
+        return withRealm || withSQLite;
+    }
+
     public static Scheduler getBackgroundThread() {
         return backgroundThread;
     }

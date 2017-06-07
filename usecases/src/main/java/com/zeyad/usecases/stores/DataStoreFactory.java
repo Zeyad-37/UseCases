@@ -47,7 +47,7 @@ public class DataStoreFactory {
     /**
      * Creates a disk {@link DataStore}.
      */
-    public MemoryStore memory() throws IllegalAccessException {
+    public MemoryStore memory() {
         if (withCache && mMemoryStore == null) {
             mMemoryStore = new MemoryStore(Config.getGson());
         }
@@ -71,7 +71,7 @@ public class DataStoreFactory {
      * Creates a cloud {@link DataStore}.
      */
     @NonNull
-    public DataStore cloud(Class dataClass) throws IllegalAccessException {
+    public DataStore cloud(Class dataClass) {
         if (mCloudStore == null) {
             mCloudStore = new CloudStore(mApiConnection,
                     mDataBaseManagerUtil.getDataBaseManager(dataClass), mDAOMapper, memory(),

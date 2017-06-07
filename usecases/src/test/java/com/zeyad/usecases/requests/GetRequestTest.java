@@ -20,7 +20,7 @@ public class GetRequestTest {
     private final String ID_COLUMN_NAME = "id";
     private final String URL = "www.google.com";
     private final boolean SHOULD_CACHE = true;
-    private final Long IDL = 1L;
+    private final Long ID = 1L;
     private GetRequest mGetRequest;
 
     @Before
@@ -28,9 +28,8 @@ public class GetRequestTest {
         mGetRequest =
                 new GetRequest.Builder(DATA_CLASS, TO_PERSIST)
                         .fullUrl(URL)
-                        .shouldCache(SHOULD_CACHE)
-                        .idColumnName(ID_COLUMN_NAME)
-                        .id(IDL)
+                        .shouldCache()
+                        .id(ID, ID_COLUMN_NAME, long.class)
                         .build();
     }
 
@@ -66,7 +65,7 @@ public class GetRequestTest {
 
     @Test
     public void testGetItemId() throws Exception {
-        assertThat(mGetRequest.getItemIdL(), is(equalTo(IDL)));
+        assertThat(mGetRequest.getItemId(), is(equalTo(ID)));
     }
 }
 

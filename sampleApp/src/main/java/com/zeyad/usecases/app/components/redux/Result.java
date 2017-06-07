@@ -7,7 +7,7 @@ import static com.zeyad.usecases.app.components.redux.UIModel.SUCCESS;
 /**
  * @author by ZIaDo on 4/19/17.
  */
-public final class Result<B> {
+final class Result<B> {
 
     private final boolean isLoading, isSuccessful;
     private final Throwable error;

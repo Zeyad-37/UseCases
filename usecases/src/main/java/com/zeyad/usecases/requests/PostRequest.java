@@ -12,12 +12,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @author zeyad on 7/29/16.
  */
 public class PostRequest implements Parcelable {
-    public static final String POST = "post", DELETE = "delete", PUT = "put", PATCH = "patch";
     public static final Parcelable.Creator<PostRequest> CREATOR =
             new Parcelable.Creator<PostRequest>() {
                 @NonNull
@@ -32,6 +32,7 @@ public class PostRequest implements Parcelable {
                     return new PostRequest[size];
                 }
             };
+    public static final String POST = "post", DELETE = "delete", PUT = "put", PATCH = "patch";
     private static final String DEFAULT_ID_KEY = "id";
     private final String url, idColumnName, method;
     private final Class requestType, responseType;
@@ -100,6 +101,13 @@ public class PostRequest implements Parcelable {
                 jsonArray.put(object);
             }
             return jsonArray;
+        } else if (object != null && object instanceof List) {
+            final JSONArray jsonArray = new JSONArray();
+            List ids = (List) object;
+            for (Object object : ids) {
+                jsonArray.put(object);
+            }
+            return jsonArray;
         } else {
             return new JSONArray();
         }
@@ -124,18 +132,6 @@ public class PostRequest implements Parcelable {
 
     public boolean isQueuable() {
         return queuable;
-    }
-
-    public JSONArray getJsonArray() {
-        return jsonArray;
-    }
-
-    public JSONObject getJsonObject() {
-        return jsonObject;
-    }
-
-    public HashMap<String, Object> getKeyValuePairs() {
-        return keyValuePairs;
     }
 
     public Object getObject() {

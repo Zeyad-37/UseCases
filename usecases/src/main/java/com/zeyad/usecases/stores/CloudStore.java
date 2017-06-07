@@ -45,7 +45,6 @@ import io.reactivex.disposables.Disposable;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
-import st.lowlevel.storo.Storo;
 
 import static com.zeyad.usecases.requests.PostRequest.DELETE;
 import static com.zeyad.usecases.requests.PostRequest.PATCH;
@@ -92,7 +91,7 @@ public class CloudStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Long itemIdL, String itemIdS,
+    public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Object itemId, Class itemIdType,
                                             @NonNull Class dataClass, boolean saveToDisk, boolean shouldCache) {
         return mApiConnection.<M>dynamicGetObject(url, shouldCache)
                 .doOnNext(m -> saveLocally(idColumnName,
@@ -256,10 +255,8 @@ public class CloudStore implements DataStore {
                                                    @NonNull Class dataClass, Class responseType,
                                                    boolean saveToDisk, boolean cache, boolean queuable) {
         return Flowable.defer(() -> {
-            List<Long> ids = Utils.getInstance().convertToListOfId(jsonArray);
-            if (willSaveToDisk(saveToDisk)) {
-                deleteFromPersistence(ids, idColumnName, dataClass);
-            }
+            deleteLocally(Utils.getInstance().convertToListOfId(jsonArray),
+                    idColumnName, dataClass, saveToDisk, cache);
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(DELETE, url, idColumnName, jsonArray, saveToDisk);
                 return Flowable.empty();
@@ -408,7 +405,7 @@ public class CloudStore implements DataStore {
     }
 
     private boolean willCache(boolean cache) {
-        return cache && mCanPersist;
+        return cache && canCache;
     }
 
     private boolean isNetworkFailure(Throwable throwable) {
@@ -515,13 +512,16 @@ public class CloudStore implements DataStore {
         }
     }
 
-    private void deleteFromPersistence(@NonNull List collection, String idColumnName, @NonNull Class dataClass) {
-        int collectionSize = collection.size();
-        for (int i = 0; i < collectionSize; i++) {
-            mDataBaseManager.evictById(dataClass, idColumnName, (long) collection.get(i));
-            if (Config.isWithCache()) {
-                Storo.delete(dataClass.getSimpleName() + (long) collection.get(i));
+    private void deleteLocally(List<Long> ids, String idColumnName, Class dataClass,
+                               boolean saveToDisk, boolean cache) {
+        if (willSaveToDisk(saveToDisk)) {
+            int collectionSize = ids.size();
+            for (int i = 0; i < collectionSize; i++) {
+                mDataBaseManager.evictById(dataClass, idColumnName, ids.get(i));
             }
+        }
+        if (willCache(cache)) {
+            mMemoryStore.deleteList(ids, dataClass);
         }
     }
 

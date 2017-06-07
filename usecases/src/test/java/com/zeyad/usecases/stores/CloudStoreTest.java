@@ -94,7 +94,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
     public void dynamicGetObject() throws Exception {
         when(mockApiConnection.dynamicGetObject(anyString(), anyBoolean())).thenReturn(observable);
 
-        cloudStore.dynamicGetObject("", "", 0L, "", Object.class, false, false);
+        cloudStore.dynamicGetObject("", "", 0L, long.class, Object.class, false, false);
 
         verify(mockApiConnection, times(1)).dynamicGetObject(anyString(), anyBoolean());
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
@@ -106,7 +106,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         when(mockApiConnection.dynamicGetObject(anyString(), anyBoolean())).thenReturn(observable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicGetObject("", "", 0L, "", Object.class, true, false)
+        cloudStore.dynamicGetObject("", "", 0L, long.class, Object.class, true, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();

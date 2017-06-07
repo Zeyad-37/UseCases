@@ -70,19 +70,8 @@ public class RealmManagerTest {
     }
 
     @Test
-    public void getByIdLessThanOne() throws Exception {
-        Flowable flowable = mRealmManager.getById("id", 0L, null, TestRealmModel.class);
-
-        TestSubscriber testSubscriber = new TestSubscriber();
-        flowable.subscribe(testSubscriber);
-
-        testSubscriber.assertError(IllegalArgumentException.class);
-        testSubscriber.assertErrorMessage("Id can not be less than Zero.");
-    }
-
-    @Test
     public void getById() throws Exception {
-        Flowable flowable = mRealmManager.getById("id", 1L, null, TestRealmModel.class);
+        Flowable flowable = mRealmManager.getById("id", 1L, long.class, TestRealmModel.class);
 
         applyTestSubscriber(flowable);
 

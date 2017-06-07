@@ -87,7 +87,7 @@ public class GenericApplication extends Application {
 
     @Override
     public void onCreate() {
-        initializeStrictMode();
+//        initializeStrictMode();
         super.onCreate();
         Completable.fromAction(() -> {
 //            checkAppTampering(this);
