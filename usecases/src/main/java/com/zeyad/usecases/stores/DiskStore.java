@@ -73,11 +73,11 @@ public class DiskStore implements DataStore {
                                             boolean cache, boolean queuable) {
         List<Long> convertToListOfId = Utils.getInstance().convertToListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
-                .doOnEach(object -> {
+                .doOnSuccess(object -> {
                     if (cachable(cache)) {
                         mMemoryStore.deleteList(convertToListOfId, dataClass);
                     }
-                });
+                }).toFlowable();
     }
 
     @NonNull
@@ -113,8 +113,11 @@ public class DiskStore implements DataStore {
     @NonNull
     @Override
     public Flowable dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
-                                    Class dataClass, Class responseType, boolean persist, boolean queuable) {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toFlowable();
+                                    Class dataClass, Class responseType, boolean persist,
+                                    boolean cache, boolean queuable) {
+        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
+                .doOnSuccess(aBoolean -> mMemoryStore.cacheList(idColumnName, jsonArray, dataClass))
+                .toFlowable();
     }
 
     @NonNull
@@ -135,8 +138,10 @@ public class DiskStore implements DataStore {
     @NonNull
     @Override
     public Flowable dynamicPutList(String url, String idColumnName, JSONArray jsonArray, Class dataClass,
-                                   Class responseType, boolean persist, boolean queuable) {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass).toFlowable();
+                                   Class responseType, boolean persist, boolean cache, boolean queuable) {
+        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
+                .doOnSuccess(aBoolean -> mMemoryStore.cacheList(idColumnName, jsonArray, dataClass))
+                .toFlowable();
     }
 
     @NonNull

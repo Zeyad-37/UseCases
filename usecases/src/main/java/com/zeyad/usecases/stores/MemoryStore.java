@@ -7,6 +7,7 @@ import com.google.gson.Gson;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.utils.Utils;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -20,9 +21,14 @@ import st.lowlevel.storo.Storo;
  */
 public class MemoryStore {
     final private Gson gson;
+//    final Map<Class, Map<Class, >> mapOfIds;
 
     MemoryStore(Gson gson) {
         this.gson = gson;
+//        mapOfIds = new HashMap<>();
+//        Map<Object, Class> objectClassMap = new HashMap<>();
+//        objectClassMap.put()
+//        mapOfIds.put(RequiredModel.class, );
     }
 
     public <M> Maybe<M> getObject(String itemId, @NonNull Class dataClass) {
@@ -54,10 +60,10 @@ public class MemoryStore {
                 .blockingSubscribe();
     }
 
-//    public void cacheList(String idColumnName, @NonNull JSONArray jsonArray, @NonNull Class dataClass) {
-//        int size = jsonArray.length();
-//        for (int i = 0; i < size; i++) {
-//            cacheObject(idColumnName, jsonArray.optJSONObject(i), dataClass);
-//        }
-//    }
+    void cacheList(String idColumnName, @NonNull JSONArray jsonArray, @NonNull Class dataClass) {
+        int size = jsonArray.length();
+        for (int i = 0; i < size; i++) {
+            cacheObject(idColumnName, jsonArray.optJSONObject(i), dataClass);
+        }
+    }
 }

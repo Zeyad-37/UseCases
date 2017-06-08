@@ -62,7 +62,8 @@ public interface DataStore {
      */
     @NonNull
     <M> Flowable<M> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
-                                    Class requestType, Class responseType, boolean persist, boolean queuable);
+                                    Class requestType, Class responseType, boolean persist,
+                                    boolean cache, boolean queuable);
 
     /**
      * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Flowable} that
@@ -79,7 +80,8 @@ public interface DataStore {
      */
     @NonNull
     <M> Flowable<M> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
-                                   Class requestType, Class responseType, boolean persist, boolean queuable);
+                                   Class requestType, Class responseType, boolean persist,
+                                   boolean cache, boolean queuable);
 
     /**
      * Delete a HashMap<String, Object> from cloud which returns an {@link Flowable} that will emit

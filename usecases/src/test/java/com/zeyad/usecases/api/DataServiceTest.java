@@ -152,7 +152,7 @@ public class DataServiceTest {
                         any(Class.class),
                         anyBoolean(),
                         anyBoolean());
-        verify(dataStoreFactory.disk(Object.class), times(1))
+        verify(dataStoreFactory.disk(Object.class), times(0))
                 .dynamicGetObject(
                         anyString(),
                         anyString(),
@@ -231,6 +231,7 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
+                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable);
 
@@ -243,6 +244,7 @@ public class DataServiceTest {
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
+                        anyBoolean(),
                         anyBoolean(),
                         anyBoolean());
     }
@@ -287,6 +289,7 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
+                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable);
 
@@ -299,6 +302,7 @@ public class DataServiceTest {
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
+                        anyBoolean(),
                         anyBoolean(),
                         anyBoolean());
     }

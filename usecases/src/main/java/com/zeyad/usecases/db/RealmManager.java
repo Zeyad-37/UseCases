@@ -16,6 +16,7 @@ import java.util.List;
 
 import io.reactivex.BackpressureStrategy;
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposables;
 import io.realm.Realm;
@@ -261,20 +262,12 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public Flowable<Boolean> evictCollection(@NonNull String idFieldName, @NonNull List<Long> list,
-                                             @NonNull Class dataClass) {
-//        return Flowable.fromIterable(list)
-//                .flatMap(aLong -> Flowable.fromCallable(() -> evictById(dataClass, idFieldName, aLong)))
-//                .reduce((aBoolean, aBoolean2) -> aBoolean && aBoolean2)
-//                .toFlowable();
-        return Flowable.fromCallable(() -> {
-            boolean isDeleted = true;
-            int size = list.size();
-            for (int i = 0; i < size; i++) {
-                isDeleted = isDeleted && evictById(dataClass, idFieldName, list.get(i));
-            }
-            return isDeleted;
-        });
+    public Single<Boolean> evictCollection(@NonNull String idFieldName, @NonNull List<Long> list,
+                                           @NonNull Class dataClass) {
+        return Single.fromCallable(() -> Observable.fromIterable(list)
+                .map(aLong -> evictById(dataClass, idFieldName, aLong))
+                .reduce((aBoolean, aBoolean2) -> aBoolean && aBoolean2)
+                .blockingGet());
     }
 
     private void closeRealm(@NonNull Realm realm) {

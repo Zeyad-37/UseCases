@@ -90,7 +90,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     @Test
     public void testDynamicDeleteCollection() {
         when(dbManager.evictCollection(anyString(), anyList(), any(Class.class)))
-                .thenReturn(Flowable.just(true));
+                .thenReturn(Single.just(true));
 
         mDiskStore.dynamicDeleteCollection(
                 "", "", new JSONArray(), Object.class, Object.class, false, false, false);
@@ -141,7 +141,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicPostList(
-                "", "", new JSONArray(), Object.class, Object.class, false, false);
+                "", "", new JSONArray(), Object.class, Object.class, false, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .putAll(any(JSONArray.class), anyString(), any(Class.class));
@@ -153,7 +153,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicPutList(
-                "", "", new JSONArray(), Object.class, Object.class, false, false);
+                "", "", new JSONArray(), Object.class, Object.class, false, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .putAll(any(JSONArray.class), anyString(), any(Class.class));

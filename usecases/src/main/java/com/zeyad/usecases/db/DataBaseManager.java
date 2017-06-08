@@ -98,7 +98,7 @@ public interface DataBaseManager {
      * @param dataClass   Class type of the items to be deleted.
      */
     @NonNull
-    Flowable<Boolean> evictCollection(String idFieldName, List<Long> list, Class dataClass);
+    Single<Boolean> evictCollection(String idFieldName, List<Long> list, Class dataClass);
 
     /**
      * Evict element by id of the DB.

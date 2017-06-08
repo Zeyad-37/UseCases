@@ -181,7 +181,7 @@ class DataService implements IDataService {
                     .<M>dynamicPostList(postRequest.getUrl(), postRequest.getIdColumnName(),
                             postRequest.getArrayBundle(), postRequest.getRequestType(),
                             postRequest.getResponseType(), postRequest.isPersist(),
-                            postRequest.isQueuable())
+                            postRequest.isCache(), postRequest.isQueuable())
                     .compose(applySchedulers());
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
@@ -212,7 +212,8 @@ class DataService implements IDataService {
             result = mDataStoreFactory.dynamically(postRequest.getUrl(), postRequest.getRequestType())
                     .<M>dynamicPutList(postRequest.getUrl(), postRequest.getIdColumnName(),
                             postRequest.getArrayBundle(), postRequest.getRequestType(),
-                            postRequest.getResponseType(), postRequest.isPersist(), postRequest.isQueuable())
+                            postRequest.getResponseType(), postRequest.isPersist(),
+                            postRequest.isCache(), postRequest.isQueuable())
                     .compose(applySchedulers());
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);

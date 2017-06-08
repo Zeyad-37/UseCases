@@ -169,11 +169,9 @@ public class CloudStore implements DataStore {
     @Override
     public <M> Flowable<M> dynamicPostList(String url, String idColumnName, @NonNull JSONArray jsonArray,
                                            @NonNull Class dataClass, Class responseType,
-                                           boolean saveToDisk, boolean queuable) {
+                                           boolean saveToDisk, boolean cache, boolean queuable) {
         return Flowable.defer(() -> {
-            if (willSaveToDisk(saveToDisk)) {
-                saveAllToDisk(jsonArray, idColumnName, dataClass);
-            }
+            saveAllLocally(idColumnName, jsonArray, dataClass, saveToDisk, cache);
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(POST, url, idColumnName, jsonArray, saveToDisk);
                 return Flowable.empty();
@@ -224,11 +222,9 @@ public class CloudStore implements DataStore {
     @Override
     public <M> Flowable<M> dynamicPutList(String url, String idColumnName, @NonNull JSONArray jsonArray,
                                           @NonNull Class dataClass, Class responseType, boolean saveToDisk,
-                                          boolean queuable) {
+                                          boolean cache, boolean queuable) {
         return Flowable.defer(() -> {
-            if (willSaveToDisk(saveToDisk)) {
-                saveAllToDisk(jsonArray, idColumnName, dataClass);
-            }
+            saveAllLocally(idColumnName, jsonArray, dataClass, saveToDisk, cache);
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(PUT, url, idColumnName, jsonArray, saveToDisk);
                 return Flowable.empty();
@@ -484,18 +480,6 @@ public class CloudStore implements DataStore {
         mUtils.queuePostCore(mDispatcher, postRequest);
     }
 
-    private void saveToDisk(JSONObject jsonObject, String idColumnName, Class dataClass) {
-        mDataBaseManager.put(jsonObject, idColumnName, dataClass)
-                .subscribeOn(Config.getBackgroundThread())
-                .subscribe(new SimpleSubscriber(dataClass));
-    }
-
-    private void saveAllToDisk(JSONArray jsonArray, String idColumnName, Class dataClass) {
-        mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
-                .subscribeOn(Config.getBackgroundThread())
-                .subscribe(new SimpleSubscriber(dataClass));
-    }
-
     private void saveAllToDisk(List collection, Class dataClass) {
         mDataBaseManager.putAll(collection, dataClass)
                 .subscribeOn(Config.getBackgroundThread())
@@ -505,10 +489,24 @@ public class CloudStore implements DataStore {
     private void saveLocally(String idColumnName, @NonNull JSONObject jsonObject,
                              @NonNull Class dataClass, boolean saveToDisk, boolean cache) {
         if (willSaveToDisk(saveToDisk)) {
-            saveToDisk(jsonObject, idColumnName, dataClass);
+            mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+                    .subscribeOn(Config.getBackgroundThread())
+                    .subscribe(new SimpleSubscriber(dataClass));
         }
         if (willCache(cache)) {
             mMemoryStore.cacheObject(idColumnName, jsonObject, dataClass);
+        }
+    }
+
+    private void saveAllLocally(String idColumnName, @NonNull JSONArray jsonArray,
+                                @NonNull Class dataClass, boolean saveToDisk, boolean cache) {
+        if (willSaveToDisk(saveToDisk)) {
+            mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
+                    .subscribeOn(Config.getBackgroundThread())
+                    .subscribe(new SimpleSubscriber(dataClass));
+        }
+        if (willCache(cache)) {
+            mMemoryStore.cacheList(idColumnName, jsonArray, dataClass);
         }
     }
 
