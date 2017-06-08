@@ -10,32 +10,60 @@ import com.zeyad.usecases.utils.Utils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-import io.reactivex.Maybe;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import st.lowlevel.storo.Storo;
 
 /**
  * @author by ZIaDo on 6/5/17.
  */
 public class MemoryStore {
-    final private Gson gson;
-//    final Map<Class, Map<Class, >> mapOfIds;
+    private final Gson gson;
+    private final Map<Class, Set<String>> mapOfIds;
 
     MemoryStore(Gson gson) {
         this.gson = gson;
-//        mapOfIds = new HashMap<>();
-//        Map<Object, Class> objectClassMap = new HashMap<>();
-//        objectClassMap.put()
-//        mapOfIds.put(RequiredModel.class, );
+        mapOfIds = new HashMap<>();
     }
 
-    public <M> Maybe<M> getObject(String itemId, @NonNull Class dataClass) {
+    public <M> Single<M> getItem(String itemId, @NonNull Class dataClass) {
         String key = dataClass.getSimpleName() + itemId;
-        return Maybe.defer(() -> Storo.contains(key) && !Storo.hasExpired(key).execute() ?
-                Utils.getInstance().<M>toFlowable(Storo.get(key, dataClass).async()).firstElement() :
-                Maybe.error(new IllegalAccessException("Cache Miss!")));
+        return Single.defer(() -> {
+            if (isValid(key)) {
+                return Utils.getInstance().<M>toFlowable(Storo.get(key, dataClass).async())
+                        .firstElement().toSingle();
+            } else {
+//                removeKey(dataClass, key);
+                return Single.error(new IllegalAccessException("Cache Miss!"));
+            }
+        });
+    }
+
+    public <M> Single<List<M>> getAllItems(@NonNull Class dataClass) {
+        int size = mapOfIds.get(dataClass).size();
+        final boolean[] missed = new boolean[1];
+        return missed[0] ? Single.error(new IllegalAccessException("Cache Miss!")) :
+                Single.just(Observable.fromIterable(mapOfIds.get(dataClass))
+                        .filter((key) -> {
+                            if (isValid(key))
+                                return true;
+                            else {
+//                                removeKey(dataClass, key);
+                                missed[0] = true;
+                                return false;
+                            }
+                        })
+                        .filter(s -> !missed[0])
+                        .map(key -> Storo.<M>get(key, dataClass).execute())
+                        .toList(missed[0] ? 0 : size)
+                        .blockingGet());
     }
 
     void cacheObject(String idColumnName, @NonNull JSONObject jsonObject, @NonNull Class dataClass) {
@@ -44,6 +72,7 @@ public class MemoryStore {
         Storo.put(key, gson.fromJson(jsonObject.toString(), dataClass))
                 .setExpiry(Config.getCacheAmount(), Config.getCacheTimeUnit())
                 .execute();
+        addKey(dataClass, key);
         Log.d("MemoryStore", className + " cached!, id = " + key);
     }
 
@@ -51,9 +80,17 @@ public class MemoryStore {
         String className = dataClass.getSimpleName();
         Observable.fromIterable(ids)
                 .map(id -> className + String.valueOf(id))
-                .filter(Storo::contains)
+                .filter((key) -> {
+                    if (isValid(key))
+                        return true;
+                    else {
+                        removeKey(dataClass, key);
+                        return false;
+                    }
+                })
                 .doOnEach(stringNotification -> {
                     String key = stringNotification.getValue();
+                    removeKey(dataClass, key);
                     Log.d("MemoryStore", className + " " + (Storo.delete(key) ? "" : "not ") +
                             "deleted!, id = " + key);
                 })
@@ -65,5 +102,23 @@ public class MemoryStore {
         for (int i = 0; i < size; i++) {
             cacheObject(idColumnName, jsonArray.optJSONObject(i), dataClass);
         }
+    }
+
+    private void addKey(Class dataType, String key) {
+        if (!mapOfIds.containsKey(dataType)) {
+            mapOfIds.put(dataType, new HashSet<>(Collections.singleton(key)));
+        } else {
+            mapOfIds.get(dataType).add(key);
+        }
+    }
+
+    private void removeKey(Class dataType, String key) {
+        if (mapOfIds.containsKey(dataType)) {
+            mapOfIds.get(dataType).remove(key);
+        }
+    }
+
+    private boolean isValid(String key) {
+        return Storo.contains(key) && !Storo.hasExpired(key).execute();
     }
 }

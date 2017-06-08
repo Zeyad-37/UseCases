@@ -42,9 +42,19 @@ class DataService implements IDataService {
     public <M> Flowable<List<M>> getList(@NonNull GetRequest getListRequest) {
         Flowable<List<M>> result;
         try {
-            result = mDataStoreFactory.dynamically(getListRequest.getUrl(), getListRequest.getDataClass())
+            Flowable<List<M>> dynamicGetList = mDataStoreFactory.dynamically(getListRequest.getUrl(),
+                    getListRequest.getDataClass())
                     .dynamicGetList(getListRequest.getUrl(), getListRequest.getDataClass(),
                             getListRequest.isPersist(), getListRequest.isShouldCache());
+            if (Config.isWithCache() && getListRequest.isShouldCache()) {
+                result = mDataStoreFactory.memory().<M>getAllItems(getListRequest.getDataClass())
+                        .doOnSuccess(m -> Log.d("getItem", "cache Hit" + m.getClass().getSimpleName()))
+                        .doOnError(throwable -> Log.d("getItem", "cache Miss"))
+                        .toFlowable()
+                        .onErrorResumeNext(t -> dynamicGetList);
+            } else {
+                result = dynamicGetList;
+            }
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
         }
@@ -77,18 +87,21 @@ class DataService implements IDataService {
     public <M> Flowable<M> getObject(@NonNull GetRequest getRequest) {
         Flowable<M> result;
         try {
-            Flowable<M> dynamicGetObject = mDataStoreFactory.dynamically(getRequest.getUrl(), getRequest.getDataClass())
+            Flowable<M> dynamicGetObject = mDataStoreFactory.dynamically(getRequest.getUrl(),
+                    getRequest.getDataClass())
                     .dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
                             getRequest.getItemId(), getRequest.getIdType(), getRequest.getDataClass(),
                             getRequest.isPersist(), getRequest.isShouldCache());
             if (Config.isWithCache()) {
                 result = mDataStoreFactory.memory()
-                        .<M>getObject(String.valueOf(getRequest.getItemId()), getRequest.getDataClass())
-                        .doOnSuccess(m -> Log.d("getObject", "cache Hit" + m.getClass().getSimpleName()))
-                        .doOnError(throwable -> Log.d("getObject", "cache Miss"))
+                        .<M>getItem(String.valueOf(getRequest.getItemId()), getRequest.getDataClass())
+                        .doOnSuccess(m -> Log.d("getItem", "cache Hit" + m.getClass().getSimpleName()))
+                        .doOnError(throwable -> Log.d("getItem", "cache Miss"))
                         .toFlowable()
                         .onErrorResumeNext(t -> dynamicGetObject);
-            } else result = dynamicGetObject;
+            } else {
+                result = dynamicGetObject;
+            }
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
         }
@@ -101,7 +114,7 @@ class DataService implements IDataService {
         try {
             if (Config.isWithCache()) {
                 result = mDataStoreFactory.memory()
-                        .<M>getObject(String.valueOf(getRequest.getItemId()), getRequest.getDataClass())
+                        .<M>getItem(String.valueOf(getRequest.getItemId()), getRequest.getDataClass())
                         .doOnSuccess(m -> Log.d("getObjectOffLineFirst", "cache Hit" + m.getClass().getSimpleName()))
                         .doOnError(throwable -> Log.d("getObjectOffLineFirst", "cache Miss"))
                         .toFlowable();
