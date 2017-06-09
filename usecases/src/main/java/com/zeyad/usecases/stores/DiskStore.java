@@ -40,7 +40,7 @@ public class DiskStore implements DataStore {
                                             @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         return mDataBaseManager.<M>getById(idColumnName, itemId, itemIdType, dataClass)
                 .doOnEach(notification -> {
-                    if (cachable(shouldCache)) {
+                    if (Utils.getInstance().withCache(shouldCache)) {
                         mMemoryStore.cacheObject(idColumnName,
                                 new JSONObject(gson.toJson(notification.getValue())), dataClass);
                     }
@@ -74,7 +74,7 @@ public class DiskStore implements DataStore {
         List<Long> convertToListOfId = Utils.getInstance().convertToListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
                 .doOnSuccess(object -> {
-                    if (cachable(cache)) {
+                    if (Utils.getInstance().withCache(cache)) {
                         mMemoryStore.deleteList(convertToListOfId, dataClass);
                     }
                 }).toFlowable();
@@ -87,7 +87,7 @@ public class DiskStore implements DataStore {
                                        boolean cache, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnSuccess(object -> {
-                    if (cachable(cache)) {
+                    if (Utils.getInstance().withCache(cache)) {
                         mMemoryStore.cacheObject(idColumnName,
                                 new JSONObject(gson.toJson(jsonObject)), dataClass);
                     }
@@ -102,7 +102,7 @@ public class DiskStore implements DataStore {
                                       boolean cache, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnSuccess(object -> {
-                    if (cachable(cache)) {
+                    if (Utils.getInstance().withCache(cache)) {
                         mMemoryStore.cacheObject(idColumnName,
                                 new JSONObject(gson.toJson(jsonObject)), dataClass);
                     }
@@ -127,7 +127,7 @@ public class DiskStore implements DataStore {
                                      boolean cache, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                 .doOnSuccess(object -> {
-                    if (cachable(cache)) {
+                    if (Utils.getInstance().withCache(cache)) {
                         mMemoryStore.cacheObject(idColumnName,
                                 new JSONObject(gson.toJson(jsonObject)), dataClass);
                     }
@@ -157,9 +157,5 @@ public class DiskStore implements DataStore {
     public Flowable dynamicDownloadFile(
             String url, File file, boolean onWifi, boolean whileCharging, boolean queuable) {
         return Flowable.error(new IllegalStateException(IO_DB_ERROR));
-    }
-
-    private boolean cachable(boolean cache) {
-        return withCache && cache;
     }
 }

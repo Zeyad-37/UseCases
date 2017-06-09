@@ -56,6 +56,8 @@ public class DataServiceTest {
         dataService =
                 new DataService(
                         dataStoreFactory, AndroidSchedulers.mainThread(), mock(Scheduler.class));
+        com.zeyad.usecases.Config.setWithCache(false);
+        com.zeyad.usecases.Config.setWithSQLite(true);
     }
 
     @Test
@@ -113,7 +115,7 @@ public class DataServiceTest {
 
         verify(dataStoreFactory.cloud(Object.class), times(1))
                 .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean());
-        verify(dataStoreFactory.disk(Object.class), times(1))
+        verify(dataStoreFactory.disk(Object.class), times(0))
                 .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean());
     }
 

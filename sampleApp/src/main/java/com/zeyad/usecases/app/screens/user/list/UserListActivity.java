@@ -103,6 +103,12 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                         .subscribe(new UISubscriber<>(this, errorMessageFactory)));
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        viewModel.getUser().compose(bindToLifecycle()).subscribe(user -> Log.d("Test", user.toString()));
+    }
+
     @NonNull
     private SuccessStateAccumulator<UserListState> getUserListStateSuccessStateAccumulator() {
         return (newResult, event, currentStateBundle) -> {

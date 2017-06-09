@@ -15,6 +15,7 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.Lifetime;
 import com.firebase.jobdispatcher.RetryStrategy;
 import com.firebase.jobdispatcher.Trigger;
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.PostRequest;
 import com.zeyad.usecases.services.GenericJobService;
@@ -142,5 +143,13 @@ public class Utils {
     @NonNull
     public JSONObject getErrorJsonObject(HttpException exception) throws JSONException, IOException {
         return new JSONObject(exception.response().errorBody().string());
+    }
+
+    public boolean withDisk(boolean shouldPersist) {
+        return Config.isWithDisk() && shouldPersist;
+    }
+
+    public boolean withCache(boolean shouldCache) {
+        return Config.isWithCache() && shouldCache;
     }
 }

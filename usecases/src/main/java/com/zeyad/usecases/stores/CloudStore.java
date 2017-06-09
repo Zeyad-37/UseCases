@@ -106,7 +106,7 @@ public class CloudStore implements DataStore {
         return mApiConnection.dynamicGetList(url, shouldCache)
                 .map(entities -> mEntityDataMapper.<List<M>>mapAllTo(entities, dataClass))
                 .doOnNext(list -> {
-                    if (willSaveToDisk(saveToDisk)) {
+                    if (Utils.getInstance().withDisk(saveToDisk)) {
                         saveAllToDisk(list, dataClass);
                     }
                 });
@@ -396,14 +396,6 @@ public class CloudStore implements DataStore {
                 mEntityDataMapper.mapTo(object, dataClass);
     }
 
-    private boolean willSaveToDisk(boolean saveToDisk) {
-        return saveToDisk && mCanPersist;
-    }
-
-    private boolean willCache(boolean cache) {
-        return cache && canCache;
-    }
-
     private boolean isNetworkFailure(Throwable throwable) {
         return throwable instanceof UnknownHostException
                 || throwable instanceof ConnectException
@@ -488,37 +480,37 @@ public class CloudStore implements DataStore {
 
     private void saveLocally(String idColumnName, @NonNull JSONObject jsonObject,
                              @NonNull Class dataClass, boolean saveToDisk, boolean cache) {
-        if (willSaveToDisk(saveToDisk)) {
+        if (Utils.getInstance().withDisk(saveToDisk)) {
             mDataBaseManager.put(jsonObject, idColumnName, dataClass)
                     .subscribeOn(Config.getBackgroundThread())
                     .subscribe(new SimpleSubscriber(dataClass));
         }
-        if (willCache(cache)) {
+        if (Utils.getInstance().withCache(cache)) {
             mMemoryStore.cacheObject(idColumnName, jsonObject, dataClass);
         }
     }
 
     private void saveAllLocally(String idColumnName, @NonNull JSONArray jsonArray,
                                 @NonNull Class dataClass, boolean saveToDisk, boolean cache) {
-        if (willSaveToDisk(saveToDisk)) {
+        if (Utils.getInstance().withDisk(saveToDisk)) {
             mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
                     .subscribeOn(Config.getBackgroundThread())
                     .subscribe(new SimpleSubscriber(dataClass));
         }
-        if (willCache(cache)) {
+        if (Utils.getInstance().withCache(cache)) {
             mMemoryStore.cacheList(idColumnName, jsonArray, dataClass);
         }
     }
 
     private void deleteLocally(List<Long> ids, String idColumnName, Class dataClass,
                                boolean saveToDisk, boolean cache) {
-        if (willSaveToDisk(saveToDisk)) {
+        if (Utils.getInstance().withDisk(saveToDisk)) {
             int collectionSize = ids.size();
             for (int i = 0; i < collectionSize; i++) {
                 mDataBaseManager.evictById(dataClass, idColumnName, ids.get(i));
             }
         }
-        if (willCache(cache)) {
+        if (Utils.getInstance().withCache(cache)) {
             mMemoryStore.deleteList(ids, dataClass);
         }
     }

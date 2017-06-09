@@ -86,6 +86,8 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 new MemoryStore(com.zeyad.usecases.Config.getGson()), utils);
         HandlerThread backgroundThread = new HandlerThread("backgroundThread");
         backgroundThread.start();
+        com.zeyad.usecases.Config.setWithCache(false);
+        com.zeyad.usecases.Config.setWithSQLite(true);
         com.zeyad.usecases.Config
                 .setBackgroundThread(AndroidSchedulers.from(backgroundThread.getLooper()));
     }

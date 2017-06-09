@@ -52,6 +52,12 @@ public class UserListVM extends BaseViewModel<UserListState> {
         };
     }
 
+    public Flowable<User> getUser() {
+        return dataUseCase.getObject(new GetRequest.Builder(User.class, true)
+                .id("Zeyad-37", User.LOGIN, String.class)
+                .build());
+    }
+
     public Flowable<List<User>> getUsers(long lastId) {
         return lastId == 0 ?
                 dataUseCase.getListOffLineFirst(new GetRequest.Builder(User.class, true)
