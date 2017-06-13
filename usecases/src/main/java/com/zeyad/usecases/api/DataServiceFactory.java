@@ -60,15 +60,15 @@ public final class DataServiceFactory {
                     .setGsonInstance(Config.getGson())
                     .initialize();
         }
-        HandlerThread backgroundThread = config.getHandlerThread();
+        HandlerThread handlerThread = config.getHandlerThread();
         if (config.isWithRealm()) {
-            backgroundThread.start();
-            Config.setBackgroundThread(AndroidSchedulers.from(backgroundThread.getLooper()));
+            handlerThread.start();
+            Config.setBackgroundThread(AndroidSchedulers.from(handlerThread.getLooper()));
         }
         ApiConnection apiConnection = new ApiConnection(ApiConnection.init(config.getOkHttpBuilder()),
                 ApiConnection.initWithCache(config.getOkHttpBuilder(), config.getOkHttpCache()));
         dataBaseManagerUtil = config.isWithRealm() || isSQLite ? isSQLite ? dataBaseManagerUtil :
-                dataClass -> new RealmManager(backgroundThread.getLooper()) : null;
+                dataClass -> new RealmManager() : null;
         sDataUseCase = new DataService(new DataStoreFactory(dataBaseManagerUtil, apiConnection,
                 config.getEntityMapper()), config.getPostExecutionThread(), Config.getBackgroundThread());
         Config.setApiConnection(apiConnection);

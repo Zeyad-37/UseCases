@@ -35,7 +35,7 @@ public class PostRequest implements Parcelable {
     public static final String POST = "post", DELETE = "delete", PUT = "put", PATCH = "patch";
     private static final String DEFAULT_ID_KEY = "id";
     private final String url, idColumnName, method;
-    private final Class requestType, responseType;
+    private final Class requestType, responseType, idType;
     private final boolean onWifi, whileCharging, persist, queuable, cache;
     private final JSONObject jsonObject;
     private final JSONArray jsonArray;
@@ -54,6 +54,7 @@ public class PostRequest implements Parcelable {
         jsonObject = builder.jsonObject;
         jsonArray = builder.jsonArray;
         idColumnName = builder.idColumnName;
+        idType = builder.idType;
         method = builder.method;
         object = builder.object;
         cache = builder.cache;
@@ -65,6 +66,7 @@ public class PostRequest implements Parcelable {
         this.method = in.readString();
         this.requestType = (Class) in.readSerializable();
         this.responseType = (Class) in.readSerializable();
+        this.idType = (Class) in.readSerializable();
         this.persist = in.readByte() != 0;
         this.whileCharging = in.readByte() != 0;
         this.onWifi = in.readByte() != 0;
@@ -155,6 +157,10 @@ public class PostRequest implements Parcelable {
         return whileCharging;
     }
 
+    public Class getIdType() {
+        return idType;
+    }
+
     @NonNull
     public Class getResponseType() {
         return responseType == null ? requestType : responseType;
@@ -172,6 +178,7 @@ public class PostRequest implements Parcelable {
         dest.writeString(this.method);
         dest.writeSerializable(this.requestType);
         dest.writeSerializable(this.responseType);
+        dest.writeSerializable(this.idType);
         dest.writeByte(this.persist ? (byte) 1 : (byte) 0);
         dest.writeByte(this.whileCharging ? (byte) 1 : (byte) 0);
         dest.writeByte(this.onWifi ? (byte) 1 : (byte) 0);
@@ -189,7 +196,7 @@ public class PostRequest implements Parcelable {
         JSONObject jsonObject;
         HashMap<String, Object> keyValuePairs;
         String url, idColumnName, method;
-        Class requestType, responseType;
+        Class requestType, responseType, idType;
         boolean persist, queuable, cache, onWifi, whileCharging;
 
         public Builder(Class requestType, boolean persist) {
@@ -246,8 +253,9 @@ public class PostRequest implements Parcelable {
         }
 
         @NonNull
-        public Builder idColumnName(String idColumnName) {
+        public Builder idColumnName(String idColumnName, Class type) {
             this.idColumnName = idColumnName;
+            idType = type;
             return this;
         }
 

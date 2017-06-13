@@ -61,7 +61,7 @@ public interface DataBaseManager {
      * @param dataClass  Class type of the items to be put.
      */
     @NonNull
-    Single<Boolean> put(JSONObject jsonObject, String idColumnName, Class dataClass);
+    Single<Boolean> put(JSONObject jsonObject, String idColumnName, Class itemIdType, Class dataClass);
 
     /**
      * Puts and element into the DB.
@@ -80,7 +80,7 @@ public interface DataBaseManager {
      * @param dataClass    Class type of the items to be put.
      */
     @NonNull
-    Single<Boolean> putAll(JSONArray jsonArray, String idColumnName, Class dataClass);
+    Single<Boolean> putAll(JSONArray jsonArray, String idColumnName, Class itemIdType, Class dataClass);
 
     /**
      * Evict all elements of the DB.

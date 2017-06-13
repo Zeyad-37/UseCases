@@ -33,7 +33,7 @@ public class PostRequestTest {
         mPostRequest =
                 new PostRequest.Builder(DATA_CLASS, TO_PERSIST)
                         .payLoad(HASH_MAP)
-                        .idColumnName(ID_COLUMN_NAME)
+                        .idColumnName(ID_COLUMN_NAME, int.class)
                         .payLoad(JSON_ARRAY)
                         .payLoad(JSON_OBJECT)
                         .fullUrl(URL)

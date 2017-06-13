@@ -101,62 +101,62 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
 
     @Test
     public void testDynamicPatchObject() throws Exception {
-        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class)))
+        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class)))
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicPatchObject(
-                "", "", new JSONObject(), Object.class, Object.class, false, false, false);
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, false);
 
         Mockito.verify(dbManager, times(1))
-                .put(any(JSONObject.class), anyString(), any(Class.class));
+                .put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class));
     }
 
     @Test
     public void testDynamicPostObject() throws Exception {
-        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class)))
+        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class)))
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicPostObject(
-                "", "", new JSONObject(), Object.class, Object.class, false, false, false);
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, false);
 
         Mockito.verify(dbManager, times(1))
-                .put(any(JSONObject.class), anyString(), any(Class.class));
+                .put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class));
     }
 
     @Test
     public void testDynamicPutObject() throws Exception {
-        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class)))
+        when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class)))
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicPutObject(
-                "", "", new JSONObject(), Object.class, Object.class, false, false, false);
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, false);
 
         Mockito.verify(dbManager, times(1))
-                .put(any(JSONObject.class), anyString(), any(Class.class));
+                .put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class));
     }
 
     @Test
     public void testDynamicPostList() throws Exception {
-        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class)))
+        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class), any(Class.class)))
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicPostList(
-                "", "", new JSONArray(), Object.class, Object.class, false, false, false);
+                "", "", int.class, new JSONArray(), Object.class, Object.class, false, false, false);
 
         Mockito.verify(dbManager, times(1))
-                .putAll(any(JSONArray.class), anyString(), any(Class.class));
+                .putAll(any(JSONArray.class), anyString(), any(Class.class), any(Class.class));
     }
 
     @Test
     public void testDynamicPutList() throws Exception {
-        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class)))
+        when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class), any(Class.class)))
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicPutList(
-                "", "", new JSONArray(), Object.class, Object.class, false, false, false);
+                "", "", int.class, new JSONArray(), Object.class, Object.class, false, false, false);
 
         Mockito.verify(dbManager, times(1))
-                .putAll(any(JSONArray.class), anyString(), any(Class.class));
+                .putAll(any(JSONArray.class), anyString(), any(Class.class), any(Class.class));
     }
 
     @Test(expected = IllegalStateException.class)

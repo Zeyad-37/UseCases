@@ -27,7 +27,7 @@ public class GenericJobServiceLogicTest {
         Bundle extras = new Bundle(2);
         extras.putString(GenericJobService.JOB_TYPE, GenericJobService.POST);
         extras.putParcelable(PAYLOAD, new PostRequest.Builder(null, true)
-                .idColumnName("id")
+                .idColumnName("id", int.class)
                 .payLoad(new JSONArray())
                 .url("")
                 .method(POST)

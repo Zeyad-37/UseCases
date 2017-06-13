@@ -44,44 +44,45 @@ public interface DataStore {
      * Patch a JSONObject which returns an {@link Flowable} that will emit a Object.
      */
     @NonNull
-    <M> Flowable<M> dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                       Class requestType, Class responseType, boolean persist,
-                                       boolean cache, boolean queuable);
+    <M> Flowable<M> dynamicPatchObject(String url, String idColumnName, Class itemIdType,
+                                       @NonNull JSONObject jsonObject, Class requestType,
+                                       Class responseType, boolean persist, boolean cache,
+                                       boolean queuable);
 
     /**
      * Post a JSONObject which returns an {@link Flowable} that will emit a Object.
      */
     @NonNull
-    <M> Flowable<M> dynamicPostObject(String url, String idColumnName, JSONObject keyValuePairs,
-                                      Class requestType, Class responseType, boolean persist,
-                                      boolean cache, boolean queuable);
+    <M> Flowable<M> dynamicPostObject(String url, String idColumnName, Class itemIdType,
+                                      JSONObject keyValuePairs, Class requestType, Class responseType,
+                                      boolean persist, boolean cache, boolean queuable);
 
     /**
      * Post a HashMap<String, Object> which returns an {@link Flowable} that will emit a list of
      * Object.
      */
     @NonNull
-    <M> Flowable<M> dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
-                                    Class requestType, Class responseType, boolean persist,
-                                    boolean cache, boolean queuable);
+    <M> Flowable<M> dynamicPostList(String url, String idColumnName, Class itemIdType,
+                                    JSONArray jsonArray, Class requestType, Class responseType,
+                                    boolean persist, boolean cache, boolean queuable);
 
     /**
      * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Flowable} that
      * will emit a Object.
      */
     @NonNull
-    <M> Flowable<M> dynamicPutObject(String url, String idColumnName, JSONObject keyValuePairs,
-                                     Class requestType, Class responseType, boolean persist,
-                                     boolean cache, boolean queuable);
+    <M> Flowable<M> dynamicPutObject(String url, String idColumnName, Class itemIdType,
+                                     JSONObject keyValuePairs, Class requestType, Class responseType,
+                                     boolean persist, boolean cache, boolean queuable);
 
     /**
      * Put a HashMap<String, Object> disk with a RealmQuery which returns an {@link Flowable} that
      * will emit a list of Object.
      */
     @NonNull
-    <M> Flowable<M> dynamicPutList(String url, String idColumnName, JSONArray jsonArray,
-                                   Class requestType, Class responseType, boolean persist,
-                                   boolean cache, boolean queuable);
+    <M> Flowable<M> dynamicPutList(String url, String idColumnName, Class itemIdType,
+                                   JSONArray jsonArray, Class requestType, Class responseType,
+                                   boolean persist, boolean cache, boolean queuable);
 
     /**
      * Delete a HashMap<String, Object> from cloud which returns an {@link Flowable} that will emit

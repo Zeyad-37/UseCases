@@ -1,7 +1,5 @@
 package com.zeyad.usecases.db;
 
-import android.os.Handler;
-import android.os.Looper;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
@@ -30,10 +28,8 @@ import io.realm.RealmResults;
 public class RealmManager implements DataBaseManager {
 
     private static final String NO_ID = "Could not find id!";
-    private final Handler backgroundHandler;
 
-    public RealmManager(Looper backgroundLooper) {
-        backgroundHandler = new Handler(backgroundLooper);
+    public RealmManager() {
     }
 
     /**
@@ -117,23 +113,16 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
+    // TODO: 6/13/17 Remove ? remove : create flow
     public <M extends RealmModel> Single<Boolean> put(@Nullable M realmModel, @NonNull Class dataClass) {
         return Single.fromCallable(() -> {
             if (realmModel == null) {
                 throw new IllegalArgumentException("RealmObject is null");
             } else {
-//                return getRealm(Realm.getDefaultInstance()).map(realm1 ->
-//                        RealmObject.isValid(executeWriteOperationInRealm(realm1,
-//                                () -> realm1.copyToRealmOrUpdate(realmModel))))
-//                        .blockingFirst();
-                Realm realm = Realm.getDefaultInstance();
-                try {
-                    RealmModel result =
-                            executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmModel));
-                    return RealmObject.isValid(result);
-                } finally {
-                    closeRealm(realm);
-                }
+                return getRealm(Realm.getDefaultInstance()).map(realm1 ->
+                        RealmObject.isValid(executeWriteOperationInRealm(realm1,
+                                () -> realm1.copyToRealmOrUpdate(realmModel))))
+                        .blockingFirst();
             }
         });
     }
@@ -148,24 +137,16 @@ public class RealmManager implements DataBaseManager {
     @NonNull
     @Override
     public Single<Boolean> put(@Nullable JSONObject jsonObject, @Nullable String idColumnName,
-                               @NonNull Class dataClass) {
+                               Class itemIdType, @NonNull Class dataClass) {
         return Single.fromCallable(() -> {
             if (jsonObject == null) {
                 throw new IllegalArgumentException("JSONObject is invalid");
             } else {
-                updateJsonObjectWithIdValue(jsonObject, idColumnName, dataClass);
-//                return getRealm(Realm.getDefaultInstance()).map(realm1 ->
-//                        RealmObject.isValid(executeWriteOperationInRealm(realm1,
-//                                () -> realm1.createOrUpdateObjectFromJson(dataClass, jsonObject))))
-//                        .blockingFirst();
-                Realm realm = Realm.getDefaultInstance();
-                try {
-                    RealmModel result = executeWriteOperationInRealm(realm,
-                            () -> realm.createOrUpdateObjectFromJson(dataClass, jsonObject));
-                    return RealmObject.isValid(result);
-                } finally {
-                    closeRealm(realm);
-                }
+                updateJsonObjectWithIdValue(jsonObject, idColumnName, itemIdType, dataClass);
+                return getRealm(Realm.getDefaultInstance()).map(realm1 ->
+                        RealmObject.isValid(executeWriteOperationInRealm(realm1,
+                                () -> realm1.createOrUpdateObjectFromJson(dataClass, jsonObject))))
+                        .blockingFirst();
             }
         });
     }
@@ -179,42 +160,25 @@ public class RealmManager implements DataBaseManager {
      */
     @NonNull
     @Override
-    public Single<Boolean> putAll(@NonNull JSONArray jsonArray, String idColumnName, @NonNull Class dataClass) {
+    public Single<Boolean> putAll(@NonNull JSONArray jsonArray, String idColumnName, Class itemIdType,
+                                  @NonNull Class dataClass) {
         return Single.fromCallable(() -> {
-            updateJsonArrayWithIdValue(jsonArray, idColumnName, dataClass);
-//            return getRealm(Realm.getDefaultInstance()).map(realm1 -> {
-//                executeWriteOperationInRealm(realm1, () ->
-//                        realm1.createOrUpdateAllFromJson(dataClass, jsonArray));
-//                return true;
-//            }).blockingFirst();
-            Realm realm = Realm.getDefaultInstance();
-            try {
-                executeWriteOperationInRealm(realm,
-                        () -> realm.createOrUpdateAllFromJson(dataClass, jsonArray));
+            updateJsonArrayWithIdValue(jsonArray, idColumnName, itemIdType, dataClass);
+            return getRealm(Realm.getDefaultInstance()).map(realm1 -> {
+                executeWriteOperationInRealm(realm1, () ->
+                        realm1.createOrUpdateAllFromJson(dataClass, jsonArray));
                 return true;
-            } finally {
-                closeRealm(realm);
-            }
+            }).blockingFirst();
         });
     }
 
     @NonNull
     @Override
-    public <T extends RealmModel> Single putAll(List<T> realmObjects, Class dataClass) {
-        return Single.fromCallable(() -> {
-//            return getRealm(Realm.getDefaultInstance()).map(realm1 -> {
-//                executeWriteOperationInRealm(realm1,
-//                        () -> realm1.copyToRealmOrUpdate(realmObjects));
-//                return true;
-//            }).blockingFirst();
-            Realm realm = Realm.getDefaultInstance();
-            try {
-                executeWriteOperationInRealm(realm, () -> realm.copyToRealmOrUpdate(realmObjects));
-                return true;
-            } finally {
-                closeRealm(realm);
-            }
-        });
+    public <T extends RealmModel> Single<Boolean> putAll(List<T> realmObjects, Class dataClass) {
+        return Single.fromCallable(() -> getRealm(Realm.getDefaultInstance())
+                .map(realm1 -> executeWriteOperationInRealm(realm1,
+                        () -> realm1.copyToRealmOrUpdate(realmObjects)).size() == realmObjects.size())
+                .blockingFirst());
     }
 
     /**
@@ -225,19 +189,11 @@ public class RealmManager implements DataBaseManager {
     @NonNull
     @Override
     public Single<Boolean> evictAll(@NonNull Class clazz) {
-        return Single.fromCallable(() -> {
-//            return getRealm(Realm.getDefaultInstance()).map(realm1 -> {
-//                executeWriteOperationInRealm(realm1, () -> realm1.delete(clazz));
-//                return true;
-//            }).blockingFirst();
-            Realm realm = Realm.getDefaultInstance();
-            try {
-                executeWriteOperationInRealm(realm, () -> realm.delete(clazz));
-                return true;
-            } finally {
-                closeRealm(realm);
-            }
-        });
+        return Single.fromCallable(() -> getRealm(Realm.getDefaultInstance())
+                .map(realm1 -> {
+                    executeWriteOperationInRealm(realm1, () -> realm1.delete(clazz));
+                    return true;
+                }).blockingFirst());
     }
 
     /**
@@ -250,34 +206,22 @@ public class RealmManager implements DataBaseManager {
     @Override
     public boolean evictById(@NonNull Class clazz, @NonNull String idFieldName, final long idFieldValue) {
         Realm realm = Realm.getDefaultInstance();
-//        return getRealm(Realm.getDefaultInstance()).map(realm1 ->
-//                realm1.where(clazz).equalTo(idFieldName, idFieldValue).findFirst())
-//                .map(realmModel -> {
-//                    if (realmModel == null) {
-//                        return false;
-//                    } else {
-//                        executeWriteOperationInRealm(realm, () -> RealmObject.deleteFromRealm(realmModel));
-//                        return !RealmObject.isValid(realmModel);
-//                    }
-//                })
-//                .blockingFirst();
-        try {
-            RealmModel toDelete = realm.where(clazz).equalTo(idFieldName, idFieldValue).findFirst();
-            if (toDelete == null) {
-                return false;
-            } else {
-                //                executeWriteOperationInRealm(realm, () -> RealmObject.deleteFromRealm(toDelete));
-                executeWriteOperationInRealm(realm, new Execute() {
-                    @Override
-                    public void run() {
-                        RealmObject.deleteFromRealm(toDelete);
+        return getRealm(Realm.getDefaultInstance()).map(realm1 ->
+                realm1.where(clazz).equalTo(idFieldName, idFieldValue).findFirst())
+                .map(realmModel -> {
+                    if (realmModel == null) {
+                        return false;
+                    } else {
+                        executeWriteOperationInRealm(realm, new Execute() {
+                            @Override
+                            public void run() {
+                                RealmObject.deleteFromRealm(realmModel);
+                            }
+                        });
+                        return !RealmObject.isValid(realmModel);
                     }
-                });
-                return !RealmObject.isValid(toDelete);
-            }
-        } finally {
-            closeRealm(realm);
-        }
+                })
+                .blockingFirst();
     }
 
     /**
@@ -295,15 +239,6 @@ public class RealmManager implements DataBaseManager {
                 .map(aLong -> evictById(dataClass, idFieldName, aLong))
                 .reduce((aBoolean, aBoolean2) -> aBoolean && aBoolean2)
                 .blockingGet());
-    }
-
-    private void closeRealm(@NonNull Realm realm) {
-        backgroundHandler.post(() -> {
-            if (!realm.isClosed()) {
-                realm.close();
-                Log.d(RealmManager.class.getSimpleName(), "realm instance closed!");
-            }
-        });
     }
 
     private void executeWriteOperationInRealm(@NonNull Realm realm, @NonNull Execute execute) {
@@ -328,27 +263,28 @@ public class RealmManager implements DataBaseManager {
 
     @NonNull
     private JSONArray updateJsonArrayWithIdValue(@NonNull JSONArray jsonArray, @Nullable String idColumnName,
-                                                 Class dataClass) throws JSONException {
+                                                 Class itemIdType, Class dataClass) throws JSONException {
         if (idColumnName == null || idColumnName.isEmpty()) {
             throw new IllegalArgumentException(NO_ID);
         }
         int length = jsonArray.length();
         for (int i = 0; i < length; i++) {
             if (jsonArray.opt(i) instanceof JSONObject) {
-                updateJsonObjectWithIdValue(jsonArray.optJSONObject(i), idColumnName, dataClass);
+                updateJsonObjectWithIdValue(jsonArray.optJSONObject(i), idColumnName, itemIdType, dataClass);
             }
         }
         return jsonArray;
     }
 
-    // TODO: 6/6/17 Added String support
     @NonNull
     private JSONObject updateJsonObjectWithIdValue(@NonNull JSONObject jsonObject, @Nullable String idColumnName,
-                                                   Class dataClass) throws JSONException {
+                                                   Class itemIdType, Class dataClass) throws JSONException {
         if (idColumnName == null || idColumnName.isEmpty()) {
             throw new IllegalArgumentException(NO_ID);
         }
-        if (jsonObject.optInt(idColumnName) == 0) {
+        if (itemIdType.equals(String.class))
+            return jsonObject;
+        else if (jsonObject.optInt(idColumnName) == 0) {
             jsonObject.put(idColumnName, getNextId(dataClass, idColumnName));
         }
         return jsonObject;
@@ -372,7 +308,7 @@ public class RealmManager implements DataBaseManager {
             emitter.setDisposable(Disposables.fromRunnable(() -> {
                 observableRealm.removeChangeListener(listener);
                 observableRealm.close();
-                Log.d(RealmManager.class.getSimpleName(), "realm instance closed!");
+                Log.d(RealmManager.class.getSimpleName(), "Realm instance closed!");
             }));
             observableRealm.addChangeListener(listener);
             emitter.onNext(observableRealm);

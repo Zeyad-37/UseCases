@@ -39,10 +39,10 @@ public class DiskStore implements DataStore {
     public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Object itemId, Class itemIdType,
                                             @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         return mDataBaseManager.<M>getById(idColumnName, itemId, itemIdType, dataClass)
-                .doOnEach(notification -> {
+                .doOnNext(m -> {
                     if (Utils.getInstance().withCache(shouldCache)) {
                         mMemoryStore.cacheObject(idColumnName,
-                                new JSONObject(gson.toJson(notification.getValue())), dataClass);
+                                new JSONObject(gson.toJson(m)), dataClass);
                     }
                 });
     }
@@ -82,10 +82,10 @@ public class DiskStore implements DataStore {
 
     @NonNull
     @Override
-    public Flowable dynamicPatchObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                       @NonNull Class dataClass, Class responseType, boolean persist,
-                                       boolean cache, boolean queuable) {
-        return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+    public Flowable dynamicPatchObject(String url, String idColumnName, Class itemIdType,
+                                       @NonNull JSONObject jsonObject, @NonNull Class dataClass,
+                                       Class responseType, boolean persist, boolean cache, boolean queuable) {
+        return mDataBaseManager.put(jsonObject, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(object -> {
                     if (Utils.getInstance().withCache(cache)) {
                         mMemoryStore.cacheObject(idColumnName,
@@ -97,10 +97,10 @@ public class DiskStore implements DataStore {
 
     @NonNull
     @Override
-    public Flowable dynamicPostObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                      @NonNull Class dataClass, Class responseType, boolean persist,
-                                      boolean cache, boolean queuable) {
-        return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+    public Flowable dynamicPostObject(String url, String idColumnName, Class itemIdType,
+                                      @NonNull JSONObject jsonObject, @NonNull Class dataClass,
+                                      Class responseType, boolean persist, boolean cache, boolean queuable) {
+        return mDataBaseManager.put(jsonObject, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(object -> {
                     if (Utils.getInstance().withCache(cache)) {
                         mMemoryStore.cacheObject(idColumnName,
@@ -112,20 +112,20 @@ public class DiskStore implements DataStore {
 
     @NonNull
     @Override
-    public Flowable dynamicPostList(String url, String idColumnName, JSONArray jsonArray,
-                                    Class dataClass, Class responseType, boolean persist,
-                                    boolean cache, boolean queuable) {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
+    public Flowable dynamicPostList(String url, String idColumnName, Class itemIdType,
+                                    JSONArray jsonArray, Class dataClass, Class responseType,
+                                    boolean persist, boolean cache, boolean queuable) {
+        return mDataBaseManager.putAll(jsonArray, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(aBoolean -> mMemoryStore.cacheList(idColumnName, jsonArray, dataClass))
                 .toFlowable();
     }
 
     @NonNull
     @Override
-    public Flowable dynamicPutObject(String url, String idColumnName, @NonNull JSONObject jsonObject,
-                                     @NonNull Class dataClass, Class responseType, boolean persist,
-                                     boolean cache, boolean queuable) {
-        return mDataBaseManager.put(jsonObject, idColumnName, dataClass)
+    public Flowable dynamicPutObject(String url, String idColumnName, Class itemIdType,
+                                     @NonNull JSONObject jsonObject, @NonNull Class dataClass,
+                                     Class responseType, boolean persist, boolean cache, boolean queuable) {
+        return mDataBaseManager.put(jsonObject, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(object -> {
                     if (Utils.getInstance().withCache(cache)) {
                         mMemoryStore.cacheObject(idColumnName,
@@ -137,9 +137,10 @@ public class DiskStore implements DataStore {
 
     @NonNull
     @Override
-    public Flowable dynamicPutList(String url, String idColumnName, JSONArray jsonArray, Class dataClass,
-                                   Class responseType, boolean persist, boolean cache, boolean queuable) {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, dataClass)
+    public Flowable dynamicPutList(String url, String idColumnName, Class itemIdType,
+                                   JSONArray jsonArray, Class dataClass, Class responseType,
+                                   boolean persist, boolean cache, boolean queuable) {
+        return mDataBaseManager.putAll(jsonArray, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(aBoolean -> mMemoryStore.cacheList(idColumnName, jsonArray, dataClass))
                 .toFlowable();
     }

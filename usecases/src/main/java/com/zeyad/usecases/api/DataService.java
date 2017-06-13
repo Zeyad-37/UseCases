@@ -196,9 +196,9 @@ class DataService implements IDataService {
         try {
             result = mDataStoreFactory.dynamically(postRequest.getUrl(), postRequest.getRequestType())
                     .dynamicPatchObject(postRequest.getUrl(), postRequest.getIdColumnName(),
-                            postRequest.getObjectBundle(), postRequest.getRequestType(),
-                            postRequest.getResponseType(), postRequest.isPersist(), postRequest.isCache(),
-                            postRequest.isQueuable());
+                            postRequest.getIdType(), postRequest.getObjectBundle(),
+                            postRequest.getRequestType(), postRequest.getResponseType(),
+                            postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
         }
@@ -210,11 +210,10 @@ class DataService implements IDataService {
         Flowable<M> result;
         try {
             result = mDataStoreFactory.dynamically(postRequest.getUrl(), postRequest.getRequestType())
-                    .<M>dynamicPostObject(postRequest.getUrl(), postRequest.getIdColumnName(),
-                            postRequest.getObjectBundle(), postRequest.getRequestType(),
-                            postRequest.getResponseType(), postRequest.isPersist(), postRequest.isCache(),
-                            postRequest.isQueuable())
-                    .compose(applySchedulers());
+                    .dynamicPostObject(postRequest.getUrl(), postRequest.getIdColumnName(),
+                            postRequest.getIdType(), postRequest.getObjectBundle(),
+                            postRequest.getRequestType(), postRequest.getResponseType(),
+                            postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
         }
@@ -226,11 +225,10 @@ class DataService implements IDataService {
         Flowable<M> result;
         try {
             result = mDataStoreFactory.dynamically(postRequest.getUrl(), postRequest.getRequestType())
-                    .<M>dynamicPostList(postRequest.getUrl(), postRequest.getIdColumnName(),
-                            postRequest.getArrayBundle(), postRequest.getRequestType(),
-                            postRequest.getResponseType(), postRequest.isPersist(),
-                            postRequest.isCache(), postRequest.isQueuable())
-                    .compose(applySchedulers());
+                    .dynamicPostList(postRequest.getUrl(), postRequest.getIdColumnName(),
+                            postRequest.getIdType(), postRequest.getArrayBundle(),
+                            postRequest.getRequestType(), postRequest.getResponseType(),
+                            postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
         }
@@ -242,11 +240,10 @@ class DataService implements IDataService {
         Flowable<M> result;
         try {
             result = mDataStoreFactory.dynamically(postRequest.getUrl(), postRequest.getRequestType())
-                    .<M>dynamicPutObject(postRequest.getUrl(), postRequest.getIdColumnName(),
-                            postRequest.getObjectBundle(), postRequest.getRequestType(),
-                            postRequest.getResponseType(), postRequest.isPersist(),
-                            postRequest.isCache(), postRequest.isQueuable())
-                    .compose(applySchedulers());
+                    .dynamicPutObject(postRequest.getUrl(), postRequest.getIdColumnName(),
+                            postRequest.getIdType(), postRequest.getObjectBundle(),
+                            postRequest.getRequestType(), postRequest.getResponseType(),
+                            postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
         }
@@ -258,11 +255,10 @@ class DataService implements IDataService {
         Flowable<M> result;
         try {
             result = mDataStoreFactory.dynamically(postRequest.getUrl(), postRequest.getRequestType())
-                    .<M>dynamicPutList(postRequest.getUrl(), postRequest.getIdColumnName(),
-                            postRequest.getArrayBundle(), postRequest.getRequestType(),
-                            postRequest.getResponseType(), postRequest.isPersist(),
-                            postRequest.isCache(), postRequest.isQueuable())
-                    .compose(applySchedulers());
+                    .dynamicPutList(postRequest.getUrl(), postRequest.getIdColumnName(),
+                            postRequest.getIdType(), postRequest.getArrayBundle(),
+                            postRequest.getRequestType(), postRequest.getResponseType(),
+                            postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
         }
@@ -274,7 +270,7 @@ class DataService implements IDataService {
         PostRequest.Builder builder = new PostRequest.Builder(request.getRequestType(), request.isPersist())
                 .payLoad(Collections.singleton((Long) request.getObject()))
                 .queuable()
-                .idColumnName(request.getIdColumnName())
+                .idColumnName(request.getIdColumnName(), request.getIdType())
                 .fullUrl(request.getUrl());
         if (request.isQueuable()) {
             builder.queuable();

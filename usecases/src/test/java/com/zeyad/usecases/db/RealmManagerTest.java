@@ -1,6 +1,5 @@
 package com.zeyad.usecases.db;
 
-import android.os.HandlerThread;
 import android.support.test.rule.BuildConfig;
 
 import com.google.gson.Gson;
@@ -64,9 +63,7 @@ public class RealmManagerTest {
     @Before
     public void before() {
         mockRealm();
-        HandlerThread handlerThread = new HandlerThread("backgroundThread");
-        handlerThread.start();
-        mRealmManager = new RealmManager(handlerThread.getLooper());
+        mRealmManager = new RealmManager();
     }
 
     @Test
@@ -113,7 +110,7 @@ public class RealmManagerTest {
     @Test
     public void putJSONObject() throws Exception {
         Single<Boolean> completable = mRealmManager.put(new JSONObject(new Gson().toJson(new TestRealmModel())),
-                "id", TestRealmModel.class);
+                "id", int.class, TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 
@@ -137,7 +134,7 @@ public class RealmManagerTest {
 
     @Test
     public void putAllJSONArray() throws Exception {
-        Single<Boolean> completable = mRealmManager.putAll(new JSONArray(), "id", TestRealmModel.class);
+        Single<Boolean> completable = mRealmManager.putAll(new JSONArray(), "id", int.class, TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 

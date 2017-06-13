@@ -171,6 +171,7 @@ public class DataServiceTest {
                 .dynamicPatchObject(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONObject.class),
                         any(Class.class),
                         any(Class.class),
@@ -185,6 +186,7 @@ public class DataServiceTest {
                 .dynamicPatchObject(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONObject.class),
                         any(Class.class),
                         any(Class.class),
@@ -200,6 +202,7 @@ public class DataServiceTest {
                 .dynamicPostObject(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONObject.class),
                         any(Class.class),
                         any(Class.class),
@@ -214,6 +217,7 @@ public class DataServiceTest {
                 .dynamicPostObject(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONObject.class),
                         any(Class.class),
                         any(Class.class),
@@ -229,6 +233,7 @@ public class DataServiceTest {
                 .dynamicPostList(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
@@ -243,6 +248,7 @@ public class DataServiceTest {
                 .dynamicPostList(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
@@ -258,6 +264,7 @@ public class DataServiceTest {
                 .dynamicPutObject(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONObject.class),
                         any(Class.class),
                         any(Class.class),
@@ -272,6 +279,7 @@ public class DataServiceTest {
                 .dynamicPutObject(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONObject.class),
                         any(Class.class),
                         any(Class.class),
@@ -287,6 +295,7 @@ public class DataServiceTest {
                 .dynamicPutList(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
@@ -301,6 +310,7 @@ public class DataServiceTest {
                 .dynamicPutList(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
