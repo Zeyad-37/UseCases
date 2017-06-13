@@ -2,7 +2,6 @@ package com.zeyad.usecases.stores;
 
 import android.support.annotation.NonNull;
 
-import com.zeyad.usecases.Config;
 import com.zeyad.usecases.db.DataBaseManager;
 import com.zeyad.usecases.db.RealmQueryProvider;
 import com.zeyad.usecases.utils.Utils;
@@ -19,7 +18,6 @@ import io.reactivex.Single;
 
 public class DiskStore implements DataStore {
     private static final String IO_DB_ERROR = "Can not file IO to local DB";
-    private final boolean withCache;
     private final DataBaseManager mDataBaseManager;
     private final MemoryStore mMemoryStore;
 
@@ -30,7 +28,6 @@ public class DiskStore implements DataStore {
      */
     DiskStore(DataBaseManager realmManager, MemoryStore memoryStore) {
         mDataBaseManager = realmManager;
-        withCache = Config.isWithCache();
         mMemoryStore = memoryStore;
     }
 

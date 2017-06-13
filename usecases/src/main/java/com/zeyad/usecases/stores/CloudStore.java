@@ -106,7 +106,7 @@ public class CloudStore implements DataStore {
         return mApiConnection.dynamicGetList(url, shouldCache)
                 .map(entities -> mEntityDataMapper.<List<M>>mapAllTo(entities, dataClass))
                 .doOnNext(list -> {
-                    if (Utils.getInstance().withDisk(saveToDisk)) {
+                    if (mUtils.withDisk(saveToDisk)) {
                         saveAllToDisk(list, dataClass);
                     }
                 });
@@ -256,7 +256,7 @@ public class CloudStore implements DataStore {
                                                    @NonNull Class dataClass, Class responseType,
                                                    boolean saveToDisk, boolean cache, boolean queuable) {
         return Flowable.defer(() -> {
-            deleteLocally(Utils.getInstance().convertToListOfId(jsonArray),
+            deleteLocally(mUtils.convertToListOfId(jsonArray),
                     idColumnName, dataClass, saveToDisk, cache);
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(DELETE, url, idColumnName, null, jsonArray, saveToDisk);
@@ -487,37 +487,37 @@ public class CloudStore implements DataStore {
 
     private void saveLocally(String idColumnName, Class itemIdType, @NonNull JSONObject jsonObject,
                              @NonNull Class dataClass, boolean saveToDisk, boolean cache) {
-        if (Utils.getInstance().withDisk(saveToDisk)) {
+        if (mUtils.withDisk(saveToDisk)) {
             mDataBaseManager.put(jsonObject, idColumnName, itemIdType, dataClass)
                     .subscribeOn(Config.getBackgroundThread())
                     .subscribe(new SimpleSubscriber(dataClass));
         }
-        if (Utils.getInstance().withCache(cache)) {
+        if (mUtils.withCache(cache)) {
             mMemoryStore.cacheObject(idColumnName, jsonObject, dataClass);
         }
     }
 
     private void saveAllLocally(String idColumnName, Class itemIdType, @NonNull JSONArray jsonArray,
                                 @NonNull Class dataClass, boolean saveToDisk, boolean cache) {
-        if (Utils.getInstance().withDisk(saveToDisk)) {
+        if (mUtils.withDisk(saveToDisk)) {
             mDataBaseManager.putAll(jsonArray, idColumnName, itemIdType, dataClass)
                     .subscribeOn(Config.getBackgroundThread())
                     .subscribe(new SimpleSubscriber(dataClass));
         }
-        if (Utils.getInstance().withCache(cache)) {
+        if (mUtils.withCache(cache)) {
             mMemoryStore.cacheList(idColumnName, jsonArray, dataClass);
         }
     }
 
     private void deleteLocally(List<Long> ids, String idColumnName, Class dataClass,
                                boolean saveToDisk, boolean cache) {
-        if (Utils.getInstance().withDisk(saveToDisk)) {
+        if (mUtils.withDisk(saveToDisk)) {
             int collectionSize = ids.size();
             for (int i = 0; i < collectionSize; i++) {
                 mDataBaseManager.evictById(dataClass, idColumnName, ids.get(i));
             }
         }
-        if (Utils.getInstance().withCache(cache)) {
+        if (mUtils.withCache(cache)) {
             mMemoryStore.deleteList(ids, dataClass);
         }
     }

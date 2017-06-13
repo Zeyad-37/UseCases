@@ -40,16 +40,19 @@ public abstract class BaseViewModel<S> extends ViewModel {
                 .distinctUntilChanged((objectResult, objectResult2) ->
                         objectResult.getBundle().equals(objectResult2.getBundle()) ||
                                 (objectResult.isLoading() && objectResult2.isLoading()))
-                .scan(UIModel.idleState(initialState), (currentUIModel, result) -> {
+                .scan(UIModel.idleState(new ResultBundle<>("", initialState)), (currentUIModel, result) -> {
+                    String event = result.getEvent();
                     S bundle = currentUIModel.getBundle();
                     if (result.isLoading()) {
-                        currentUIModel = UIModel.loadingState(bundle);
+                        currentUIModel = UIModel.loadingState(new ResultBundle<>(event, bundle));
                     } else if (result.isSuccessful()) {
                         currentUIModel =
-                                UIModel.successState(successStateAccumulator.accumulateSuccessStates(
-                                        result.getBundle(), result.getEvent(), bundle));
+                                UIModel.successState(new ResultBundle<>(event,
+                                        successStateAccumulator.accumulateSuccessStates(
+                                                result.getBundle(), event, bundle)));
                     } else {
-                        currentUIModel = UIModel.errorState(result.getError(), bundle);
+                        currentUIModel = UIModel.errorState(result.getError(),
+                                new ResultBundle<>(event, bundle));
                     }
                     return currentUIModel;
                 })

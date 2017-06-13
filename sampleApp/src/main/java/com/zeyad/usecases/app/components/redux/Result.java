@@ -52,18 +52,6 @@ final class Result<B> {
     }
 
     String getEvent() {
-        return bundle.getEvent();
-    }
-
-    String getKeySelector() {
-        return state.equalsIgnoreCase(LOADING) ? state : state + (bundle != null ? bundle.toString() : "");
-    }
-
-    @Override
-    public String toString() {
-        return String.format("State: %s, Error: %s, Bundle type: %s, Key Selector: %s", state,
-                (error != null ? error.toString() : "null"),
-                (bundle != null ? bundle.getClass().getSimpleName() : "null"),
-                getKeySelector());
+        return bundle == null ? "" : bundle.getEvent();
     }
 }

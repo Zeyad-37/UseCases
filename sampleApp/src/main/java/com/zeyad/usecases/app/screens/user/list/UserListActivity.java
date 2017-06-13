@@ -106,7 +106,9 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     @Override
     protected void onResume() {
         super.onResume();
-        viewModel.getUser().compose(bindToLifecycle()).subscribe(user -> Log.d("Test", user.toString()));
+        viewModel.getUser().compose(bindToLifecycle()).subscribe(user -> Log.d("Test", user.toString()),
+                throwable -> {
+                });
     }
 
     @NonNull

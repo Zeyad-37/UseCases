@@ -53,8 +53,10 @@ public class UserListVM extends BaseViewModel<UserListState> {
     }
 
     public Flowable<User> getUser() {
-        return dataUseCase.getObject(new GetRequest.Builder(User.class, true)
+        return dataUseCase.getObjectOffLineFirst(new GetRequest.Builder(User.class, true)
+                .url(String.format(USER, "Zeyad-37"))
                 .id("Zeyad-37", User.LOGIN, String.class)
+                .cache()
                 .build());
     }
 
@@ -62,9 +64,11 @@ public class UserListVM extends BaseViewModel<UserListState> {
         return lastId == 0 ?
                 dataUseCase.getListOffLineFirst(new GetRequest.Builder(User.class, true)
                         .url(String.format(USERS, lastId))
+                        .cache()
                         .build()) :
                 dataUseCase.getList(new GetRequest.Builder(User.class, true)
                         .url(String.format(USERS, lastId))
+                        .cache()
                         .build());
     }
 
@@ -75,7 +79,8 @@ public class UserListVM extends BaseViewModel<UserListState> {
                                 .build())
                                 .onErrorReturnItem(new User())
                                 .filter(user -> user.getId() != 0)
-                                .map(user -> user != null ? Collections.singletonList(user) : Collections.emptyList()),
+                                .map(user -> user != null ?
+                                        Collections.singletonList(user) : Collections.emptyList()),
                         (BiFunction<List<User>, List<User>, List<User>>) (users, singleton) -> {
                             users.addAll(singleton);
                             return new ArrayList<>(new HashSet<>(users));

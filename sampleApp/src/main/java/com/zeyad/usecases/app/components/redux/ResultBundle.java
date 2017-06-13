@@ -13,11 +13,21 @@ class ResultBundle<E extends BaseEvent, B> {
         this.bundle = bundle;
     }
 
+    ResultBundle(String event, B bundle) {
+        this.event = event;
+        this.bundle = bundle;
+    }
+
     String getEvent() {
         return event;
     }
 
     B getBundle() {
         return bundle;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("Event: %s, bundle %s", event, (bundle != null ? bundle.toString() : ""));
     }
 }

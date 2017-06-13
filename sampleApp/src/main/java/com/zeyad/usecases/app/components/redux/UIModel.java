@@ -9,9 +9,10 @@ final class UIModel<S> {
     private final boolean isLoading, isSuccessful;
     private final Throwable error;
     private final String state;
-    private final S bundle;
+    private final ResultBundle<?, S> bundle;
 
-    private UIModel(String state, boolean isLoading, Throwable error, boolean isSuccessful, S bundle) {
+    private UIModel(String state, boolean isLoading, Throwable error, boolean isSuccessful,
+                    ResultBundle<?, S> bundle) {
         this.isLoading = isLoading;
         this.error = error;
         this.isSuccessful = isSuccessful;
@@ -19,19 +20,19 @@ final class UIModel<S> {
         this.state = state;
     }
 
-    static <B> UIModel<B> idleState(B bundle) {
+    static <S> UIModel<S> idleState(ResultBundle<?, S> bundle) {
         return new UIModel<>(IDLE, false, null, false, bundle);
     }
 
-    static <B> UIModel<B> loadingState(B bundle) {
+    static <S> UIModel<S> loadingState(ResultBundle<?, S> bundle) {
         return new UIModel<>(LOADING, true, null, false, bundle);
     }
 
-    static <B> UIModel<B> errorState(Throwable error, B bundle) {
+    static <S> UIModel<S> errorState(Throwable error, ResultBundle<?, S> bundle) {
         return new UIModel<>(ERROR, false, error, false, bundle);
     }
 
-    static <B> UIModel<B> successState(B bundle) {
+    static <S> UIModel<S> successState(ResultBundle<?, S> bundle) {
         return new UIModel<>(SUCCESS, false, null, true, bundle);
     }
 
@@ -44,6 +45,10 @@ final class UIModel<S> {
     }
 
     S getBundle() {
+        return bundle != null && bundle.getBundle() != null ? bundle.getBundle() : null;
+    }
+
+    ResultBundle<?, S> getResultBundle() {
         return bundle;
     }
 
@@ -53,9 +58,10 @@ final class UIModel<S> {
 
     @Override
     public String toString() {
-        return String.format("State: %s, Error: %s, Bundle type: %s, Key Selector: %s", state,
+        return String.format("State: %s, Error: %s, Bundle type: %s, Key Selector: %s",
+                (state.equalsIgnoreCase(SUCCESS) ? state + ", event: " + bundle.getEvent() : state),
                 (error != null ? error.toString() : "null"),
-                (bundle != null ? bundle.getClass().getSimpleName() : "null"),
+                (getBundle() != null ? getBundle().getClass().getSimpleName() : "null"),
                 state.equalsIgnoreCase(LOADING) ? state : state + (bundle != null ?
                         bundle.toString() : ""));
     }

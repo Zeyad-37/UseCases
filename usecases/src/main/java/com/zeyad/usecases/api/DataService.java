@@ -267,7 +267,8 @@ class DataService implements IDataService {
 
     @Override
     public <M> Flowable<M> deleteItemById(@NonNull PostRequest request) {
-        PostRequest.Builder builder = new PostRequest.Builder(request.getRequestType(), request.isPersist())
+        PostRequest.Builder builder = new PostRequest
+                .Builder(request.getRequestType(), request.isPersist())
                 .payLoad(Collections.singleton((Long) request.getObject()))
                 .queuable()
                 .idColumnName(request.getIdColumnName(), request.getIdType())
