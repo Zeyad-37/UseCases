@@ -3,7 +3,6 @@ package com.zeyad.usecases.api;
 import android.support.annotation.NonNull;
 import android.util.Log;
 
-import com.zeyad.usecases.Config;
 import com.zeyad.usecases.db.RealmQueryProvider;
 import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.GetRequest;
@@ -20,6 +19,7 @@ import io.reactivex.Flowable;
 import io.reactivex.FlowableTransformer;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
+import io.reactivex.functions.Function;
 
 /**
  * @author by ZIaDo on 5/9/17.
@@ -42,14 +42,16 @@ class DataService implements IDataService {
     public <M> Flowable<List<M>> getList(@NonNull GetRequest getListRequest) {
         Flowable<List<M>> result;
         try {
-            Flowable<List<M>> dynamicGetList = mDataStoreFactory.dynamically(getListRequest.getUrl(),
-                    getListRequest.getDataClass())
-                    .dynamicGetList(getListRequest.getUrl(), getListRequest.getDataClass(),
-                            getListRequest.isPersist(), getListRequest.isShouldCache());
-            if (Utils.getInstance().withCache(getListRequest.isShouldCache())) {
-                result = mDataStoreFactory.memory().<M>getAllItems(getListRequest.getDataClass())
-                        .doOnSuccess(m -> Log.d("getItem", "cache Hit" + m.getClass().getSimpleName()))
-                        .doOnError(throwable -> Log.d("getItem", "cache Miss"))
+            Class dataClass = getListRequest.getDataClass();
+            String url = getListRequest.getUrl();
+            String simpleName = dataClass.getSimpleName();
+            boolean shouldCache = getListRequest.isShouldCache();
+            Flowable<List<M>> dynamicGetList = mDataStoreFactory.dynamically(url, dataClass)
+                    .dynamicGetList(url, dataClass, getListRequest.isPersist(), shouldCache);
+            if (Utils.getInstance().withCache(shouldCache)) {
+                result = mDataStoreFactory.memory().<M>getAllItems(dataClass)
+                        .doOnSuccess(m -> Log.d("getList", "cache Hit " + simpleName))
+                        .doOnError(throwable -> Log.d("getList", "cache Miss " + simpleName))
                         .toFlowable()
                         .onErrorResumeNext(t -> dynamicGetList);
             } else {
@@ -63,29 +65,42 @@ class DataService implements IDataService {
 
     @Override
     public <M> Flowable<List<M>> getListOffLineFirst(@NonNull GetRequest getRequest) {
-        Flowable<List<M>> result = Flowable.empty();
+        Flowable<List<M>> result;
         try {
-            if (Utils.getInstance().withCache(getRequest.isShouldCache())) {
-                result = mDataStoreFactory.memory().<M>getAllItems(getRequest.getDataClass())
-                        .doOnSuccess(m -> Log.d("getAllItems", "cache Hit" + m.getClass().getSimpleName()))
-                        .doOnError(throwable -> Log.d("getAllItems", "cache Miss"))
-                        .toFlowable();
+            Utils utils = Utils.getInstance();
+            Class dataClass = getRequest.getDataClass();
+            String simpleName = dataClass.getSimpleName();
+            boolean persist = getRequest.isPersist();
+            boolean shouldCache = getRequest.isShouldCache();
+            Flowable<List<M>> memory = mDataStoreFactory.memory().<M>getAllItems(dataClass)
+                    .doOnSuccess(m -> Log.d("getListOffLineFirst", "cache Hit " + simpleName))
+                    .doOnError(throwable -> Log.d("getListOffLineFirst", "cache Miss " + simpleName))
+                    .toFlowable();
+            Flowable<List<M>> disk = mDataStoreFactory.disk(dataClass)
+                    .<M>dynamicGetList("", dataClass, persist, shouldCache)
+                    .doOnNext(m -> Log.d("getListOffLineFirst", "Disk Hit " + simpleName))
+                    .doOnError(throwable -> Log.e("getListOffLineFirst", "Disk Miss " + simpleName,
+                            throwable));
+            Flowable<List<M>> cloud = mDataStoreFactory.cloud(dataClass)
+                    .dynamicGetList(getRequest.getUrl(), dataClass, persist, shouldCache);
+            boolean withDisk = utils.withDisk(persist);
+            boolean withCache = utils.withCache(shouldCache);
+            if (withDisk && withCache) {
+                result = memory.onErrorResumeNext(new Function<Throwable, Flowable<? extends List<M>>>() {
+                    @Override
+                    public Flowable<? extends List<M>> apply(@io.reactivex.annotations.NonNull Throwable throwable) throws Exception {
+                        return disk.flatMap(m -> m.isEmpty() ? cloud : Flowable.just(m))
+                                .onErrorResumeNext(t -> cloud);
+                    }
+                });
+            } else if (withDisk) {
+                result = disk.flatMap(m -> m.isEmpty() ? cloud : Flowable.just(m))
+                        .onErrorResumeNext(t -> cloud);
+            } else if (withCache) {
+                result = memory.onErrorResumeNext(t -> cloud);
+            } else {
+                result = cloud;
             }
-            if (Utils.getInstance().withDisk(getRequest.isPersist())) {
-                Flowable<List<M>> disk = mDataStoreFactory.disk(getRequest.getDataClass())
-                        .<M>dynamicGetList(getRequest.getUrl(), getRequest.getDataClass(),
-                                getRequest.isPersist(), getRequest.isShouldCache())
-                        .doOnNext(m -> Log.d("getListOffLineFirst", "Disk Hit " + m.getClass().getSimpleName()))
-                        .doOnError(throwable -> Log.e("getListOffLineFirst", "Disk Miss", throwable));
-                if (Config.isWithCache()) {
-                    result = result.onErrorResumeNext(t -> disk);
-                } else result = disk;
-            }
-            Flowable<List<M>> online = mDataStoreFactory.cloud(getRequest.getDataClass())
-                    .dynamicGetList(getRequest.getUrl(), getRequest.getDataClass(),
-                            getRequest.isPersist(), getRequest.isShouldCache());
-            result = result.flatMap(m -> m == null ? online : Flowable.just(m))
-                    .onErrorResumeNext(t -> online);
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
         }
@@ -96,16 +111,19 @@ class DataService implements IDataService {
     public <M> Flowable<M> getObject(@NonNull GetRequest getRequest) {
         Flowable<M> result;
         try {
-            Flowable<M> dynamicGetObject = mDataStoreFactory.dynamically(getRequest.getUrl(),
-                    getRequest.getDataClass())
-                    .dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
-                            getRequest.getItemId(), getRequest.getIdType(), getRequest.getDataClass(),
-                            getRequest.isPersist(), getRequest.isShouldCache());
-            if (Utils.getInstance().withCache(getRequest.isShouldCache())) {
+            Object itemId = getRequest.getItemId();
+            Class dataClass = getRequest.getDataClass();
+            boolean shouldCache = getRequest.isShouldCache();
+            String url = getRequest.getUrl();
+            String simpleName = dataClass.getSimpleName();
+            Flowable<M> dynamicGetObject = mDataStoreFactory.dynamically(url, dataClass)
+                    .dynamicGetObject(url, getRequest.getIdColumnName(), itemId, getRequest.getIdType(),
+                            dataClass, getRequest.isPersist(), shouldCache);
+            if (Utils.getInstance().withCache(shouldCache)) {
                 result = mDataStoreFactory.memory()
-                        .<M>getItem(String.valueOf(getRequest.getItemId()), getRequest.getDataClass())
-                        .doOnSuccess(m -> Log.d("getItem", "cache Hit" + m.getClass().getSimpleName()))
-                        .doOnError(throwable -> Log.d("getItem", "cache Miss"))
+                        .<M>getItem(String.valueOf(itemId), dataClass)
+                        .doOnSuccess(m -> Log.d("getObject", "cache Hit " + simpleName))
+                        .doOnError(throwable -> Log.d("getObject", "cache Miss " + simpleName))
                         .toFlowable()
                         .onErrorResumeNext(t -> dynamicGetObject);
             } else {
@@ -119,34 +137,41 @@ class DataService implements IDataService {
 
     @Override
     public <M> Flowable<M> getObjectOffLineFirst(@NonNull GetRequest getRequest) {
-        Flowable<M> result = Flowable.empty();
+        Flowable<M> result;
         try {
+            Utils utils = Utils.getInstance();
+            Object itemId = getRequest.getItemId();
             Class dataClass = getRequest.getDataClass();
-            if (Utils.getInstance().withCache(getRequest.isShouldCache())) {
-                result = mDataStoreFactory.memory()
-                        .<M>getItem(String.valueOf(getRequest.getItemId()), dataClass)
-                        .doOnSuccess(m -> Log.d("getObjectOffLineFirst", "cache Hit" + m.getClass().getSimpleName()))
-                        .doOnError(throwable -> Log.d("getObjectOffLineFirst", "cache Miss"))
-                        .toFlowable();
+            Class idType = getRequest.getIdType();
+            String idColumnName = getRequest.getIdColumnName();
+            String simpleName = dataClass.getSimpleName();
+            boolean persist = getRequest.isPersist();
+            boolean shouldCache = getRequest.isShouldCache();
+            Flowable<M> memory = mDataStoreFactory.memory()
+                    .<M>getItem(String.valueOf(itemId), dataClass)
+                    .doOnSuccess(m -> Log.d("getObjectOffLineFirst", "cache Hit " + simpleName))
+                    .doOnError(throwable -> Log.d("getObjectOffLineFirst", "cache Miss " + simpleName))
+                    .toFlowable();
+            Flowable<M> disk = mDataStoreFactory.disk(dataClass)
+                    .<M>dynamicGetObject("", idColumnName, itemId, idType, dataClass, persist, shouldCache)
+                    .doOnNext(m -> Log.d("getObjectOffLineFirst", "Disk Hit " + simpleName))
+                    .doOnError(throwable -> Log.e("getObjectOffLineFirst", "Disk Miss " + simpleName,
+                            throwable));
+            Flowable<M> cloud = mDataStoreFactory.cloud(dataClass)
+                    .<M>dynamicGetObject(getRequest.getUrl(), idColumnName, itemId, idType, dataClass,
+                            persist, shouldCache)
+                    .doOnNext(m -> Log.d("getObjectOffLineFirst", "Cloud Hit " + simpleName));
+            boolean withDisk = utils.withDisk(persist);
+            boolean withCache = utils.withCache(shouldCache);
+            if (withDisk && withCache) {
+                result = memory.onErrorResumeNext(t -> disk);
+            } else if (withDisk) {
+                result = disk.onErrorResumeNext(t -> cloud);
+            } else if (withCache) {
+                result = memory.onErrorResumeNext(t -> cloud);
+            } else {
+                result = cloud;
             }
-            if (Utils.getInstance().withDisk(getRequest.isPersist())) {
-                Flowable<M> disk = mDataStoreFactory.disk(dataClass)
-                        .<M>dynamicGetObject("", getRequest.getIdColumnName(), getRequest.getItemId(),
-                                getRequest.getIdType(), dataClass, getRequest.isPersist(),
-                                getRequest.isShouldCache())
-                        .doOnNext(m -> Log.d("getObjectOffLineFirst", "Disk Hit " + m.getClass().getSimpleName()))
-                        .doOnError(throwable -> Log.e("getObjectOffLineFirst", "Disk Miss", throwable));
-                if (Config.isWithCache()) {
-                    result = result.onErrorResumeNext(t -> disk);
-                } else result = disk;
-            }
-            Flowable<M> online = mDataStoreFactory.cloud(dataClass)
-                    .<M>dynamicGetObject(getRequest.getUrl(), getRequest.getIdColumnName(),
-                            getRequest.getItemId(), getRequest.getIdType(), dataClass,
-                            getRequest.isPersist(), getRequest.isShouldCache())
-                    .doOnNext(m -> Log.d("getObjectOffLineFirst", "Cloud Hit " + m.getClass().getSimpleName()));
-            result = result.flatMap(m -> m == null ? online : Flowable.just(m))
-                    .onErrorResumeNext(t -> online);
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
         }

@@ -116,7 +116,7 @@ public class GetRequest implements Parcelable {
         }
 
         @NonNull
-        public Builder shouldCache() {
+        public Builder cache() {
             mShouldCache = true;
             return this;
         }

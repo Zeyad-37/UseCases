@@ -50,6 +50,8 @@ public class MemoryStore {
     public <M> Single<List<M>> getAllItems(@NonNull Class<M> dataClass) {
         final boolean[] missed = new boolean[1];
         Set<String> stringSet = mapOfIds.get(dataClass);
+        if (stringSet == null)
+            return Single.error(new IllegalAccessException("Cache Miss!"));
         List<M> result = Observable.fromIterable(stringSet)
                 .filter((key) -> {
                     if (isValid(key))

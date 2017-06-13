@@ -49,25 +49,27 @@ public class RealmManager implements DataBaseManager {
     @Override
     public <M> Flowable<M> getById(@NonNull final String idColumnName, final Object itemId,
                                    final Class itemIdType, Class dataClass) {
-        return Flowable.defer(() -> {
-            Realm realm = Realm.getDefaultInstance();
-            return getRealm(realm).map(realm1 -> {
-                if (itemIdType.equals(long.class) || itemIdType.equals(Long.class)) {
-                    return realm1.where(dataClass).equalTo(idColumnName, (long) itemId).findAll();
-                } else if (itemIdType.equals(int.class) || itemIdType.equals(Integer.class)) {
-                    return realm1.where(dataClass).equalTo(idColumnName, (int) itemId).findAll();
-                } else if (itemIdType.equals(short.class) || itemIdType.equals(Short.class)) {
-                    return realm1.where(dataClass).equalTo(idColumnName, (short) itemId).findAll();
-                } else if (itemIdType.equals(byte.class) || itemIdType.equals(Byte.class)) {
-                    return realm1.where(dataClass).equalTo(idColumnName, (byte) itemId).findAll();
-                } else if (itemIdType.equals(String.class)) {
-                    return realm1.where(dataClass).equalTo(idColumnName, String.valueOf(itemId)).findAll();
-                } else {
-                    return Flowable.error(new IllegalArgumentException("Unsupported ID type!"));
-                }
-            }).filter(results -> ((RealmResults) results).isLoaded())
-                    .map(realmResults -> (M) realm.copyFromRealm((RealmResults) realmResults).get(0));
-        });
+        return Flowable.defer(() -> getRealm(Realm.getDefaultInstance()).flatMap(realm1 -> {
+            RealmModel result;
+            if (itemIdType.equals(long.class) || itemIdType.equals(Long.class)) {
+                result = realm1.where(dataClass).equalTo(idColumnName, (long) itemId).findFirst();
+            } else if (itemIdType.equals(int.class) || itemIdType.equals(Integer.class)) {
+                result = realm1.where(dataClass).equalTo(idColumnName, (int) itemId).findFirst();
+            } else if (itemIdType.equals(short.class) || itemIdType.equals(Short.class)) {
+                result = realm1.where(dataClass).equalTo(idColumnName, (short) itemId).findFirst();
+            } else if (itemIdType.equals(byte.class) || itemIdType.equals(Byte.class)) {
+                result = realm1.where(dataClass).equalTo(idColumnName, (byte) itemId).findFirst();
+            } else if (itemIdType.equals(String.class)) {
+                result = realm1.where(dataClass).equalTo(idColumnName, String.valueOf(itemId)).findFirst();
+            } else {
+                return Flowable.error(new IllegalArgumentException("Unsupported ID type!"));
+            }
+            if (result == null) {
+                return Flowable.error(new IllegalAccessException(String
+                        .format("%s with ID: %s was not found!", dataClass.getSimpleName(), itemId)));
+            }
+            return Flowable.just((M) realm1.copyFromRealm(result));
+        }));
     }
 
     /**
@@ -80,9 +82,12 @@ public class RealmManager implements DataBaseManager {
     public <M> Flowable<List<M>> getAll(Class clazz) {
         return Flowable.defer(() -> {
             Realm realm = Realm.getDefaultInstance();
-            return getRealm(realm).map(realm1 -> realm.where(clazz).findAll())
+            return getRealm(realm)
+                    .map(realm1 -> realm1.where(clazz).findAll())
                     .filter(RealmResults::isLoaded)
-                    .<List<M>>map(realm::copyFromRealm);
+                    .<List<M>>map(realm::copyFromRealm)
+                    .flatMap(ms -> ms.isEmpty() ? Flowable.error(new IllegalAccessException(String
+                            .format("%s were not found!", clazz.getSimpleName()))) : Flowable.just(ms));
         });
     }
 
