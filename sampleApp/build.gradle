@@ -23,10 +23,11 @@ android {
 
     defaultConfig {
         applicationId "com.zeyad.usecase.accesslayer"
-        minSdkVersion 17
+        minSdkVersion 21
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
+        testInstrumentationRunner "com.zeyad.usecases.app.UseCasesTestRunner"
     }
 
     signingConfigs {
@@ -47,6 +48,7 @@ android {
 
     buildTypes {
         debug {
+            ext.alwaysUpdateBuildId = false
             minifyEnabled false
             shrinkResources false
             debuggable true
@@ -91,6 +93,17 @@ android {
         exclude 'META-INF/LICENSE'
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/rxjava.properties'
+    }
+
+    if (project.hasProperty('devBuild')) {
+        splits.abi.enable = false
+        splits.density.enable = false
+        aaptOptions.cruncherEnabled = false
+    }
+    sourceSets {
+        main {
+            assets.srcDirs = ['src/main/assets', 'src/androidTest/java/com/zeyad/usecases/app/assets/']
+        }
     }
 }
 
@@ -155,6 +168,11 @@ dependencies {
     androidTestCompile 'org.mockito:mockito-core:1.10.19'
     androidTestCompile 'com.google.dexmaker:dexmaker:1.2'
     androidTestCompile 'com.google.dexmaker:dexmaker-mockito:1.2'
+    androidTestCompile('com.jakewharton.espresso:okhttp3-idling-resource:1.0.0') {
+        exclude group: 'com.android.support'
+    }
+    androidTestCompile 'com.squareup.okhttp3:mockwebserver:3.8.0'
+    androidTestCompile 'com.github.andrzejchm.RESTMock:android:0.1.4'
 
     testCompile 'junit:junit:4.12'
     testCompile 'org.mockito:mockito-core:1.10.19'

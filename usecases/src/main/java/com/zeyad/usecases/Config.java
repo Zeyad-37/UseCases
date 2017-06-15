@@ -139,10 +139,6 @@ public final class Config {
         Config.cloudStore = cloudStore;
     }
 
-    public static boolean isWithSQLite() {
-        return withSQLite;
-    }
-
     public static void setWithSQLite(boolean withSQLite) {
         Config.withSQLite = withSQLite;
     }

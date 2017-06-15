@@ -8,6 +8,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.StrictMode;
+import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 
@@ -17,7 +18,11 @@ import com.zeyad.usecases.api.DataServiceConfig;
 import com.zeyad.usecases.api.DataServiceFactory;
 
 import java.security.MessageDigest;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.X509TrustManager;
 
 import io.flowup.FlowUp;
 import io.reactivex.Completable;
@@ -25,6 +30,9 @@ import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.rx.RealmObservableFactory;
+import okhttp3.CertificatePinner;
+import okhttp3.ConnectionSpec;
+import okhttp3.OkHttpClient;
 
 import static com.zeyad.usecases.app.utils.Constants.URLS.API_BASE_URL;
 
@@ -105,10 +113,34 @@ public class GenericApplication extends Application {
                 }, Throwable::printStackTrace);
         initializeRealm();
         DataServiceFactory.init(new DataServiceConfig.Builder(this)
-                .baseUrl(API_BASE_URL)
+                .baseUrl(getApiBaseUrl())
+                .okHttpBuilder(getOkHttpBuilder())
                 .withCache(3, TimeUnit.MINUTES)
                 .withRealm()
                 .build());
+    }
+
+    @NonNull
+    OkHttpClient.Builder getOkHttpBuilder() {
+        OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .certificatePinner(new CertificatePinner.Builder()
+                        .add(API_BASE_URL,
+                                "sha256/6wJsqVDF8K19zxfLxV5DGRneLyzso9adVdUN/exDacw")
+                        .add(API_BASE_URL,
+                                "sha256/k2v657xBsOVe1PQRwOsHsw3bsGT2VzIqz5K+59sNQws=")
+                        .add(API_BASE_URL,
+                                "sha256/WoiWRyIOVNa9ihaBciRSC7XHjliYS9VwUGOIud4PB18=")
+                        .build())
+                .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS,
+                        ConnectionSpec.COMPATIBLE_TLS));
+        if (getSSlSocketFactory() != null && getX509TrustManager() != null)
+            builder.sslSocketFactory(getSSlSocketFactory(), getX509TrustManager());
+        return builder;
+    }
+
+    @NonNull
+    String getApiBaseUrl() {
+        return API_BASE_URL;
     }
 
     private void initializeStrictMode() {
@@ -142,5 +174,13 @@ public class GenericApplication extends Application {
                 && verifyInstaller(context)
                 && checkEmulator()
                 && checkDebuggable(context);
+    }
+
+    X509TrustManager getX509TrustManager() {
+        return null;
+    }
+
+    SSLSocketFactory getSSlSocketFactory() {
+        return null;
     }
 }
