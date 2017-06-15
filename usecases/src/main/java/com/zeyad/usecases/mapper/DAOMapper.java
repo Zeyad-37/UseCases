@@ -9,21 +9,14 @@ import com.zeyad.usecases.Config;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DAOMapper {
-    private static DAOMapper sDAOMapper;
-    public Gson gson;
+public final class DAOMapper {
+    private final Gson gson;
 
     public DAOMapper() {
         gson = Config.getGson();
     }
 
-    public static DAOMapper getInstance() {
-        if (sDAOMapper == null)
-            sDAOMapper = new DAOMapper();
-        return sDAOMapper;
-    }
-
-    @Nullable
+    @NonNull
     public <M> M mapTo(@Nullable Object object, @NonNull Class domainClass) {
         return (M) gson.fromJson(gson.toJson(object), domainClass);
     }
@@ -36,9 +29,11 @@ public class DAOMapper {
      */
     @NonNull
     public <M> M mapAllTo(@NonNull List list, @NonNull Class domainClass) {
-        List<Object> objects = new ArrayList<>(list.size());
-        for (int i = 0, size = list.size(); i < size; i++)
+        int size = list.size();
+        List<Object> objects = new ArrayList<>(size);
+        for (int i = 0; i < size; i++) {
             objects.add(mapTo(list.get(i), domainClass));
+        }
         return (M) objects;
     }
 }

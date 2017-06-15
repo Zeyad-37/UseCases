@@ -16,6 +16,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Flowable;
 import okhttp3.Cache;
 import okhttp3.CacheControl;
 import okhttp3.CertificatePinner;
@@ -35,17 +36,16 @@ import okio.BufferedSink;
 import okio.GzipSink;
 import okio.Okio;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
-import rx.Observable;
 
 /**
- * Api Connection class used to retrieve data from the cloud.
- * Implements {@link Callable} so when executed asynchronously can
- * return a value.
+ * Api Connection class used to retrieve data from the cloud. Implements {@link Callable} so when
+ * executed asynchronously can return a value.
  */
 public class ApiConnection {
-    private static final String CACHING_DISABLED = "There would be no caching. Since caching module is disabled.",
+    private static final String
+            CACHING_DISABLED = "There would be no caching. Since caching module is disabled.",
             CACHE_CONTROL = "Cache-Control";
     private static final int TIME_OUT = 15;
     private final RestApi mRestApiWithoutCache, mRestApiWithCache;
@@ -55,34 +55,37 @@ public class ApiConnection {
         mRestApiWithCache = restApiWithCache;
     }
 
-    public static RestApi initWithCache(@Nullable OkHttpClient.Builder okHttpBuilder, @Nullable Cache cache) {
-        if (okHttpBuilder == null)
+    public static RestApi initWithCache(
+            @Nullable OkHttpClient.Builder okHttpBuilder, @Nullable Cache cache) {
+        if (okHttpBuilder == null) {
             okHttpBuilder = getBuilderForOkHttp();
+        }
         return createRetro2Client(provideOkHttpClient(okHttpBuilder, cache)).create(RestApi.class);
     }
 
     public static RestApi init(@Nullable OkHttpClient.Builder okHttpBuilder) {
-        if (okHttpBuilder == null)
+        if (okHttpBuilder == null) {
             okHttpBuilder = getBuilderForOkHttp();
+        }
         return createRetro2Client(provideOkHttpClient(okHttpBuilder, null)).create(RestApi.class);
     }
 
     @NonNull
     static HttpLoggingInterceptor provideHttpLoggingInterceptor() {
         return new HttpLoggingInterceptor(message -> Log.d("NetworkInfo", message))
-                .setLevel(BuildConfig.DEBUG ? HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.HEADERS);
+                .setLevel(
+                        BuildConfig.DEBUG
+                                ? HttpLoggingInterceptor.Level.BODY
+                                : HttpLoggingInterceptor.Level.NONE);
     }
 
     private static Interceptor provideCacheInterceptor() {
         return chain -> {
             Response response = chain.proceed(chain.request());
             // re-write response header to force use of cache
-            CacheControl cacheControl = new CacheControl.Builder()
-                    .maxAge(2, TimeUnit.MINUTES)
-                    .build();
-            return response.newBuilder()
-                    .header(CACHE_CONTROL, cacheControl.toString())
-                    .build();
+            CacheControl cacheControl =
+                    new CacheControl.Builder().maxAge(2, TimeUnit.MINUTES).build();
+            return response.newBuilder().header(CACHE_CONTROL, cacheControl.toString()).build();
         };
     }
 
@@ -104,18 +107,20 @@ public class ApiConnection {
     private static OkHttpClient.Builder getBuilderForOkHttp() {
         return new OkHttpClient.Builder()
                 .addInterceptor(provideHttpLoggingInterceptor())
-//                .addInterceptor(provideOfflineCacheInterceptor())
-//                .addNetworkInterceptor(provideCacheInterceptor())
+                //                .addInterceptor(provideOfflineCacheInterceptor())
+                //                .addNetworkInterceptor(provideCacheInterceptor())
                 .connectTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .readTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .writeTimeout(TIME_OUT, TimeUnit.SECONDS);
     }
 
-    private static OkHttpClient provideOkHttpClient(@NonNull OkHttpClient.Builder okHttpBuilder, @Nullable Cache cache) {
+    private static OkHttpClient provideOkHttpClient(
+            @NonNull OkHttpClient.Builder okHttpBuilder, @Nullable Cache cache) {
         boolean useApiWithCache = cache != null;
         Config.getInstance().setUseApiWithCache(useApiWithCache);
-        if (useApiWithCache)
+        if (useApiWithCache) {
             okHttpBuilder.cache(cache);
+        }
         return okHttpBuilder.build();
     }
 
@@ -124,12 +129,12 @@ public class ApiConnection {
                 .baseUrl(Config.getBaseURL())
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create(Config.getGson()))
-                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build();
     }
 
     @NonNull
-    public Observable<ResponseBody> dynamicDownload(String url) {
+    public Flowable<ResponseBody> dynamicDownload(String url) {
         return getRestApi().dynamicDownload(url);
     }
 
@@ -138,25 +143,25 @@ public class ApiConnection {
     }
 
     @NonNull
-    public <M> Observable<M> dynamicGetObject(String url) {
-        return (Observable<M>) getRestApi().dynamicGetObject(url);
+    public <M> Flowable<M> dynamicGetObject(String url) {
+        return (Flowable<M>) getRestApi().dynamicGetObject(url);
     }
 
     @NonNull
-    public <M> Observable<M> dynamicGetObject(String url, boolean shouldCache) {
+    public <M> Flowable<M> dynamicGetObject(String url, boolean shouldCache) {
         if (shouldCache && !Config.getInstance().isUseApiWithCache()) {
             logNoCache();
         }
-        return (Observable<M>) getRestApi().dynamicGetObject(url);
+        return (Flowable<M>) getRestApi().dynamicGetObject(url);
     }
 
     @NonNull
-    public Observable<List> dynamicGetList(String url) {
+    public Flowable<List> dynamicGetList(String url) {
         return getRestApi().dynamicGetList(url);
     }
 
     @NonNull
-    public Observable<List> dynamicGetList(String url, boolean shouldCache) {
+    public Flowable<List> dynamicGetList(String url, boolean shouldCache) {
         if (shouldCache && !Config.getInstance().isUseApiWithCache()) {
             logNoCache();
         }
@@ -164,28 +169,29 @@ public class ApiConnection {
     }
 
     @NonNull
-    public <M> Observable<M> dynamicPost(String url, RequestBody requestBody) {
-        return (Observable<M>) getRestApi().dynamicPost(url, requestBody);
+    public <M> Flowable<M> dynamicPost(String url, RequestBody requestBody) {
+        return (Flowable<M>) getRestApi().dynamicPost(url, requestBody);
     }
 
     @NonNull
-    public <M> Observable<M> dynamicPut(String url, RequestBody requestBody) {
-        return (Observable<M>) getRestApi().dynamicPut(url, requestBody);
+    public <M> Flowable<M> dynamicPut(String url, RequestBody requestBody) {
+        return (Flowable<M>) getRestApi().dynamicPut(url, requestBody);
     }
 
     @NonNull
-    public <M> Observable<M> dynamicUpload(String url, Map<String, RequestBody> partMap, MultipartBody.Part file) {
-        return (Observable<M>) getRestApi().dynamicUpload(url, partMap, file);
+    public <M> Flowable<M> dynamicUpload(
+            String url, Map<String, RequestBody> partMap, MultipartBody.Part file) {
+        return (Flowable<M>) getRestApi().dynamicUpload(url, partMap, file);
     }
 
     @NonNull
-    public <M> Observable<M> dynamicDelete(String url, RequestBody body) {
-        return (Observable<M>) getRestApi().dynamicDelete(url, body);
+    public <M> Flowable<M> dynamicDelete(String url, RequestBody body) {
+        return (Flowable<M>) getRestApi().dynamicDelete(url, body);
     }
 
     @NonNull
-    public <M> Observable<M> dynamicPatch(String url, RequestBody body) {
-        return (Observable<M>) getRestApi().dynamicPatch(url, body);
+    public <M> Flowable<M> dynamicPatch(String url, RequestBody body) {
+        return (Flowable<M>) getRestApi().dynamicPatch(url, body);
     }
 
     RestApi getRestApiWithoutCache() {
@@ -200,20 +206,18 @@ public class ApiConnection {
     private Interceptor provideGzipRequestInterceptor() {
         return chain -> {
             Request originalRequest = chain.request();
-            if (originalRequest.body() == null || originalRequest.header("Content-Encoding") != null)
-                return chain.proceed(originalRequest);
-            Request compressedRequest = originalRequest.newBuilder()
-                    .header("Content-Encoding", "gzip")
-                    .method(originalRequest.method(), forceContentLength(gzip(originalRequest.body())))
-                    .build();
-            return chain.proceed(compressedRequest);
+            return originalRequest.body() == null || originalRequest.header("Content-Encoding") != null ?
+                    chain.proceed(originalRequest) :
+                    chain.proceed(originalRequest.newBuilder().header("Content-Encoding", "gzip")
+                            .method(originalRequest.method(), forceContentLength(gzip(originalRequest.body())))
+                            .build());
         };
     }
 
     @SuppressWarnings("unused")
     private CertificatePinner provideCertificatePinner() {
         return new CertificatePinner.Builder()
-//                .add("api.github.com", "sha256/6wJsqVDF8K19zxfLxV5DGRneLyzso9adVdUN/exDacw=")
+                //                .add("api.github.com", "sha256/6wJsqVDF8K19zxfLxV5DGRneLyzso9adVdUN/exDacw=")
                 .build();
     }
 
@@ -276,7 +280,7 @@ public class ApiConnection {
             cache = new Cache(new File(Config.getInstance().getContext().getCacheDir(), "http-cache"),
                     10 * 1024 * 1024); // 10 MB
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("ApiConnection", "", e);
         }
         return cache;
     }

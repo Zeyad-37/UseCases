@@ -10,41 +10,42 @@ import com.zeyad.usecases.Config;
  * @author zeyad on 7/29/16.
  */
 public class GetRequest implements Parcelable {
-    public static final Creator<GetRequest> CREATOR = new Creator<GetRequest>() {
-        @NonNull
+
+    public static final Parcelable.Creator<GetRequest> CREATOR = new Parcelable.Creator<GetRequest>() {
         @Override
-        public GetRequest createFromParcel(@NonNull Parcel source) {
+        public GetRequest createFromParcel(Parcel source) {
             return new GetRequest(source);
         }
 
-        @NonNull
         @Override
         public GetRequest[] newArray(int size) {
             return new GetRequest[size];
         }
     };
     private static final String DEFAULT_ID_KEY = "id";
-    private String url, idColumnName;
-    private Class dataClass;
-    private boolean persist, shouldCache;
-    private int itemId;
+    private final String url, idColumnName;
+    private final Class dataClass, idType;
+    private final boolean persist, shouldCache;
+    private final Object itemId;
 
     private GetRequest(@NonNull Builder builder) {
         url = builder.mUrl;
         dataClass = builder.mDataClass;
+        idType = builder.idType;
         persist = builder.mPersist;
         idColumnName = builder.mIdColumnName;
         itemId = builder.mItemId;
         shouldCache = builder.mShouldCache;
     }
 
-    protected GetRequest(@NonNull Parcel in) {
+    protected GetRequest(Parcel in) {
         this.url = in.readString();
         this.idColumnName = in.readString();
         this.dataClass = (Class) in.readSerializable();
+        this.idType = (Class) in.readSerializable();
         this.persist = in.readByte() != 0;
         this.shouldCache = in.readByte() != 0;
-        this.itemId = in.readInt();
+        this.itemId = in.readParcelable(Object.class.getClassLoader());
     }
 
     @NonNull
@@ -69,7 +70,11 @@ public class GetRequest implements Parcelable {
         return idColumnName != null ? idColumnName : DEFAULT_ID_KEY;
     }
 
-    public int getItemId() {
+    public Class getIdType() {
+        return idType;
+    }
+
+    public Object getItemId() {
         return itemId;
     }
 
@@ -79,20 +84,21 @@ public class GetRequest implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
+    public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.url);
         dest.writeString(this.idColumnName);
         dest.writeSerializable(this.dataClass);
+        dest.writeSerializable(this.idType);
         dest.writeByte(this.persist ? (byte) 1 : (byte) 0);
         dest.writeByte(this.shouldCache ? (byte) 1 : (byte) 0);
-        dest.writeInt(this.itemId);
+        dest.writeParcelable((Parcelable) this.itemId, flags);
     }
 
     public static class Builder {
-        private int mItemId;
+        private Object mItemId;
         private boolean mShouldCache, mPersist;
         private String mIdColumnName, mUrl;
-        private Class mDataClass;
+        private Class mDataClass, idType;
 
         public Builder(Class dataClass, boolean persist) {
             mDataClass = dataClass;
@@ -112,20 +118,16 @@ public class GetRequest implements Parcelable {
         }
 
         @NonNull
-        public Builder shouldCache(boolean shouldCache) {
-            mShouldCache = shouldCache;
+        public Builder cache() {
+            mShouldCache = true;
             return this;
         }
 
         @NonNull
-        public Builder idColumnName(String idColumnName) {
-            mIdColumnName = idColumnName;
-            return this;
-        }
-
-        @NonNull
-        public Builder id(int id) {
+        public Builder id(Object id, String idColumnName, Class type) {
             mItemId = id;
+            idType = type;
+            mIdColumnName = idColumnName;
             return this;
         }
 
@@ -135,3 +137,4 @@ public class GetRequest implements Parcelable {
         }
     }
 }
+

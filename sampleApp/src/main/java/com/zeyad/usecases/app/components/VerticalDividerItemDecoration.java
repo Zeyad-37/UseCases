@@ -13,7 +13,7 @@ public class VerticalDividerItemDecoration extends RecyclerView.ItemDecoration {
 
     private static final int[] ATTRS = new int[]{android.R.attr.listDivider};
 
-    private Drawable mDivider;
+    private final Drawable mDivider;
 
     /**
      * Default divider will be used
@@ -39,13 +39,15 @@ public class VerticalDividerItemDecoration extends RecyclerView.ItemDecoration {
             RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
             int top = child.getBottom() + params.bottomMargin;
             int bottom = top + mDivider.getIntrinsicHeight();
-            mDivider.setBounds(parent.getPaddingLeft(), top, parent.getWidth() - parent.getPaddingRight(), bottom);
+            mDivider.setBounds(parent.getPaddingLeft(), top, parent.getWidth() - parent.getPaddingRight(),
+                    bottom);
             mDivider.draw(c);
         }
     }
 
     @Override
-    public void getItemOffsets(Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
+    public void getItemOffsets(
+            Rect outRect, View view, RecyclerView parent, RecyclerView.State state) {
         outRect.bottom = 1;
     }
 }

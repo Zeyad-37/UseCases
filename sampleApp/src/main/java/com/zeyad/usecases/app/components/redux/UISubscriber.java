@@ -1,28 +1,32 @@
 package com.zeyad.usecases.app.components.redux;
 
+import android.support.annotation.NonNull;
 import android.util.Log;
 
-import rx.Subscriber;
+import io.reactivex.subscribers.DisposableSubscriber;
 import rx.exceptions.OnErrorNotImplementedException;
 
 /**
  * @author zeyad on 11/28/16.
  */
-public class UISubscriber<V extends LoadDataView<S>, S> extends Subscriber<UIModel<S>> {
-    private ErrorMessageFactory errorMessageFactory;
-    private V view;
+public class UISubscriber<V extends LoadDataView<S>, S> extends DisposableSubscriber<UIModel<S>> {
+    @NonNull
+    private final ErrorMessageFactory errorMessageFactory;
+    @NonNull
+    private final V view;
 
-    public UISubscriber(V view, ErrorMessageFactory errorMessageFactory) {
+    public UISubscriber(@NonNull V view, @NonNull ErrorMessageFactory errorMessageFactory) {
         this.view = view;
         this.errorMessageFactory = errorMessageFactory;
     }
 
     @Override
-    public void onCompleted() {
+    public void onComplete() {
     }
 
     @Override
     public void onError(Throwable throwable) {
+        Log.e("UISubscriber", "onError", throwable);
         throw new OnErrorNotImplementedException(throwable);
     }
 
@@ -31,11 +35,11 @@ public class UISubscriber<V extends LoadDataView<S>, S> extends Subscriber<UIMod
         Log.d("onNext", "UIModel: " + uiModel.toString());
         view.toggleViews(uiModel.isLoading());
         if (!uiModel.isLoading()) {
-            if (uiModel.isSuccessful())
+            if (uiModel.isSuccessful()) {
                 view.renderState(uiModel.getBundle());
-            else if (uiModel.getError() != null) {
+            } else if (uiModel.getError() != null) {
                 Throwable throwable = uiModel.getError();
-                throwable.printStackTrace();
+                Log.e("UISubscriber", "onNext", throwable);
                 view.showError(errorMessageFactory.getErrorMessage(throwable));
             }
         }

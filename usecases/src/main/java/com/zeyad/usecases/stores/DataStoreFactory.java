@@ -4,61 +4,79 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.db.DataBaseManager;
 import com.zeyad.usecases.mapper.DAOMapper;
 import com.zeyad.usecases.network.ApiConnection;
+import com.zeyad.usecases.utils.DataBaseManagerUtil;
+import com.zeyad.usecases.utils.Utils;
 
 public class DataStoreFactory {
-    private final static String DB_NOT_ENABLED = "Database not enabled!", DB_MANAGER_NULL = "DataBaseManager cannot be null!";
+    private final static String DB_NOT_ENABLED = "Database not enabled!";
+    private static CloudStore mCloudStore;
+    private static DiskStore mDiskStore;
+    private static MemoryStore mMemoryStore;
     @Nullable
-    private DataBaseManager mDataBaseManager;
-    private ApiConnection mApiConnection;
-    private DAOMapper mDAOMapper;
+    private final DataBaseManagerUtil mDataBaseManagerUtil;
+    private final ApiConnection mApiConnection;
+    private final DAOMapper mDAOMapper;
+    private boolean withCache;
 
-    public DataStoreFactory(ApiConnection restApi, DAOMapper daoMapper) {
-        mDataBaseManager = null;
+    public DataStoreFactory(@Nullable DataBaseManagerUtil dataBaseManagerUtil, ApiConnection restApi,
+                            DAOMapper daoMapper) {
+        Config.setHasRealm(dataBaseManagerUtil != null);
+        Config.setWithSQLite(dataBaseManagerUtil != null);
+        mDataBaseManagerUtil = dataBaseManagerUtil;
         mApiConnection = restApi;
         mDAOMapper = daoMapper;
-    }
-
-    public DataStoreFactory(@Nullable DataBaseManager dataBaseManager, ApiConnection restApi, DAOMapper daoMapper) {
-        if (dataBaseManager == null)
-            throw new IllegalArgumentException(DB_MANAGER_NULL);
-        Config.setHasRealm(true);
-        mDataBaseManager = dataBaseManager;
-        mApiConnection = restApi;
-        mDAOMapper = daoMapper;
+        withCache = Config.isWithCache();
     }
 
     /**
      * Create {@link DataStore} .
      */
     @NonNull
-    public DataStore dynamically(@NonNull String url) throws Exception {
-        if (!url.isEmpty())
-            return cloud();
-        else if (mDataBaseManager == null)
+    public DataStore dynamically(@NonNull String url, Class dataClass) throws IllegalAccessException {
+        if (!url.isEmpty()) {
+            return cloud(dataClass);
+        } else if (mDataBaseManagerUtil == null) {
             throw new IllegalAccessException(DB_NOT_ENABLED);
-        else
-            return disk();
+        } else {
+            return disk(dataClass);
+        }
+    }
+
+    /**
+     * Creates a disk {@link DataStore}.
+     */
+    public MemoryStore memory() {
+        if (withCache && mMemoryStore == null) {
+            mMemoryStore = new MemoryStore(Config.getGson());
+        }
+        return withCache ? mMemoryStore : null;
     }
 
     /**
      * Creates a disk {@link DataStore}.
      */
     @NonNull
-    public DataStore disk() throws IllegalAccessException {
-        if (!Config.isWithRealm() || mDataBaseManager == null) {
+    public DataStore disk(Class dataClass) throws IllegalAccessException {
+        if (!Config.isWithRealm() || mDataBaseManagerUtil == null) {
             throw new IllegalAccessException(DB_NOT_ENABLED);
+        } else if (mDiskStore == null) {
+            mDiskStore = new DiskStore(mDataBaseManagerUtil.getDataBaseManager(dataClass), memory());
         }
-        return new DiskDataStore(mDataBaseManager, mDAOMapper);
+        return mDiskStore;
     }
 
     /**
      * Creates a cloud {@link DataStore}.
      */
     @NonNull
-    public DataStore cloud() {
-        return new CloudDataStore(mApiConnection, mDataBaseManager, mDAOMapper);
+    public DataStore cloud(Class dataClass) {
+        if (mCloudStore == null) {
+            mCloudStore = new CloudStore(mApiConnection,
+                    mDataBaseManagerUtil.getDataBaseManager(dataClass), mDAOMapper, memory(),
+                    Utils.getInstance());
+        }
+        return mCloudStore;
     }
 }

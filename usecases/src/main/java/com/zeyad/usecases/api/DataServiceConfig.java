@@ -5,26 +5,28 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.mapper.DAOMapper;
+import com.zeyad.usecases.utils.DataBaseManagerUtil;
 
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Scheduler;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
-import rx.Scheduler;
 
 /**
  * @author by ZIaDo on 12/9/16.
  */
 public class DataServiceConfig {
 
-    private Context context;
-    private OkHttpClient.Builder okHttpBuilder;
-    private Cache okHttpCache;
-    private String baseUrl;
-    private boolean withCache, withRealm;
-    private int cacheSize, cacheAmount;
-    private TimeUnit timeUnit;
-    private Scheduler postExecutionThread;
+    private final Context context;
+    private final OkHttpClient.Builder okHttpBuilder;
+    private final Cache okHttpCache;
+    private final String baseUrl;
+    private final boolean withCache, withRealm;
+    private final int cacheSize, cacheAmount;
+    private final TimeUnit timeUnit;
+    private final Scheduler postExecutionThread;
+    private final DataBaseManagerUtil dataBaseManagerUtil;
 
     private DataServiceConfig(@NonNull Builder dataUseCaseConfigBuilder) {
         context = dataUseCaseConfigBuilder.context;
@@ -37,6 +39,7 @@ public class DataServiceConfig {
         cacheAmount = dataUseCaseConfigBuilder.cacheAmount;
         timeUnit = dataUseCaseConfigBuilder.timeUnit;
         postExecutionThread = dataUseCaseConfigBuilder.postExecutionThread;
+        dataBaseManagerUtil = dataUseCaseConfigBuilder.dataBaseManagerUtil;
     }
 
     public Context getContext() {
@@ -85,6 +88,10 @@ public class DataServiceConfig {
         return timeUnit;
     }
 
+    DataBaseManagerUtil getDataBaseManagerUtil() {
+        return dataBaseManagerUtil;
+    }
+
     @NonNull
     HandlerThread getHandlerThread() {
         return new HandlerThread("backgroundThread");
@@ -99,6 +106,7 @@ public class DataServiceConfig {
         private int cacheSize, cacheAmount;
         private TimeUnit timeUnit;
         private Scheduler postExecutionThread;
+        private DataBaseManagerUtil dataBaseManagerUtil;
 
         public Builder(Context context) {
             this.context = context;
@@ -131,6 +139,7 @@ public class DataServiceConfig {
         @NonNull
         public Builder withRealm() {
             this.withRealm = true;
+            this.dataBaseManagerUtil = null;
             return this;
         }
 
@@ -145,6 +154,13 @@ public class DataServiceConfig {
         @NonNull
         public Builder cacheSize(int cacheSize) {
             this.cacheSize = cacheSize;
+            return this;
+        }
+
+        @NonNull
+        public Builder withSQLite(DataBaseManagerUtil dataBaseManagerUtil) {
+            this.dataBaseManagerUtil = dataBaseManagerUtil;
+            this.withRealm = false;
             return this;
         }
 

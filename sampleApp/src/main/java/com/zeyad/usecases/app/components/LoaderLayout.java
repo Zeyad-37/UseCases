@@ -22,25 +22,19 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
     private StatusTextListener mStatusTextListener;
     private boolean mBlockTouch;
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public LoaderLayout(Context context) {
         super(context);
         initView(context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public LoaderLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
         initView(context);
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     public LoaderLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
         initView(context);
@@ -59,7 +53,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         mTxvStatus = (TextView) findViewById(R.id.txv_status);
         // set click listener
         mTxvStatus.setOnClickListener(this);
-        showProgress();
+        //        showProgress();
     }
 
     /**
@@ -71,39 +65,27 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         this.mStatusTextListener = mStatusTextListener;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.txv_status:
-                if (mStatusTextListener != null) {
-                    mStatusTextListener.onStatusTextClick();
-                }
-                break;
+        if (view.getId() == R.id.txv_status && mStatusTextListener != null) {
+            mStatusTextListener.onStatusTextClick();
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         return mBlockTouch;
     }
 
-    /**
-     * {@inheritDoc}
-     */
+    /** {@inheritDoc} */
     @Override
     public boolean onInterceptHoverEvent(MotionEvent event) {
         return mBlockTouch;
     }
 
-    /**
-     * Show progress bar and hide another views.
-     */
+    /** Show progress bar and hide another views. */
     public void showProgress() {
         mProgressBar.bringToFront();
         mProgressBar.setVisibility(VISIBLE);
@@ -112,9 +94,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         mBlockTouch = true;
     }
 
-    /**
-     * Show progress bar over a semi transparent content.
-     */
+    /** Show progress bar over a semi transparent content. */
     public void showProgressOverContent() {
         mProgressBar.bringToFront();
         mProgressBar.setVisibility(VISIBLE);
@@ -125,9 +105,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         mBlockTouch = true;
     }
 
-    /**
-     * Show content views.
-     */
+    /** Show content views. */
     public void showContents() {
         mProgressBar.setVisibility(GONE);
         mTxvStatus.setVisibility(GONE);
@@ -158,7 +136,7 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         int childCount = getChildCount();
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
-            if (view != mProgressBar && view != mTxvStatus) {
+            if (!view.equals(mProgressBar) && !view.equals(mTxvStatus)) {
                 view.setVisibility(visibility);
             }
         }
@@ -173,19 +151,15 @@ public class LoaderLayout extends FrameLayout implements View.OnClickListener {
         int childCount = getChildCount();
         for (int i = 0; i < childCount; i++) {
             View view = getChildAt(i);
-            if (view != mProgressBar && view != mTxvStatus) {
+            if (!view.equals(mProgressBar) && !view.equals(mTxvStatus)) {
                 view.setAlpha(alpha);
             }
         }
     }
 
-    /**
-     * Interface to listen event of status text click.
-     */
+    /** Interface to listen event of status text click. */
     public interface StatusTextListener {
-        /**
-         * Called when status text clicked.
-         */
+        /** Called when status text clicked. */
         void onStatusTextClick();
     }
 }

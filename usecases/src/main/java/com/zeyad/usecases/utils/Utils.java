@@ -15,44 +15,59 @@ import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.Lifetime;
 import com.firebase.jobdispatcher.RetryStrategy;
 import com.firebase.jobdispatcher.Trigger;
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.PostRequest;
 import com.zeyad.usecases.services.GenericJobService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import io.reactivex.Flowable;
+import retrofit2.HttpException;
+import rx.Observable;
 
 public class Utils {
 
     private static Utils instance;
 
-    public Utils() {
-        instance = this;
+    private Utils() {
     }
 
     public static Utils getInstance() {
-        if (instance == null)
+        if (instance == null) {
             instance = new Utils();
+        }
         return instance;
     }
 
     public boolean isNetworkAvailable(@NonNull Context context) {
-        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context
-                .CONNECTIVITY_SERVICE);
+        ConnectivityManager connectivityManager =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Network[] networks = connectivityManager.getAllNetworks();
-            for (Network network : networks)
-                if (connectivityManager.getNetworkInfo(network).getState().equals(NetworkInfo.State.CONNECTED))
+            for (Network network : networks) {
+                if (connectivityManager
+                        .getNetworkInfo(network)
+                        .getState()
+                        .equals(NetworkInfo.State.CONNECTED)) {
                     return true;
+                }
+            }
         } else if (connectivityManager != null) {
             NetworkInfo[] info = connectivityManager.getAllNetworkInfo();
-            if (info != null)
-                for (NetworkInfo anInfo : info)
-                    if (anInfo.getState() == NetworkInfo.State.CONNECTED)
+            if (info != null) {
+                for (NetworkInfo anInfo : info) {
+                    if (anInfo.getState() == NetworkInfo.State.CONNECTED) {
                         return true;
+                    }
+                }
+            }
         }
         return false;
     }
@@ -75,9 +90,11 @@ public class Utils {
         Log.d("FBJD", postRequest.getMethod() + " request is queued successfully!");
     }
 
-    public void queueFileIOCore(@NonNull FirebaseJobDispatcher dispatcher, boolean isDownload, @NonNull FileIORequest fileIORequest) {
+    public void queueFileIOCore(@NonNull FirebaseJobDispatcher dispatcher, boolean isDownload,
+                                @NonNull FileIORequest fileIORequest) {
         Bundle extras = new Bundle(2);
-        extras.putString(GenericJobService.JOB_TYPE, isDownload ? GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE);
+        extras.putString(GenericJobService.JOB_TYPE, isDownload ?
+                GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE);
         extras.putParcelable(GenericJobService.PAYLOAD, fileIORequest);
         dispatcher.mustSchedule(dispatcher.newJobBuilder()
                 .setService(GenericJobService.class)
@@ -90,10 +107,10 @@ public class Utils {
                         fileIORequest.isWhileCharging() ? Constraint.DEVICE_CHARGING : 0)
                 .setExtras(extras)
                 .build());
-        Log.d("FBJD", String.format("%s file request is queued successfully!", isDownload ? "Download" : "Upload"));
+        Log.d("FBJD", String.format("%s file request is queued successfully!", isDownload ?
+                "Download" : "Upload"));
     }
 
-    @Nullable
     public List<Long> convertToListOfId(@Nullable JSONArray jsonArray) {
         List<Long> idList = new ArrayList<>();
         if (jsonArray != null && jsonArray.length() > 0) {
@@ -103,13 +120,36 @@ public class Utils {
                 return null;
             }
             idList = new ArrayList<>(jsonArray.length());
-            for (int i = 0, length = jsonArray.length(); i < length; i++)
+            int length = jsonArray.length();
+            for (int i = 0; i < length; i++) {
                 try {
                     idList.add(jsonArray.getLong(i));
                 } catch (JSONException e) {
-                    e.printStackTrace();
+                    Log.e("Utils", "convertToListOfId", e);
                 }
+            }
         }
         return idList;
+    }
+
+    public <T> Flowable<T> toFlowable(Observable<T> source) {
+        if (source == null) {
+            throw new IllegalArgumentException("Source observable is null");
+        } else {
+            return new ObservableV1ToFlowableV2<>(source);
+        }
+    }
+
+    @NonNull
+    public JSONObject getErrorJsonObject(HttpException exception) throws JSONException, IOException {
+        return new JSONObject(exception.response().errorBody().string());
+    }
+
+    public boolean withDisk(boolean shouldPersist) {
+        return Config.isWithDisk() && shouldPersist;
+    }
+
+    public boolean withCache(boolean shouldCache) {
+        return Config.isWithCache() && shouldCache;
     }
 }

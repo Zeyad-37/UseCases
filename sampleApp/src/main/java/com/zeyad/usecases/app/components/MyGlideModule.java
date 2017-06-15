@@ -9,15 +9,12 @@ import com.bumptech.glide.module.GlideModule;
 /**
  * @author by ZIaDo on 4/18/17.
  */
-
 public class MyGlideModule implements GlideModule {
     @Override
     public void applyOptions(Context context, GlideBuilder builder) {
-//        builder.setDiskCache(new DiskCacheFactory(context, “.”, IMAGE_CACHE_SIZE));
+        //        builder.setDiskCache(new DiskCacheFactory(context, “.”, IMAGE_CACHE_SIZE));
     }
 
     @Override
-    public void registerComponents(Context context, Glide glide) {
-
-    }
+    public void registerComponents(Context context, Glide glide) {}
 }

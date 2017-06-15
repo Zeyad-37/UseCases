@@ -9,7 +9,7 @@ import android.view.View;
 
 public class HorizontalDividerItemDecoration extends RecyclerView.ItemDecoration {
 
-    private Drawable mDivider;
+    private final Drawable mDivider;
 
     /**
      * Custom divider will be used
@@ -26,7 +26,8 @@ public class HorizontalDividerItemDecoration extends RecyclerView.ItemDecoration
             RecyclerView.LayoutParams params = (RecyclerView.LayoutParams) child.getLayoutParams();
             int top = child.getBottom() + params.bottomMargin;
             int bottom = top + mDivider.getIntrinsicHeight();
-            mDivider.setBounds(parent.getPaddingLeft(), top, parent.getWidth() - parent.getPaddingRight(), bottom);
+            mDivider.setBounds(parent.getPaddingLeft(), top, parent.getWidth() - parent.getPaddingRight(),
+                    bottom);
             mDivider.draw(c);
         }
     }

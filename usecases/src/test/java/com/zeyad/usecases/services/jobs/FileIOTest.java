@@ -7,7 +7,7 @@ import android.support.test.rule.BuildConfig;
 
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.requests.FileIORequest;
-import com.zeyad.usecases.stores.CloudDataStore;
+import com.zeyad.usecases.stores.CloudStore;
 import com.zeyad.usecases.utils.Utils;
 
 import org.json.JSONException;
@@ -22,7 +22,7 @@ import org.robolectric.annotation.Config;
 import java.io.File;
 import java.util.HashMap;
 
-import rx.Observable;
+import io.reactivex.Flowable;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
@@ -36,7 +36,7 @@ import static org.mockito.Mockito.verify;
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 public class FileIOTest {
-    private CloudDataStore cloudDataStore;
+    private CloudStore cloudStore;
     private Context mockContext;
     private Utils utils;
     // item under test
@@ -46,34 +46,36 @@ public class FileIOTest {
     public void setUp() throws Exception {
         mockContext = mock(Context.class);
         utils = mock(Utils.class);
-        cloudDataStore = createCloudDataStore();
+        cloudStore = createCloudDataStore();
     }
 
     @After
     public void tearDown() throws Exception {
-        reset(cloudDataStore);
+        reset(cloudStore);
     }
 
     @Test
     public void testDownload() {
-//        fileIO = createFileIO(mockFileIoReq(true, true, getValidFile()), true);
-//        fileIO.execute();
-//        verify(cloudDataStore).dynamicDownloadFile(anyString(), any(), anyBoolean(), anyBoolean(), anyBoolean());
+        //        fileIO = createFileIO(mockFileIoReq(true, true, getValidFile()), true);
+        //        fileIO.execute();
+        //        verify(cloudStore).dynamicDownloadFile(anyString(), any(), anyBoolean(), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testUpload() throws JSONException {
-//        fileIO = createFileIO(mockFileIoReq(true, true, getValidFile()), false);
-//        fileIO.execute();
-//        verify(cloudDataStore).dynamicUploadFile(anyString(), any(), anyString(), (HashMap<String, Object>) anyMap(),
-//                anyBoolean(), anyBoolean(), anyBoolean(), any());
+        //        fileIO = createFileIO(mockFileIoReq(true, true, getValidFile()), false);
+        //        fileIO.execute();
+        //        verify(cloudStore).dynamicUploadFile(anyString(), any(), anyString(), (HashMap<String, Object>) anyMap(),
+        //                anyBoolean(), anyBoolean(), anyBoolean(), any());
     }
 
     @Test
     public void testReQueue() throws JSONException {
         FileIORequest fileIOReq = mockFileIoReq(true, true, getValidFile());
         fileIO = createFileIO(fileIOReq, true);
-        Mockito.doNothing().when(utils).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
+        Mockito.doNothing()
+                .when(utils)
+                .queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
         fileIO.queueIOFile();
         verify(utils, times(1)).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
     }
@@ -104,13 +106,27 @@ public class FileIOTest {
         return new FileIO(0, fileIoReq, mockContext, isDownload, createCloudDataStore(), utils);
     }
 
-    private CloudDataStore createCloudDataStore() {
-        final CloudDataStore cloudDataStore = mock(CloudDataStore.class);
-        Mockito.when(cloudDataStore.dynamicDownloadFile(Mockito.anyString(), any(), anyBoolean(),
-                anyBoolean(), anyBoolean())).thenReturn(Observable.empty());
-        Mockito.when(cloudDataStore.dynamicUploadFile(Mockito.anyString(), any(), anyString(),
-                (HashMap<String, Object>) anyMap(), anyBoolean(), anyBoolean(), anyBoolean(), any()))
-                .thenReturn(Observable.empty());
-        return cloudDataStore;
+    private CloudStore createCloudDataStore() {
+        final CloudStore cloudStore = mock(CloudStore.class);
+        Mockito.when(
+                cloudStore.dynamicDownloadFile(
+                        Mockito.anyString(),
+                        any(),
+                        anyBoolean(),
+                        anyBoolean(),
+                        anyBoolean()))
+                .thenReturn(Flowable.empty());
+        Mockito.when(
+                cloudStore.dynamicUploadFile(
+                        Mockito.anyString(),
+                        any(),
+                        anyString(),
+                        (HashMap<String, Object>) anyMap(),
+                        anyBoolean(),
+                        anyBoolean(),
+                        anyBoolean(),
+                        any()))
+                .thenReturn(Flowable.empty());
+        return cloudStore;
     }
 }

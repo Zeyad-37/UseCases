@@ -12,17 +12,17 @@ import com.zeyad.usecases.utils.Utils;
 
 import org.json.JSONObject;
 
+import io.reactivex.Completable;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
-import rx.Completable;
 
-import static com.zeyad.usecases.stores.CloudDataStore.APPLICATION_JSON;
+import static com.zeyad.usecases.stores.CloudStore.APPLICATION_JSON;
 
 /**
  * @author Zeyad on 6/05/16.
  */
 public class Post {
-    private static final String TAG = Post.class.getSimpleName();
+    private static final String TAG = Post.class.getSimpleName(), ON_ERROR = "onError", COMPLETED = "Completed";
     private static int mTrailCount;
     @NonNull
     private final FirebaseJobDispatcher mDispatcher;
@@ -47,86 +47,68 @@ public class Post {
                 bundle = jsonObject.toString();
                 isObject = true;
             }
-        } else bundle = mPostRequest.getArrayBundle().toString();
+        } else {
+            bundle = mPostRequest.getArrayBundle().toString();
+        }
         RequestBody requestBody = RequestBody.create(MediaType.parse(APPLICATION_JSON), bundle);
-        RequestBody listRequestBody = RequestBody.create(MediaType
-                .parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString());
+        RequestBody listRequestBody =
+                RequestBody.create(MediaType.parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString());
         switch (mPostRequest.getMethod()) {
             case PostRequest.PATCH:
-                return mRestApi.dynamicPatch(mPostRequest.getUrl(), requestBody)
-                        .doOnSubscribe(() -> Log.d(TAG, "Patching " + mPostRequest.getDataClass()
+                return Completable.fromObservable(mRestApi.dynamicPatch(mPostRequest.getUrl(), requestBody)
+                        .doOnSubscribe(subscription -> Log.d(TAG, "Patching " + mPostRequest.getRequestType()
                                 .getSimpleName()))
-                        .toCompletable()
-                        .doOnError(throwable -> {
-                            queuePost();
-                            throwable.printStackTrace();
-                        })
-                        .doOnCompleted(() -> Log.d(TAG, "Completed"));
+                        .doOnError(this::onError)
+                        .doOnComplete(() -> Log.d(TAG, COMPLETED))
+                        .toObservable());
             case PostRequest.POST:
-                if (isObject)
-                    return mRestApi.dynamicPost(mPostRequest.getUrl(), requestBody)
-                            .doOnSubscribe(() -> Log.d(TAG, "Posting " + mPostRequest.getDataClass()
-                                    .getSimpleName()))
-                            .toCompletable()
-                            .doOnError(throwable -> {
-                                queuePost();
-                                throwable.printStackTrace();
-                            })
-                            .doOnCompleted(() -> Log.d(TAG, "Completed"));
-                else
-                    return mRestApi.dynamicPost(mPostRequest.getUrl(), listRequestBody)
-                            .doOnSubscribe(() -> Log.d(TAG, "Posting List of " + mPostRequest
-                                    .getDataClass().getSimpleName()))
-                            .toCompletable()
-                            .doOnError(throwable -> {
-                                queuePost();
-                                throwable.printStackTrace();
-                            })
-                            .doOnCompleted(() -> Log.d(TAG, "Completed"));
+                return isObject ? Completable.fromObservable(mRestApi.dynamicPost(mPostRequest.getUrl(), requestBody)
+                        .doOnSubscribe(subscription -> Log.d(TAG, "Posting " + mPostRequest.getRequestType()
+                                .getSimpleName()))
+                        .doOnError(this::onError)
+                        .doOnComplete(() -> Log.d(TAG, COMPLETED))
+                        .toObservable()) :
+                        Completable.fromObservable(mRestApi.dynamicPost(mPostRequest.getUrl(), listRequestBody)
+                                .doOnSubscribe(subscription -> Log.d(TAG, "Posting List of " + mPostRequest
+                                        .getRequestType().getSimpleName()))
+                                .doOnError(this::onError)
+                                .doOnComplete(() -> Log.d(TAG, COMPLETED))
+                                .toObservable());
             case PostRequest.PUT:
-                if (isObject)
-                    return mRestApi.dynamicPut(mPostRequest.getUrl(), requestBody)
-                            .doOnSubscribe(() -> Log.d(TAG, "Putting " + mPostRequest.getDataClass()
-                                    .getSimpleName()))
-                            .toCompletable()
-                            .doOnError(throwable -> {
-                                queuePost();
-                                throwable.printStackTrace();
-                            })
-                            .doOnCompleted(() -> Log.d(TAG, "Completed"));
-                else
-                    return mRestApi.dynamicPut(mPostRequest.getUrl(), listRequestBody)
-                            .doOnSubscribe(() -> Log.d(TAG, "Putting List of " + mPostRequest.getDataClass()
-                                    .getSimpleName()))
-                            .toCompletable()
-                            .doOnError(throwable -> {
-                                queuePost();
-                                throwable.printStackTrace();
-                            })
-                            .doOnCompleted(() -> Log.d(TAG, "Completed"));
+                return isObject ? Completable.fromObservable(mRestApi.dynamicPut(mPostRequest.getUrl(), requestBody)
+                        .doOnSubscribe(subscription -> Log.d(TAG, "Putting " + mPostRequest.getRequestType()
+                                .getSimpleName()))
+                        .doOnError(this::onError)
+                        .doOnComplete(() -> Log.d(TAG, COMPLETED))
+                        .toObservable()) :
+                        Completable.fromObservable(mRestApi.dynamicPut(mPostRequest.getUrl(), listRequestBody)
+                                .doOnSubscribe(subscription -> Log.d(TAG, "Putting List of " + mPostRequest.getRequestType()
+                                        .getSimpleName()))
+                                .doOnError(this::onError)
+                                .doOnComplete(() -> Log.d(TAG, COMPLETED))
+                                .toObservable());
             case PostRequest.DELETE:
-                if (isObject)
-                    return mRestApi.dynamicDelete(mPostRequest.getUrl(), requestBody)
-                            .doOnSubscribe(() -> Log.d(TAG, "Deleting " + mPostRequest.getDataClass()
-                                    .getSimpleName()))
-                            .toCompletable()
-                            .doOnError(throwable -> {
-                                queuePost();
-                                throwable.printStackTrace();
-                            })
-                            .doOnCompleted(() -> Log.d(TAG, "Completed"));
-                else
-                    return mRestApi.dynamicDelete(mPostRequest.getUrl(), listRequestBody)
-                            .doOnSubscribe(() -> Log.d(TAG, "Deleting List of " + mPostRequest
-                                    .getDataClass().getSimpleName()))
-                            .toCompletable()
-                            .doOnError(throwable -> {
-                                queuePost();
-                                throwable.printStackTrace();
-                            })
-                            .doOnCompleted(() -> Log.d(TAG, "Completed"));
+                return isObject ? Completable.fromObservable(mRestApi.dynamicDelete(mPostRequest.getUrl(), requestBody)
+                        .doOnSubscribe(subscription -> Log.d(TAG, "Deleting " + mPostRequest.getRequestType()
+                                .getSimpleName()))
+                        .doOnError(this::onError)
+                        .doOnComplete(() -> Log.d(TAG, COMPLETED))
+                        .toObservable()) :
+                        Completable.fromObservable(mRestApi.dynamicDelete(mPostRequest.getUrl(), listRequestBody)
+                                .doOnSubscribe(subscription -> Log.d(TAG, "Deleting List of " + mPostRequest
+                                        .getRequestType().getSimpleName()))
+                                .doOnError(this::onError)
+                                .doOnComplete(() -> Log.d(TAG, COMPLETED))
+                                .toObservable());
+            default:
+                break;
         }
         return Completable.complete();
+    }
+
+    private void onError(Throwable throwable) {
+        queuePost();
+        Log.e(TAG, ON_ERROR, throwable);
     }
 
     void queuePost() {

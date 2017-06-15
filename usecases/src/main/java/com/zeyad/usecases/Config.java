@@ -2,23 +2,22 @@ package com.zeyad.usecases;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 
 import com.google.gson.ExclusionStrategy;
 import com.google.gson.FieldAttributes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.zeyad.usecases.network.ApiConnection;
-import com.zeyad.usecases.stores.CloudDataStore;
+import com.zeyad.usecases.stores.CloudStore;
 
 import java.util.concurrent.TimeUnit;
 
+import io.reactivex.Scheduler;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
-import rx.Scheduler;
 
-public class Config {
+public final class Config {
     private static Config sInstance;
     private static Gson mGson;
     private static String mBaseURL;
@@ -27,23 +26,22 @@ public class Config {
     private static TimeUnit cacheTimeUnit;
     private static Scheduler backgroundThread;
     private static ApiConnection apiConnection;
-    private static CloudDataStore cloudDataStore;
+    private static CloudStore cloudStore;
+    private static boolean withSQLite;
     private Context mContext;
     private boolean mUseApiWithCache;
 
     private Config(@NonNull Context context) {
         mContext = context;
-        mGson = createGson();
-        setupRealm();
+        setup();
     }
 
     private Config() {
-        mGson = createGson();
-        setupRealm();
+        setup();
     }
 
-    private static Gson createGson() {
-        mGson = new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
+    private static GsonBuilder createGson() {
+        return new GsonBuilder().setExclusionStrategies(new ExclusionStrategy() {
             @Override
             public boolean shouldSkipField(@NonNull FieldAttributes f) {
                 return f.getDeclaringClass().equals(RealmObject.class)
@@ -55,22 +53,18 @@ public class Config {
             public boolean shouldSkipClass(Class<?> clazz) {
                 return false;
             }
-        }).create();
-        return mGson;
+        });
     }
 
     public static Config getInstance() {
-        if (sInstance == null)
-            init();
+        if (sInstance == null) {
+            sInstance = new Config();
+        }
         return sInstance;
     }
 
     public static void init(@NonNull Context context) {
         sInstance = new Config(context);
-    }
-
-    public static void init() {
-        sInstance = new Config();
     }
 
     public static String getBaseURL() {
@@ -82,8 +76,6 @@ public class Config {
     }
 
     public static Gson getGson() {
-        if (mGson == null)
-            mGson = createGson();
         return mGson;
     }
 
@@ -119,6 +111,10 @@ public class Config {
         return withRealm;
     }
 
+    public static boolean isWithDisk() {
+        return withRealm || withSQLite;
+    }
+
     public static Scheduler getBackgroundThread() {
         return backgroundThread;
     }
@@ -135,30 +131,42 @@ public class Config {
         Config.apiConnection = apiConnection;
     }
 
-    public static CloudDataStore getCloudDataStore() {
-        return cloudDataStore;
+    public static CloudStore getCloudStore() {
+        return cloudStore;
     }
 
-    public static void setCloudDataStore(CloudDataStore cloudDataStore) {
-        Config.cloudDataStore = cloudDataStore;
+    public static void setCloudStore(CloudStore cloudStore) {
+        Config.cloudStore = cloudStore;
+    }
+
+    public static boolean isWithSQLite() {
+        return withSQLite;
+    }
+
+    public static void setWithSQLite(boolean withSQLite) {
+        Config.withSQLite = withSQLite;
+    }
+
+    public static void setGson() {
+        mGson = createGson().create();
+    }
+
+    private void setup() {
+        mGson = createGson().create();
+        setupRealm();
     }
 
     private void setupRealm() {
-//        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
-//                .name("library.realm")
-//                .modules(new LibraryModule())
-//                .rxFactory(new RealmObservableFactory())
-//                .deleteRealmIfMigrationNeeded()
-//                .build());
+        //        Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
+        //                .name("library.realm")
+        //                .modules(new LibraryModule())
+        //                .rxFactory(new RealmObservableFactory())
+        //                .deleteRealmIfMigrationNeeded()
+        //                .build());
     }
 
-    @Nullable
     public Context getContext() {
         return mContext;
-    }
-
-    public void setContext(Context context) {
-        mContext = context;
     }
 
     public boolean isUseApiWithCache() {

@@ -1,37 +1,31 @@
 package com.zeyad.usecases.app.components.redux;
 
-import static com.zeyad.usecases.app.components.redux.UIModel.ERROR;
-import static com.zeyad.usecases.app.components.redux.UIModel.LOADING;
-import static com.zeyad.usecases.app.components.redux.UIModel.SUCCESS;
-
 /**
  * @author by ZIaDo on 4/19/17.
  */
-public class Result<B> {
+final class Result<B> {
 
     private final boolean isLoading, isSuccessful;
     private final Throwable error;
-    private final String state;
-    private final B bundle;
+    private final ResultBundle<?, B> bundle;
 
-    private Result(String state, boolean isLoading, Throwable error, boolean isSuccessful, B bundle) {
+    private Result(boolean isLoading, Throwable error, boolean isSuccessful, ResultBundle<?, B> bundle) {
         this.isLoading = isLoading;
         this.error = error;
         this.isSuccessful = isSuccessful;
         this.bundle = bundle;
-        this.state = state;
     }
 
     static <B> Result<B> loadingResult() {
-        return new Result<>(LOADING, true, null, false, null);
+        return new Result<>(true, null, false, new ResultBundle<>("", null));
     }
 
     static <B> Result<B> errorResult(Throwable error) {
-        return new Result<>(ERROR, false, error, false, null);
+        return new Result<>(false, error, false, new ResultBundle<>("", null));
     }
 
-    static <B> Result<B> successResult(B bundle) {
-        return new Result<>(SUCCESS, false, null, true, bundle);
+    static <B> Result<B> successResult(ResultBundle<?, B> bundle) {
+        return new Result<>(false, null, true, bundle);
     }
 
     boolean isLoading() {
@@ -46,14 +40,12 @@ public class Result<B> {
         return isSuccessful;
     }
 
-    public B getBundle() {
-        return bundle;
+    B getBundle() {
+        B bundle = this.bundle.getBundle();
+        return bundle != null ? bundle : (B) new Object();
     }
 
-    @Override
-    public String toString() {
-        return "State: " + state + ", Error: " + (error != null ? error.toString() : "null") +
-                ", Bundle type: " + (bundle != null ? bundle.getClass().getSimpleName() : "null") +
-                ", Key Selector: " + state + (bundle != null ? bundle.toString() : "");
+    String getEvent() {
+        return bundle == null ? "" : bundle.getEvent();
     }
 }

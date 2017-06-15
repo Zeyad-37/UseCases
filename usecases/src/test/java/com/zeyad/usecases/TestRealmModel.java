@@ -16,14 +16,14 @@ public class TestRealmModel implements RealmModel {
     @SerializedName("id")
     @PrimaryKey
     private int id;
+
     @SerializedName("value")
     private String value;
 
     public TestRealmModel(int id, String value) {
         this.id = id;
         this.value = value;
-        if (id <= 0)
-            throw new IllegalArgumentException("id should be greater than 0");
+        if (id <= 0) throw new IllegalArgumentException("id should be greater than 0");
     }
 
     public TestRealmModel() {
@@ -48,10 +48,7 @@ public class TestRealmModel implements RealmModel {
     @NonNull
     @Override
     public String toString() {
-        return "TestRealmModel{" +
-                "id=" + id +
-                ", value='" + value + '\'' +
-                '}';
+        return "TestRealmModel{" + "id=" + id + ", value='" + value + '\'' + '}';
     }
 
     @Override

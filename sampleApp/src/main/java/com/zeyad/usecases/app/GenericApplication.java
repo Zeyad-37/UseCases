@@ -11,6 +11,8 @@ import android.os.StrictMode;
 import android.util.Base64;
 import android.util.Log;
 
+import com.rollbar.android.Rollbar;
+import com.squareup.leakcanary.LeakCanary;
 import com.zeyad.usecases.api.DataServiceConfig;
 import com.zeyad.usecases.api.DataServiceFactory;
 
@@ -18,6 +20,8 @@ import java.security.MessageDigest;
 import java.util.concurrent.TimeUnit;
 
 import io.flowup.FlowUp;
+import io.reactivex.Completable;
+import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.rx.RealmObservableFactory;
@@ -32,27 +36,29 @@ public class GenericApplication extends Application {
     @TargetApi(value = 24)
     private static boolean checkAppSignature(Context context) {
         try {
-            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),
-                    PackageManager.GET_SIGNATURES);
+            PackageInfo packageInfo = context.getPackageManager()
+                    .getPackageInfo(context.getPackageName(), PackageManager.GET_SIGNATURES);
             for (Signature signature : packageInfo.signatures) {
                 byte[] signatureBytes = signature.toByteArray();
                 MessageDigest md = MessageDigest.getInstance("SHA");
-                md.update(signature.toByteArray());
+                md.update(signatureBytes);
                 final String currentSignature = Base64.encodeToString(md.digest(), Base64.DEFAULT);
                 Log.d("REMOVE_ME", "Include this string as a value for SIGNATURE:" + currentSignature);
                 //compare signatures
-                if (java.security.CryptoPrimitive.SIGNATURE.equals(currentSignature)) {
+                if (java.security.CryptoPrimitive.SIGNATURE.toString().equals(currentSignature)) {
                     return true;
                 }
             }
         } catch (Exception e) {
+            Log.e("GenericApplication", "checkAppSignature", e);
             //assumes an issue in checking signature., but we let the caller decide on what to do.
         }
         return false;
     }
 
     private static boolean verifyInstaller(Context context) {
-        final String installer = context.getPackageManager().getInstallerPackageName(context.getPackageName());
+        final String installer =
+                context.getPackageManager().getInstallerPackageName(context.getPackageName());
         return installer != null && installer.startsWith("com.android.vending");
     }
 
@@ -65,6 +71,7 @@ public class GenericApplication extends Application {
                 return true;
             }
         } catch (Exception ignored) {
+            Log.e("GenericApplication", "checkEmulator", ignored);
         }
         return false;
     }
@@ -81,35 +88,35 @@ public class GenericApplication extends Application {
 
     @Override
     public void onCreate() {
-        initializeStrictMode();
+//        initializeStrictMode();
         super.onCreate();
-//        if (LeakCanary.isInAnalyzerProcess(this)) {
-//            // This process is dedicated to LeakCanary for heap analysis.
-//            // You should not init your app in this process.
-//            return;
-//        }
-//        LeakCanary.install(this);
-//        checkAppTampering(sInstance);
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this);
+        Completable.fromAction(() -> {
+//            checkAppTampering(this);
+            initializeFlowUp();
+            Rollbar.init(this, "c8c8b4cb1d4f4650a77ae1558865ca87", "production");
+        }).subscribeOn(Schedulers.io())
+                .subscribe(() -> {
+                }, Throwable::printStackTrace);
         initializeRealm();
         DataServiceFactory.init(new DataServiceConfig.Builder(this)
                 .baseUrl(API_BASE_URL)
                 .withCache(3, TimeUnit.MINUTES)
                 .withRealm()
                 .build());
-        initializeStetho();
-        initializeFlowUp();
     }
 
     private void initializeStrictMode() {
         if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(new StrictMode.ThreadPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build());
-            StrictMode.setVmPolicy(new StrictMode.VmPolicy.Builder()
-                    .detectAll()
-                    .penaltyLog()
-                    .build());
+            StrictMode.setThreadPolicy(
+                    new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+            StrictMode.setVmPolicy(
+                    new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
         }
     }
 
@@ -123,21 +130,6 @@ public class GenericApplication extends Application {
                 .build());
     }
 
-    private void initializeStetho() {
-//        Stetho.initialize(Stetho.newInitializerBuilder(this)
-//                .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-//                .enableWebKitInspector(RealmInspectorModulesProvider.builder(this).build())
-//                .build());
-//        RealmInspectorModulesProvider.builder(this)
-//                .withFolder(getCacheDir())
-////                .withEncryptionKey("encrypted.realm", key)
-//                .withMetaTables()
-//                .withDescendingOrder()
-//                .withLimit(1000)
-//                .databaseNamePattern(Pattern.compile(".+\\.realm"))
-//                .build();
-    }
-
     private void initializeFlowUp() {
         FlowUp.Builder.with(this)
                 .apiKey(getString(R.string.flow_up_api_key))
@@ -146,7 +138,9 @@ public class GenericApplication extends Application {
     }
 
     private boolean checkAppTampering(Context context) {
-        return checkAppSignature(context) && verifyInstaller(context) && checkEmulator()
+        return checkAppSignature(context)
+                && verifyInstaller(context)
+                && checkEmulator()
                 && checkDebuggable(context);
     }
 }

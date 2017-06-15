@@ -4,7 +4,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
 
-import com.trello.rxlifecycle.components.support.RxFragment;
+import com.trello.rxlifecycle2.components.support.RxFragment;
 import com.zeyad.usecases.app.components.eventbus.IRxEventBus;
 import com.zeyad.usecases.app.components.eventbus.RxEventBusFactory;
 import com.zeyad.usecases.app.components.navigation.INavigator;
@@ -13,20 +13,23 @@ import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
 import org.parceler.Parcels;
 
-import rx.Observable;
+import io.reactivex.BackpressureStrategy;
+import io.reactivex.FlowableTransformer;
+import io.reactivex.Observable;
 
 import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
 
 /**
  * @author zeyad on 11/28/16.
  */
-public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFragment implements LoadDataView<S> {
+public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFragment
+        implements LoadDataView<S> {
 
     public INavigator navigator;
     public IRxEventBus rxEventBus;
     public ErrorMessageFactory errorMessageFactory;
     public Observable<BaseEvent> events;
-    public Observable.Transformer<BaseEvent, UIModel<S>> uiModelsTransformer;
+    public FlowableTransformer<BaseEvent, UIModel<S>> uiModelsTransformer;
     public VM viewModel;
     public S viewState;
 
@@ -40,8 +43,9 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
         setRetainInstance(true);
         navigator = NavigatorFactory.getInstance();
         rxEventBus = RxEventBusFactory.getInstance();
-        if (savedInstanceState != null)
+        if (savedInstanceState != null) {
             viewState = Parcels.unwrap(savedInstanceState.getParcelable(UI_MODEL));
+        }
         initialize();
     }
 
@@ -49,15 +53,17 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
     public void onStart() {
         super.onStart();
         uiModelsTransformer = viewModel.uiModels();
-        events.compose(uiModelsTransformer)
+        events.toFlowable(BackpressureStrategy.BUFFER)
+                .compose(uiModelsTransformer)
                 .compose(bindToLifecycle())
                 .subscribe(new UISubscriber<>(this, errorMessageFactory));
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-        if (outState != null)
+        if (outState != null) {
             outState.putAll(saveState());
+        }
         super.onSaveInstanceState(outState);
     }
 
@@ -91,17 +97,21 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
      * @param message An string representing a message to be shown.
      */
     public void showSnackBarMessage(View view, String message, int duration) {
-        if (view != null)
+        if (view != null) {
             SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_INFO, view, message, duration).show();
-        else throw new NullPointerException("View is null");
+        } else {
+            throw new IllegalArgumentException("View is null");
+        }
     }
 
     public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,
                                        String message, String actionText, View.OnClickListener onClickListener) {
-        if (view != null)
-            SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText,
-                    onClickListener).show();
-        else throw new NullPointerException("View is null");
+        if (view != null) {
+            SnackBarFactory.getSnackBarWithAction(typeSnackBar, view, message, actionText, onClickListener)
+                    .show();
+        } else {
+            throw new IllegalArgumentException("View is null");
+        }
     }
 
     public void showSnackBarWithAction(@SnackBarFactory.SnackBarType String typeSnackBar, View view,
@@ -116,8 +126,10 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends RxFra
      * @param duration Visibility duration.
      */
     public void showErrorSnackBar(String message, View view, int duration) {
-        if (view != null)
+        if (view != null) {
             SnackBarFactory.getSnackBar(SnackBarFactory.TYPE_ERROR, view, message, duration).show();
-        else throw new NullPointerException("View is null");
+        } else {
+            throw new IllegalArgumentException("View is null");
+        }
     }
 }

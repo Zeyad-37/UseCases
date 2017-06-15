@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import java.util.List;
 import java.util.Map;
 
+import io.reactivex.Flowable;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -19,7 +20,6 @@ import retrofit2.http.Part;
 import retrofit2.http.PartMap;
 import retrofit2.http.Streaming;
 import retrofit2.http.Url;
-import rx.Observable;
 
 /**
  * RestApi for retrieving data from the network.
@@ -28,44 +28,44 @@ public interface RestApi {
 
     @NonNull
     @GET
-    Observable<Object> dynamicGetObject(@Url String url);
+    Flowable<Object> dynamicGetObject(@Url String url);
 
     @NonNull
     @GET
-    Observable<Object> dynamicGetObject(@Url String url, boolean shouldCache);
+    Flowable<Object> dynamicGetObject(@Url String url, boolean shouldCache);
 
     @NonNull
     @GET
-    Observable<List> dynamicGetList(@Url String url);
+    Flowable<List> dynamicGetList(@Url String url);
 
     @NonNull
     @GET
-    Observable<List> dynamicGetList(@Url String url, boolean shouldCache);
+    Flowable<List> dynamicGetList(@Url String url, boolean shouldCache);
 
     @NonNull
     @POST
-    Observable<Object> dynamicPost(@Url String url, @Body RequestBody body);
+    Flowable<Object> dynamicPost(@Url String url, @Body RequestBody body);
 
     @NonNull
     @PUT
-    Observable<Object> dynamicPut(@Url String url, @Body RequestBody body);
+    Flowable<Object> dynamicPut(@Url String url, @Body RequestBody body);
 
     @NonNull
     @DELETE
-    Observable<Object> dynamicDelete(@Url String url, @Body RequestBody body);
+    Flowable<Object> dynamicDelete(@Url String url, @Body RequestBody body);
 
     @NonNull
     @Streaming
     @GET
-    Observable<ResponseBody> dynamicDownload(@Url String fileUrl);
+    Flowable<ResponseBody> dynamicDownload(@Url String fileUrl);
 
     @NonNull
     @Multipart
     @POST
-    Observable<Object> dynamicUpload(@Url String url, @PartMap() Map<String, RequestBody> partMap,
-                                     @Part MultipartBody.Part file);
+    Flowable<Object> dynamicUpload(@Url String url, @PartMap() Map<String, RequestBody> partMap,
+                                   @Part MultipartBody.Part file);
 
     @NonNull
     @PATCH
-    Observable<Object> dynamicPatch(@Url String url, @Body RequestBody requestBody);
+    Flowable<Object> dynamicPatch(@Url String url, @Body RequestBody requestBody);
 }

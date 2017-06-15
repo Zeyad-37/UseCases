@@ -14,27 +14,27 @@ import java.util.HashMap;
  */
 public class FileIORequest implements Parcelable {
 
-    public static final Parcelable.Creator<FileIORequest> CREATOR = new Parcelable.Creator<FileIORequest>() {
-        @NonNull
-        @Override
-        public FileIORequest createFromParcel(@NonNull Parcel source) {
-            return new FileIORequest(source);
-        }
+    public static final Parcelable.Creator<FileIORequest> CREATOR =
+            new Parcelable.Creator<FileIORequest>() {
+                @NonNull
+                @Override
+                public FileIORequest createFromParcel(@NonNull Parcel source) {
+                    return new FileIORequest(source);
+                }
 
-        @NonNull
-        @Override
-        public FileIORequest[] newArray(int size) {
-            return new FileIORequest[size];
-        }
-    };
+                @NonNull
+                @Override
+                public FileIORequest[] newArray(int size) {
+                    return new FileIORequest[size];
+                }
+            };
     private File file;
     private String url, key;
     private boolean onWifi, whileCharging, queuable;
     private Class dataClass;
     private HashMap<String, Object> parameters;
 
-    public FileIORequest() {
-    }
+    public FileIORequest() {}
 
     private FileIORequest(@NonNull Builder uploadRequestBuilder) {
         url = uploadRequestBuilder.url;
@@ -176,3 +176,4 @@ public class FileIORequest implements Parcelable {
         }
     }
 }
+

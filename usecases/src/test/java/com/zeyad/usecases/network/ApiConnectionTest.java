@@ -29,7 +29,8 @@ public class ApiConnectionTest {
     private final String mValidUrl = getValidUrl();
     private final RequestBody mMockedRequestBody = mock(RequestBody.class);
     private final Map<String, RequestBody> mPartMap = Mockito.mock(Map.class);
-    private final MultipartBody.Part mMultipartBodyPart = MultipartBody.Part.create(mMockedRequestBody);
+    private final MultipartBody.Part mMultipartBodyPart =
+            MultipartBody.Part.create(mMockedRequestBody);
     private ApiConnection mApiConnection;
     private RestApi mRestApiWithCache;
     private RestApi mRestApiWithoutCache;
@@ -42,7 +43,7 @@ public class ApiConnectionTest {
     }
 
     @NonNull
-    String getValidUrl() {
+    private String getValidUrl() {
         return "http://www.google.com";
     }
 
@@ -53,14 +54,22 @@ public class ApiConnectionTest {
         assertThat(mRestApiWithCache, is(notNullValue()));
         assertThat(mRestApiWithoutCache, is(notNullValue()));
         assertThat(getCurrentSetRestApiWithCache(mApiConnection), is(equalTo(mRestApiWithCache)));
-        assertThat(getCurrentSetRestApiWithoutCache(mApiConnection), is(equalTo(mRestApiWithoutCache)));
+        assertThat(
+                getCurrentSetRestApiWithoutCache(mApiConnection),
+                is(equalTo(mRestApiWithoutCache)));
     }
 
     @Test
     public void testProvideHttpLoggingInterceptor() throws Exception {
-        HttpLoggingInterceptor httpLoggingInterceptor = ApiConnection.provideHttpLoggingInterceptor();
-        assertThat(httpLoggingInterceptor.getLevel(), is(equalTo(BuildConfig.DEBUG ?
-                HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE)));
+        HttpLoggingInterceptor httpLoggingInterceptor =
+                ApiConnection.provideHttpLoggingInterceptor();
+        assertThat(
+                httpLoggingInterceptor.getLevel(),
+                is(
+                        equalTo(
+                                BuildConfig.DEBUG
+                                        ? HttpLoggingInterceptor.Level.BODY
+                                        : HttpLoggingInterceptor.Level.NONE)));
     }
 
     @Test
@@ -70,13 +79,15 @@ public class ApiConnectionTest {
     }
 
     @Test
-    public void testDynamicGetObject_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsTrue() throws Exception {
+    public void testDynamicGetObject_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsTrue()
+            throws Exception {
         mApiConnection.dynamicGetObject(mValidUrl, true);
         Mockito.verify(mRestApiWithoutCache).dynamicGetObject(eq(mValidUrl));
     }
 
     @Test
-    public void testDynamicGetObject_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsFalse() throws Exception {
+    public void testDynamicGetObject_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsFalse()
+            throws Exception {
         mApiConnection.dynamicGetObject(mValidUrl, false);
         Mockito.verify(mRestApiWithoutCache).dynamicGetObject(eq(mValidUrl));
     }
@@ -94,13 +105,15 @@ public class ApiConnectionTest {
     }
 
     @Test
-    public void testDynamicGetListCache_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsTrue() throws Exception {
+    public void testDynamicGetListCache_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsTrue()
+            throws Exception {
         mApiConnection.dynamicGetList(mValidUrl, true);
         Mockito.verify(mRestApiWithoutCache).dynamicGetList(eq(mValidUrl));
     }
 
     @Test
-    public void testDynamicGetListCache_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsFalse() throws Exception {
+    public void testDynamicGetListCache_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsFalse()
+            throws Exception {
         mApiConnection.dynamicGetList(mValidUrl, false);
         Mockito.verify(mRestApiWithoutCache).dynamicGetList(eq(mValidUrl));
     }
@@ -132,7 +145,8 @@ public class ApiConnectionTest {
     @Test
     public void testUploadPartAndRequestBody() throws Exception {
         mApiConnection.dynamicUpload(mValidUrl, mPartMap, mMultipartBodyPart);
-        Mockito.verify(mRestApiWithoutCache).dynamicUpload(eq(mValidUrl), eq(mPartMap), eq(mMultipartBodyPart));
+        Mockito.verify(mRestApiWithoutCache)
+                .dynamicUpload(eq(mValidUrl), eq(mPartMap), eq(mMultipartBodyPart));
     }
 
     @Test
@@ -156,7 +170,9 @@ public class ApiConnectionTest {
     }
 
     @NonNull
-    private ApiConnection getApiImplementation(RestApi restApiWithoutCache, RestApi restApiWithCache) {
+    private ApiConnection getApiImplementation(
+            RestApi restApiWithoutCache, RestApi restApiWithCache) {
         return new ApiConnection(restApiWithoutCache, restApiWithCache);
     }
 }
+

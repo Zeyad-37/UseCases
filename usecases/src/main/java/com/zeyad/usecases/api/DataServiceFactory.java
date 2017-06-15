@@ -11,53 +11,66 @@ import com.zeyad.usecases.Config;
 import com.zeyad.usecases.db.RealmManager;
 import com.zeyad.usecases.network.ApiConnection;
 import com.zeyad.usecases.stores.DataStoreFactory;
+import com.zeyad.usecases.utils.DataBaseManagerUtil;
 
-import rx.android.schedulers.AndroidSchedulers;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import st.lowlevel.storo.StoroBuilder;
 
-public class DataServiceFactory {
+public final class DataServiceFactory {
     @Nullable
     private static IDataService sDataUseCase;
 
+    private DataServiceFactory() {
+    }
+
     /**
-     * @return IDataService the implementation instance of IDataService, throws NullPointerException if null.
+     * @return IDataService the implementation instance of IDataService, throws NullPointerException
+     * if null.
      */
     @Nullable
     public static IDataService getInstance() {
-        if (sDataUseCase == null)
-            throw new NullPointerException("DataServiceFactory#init must be called before calling getInstance()");
+        if (sDataUseCase == null) {
+            throw new NullPointerException(
+                    "DataServiceFactory#init must be called before calling getInstance()");
+        }
         return sDataUseCase;
     }
 
     /**
-     * Initialization method, that takes a DataServiceConfig object to setup DataUseCase Singleton instance.
+     * Initialization method, that takes a DataServiceConfig object to setup DataUseCase Singleton
+     * instance.
      *
      * @param config configuration object to DataUseCase.
      */
     public static void init(@NonNull DataServiceConfig config) {
-        if (!doesContextBelongsToApplication(config.getContext()))
+        if (!doesContextBelongsToApplication(config.getContext())) {
             throw new IllegalArgumentException("Context should be application context only.");
+        }
+        DataBaseManagerUtil dataBaseManagerUtil = config.getDataBaseManagerUtil();
+        boolean isSQLite = dataBaseManagerUtil != null;
         Config.init(config.getContext());
         Config.setBaseURL(config.getBaseUrl());
         Config.setWithCache(config.isWithCache());
         Config.setCacheExpiry(config.getCacheAmount(), config.getTimeUnit());
-        if (config.isWithCache())
+        Config.setWithSQLite(isSQLite);
+        Config.setHasRealm(config.isWithRealm());
+        if (config.isWithCache()) {
             StoroBuilder.configure(config.getCacheSize())
                     .setDefaultCacheDirectory(config.getContext())
                     .setGsonInstance(Config.getGson())
                     .initialize();
-        HandlerThread backgroundThread = config.getHandlerThread();
+        }
+        HandlerThread handlerThread = config.getHandlerThread();
         if (config.isWithRealm()) {
-            backgroundThread.start();
-            Config.setBackgroundThread(AndroidSchedulers.from(backgroundThread.getLooper()));
+            handlerThread.start();
+            Config.setBackgroundThread(AndroidSchedulers.from(handlerThread.getLooper()));
         }
         ApiConnection apiConnection = new ApiConnection(ApiConnection.init(config.getOkHttpBuilder()),
                 ApiConnection.initWithCache(config.getOkHttpBuilder(), config.getOkHttpCache()));
-        sDataUseCase = new DataService(config.isWithCache() ?
-                new DataStoreFactory(new RealmManager(backgroundThread.getLooper()),
-                        apiConnection, config.getEntityMapper()) :
-                new DataStoreFactory(apiConnection, config.getEntityMapper()), config.getPostExecutionThread(),
-                Config.getBackgroundThread());
+        dataBaseManagerUtil = config.isWithRealm() || isSQLite ? isSQLite ? dataBaseManagerUtil :
+                dataClass -> new RealmManager() : null;
+        sDataUseCase = new DataService(new DataStoreFactory(dataBaseManagerUtil, apiConnection,
+                config.getEntityMapper()), config.getPostExecutionThread(), Config.getBackgroundThread());
         Config.setApiConnection(apiConnection);
     }
 

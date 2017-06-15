@@ -2,8 +2,8 @@ package com.zeyad.usecases.app.screens.screens.user_list;
 
 import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
-import com.zeyad.usecases.app.screens.user_list.User;
-import com.zeyad.usecases.app.screens.user_list.UserListVM;
+import com.zeyad.usecases.app.screens.user.list.User;
+import com.zeyad.usecases.app.screens.user.list.UserListVM;
 import com.zeyad.usecases.db.RealmQueryProvider;
 import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;
@@ -14,8 +14,8 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import rx.Observable;
-import rx.observers.TestSubscriber;
+import io.reactivex.Flowable;
+import io.reactivex.subscribers.TestSubscriber;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -46,10 +46,9 @@ public class UserListVMTest {
         user.setId(1);
         userList = new ArrayList<>();
         userList.add(user);
-        Observable<List<User>> observableUserRealm = Observable.just(userList);
+        Flowable<List<User>> observableUserRealm = Flowable.just(userList);
 
-        when(mockDataUseCase.<User>getListOffLineFirst(any()))
-                .thenReturn(observableUserRealm);
+        when(mockDataUseCase.<User>getListOffLineFirst(any())).thenReturn(observableUserRealm);
 
         TestSubscriber<List<User>> subscriber = new TestSubscriber<>();
         userListVM.getUsers(0).subscribe(subscriber);
@@ -57,7 +56,7 @@ public class UserListVMTest {
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).getListOffLineFirst(any(GetRequest.class));
 
-        subscriber.assertCompleted();
+        subscriber.assertComplete();
         subscriber.assertNoErrors();
         subscriber.assertValue(userList);
     }
@@ -67,10 +66,10 @@ public class UserListVMTest {
         List<Long> ids = new ArrayList<>();
         ids.add(1L);
         ids.add(2L);
-        Observable<List<Long>> observableUserRealm = Observable.just(ids);
+        Flowable<List<Long>> observableUserRealm = Flowable.just(ids);
 
         when(mockDataUseCase.deleteCollectionByIds(any(PostRequest.class)))
-                .thenReturn(Observable.just(true));
+                .thenReturn(Flowable.just(true));
 
         TestSubscriber<List<Long>> subscriber = new TestSubscriber<>();
         userListVM.deleteCollection(ids).subscribe(subscriber);
@@ -78,7 +77,7 @@ public class UserListVMTest {
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).deleteCollectionByIds(any(PostRequest.class));
 
-        subscriber.assertCompleted();
+        subscriber.assertComplete();
         subscriber.assertNoErrors();
         subscriber.assertValue(ids);
     }
@@ -90,8 +89,8 @@ public class UserListVMTest {
         user.setId(1);
         userList = new ArrayList<>();
         userList.add(user);
-        Observable<List<User>> listObservable = Observable.just(userList);
-        Observable<User> userObservable = Observable.just(user);
+        Flowable<List<User>> listObservable = Flowable.just(userList);
+        Flowable<User> userObservable = Flowable.just(user);
 
         when(mockDataUseCase.<User>getObject(any(GetRequest.class))).thenReturn(userObservable);
         when(mockDataUseCase.<User>queryDisk(any(RealmQueryProvider.class)))
@@ -103,8 +102,8 @@ public class UserListVMTest {
         // Verify repository interactions
         verify(mockDataUseCase, times(1)).queryDisk(any(RealmQueryProvider.class));
 
-        subscriber.assertCompleted();
+        subscriber.assertComplete();
         subscriber.assertNoErrors();
-//        subscriber.assertValue(userList);
+        //        subscriber.assertValue(userList);
     }
 }

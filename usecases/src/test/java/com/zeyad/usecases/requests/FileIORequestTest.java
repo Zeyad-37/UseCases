@@ -30,11 +30,12 @@ public class FileIORequestTest {
 
     @Before
     public void setUp() throws Exception {
-        mFileIORequest = new FileIORequest.Builder(URL, FILE)
-                .onWifi(ON_WIFI)
-                .whileCharging(WHILE_CHARGING)
-                .dataClass(DATA_CLASS)
-                .build();
+        mFileIORequest =
+                new FileIORequest.Builder(URL, FILE)
+                        .onWifi(ON_WIFI)
+                        .whileCharging(WHILE_CHARGING)
+                        .dataClass(DATA_CLASS)
+                        .build();
     }
 
     @After
@@ -67,3 +68,4 @@ public class FileIORequestTest {
         assertThat(mFileIORequest.isWhileCharging(), is(equalTo(WHILE_CHARGING)));
     }
 }
+

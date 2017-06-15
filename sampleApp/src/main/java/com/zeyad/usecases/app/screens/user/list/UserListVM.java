@@ -1,0 +1,97 @@
+package com.zeyad.usecases.app.screens.user.list;
+
+import com.zeyad.usecases.api.IDataService;
+import com.zeyad.usecases.app.components.redux.BaseEvent;
+import com.zeyad.usecases.app.components.redux.BaseViewModel;
+import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
+import com.zeyad.usecases.app.screens.user.list.events.DeleteUsersEvent;
+import com.zeyad.usecases.app.screens.user.list.events.GetPaginatedUsersEvent;
+import com.zeyad.usecases.app.screens.user.list.events.SearchUsersEvent;
+import com.zeyad.usecases.requests.GetRequest;
+import com.zeyad.usecases.requests.PostRequest;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+
+import io.reactivex.Flowable;
+import io.reactivex.functions.BiFunction;
+import io.reactivex.functions.Function;
+
+import static com.zeyad.usecases.app.utils.Constants.URLS.USER;
+import static com.zeyad.usecases.app.utils.Constants.URLS.USERS;
+
+/**
+ * @author zeyad on 11/1/16.
+ */
+public class UserListVM extends BaseViewModel<UserListState> {
+
+    private IDataService dataUseCase;
+
+    @Override
+    public void init(SuccessStateAccumulator<UserListState> successStateAccumulator,
+                     UserListState initialState, Object... otherDependencies) {
+        dataUseCase = (IDataService) otherDependencies[0];
+        setSuccessStateAccumulator(successStateAccumulator);
+        setInitialState(initialState);
+    }
+
+    @Override
+    public Function<BaseEvent, Flowable<?>> mapEventsToExecutables() {
+        return event -> {
+            Flowable executable = Flowable.empty();
+            if (event instanceof GetPaginatedUsersEvent) {
+                executable = getUsers(((GetPaginatedUsersEvent) event).getLastId());
+            } else if (event instanceof DeleteUsersEvent) {
+                executable = deleteCollection(((DeleteUsersEvent) event).getSelectedItemsIds());
+            } else if (event instanceof SearchUsersEvent) {
+                executable = search(((SearchUsersEvent) event).getQuery());
+            }
+            return executable;
+        };
+    }
+
+    public Flowable<User> getUser() {
+        return dataUseCase.getObjectOffLineFirst(new GetRequest.Builder(User.class, true)
+                .url(String.format(USER, "Zeyad-37"))
+                .id("Zeyad-37", User.LOGIN, String.class)
+                .cache()
+                .build());
+    }
+
+    public Flowable<List<User>> getUsers(long lastId) {
+        return lastId == 0 ?
+                dataUseCase.getListOffLineFirst(new GetRequest.Builder(User.class, true)
+                        .url(String.format(USERS, lastId))
+                        .cache()
+                        .build()) :
+                dataUseCase.getList(new GetRequest.Builder(User.class, true)
+                        .url(String.format(USERS, lastId))
+                        .cache()
+                        .build());
+    }
+
+    public Flowable<List<User>> search(String query) {
+        return dataUseCase.<User>queryDisk(realm -> realm.where(User.class).beginsWith(User.LOGIN, query))
+                .zipWith(dataUseCase.<User>getObject(new GetRequest.Builder(User.class, false)
+                                .url(String.format(USER, query))
+                                .build())
+                                .onErrorReturnItem(new User())
+                                .filter(user -> user.getId() != 0)
+                                .map(user -> user != null ?
+                                        Collections.singletonList(user) : Collections.emptyList()),
+                        (BiFunction<List<User>, List<User>, List<User>>) (users, singleton) -> {
+                            users.addAll(singleton);
+                            return new ArrayList<>(new HashSet<>(users));
+                        });
+    }
+
+    public Flowable<List<Long>> deleteCollection(List<Long> selectedItemsIds) {
+        return dataUseCase.deleteCollectionByIds(new PostRequest.Builder(User.class, true)
+                .payLoad(selectedItemsIds)
+                .cache()
+                .build())
+                .map(o -> selectedItemsIds);
+    }
+}

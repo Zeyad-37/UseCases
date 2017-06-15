@@ -1,10 +1,12 @@
 package com.zeyad.usecases.mapper;
 
 import com.google.gson.internal.LinkedTreeMap;
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.TestRealmModel;
 
 import junit.framework.Assert;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,26 +21,40 @@ public class DAOMapperTest {
 
     @Before
     public void setUp() throws Exception {
+        Config.setGson();
         daoMapper = new DAOMapper();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        daoMapper = null;
     }
 
     @Test
     public void mapTo() throws Exception {
-        Assert.assertEquals(daoMapper.mapTo(new Object(), Object.class).getClass(), LinkedTreeMap.class);
-        Assert.assertEquals(daoMapper.mapTo(new Object(), TestRealmModel.class).getClass(), TestRealmModel.class);
+        Assert.assertEquals(
+                daoMapper.mapTo(new Object(), Object.class).getClass(), LinkedTreeMap.class);
+        Assert.assertEquals(
+                daoMapper.mapTo(new Object(), TestRealmModel.class).getClass(),
+                TestRealmModel.class);
     }
 
     @Test
     public void mapAllTo() throws Exception {
-        Assert.assertEquals(daoMapper.mapAllTo(Collections.EMPTY_LIST, Object.class).getClass(), ArrayList.class);
-        Assert.assertEquals(daoMapper.mapAllTo(Collections.singletonList(new Object()),
-                Object.class).getClass(), ArrayList.class);
-        Assert.assertEquals(daoMapper.mapAllTo(Collections.singletonList(new TestRealmModel()),
-                TestRealmModel.class).getClass(), ArrayList.class);
-    }
-
-    @Test
-    public void getInstance() throws Exception {
-        Assert.assertNotNull(DAOMapper.getInstance());
+        Assert.assertEquals(
+                daoMapper.mapAllTo(Collections.EMPTY_LIST, Object.class).getClass(),
+                ArrayList.class);
+        Assert.assertEquals(
+                daoMapper
+                        .mapAllTo(Collections.singletonList(new Object()), Object.class)
+                        .getClass(),
+                ArrayList.class);
+        Assert.assertEquals(
+                daoMapper
+                        .mapAllTo(
+                                Collections.singletonList(new TestRealmModel()),
+                                TestRealmModel.class)
+                        .getClass(),
+                ArrayList.class);
     }
 }
