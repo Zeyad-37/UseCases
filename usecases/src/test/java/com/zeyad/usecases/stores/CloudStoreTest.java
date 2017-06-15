@@ -82,6 +82,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         when(mockDataBaseManager.putAll(anyList(), any(Class.class)))
                 .thenReturn(Single.just(true));
         when(utils.isNetworkAvailable(any(Context.class))).thenReturn(true);
+        when(utils.withDisk(true)).thenReturn(true);
         cloudStore = new CloudStore(mockApiConnection, mockDataBaseManager, new DAOMapper(),
                 new MemoryStore(com.zeyad.usecases.Config.getGson()), utils);
         HandlerThread backgroundThread = new HandlerThread("backgroundThread");
@@ -104,7 +105,6 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicGetObjectCanWillPersist() throws Exception {
-        cloudStore.mCanPersist = true;
         when(mockApiConnection.dynamicGetObject(anyString(), anyBoolean())).thenReturn(observable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -132,7 +132,6 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicGetListCanWillPersist() throws Exception {
-        cloudStore.mCanPersist = true;
         Flowable<List> observable = Flowable.just(Collections.singletonList(new TestRealmModel()));
         when(mockApiConnection.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
 
@@ -163,13 +162,13 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicPatchObjectCanWillPersist() throws Exception {
-        cloudStore.mCanPersist = true;
+        com.zeyad.usecases.Config.setWithSQLite(true);
         when(mockApiConnection.dynamicPatch(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPatchObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, true, false, false)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, true, true, true)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -222,7 +221,6 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicPostObjectCanWillPersist() throws Exception {
-        cloudStore.mCanPersist = true;
         when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -281,13 +279,12 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicPostListCanWillPersist() throws Exception {
-        cloudStore.mCanPersist = true;
         when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicPostList("", "", int.class, new JSONArray(), Object.class, Object.class, true, false,
-                false)
+        cloudStore.dynamicPostList("", "", int.class, new JSONArray(), Object.class, Object.class,
+                true, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -340,7 +337,6 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicPutObjectCanWillPersist() throws Exception {
-        cloudStore.mCanPersist = true;
         when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -399,7 +395,6 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicPutListCanWillPersist() throws Exception {
-        cloudStore.mCanPersist = true;
         when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -457,7 +452,6 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicDeleteCollectionCanWillPersist() throws Exception {
-        cloudStore.mCanPersist = true;
         when(mockApiConnection.dynamicDelete(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -613,8 +607,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class));
         verify(mockDataBaseManager, times(putO)).put(any(RealmObject.class), any(Class.class));
         verify(mockDataBaseManager, times(putM)).put(any(RealmModel.class), any(Class.class));
-        verify(mockDataBaseManager, atLeast(evict))
-                .evictById(any(Class.class), anyString(), anyLong());
+        verify(mockDataBaseManager, atLeast(evict)).evictById(any(Class.class), anyString(), anyLong());
     }
 
     @NonNull

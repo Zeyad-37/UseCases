@@ -8,6 +8,7 @@ import com.zeyad.usecases.requests.PostRequest;
 import com.zeyad.usecases.stores.CloudStore;
 import com.zeyad.usecases.stores.DataStoreFactory;
 import com.zeyad.usecases.stores.DiskStore;
+import com.zeyad.usecases.stores.MemoryStore;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,12 +48,17 @@ public class DataServiceTest {
     public void setUp() throws Exception {
         flowable = Flowable.just(true);
         postRequest = new PostRequest.Builder(Object.class, false).build();
-        getRequest = new GetRequest.Builder(Object.class, false).build();
+        getRequest = new GetRequest.Builder(TestRealmModel.class, false)
+                .url("")
+                .id(37, "id", int.class)
+                .cache()
+                .build();
         dataStoreFactory = mock(DataStoreFactory.class);
         when(dataStoreFactory.dynamically(anyString(), any(Class.class)))
                 .thenReturn(mock(CloudStore.class));
-        when(dataStoreFactory.disk(Object.class)).thenReturn(mock(DiskStore.class));
-        when(dataStoreFactory.cloud(Object.class)).thenReturn(mock(CloudStore.class));
+        when(dataStoreFactory.disk(any())).thenReturn(mock(DiskStore.class));
+        when(dataStoreFactory.cloud(any())).thenReturn(mock(CloudStore.class));
+        when(dataStoreFactory.memory()).thenReturn(mock(MemoryStore.class));
         dataService =
                 new DataService(
                         dataStoreFactory, AndroidSchedulers.mainThread(), mock(Scheduler.class));
@@ -110,12 +116,16 @@ public class DataServiceTest {
                 .disk(Object.class)
                 .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
                 .thenReturn(Flowable.just(Collections.EMPTY_LIST));
+        when(dataStoreFactory
+                .memory()
+                .getAllItems(any(Class.class)))
+                .thenReturn(Single.just(Collections.singletonList(true)));
 
         dataService.getListOffLineFirst(getRequest);
 
         verify(dataStoreFactory.cloud(Object.class), times(1))
                 .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean());
-        verify(dataStoreFactory.disk(Object.class), times(0))
+        verify(dataStoreFactory.disk(Object.class), times(1))
                 .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean());
     }
 
@@ -143,6 +153,11 @@ public class DataServiceTest {
                         anyBoolean()))
                 .thenReturn(flowable);
 
+        when(dataStoreFactory
+                .memory()
+                .getItem(anyString(), any(Class.class)))
+                .thenReturn(Single.just(true));
+
         dataService.getObjectOffLineFirst(getRequest);
 
         verify(dataStoreFactory.cloud(Object.class), times(1))
@@ -154,7 +169,7 @@ public class DataServiceTest {
                         any(Class.class),
                         anyBoolean(),
                         anyBoolean());
-        verify(dataStoreFactory.disk(Object.class), times(0))
+        verify(dataStoreFactory.disk(Object.class), times(1))
                 .dynamicGetObject(
                         anyString(),
                         anyString(),

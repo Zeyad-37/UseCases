@@ -64,7 +64,6 @@ public class CloudStore implements DataStore {
     private final FirebaseJobDispatcher mDispatcher;
     private final Utils mUtils;
     private final MemoryStore mMemoryStore;
-    boolean mCanPersist, canCache;
 
     /**
      * Construct a {@link DataStore} based on connections to the api (Cloud).
@@ -77,8 +76,6 @@ public class CloudStore implements DataStore {
         mApiConnection = apiConnection;
         mEntityDataMapper = entityDataMapper;
         mDataBaseManager = dataBaseManager;
-        mCanPersist = Config.isWithRealm() || Config.isWithSQLite();
-        canCache = memoryStore != null;
         mDispatcher = new FirebaseJobDispatcher(new GooglePlayDriver(Config.getInstance().getContext()));
         mMemoryStore = memoryStore;
         mUtils = utils;

@@ -92,7 +92,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
         viewModel = ViewModelProviders.of(this).get(UserListVM.class);
         viewModel.init(getUserListStateSuccessStateAccumulator(), null, DataServiceFactory.getInstance());
         events = Single.<BaseEvent>just(new GetPaginatedUsersEvent(0))
-                .doOnSuccess(event -> Log.d("GetUsersEvent", "fired!"))
+                .doOnSuccess(event -> Log.d("GetPaginatedUsersEvent", "fired!"))
                 .toObservable();
         rxEventBus.toFlowable()
                 .compose(bindToLifecycle())
@@ -106,7 +106,9 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     @Override
     protected void onResume() {
         super.onResume();
-        viewModel.getUser().compose(bindToLifecycle()).subscribe(user -> Log.d("Test", user.toString()),
+        viewModel.getUser()
+                .compose(bindToLifecycle())
+                .subscribe(user -> Log.d("Test", user.toString()),
                 throwable -> {
                 });
     }

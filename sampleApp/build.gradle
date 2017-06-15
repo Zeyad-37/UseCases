@@ -120,8 +120,9 @@ dependencies {
     compile "com.android.support:palette-v7:$supportLibraryVersion"
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
-//    compile "android.arch.lifecycle:runtime:1.0.0-alpha1"
+//    compile "android.arch.lifecycle:runtime:1.0.0-alpha2"
     compile "android.arch.lifecycle:extensions:1.0.0-alpha2"
+    compile "android.arch.lifecycle:reactivestreams:1.0.0-alpha2"
     // Network
     compile 'com.github.bumptech.glide:glide:3.7.0'
     // Rx
@@ -135,6 +136,9 @@ dependencies {
     compile "com.jakewharton:butterknife:$butterKnifeVersion"
     annotationProcessor "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
     // Utilities
+    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5.1'
+    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
+    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.1'
     compile "org.parceler:parceler-api:$parcelerVersion"
     annotationProcessor "org.parceler:parceler:$parcelerVersion"
     compile("io.flowup:android-sdk:0.2.4") {

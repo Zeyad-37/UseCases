@@ -46,10 +46,9 @@ public abstract class BaseViewModel<S> extends ViewModel {
                     if (result.isLoading()) {
                         currentUIModel = UIModel.loadingState(new ResultBundle<>(event, bundle));
                     } else if (result.isSuccessful()) {
-                        currentUIModel =
-                                UIModel.successState(new ResultBundle<>(event,
-                                        successStateAccumulator.accumulateSuccessStates(
-                                                result.getBundle(), event, bundle)));
+                        currentUIModel = UIModel
+                                .successState(new ResultBundle<>(event, successStateAccumulator
+                                        .accumulateSuccessStates(result.getBundle(), event, bundle)));
                     } else {
                         currentUIModel = UIModel.errorState(result.getError(),
                                 new ResultBundle<>(event, bundle));

@@ -235,7 +235,7 @@ public class RealmManager implements DataBaseManager {
     @Override
     public Single<Boolean> evictCollection(@NonNull String idFieldName, @NonNull List<Long> list,
                                            @NonNull Class dataClass) {
-        return Single.fromCallable(() -> Observable.fromIterable(list)
+        return Single.fromCallable(() -> list.isEmpty() ? false : Observable.fromIterable(list)
                 .map(aLong -> evictById(dataClass, idFieldName, aLong))
                 .reduce((aBoolean, aBoolean2) -> aBoolean && aBoolean2)
                 .blockingGet());

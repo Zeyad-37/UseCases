@@ -45,7 +45,7 @@ final class UIModel<S> {
     }
 
     S getBundle() {
-        return bundle != null && bundle.getBundle() != null ? bundle.getBundle() : null;
+        return bundle.getBundle();
     }
 
     ResultBundle<?, S> getResultBundle() {
@@ -60,7 +60,7 @@ final class UIModel<S> {
     public String toString() {
         return String.format("State: %s, Error: %s, Bundle type: %s, Key Selector: %s",
                 (state.equalsIgnoreCase(SUCCESS) ? state + ", event: " + bundle.getEvent() : state),
-                (error != null ? error.toString() : "null"),
+                (error != null ? error.getMessage() : "null"),
                 (getBundle() != null ? getBundle().getClass().getSimpleName() : "null"),
                 state.equalsIgnoreCase(LOADING) ? state : state + (bundle != null ?
                         bundle.toString() : ""));

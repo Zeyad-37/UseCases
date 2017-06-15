@@ -12,6 +12,7 @@ import android.util.Base64;
 import android.util.Log;
 
 import com.rollbar.android.Rollbar;
+import com.squareup.leakcanary.LeakCanary;
 import com.zeyad.usecases.api.DataServiceConfig;
 import com.zeyad.usecases.api.DataServiceFactory;
 
@@ -89,6 +90,12 @@ public class GenericApplication extends Application {
     public void onCreate() {
 //        initializeStrictMode();
         super.onCreate();
+        if (LeakCanary.isInAnalyzerProcess(this)) {
+            // This process is dedicated to LeakCanary for heap analysis.
+            // You should not init your app in this process.
+            return;
+        }
+        LeakCanary.install(this);
         Completable.fromAction(() -> {
 //            checkAppTampering(this);
             initializeFlowUp();
