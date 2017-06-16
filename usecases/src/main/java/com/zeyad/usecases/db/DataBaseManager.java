@@ -98,7 +98,7 @@ public interface DataBaseManager {
      * @param dataClass   Class type of the items to be deleted.
      */
     @NonNull
-    Single<Boolean> evictCollection(String idFieldName, List<Long> list, Class dataClass);
+    Single<Boolean> evictCollection(String idFieldName, List<Object> list, Class itemIdType, Class dataClass);
 
     /**
      * Evict element by id of the DB.
@@ -107,6 +107,6 @@ public interface DataBaseManager {
      * @param idFieldName  The id used to look for inside the DB.
      * @param idFieldValue Name of the id field.
      */
-    boolean evictById(Class clazz, String idFieldName, long idFieldValue);
+    boolean evictById(Class clazz, String idFieldName, Object idFieldValue, Class itemIdType);
 }
 

@@ -7,13 +7,13 @@ import java.util.List;
 /** @author by ZIaDo on 3/27/17. */
 public final class DeleteUsersEvent extends BaseEvent {
 
-    private final List<Long> selectedItemsIds;
+    private final List<String> selectedItemsIds;
 
-    public DeleteUsersEvent(List<Long> selectedItemsIds) {
+    public DeleteUsersEvent(List<String> selectedItemsIds) {
         this.selectedItemsIds = selectedItemsIds;
     }
 
-    public List<Long> getSelectedItemsIds() {
+    public List<String> getSelectedItemsIds() {
         return selectedItemsIds;
     }
 }

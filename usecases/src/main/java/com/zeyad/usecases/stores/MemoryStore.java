@@ -21,12 +21,11 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import st.lowlevel.storo.Storo;
 
-import static st.lowlevel.storo.Storo.get;
-
 /**
  * @author by ZIaDo on 6/5/17.
  */
 public class MemoryStore {
+    private static final String TAG = "MemoryStore";
     private final Gson gson;
     private final Map<Class, Set<String>> mapOfIds;
 
@@ -39,7 +38,7 @@ public class MemoryStore {
         String key = dataClass.getSimpleName() + itemId;
         return Single.defer(() -> {
             if (isValid(key)) {
-                return Utils.getInstance().<M>toFlowable(get(key, dataClass).async())
+                return Utils.getInstance().<M>toFlowable(Storo.get(key, dataClass).async())
                         .firstElement().toSingle();
             } else {
                 return Single.error(new IllegalAccessException("Cache Miss!"));
@@ -75,10 +74,21 @@ public class MemoryStore {
                 .setExpiry(Config.getCacheAmount(), Config.getCacheTimeUnit())
                 .execute();
         addKey(dataClass, key);
-        Log.d("MemoryStore", className + " cached!, id = " + key);
+        Log.d(TAG, className + " cached!, id = " + key);
     }
 
-    void deleteList(List<Long> ids, @NonNull Class dataClass) {
+    void cacheList(String idColumnName, @NonNull JSONArray jsonArray, @NonNull Class dataClass) {
+        int size = jsonArray.length();
+        for (int i = 0; i < size; i++) {
+            cacheObject(idColumnName, jsonArray.optJSONObject(i), dataClass);
+        }
+    }
+
+    void deleteList(@NonNull List<String> ids, @NonNull Class dataClass) {
+        if (ids.isEmpty()) {
+            Log.e(TAG, "deleteList", new IllegalArgumentException("List of ids is empty!"));
+            return;
+        }
         String className = dataClass.getSimpleName();
         Observable.fromIterable(ids)
                 .map(id -> className + String.valueOf(id))
@@ -93,17 +103,10 @@ public class MemoryStore {
                 .doOnEach(stringNotification -> {
                     String key = stringNotification.getValue();
                     removeKey(dataClass, key);
-                    Log.d("MemoryStore", className + " " + (Storo.delete(key) ? "" : "not ") +
-                            "deleted!, id = " + key);
+                    Log.d(TAG, String.format("%s %s deleted!, id = %s", className,
+                            (Storo.delete(key) ? "" : "not "), key));
                 })
                 .blockingSubscribe();
-    }
-
-    void cacheList(String idColumnName, @NonNull JSONArray jsonArray, @NonNull Class dataClass) {
-        int size = jsonArray.length();
-        for (int i = 0; i < size; i++) {
-            cacheObject(idColumnName, jsonArray.optJSONObject(i), dataClass);
-        }
     }
 
     private void addKey(Class dataType, String key) {

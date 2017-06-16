@@ -114,7 +114,7 @@ public abstract class GenericRecyclerViewAdapter
         ArrayList<Long> integers = new ArrayList<>();
         for (int i = 0; i < mDataList.size(); i++) {
             try {
-                if (getSelectedItems().contains(i)) {
+                if (getSelectedItemsIndices().contains(i)) {
                     integers.add(mDataList.get(i).getId());
                 }
             } catch (Exception e) {
@@ -454,7 +454,7 @@ public abstract class GenericRecyclerViewAdapter
     @SuppressWarnings(UNUSED)
     public boolean isSelected(int position) throws IllegalStateException {
         if (allowSelection) {
-            return getSelectedItems().contains(position);
+            return getSelectedItemsIndices().contains(position);
         } else {
             throw new IllegalStateException(SELECTION_DISABLED);
         }
@@ -517,7 +517,7 @@ public abstract class GenericRecyclerViewAdapter
      */
     public void clearSelection() throws IllegalStateException {
         if (allowSelection) {
-            List<Integer> selection = getSelectedItems();
+            List<Integer> selection = getSelectedItemsIndices();
             mSelectedItems.clear();
             for (Integer i : selection) {
                 notifyItemChanged(i);
@@ -543,14 +543,26 @@ public abstract class GenericRecyclerViewAdapter
     /**
      * Indicates the list of selected items
      *
-     * @return List of selected items ids
+     * @return List of selected items
      */
     @SuppressWarnings(UNUSED)
-    public List<Integer> getSelectedItems() throws IllegalStateException {
+    public List<Integer> getSelectedItemsIndices() throws IllegalStateException {
         if (allowSelection) {
             List<Integer> items = new ArrayList<>(mSelectedItems.size());
             for (int i = 0; i < mSelectedItems.size(); ++i) {
                 items.add(mSelectedItems.keyAt(i));
+            }
+            return items;
+        } else {
+            throw new IllegalStateException(SELECTION_DISABLED);
+        }
+    }
+
+    public List<ItemInfo> getSelectedItems() throws IllegalStateException {
+        if (allowSelection) {
+            List<ItemInfo> items = new ArrayList<>(mSelectedItems.size());
+            for (int i = 0; i < mSelectedItems.size(); ++i) {
+                items.add(mDataList.get(mSelectedItems.keyAt(i)));
             }
             return items;
         } else {

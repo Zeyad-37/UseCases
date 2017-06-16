@@ -111,8 +111,24 @@ public class Utils {
                 "Download" : "Upload"));
     }
 
-    public List<Long> convertToListOfId(@Nullable JSONArray jsonArray) {
-        List<Long> idList = new ArrayList<>();
+    public List<Object> convertToListOfId(@Nullable JSONArray jsonArray) {
+        List<Object> idList = new ArrayList<>();
+        if (jsonArray != null && jsonArray.length() > 0) {
+            idList = new ArrayList<>(jsonArray.length());
+            int length = jsonArray.length();
+            for (int i = 0; i < length; i++) {
+                try {
+                    idList.add(jsonArray.get(i));
+                } catch (JSONException e) {
+                    Log.e("Utils", "convertToListOfId", e);
+                }
+            }
+        }
+        return idList;
+    }
+
+    public List<String> convertToStringListOfId(@Nullable JSONArray jsonArray) {
+        List<String> idList = new ArrayList<>();
         if (jsonArray != null && jsonArray.length() > 0) {
             try {
                 jsonArray.getLong(0);
@@ -123,7 +139,7 @@ public class Utils {
             int length = jsonArray.length();
             for (int i = 0; i < length; i++) {
                 try {
-                    idList.add(jsonArray.getLong(i));
+                    idList.add(String.valueOf(jsonArray.get(i)));
                 } catch (JSONException e) {
                     Log.e("Utils", "convertToListOfId", e);
                 }

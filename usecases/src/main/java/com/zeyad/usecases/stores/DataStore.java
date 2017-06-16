@@ -89,9 +89,9 @@ public interface DataStore {
      * a Object.
      */
     @NonNull
-    <M> Flowable<M> dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
-                                            Class requestType, Class responseType, boolean persist,
-                                            boolean cache, boolean queuable);
+    <M> Flowable<M> dynamicDeleteCollection(String url, String idColumnName, Class itemIdType,
+                                            JSONArray jsonArray, Class requestType, Class responseType,
+                                            boolean persist, boolean cache, boolean queuable);
 
     /**
      * Delete all items of the same type from cloud or disk which returns an {@link Completable}

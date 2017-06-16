@@ -20,6 +20,7 @@ public class DiskStore implements DataStore {
     private static final String IO_DB_ERROR = "Can not file IO to local DB";
     private final DataBaseManager mDataBaseManager;
     private final MemoryStore mMemoryStore;
+    private final Utils mUtils;
 
     /**
      * Construct a {@link DataStore} based file system data store.
@@ -29,6 +30,7 @@ public class DiskStore implements DataStore {
     DiskStore(DataBaseManager realmManager, MemoryStore memoryStore) {
         mDataBaseManager = realmManager;
         mMemoryStore = memoryStore;
+        mUtils = Utils.getInstance();
     }
 
     @NonNull
@@ -37,7 +39,7 @@ public class DiskStore implements DataStore {
                                             @NonNull Class dataClass, boolean persist, boolean shouldCache) {
         return mDataBaseManager.<M>getById(idColumnName, itemId, itemIdType, dataClass)
                 .doOnNext(m -> {
-                    if (Utils.getInstance().withCache(shouldCache)) {
+                    if (mUtils.withCache(shouldCache)) {
                         mMemoryStore.cacheObject(idColumnName,
                                 new JSONObject(gson.toJson(m)), dataClass);
                     }
@@ -65,14 +67,15 @@ public class DiskStore implements DataStore {
 
     @NonNull
     @Override
-    public Flowable dynamicDeleteCollection(String url, String idColumnName, JSONArray jsonArray,
-                                            @NonNull Class dataClass, Class responseType, boolean persist,
-                                            boolean cache, boolean queuable) {
-        List<Long> convertToListOfId = Utils.getInstance().convertToListOfId(jsonArray);
-        return mDataBaseManager.evictCollection(idColumnName, convertToListOfId, dataClass)
+    public Flowable dynamicDeleteCollection(String url, String idColumnName, Class itemIdType,
+                                            JSONArray jsonArray, @NonNull Class dataClass,
+                                            Class responseType, boolean persist, boolean cache,
+                                            boolean queuable) {
+        return mDataBaseManager.evictCollection(idColumnName, mUtils.convertToListOfId(jsonArray),
+                itemIdType, dataClass)
                 .doOnSuccess(object -> {
-                    if (Utils.getInstance().withCache(cache)) {
-                        mMemoryStore.deleteList(convertToListOfId, dataClass);
+                    if (mUtils.withCache(cache)) {
+                        mMemoryStore.deleteList(mUtils.convertToStringListOfId(jsonArray), dataClass);
                     }
                 }).toFlowable();
     }
@@ -84,7 +87,7 @@ public class DiskStore implements DataStore {
                                        Class responseType, boolean persist, boolean cache, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(object -> {
-                    if (Utils.getInstance().withCache(cache)) {
+                    if (mUtils.withCache(cache)) {
                         mMemoryStore.cacheObject(idColumnName,
                                 new JSONObject(gson.toJson(jsonObject)), dataClass);
                     }
@@ -99,7 +102,7 @@ public class DiskStore implements DataStore {
                                       Class responseType, boolean persist, boolean cache, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(object -> {
-                    if (Utils.getInstance().withCache(cache)) {
+                    if (mUtils.withCache(cache)) {
                         mMemoryStore.cacheObject(idColumnName,
                                 new JSONObject(gson.toJson(jsonObject)), dataClass);
                     }
@@ -124,7 +127,7 @@ public class DiskStore implements DataStore {
                                      Class responseType, boolean persist, boolean cache, boolean queuable) {
         return mDataBaseManager.put(jsonObject, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(object -> {
-                    if (Utils.getInstance().withCache(cache)) {
+                    if (mUtils.withCache(cache)) {
                         mMemoryStore.cacheObject(idColumnName,
                                 new JSONObject(gson.toJson(jsonObject)), dataClass);
                     }

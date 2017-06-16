@@ -87,9 +87,10 @@ public class UserListVM extends BaseViewModel<UserListState> {
                         });
     }
 
-    public Flowable<List<Long>> deleteCollection(List<Long> selectedItemsIds) {
+    public Flowable<List<String>> deleteCollection(List<String> selectedItemsIds) {
         return dataUseCase.deleteCollectionByIds(new PostRequest.Builder(User.class, true)
                 .payLoad(selectedItemsIds)
+                .idColumnName(User.LOGIN, String.class)
                 .cache()
                 .build())
                 .map(o -> selectedItemsIds);

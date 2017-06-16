@@ -107,7 +107,7 @@ public class GenericApplication extends Application {
         Completable.fromAction(() -> {
 //            checkAppTampering(this);
             initializeFlowUp();
-            Rollbar.init(this, "c8c8b4cb1d4f4650a77ae1558865ca87", "production");
+            Rollbar.init(this, "c8c8b4cb1d4f4650a77ae1558865ca87", BuildConfig.DEBUG ? "debug" : "production");
         }).subscribeOn(Schedulers.io())
                 .subscribe(() -> {
                 }, Throwable::printStackTrace);

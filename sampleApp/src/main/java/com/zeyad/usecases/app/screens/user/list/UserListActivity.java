@@ -313,7 +313,9 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     public boolean onCreateActionMode(ActionMode mode, Menu menu) {
         mode.getMenuInflater().inflate(R.menu.selected_list_menu, menu);
         events = events.mergeWith(Observable.defer(() -> RxMenuItem.clicks(menu.findItem(R.id.delete_item))
-                .map(click -> new DeleteUsersEvent(usersAdapter.getSelectedItemsIds()))
+                .map(click -> new DeleteUsersEvent(Observable.fromIterable(usersAdapter.getSelectedItems())
+                        .map(itemInfo -> ((User) itemInfo.getData()).getLogin())
+                        .toList().blockingGet()))
                 .doOnEach(notification -> {
                     actionMode.finish();
                     Log.d("DeleteEvent", "fired!");

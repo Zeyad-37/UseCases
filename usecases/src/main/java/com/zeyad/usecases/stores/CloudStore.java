@@ -249,12 +249,13 @@ public class CloudStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<M> dynamicDeleteCollection(String url, String idColumnName, @NonNull JSONArray jsonArray,
-                                                   @NonNull Class dataClass, Class responseType,
-                                                   boolean saveToDisk, boolean cache, boolean queuable) {
+    public <M> Flowable<M> dynamicDeleteCollection(String url, String idColumnName, Class itemIdType,
+                                                   @NonNull JSONArray jsonArray, @NonNull Class dataClass,
+                                                   Class responseType, boolean saveToDisk, boolean cache,
+                                                   boolean queuable) {
         return Flowable.defer(() -> {
-            deleteLocally(mUtils.convertToListOfId(jsonArray),
-                    idColumnName, dataClass, saveToDisk, cache);
+            deleteLocally(mUtils.convertToListOfId(jsonArray), idColumnName, itemIdType, dataClass,
+                    saveToDisk, cache);
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(DELETE, url, idColumnName, null, jsonArray, saveToDisk);
                 return Flowable.empty();
@@ -506,16 +507,20 @@ public class CloudStore implements DataStore {
         }
     }
 
-    private void deleteLocally(List<Long> ids, String idColumnName, Class dataClass,
+    private void deleteLocally(List<Object> ids, String idColumnName, Class itemIdType, Class dataClass,
                                boolean saveToDisk, boolean cache) {
         if (mUtils.withDisk(saveToDisk)) {
             int collectionSize = ids.size();
             for (int i = 0; i < collectionSize; i++) {
-                mDataBaseManager.evictById(dataClass, idColumnName, ids.get(i));
+                mDataBaseManager.evictById(dataClass, idColumnName, ids.get(i), itemIdType);
             }
         }
         if (mUtils.withCache(cache)) {
-            mMemoryStore.deleteList(ids, dataClass);
+            List<String> stringIds = Flowable.fromIterable(ids)
+                    .map(String::valueOf)
+                    .toList(ids.size())
+                    .blockingGet();
+            mMemoryStore.deleteList(stringIds, dataClass);
         }
     }
 
