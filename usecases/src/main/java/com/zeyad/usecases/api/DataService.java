@@ -19,7 +19,6 @@ import io.reactivex.Flowable;
 import io.reactivex.FlowableTransformer;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.functions.Function;
 
 /**
  * @author by ZIaDo on 5/9/17.
@@ -72,32 +71,26 @@ class DataService implements IDataService {
             String simpleName = dataClass.getSimpleName();
             boolean persist = getRequest.isPersist();
             boolean shouldCache = getRequest.isShouldCache();
-            Flowable<List<M>> memory = mDataStoreFactory.memory().<M>getAllItems(dataClass)
-                    .doOnSuccess(m -> Log.d("getListOffLineFirst", "cache Hit " + simpleName))
-                    .doOnError(throwable -> Log.d("getListOffLineFirst", "cache Miss " + simpleName))
-                    .toFlowable();
+            boolean withDisk = utils.withDisk(persist);
+            boolean withCache = utils.withCache(shouldCache);
+            Flowable<List<M>> cloud = mDataStoreFactory.cloud(dataClass)
+                    .dynamicGetList(getRequest.getUrl(), dataClass, persist, shouldCache);
             Flowable<List<M>> disk = mDataStoreFactory.disk(dataClass)
                     .<M>dynamicGetList("", dataClass, persist, shouldCache)
                     .doOnNext(m -> Log.d("getListOffLineFirst", "Disk Hit " + simpleName))
                     .doOnError(throwable -> Log.e("getListOffLineFirst", "Disk Miss " + simpleName,
-                            throwable));
-            Flowable<List<M>> cloud = mDataStoreFactory.cloud(dataClass)
-                    .dynamicGetList(getRequest.getUrl(), dataClass, persist, shouldCache);
-            boolean withDisk = utils.withDisk(persist);
-            boolean withCache = utils.withCache(shouldCache);
-            if (withDisk && withCache) {
-                result = memory.onErrorResumeNext(new Function<Throwable, Flowable<? extends List<M>>>() {
-                    @Override
-                    public Flowable<? extends List<M>> apply(@io.reactivex.annotations.NonNull Throwable throwable) throws Exception {
-                        return disk.flatMap(m -> m.isEmpty() ? cloud : Flowable.just(m))
-                                .onErrorResumeNext(t -> cloud);
-                    }
-                });
+                            throwable))
+                    .flatMap(m -> m.isEmpty() ? cloud : Flowable.just(m))
+                    .onErrorResumeNext(t -> cloud);
+            Flowable<List<M>> memory = mDataStoreFactory.memory().<M>getAllItems(dataClass)
+                    .doOnSuccess(m -> Log.d("getListOffLineFirst", "cache Hit " + simpleName))
+                    .doOnError(throwable -> Log.d("getListOffLineFirst", "cache Miss " + simpleName))
+                    .toFlowable()
+                    .onErrorResumeNext(throwable -> withDisk ? disk : cloud);
+            if (withCache) {
+                result = memory;
             } else if (withDisk) {
-                result = disk.flatMap(m -> m.isEmpty() ? cloud : Flowable.just(m))
-                        .onErrorResumeNext(t -> cloud);
-            } else if (withCache) {
-                result = memory.onErrorResumeNext(t -> cloud);
+                result = disk;
             } else {
                 result = cloud;
             }
@@ -147,28 +140,28 @@ class DataService implements IDataService {
             String simpleName = dataClass.getSimpleName();
             boolean persist = getRequest.isPersist();
             boolean shouldCache = getRequest.isShouldCache();
-            Flowable<M> memory = mDataStoreFactory.memory()
-                    .<M>getItem(String.valueOf(itemId), dataClass)
-                    .doOnSuccess(m -> Log.d("getObjectOffLineFirst", "cache Hit " + simpleName))
-                    .doOnError(throwable -> Log.d("getObjectOffLineFirst", "cache Miss " + simpleName))
-                    .toFlowable();
-            Flowable<M> disk = mDataStoreFactory.disk(dataClass)
-                    .<M>dynamicGetObject("", idColumnName, itemId, idType, dataClass, persist, shouldCache)
-                    .doOnNext(m -> Log.d("getObjectOffLineFirst", "Disk Hit " + simpleName))
-                    .doOnError(throwable -> Log.e("getObjectOffLineFirst", "Disk Miss " + simpleName,
-                            throwable));
+            boolean withDisk = utils.withDisk(persist);
+            boolean withCache = utils.withCache(shouldCache);
             Flowable<M> cloud = mDataStoreFactory.cloud(dataClass)
                     .<M>dynamicGetObject(getRequest.getUrl(), idColumnName, itemId, idType, dataClass,
                             persist, shouldCache)
                     .doOnNext(m -> Log.d("getObjectOffLineFirst", "Cloud Hit " + simpleName));
-            boolean withDisk = utils.withDisk(persist);
-            boolean withCache = utils.withCache(shouldCache);
-            if (withDisk && withCache) {
-                result = memory.onErrorResumeNext(t -> disk);
+            Flowable<M> disk = mDataStoreFactory.disk(dataClass)
+                    .<M>dynamicGetObject("", idColumnName, itemId, idType, dataClass, persist, shouldCache)
+                    .doOnNext(m -> Log.d("getObjectOffLineFirst", "Disk Hit " + simpleName))
+                    .doOnError(throwable -> Log.e("getObjectOffLineFirst", "Disk Miss " + simpleName,
+                            throwable))
+                    .onErrorResumeNext(t -> cloud);
+            Flowable<M> memory = mDataStoreFactory.memory()
+                    .<M>getItem(String.valueOf(itemId), dataClass)
+                    .doOnSuccess(m -> Log.d("getObjectOffLineFirst", "cache Hit " + simpleName))
+                    .doOnError(throwable -> Log.d("getObjectOffLineFirst", "cache Miss " + simpleName))
+                    .toFlowable()
+                    .onErrorResumeNext(t -> withDisk ? disk : cloud);
+            if (withCache) {
+                result = memory;
             } else if (withDisk) {
-                result = disk.onErrorResumeNext(t -> cloud);
-            } else if (withCache) {
-                result = memory.onErrorResumeNext(t -> cloud);
+                result = disk;
             } else {
                 result = cloud;
             }
@@ -285,9 +278,9 @@ class DataService implements IDataService {
         try {
             result = mDataStoreFactory.dynamically(deleteRequest.getUrl(), deleteRequest.getRequestType())
                     .<M>dynamicDeleteCollection(deleteRequest.getUrl(), deleteRequest.getIdColumnName(),
-                            deleteRequest.getArrayBundle(), deleteRequest.getRequestType(),
-                            deleteRequest.getResponseType(), deleteRequest.isPersist(),
-                            deleteRequest.isCache(), deleteRequest.isQueuable())
+                            deleteRequest.getIdType(), deleteRequest.getArrayBundle(),
+                            deleteRequest.getRequestType(), deleteRequest.getResponseType(),
+                            deleteRequest.isPersist(), deleteRequest.isCache(), deleteRequest.isQueuable())
                     .compose(applySchedulers());
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
