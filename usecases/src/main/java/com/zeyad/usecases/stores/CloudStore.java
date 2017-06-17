@@ -254,8 +254,8 @@ public class CloudStore implements DataStore {
                                                    Class responseType, boolean saveToDisk, boolean cache,
                                                    boolean queuable) {
         return Flowable.defer(() -> {
-            deleteLocally(mUtils.convertToListOfId(jsonArray), idColumnName, itemIdType, dataClass,
-                    saveToDisk, cache);
+            deleteLocally(mUtils.convertToListOfId(jsonArray, itemIdType), idColumnName, itemIdType,
+                    dataClass, saveToDisk, cache);
             if (isQueuableIfOutOfNetwork(queuable)) {
                 queuePost(DELETE, url, idColumnName, null, jsonArray, saveToDisk);
                 return Flowable.empty();

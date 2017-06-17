@@ -71,11 +71,12 @@ public class DiskStore implements DataStore {
                                             JSONArray jsonArray, @NonNull Class dataClass,
                                             Class responseType, boolean persist, boolean cache,
                                             boolean queuable) {
-        return mDataBaseManager.evictCollection(idColumnName, mUtils.convertToListOfId(jsonArray),
-                itemIdType, dataClass)
+        List<String> stringIds = mUtils.convertToStringListOfId(jsonArray);
+        return mDataBaseManager.evictCollection(idColumnName,
+                mUtils.convertToListOfId(jsonArray, itemIdType), itemIdType, dataClass)
                 .doOnSuccess(object -> {
                     if (mUtils.withCache(cache)) {
-                        mMemoryStore.deleteList(mUtils.convertToStringListOfId(jsonArray), dataClass);
+                        mMemoryStore.deleteList(stringIds, dataClass);
                     }
                 }).toFlowable();
     }

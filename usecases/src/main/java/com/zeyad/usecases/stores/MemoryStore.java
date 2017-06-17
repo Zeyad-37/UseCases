@@ -86,7 +86,6 @@ public class MemoryStore {
 
     void deleteList(@NonNull List<String> ids, @NonNull Class dataClass) {
         if (ids.isEmpty()) {
-            Log.e(TAG, "deleteList", new IllegalArgumentException("List of ids is empty!"));
             return;
         }
         String className = dataClass.getSimpleName();
