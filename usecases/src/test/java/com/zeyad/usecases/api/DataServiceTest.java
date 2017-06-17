@@ -51,7 +51,7 @@ public class DataServiceTest {
         getRequest = new GetRequest.Builder(TestRealmModel.class, false)
                 .url("")
                 .id(37, "id", int.class)
-                .cache()
+                .cache("id")
                 .build();
         dataStoreFactory = mock(DataStoreFactory.class);
         when(dataStoreFactory.dynamically(anyString(), any(Class.class)))
@@ -70,13 +70,13 @@ public class DataServiceTest {
     public void getList() throws Exception {
         when(dataStoreFactory
                 .dynamically(anyString(), any(Class.class))
-                .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+                .dynamicGetList(anyString(), anyString(), any(Class.class), anyBoolean(), anyBoolean()))
                 .thenReturn(Flowable.just(Collections.EMPTY_LIST));
 
         dataService.getList(getRequest);
 
         verify(dataStoreFactory.dynamically(anyString(), any(Class.class)), times(1))
-                .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean());
+                .dynamicGetList(anyString(), anyString(), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
@@ -110,11 +110,11 @@ public class DataServiceTest {
     public void getListOffLineFirst() throws Exception {
         when(dataStoreFactory
                 .cloud(Object.class)
-                .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+                .dynamicGetList(anyString(), anyString(), any(Class.class), anyBoolean(), anyBoolean()))
                 .thenReturn(Flowable.just(Collections.EMPTY_LIST));
         when(dataStoreFactory
                 .disk(Object.class)
-                .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean()))
+                .dynamicGetList(anyString(), anyString(), any(Class.class), anyBoolean(), anyBoolean()))
                 .thenReturn(Flowable.just(Collections.EMPTY_LIST));
         when(dataStoreFactory
                 .memory()
@@ -124,9 +124,9 @@ public class DataServiceTest {
         dataService.getListOffLineFirst(getRequest);
 
         verify(dataStoreFactory.cloud(Object.class), times(1))
-                .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean());
+                .dynamicGetList(anyString(), anyString(), any(Class.class), anyBoolean(), anyBoolean());
         verify(dataStoreFactory.disk(Object.class), times(1))
-                .dynamicGetList(anyString(), any(Class.class), anyBoolean(), anyBoolean());
+                .dynamicGetList(anyString(), anyString(), any(Class.class), anyBoolean(), anyBoolean());
     }
 
     @Test
@@ -341,6 +341,7 @@ public class DataServiceTest {
                 .dynamicDeleteCollection(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
@@ -355,6 +356,7 @@ public class DataServiceTest {
                 .dynamicDeleteCollection(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
@@ -370,6 +372,7 @@ public class DataServiceTest {
                 .dynamicDeleteCollection(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
@@ -384,6 +387,7 @@ public class DataServiceTest {
                 .dynamicDeleteCollection(
                         anyString(),
                         anyString(),
+                        any(Class.class),
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),

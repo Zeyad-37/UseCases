@@ -148,7 +148,7 @@ public class RealmManagerTest {
     @Test
     public void evictCollection() throws Exception {
         Single<Boolean> completable =
-                mRealmManager.evictCollection("id", new ArrayList<>(), TestRealmModel.class);
+                mRealmManager.evictCollection("id", new ArrayList<>(), String.class, TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 

@@ -24,7 +24,6 @@ import io.reactivex.Single;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -52,7 +51,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
         Flowable<List<TestRealmModel>> observable = Flowable.just(testRealmObjects);
         when(dbManager.<TestRealmModel>getAll(any(Class.class))).thenReturn(observable);
 
-        mDiskStore.dynamicGetList("", Object.class, false, false);
+        mDiskStore.dynamicGetList("", "", Object.class, false, false);
 
         Mockito.verify(dbManager, times(1)).getAll(any(Class.class));
     }
@@ -89,14 +88,14 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
 
     @Test
     public void testDynamicDeleteCollection() {
-        when(dbManager.evictCollection(anyString(), anyList(), any(Class.class)))
+        when(dbManager.evictCollection(anyString(), anyList(), any(Class.class), any(Class.class)))
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicDeleteCollection(
-                "", "", new JSONArray(), Object.class, Object.class, false, false, false);
+                "", "", String.class, new JSONArray(), Object.class, Object.class, false, false, false);
 
         Mockito.verify(dbManager, times(1))
-                .evictCollection(anyString(), anyListOf(Long.class), any(Class.class));
+                .evictCollection(anyString(), anyList(), any(Class.class), any(Class.class));
     }
 
     @Test

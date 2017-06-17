@@ -61,15 +61,15 @@ public class UserListVMTest {
 
     @Test
     public void deleteCollection() throws Exception {
-        List<Long> ids = new ArrayList<>();
-        ids.add(1L);
-        ids.add(2L);
-        Flowable<List<Long>> observableUserRealm = Flowable.just(ids);
+        List<String> ids = new ArrayList<>();
+        ids.add("1");
+        ids.add("2");
+        Flowable<List<String>> observableUserRealm = Flowable.just(ids);
 
         when(mockDataUseCase.deleteCollectionByIds(any(PostRequest.class)))
                 .thenReturn(Flowable.just(true));
 
-        TestSubscriber<List<Long>> subscriber = new TestSubscriber<>();
+        TestSubscriber<List<String>> subscriber = new TestSubscriber<>();
         userListVM.deleteCollection(ids).subscribe(subscriber);
 
         // Verify repository interactions

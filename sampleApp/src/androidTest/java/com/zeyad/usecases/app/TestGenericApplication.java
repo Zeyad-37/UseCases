@@ -11,7 +11,6 @@ import okhttp3.internal.tls.SslClient;
 /**
  * @author by ZIaDo on 6/15/17.
  */
-
 public class TestGenericApplication extends GenericApplication {
     @NonNull
     @Override

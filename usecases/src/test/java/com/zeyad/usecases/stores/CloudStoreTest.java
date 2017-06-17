@@ -44,7 +44,6 @@ import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeast;
@@ -124,7 +123,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         Flowable<List> observable = Flowable.just(testRealmObjects);
         when(mockApiConnection.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
 
-        cloudStore.dynamicGetList("", Object.class, false, false);
+        cloudStore.dynamicGetList("", "", Object.class, false, false);
 
         verify(mockApiConnection, times(1)).dynamicGetList(anyString(), anyBoolean());
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
@@ -136,7 +135,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         when(mockApiConnection.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
 
         TestSubscriber<List> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicGetList("", Object.class, true, false).subscribe(testSubscriber);
+        cloudStore.dynamicGetList("", "", Object.class, true, false).subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
 
@@ -441,7 +440,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicDeleteCollection(
-                "", "", new JSONArray(), Object.class, Object.class, false, false, false)
+                "", "", String.class, new JSONArray(), Object.class, Object.class, false, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -457,7 +456,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicDeleteCollection(
-                "", "", new JSONArray(), Object.class, Object.class, true, false, false)
+                "", "", String.class, new JSONArray(), Object.class, Object.class, true, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -472,7 +471,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicDeleteCollection(
-                "", "", new JSONArray(), Object.class, Object.class, false, false, true)
+                "", "", String.class, new JSONArray(), Object.class, Object.class, false, false, true)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
@@ -485,7 +484,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicDeleteCollection(
-                "", "", new JSONArray(), Object.class, Object.class, false, false, false)
+                "", "", String.class, new JSONArray(), Object.class, Object.class, false, false, false)
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
@@ -607,7 +606,8 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class));
         verify(mockDataBaseManager, times(putO)).put(any(RealmObject.class), any(Class.class));
         verify(mockDataBaseManager, times(putM)).put(any(RealmModel.class), any(Class.class));
-        verify(mockDataBaseManager, atLeast(evict)).evictById(any(Class.class), anyString(), anyLong());
+        verify(mockDataBaseManager, atLeast(evict)).evictById(any(Class.class), anyString(), any(),
+                any(Class.class));
     }
 
     @NonNull
