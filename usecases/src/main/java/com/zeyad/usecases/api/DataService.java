@@ -46,7 +46,8 @@ class DataService implements IDataService {
             String simpleName = dataClass.getSimpleName();
             boolean shouldCache = getListRequest.isShouldCache();
             Flowable<List<M>> dynamicGetList = mDataStoreFactory.dynamically(url, dataClass)
-                    .dynamicGetList(url, dataClass, getListRequest.isPersist(), shouldCache);
+                    .dynamicGetList(url, getListRequest.getIdColumnName(), dataClass,
+                            getListRequest.isPersist(), shouldCache);
             if (Utils.getInstance().withCache(shouldCache)) {
                 result = mDataStoreFactory.memory().<M>getAllItems(dataClass)
                         .doOnSuccess(m -> Log.d("getList", "cache Hit " + simpleName))
@@ -69,14 +70,15 @@ class DataService implements IDataService {
             Utils utils = Utils.getInstance();
             Class dataClass = getRequest.getDataClass();
             String simpleName = dataClass.getSimpleName();
+            String idColumnName = getRequest.getIdColumnName();
             boolean persist = getRequest.isPersist();
             boolean shouldCache = getRequest.isShouldCache();
             boolean withDisk = utils.withDisk(persist);
             boolean withCache = utils.withCache(shouldCache);
             Flowable<List<M>> cloud = mDataStoreFactory.cloud(dataClass)
-                    .dynamicGetList(getRequest.getUrl(), dataClass, persist, shouldCache);
+                    .dynamicGetList(getRequest.getUrl(), idColumnName, dataClass, persist, shouldCache);
             Flowable<List<M>> disk = mDataStoreFactory.disk(dataClass)
-                    .<M>dynamicGetList("", dataClass, persist, shouldCache)
+                    .<M>dynamicGetList("", idColumnName, dataClass, persist, shouldCache)
                     .doOnNext(m -> Log.d("getListOffLineFirst", "Disk Hit " + simpleName))
                     .doOnError(throwable -> Log.e("getListOffLineFirst", "Disk Miss " + simpleName,
                             throwable))

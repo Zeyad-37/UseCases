@@ -78,6 +78,11 @@ public class MemoryStore {
     }
 
     void cacheList(String idColumnName, @NonNull JSONArray jsonArray, @NonNull Class dataClass) {
+        if (idColumnName == null || idColumnName.isEmpty()) {
+            Log.e(TAG, "cacheList",
+                    new IllegalArgumentException("idColumnName is not available to cache list"));
+            return;
+        }
         int size = jsonArray.length();
         for (int i = 0; i < size; i++) {
             cacheObject(idColumnName, jsonArray.optJSONObject(i), dataClass);

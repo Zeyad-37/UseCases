@@ -116,8 +116,9 @@ public class GetRequest implements Parcelable {
         }
 
         @NonNull
-        public Builder cache() {
+        public Builder cache(String idColumnName) {
             mShouldCache = true;
+            mIdColumnName = idColumnName;
             return this;
         }
 

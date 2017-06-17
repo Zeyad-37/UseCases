@@ -98,13 +98,15 @@ public class CloudStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<List<M>> dynamicGetList(String url, @NonNull Class dataClass, boolean saveToDisk,
+    public <M> Flowable<List<M>> dynamicGetList(String url, String idColumnName,
+                                                @NonNull Class dataClass, boolean saveToDisk,
                                                 boolean shouldCache) {
         return mApiConnection.dynamicGetList(url, shouldCache)
                 .map(entities -> mEntityDataMapper.<List<M>>mapAllTo(entities, dataClass))
                 .doOnNext(list -> {
                     if (mUtils.withDisk(saveToDisk)) {
                         saveAllToDisk(list, dataClass);
+                        saveAllToMemory(idColumnName, new JSONArray(gson.toJson(list)), dataClass);
                     }
                 });
     }
@@ -481,6 +483,10 @@ public class CloudStore implements DataStore {
         mDataBaseManager.putAll(collection, dataClass)
                 .subscribeOn(Config.getBackgroundThread())
                 .subscribe(new SimpleSubscriber(dataClass));
+    }
+
+    private void saveAllToMemory(String idColumnName, JSONArray jsonArray, Class dataClass) {
+        mMemoryStore.cacheList(idColumnName, jsonArray, dataClass);
     }
 
     private void saveLocally(String idColumnName, Class itemIdType, @NonNull JSONObject jsonObject,

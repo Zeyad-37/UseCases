@@ -56,7 +56,7 @@ public class UserListVM extends BaseViewModel<UserListState> {
         return dataUseCase.getObjectOffLineFirst(new GetRequest.Builder(User.class, true)
                 .url(String.format(USER, "Zeyad-37"))
                 .id("Zeyad-37", User.LOGIN, String.class)
-                .cache()
+                .cache(User.LOGIN)
                 .build());
     }
 
@@ -64,11 +64,11 @@ public class UserListVM extends BaseViewModel<UserListState> {
         return lastId == 0 ?
                 dataUseCase.getListOffLineFirst(new GetRequest.Builder(User.class, true)
                         .url(String.format(USERS, lastId))
-                        .cache()
+                        .cache(User.LOGIN)
                         .build()) :
                 dataUseCase.getList(new GetRequest.Builder(User.class, true)
                         .url(String.format(USERS, lastId))
-                        .cache()
+                        .cache(User.LOGIN)
                         .build());
     }
 

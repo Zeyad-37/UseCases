@@ -24,7 +24,8 @@ public interface DataStore {
     Gson gson = Config.getGson();
 
     @NonNull
-    <M> Flowable<List<M>> dynamicGetList(String url, Class requestType, boolean persist, boolean shouldCache);
+    <M> Flowable<List<M>> dynamicGetList(String url, String idColumnName, Class requestType,
+                                         boolean persist, boolean shouldCache);
 
     /**
      * Get an {@link Flowable} which will emit a Object by its id.
