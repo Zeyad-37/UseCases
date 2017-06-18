@@ -33,6 +33,7 @@ import io.realm.rx.RealmObservableFactory;
 import okhttp3.CertificatePinner;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 
 import static com.zeyad.usecases.app.utils.Constants.URLS.API_BASE_URL;
 
@@ -40,7 +41,7 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.API_BASE_URL;
  * @author by ZIaDo on 9/24/16.
  */
 public class GenericApplication extends Application {
-
+    private static final int TIME_OUT = 15;
     @TargetApi(value = 24)
     private static boolean checkAppSignature(Context context) {
         try {
@@ -123,6 +124,12 @@ public class GenericApplication extends Application {
     @NonNull
     OkHttpClient.Builder getOkHttpBuilder() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .addInterceptor(new HttpLoggingInterceptor(message -> Log.d("NetworkInfo", message))
+                        .setLevel(BuildConfig.DEBUG ?
+                                HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE))
+                .connectTimeout(TIME_OUT, TimeUnit.SECONDS)
+                .readTimeout(TIME_OUT, TimeUnit.SECONDS)
+                .writeTimeout(TIME_OUT, TimeUnit.SECONDS)
                 .certificatePinner(new CertificatePinner.Builder()
                         .add(API_BASE_URL,
                                 "sha256/6wJsqVDF8K19zxfLxV5DGRneLyzso9adVdUN/exDacw")

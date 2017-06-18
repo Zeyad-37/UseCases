@@ -38,7 +38,7 @@ public class MemoryStore {
         String key = dataClass.getSimpleName() + itemId;
         return Single.defer(() -> {
             if (isValid(key)) {
-                return Utils.getInstance().<M>toFlowable(Storo.get(key, dataClass).async())
+                return Utils.getInstance().toFlowable(Storo.<M>get(key, dataClass).async())
                         .firstElement().toSingle();
             } else {
                 return Single.error(new IllegalAccessException("Cache Miss!"));
@@ -47,24 +47,26 @@ public class MemoryStore {
     }
 
     public <M> Single<List<M>> getAllItems(@NonNull Class<M> dataClass) {
-        final boolean[] missed = new boolean[1];
-        Set<String> stringSet = mapOfIds.get(dataClass);
-        if (stringSet == null)
-            return Single.error(new IllegalAccessException("Cache Miss!"));
-        List<M> result = Observable.fromIterable(stringSet)
-                .filter((key) -> {
-                    if (isValid(key))
-                        return true;
-                    else {
-                        missed[0] = true;
-                        return false;
-                    }
-                })
-                .filter(s -> !missed[0])
-                .map(key -> Storo.get(key, dataClass).execute())
-                .toList(missed[0] ? 0 : stringSet.size())
-                .blockingGet();
-        return missed[0] ? Single.error(new IllegalAccessException("Cache Miss!")) : Single.just(result);
+        return Single.defer(() -> {
+            final boolean[] missed = new boolean[1];
+            Set<String> stringSet = mapOfIds.get(dataClass);
+            if (stringSet == null)
+                return Single.error(new IllegalAccessException("Cache Miss!"));
+            List<M> result = Observable.fromIterable(stringSet)
+                    .filter((key) -> {
+                        if (isValid(key))
+                            return true;
+                        else {
+                            missed[0] = true;
+                            return false;
+                        }
+                    })
+                    .filter(s -> !missed[0])
+                    .map(key -> Storo.get(key, dataClass).execute())
+                    .toList(missed[0] ? 0 : stringSet.size())
+                    .blockingGet();
+            return missed[0] ? Single.error(new IllegalAccessException("Cache Miss!")) : Single.just(result);
+        });
     }
 
     void cacheObject(String idColumnName, @NonNull JSONObject jsonObject, @NonNull Class dataClass) {

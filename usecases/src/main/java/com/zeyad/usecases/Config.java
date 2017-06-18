@@ -13,6 +13,7 @@ import com.zeyad.usecases.stores.CloudStore;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Scheduler;
+import io.reactivex.schedulers.Schedulers;
 import io.realm.RealmList;
 import io.realm.RealmModel;
 import io.realm.RealmObject;
@@ -116,7 +117,7 @@ public final class Config {
     }
 
     public static Scheduler getBackgroundThread() {
-        return backgroundThread;
+        return backgroundThread == null ? Schedulers.io() : backgroundThread;
     }
 
     public static void setBackgroundThread(Scheduler backgroundThread) {

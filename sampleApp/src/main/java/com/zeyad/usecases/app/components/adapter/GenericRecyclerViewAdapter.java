@@ -49,10 +49,7 @@ public abstract class GenericRecyclerViewAdapter
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         ItemInfo itemInfo = mDataList.get(position);
-        holder.bindData(
-                itemInfo.getData(),
-                mSelectedItems.get(position, false),
-                position,
+        holder.bindData(itemInfo.getData(), mSelectedItems.get(position, false), position,
                 itemInfo.isEnabled());
         if (areItemsClickable &&
                 !(hasHeader() && position == 0 || hasFooter() && position == mDataList.size() - 1)) {
@@ -71,7 +68,7 @@ public abstract class GenericRecyclerViewAdapter
             holder.expand(isExpanded);
             holder.itemView.setActivated(true);
             holder.itemView.setOnClickListener(view -> {
-                expandedPosition = isExpanded ? -1 : position;
+                expandedPosition = isExpanded ? -1 : holder.getAdapterPosition();
                 notifyDataSetChanged();
             });
         }

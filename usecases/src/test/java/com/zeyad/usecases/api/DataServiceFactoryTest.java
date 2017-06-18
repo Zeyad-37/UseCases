@@ -33,14 +33,11 @@ public class DataServiceFactoryTest {
     @Before
     public void setUp() throws Exception {
         mockContext = mock(Context.class);
-        builder =
-                new OkHttpClient.Builder()
+        builder = new OkHttpClient.Builder()
                         .connectTimeout(15, TimeUnit.SECONDS)
                         .readTimeout(15, TimeUnit.SECONDS)
                         .writeTimeout(15, TimeUnit.SECONDS);
-        cache =
-                new Cache(
-                        new File("/data/data/com/zeyad/usecases/cache/", "http-cache"),
+        cache = new Cache(new File("/data/data/com/zeyad/usecases/cache/", "http-cache"),
                         10 * 1024 * 1024);
         mDataServiceConfig =
                 new DataServiceConfig.Builder(mockContext)

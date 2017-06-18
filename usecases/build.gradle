@@ -61,7 +61,8 @@ android {
         versionCode 1
         versionName "1.0"
 //        multiDexEnabled true
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+//        testInstrumentationRunner "io.appflate.restmock.android.RESTMockTestRunner"
     }
 
     buildTypes {
@@ -109,6 +110,11 @@ android {
         splits.density.enable = false
         aaptOptions.cruncherEnabled = false
     }
+    sourceSets {
+        main {
+            assets.srcDirs = ['src/main/assets', 'src/main/java/com/zeyad/usecases/assets', 'src/test/java/com/zeyad/usecases/assets']
+        }
+    }
 }
 
 ext {
@@ -119,6 +125,7 @@ ext {
     espressoCore = '2.2.2'
     powerMock = '1.6.6'
     robolectric = '3.3.2'
+    okhttpIdelingResourceVersion = '1.0.0'
 }
 
 dependencies {
@@ -145,7 +152,7 @@ dependencies {
     // Testing
     testCompile 'junit:junit:4.12'
     testCompile "com.android.support:support-annotations:$supportLibraryVersion"
-    testCompile "com.android.support.test.espresso:espresso-core:$espressoCore"
+//    testCompile "com.android.support.test.espresso:espresso-core:$espressoCore"
 //    testCompile "org.mockito:mockito-core:2.0.57-beta"
     testCompile "org.mockito:mockito-core:1.10.19"
     testCompile "org.robolectric:robolectric:$robolectric"
@@ -156,13 +163,21 @@ dependencies {
     testCompile "org.powermock:powermock-api-mockito:$powerMock"
     testCompile "org.powermock:powermock-classloading-xstream:$powerMock"
 
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2') {
+    testCompile "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
+    testCompile 'com.github.andrzejchm.RESTMock:android:0.2.1'
+    testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1'
+    //required to resolve robolectric test problems
+    testCompile("com.jakewharton.espresso:okhttp3-idling-resource:$okhttpIdelingResourceVersion") {
         exclude group: 'com.android.support'
     }
-    androidTestCompile('com.jakewharton.espresso:okhttp3-idling-resource:1.0.0') {
-        exclude group: 'com.android.support'
-    }
-    androidTestCompile "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
+
+//    androidTestCompile("com.android.support.test.espresso:espresso-core:$espressoCore") {
+//        exclude group: 'com.android.support'
+//    }
+//    androidTestCompile("com.jakewharton.espresso:okhttp3-idling-resource:$okhttpIdelingResourceVersion") {
+//        exclude group: 'com.android.support'
+//    }
+//    androidTestCompile "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
 }
 
 task createPom {

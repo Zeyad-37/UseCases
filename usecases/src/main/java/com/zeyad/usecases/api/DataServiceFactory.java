@@ -68,7 +68,7 @@ public final class DataServiceFactory {
         ApiConnection apiConnection = new ApiConnection(ApiConnection.init(config.getOkHttpBuilder()),
                 ApiConnection.initWithCache(config.getOkHttpBuilder(), config.getOkHttpCache()));
         dataBaseManagerUtil = config.isWithRealm() || isSQLite ? isSQLite ? dataBaseManagerUtil :
-                dataClass -> new RealmManager() : null;
+                dataClass -> new RealmManager() : dataClass -> null;
         sDataUseCase = new DataService(new DataStoreFactory(dataBaseManagerUtil, apiConnection,
                 config.getEntityMapper()), config.getPostExecutionThread(), Config.getBackgroundThread());
         Config.setApiConnection(apiConnection);

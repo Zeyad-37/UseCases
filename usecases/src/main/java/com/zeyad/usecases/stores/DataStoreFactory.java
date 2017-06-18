@@ -14,7 +14,6 @@ public class DataStoreFactory {
     private static CloudStore mCloudStore;
     private static DiskStore mDiskStore;
     private static MemoryStore mMemoryStore;
-    @Nullable
     private final DataBaseManagerUtil mDataBaseManagerUtil;
     private final ApiConnection mApiConnection;
     private final DAOMapper mDAOMapper;
