@@ -133,6 +133,10 @@ dependencies {
     compile "com.android.support:palette-v7:$supportLibraryVersion"
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
+    // Bootstrap
+    compile 'com.github.Zeyad-37:GenericRecyclerViewAdapter:v1.0'
+//    compile 'com.github.Zeyad-37:RxReduxAndroid:1.0.1'
+
 //    compile "android.arch.lifecycle:runtime:1.0.0-alpha3"
     compile "android.arch.lifecycle:extensions:1.0.0-alpha3"
     compile "android.arch.lifecycle:reactivestreams:1.0.0-alpha3"

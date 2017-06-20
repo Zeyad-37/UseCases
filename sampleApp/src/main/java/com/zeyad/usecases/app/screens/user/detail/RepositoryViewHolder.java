@@ -3,8 +3,8 @@ package com.zeyad.usecases.app.screens.user.detail;
 import android.view.View;
 import android.widget.TextView;
 
+import com.zeyad.gadapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.R;
-import com.zeyad.usecases.app.components.adapter.GenericRecyclerViewAdapter;
 import com.zeyad.usecases.app.utils.Utils;
 
 import butterknife.BindView;
