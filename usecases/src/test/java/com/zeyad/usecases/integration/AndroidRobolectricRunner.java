@@ -9,9 +9,9 @@ import org.robolectric.TestLifecycle;
 /**
  * @author by ZIaDo on 6/17/17.
  */
-public class AndroidSampleRobolectricRunner extends RobolectricTestRunner {
+public class AndroidRobolectricRunner extends RobolectricTestRunner {
 
-    public AndroidSampleRobolectricRunner(Class<?> klass) throws InitializationError {
+    public AndroidRobolectricRunner(Class<?> klass) throws InitializationError {
         super(klass);
     }
 
