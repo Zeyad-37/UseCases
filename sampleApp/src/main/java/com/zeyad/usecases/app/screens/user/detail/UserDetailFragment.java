@@ -27,9 +27,9 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.zeyad.gadapter.GenericRecyclerViewAdapter;
 import com.zeyad.gadapter.ItemInfo;
+import com.zeyad.rxredux.core.redux.BaseFragment;
 import com.zeyad.usecases.api.DataServiceFactory;
 import com.zeyad.usecases.app.R;
-import com.zeyad.usecases.app.components.redux.BaseFragment;
 import com.zeyad.usecases.app.screens.user.list.User;
 import com.zeyad.usecases.app.screens.user.list.UserListActivity;
 import com.zeyad.usecases.app.utils.Utils;
@@ -43,7 +43,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
 
-import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
+import static com.zeyad.rxredux.core.redux.BaseActivity.UI_MODEL;
 
 /**
  * A fragment representing a single Repository detail screen. This fragment is either contained in a

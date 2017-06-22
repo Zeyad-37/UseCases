@@ -1,7 +1,7 @@
 package com.zeyad.usecases.app.screens.screens.user_detail;
 
+import com.zeyad.rxredux.core.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.api.IDataService;
-import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.screens.user.detail.Repository;
 import com.zeyad.usecases.app.screens.user.detail.UserDetailState;
 import com.zeyad.usecases.app.screens.user.detail.UserDetailVM;

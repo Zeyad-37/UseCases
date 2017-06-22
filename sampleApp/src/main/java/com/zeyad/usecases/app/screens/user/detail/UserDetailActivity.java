@@ -26,7 +26,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
-import static com.zeyad.usecases.app.components.redux.BaseActivity.UI_MODEL;
+import static com.zeyad.rxredux.core.redux.BaseActivity.UI_MODEL;
 
 /**
  * An activity representing a single Repository detail screen. This activity is only used narrow

@@ -1,9 +1,9 @@
 package com.zeyad.usecases.app.screens.user.list;
 
+import com.zeyad.rxredux.core.redux.BaseEvent;
+import com.zeyad.rxredux.core.redux.BaseViewModel;
+import com.zeyad.rxredux.core.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.api.IDataService;
-import com.zeyad.usecases.app.components.redux.BaseEvent;
-import com.zeyad.usecases.app.components.redux.BaseViewModel;
-import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.screens.user.list.events.DeleteUsersEvent;
 import com.zeyad.usecases.app.screens.user.list.events.GetPaginatedUsersEvent;
 import com.zeyad.usecases.app.screens.user.list.events.SearchUsersEvent;

@@ -1,9 +1,9 @@
 package com.zeyad.usecases.app.screens.user.detail;
 
+import com.zeyad.rxredux.core.redux.BaseEvent;
+import com.zeyad.rxredux.core.redux.BaseViewModel;
+import com.zeyad.rxredux.core.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.api.IDataService;
-import com.zeyad.usecases.app.components.redux.BaseEvent;
-import com.zeyad.usecases.app.components.redux.BaseViewModel;
-import com.zeyad.usecases.app.components.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.requests.GetRequest;
 
