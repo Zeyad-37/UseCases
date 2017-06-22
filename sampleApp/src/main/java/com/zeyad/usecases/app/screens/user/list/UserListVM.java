@@ -68,7 +68,6 @@ public class UserListVM extends BaseViewModel<UserListState> {
                         .build()) :
                 dataUseCase.getList(new GetRequest.Builder(User.class, true)
                         .url(String.format(USERS, lastId))
-                        .cache(User.LOGIN)
                         .build());
     }
 

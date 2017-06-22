@@ -65,7 +65,7 @@ public class RealmManager implements DataBaseManager {
                     .filter(RealmResults::isLoaded)
                     .<List<M>>map(realm::copyFromRealm)
                     .flatMap(ms -> ms.isEmpty() ? Flowable.error(new IllegalAccessException(String
-                            .format("%s were not found!", clazz.getSimpleName()))) : Flowable.just(ms));
+                            .format("%s(s) were not found!", clazz.getSimpleName()))) : Flowable.just(ms));
         });
     }
 

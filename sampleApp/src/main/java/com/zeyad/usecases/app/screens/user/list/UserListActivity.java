@@ -56,6 +56,8 @@ import io.reactivex.BackpressureStrategy;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
+import static android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING;
+
 /**
  * An activity representing a list of Repos. This activity has different presentations for handset
  * and tablet-size devices. On handsets, the activity presents a list of items, which when touched,
@@ -96,22 +98,22 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                 .toObservable();
         rxEventBus.toFlowable()
                 .compose(bindToLifecycle())
-                .subscribe(stream -> events.mergeWith((Observable<DeleteUsersEvent>) stream)
+                .subscribe(stream -> events.mergeWith((Observable<BaseEvent>) stream)
                         .toFlowable(BackpressureStrategy.BUFFER)
                         .compose(uiModelsTransformer)
                         .compose(bindToLifecycle())
                         .subscribe(new UISubscriber<>(this, errorMessageFactory)));
     }
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        viewModel.getUser()
-                .compose(bindToLifecycle())
-                .subscribe(user -> Log.d("Test", user.toString()),
-                throwable -> {
-                });
-    }
+//    @Override
+//    protected void onResume() {
+//        super.onResume();
+//        viewModel.getUser()
+//                .compose(bindToLifecycle())
+//                .subscribe(user -> Log.d("Test", user.toString()),
+//                throwable -> {
+//                });
+//    }
 
     @NonNull
     private SuccessStateAccumulator<UserListState> getUserListStateSuccessStateAccumulator() {
@@ -228,8 +230,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                 }
             }
         });
-        usersAdapter.setOnItemLongClickListener(
-                (position, itemInfo, holder) -> {
+        usersAdapter.setOnItemLongClickListener((position, itemInfo, holder) -> {
                     if (usersAdapter.isSelectionAllowed()) {
                         actionMode = startSupportActionMode(UserListActivity.this);
                         toggleSelection(position);
@@ -242,12 +243,16 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
         usersAdapter.setAllowSelection(true);
         events = events.mergeWith(Observable.defer(() -> RxRecyclerView.scrollStateChanges(userRecycler)
                 .map(integer -> {
-                    int totalItemCount = layoutManager.getItemCount();
-                    int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
-                    return (layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount &&
-                            firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE ?
-                            new GetPaginatedUsersEvent(viewState.getLastId()) :
-                            new GetPaginatedUsersEvent(-1);
+                    if (integer == SCROLL_STATE_SETTLING) {
+                        int totalItemCount = layoutManager.getItemCount();
+                        int firstVisibleItemPosition = layoutManager.findFirstVisibleItemPosition();
+                        return (layoutManager.getChildCount() + firstVisibleItemPosition) >= totalItemCount &&
+                                firstVisibleItemPosition >= 0 && totalItemCount >= PAGE_SIZE ?
+                                new GetPaginatedUsersEvent(viewState.getLastId()) :
+                                new GetPaginatedUsersEvent(-1);
+                    } else {
+                        return new GetPaginatedUsersEvent(-1);
+                    }
                 })
                 .filter(usersNextPageEvent -> usersNextPageEvent.getLastId() != -1)
                 .throttleLast(200, TimeUnit.MILLISECONDS)
@@ -296,8 +301,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
      *
      * @param position Position of the item to toggle the selection viewState
      */
-
-    private boolean toggleSelection(int position) {
+    private void toggleSelection(int position) {
         usersAdapter.toggleSelection(position);
         int count = usersAdapter.getSelectedItemCount();
         if (count == 0) {
@@ -306,7 +310,6 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
             actionMode.setTitle(String.valueOf(count));
             actionMode.invalidate();
         }
-        return true;
     }
 
     @Override
