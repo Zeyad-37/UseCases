@@ -92,7 +92,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     public void initialize() {
         errorMessageFactory = Throwable::getLocalizedMessage;
         viewModel = ViewModelProviders.of(this).get(UserListVM.class);
-        viewModel.init(getUserListStateSuccessStateAccumulator(), null, DataServiceFactory.getInstance());
+        viewModel.init(getUserListStateSuccessStateAccumulator(), viewState, DataServiceFactory.getInstance());
         events = Single.<BaseEvent>just(new GetPaginatedUsersEvent(0))
                 .doOnSuccess(event -> Log.d("GetPaginatedUsersEvent", "fired!"))
                 .toObservable();
