@@ -18,7 +18,7 @@ public class AndroidRobolectricRunner extends RobolectricTestRunner {
     @NonNull
     @Override
     public Class<? extends TestLifecycle> getTestLifecycleClass() {
-        return AndroidSampleTestLifecycle.class;
+        return AndroidTestLifecycle.class;
     }
 }
 
