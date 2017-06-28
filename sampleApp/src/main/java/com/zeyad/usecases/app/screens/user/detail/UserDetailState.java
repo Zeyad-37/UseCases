@@ -3,6 +3,7 @@ package com.zeyad.usecases.app.screens.user.detail;
 import com.zeyad.usecases.app.screens.user.list.User;
 
 import org.parceler.Parcel;
+import org.parceler.Transient;
 
 import java.util.List;
 
@@ -13,6 +14,7 @@ import java.util.List;
 public class UserDetailState {
     boolean isTwoPane;
     User user;
+    @Transient
     List<Repository> repos;
 
     UserDetailState() {

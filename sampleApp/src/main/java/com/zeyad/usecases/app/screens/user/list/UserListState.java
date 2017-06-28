@@ -1,6 +1,7 @@
 package com.zeyad.usecases.app.screens.user.list;
 
 import org.parceler.Parcel;
+import org.parceler.Transient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,7 +11,9 @@ import java.util.List;
  */
 @Parcel
 public class UserListState {
+    @Transient
     List<User> users;
+    @Transient
     List<User> searchList;
     long lastId;
 
