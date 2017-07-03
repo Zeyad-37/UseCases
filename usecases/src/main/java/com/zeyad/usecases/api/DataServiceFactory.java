@@ -30,7 +30,7 @@ public final class DataServiceFactory {
     @Nullable
     public static IDataService getInstance() {
         if (sDataUseCase == null) {
-            throw new NullPointerException(
+            throw new IllegalAccessError(
                     "DataServiceFactory#init must be called before calling getInstance()");
         }
         return sDataUseCase;

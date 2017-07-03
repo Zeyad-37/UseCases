@@ -50,13 +50,14 @@ public class MemoryStore {
         return Single.defer(() -> {
             final boolean[] missed = new boolean[1];
             Set<String> stringSet = mapOfIds.get(dataClass);
-            if (stringSet == null)
+            if (stringSet == null) {
                 return Single.error(new IllegalAccessException("Cache Miss!"));
+            }
             List<M> result = Observable.fromIterable(stringSet)
                     .filter((key) -> {
-                        if (isValid(key))
+                        if (isValid(key)) {
                             return true;
-                        else {
+                        } else {
                             missed[0] = true;
                             return false;
                         }
@@ -97,22 +98,22 @@ public class MemoryStore {
         }
         String className = dataClass.getSimpleName();
         Observable.fromIterable(ids)
-                .map(id -> className + String.valueOf(id))
-                .filter((key) -> {
-                    if (isValid(key))
+                  .map(id -> className + id)
+                  .filter((key) -> {
+                      if (isValid(key)) {
                         return true;
-                    else {
+                      } else {
                         removeKey(dataClass, key);
                         return false;
                     }
                 })
-                .doOnEach(stringNotification -> {
+                  .doOnEach(stringNotification -> {
                     String key = stringNotification.getValue();
                     removeKey(dataClass, key);
                     Log.d(TAG, String.format("%s %s deleted!, id = %s", className,
                             (Storo.delete(key) ? "" : "not "), key));
                 })
-                .blockingSubscribe();
+                  .blockingSubscribe();
     }
 
     private void addKey(Class dataType, String key) {

@@ -35,10 +35,8 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Flowable;
-import io.reactivex.FlowableTransformer;
 import io.reactivex.Single;
 import io.reactivex.SingleObserver;
 import io.reactivex.disposables.Disposable;
@@ -55,7 +53,7 @@ public class CloudStore implements DataStore {
 
     public static final String APPLICATION_JSON = "application/json";
     private static final String TAG = CloudStore.class.getSimpleName(), MULTIPART_FORM_DATA = "multipart/form-data";
-    private static final int COUNTER_START = 1, ATTEMPTS = 3;
+    //    private static final int COUNTER_START = 1, ATTEMPTS = 3;
     private final DataBaseManager mDataBaseManager;
     @NonNull
     private final DAOMapper mEntityDataMapper;
@@ -88,16 +86,6 @@ public class CloudStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Object itemId, Class itemIdType,
-                                            @NonNull Class dataClass, boolean saveToDisk, boolean shouldCache) {
-        return mApiConnection.<M>dynamicGetObject(url, shouldCache)
-                .doOnNext(m -> saveLocally(idColumnName, itemIdType,
-                        new JSONObject(gson.toJson(m)), dataClass, saveToDisk, shouldCache))
-                .map(entity -> mEntityDataMapper.<M>mapTo(entity, dataClass));
-    }
-
-    @NonNull
-    @Override
     public <M> Flowable<List<M>> dynamicGetList(String url, String idColumnName,
                                                 @NonNull Class dataClass, boolean saveToDisk,
                                                 boolean shouldCache) {
@@ -109,6 +97,22 @@ public class CloudStore implements DataStore {
                         saveAllToMemory(idColumnName, new JSONArray(gson.toJson(list)), dataClass);
                     }
                 });
+    }
+
+    @NonNull
+    @Override
+    public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Object itemId, Class itemIdType,
+            @NonNull Class dataClass, boolean saveToDisk, boolean shouldCache) {
+        return mApiConnection.<M> dynamicGetObject(url, shouldCache)
+                .doOnNext(m -> saveLocally(idColumnName, itemIdType,
+                        new JSONObject(gson.toJson(m)), dataClass, saveToDisk, shouldCache))
+                .map(entity -> mEntityDataMapper.<M> mapTo(entity, dataClass));
+    }
+
+    @NonNull
+    @Override
+    public <M> Flowable<List<M>> queryDisk(RealmQueryProvider queryFactory) {
+        return Flowable.error(new IllegalAccessException("Can not search disk in cloud data store!"));
     }
 
     @NonNull
@@ -285,42 +289,6 @@ public class CloudStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<M> dynamicUploadFile(String url, @NonNull File file, @NonNull String key,
-                                             @Nullable Map<String, Object> parameters,
-                                             boolean onWifi, boolean whileCharging, boolean queuable,
-                                             @NonNull Class dataClass) {
-        return Flowable.defer(() -> {
-            if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(Config.getInstance().getContext()) == onWifi
-                    && isChargingReqCompatible(isCharging(Config.getInstance().getContext()), whileCharging)) {
-                queueIOFile(url, file, true, whileCharging, false);
-                return Flowable.empty();
-            } else if (!mUtils.isNetworkAvailable(Config.getInstance().getContext())) {
-                return getErrorFlowableNotPersisted();
-            }
-            RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
-            HashMap<String, RequestBody> map = new HashMap<>();
-            map.put(key, requestFile);
-            if (parameters != null && !parameters.isEmpty()) {
-                for (Map.Entry<String, Object> entry : parameters.entrySet()) {
-                    map.put(entry.getKey(), RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA),
-                            String.valueOf(entry.getValue())));
-                }
-            }
-            return mApiConnection.<M>dynamicUpload(url, map, MultipartBody.Part.createFormData(key,
-                    file.getName(), requestFile))
-                    .map(object -> daoMapHelper(dataClass, object))
-                    .onErrorResumeNext(throwable -> {
-                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                            queueIOFile(url, file, true, whileCharging, false);
-                            return Flowable.empty();
-                        }
-                        return Flowable.error(throwable);
-                    });
-        });
-    }
-
-    @NonNull
-    @Override
     public Flowable<File> dynamicDownloadFile(String url, @NonNull File file, boolean onWifi,
                                               boolean whileCharging, boolean queuable) {
         return Flowable.defer(() -> {
@@ -379,20 +347,50 @@ public class CloudStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<List<M>> queryDisk(RealmQueryProvider queryFactory) {
-        return Flowable.error(new IllegalAccessException("Can not search disk in cloud data store!"));
-    }
-
-    private <M> FlowableTransformer<M, M> applyExponentialBackoff() {
-        return observable -> observable.retryWhen(attempts -> {
-            return attempts.zipWith(
-                    Flowable.range(COUNTER_START, ATTEMPTS), (n, i) -> i)
-                    .flatMap(i -> {
-                        Log.d(TAG, "delay retry by " + i + " second(s)");
-                        return Flowable.timer(5 * i, TimeUnit.SECONDS);
+    public <M> Flowable<M> dynamicUploadFile(String url, @NonNull File file, @NonNull String key,
+            @Nullable Map<String, Object> parameters,
+            boolean onWifi, boolean whileCharging, boolean queuable,
+            @NonNull Class dataClass) {
+        return Flowable.defer(() -> {
+            if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(Config.getInstance().getContext()) == onWifi
+                    && isChargingReqCompatible(isCharging(Config.getInstance().getContext()), whileCharging)) {
+                queueIOFile(url, file, true, whileCharging, false);
+                return Flowable.empty();
+            } else if (!mUtils.isNetworkAvailable(Config.getInstance().getContext())) {
+                return getErrorFlowableNotPersisted();
+            }
+            RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
+            HashMap<String, RequestBody> map = new HashMap<>();
+            map.put(key, requestFile);
+            if (parameters != null && !parameters.isEmpty()) {
+                for (Map.Entry<String, Object> entry : parameters.entrySet()) {
+                    map.put(entry.getKey(), RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA),
+                            String.valueOf(entry.getValue())));
+                }
+            }
+            return mApiConnection.<M> dynamicUpload(url, map, MultipartBody.Part.createFormData(key,
+                    file.getName(), requestFile))
+                    .map(object -> daoMapHelper(dataClass, object))
+                    .onErrorResumeNext(throwable -> {
+                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
+                            queueIOFile(url, file, true, whileCharging, false);
+                            return Flowable.empty();
+                        }
+                        return Flowable.error(throwable);
                     });
         });
     }
+
+    //    private <M> FlowableTransformer<M, M> applyExponentialBackoff() {
+    //        return observable -> observable.retryWhen(attempts -> {
+    //            return attempts.zipWith(
+    //                    Flowable.range(COUNTER_START, ATTEMPTS), (n, i) -> i)
+    //                    .flatMap(i -> {
+    //                        Log.d(TAG, "delay retry by " + i + " second(s)");
+    //                        return Flowable.timer(5 * i, TimeUnit.SECONDS);
+    //                    });
+    //        });
+    //    }
 
     @Nullable
     private <M> M daoMapHelper(@NonNull Class dataClass, M object) {
@@ -452,7 +450,7 @@ public class CloudStore implements DataStore {
         mUtils.queueFileIOCore(mDispatcher, isDownload, new FileIORequest.Builder(url, file)
                 .onWifi(onWifi)
                 .whileCharging(whileCharging)
-                .build());
+                .build(), 0);
     }
 
     private void queuePost(String method, String url, String idColumnName, Class idType,
@@ -476,7 +474,7 @@ public class CloudStore implements DataStore {
     }
 
     private void queuePostCore(@NonNull PostRequest postRequest) {
-        mUtils.queuePostCore(mDispatcher, postRequest);
+        mUtils.queuePostCore(mDispatcher, postRequest, 0);
     }
 
     private void saveAllToDisk(List collection, Class dataClass) {

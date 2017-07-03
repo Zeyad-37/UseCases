@@ -39,7 +39,7 @@ public class Utils {
     private Utils() {
     }
 
-    public static Utils getInstance() {
+    public static synchronized Utils getInstance() {
         if (instance == null) {
             instance = new Utils();
         }
@@ -72,10 +72,11 @@ public class Utils {
         return false;
     }
 
-    public void queuePostCore(@NonNull FirebaseJobDispatcher dispatcher, @NonNull PostRequest postRequest) {
+    public void queuePostCore(@NonNull FirebaseJobDispatcher dispatcher, @NonNull PostRequest postRequest, int trailCount) {
         Bundle extras = new Bundle(2);
         extras.putString(GenericJobService.JOB_TYPE, GenericJobService.POST);
         extras.putParcelable(GenericJobService.PAYLOAD, postRequest);
+        extras.putInt(GenericJobService.TRIAL_COUNT, trailCount);
         dispatcher.mustSchedule(dispatcher.newJobBuilder()
                 .setService(GenericJobService.class)
                 .setTag(GenericJobService.POST)
@@ -91,11 +92,12 @@ public class Utils {
     }
 
     public void queueFileIOCore(@NonNull FirebaseJobDispatcher dispatcher, boolean isDownload,
-                                @NonNull FileIORequest fileIORequest) {
+            @NonNull FileIORequest fileIORequest, int trailCount) {
         Bundle extras = new Bundle(2);
         extras.putString(GenericJobService.JOB_TYPE, isDownload ?
                 GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE);
         extras.putParcelable(GenericJobService.PAYLOAD, fileIORequest);
+        extras.putInt(GenericJobService.TRIAL_COUNT, trailCount);
         dispatcher.mustSchedule(dispatcher.newJobBuilder()
                 .setService(GenericJobService.class)
                 .setTag(isDownload ? GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE)

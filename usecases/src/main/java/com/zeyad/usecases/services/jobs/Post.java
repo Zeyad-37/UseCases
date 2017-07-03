@@ -23,12 +23,12 @@ import static com.zeyad.usecases.stores.CloudStore.APPLICATION_JSON;
  */
 public class Post {
     private static final String TAG = Post.class.getSimpleName(), ON_ERROR = "onError", COMPLETED = "Completed";
-    private static int mTrailCount;
     @NonNull
     private final FirebaseJobDispatcher mDispatcher;
     private final PostRequest mPostRequest;
     private final ApiConnection mRestApi;
     private final Utils mUtils;
+    private final int mTrailCount;
 
     public Post(Context context, PostRequest postRequest, ApiConnection restApi, int trailCount, Utils utils) {
         mPostRequest = postRequest;
@@ -112,9 +112,8 @@ public class Post {
     }
 
     void queuePost() {
-        mTrailCount++;
         if (mTrailCount < 3) { // inject value at init!
-            mUtils.queuePostCore(mDispatcher, mPostRequest);
+            mUtils.queuePostCore(mDispatcher, mPostRequest, mTrailCount + 1);
         }
     }
 }

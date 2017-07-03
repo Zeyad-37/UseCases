@@ -4,39 +4,12 @@ apply plugin: 'android-apt'
 apply plugin: 'maven'
 apply plugin: 'realm-android'
 
-apply plugin: 'com.jfrog.bintray'
 apply plugin: 'com.github.dcendents.android-maven'
 
 apply plugin: "net.ltgt.errorprone"
 
-//def siteUrl = "https://github.com/Zeyad-37/UseCases"
-//def gitUrl = "https://github.com/Zeyad-37/UseCases.git"
 version = "1.0.1"
 group = "com.github.zeyad-37"
-
-ext {
-    bintrayRepo = 'maven'
-    bintrayName = 'usecases'
-
-    publishedGroupId = 'com.github.zeyad-37'
-    libraryName = 'UseCases'
-    artifact = 'usecases'
-
-    libraryDescription = 'Is a library that is a generic implementation of the Domain and Data layers in a clean architecture.'
-
-    siteUrl = 'https://github.com/Zeyad-37/UseCases'
-    gitUrl = 'https://github.com/Zeyad-37/UseCases.git'
-
-    libraryVersion = version
-
-    developerId = 'zeyad-37'
-    developerName = 'Zeyad Gasser'
-    developerEmail = 'zeyad.gasser@gmail.com'
-
-    licenseName = 'The Apache Software License, Version 2.0'
-    licenseUrl = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
-    allLicenses = ["Apache-2.0"]
-}
 
 buildscript {
     repositories {
@@ -60,9 +33,7 @@ android {
         targetSdkVersion 25
         versionCode 1
         versionName "1.0"
-//        multiDexEnabled true
-//        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-//        testInstrumentationRunner "io.appflate.restmock.android.RESTMockTestRunner"
+        testInstrumentationRunner "com.zeyad.usecases.integration.AndroidRobolectricRunner"
     }
 
     buildTypes {
@@ -71,7 +42,7 @@ android {
 //            consumerProguardFiles 'proguard-project.txt'
         }
         release {
-//            consumerProguardFiles 'proguard-project.txt'
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 
@@ -131,7 +102,7 @@ ext {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     //Job Dispatcher
-    compile 'com.firebase:firebase-jobdispatcher-with-gcm-dep:0.6.0'
+    compile 'com.firebase:firebase-jobdispatcher:0.6.0'
     // Network
     compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
     compile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
@@ -152,8 +123,6 @@ dependencies {
     // Testing
     testCompile 'junit:junit:4.12'
     testCompile "com.android.support:support-annotations:$supportLibraryVersion"
-//    testCompile "com.android.support.test.espresso:espresso-core:$espressoCore"
-//    testCompile "org.mockito:mockito-core:2.0.57-beta"
     testCompile "org.mockito:mockito-core:1.10.19"
     testCompile "org.robolectric:robolectric:$robolectric"
     testCompile "org.robolectric:shadows-support-v4:$robolectric"
@@ -164,96 +133,16 @@ dependencies {
     testCompile "org.powermock:powermock-classloading-xstream:$powerMock"
 
     testCompile "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
-    testCompile 'com.github.andrzejchm.RESTMock:android:0.2.1'
-    testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1'
+    testCompile 'com.github.andrzejchm.RESTMock:android:0.2.2'
     //required to resolve robolectric test problems
     testCompile("com.jakewharton.espresso:okhttp3-idling-resource:$okhttpIdelingResourceVersion") {
         exclude group: 'com.android.support'
-    }
-
-//    androidTestCompile("com.android.support.test.espresso:espresso-core:$espressoCore") {
-//        exclude group: 'com.android.support'
-//    }
-//    androidTestCompile("com.jakewharton.espresso:okhttp3-idling-resource:$okhttpIdelingResourceVersion") {
-//        exclude group: 'com.android.support'
-//    }
-//    androidTestCompile "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
-}
-
-task createPom {
-    apply plugin: 'maven'
-    description "Generates pom.xml"
-    pom {
-        project {
-            groupId group
-            artifactId 'usecases'
-            version version
-            packaging 'aar'
-        }
-    }.withXml {
-        def dependenciesNode = asNode().appendNode('dependencies')
-
-        configurations.compile.allDependencies.each { dependency ->
-            def dependencyNode = dependenciesNode.appendNode('dependency')
-            dependencyNode.appendNode('groupId', dependency.group)
-            dependencyNode.appendNode('artifactId', dependency.name)
-            dependencyNode.appendNode('version', dependency.version)
-        }
-    }.writeTo("$buildDir/pom.xml")
-}
-
-task sourcesJar(type: Jar) {
-    from android.sourceSets.main.java.srcDirs
-    classifier = 'sources'
-}
-
-task javadoc(type: Javadoc) {
-    source = android.sourceSets.main.java.srcDirs
-    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
-}
-
-task javadocJar(type: Jar, dependsOn: javadoc) {
-    classifier = 'javadoc'
-    from javadoc.destinationDir
-}
-
-artifacts {
-    archives javadocJar
-    archives sourcesJar
-}
-
-bintray {
-    user = 'zeyad-37'
-    key = '24dde90ae6153839f9a6053e9154d03619db2e63'
-
-    configurations = ['archives']
-
-    pkg {
-        repo = "maven"
-        name = 'usecases'
-
-//        websiteUrl = siteUrl
-//        vcsUrl = gitUrl
-        websiteUrl = 'https://github.com/Zeyad-37/UseCases'
-        vcsUrl = 'https://github.com/Zeyad-37/UseCases.git'
-
-        licenses = ["Apache-2.0"]
-        publish = true
-        version {
-            gpg {
-                sign = true //Determines whether to GPG sign the files. The default is false
-                passphrase = 'ziado123' //Optional. The passphrase for GPG signing'
-            }
-        }
     }
 }
 
 //apply from: "$project.rootDir/tools/script-git-version.gradle"
 apply from: "$project.rootDir/tools/script-findbugs.gradle"
-apply from: "$project.rootDir/tools/script-pmd.gradle"
+//apply from: "$project.rootDir/tools/script-pmd.gradle"
 //apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
-apply from: "$project.rootDir/tools/script-infer.gradle"
+//apply from: "$project.rootDir/tools/script-infer.gradle"
 //apply from: "$project.rootDir/tools/script-check-style.gradle"
-
-//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/installv1.gradle'
-//apply from: 'https://raw.githubusercontent.com/nuuneoi/JCenter/master/bintrayv1.gradle'

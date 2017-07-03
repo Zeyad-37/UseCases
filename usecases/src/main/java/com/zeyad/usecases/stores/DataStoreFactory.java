@@ -17,7 +17,7 @@ public class DataStoreFactory {
     private final DataBaseManagerUtil mDataBaseManagerUtil;
     private final ApiConnection mApiConnection;
     private final DAOMapper mDAOMapper;
-    private boolean withCache;
+    private final boolean withCache;
 
     public DataStoreFactory(@Nullable DataBaseManagerUtil dataBaseManagerUtil, ApiConnection restApi,
                             DAOMapper daoMapper) {

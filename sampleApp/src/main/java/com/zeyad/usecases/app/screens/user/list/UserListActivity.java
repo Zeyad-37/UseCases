@@ -109,11 +109,22 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
 //    protected void onResume() {
 //        super.onResume();
 //        viewModel.getUser()
-//                .compose(bindToLifecycle())
-//                .subscribe(user -> Log.d("Test", user.toString()),
-//                throwable -> {
-//                });
+    //                 .compose(bindToLifecycle())
+    //                 .doOnCancel(() -> Log.d("Test", "Cancelled"))
+    //                 .subscribe(user -> Log.d("Test", user.toString()),
+    //                         throwable -> {
+    //                         });
 //    }
+
+    @Override
+    public void setupUI() {
+        setContentView(R.layout.activity_user_list);
+        ButterKnife.bind(this);
+        setSupportActionBar(toolbar);
+        toolbar.setTitle(getTitle());
+        setupRecyclerView();
+        twoPane = findViewById(R.id.user_detail_container) != null;
+    }
 
     @NonNull
     private SuccessStateAccumulator<UserListState> getUserListStateSuccessStateAccumulator() {
@@ -137,6 +148,8 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                             .toList()
                             .blockingGet();
                     break;
+                default:
+                    break;
             }
             int lastId = users.get(users.size() - 1).getId();
             users = new ArrayList<>(new HashSet<>(users));
@@ -144,16 +157,6 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                     String.valueOf(user1.getId()).compareTo(String.valueOf(user2.getId())));
             return UserListState.builder().users(users).searchList(searchList).lastId(lastId).build();
         };
-    }
-
-    @Override
-    public void setupUI() {
-        setContentView(R.layout.activity_user_list);
-        ButterKnife.bind(this);
-        setSupportActionBar(toolbar);
-        toolbar.setTitle(getTitle());
-        setupRecyclerView();
-        twoPane = findViewById(R.id.user_detail_container) != null;
     }
 
     @Override
@@ -170,6 +173,17 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                     .map(user -> new ItemInfo(user, R.layout.user_item_layout).setId(user.getId()))
                     .toList(users.size()).blockingGet());
         }
+    }
+
+    @Override
+    public void toggleViews(boolean toggle) {
+        loaderLayout.bringToFront();
+        loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
+    }
+
+    @Override
+    public void showError(String message) {
+        showErrorSnackBar(message, userRecycler, Snackbar.LENGTH_LONG);
     }
 
     private void setupRecyclerView() {
@@ -258,17 +272,6 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                 .throttleLast(200, TimeUnit.MILLISECONDS)
                 .debounce(300, TimeUnit.MILLISECONDS)
                 .doOnNext(searchUsersEvent -> Log.d("NextPageEvent", "fired!"))));
-    }
-
-    @Override
-    public void toggleViews(boolean toggle) {
-        loaderLayout.bringToFront();
-        loaderLayout.setVisibility(toggle ? View.VISIBLE : View.GONE);
-    }
-
-    @Override
-    public void showError(String message) {
-        showErrorSnackBar(message, userRecycler, Snackbar.LENGTH_LONG);
     }
 
     @Override

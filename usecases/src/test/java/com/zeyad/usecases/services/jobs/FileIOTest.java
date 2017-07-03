@@ -26,6 +26,7 @@ import io.reactivex.Flowable;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
@@ -74,10 +75,10 @@ public class FileIOTest {
         FileIORequest fileIOReq = mockFileIoReq(true, true, getValidFile());
         fileIO = createFileIO(fileIOReq, true);
         Mockito.doNothing()
-                .when(utils)
-                .queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
+               .when(utils)
+               .queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class), anyInt());
         fileIO.queueIOFile();
-        verify(utils, times(1)).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class));
+        verify(utils, times(1)).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class), anyInt());
     }
 
     private String getValidUrl() {

@@ -109,7 +109,7 @@ public class FileIORequest implements Parcelable {
 
     public static class Builder {
 
-        private File file;
+        private final File file;
         private String url, key;
         private boolean onWifi, whileCharging, queuable;
         private Class dataClass;

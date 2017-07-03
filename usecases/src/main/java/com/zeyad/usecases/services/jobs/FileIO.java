@@ -19,13 +19,13 @@ import io.reactivex.Completable;
  */
 public class FileIO {
     private static final String TAG = FileIO.class.getSimpleName(), ON_ERROR = "onError";
-    private static int mTrailCount;
     @NonNull
     private final FirebaseJobDispatcher mDispatcher;
     private final FileIORequest mFileIORequest;
     private final CloudStore mCloudStore;
     private final Utils mUtils;
     private final boolean mIsDownload;
+    private final int mTrailCount;
 
     public FileIO(int trailCount, FileIORequest payLoad, Context context, boolean isDownload,
                   CloudStore cloudStore, Utils utils) {
@@ -61,9 +61,8 @@ public class FileIO {
     }
 
     void queueIOFile() {
-        mTrailCount++;
         if (mTrailCount < 3) {
-            mUtils.queueFileIOCore(mDispatcher, mIsDownload, mFileIORequest);
+            mUtils.queueFileIOCore(mDispatcher, mIsDownload, mFileIORequest, mTrailCount + 1);
         }
     }
 }

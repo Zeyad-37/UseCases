@@ -103,7 +103,7 @@ public class PostRequest implements Parcelable {
                 jsonArray.put(object);
             }
             return jsonArray;
-        } else if (object != null && object instanceof List) {
+        } else if (object instanceof List) {
             final JSONArray jsonArray = new JSONArray();
             List ids = (List) object;
             for (Object object : ids) {

@@ -6,9 +6,9 @@ import android.support.annotation.Nullable;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.security.GeneralSecurityException;
 import java.security.KeyManagementException;
 import java.security.KeyStore;
+import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 
@@ -24,7 +24,7 @@ public class TLSSocketFactory extends SSLSocketFactory {
 
     private final SSLSocketFactory internalSSLSocketFactory;
 
-    public TLSSocketFactory() throws KeyManagementException, NoSuchAlgorithmException {
+    public TLSSocketFactory() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException {
         SSLContext sslContext = SSLContext.getInstance("TLS");
         sslContext.init(null, new TrustManager[] {systemDefaultTrustManager()}, null);
         internalSSLSocketFactory = sslContext.getSocketFactory();
@@ -78,26 +78,22 @@ public class TLSSocketFactory extends SSLSocketFactory {
 
     @Nullable
     private Socket enableTLSOnSocket(@Nullable Socket socket) {
-        if (socket != null && (socket instanceof SSLSocket)) {
+        if (socket instanceof SSLSocket) {
             ((SSLSocket) socket).setEnabledProtocols(new String[] {"TLSv1.1", "TLSv1.2"});
         }
         return socket;
     }
 
     @NonNull
-    private X509TrustManager systemDefaultTrustManager() {
-        try {
-            TrustManagerFactory trustManagerFactory =
-                    TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-            trustManagerFactory.init((KeyStore) null);
-            TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
-            if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
-                throw new IllegalStateException(
-                        "Unexpected default trust managers:" + Arrays.toString(trustManagers));
-            }
-            return (X509TrustManager) trustManagers[0];
-        } catch (GeneralSecurityException e) {
-            throw new AssertionError(); // The system has no TLS. Just give up.
+    private X509TrustManager systemDefaultTrustManager() throws NoSuchAlgorithmException, KeyStoreException {
+        TrustManagerFactory trustManagerFactory =
+                TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        trustManagerFactory.init((KeyStore) null);
+        TrustManager[] trustManagers = trustManagerFactory.getTrustManagers();
+        if (trustManagers.length != 1 || !(trustManagers[0] instanceof X509TrustManager)) {
+            throw new IllegalStateException(
+                    "Unexpected default trust managers:" + Arrays.toString(trustManagers));
         }
+        return (X509TrustManager) trustManagers[0];
     }
 }

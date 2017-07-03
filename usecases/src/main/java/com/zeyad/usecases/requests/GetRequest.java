@@ -93,10 +93,12 @@ public class GetRequest implements Parcelable {
     }
 
     public static class Builder {
+        private final boolean mPersist;
+        private final Class mDataClass;
         private Object mItemId;
-        private boolean mShouldCache, mPersist;
+        private boolean mShouldCache;
         private String mIdColumnName, mUrl;
-        private Class mDataClass, idType;
+        private Class idType;
 
         public Builder(Class dataClass, boolean persist) {
             mDataClass = dataClass;

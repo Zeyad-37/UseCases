@@ -7,6 +7,9 @@ import java.util.List;
 /** @author by ZIaDo on 10/1/16. */
 public class Utils {
 
+    private Utils() {
+    }
+
     public static boolean isNotEmpty(String text) {
         return text != null && !text.isEmpty() && !text.equalsIgnoreCase("null");
     }

@@ -7,7 +7,6 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
-import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
@@ -17,6 +16,7 @@ import com.squareup.leakcanary.LeakCanary;
 import com.zeyad.usecases.api.DataServiceConfig;
 import com.zeyad.usecases.api.DataServiceFactory;
 
+import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 
-import io.flowup.FlowUp;
 import io.reactivex.Completable;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
@@ -85,7 +84,9 @@ public class GenericApplication extends Application {
         return false;
     }
 
-    private static String getSystemProperty(String name) throws Exception {
+    private static String getSystemProperty(String name)
+            throws NoSuchMethodException, ClassNotFoundException, InvocationTargetException,
+            IllegalAccessException {
         Class systemPropertyClazz = Class.forName("android.os.SystemProperties");
         return (String) systemPropertyClazz.getMethod("get", new Class[]{String.class})
                 .invoke(systemPropertyClazz, name);
@@ -97,7 +98,7 @@ public class GenericApplication extends Application {
 
     @Override
     public void onCreate() {
-//        initializeStrictMode();
+        initializeStrictMode();
         super.onCreate();
         if (LeakCanary.isInAnalyzerProcess(this)) {
             // This process is dedicated to LeakCanary for heap analysis.
@@ -106,8 +107,10 @@ public class GenericApplication extends Application {
         }
         LeakCanary.install(this);
         Completable.fromAction(() -> {
-//            checkAppTampering(this);
-            initializeFlowUp();
+            if (!checkAppTampering(this)) {
+                throw new IllegalAccessException("App might be tampered with!");
+            }
+            //            initializeFlowUp();
             Rollbar.init(this, "c8c8b4cb1d4f4650a77ae1558865ca87", BuildConfig.DEBUG ? "debug" : "production");
         }).subscribeOn(Schedulers.io())
                 .subscribe(() -> {
@@ -140,8 +143,9 @@ public class GenericApplication extends Application {
                         .build())
                 .connectionSpecs(Arrays.asList(ConnectionSpec.MODERN_TLS,
                         ConnectionSpec.COMPATIBLE_TLS));
-        if (getSSlSocketFactory() != null && getX509TrustManager() != null)
+        if (getSSlSocketFactory() != null && getX509TrustManager() != null) {
             builder.sslSocketFactory(getSSlSocketFactory(), getX509TrustManager());
+        }
         return builder;
     }
 
@@ -151,12 +155,12 @@ public class GenericApplication extends Application {
     }
 
     private void initializeStrictMode() {
-        if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(
-                    new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-            StrictMode.setVmPolicy(
-                    new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
-        }
+        //        if (BuildConfig.DEBUG) {
+        //            StrictMode.setThreadPolicy(
+        //                    new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+        //            StrictMode.setVmPolicy(
+        //                    new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
+        //        }
     }
 
     private void initializeRealm() {
@@ -170,17 +174,18 @@ public class GenericApplication extends Application {
     }
 
     private void initializeFlowUp() {
-        FlowUp.Builder.with(this)
-                .apiKey(getString(R.string.flow_up_api_key))
-                .forceReports(BuildConfig.DEBUG)
-                .start();
+        //        FlowUp.Builder.with(this)
+        //                .apiKey(getString(R.string.flow_up_api_key))
+        //                .forceReports(BuildConfig.DEBUG)
+        //                .start();
     }
 
     private boolean checkAppTampering(Context context) {
-        return checkAppSignature(context)
-                && verifyInstaller(context)
-                && checkEmulator()
-                && checkDebuggable(context);
+        return true;
+        //        return checkAppSignature(context)
+        //                && verifyInstaller(context)
+        //                && checkEmulator()
+        //                && checkDebuggable(context);
     }
 
     X509TrustManager getX509TrustManager() {

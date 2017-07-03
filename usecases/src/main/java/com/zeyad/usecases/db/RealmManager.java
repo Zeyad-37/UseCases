@@ -29,9 +29,6 @@ public class RealmManager implements DataBaseManager {
 
     private static final String NO_ID = "Could not find id!";
 
-    public RealmManager() {
-    }
-
     /**
      * Gets an {@link Flowable} which will emit an Object
      * @param idColumnName name of ID variable
@@ -133,6 +130,15 @@ public class RealmManager implements DataBaseManager {
         });
     }
 
+    @NonNull
+    @Override
+    public <T extends RealmModel> Single<Boolean> putAll(List<T> realmObjects, Class dataClass) {
+        return Single.fromCallable(() -> getRealm(Realm.getDefaultInstance())
+                .map(realm1 -> executeWriteOperationInRealm(realm1,
+                        () -> realm1.copyToRealmOrUpdate(realmObjects)).size() == realmObjects.size())
+                .blockingFirst());
+    }
+
     /**
      * Puts and element into the DB.
      *
@@ -154,15 +160,6 @@ public class RealmManager implements DataBaseManager {
         });
     }
 
-    @NonNull
-    @Override
-    public <T extends RealmModel> Single<Boolean> putAll(List<T> realmObjects, Class dataClass) {
-        return Single.fromCallable(() -> getRealm(Realm.getDefaultInstance())
-                .map(realm1 -> executeWriteOperationInRealm(realm1,
-                        () -> realm1.copyToRealmOrUpdate(realmObjects)).size() == realmObjects.size())
-                .blockingFirst());
-    }
-
     /**
      * Evict all elements of the DB.
      *
@@ -176,6 +173,23 @@ public class RealmManager implements DataBaseManager {
                     executeWriteOperationInRealm(realm1, () -> realm1.delete(clazz));
                     return true;
                 }).blockingFirst());
+    }
+
+    /**
+     * Evict a collection elements of the DB.
+     *
+     * @param idFieldName The id used to look for inside the DB.
+     * @param list        List of ids to be deleted.
+     * @param dataClass   Class type of the items to be deleted.
+     */
+    @NonNull
+    @Override
+    public Single<Boolean> evictCollection(@NonNull String idFieldName, @NonNull List<Object> list,
+            final Class itemIdType, @NonNull Class dataClass) {
+        return Single.fromCallable(() -> list.isEmpty() ? false : Observable.fromIterable(list)
+                                                                            .map(id -> evictById(dataClass, idFieldName, id, itemIdType))
+                                                                            .reduce((aBoolean, aBoolean2) -> aBoolean && aBoolean2)
+                                                                            .blockingGet());
     }
 
     /**
@@ -208,23 +222,6 @@ public class RealmManager implements DataBaseManager {
                 .blockingFirst();
     }
 
-    /**
-     * Evict a collection elements of the DB.
-     *
-     * @param idFieldName The id used to look for inside the DB.
-     * @param list        List of ids to be deleted.
-     * @param dataClass   Class type of the items to be deleted.
-     */
-    @NonNull
-    @Override
-    public Single<Boolean> evictCollection(@NonNull String idFieldName, @NonNull List<Object> list,
-                                           final Class itemIdType, @NonNull Class dataClass) {
-        return Single.fromCallable(() -> list.isEmpty() ? false : Observable.fromIterable(list)
-                .map(id -> evictById(dataClass, idFieldName, id, itemIdType))
-                .reduce((aBoolean, aBoolean2) -> aBoolean && aBoolean2)
-                .blockingGet());
-    }
-
     private Flowable<RealmModel> getItemById(Realm realm, @NonNull Class dataClass, @NonNull String idColumnName,
                                              final Object itemId, final Class itemIdType) {
         RealmModel result;
@@ -232,9 +229,11 @@ public class RealmManager implements DataBaseManager {
             result = realm.where(dataClass).equalTo(idColumnName, (long) itemId).findFirst();
         } else if (itemIdType.equals(int.class) || itemIdType.equals(Integer.class)) {
             result = realm.where(dataClass).equalTo(idColumnName, (int) itemId).findFirst();
-        } else if (itemIdType.equals(short.class) || itemIdType.equals(Short.class)) {
-            result = realm.where(dataClass).equalTo(idColumnName, (short) itemId).findFirst();
-        } else if (itemIdType.equals(byte.class) || itemIdType.equals(Byte.class)) {
+        }
+        //        else if (itemIdType.equals(short.class) || itemIdType.equals(Short.class)) {
+        //            result = realm.where(dataClass).equalTo(idColumnName, (short) itemId).findFirst();
+        //        }
+        else if (itemIdType.equals(byte.class) || itemIdType.equals(Byte.class)) {
             result = realm.where(dataClass).equalTo(idColumnName, (byte) itemId).findFirst();
         } else if (itemIdType.equals(String.class)) {
             result = realm.where(dataClass).equalTo(idColumnName, String.valueOf(itemId)).findFirst();
@@ -289,9 +288,9 @@ public class RealmManager implements DataBaseManager {
         if (idColumnName == null || idColumnName.isEmpty()) {
             throw new IllegalArgumentException(NO_ID);
         }
-        if (itemIdType.equals(String.class))
+        if (itemIdType.equals(String.class)) {
             return jsonObject;
-        else if (jsonObject.optInt(idColumnName) == 0) {
+        } else if (jsonObject.optInt(idColumnName) == 0) {
             jsonObject.put(idColumnName, getNextId(dataClass, idColumnName));
         }
         return jsonObject;

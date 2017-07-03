@@ -10,20 +10,25 @@ import io.reactivex.FlowableTransformer;
 import io.reactivex.MaybeTransformer;
 import io.reactivex.ObservableTransformer;
 import io.reactivex.SingleTransformer;
+import io.reactivex.annotations.NonNull;
 
 /**
  * @author by ZIaDo on 6/14/17.
  */
 public class LifecycleRxJavaBinder {
-    public static <T> FlowableTransformer<T, T> applyFlowable(LifecycleOwner lifecycleOwner) {
+
+    private LifecycleRxJavaBinder() {
+    }
+
+    public static <T> FlowableTransformer<T, T> applyFlowable(@NonNull final LifecycleOwner lifecycleOwner) {
         return flowable -> {
             LiveData<T> liveData = LiveDataReactiveStreams.fromPublisher(flowable);
             return Flowable.fromPublisher(LiveDataReactiveStreams.toPublisher(lifecycleOwner, liveData));
         };
     }
 
-    public static <T> ObservableTransformer<T, T> applyObservable(LifecycleOwner lifecycleOwner,
-                                                                  BackpressureStrategy strategy) {
+    public static <T> ObservableTransformer<T, T> applyObservable(@NonNull final LifecycleOwner lifecycleOwner,
+            final BackpressureStrategy strategy) {
         return observable -> {
             LiveData<T> liveData = LiveDataReactiveStreams.fromPublisher(observable.toFlowable(strategy));
             return Flowable.fromPublisher(LiveDataReactiveStreams
@@ -31,7 +36,7 @@ public class LifecycleRxJavaBinder {
         };
     }
 
-    public static <T> ObservableTransformer<T, T> applyObservable(LifecycleOwner lifecycleOwner) {
+    public static <T> ObservableTransformer<T, T> applyObservable(@NonNull final LifecycleOwner lifecycleOwner) {
         return observable -> {
             LiveData<T> liveData = LiveDataReactiveStreams.fromPublisher(observable
                     .toFlowable(BackpressureStrategy.BUFFER));
@@ -40,7 +45,7 @@ public class LifecycleRxJavaBinder {
         };
     }
 
-    public static <T> SingleTransformer<T, T> applySingle(LifecycleOwner lifecycleOwner) {
+    public static <T> SingleTransformer<T, T> applySingle(@NonNull final LifecycleOwner lifecycleOwner) {
         return single -> {
             LiveData<T> liveData = LiveDataReactiveStreams.fromPublisher(single.toFlowable());
             return Flowable.fromPublisher(LiveDataReactiveStreams
@@ -48,7 +53,7 @@ public class LifecycleRxJavaBinder {
         };
     }
 
-    public static <T> MaybeTransformer<T, T> applyMaybe(LifecycleOwner lifecycleOwner) {
+    public static <T> MaybeTransformer<T, T> applyMaybe(@NonNull final LifecycleOwner lifecycleOwner) {
         return maybe -> {
             LiveData<T> liveData = LiveDataReactiveStreams.fromPublisher(maybe.toFlowable());
             return Flowable.fromPublisher(LiveDataReactiveStreams

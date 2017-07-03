@@ -96,7 +96,7 @@ public class DataServiceConfig {
     }
 
     public static class Builder {
-        private Context context;
+        private final Context context;
         private OkHttpClient.Builder okHttpBuilder;
         private Cache okHttpCache;
         private String baseUrl;

@@ -34,6 +34,7 @@ import okhttp3.ResponseBody;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
@@ -155,9 +156,9 @@ public class PostTest {
                         createPostRequestForJsonArray(PostRequest.DELETE),
                         apiConnection,
                         0);
-        Mockito.doNothing().when(utils).queuePostCore(any(), any(PostRequest.class));
+        Mockito.doNothing().when(utils).queuePostCore(any(), any(PostRequest.class), anyInt());
         post.queuePost();
-        verify(utils, times(1)).queuePostCore(any(), any(PostRequest.class));
+        verify(utils, times(1)).queuePostCore(any(), any(PostRequest.class), anyInt());
     }
 
     //--------------------------------------------------------------------------------------------//
