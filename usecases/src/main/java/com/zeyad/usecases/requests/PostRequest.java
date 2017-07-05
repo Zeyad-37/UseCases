@@ -18,29 +18,28 @@ import java.util.List;
  * @author zeyad on 7/29/16.
  */
 public class PostRequest implements Parcelable {
-    public static final Parcelable.Creator<PostRequest> CREATOR =
-            new Parcelable.Creator<PostRequest>() {
-                @NonNull
-                @Override
-                public PostRequest createFromParcel(@NonNull Parcel source) {
-                    return new PostRequest(source);
-                }
 
-                @NonNull
-                @Override
-                public PostRequest[] newArray(int size) {
-                    return new PostRequest[size];
-                }
-            };
     public static final String POST = "post", DELETE = "delete", PUT = "put", PATCH = "patch";
+    public static final Parcelable.Creator<PostRequest> CREATOR = new Parcelable.Creator<PostRequest>() {
+        @Override
+        public PostRequest createFromParcel(Parcel source) {
+            return new PostRequest(source);
+        }
+
+        @Override
+        public PostRequest[] newArray(int size) {
+            return new PostRequest[size];
+        }
+    };
     private static final String DEFAULT_ID_KEY = "id";
     private final String url, idColumnName, method;
     private final Class requestType, responseType, idType;
     private final boolean onWifi, whileCharging, persist, queuable, cache;
-    private final JSONObject jsonObject;
-    private final JSONArray jsonArray;
-    private final HashMap<String, Object> keyValuePairs;
-    private final Object object;
+    private final String payload;
+    //    private final JSONObject jsonObject;
+    //    private final JSONArray jsonArray;
+    //    private final HashMap<String, Object> keyValuePairs;
+    private Object object;
 
     public PostRequest(@NonNull Builder builder) {
         url = builder.url;
@@ -50,66 +49,84 @@ public class PostRequest implements Parcelable {
         onWifi = builder.onWifi;
         whileCharging = builder.whileCharging;
         queuable = builder.queuable;
-        keyValuePairs = builder.keyValuePairs;
-        jsonObject = builder.jsonObject;
-        jsonArray = builder.jsonArray;
+        //        keyValuePairs = builder.keyValuePairs;
+        //        jsonObject = builder.jsonObject;
+        //        jsonArray = builder.jsonArray;
         idColumnName = builder.idColumnName;
         idType = builder.idType;
         method = builder.method;
         object = builder.object;
         cache = builder.cache;
+        String objectBundle = getObjectBundle(builder.jsonObject, builder.keyValuePairs).toString();
+        payload = objectBundle.replaceAll("\\{", "").replaceAll("\\}", "").isEmpty() ?
+                  getArrayBundle(builder.jsonArray, builder.keyValuePairs).toString() : objectBundle;
     }
 
-    protected PostRequest(@NonNull Parcel in) {
+    protected PostRequest(Parcel in) {
         this.url = in.readString();
         this.idColumnName = in.readString();
         this.method = in.readString();
         this.requestType = (Class) in.readSerializable();
         this.responseType = (Class) in.readSerializable();
         this.idType = (Class) in.readSerializable();
-        this.persist = in.readByte() != 0;
-        this.whileCharging = in.readByte() != 0;
         this.onWifi = in.readByte() != 0;
-        this.cache = in.readByte() != 0;
+        this.whileCharging = in.readByte() != 0;
+        this.persist = in.readByte() != 0;
         this.queuable = in.readByte() != 0;
-        this.jsonObject = in.readParcelable(JSONObject.class.getClassLoader());
-        this.jsonArray = in.readParcelable(JSONArray.class.getClassLoader());
-        this.keyValuePairs = (HashMap<String, Object>) in.readSerializable();
-        this.object = in.readParcelable(Object.class.getClassLoader());
+        this.cache = in.readByte() != 0;
+        this.payload = in.readString();
     }
 
     public JSONObject getObjectBundle() {
-        JSONObject jsonObject = new JSONObject();
+        try {
+            return new JSONObject(payload);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new JSONObject();
+    }
+
+    public JSONArray getArrayBundle() {
+        try {
+            return new JSONArray(payload);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return new JSONArray();
+    }
+
+    private JSONObject getObjectBundle(JSONObject jsonObject, HashMap<String, Object> keyValuePairs) {
+        JSONObject result = new JSONObject();
         if (object != null) {
             try {
                 return new JSONObject(Config.getGson().toJson(object));
             } catch (JSONException e) {
                 Log.e("PostRequest", "", e);
             }
-        } else if (this.jsonObject != null) {
-            jsonObject = this.jsonObject;
+        } else if (jsonObject != null) {
+            result = jsonObject;
         } else if (keyValuePairs != null) {
-            jsonObject = new JSONObject(keyValuePairs);
+            result = new JSONObject(keyValuePairs);
         }
-        return jsonObject;
+        return result;
     }
 
-    public JSONArray getArrayBundle() {
+    private JSONArray getArrayBundle(JSONArray jsonArray, HashMap<String, Object> keyValuePairs) {
         if (jsonArray != null) {
             return jsonArray;
         } else if (keyValuePairs != null) {
-            final JSONArray jsonArray = new JSONArray();
-            for (Object object : keyValuePairs.values()) {
-                jsonArray.put(object);
+            final JSONArray result = new JSONArray();
+            for (Object item : keyValuePairs.values()) {
+                result.put(item);
             }
-            return jsonArray;
+            return result;
         } else if (object instanceof List) {
-            final JSONArray jsonArray = new JSONArray();
+            final JSONArray result = new JSONArray();
             List ids = (List) object;
-            for (Object object : ids) {
-                jsonArray.put(object);
+            for (Object item : ids) {
+                result.put(item);
             }
-            return jsonArray;
+            return result;
         } else {
             return new JSONArray();
         }
@@ -172,22 +189,19 @@ public class PostRequest implements Parcelable {
     }
 
     @Override
-    public void writeToParcel(@NonNull Parcel dest, int flags) {
+    public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(this.url);
         dest.writeString(this.idColumnName);
         dest.writeString(this.method);
         dest.writeSerializable(this.requestType);
         dest.writeSerializable(this.responseType);
         dest.writeSerializable(this.idType);
-        dest.writeByte(this.persist ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.whileCharging ? (byte) 1 : (byte) 0);
         dest.writeByte(this.onWifi ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.cache ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.whileCharging ? (byte) 1 : (byte) 0);
+        dest.writeByte(this.persist ? (byte) 1 : (byte) 0);
         dest.writeByte(this.queuable ? (byte) 1 : (byte) 0);
-        dest.writeParcelable((Parcelable) this.jsonObject, flags);
-        dest.writeParcelable((Parcelable) this.jsonArray, flags);
-        dest.writeSerializable(this.keyValuePairs);
-        dest.writeParcelable((Parcelable) this.object, flags);
+        dest.writeByte(this.cache ? (byte) 1 : (byte) 0);
+        dest.writeString(this.payload);
     }
 
     public static class Builder {
@@ -229,26 +243,16 @@ public class PostRequest implements Parcelable {
         }
 
         @NonNull
-        public Builder queuable() {
+        public Builder queuable(boolean onWifi, boolean whileCharging) {
             queuable = true;
+            this.onWifi = onWifi;
+            this.whileCharging = whileCharging;
             return this;
         }
 
         @NonNull
         public Builder cache() {
             cache = true;
-            return this;
-        }
-
-        @NonNull
-        public Builder onWifi() {
-            onWifi = true;
-            return this;
-        }
-
-        @NonNull
-        public Builder whileCharging() {
-            whileCharging = true;
             return this;
         }
 

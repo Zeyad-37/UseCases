@@ -173,11 +173,10 @@ class DataService implements IDataService {
         PostRequest.Builder builder = new PostRequest
                 .Builder(request.getRequestType(), request.isPersist())
                 .payLoad(Collections.singleton((Long) request.getObject()))
-                .queuable()
                 .idColumnName(request.getIdColumnName(), request.getIdType())
                 .fullUrl(request.getUrl());
         if (request.isQueuable()) {
-            builder.queuable();
+            builder.queuable(request.isOnWifi(), request.isWhileCharging());
         }
         return deleteCollectionByIds(builder.build());
     }

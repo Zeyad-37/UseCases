@@ -102,7 +102,7 @@ ext {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     //Job Dispatcher
-    compile 'com.firebase:firebase-jobdispatcher:0.6.0'
+    compile 'com.firebase:firebase-jobdispatcher:0.7.0'
     // Network
     compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
     compile "com.squareup.retrofit2:converter-gson:$retrofitVersion"

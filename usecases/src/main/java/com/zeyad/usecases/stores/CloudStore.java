@@ -263,7 +263,7 @@ public class CloudStore implements DataStore {
             deleteLocally(mUtils.convertToListOfId(jsonArray, itemIdType), idColumnName, itemIdType,
                     dataClass, saveToDisk, cache);
             if (isQueuableIfOutOfNetwork(queuable)) {
-                queuePost(DELETE, url, idColumnName, null, jsonArray, saveToDisk);
+                queuePost(DELETE, url, idColumnName, itemIdType, jsonArray, saveToDisk);
                 return Flowable.empty();
             } else if (!mUtils.isNetworkAvailable(Config.getInstance().getContext())) {
                 return getErrorFlowableNotPersisted();
@@ -273,7 +273,7 @@ public class CloudStore implements DataStore {
                     .map(object -> daoMapHelper(responseType, object))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                            queuePost(DELETE, url, idColumnName, null, jsonArray, saveToDisk);
+                            queuePost(DELETE, url, idColumnName, itemIdType, jsonArray, saveToDisk);
                             return Flowable.empty();
                         }
                         return Flowable.error(throwable);
@@ -441,9 +441,7 @@ public class CloudStore implements DataStore {
 
     private boolean isOnWifi(@NonNull Context context) {
         return ((ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE))
-                .getActiveNetworkInfo()
-                .getType()
-                == ConnectivityManager.TYPE_WIFI;
+                .getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI;
     }
 
     private void queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload) {

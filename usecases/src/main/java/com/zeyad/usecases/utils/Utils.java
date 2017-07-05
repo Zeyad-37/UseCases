@@ -73,7 +73,7 @@ public class Utils {
     }
 
     public void queuePostCore(@NonNull FirebaseJobDispatcher dispatcher, @NonNull PostRequest postRequest, int trailCount) {
-        Bundle extras = new Bundle(2);
+        Bundle extras = new Bundle(3);
         extras.putString(GenericJobService.JOB_TYPE, GenericJobService.POST);
         extras.putParcelable(GenericJobService.PAYLOAD, postRequest);
         extras.putInt(GenericJobService.TRIAL_COUNT, trailCount);
@@ -93,7 +93,7 @@ public class Utils {
 
     public void queueFileIOCore(@NonNull FirebaseJobDispatcher dispatcher, boolean isDownload,
             @NonNull FileIORequest fileIORequest, int trailCount) {
-        Bundle extras = new Bundle(2);
+        Bundle extras = new Bundle(3);
         extras.putString(GenericJobService.JOB_TYPE, isDownload ?
                 GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE);
         extras.putParcelable(GenericJobService.PAYLOAD, fileIORequest);

@@ -29,6 +29,7 @@ public class Post {
     private final ApiConnection mRestApi;
     private final Utils mUtils;
     private final int mTrailCount;
+    private boolean isObject = false;
 
     public Post(Context context, PostRequest postRequest, ApiConnection restApi, int trailCount, Utils utils) {
         mPostRequest = postRequest;
@@ -40,7 +41,6 @@ public class Post {
 
     public Completable execute() {
         String bundle = "";
-        boolean isObject = false;
         if (mPostRequest.getArrayBundle().length() == 0) {
             JSONObject jsonObject = mPostRequest.getObjectBundle();
             if (jsonObject != null) {
@@ -62,44 +62,32 @@ public class Post {
                         .doOnComplete(() -> Log.d(TAG, COMPLETED))
                         .toObservable());
             case PostRequest.POST:
-                return isObject ? Completable.fromObservable(mRestApi.dynamicPost(mPostRequest.getUrl(), requestBody)
-                        .doOnSubscribe(subscription -> Log.d(TAG, "Posting " + mPostRequest.getRequestType()
-                                .getSimpleName()))
-                        .doOnError(this::onError)
-                        .doOnComplete(() -> Log.d(TAG, COMPLETED))
-                        .toObservable()) :
-                        Completable.fromObservable(mRestApi.dynamicPost(mPostRequest.getUrl(), listRequestBody)
-                                .doOnSubscribe(subscription -> Log.d(TAG, "Posting List of " + mPostRequest
-                                        .getRequestType().getSimpleName()))
-                                .doOnError(this::onError)
-                                .doOnComplete(() -> Log.d(TAG, COMPLETED))
-                                .toObservable());
+                return Completable.fromObservable(mRestApi.dynamicPost(mPostRequest.getUrl(),
+                        isObject ? requestBody : listRequestBody)
+                                                          .doOnSubscribe(subscription -> Log.d(TAG,
+                                                                  "Posting " + (isObject ? "List of " : "") + mPostRequest.getRequestType()
+                                                                                                                          .getSimpleName()))
+                                                          .doOnError(this::onError)
+                                                          .doOnComplete(() -> Log.d(TAG, COMPLETED))
+                                                          .toObservable());
             case PostRequest.PUT:
-                return isObject ? Completable.fromObservable(mRestApi.dynamicPut(mPostRequest.getUrl(), requestBody)
-                        .doOnSubscribe(subscription -> Log.d(TAG, "Putting " + mPostRequest.getRequestType()
-                                .getSimpleName()))
-                        .doOnError(this::onError)
-                        .doOnComplete(() -> Log.d(TAG, COMPLETED))
-                        .toObservable()) :
-                        Completable.fromObservable(mRestApi.dynamicPut(mPostRequest.getUrl(), listRequestBody)
-                                .doOnSubscribe(subscription -> Log.d(TAG, "Putting List of " + mPostRequest.getRequestType()
-                                        .getSimpleName()))
-                                .doOnError(this::onError)
-                                .doOnComplete(() -> Log.d(TAG, COMPLETED))
-                                .toObservable());
+                return Completable.fromObservable(mRestApi.dynamicPut(mPostRequest.getUrl(),
+                        isObject ? requestBody : listRequestBody)
+                                                          .doOnSubscribe(subscription -> Log.d(TAG,
+                                                                  "Putting " + (isObject ? "List of " : "") + mPostRequest.getRequestType()
+                                                                                                                          .getSimpleName()))
+                                                          .doOnError(this::onError)
+                                                          .doOnComplete(() -> Log.d(TAG, COMPLETED))
+                                                          .toObservable());
             case PostRequest.DELETE:
-                return isObject ? Completable.fromObservable(mRestApi.dynamicDelete(mPostRequest.getUrl(), requestBody)
-                        .doOnSubscribe(subscription -> Log.d(TAG, "Deleting " + mPostRequest.getRequestType()
-                                .getSimpleName()))
-                        .doOnError(this::onError)
-                        .doOnComplete(() -> Log.d(TAG, COMPLETED))
-                        .toObservable()) :
-                        Completable.fromObservable(mRestApi.dynamicDelete(mPostRequest.getUrl(), listRequestBody)
-                                .doOnSubscribe(subscription -> Log.d(TAG, "Deleting List of " + mPostRequest
-                                        .getRequestType().getSimpleName()))
-                                .doOnError(this::onError)
-                                .doOnComplete(() -> Log.d(TAG, COMPLETED))
-                                .toObservable());
+                return Completable.fromObservable(mRestApi.dynamicDelete(mPostRequest.getUrl(),
+                        isObject ? requestBody : listRequestBody)
+                                                          .doOnSubscribe(subscription -> Log.d(TAG,
+                                                                  "Deleting " + (isObject ? "List of " : "") + mPostRequest.getRequestType()
+                                                                                                                           .getSimpleName()))
+                                                          .doOnError(this::onError)
+                                                          .doOnComplete(() -> Log.d(TAG, COMPLETED))
+                                                          .toObservable());
             default:
                 break;
         }

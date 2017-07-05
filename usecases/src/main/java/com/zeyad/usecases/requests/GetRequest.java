@@ -1,25 +1,12 @@
 package com.zeyad.usecases.requests;
 
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
 
 /** @author zeyad on 7/29/16. */
-public class GetRequest implements Parcelable {
+public class GetRequest {
 
-    public static final Parcelable.Creator<GetRequest> CREATOR = new Parcelable.Creator<GetRequest>() {
-        @Override
-        public GetRequest createFromParcel(Parcel source) {
-            return new GetRequest(source);
-        }
-
-        @Override
-        public GetRequest[] newArray(int size) {
-            return new GetRequest[size];
-        }
-    };
     private static final String DEFAULT_ID_KEY = "id";
     private final String url, idColumnName;
     private final Class dataClass, idType;
@@ -34,16 +21,6 @@ public class GetRequest implements Parcelable {
         idColumnName = builder.mIdColumnName;
         itemId = builder.mItemId;
         shouldCache = builder.mShouldCache;
-    }
-
-    protected GetRequest(Parcel in) {
-        this.url = in.readString();
-        this.idColumnName = in.readString();
-        this.dataClass = (Class) in.readSerializable();
-        this.idType = (Class) in.readSerializable();
-        this.persist = in.readByte() != 0;
-        this.shouldCache = in.readByte() != 0;
-        this.itemId = in.readParcelable(Object.class.getClassLoader());
     }
 
     @NonNull
@@ -74,22 +51,6 @@ public class GetRequest implements Parcelable {
 
     public Object getItemId() {
         return itemId;
-    }
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(this.url);
-        dest.writeString(this.idColumnName);
-        dest.writeSerializable(this.dataClass);
-        dest.writeSerializable(this.idType);
-        dest.writeByte(this.persist ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.shouldCache ? (byte) 1 : (byte) 0);
-        dest.writeParcelable((Parcelable) this.itemId, flags);
     }
 
     public static class Builder {
@@ -138,4 +99,3 @@ public class GetRequest implements Parcelable {
         }
     }
 }
-

@@ -29,10 +29,17 @@ public class GenericJobService extends JobService {
     }
 
     @Override
+    public void onDestroy() {
+        if (disposable != null && !disposable.isDisposed()) {
+            disposable.dispose();
+        }
+        super.onDestroy();
+    }
+
+    @Override
     public boolean onStartJob(@NonNull JobParameters params) {
         disposable = genericJobServiceLogic.startJob(params.getExtras().getBundle(PAYLOAD),
-                Config.getCloudStore(),
-                Utils.getInstance(), "Job Started").subscribe();
+                Config.getCloudStore(), Utils.getInstance(), "Job Started").subscribe();
         return true; // Answers the question: "Is there still work going on?"
     }
 
@@ -43,13 +50,5 @@ public class GenericJobService extends JobService {
         }
         Log.i(TAG, "on stop job: " + params.getTag());
         return true; // Answers the question: "Should this job be retried?"
-    }
-
-    @Override
-    public void onDestroy() {
-        if (disposable != null && !disposable.isDisposed()) {
-            disposable.dispose();
-        }
-        super.onDestroy();
     }
 }
