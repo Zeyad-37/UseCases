@@ -8,7 +8,7 @@ import com.firebase.jobdispatcher.JobService;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.utils.Utils;
 
-import io.reactivex.disposables.Disposable;
+import io.reactivex.disposables.CompositeDisposable;
 
 public class GenericJobService extends JobService {
 
@@ -17,10 +17,10 @@ public class GenericJobService extends JobService {
             JOB_TYPE = "JOB_TYPE",
             POST = "POST",
             PAYLOAD = "payload",
-            TRIAL_COUNT = "trialCount";
-    private static final String TAG = GenericJobService.class.getSimpleName();
+            TRIAL_COUNT = "trialCount",
+            TAG = GenericJobService.class.getSimpleName();
+    private static final CompositeDisposable disposable = new CompositeDisposable();
     private final GenericJobServiceLogic genericJobServiceLogic = new GenericJobServiceLogic();
-    private Disposable disposable;
 
     @Override
     public void onCreate() {
@@ -30,7 +30,7 @@ public class GenericJobService extends JobService {
 
     @Override
     public void onDestroy() {
-        if (disposable != null && !disposable.isDisposed()) {
+        if (!disposable.isDisposed()) {
             disposable.dispose();
         }
         super.onDestroy();
@@ -38,14 +38,14 @@ public class GenericJobService extends JobService {
 
     @Override
     public boolean onStartJob(@NonNull JobParameters params) {
-        disposable = genericJobServiceLogic.startJob(params.getExtras().getBundle(PAYLOAD),
-                Config.getCloudStore(), Utils.getInstance(), "Job Started").subscribe();
+        disposable.add(genericJobServiceLogic.startJob(params.getExtras().getBundle(PAYLOAD),
+                Config.getCloudStore(), Utils.getInstance(), "Job Started").subscribe());
         return true; // Answers the question: "Is there still work going on?"
     }
 
     @Override
     public boolean onStopJob(@NonNull JobParameters params) {
-        if (disposable != null && !disposable.isDisposed()) {
+        if (!disposable.isDisposed()) {
             disposable.dispose();
         }
         Log.i(TAG, "on stop job: " + params.getTag());

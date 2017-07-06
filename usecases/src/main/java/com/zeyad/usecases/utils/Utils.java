@@ -77,18 +77,7 @@ public class Utils {
         extras.putString(GenericJobService.JOB_TYPE, GenericJobService.POST);
         extras.putParcelable(GenericJobService.PAYLOAD, postRequest);
         extras.putInt(GenericJobService.TRIAL_COUNT, trailCount);
-        dispatcher.mustSchedule(dispatcher.newJobBuilder()
-                .setService(GenericJobService.class)
-                .setTag(GenericJobService.POST)
-                .setRecurring(false)
-                .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
-                .setTrigger(Trigger.executionWindow(0, 60))
-                .setReplaceCurrent(false)
-                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
-                .setConstraints(Constraint.ON_ANY_NETWORK, Constraint.DEVICE_CHARGING)
-                .setExtras(extras)
-                .build());
-        Log.d("FBJD", postRequest.getMethod() + " request is queued successfully!");
+        queueCore(dispatcher, extras, postRequest.getMethod(), postRequest.isOnWifi(), postRequest.isWhileCharging());
     }
 
     public void queueFileIOCore(@NonNull FirebaseJobDispatcher dispatcher, boolean isDownload,
@@ -98,19 +87,26 @@ public class Utils {
                 GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE);
         extras.putParcelable(GenericJobService.PAYLOAD, fileIORequest);
         extras.putInt(GenericJobService.TRIAL_COUNT, trailCount);
+        queueCore(dispatcher, extras, (isDownload ? "Download" : "Upload") + " file",
+                fileIORequest.onWifi(), fileIORequest.isWhileCharging());
+    }
+
+    private void queueCore(@NonNull FirebaseJobDispatcher dispatcher, @NonNull Bundle extras, String message,
+            boolean isOnWifi, boolean whileCharging) {
         dispatcher.mustSchedule(dispatcher.newJobBuilder()
-                .setService(GenericJobService.class)
-                .setTag(isDownload ? GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE)
-                .setRecurring(false)
-                .setLifetime(Lifetime.FOREVER)
-                .setReplaceCurrent(false)
-                .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
-                .setConstraints(fileIORequest.onWifi() ? Constraint.ON_UNMETERED_NETWORK : Constraint.ON_ANY_NETWORK,
-                        fileIORequest.isWhileCharging() ? Constraint.DEVICE_CHARGING : 0)
-                .setExtras(extras)
-                .build());
-        Log.d("FBJD", String.format("%s file request is queued successfully!", isDownload ?
-                "Download" : "Upload"));
+                                          .setService(GenericJobService.class)
+                                          .setTag(extras.getString(GenericJobService.JOB_TYPE) + System.currentTimeMillis())
+                                          .setRecurring(false)
+                                          .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
+                                          .setTrigger(Trigger.executionWindow(0, 10))
+                                          .setReplaceCurrent(true)
+                                          .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                                          .setConstraints(isOnWifi ?
+                                                          Constraint.ON_UNMETERED_NETWORK : Constraint.ON_ANY_NETWORK,
+                                                  whileCharging ? Constraint.DEVICE_CHARGING : Constraint.DEVICE_IDLE)
+                                          .setExtras(extras)
+                                          .build());
+        Log.d("FBJD", message + " request is queued successfully!");
     }
 
     public List convertToListOfId(@Nullable JSONArray jsonArray, Class idType) {
