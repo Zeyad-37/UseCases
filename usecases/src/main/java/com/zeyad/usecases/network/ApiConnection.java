@@ -163,8 +163,8 @@ public class ApiConnection {
     }
 
     @NonNull
-    public <M> Flowable<M> dynamicDelete(String url, RequestBody body) {
-        return (Flowable<M>) getRestApi().dynamicDelete(url, body);
+    public <M> Flowable<M> dynamicDelete(String url) {
+        return (Flowable<M>) getRestApi().dynamicDelete(url);
     }
 
     @NonNull

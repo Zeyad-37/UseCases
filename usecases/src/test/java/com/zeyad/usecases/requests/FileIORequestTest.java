@@ -33,7 +33,7 @@ public class FileIORequestTest {
                 new FileIORequest.Builder(URL, FILE)
                         .onWifi(ON_WIFI)
                         .whileCharging(WHILE_CHARGING)
-                        .dataClass(DATA_CLASS)
+                        .responseType(DATA_CLASS)
                         .build();
     }
 

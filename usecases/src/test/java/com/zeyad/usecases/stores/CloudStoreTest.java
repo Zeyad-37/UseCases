@@ -435,7 +435,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicDeleteCollection() throws Exception {
-        when(mockApiConnection.dynamicDelete(anyString(), any(RequestBody.class)))
+        when(mockApiConnection.dynamicDelete(anyString()))
                 .thenReturn(observable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -445,13 +445,13 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         testSubscriber.assertNoErrors();
 
-        verify(mockApiConnection, times(1)).dynamicDelete(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicDelete(anyString());
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
     @Test
     public void dynamicDeleteCollectionCanWillPersist() throws Exception {
-        when(mockApiConnection.dynamicDelete(anyString(), any(RequestBody.class)))
+        when(mockApiConnection.dynamicDelete(anyString()))
                 .thenReturn(observable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -461,7 +461,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         testSubscriber.assertNoErrors();
 
-        verify(mockApiConnection, times(1)).dynamicDelete(anyString(), any(RequestBody.class));
+        verify(mockApiConnection, times(1)).dynamicDelete(anyString());
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 

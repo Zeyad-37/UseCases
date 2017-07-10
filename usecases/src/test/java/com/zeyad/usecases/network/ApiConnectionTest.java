@@ -151,14 +151,14 @@ public class ApiConnectionTest {
 
     @Test
     public void testDynamicDeleteList() throws Exception {
-        mApiConnection.dynamicDelete(mValidUrl, mMockedRequestBody);
-        Mockito.verify(mRestApiWithoutCache).dynamicDelete(eq(mValidUrl), eq(mMockedRequestBody));
+        mApiConnection.dynamicDelete(mValidUrl);
+        Mockito.verify(mRestApiWithoutCache).dynamicDelete(eq(mValidUrl));
     }
 
     @Test
     public void testDynamicDeleteObject() throws Exception {
-        mApiConnection.dynamicDelete(mValidUrl, mMockedRequestBody);
-        Mockito.verify(mRestApiWithoutCache).dynamicDelete(eq(mValidUrl), eq(mMockedRequestBody));
+        mApiConnection.dynamicDelete(mValidUrl);
+        Mockito.verify(mRestApiWithoutCache).dynamicDelete(eq(mValidUrl));
     }
 
     private RestApi getCurrentSetRestApiWithoutCache(@NonNull ApiConnection apiConnection) {

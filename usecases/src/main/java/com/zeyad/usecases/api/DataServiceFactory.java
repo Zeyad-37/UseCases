@@ -16,6 +16,8 @@ import com.zeyad.usecases.utils.DataBaseManagerUtil;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import st.lowlevel.storo.StoroBuilder;
 
+import static st.lowlevel.storo.StoroBuilder.Storage.INTERNAL;
+
 public final class DataServiceFactory {
     @Nullable
     private static IDataService sDataUseCase;
@@ -56,9 +58,10 @@ public final class DataServiceFactory {
         Config.setHasRealm(config.isWithRealm());
         if (config.isWithCache()) {
             StoroBuilder.configure(config.getCacheSize())
-                    .setDefaultCacheDirectory(config.getContext())
-                    .setGsonInstance(Config.getGson())
-                    .initialize();
+                        .setCacheDirectory(config.getContext(), INTERNAL)
+                        //                        .setDefaultCacheDirectory(config.getContext())
+                        .setGsonInstance(Config.getGson())
+                        .initialize();
         }
         HandlerThread handlerThread = config.getHandlerThread();
         if (config.isWithRealm()) {

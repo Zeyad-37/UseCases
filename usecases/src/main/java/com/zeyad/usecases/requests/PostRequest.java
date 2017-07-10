@@ -32,13 +32,9 @@ public class PostRequest implements Parcelable {
         }
     };
     private static final String DEFAULT_ID_KEY = "id";
-    private final String url, idColumnName, method;
+    private final String url, idColumnName, method, payload;
     private final Class requestType, responseType, idType;
     private final boolean onWifi, whileCharging, persist, queuable, cache;
-    private final String payload;
-    //    private final JSONObject jsonObject;
-    //    private final JSONArray jsonArray;
-    //    private final HashMap<String, Object> keyValuePairs;
     private Object object;
 
     public PostRequest(@NonNull Builder builder) {
@@ -49,9 +45,6 @@ public class PostRequest implements Parcelable {
         onWifi = builder.onWifi;
         whileCharging = builder.whileCharging;
         queuable = builder.queuable;
-        //        keyValuePairs = builder.keyValuePairs;
-        //        jsonObject = builder.jsonObject;
-        //        jsonArray = builder.jsonArray;
         idColumnName = builder.idColumnName;
         idType = builder.idType;
         method = builder.method;
@@ -77,22 +70,12 @@ public class PostRequest implements Parcelable {
         this.payload = in.readString();
     }
 
-    public JSONObject getObjectBundle() {
-        try {
-            return new JSONObject(payload);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return new JSONObject();
+    public JSONObject getObjectBundle() throws JSONException {
+        return new JSONObject(payload);
     }
 
-    public JSONArray getArrayBundle() {
-        try {
-            return new JSONArray(payload);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return new JSONArray();
+    public JSONArray getArrayBundle() throws JSONException {
+        return new JSONArray(payload);
     }
 
     private JSONObject getObjectBundle(JSONObject jsonObject, HashMap<String, Object> keyValuePairs) {
@@ -123,6 +106,13 @@ public class PostRequest implements Parcelable {
         } else if (object instanceof List) {
             final JSONArray result = new JSONArray();
             List ids = (List) object;
+            for (Object item : ids) {
+                result.put(item);
+            }
+            return result;
+        } else if (object instanceof Object[]) {
+            final JSONArray result = new JSONArray();
+            Object[] ids = (Object[]) object;
             for (Object item : ids) {
                 result.put(item);
             }
@@ -233,12 +223,6 @@ public class PostRequest implements Parcelable {
         @NonNull
         public Builder responseType(Class responseType) {
             this.responseType = responseType;
-            return this;
-        }
-
-        @NonNull
-        public Builder requestType(Class requestType) {
-            this.requestType = requestType;
             return this;
         }
 

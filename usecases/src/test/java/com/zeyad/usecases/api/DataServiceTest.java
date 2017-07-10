@@ -433,7 +433,7 @@ public class DataServiceTest {
                 .thenReturn(flowable);
 
         dataService.uploadFile(
-                new FileIORequest.Builder("", new File("")).dataClass(Object.class).build());
+                new FileIORequest.Builder("", new File("")).responseType(Object.class).build());
 
         verify(dataStoreFactory.cloud(Object.class), times(1))
                 .dynamicUploadFile(
@@ -460,7 +460,7 @@ public class DataServiceTest {
                 .thenReturn(flowable);
 
         dataService.downloadFile(
-                new FileIORequest.Builder("", new File("")).dataClass(Object.class).build());
+                new FileIORequest.Builder("", new File("")).responseType(Object.class).build());
 
         verify(dataStoreFactory.cloud(Object.class), times(1))
                 .dynamicDownloadFile(

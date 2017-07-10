@@ -143,7 +143,8 @@ dependencies {
     // Network
     compile 'com.github.bumptech.glide:glide:3.7.0'
     // Rx
-    compile "com.jakewharton.rxbinding2:rxbinding:$rxbindingVersion"
+//    def withoutRx = { exclude group: "io.reactivex.rxjava2" }
+    compile "com.jakewharton.rxbinding2:rxbinding:$rxbindingVersion"//, withoutRx
     compile "com.jakewharton.rxbinding2:rxbinding-appcompat-v7:$rxbindingVersion"
     compile "com.jakewharton.rxbinding2:rxbinding-design:$rxbindingVersion"
     compile "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7:$rxbindingVersion"
@@ -161,7 +162,7 @@ dependencies {
 //    compile("io.flowup:android-sdk:0.2.4") {
 //        exclude group: 'com.google.android.gms'
 //    }
-    testCompile 'io.flowup:android-sdk-no-op:0.2.4'
+//    testCompile 'io.flowup:android-sdk-no-op:0.2.4'
     // Testing
     androidTestCompile "com.android.support.test:runner:$androidSupportTest"
     androidTestCompile "com.android.support.test:rules:$androidSupportTest"

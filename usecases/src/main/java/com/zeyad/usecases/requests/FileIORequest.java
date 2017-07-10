@@ -4,8 +4,6 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
 
-import com.zeyad.usecases.Config;
-
 import java.io.File;
 import java.util.HashMap;
 
@@ -121,19 +119,7 @@ public class FileIORequest implements Parcelable {
         }
 
         @NonNull
-        public Builder url(String url) {
-            this.url = Config.getBaseURL() + url;
-            return this;
-        }
-
-        @NonNull
-        public Builder fullUrl(String url) {
-            this.url = url;
-            return this;
-        }
-
-        @NonNull
-        public Builder dataClass(Class dataClass) {
+        public Builder responseType(Class dataClass) {
             this.dataClass = dataClass;
             return this;
         }

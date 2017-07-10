@@ -11,6 +11,8 @@ import com.zeyad.usecases.stores.DataStoreFactory;
 import com.zeyad.usecases.utils.ReplayingShare;
 import com.zeyad.usecases.utils.Utils;
 
+import org.json.JSONException;
+
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
@@ -102,7 +104,7 @@ class DataService implements IDataService {
                             postRequest.getIdType(), postRequest.getObjectBundle(),
                             postRequest.getRequestType(), postRequest.getResponseType(),
                             postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | JSONException e) {
             result = Flowable.error(e);
         }
         return result.compose(applySchedulers());
@@ -117,7 +119,7 @@ class DataService implements IDataService {
                             postRequest.getIdType(), postRequest.getObjectBundle(),
                             postRequest.getRequestType(), postRequest.getResponseType(),
                             postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | JSONException e) {
             result = Flowable.error(e);
         }
         return result.compose(applySchedulers());
@@ -132,7 +134,7 @@ class DataService implements IDataService {
                             postRequest.getIdType(), postRequest.getArrayBundle(),
                             postRequest.getRequestType(), postRequest.getResponseType(),
                             postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | JSONException e) {
             result = Flowable.error(e);
         }
         return result.compose(applySchedulers());
@@ -147,7 +149,7 @@ class DataService implements IDataService {
                             postRequest.getIdType(), postRequest.getObjectBundle(),
                             postRequest.getRequestType(), postRequest.getResponseType(),
                             postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | JSONException e) {
             result = Flowable.error(e);
         }
         return result.compose(applySchedulers());
@@ -162,7 +164,7 @@ class DataService implements IDataService {
                             postRequest.getIdType(), postRequest.getArrayBundle(),
                             postRequest.getRequestType(), postRequest.getResponseType(),
                             postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | JSONException e) {
             result = Flowable.error(e);
         }
         return result.compose(applySchedulers());
@@ -172,8 +174,9 @@ class DataService implements IDataService {
     public <M> Flowable<M> deleteItemById(@NonNull PostRequest request) {
         PostRequest.Builder builder = new PostRequest
                 .Builder(request.getRequestType(), request.isPersist())
-                .payLoad(Collections.singleton((Long) request.getObject()))
+                .payLoad(Collections.singletonList(request.getObject()))
                 .idColumnName(request.getIdColumnName(), request.getIdType())
+                .responseType(request.getResponseType())
                 .fullUrl(request.getUrl());
         if (request.isQueuable()) {
             builder.queuable(request.isOnWifi(), request.isWhileCharging());
@@ -191,7 +194,7 @@ class DataService implements IDataService {
                             deleteRequest.getRequestType(), deleteRequest.getResponseType(),
                             deleteRequest.isPersist(), deleteRequest.isCache(), deleteRequest.isQueuable())
                     .compose(applySchedulers());
-        } catch (IllegalAccessException e) {
+        } catch (IllegalAccessException | JSONException e) {
             result = Flowable.error(e);
         }
         return result.compose(applySchedulers());

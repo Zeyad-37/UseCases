@@ -14,7 +14,6 @@ import com.firebase.jobdispatcher.Constraint;
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
 import com.firebase.jobdispatcher.Lifetime;
 import com.firebase.jobdispatcher.RetryStrategy;
-import com.firebase.jobdispatcher.Trigger;
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.requests.PostRequest;
@@ -91,20 +90,21 @@ public class Utils {
                 fileIORequest.onWifi(), fileIORequest.isWhileCharging());
     }
 
-    private void queueCore(@NonNull FirebaseJobDispatcher dispatcher, @NonNull Bundle extras, String message,
+    private void queueCore(@NonNull FirebaseJobDispatcher dispatcher, @NonNull Bundle bundle, String message,
             boolean isOnWifi, boolean whileCharging) {
+        int network = isOnWifi ? Constraint.ON_UNMETERED_NETWORK : Constraint.ON_ANY_NETWORK;
+        int power = whileCharging ? Constraint.DEVICE_CHARGING : Constraint.DEVICE_IDLE;
         dispatcher.mustSchedule(dispatcher.newJobBuilder()
                                           .setService(GenericJobService.class)
-                                          .setTag(extras.getString(GenericJobService.JOB_TYPE) + System.currentTimeMillis())
+                                          .setTag(bundle.getString("JOB_TYPE")
+                                                        .concat(String.valueOf(System.currentTimeMillis())))
                                           .setRecurring(false)
                                           .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
-                                          .setTrigger(Trigger.executionWindow(0, 10))
+                                          //                                          .setTrigger(Trigger.executionWindow(0, 10))
                                           .setReplaceCurrent(true)
                                           .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
-                                          .setConstraints(isOnWifi ?
-                                                          Constraint.ON_UNMETERED_NETWORK : Constraint.ON_ANY_NETWORK,
-                                                  whileCharging ? Constraint.DEVICE_CHARGING : Constraint.DEVICE_IDLE)
-                                          .setExtras(extras)
+                                          .setExtras(bundle)
+                                          .setConstraints(network, power)
                                           .build());
         Log.d("FBJD", message + " request is queued successfully!");
     }

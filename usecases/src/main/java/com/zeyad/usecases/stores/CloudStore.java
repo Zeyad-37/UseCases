@@ -268,8 +268,7 @@ public class CloudStore implements DataStore {
             } else if (!mUtils.isNetworkAvailable(Config.getInstance().getContext())) {
                 return getErrorFlowableNotPersisted();
             }
-            return mApiConnection.<M>dynamicDelete(url, RequestBody.create(MediaType.parse(APPLICATION_JSON),
-                    jsonArray.toString()))
+            return mApiConnection.<M> dynamicDelete(url)
                     .map(object -> daoMapHelper(responseType, object))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {

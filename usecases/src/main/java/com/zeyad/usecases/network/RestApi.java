@@ -51,8 +51,12 @@ public interface RestApi {
     Flowable<Object> dynamicPut(@Url String url, @Body RequestBody body);
 
     @NonNull
+    @PATCH
+    Flowable<Object> dynamicPatch(@Url String url, @Body RequestBody requestBody);
+
+    @NonNull
     @DELETE
-    Flowable<Object> dynamicDelete(@Url String url, @Body RequestBody body);
+    Flowable<Object> dynamicDelete(@Url String url);
 
     @NonNull
     @Streaming
@@ -64,8 +68,4 @@ public interface RestApi {
     @POST
     Flowable<Object> dynamicUpload(@Url String url, @PartMap() Map<String, RequestBody> partMap,
                                    @Part MultipartBody.Part file);
-
-    @NonNull
-    @PATCH
-    Flowable<Object> dynamicPatch(@Url String url, @Body RequestBody requestBody);
 }

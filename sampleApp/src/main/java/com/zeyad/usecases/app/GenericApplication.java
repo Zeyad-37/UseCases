@@ -7,6 +7,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.os.StrictMode;
 import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
@@ -98,13 +99,11 @@ public class GenericApplication extends Application {
 
     @Override
     public void onCreate() {
-        initializeStrictMode();
         super.onCreate();
         if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
             return;
         }
+        initializeStrictMode();
         LeakCanary.install(this);
         Completable.fromAction(() -> {
             if (!checkAppTampering(this)) {
@@ -155,12 +154,12 @@ public class GenericApplication extends Application {
     }
 
     private void initializeStrictMode() {
-        //        if (BuildConfig.DEBUG) {
-        //            StrictMode.setThreadPolicy(
-        //                    new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-        //            StrictMode.setVmPolicy(
-        //                    new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
-        //        }
+        if (BuildConfig.DEBUG) {
+            StrictMode.setThreadPolicy(
+                    new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
+            StrictMode.setVmPolicy(
+                    new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
+        }
     }
 
     private void initializeRealm() {
@@ -171,13 +170,6 @@ public class GenericApplication extends Application {
                 .rxFactory(new RealmObservableFactory())
                 .deleteRealmIfMigrationNeeded()
                 .build());
-    }
-
-    private void initializeFlowUp() {
-        //        FlowUp.Builder.with(this)
-        //                .apiKey(getString(R.string.flow_up_api_key))
-        //                .forceReports(BuildConfig.DEBUG)
-        //                .start();
     }
 
     private boolean checkAppTampering(Context context) {

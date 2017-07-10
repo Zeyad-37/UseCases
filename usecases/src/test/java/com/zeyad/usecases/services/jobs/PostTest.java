@@ -133,7 +133,7 @@ public class PostTest {
                         apiConnection,
                         3);
         post.execute();
-        verify(apiConnection).dynamicDelete(anyString(), any(RequestBody.class));
+        verify(apiConnection).dynamicDelete(anyString());
     }
 
     @Test
@@ -145,7 +145,7 @@ public class PostTest {
                         apiConnection,
                         3);
         post.execute();
-        verify(apiConnection).dynamicDelete(anyString(), any(RequestBody.class));
+        verify(apiConnection).dynamicDelete(anyString());
     }
 
     @Test
@@ -186,7 +186,7 @@ public class PostTest {
         final Flowable<Object> OBJECT_OBSERVABLE = getObjectObservable();
         apiConnection = mock(ApiConnection.class);
         when(apiConnection.dynamicDownload(anyString())).thenReturn(getResponseBodyObservable());
-        when(apiConnection.dynamicDelete(anyString(), any())).thenReturn(OBJECT_OBSERVABLE);
+        when(apiConnection.dynamicDelete(anyString())).thenReturn(OBJECT_OBSERVABLE);
         when(apiConnection.dynamicGetObject(any(), anyBoolean())).thenReturn(OBJECT_OBSERVABLE);
         when(apiConnection.dynamicGetObject(any())).thenReturn(OBJECT_OBSERVABLE);
         when(apiConnection.dynamicGetList(any())).thenReturn(getListObservable());

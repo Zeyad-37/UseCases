@@ -21,6 +21,10 @@ allprojects {
         maven { url 'https://jitpack.io' }
         maven { url 'https://maven.google.com' }
     }
+
+    tasks.withType(Test) {
+        maxParallelForks = Runtime.runtime.availableProcessors()
+    }
 }
 
 task clean(type: Delete) {

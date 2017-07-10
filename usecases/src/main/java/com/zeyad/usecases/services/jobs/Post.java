@@ -10,6 +10,7 @@ import com.zeyad.usecases.network.ApiConnection;
 import com.zeyad.usecases.requests.PostRequest;
 import com.zeyad.usecases.utils.Utils;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import io.reactivex.Completable;
@@ -41,18 +42,20 @@ public class Post {
 
     public Completable execute() {
         String bundle = "";
-        if (mPostRequest.getArrayBundle().length() == 0) {
-            JSONObject jsonObject = mPostRequest.getObjectBundle();
-            if (jsonObject != null) {
-                bundle = jsonObject.toString();
-                isObject = true;
+        try {
+            if (mPostRequest.getArrayBundle().length() == 0) {
+                JSONObject jsonObject = mPostRequest.getObjectBundle();
+                if (jsonObject != null) {
+                    bundle = jsonObject.toString();
+                    isObject = true;
+                }
+            } else {
+                bundle = mPostRequest.getArrayBundle().toString();
             }
-        } else {
-            bundle = mPostRequest.getArrayBundle().toString();
+        } catch (JSONException e) {
+            return Completable.error(e);
         }
         RequestBody requestBody = RequestBody.create(MediaType.parse(APPLICATION_JSON), bundle);
-        RequestBody listRequestBody =
-                RequestBody.create(MediaType.parse(APPLICATION_JSON), mPostRequest.getArrayBundle().toString());
         switch (mPostRequest.getMethod()) {
             case PostRequest.PATCH:
                 return Completable.fromObservable(mRestApi.dynamicPatch(mPostRequest.getUrl(), requestBody)
@@ -62,8 +65,7 @@ public class Post {
                         .doOnComplete(() -> Log.d(TAG, COMPLETED))
                         .toObservable());
             case PostRequest.POST:
-                return Completable.fromObservable(mRestApi.dynamicPost(mPostRequest.getUrl(),
-                        isObject ? requestBody : listRequestBody)
+                return Completable.fromObservable(mRestApi.dynamicPost(mPostRequest.getUrl(), requestBody)
                                                           .doOnSubscribe(subscription -> Log.d(TAG,
                                                                   "Posting " + (isObject ? "List of " : "") + mPostRequest.getRequestType()
                                                                                                                           .getSimpleName()))
@@ -71,8 +73,7 @@ public class Post {
                                                           .doOnComplete(() -> Log.d(TAG, COMPLETED))
                                                           .toObservable());
             case PostRequest.PUT:
-                return Completable.fromObservable(mRestApi.dynamicPut(mPostRequest.getUrl(),
-                        isObject ? requestBody : listRequestBody)
+                return Completable.fromObservable(mRestApi.dynamicPut(mPostRequest.getUrl(), requestBody)
                                                           .doOnSubscribe(subscription -> Log.d(TAG,
                                                                   "Putting " + (isObject ? "List of " : "") + mPostRequest.getRequestType()
                                                                                                                           .getSimpleName()))
@@ -80,8 +81,7 @@ public class Post {
                                                           .doOnComplete(() -> Log.d(TAG, COMPLETED))
                                                           .toObservable());
             case PostRequest.DELETE:
-                return Completable.fromObservable(mRestApi.dynamicDelete(mPostRequest.getUrl(),
-                        isObject ? requestBody : listRequestBody)
+                return Completable.fromObservable(mRestApi.dynamicDelete(mPostRequest.getUrl())
                                                           .doOnSubscribe(subscription -> Log.d(TAG,
                                                                   "Deleting " + (isObject ? "List of " : "") + mPostRequest.getRequestType()
                                                                                                                            .getSimpleName()))
@@ -89,9 +89,8 @@ public class Post {
                                                           .doOnComplete(() -> Log.d(TAG, COMPLETED))
                                                           .toObservable());
             default:
-                break;
+                return Completable.error(new IllegalArgumentException("Method does not exist!"));
         }
-        return Completable.complete();
     }
 
     private void onError(Throwable throwable) {
