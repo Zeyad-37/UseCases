@@ -12,6 +12,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.util.Log;
 import android.util.Pair;
 import android.view.LayoutInflater;
@@ -28,6 +29,8 @@ import com.jakewharton.rxbinding2.support.v7.widget.RxSearchView;
 import com.jakewharton.rxbinding2.view.RxMenuItem;
 import com.zeyad.gadapter.GenericRecyclerViewAdapter;
 import com.zeyad.gadapter.ItemInfo;
+import com.zeyad.gadapter.OnStartDragListener;
+import com.zeyad.gadapter.SimpleItemTouchHelperCallback;
 import com.zeyad.rxredux.core.redux.BaseActivity;
 import com.zeyad.rxredux.core.redux.BaseEvent;
 import com.zeyad.rxredux.core.redux.SuccessStateAccumulator;
@@ -64,7 +67,7 @@ import static android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING;
  * lead to a {@link UserDetailActivity} representing item details. On tablets, the activity presents
  * the list of items and item details side-by-side using two vertical panes.
  */
-public class UserListActivity extends BaseActivity<UserListState, UserListVM> implements ActionMode.Callback {
+public class UserListActivity extends BaseActivity<UserListState, UserListVM> implements OnStartDragListener, ActionMode.Callback {
     public static final int PAGE_SIZE = 6;
 
     @BindView(R.id.imageView_avatar)
@@ -79,6 +82,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
 
+    private ItemTouchHelper itemTouchHelper;
     private GenericRecyclerViewAdapter usersAdapter;
     private ActionMode actionMode;
     private String currentFragTag;
@@ -244,13 +248,19 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                 }
             }
         });
-        usersAdapter.setOnItemLongClickListener((position, itemInfo, holder) -> {
-                    if (usersAdapter.isSelectionAllowed()) {
-                        actionMode = startSupportActionMode(UserListActivity.this);
-                        toggleSelection(position);
-                    }
-                    return true;
-                });
+        //        usersAdapter.setOnItemLongClickListener((position, itemInfo, holder) -> {
+        //                    if (usersAdapter.isSelectionAllowed()) {
+        //                        actionMode = startSupportActionMode(UserListActivity.this);
+        //                        toggleSelection(position);
+        //                    }
+        //                    return true;
+        //                });
+        usersAdapter.setOnItemSwipeListener(itemInfo -> {
+            events = events.mergeWith(Observable.defer(() ->
+                    Observable.just(new DeleteUsersEvent(Collections.singletonList(((User) itemInfo.getData()).getLogin())))
+                              .doOnEach(notification -> Log.d("DeleteEvent", "fired!"))));
+            rxEventBus.send(events);
+        });
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         userRecycler.setLayoutManager(layoutManager);
         userRecycler.setAdapter(usersAdapter);
@@ -272,6 +282,8 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                 .throttleLast(200, TimeUnit.MILLISECONDS)
                 .debounce(300, TimeUnit.MILLISECONDS)
                 .doOnNext(searchUsersEvent -> Log.d("NextPageEvent", "fired!"))));
+        itemTouchHelper = new ItemTouchHelper(new SimpleItemTouchHelperCallback(usersAdapter));
+        itemTouchHelper.attachToRecyclerView(userRecycler);
     }
 
     @Override
@@ -351,5 +363,10 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
         }
         actionMode = null;
         toolbar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+        itemTouchHelper.startDrag(viewHolder);
     }
 }
