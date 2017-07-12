@@ -28,7 +28,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyMap;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -91,7 +90,7 @@ public class FileIOTest {
         Mockito.when(fileIORequest.getUrl()).thenReturn(getValidUrl());
         Mockito.when(fileIORequest.getFile()).thenReturn(file);
         Mockito.when(fileIORequest.isWhileCharging()).thenReturn(isCharging);
-        Mockito.when(fileIORequest.onWifi()).thenReturn(wifi);
+        Mockito.when(fileIORequest.isOnWifi()).thenReturn(wifi);
         return fileIORequest;
     }
 
@@ -120,8 +119,7 @@ public class FileIOTest {
         Mockito.when(
                 cloudStore.dynamicUploadFile(
                                 Mockito.anyString(),
-                                any(),
-                                anyString(),
+                        (HashMap<String, File>) anyMap(),
                                 (HashMap<String, Object>) anyMap(),
                                 anyBoolean(),
                                 anyBoolean(),

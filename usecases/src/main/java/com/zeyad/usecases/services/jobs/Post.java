@@ -43,7 +43,7 @@ public class Post {
     public Completable execute() {
         String bundle = "";
         try {
-            if (mPostRequest.getArrayBundle().length() == 0) {
+            if (mPostRequest.getObjectBundle().length() > 0) {
                 JSONObject jsonObject = mPostRequest.getObjectBundle();
                 if (jsonObject != null) {
                     bundle = jsonObject.toString();
@@ -53,7 +53,11 @@ public class Post {
                 bundle = mPostRequest.getArrayBundle().toString();
             }
         } catch (JSONException e) {
-            return Completable.error(e);
+            try {
+                bundle = mPostRequest.getArrayBundle().toString();
+            } catch (JSONException e1) {
+                return Completable.error(e);
+            }
         }
         RequestBody requestBody = RequestBody.create(MediaType.parse(APPLICATION_JSON), bundle);
         switch (mPostRequest.getMethod()) {

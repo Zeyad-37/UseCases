@@ -3,7 +3,6 @@ package com.zeyad.usecases.requests;
 import android.os.Parcel;
 import android.os.Parcelable;
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.zeyad.usecases.Config;
 
@@ -50,9 +49,12 @@ public class PostRequest implements Parcelable {
         method = builder.method;
         object = builder.object;
         cache = builder.cache;
-        String objectBundle = getObjectBundle(builder.jsonObject, builder.keyValuePairs).toString();
+        String objectString = getObjectBundle(builder.jsonObject, builder.keyValuePairs).toString();
+        String arrayString = getArrayBundle(builder.jsonArray, builder.keyValuePairs).toString();
+        String objectBundle = objectString == null ? "" : objectString;
+        String arrayBundle = arrayString == null ? "" : arrayString;
         payload = objectBundle.replaceAll("\\{", "").replaceAll("\\}", "").isEmpty() ?
-                  getArrayBundle(builder.jsonArray, builder.keyValuePairs).toString() : objectBundle;
+                  arrayBundle : objectBundle;
     }
 
     protected PostRequest(Parcel in) {
@@ -84,7 +86,8 @@ public class PostRequest implements Parcelable {
             try {
                 return new JSONObject(Config.getGson().toJson(object));
             } catch (JSONException e) {
-                Log.e("PostRequest", "", e);
+                //                Log.e("PostRequest", "", e);
+                return result;
             }
         } else if (jsonObject != null) {
             result = jsonObject;

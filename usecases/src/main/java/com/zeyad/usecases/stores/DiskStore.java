@@ -1,6 +1,7 @@
 package com.zeyad.usecases.stores;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.zeyad.usecases.db.DataBaseManager;
 import com.zeyad.usecases.db.RealmQueryProvider;
@@ -10,8 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -35,9 +36,21 @@ public class DiskStore implements DataStore {
 
     @NonNull
     @Override
+    public <M> Flowable<List<M>> dynamicGetList(
+            String url, String idColumnName, Class dataClass, boolean persist, boolean shouldCache) {
+        return mDataBaseManager.<M> getAll(dataClass)
+                .doOnNext(ms -> {
+                    if (mUtils.withCache(shouldCache)) {
+                        mMemoryStore.cacheList(idColumnName, new JSONArray(gson.toJson(ms)), dataClass);
+                    }
+                });
+    }
+
+    @NonNull
+    @Override
     public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Object itemId, Class itemIdType,
-                                            @NonNull Class dataClass, boolean persist, boolean shouldCache) {
-        return mDataBaseManager.<M>getById(idColumnName, itemId, itemIdType, dataClass)
+            @NonNull Class dataClass, boolean persist, boolean shouldCache) {
+        return mDataBaseManager.<M> getById(idColumnName, itemId, itemIdType, dataClass)
                 .doOnNext(m -> {
                     if (mUtils.withCache(shouldCache)) {
                         mMemoryStore.cacheObject(idColumnName,
@@ -48,42 +61,8 @@ public class DiskStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable<List<M>> dynamicGetList(
-            String url, String idColumnName, Class dataClass, boolean persist, boolean shouldCache) {
-        return mDataBaseManager.<M>getAll(dataClass)
-                .doOnNext(ms -> {
-                    if (mUtils.withCache(shouldCache)) {
-                        mMemoryStore.cacheList(idColumnName, new JSONArray(gson.toJson(ms)), dataClass);
-                    }
-                });
-    }
-
-    @NonNull
-    @Override
     public <M> Flowable<List<M>> queryDisk(RealmQueryProvider queryFactory) {
         return mDataBaseManager.getQuery(queryFactory);
-    }
-
-    @NonNull
-    @Override
-    public Single<Boolean> dynamicDeleteAll(Class dataClass) {
-        return mDataBaseManager.evictAll(dataClass);
-    }
-
-    @NonNull
-    @Override
-    public Flowable dynamicDeleteCollection(String url, String idColumnName, Class itemIdType,
-                                            JSONArray jsonArray, @NonNull Class dataClass,
-                                            Class responseType, boolean persist, boolean cache,
-                                            boolean queuable) {
-        List<String> stringIds = mUtils.convertToStringListOfId(jsonArray);
-        return mDataBaseManager.evictCollection(idColumnName,
-                mUtils.convertToListOfId(jsonArray, itemIdType), itemIdType, dataClass)
-                .doOnSuccess(object -> {
-                    if (mUtils.withCache(cache)) {
-                        mMemoryStore.deleteList(stringIds, dataClass);
-                    }
-                }).toFlowable();
     }
 
     @NonNull
@@ -153,16 +132,42 @@ public class DiskStore implements DataStore {
 
     @NonNull
     @Override
-    public <M> Flowable dynamicUploadFile(String url, File file, String key, Map<String, Object> parameters,
-                                          boolean onWifi, boolean whileCharging, boolean queuable,
-                                          Class domainClass) {
-        return Flowable.error(new IllegalStateException(IO_DB_ERROR));
+    public Flowable dynamicDeleteCollection(String url, String idColumnName, Class itemIdType,
+            JSONArray jsonArray, @NonNull Class dataClass,
+            Class responseType, boolean persist, boolean cache,
+            boolean queuable) {
+        List<String> stringIds = mUtils.convertToStringListOfId(jsonArray);
+        return mDataBaseManager.evictCollection(idColumnName,
+                mUtils.convertToListOfId(jsonArray, itemIdType), itemIdType, dataClass)
+                               .doOnSuccess(object -> {
+                                   if (mUtils.withCache(cache)) {
+                                       mMemoryStore.deleteList(stringIds, dataClass);
+                                   }
+                               }).toFlowable();
+    }
+
+    @NonNull
+    @Override
+    public Single<Boolean> dynamicDeleteAll(Class dataClass) {
+        return mDataBaseManager.evictAll(dataClass);
     }
 
     @NonNull
     @Override
     public Flowable dynamicDownloadFile(
             String url, File file, boolean onWifi, boolean whileCharging, boolean queuable) {
+        return Flowable.error(new IllegalStateException(IO_DB_ERROR));
+    }
+
+    @NonNull
+    @Override
+    public <M> Flowable<M> dynamicUploadFile(String url,
+            @NonNull HashMap<String, File> keyFileMap,
+            @Nullable HashMap<String, Object> parameters,
+            boolean onWifi,
+            boolean whileCharging,
+            boolean queuable,
+            @NonNull Class responseType) {
         return Flowable.error(new IllegalStateException(IO_DB_ERROR));
     }
 }

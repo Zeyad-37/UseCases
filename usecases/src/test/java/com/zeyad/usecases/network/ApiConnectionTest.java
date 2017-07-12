@@ -10,6 +10,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 import org.mockito.Mockito;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import okhttp3.MultipartBody;
@@ -29,8 +31,7 @@ public class ApiConnectionTest {
     private final String mValidUrl = getValidUrl();
     private final RequestBody mMockedRequestBody = mock(RequestBody.class);
     private final Map<String, RequestBody> mPartMap = Mockito.mock(Map.class);
-    private final MultipartBody.Part mMultipartBodyPart =
-            MultipartBody.Part.create(mMockedRequestBody);
+    private final List<MultipartBody.Part> mMultipartBodyParts = Collections.singletonList(MultipartBody.Part.create(mMockedRequestBody));
     private ApiConnection mApiConnection;
     private RestApi mRestApiWithCache;
     private RestApi mRestApiWithoutCache;
@@ -144,9 +145,9 @@ public class ApiConnectionTest {
 
     @Test
     public void testUploadPartAndRequestBody() throws Exception {
-        mApiConnection.dynamicUpload(mValidUrl, mPartMap, mMultipartBodyPart);
+        mApiConnection.dynamicUpload(mValidUrl, mPartMap, mMultipartBodyParts);
         Mockito.verify(mRestApiWithoutCache)
-                .dynamicUpload(eq(mValidUrl), eq(mPartMap), eq(mMultipartBodyPart));
+               .dynamicUpload(eq(mValidUrl), eq(mPartMap), eq(mMultipartBodyParts));
     }
 
     @Test

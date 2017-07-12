@@ -158,8 +158,8 @@ public class ApiConnection {
 
     @NonNull
     public <M> Flowable<M> dynamicUpload(
-            String url, Map<String, RequestBody> partMap, MultipartBody.Part file) {
-        return (Flowable<M>) getRestApi().dynamicUpload(url, partMap, file);
+            String url, Map<String, RequestBody> partMap, List<MultipartBody.Part> files) {
+        return (Flowable<M>) getRestApi().dynamicUpload(url, partMap, files);
     }
 
     @NonNull

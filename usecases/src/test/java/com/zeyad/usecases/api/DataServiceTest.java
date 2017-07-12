@@ -423,8 +423,7 @@ public class DataServiceTest {
                 .cloud(Object.class)
                 .dynamicUploadFile(
                         anyString(),
-                        any(File.class),
-                        anyString(),
+                        (HashMap<String, File>) anyMap(),
                         (HashMap<String, Object>) anyMap(),
                         anyBoolean(),
                         anyBoolean(),
@@ -433,13 +432,12 @@ public class DataServiceTest {
                 .thenReturn(flowable);
 
         dataService.uploadFile(
-                new FileIORequest.Builder("", new File("")).responseType(Object.class).build());
+                new FileIORequest.Builder("").responseType(Object.class).build());
 
         verify(dataStoreFactory.cloud(Object.class), times(1))
                 .dynamicUploadFile(
                         anyString(),
-                        any(File.class),
-                        anyString(),
+                        (HashMap<String, File>) anyMap(),
                         (HashMap<String, Object>) anyMap(),
                         anyBoolean(),
                         anyBoolean(),
@@ -460,7 +458,7 @@ public class DataServiceTest {
                 .thenReturn(flowable);
 
         dataService.downloadFile(
-                new FileIORequest.Builder("", new File("")).responseType(Object.class).build());
+                new FileIORequest.Builder("").responseType(Object.class).build());
 
         verify(dataStoreFactory.cloud(Object.class), times(1))
                 .dynamicDownloadFile(

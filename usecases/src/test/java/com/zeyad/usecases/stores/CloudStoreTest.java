@@ -39,11 +39,13 @@ import io.realm.RealmModel;
 import io.realm.RealmObject;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okhttp3.ResponseBody;
 
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.atLeast;
@@ -63,12 +65,14 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
     private Context mockContext;
     private ApiConnection mockApiConnection;
     private DataBaseManager mockDataBaseManager;
-    private Flowable observable;
+    private Flowable<Object> observable;
+    private Flowable<ResponseBody> fileFlowable;
 
     @Before
     public void setUp() throws Exception {
         com.zeyad.usecases.Config.setGson();
         observable = Flowable.just(new Object());
+        fileFlowable = Flowable.just(ResponseBody.create(null, ""));
         mockContext = mock(Context.class);
         mockApiConnection = mock(ApiConnection.class);
         mockDataBaseManager = mock(RealmManager.class);
@@ -505,18 +509,18 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicUploadFile() throws Exception {
-        when(mockApiConnection.dynamicUpload(anyString(), anyMap(), any(MultipartBody.Part.class)))
+        when(mockApiConnection.dynamicUpload(anyString(), anyMap(), anyListOf(MultipartBody.Part.class)))
                 .thenReturn(observable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicUploadFile(
-                "", new File(""), "", new HashMap(), false, false, false, Object.class)
+                "", new HashMap<>(), new HashMap<>(), false, false, false, Object.class)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1))
-                .dynamicUpload(anyString(), anyMap(), any(MultipartBody.Part.class));
+                .dynamicUpload(anyString(), anyMap(), anyListOf(MultipartBody.Part.class));
         verifyDBInteractions(0, 0, 0, 0, 0, 0);
     }
 
@@ -526,7 +530,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicUploadFile(
-                "", new File(""), "", new HashMap(), false, false, true, Object.class)
+                "", new HashMap<>(), new HashMap<>(), false, false, true, Object.class)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
@@ -539,7 +543,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicUploadFile(
-                "", new File(""), "", new HashMap(), false, false, false, Object.class)
+                "", new HashMap<>(), new HashMap<>(), false, false, false, Object.class)
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
@@ -548,7 +552,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicDownloadFile() throws Exception {
-        when(mockApiConnection.dynamicDownload(anyString())).thenReturn(observable);
+        when(mockApiConnection.dynamicDownload(anyString())).thenReturn(fileFlowable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicDownloadFile("", new File(""), false, false, false)

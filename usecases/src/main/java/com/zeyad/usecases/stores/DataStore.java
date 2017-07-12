@@ -1,6 +1,7 @@
 package com.zeyad.usecases.stores;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.google.gson.Gson;
 import com.zeyad.usecases.Config;
@@ -10,8 +11,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -106,6 +107,7 @@ public interface DataStore {
                                        boolean queuable);
 
     @NonNull
-    <M> Flowable<M> dynamicUploadFile(String url, File file, String key, Map<String, Object> parameter,
-                                      boolean onWifi, boolean whileCharging, boolean queuable, Class responseType);
+    <M> Flowable<M> dynamicUploadFile(String url, @NonNull HashMap<String, File> keyFileMap,
+            @Nullable HashMap<String, Object> parameters, boolean onWifi, boolean whileCharging, boolean queuable,
+            @NonNull Class responseType);
 }

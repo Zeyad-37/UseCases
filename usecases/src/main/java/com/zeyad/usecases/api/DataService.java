@@ -311,10 +311,10 @@ class DataService implements IDataService {
     @Override
     public <M> Flowable<M> uploadFile(@NonNull FileIORequest fileIORequest) {
         return mDataStoreFactory.cloud(fileIORequest.getDataClass())
-                .<M>dynamicUploadFile(fileIORequest.getUrl(), fileIORequest.getFile(),
-                            fileIORequest.getKey(), fileIORequest.getParameters(),
-                            fileIORequest.onWifi(), fileIORequest.isWhileCharging(),
-                        fileIORequest.isQueuable(), fileIORequest.getDataClass())
+                .<M> dynamicUploadFile(fileIORequest.getUrl(), fileIORequest.getKeyFileMap(),
+                        fileIORequest.getParameters(), fileIORequest.isOnWifi(),
+                        fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
+                        fileIORequest.getDataClass())
                 .compose(applySchedulers());
     }
 
@@ -322,7 +322,7 @@ class DataService implements IDataService {
     public Flowable<File> downloadFile(@NonNull FileIORequest fileIORequest) {
         return mDataStoreFactory.cloud(fileIORequest.getDataClass())
                     .dynamicDownloadFile(fileIORequest.getUrl(), fileIORequest.getFile(),
-                            fileIORequest.onWifi(), fileIORequest.isWhileCharging(),
+                            fileIORequest.isOnWifi(), fileIORequest.isWhileCharging(),
                             fileIORequest.isQueuable()).compose(applySchedulers());
     }
 

@@ -77,6 +77,9 @@ public final class Config {
     }
 
     public static Gson getGson() {
+        if (mGson == null) {
+            setGson();
+        }
         return mGson;
     }
 
@@ -149,7 +152,7 @@ public final class Config {
     }
 
     private void setup() {
-        mGson = createGson().create();
+        setGson();
         setupRealm();
     }
 

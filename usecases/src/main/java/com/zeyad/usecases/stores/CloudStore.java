@@ -32,6 +32,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,8 +52,8 @@ import static com.zeyad.usecases.requests.PostRequest.PUT;
 
 public class CloudStore implements DataStore {
 
-    public static final String APPLICATION_JSON = "application/json";
-    private static final String TAG = CloudStore.class.getSimpleName(), MULTIPART_FORM_DATA = "multipart/form-data";
+    public static final String APPLICATION_JSON = "application/json", MULTIPART_FORM_DATA = "multipart/form-data";
+    private static final String TAG = CloudStore.class.getSimpleName();
     //    private static final int COUNTER_START = 1, ATTEMPTS = 3;
     private final DataBaseManager mDataBaseManager;
     @NonNull
@@ -293,19 +294,12 @@ public class CloudStore implements DataStore {
         return Flowable.defer(() -> {
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(Config.getInstance().getContext()) == onWifi
                     && isChargingReqCompatible(isCharging(Config.getInstance().getContext()), whileCharging)) {
-                queueIOFile(url, file, onWifi, whileCharging, true);
+                queueIOFile(url, null, file, onWifi, whileCharging, true);
                 return Flowable.just(new File(""));
             } else if (!mUtils.isNetworkAvailable(Config.getInstance().getContext())) {
                 return getErrorFlowableNotPersisted();
             }
             return mApiConnection.dynamicDownload(url)
-                    .onErrorResumeNext(throwable -> {
-                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                            queueIOFile(url, file, true, whileCharging, false);
-                            return Flowable.empty();
-                        }
-                        return Flowable.error(throwable);
-                    })
                     .map(responseBody -> {
                         try {
                             InputStream inputStream = null;
@@ -340,38 +334,46 @@ public class CloudStore implements DataStore {
                             Log.e(TAG, "", e);
                         }
                         return file;
+                    })
+                                 .onErrorResumeNext(throwable -> {
+                                     if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
+                                         queueIOFile(url, null, file, true, whileCharging, false);
+                                         return Flowable.just(new File(""));
+                                     }
+                                     return Flowable.error(throwable);
                     });
         });
     }
 
     @NonNull
     @Override
-    public <M> Flowable<M> dynamicUploadFile(String url, @NonNull File file, @NonNull String key,
-            @Nullable Map<String, Object> parameters, boolean onWifi, boolean whileCharging, boolean queuable,
+    public <M> Flowable<M> dynamicUploadFile(String url, @NonNull HashMap<String, File> keyFileMap,
+            @Nullable HashMap<String, Object> parameters, boolean onWifi, boolean whileCharging, boolean queuable,
             @NonNull Class responseType) {
         return Flowable.defer(() -> {
+            List<MultipartBody.Part> multiPartBodyParts = new ArrayList<>();
+            keyFileMap.forEach((key, file) -> multiPartBodyParts.add(MultipartBody.Part.createFormData(key,
+                    file.getName(), RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file))));
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(Config.getInstance().getContext()) == onWifi
                     && isChargingReqCompatible(isCharging(Config.getInstance().getContext()), whileCharging)) {
-                queueIOFile(url, file, true, whileCharging, false);
+                queueIOFile(url, keyFileMap, null, true, whileCharging, false);
                 return Flowable.just((M) responseType.newInstance());
             } else if (!mUtils.isNetworkAvailable(Config.getInstance().getContext())) {
                 return getErrorFlowableNotPersisted();
             }
-            RequestBody requestFile = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file);
+
             HashMap<String, RequestBody> map = new HashMap<>();
-            map.put(key, requestFile);
             if (parameters != null && !parameters.isEmpty()) {
                 for (Map.Entry<String, Object> entry : parameters.entrySet()) {
                     map.put(entry.getKey(), RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA),
                             String.valueOf(entry.getValue())));
                 }
             }
-            return mApiConnection.<M> dynamicUpload(url, map, MultipartBody.Part.createFormData(key,
-                    file.getName(), requestFile))
+            return mApiConnection.<M> dynamicUpload(url, map, multiPartBodyParts)
                     .map(object -> daoMapHelper(responseType, object))
                     .onErrorResumeNext(throwable -> {
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                            queueIOFile(url, file, true, whileCharging, false);
+                            queueIOFile(url, keyFileMap, null, true, whileCharging, false);
                             return Flowable.empty();
                         }
                         return Flowable.error(throwable);
@@ -442,8 +444,11 @@ public class CloudStore implements DataStore {
                 .getActiveNetworkInfo().getType() == ConnectivityManager.TYPE_WIFI;
     }
 
-    private void queueIOFile(String url, File file, boolean onWifi, boolean whileCharging, boolean isDownload) {
-        mUtils.queueFileIOCore(mDispatcher, isDownload, new FileIORequest.Builder(url, file)
+    private void queueIOFile(String url, HashMap<String, File> keyFileMap, File file, boolean onWifi,
+            boolean whileCharging, boolean isDownload) {
+        mUtils.queueFileIOCore(mDispatcher, isDownload, new FileIORequest.Builder(url)
+                .keyFileMapToUpload(keyFileMap)
+                .file(file)
                 .onWifi(onWifi)
                 .whileCharging(whileCharging)
                 .build(), 0);

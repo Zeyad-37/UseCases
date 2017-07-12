@@ -41,14 +41,14 @@ public class FileIO {
     public Completable execute() {
         File file = mFileIORequest.getFile();
         return mIsDownload ? Completable.fromObservable(mCloudStore
-                .dynamicDownloadFile(mFileIORequest.getUrl(), file, mFileIORequest.onWifi(),
+                .dynamicDownloadFile(mFileIORequest.getUrl(), file, mFileIORequest.isOnWifi(),
                         mFileIORequest.isWhileCharging(), mFileIORequest.isQueuable())
                 .doOnSubscribe(subscription -> Log.d(TAG, "Downloading " + file.getName()))
                 .doOnError(this::onError)
                 .toObservable()) :
                 Completable.fromObservable(mCloudStore.dynamicUploadFile(mFileIORequest.getUrl(),
-                        file, mFileIORequest.getKey(), mFileIORequest.getParameters(),
-                        mFileIORequest.onWifi(), mFileIORequest.isWhileCharging(),
+                        mFileIORequest.getKeyFileMap(), mFileIORequest.getParameters(),
+                        mFileIORequest.isOnWifi(), mFileIORequest.isWhileCharging(),
                         mFileIORequest.isQueuable(), mFileIORequest.getDataClass())
                         .doOnSubscribe(subscription -> Log.d(TAG, "Uploading " + file.getName()))
                         .doOnError(this::onError)

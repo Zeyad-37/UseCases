@@ -87,7 +87,7 @@ public class Utils {
         extras.putParcelable(GenericJobService.PAYLOAD, fileIORequest);
         extras.putInt(GenericJobService.TRIAL_COUNT, trailCount);
         queueCore(dispatcher, extras, (isDownload ? "Download" : "Upload") + " file",
-                fileIORequest.onWifi(), fileIORequest.isWhileCharging());
+                fileIORequest.isOnWifi(), fileIORequest.isWhileCharging());
     }
 
     private void queueCore(@NonNull FirebaseJobDispatcher dispatcher, @NonNull Bundle bundle, String message,
@@ -109,11 +109,11 @@ public class Utils {
         Log.d("FBJD", message + " request is queued successfully!");
     }
 
-    public List convertToListOfId(@Nullable JSONArray jsonArray, Class idType) {
-        List idList = new ArrayList<>();
+    public <T> List<T> convertToListOfId(@Nullable JSONArray jsonArray, Class<T> idType) {
+        List<T> idList = new ArrayList<>();
         if (jsonArray != null && jsonArray.length() > 0) {
-            idList = new ArrayList<>(jsonArray.length());
             int length = jsonArray.length();
+            idList = new ArrayList<>(length);
             for (int i = 0; i < length; i++) {
                 try {
                     idList.add(idType.cast(jsonArray.get(i)));

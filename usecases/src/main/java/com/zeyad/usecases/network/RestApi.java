@@ -67,5 +67,5 @@ public interface RestApi {
     @Multipart
     @POST
     Flowable<Object> dynamicUpload(@Url String url, @PartMap() Map<String, RequestBody> partMap,
-                                   @Part MultipartBody.Part file);
+            @Part List<MultipartBody.Part> file);
 }

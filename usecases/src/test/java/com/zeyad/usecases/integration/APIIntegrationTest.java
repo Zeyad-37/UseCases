@@ -337,58 +337,66 @@ public class APIIntegrationTest {
     //                      .assertComplete();
     //    }
 
-    //    @Test
-    //    public void testUploadFile() throws Exception {
-    //        String path = "upload/user";
-    //        RESTMockServer.whenPOST(pathContains(path))
-    //                      .thenReturn(new MockResponse()
-    //                              .setResponseCode(HttpURLConnection.HTTP_OK)
-    //                              .setBody(SUCCESS));
+    //        @Test
+    //        public void testUploadFile() throws Exception {
+    //            String path = "upload/user";
+    //            RESTMockServer.whenPOST(pathContains(path))
+    //                          .thenReturn(new MockResponse()
+    //                                  .setResponseCode(HttpURLConnection.HTTP_OK)
+    //                                  .setBody(SUCCESS));
     //
-    //        File file = new File(RuntimeEnvironment.application.getCacheDir().getPath(), "test");
-    //        file.mkdir();
-    //        TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
-    //        dataService.<Success> uploadFile(new FileIORequest.Builder(path, file)
-    //                .payLoad(new HashMap<>())
-    //                .responseType(Success.class)
-    //                .build())
-    //                .subscribe(testSubscriber);
+    //            File file = new File(RuntimeEnvironment.application.getCacheDir().getPath(), "test");
+    //            file.mkdir();
+    //            TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
     //
-    //        testSubscriber.awaitTerminalEvent();
+    //            HashMap<String, File> hashMap =  new HashMap<>(1);
+    //            hashMap.put("image", file);
+    //            dataService.<Success> uploadFile(new FileIORequest.Builder(path)
+    //                    .keyFileMapToUpload(hashMap)
+    //                    .payLoad(new HashMap<>())
+    //                    .responseType(Success.class)
+    //                    .build())
+    //                    .subscribe(testSubscriber);
     //
-    //        RequestsVerifier.verifyPOST(pathContains(path)).invoked();
+    //            testSubscriber.awaitTerminalEvent();
     //
-    //        testSubscriber.assertSubscribed()
-    //                      .assertNoErrors()
-    //                      .assertValueCount(1)
-    //                      .assertValue(success)
-    //                      .assertComplete();
-    //    }
+    //            RequestsVerifier.verifyPOST(pathContains(path)).invoked();
+    //
+    //            testSubscriber.assertSubscribed()
+    //                          .assertNoErrors()
+    //                          .assertValueCount(1)
+    //                          .assertValue(success)
+    //                          .assertComplete();
+    //        }
 
-    //    @Test
-    //    public void testDownloadFile() throws Exception {
-    //        String path = "download/user";
-    //        RESTMockServer.whenRequested(pathContains(path))
-    //                      .thenReturn(new MockResponse()
-    //                              .setResponseCode(HttpURLConnection.HTTP_OK)
-    //                              .setBody(SUCCESS));
+    //        @Test
+    //        public void testDownloadFile() throws Exception {
+    //            String path = "download/user";
+    //            RESTMockServer.whenRequested(pathContains(path))
+    //                          .thenReturn(new MockResponse()
+    //                                  .setResponseCode(HttpURLConnection.HTTP_OK)
+    //                                  .setBody(SUCCESS));
     //
-    //        TestSubscriber<File> testSubscriber = new TestSubscriber<>();
-    //        dataService.downloadFile(new FileIORequest.Builder(path, new File(""))
-    //                .payLoad(new HashMap<>())
-    //                .build())
-    //                   .subscribe(testSubscriber);
+    //            File file = new File(RuntimeEnvironment.application.getCacheDir().getPath(), "test");
+    //            file.mkdir();
     //
-    //        testSubscriber.awaitTerminalEvent();
+    //            TestSubscriber<File> testSubscriber = new TestSubscriber<>();
+    //            dataService.downloadFile(new FileIORequest.Builder(path)
+    //                    .file(file)
+    //                    .payLoad(new HashMap<>())
+    //                    .build())
+    //                       .subscribe(testSubscriber);
     //
-    //        RequestsVerifier.verifyRequest(pathContains(path)).invoked();
+    //            testSubscriber.awaitTerminalEvent();
     //
-    //        testSubscriber.assertSubscribed()
-    //                      .assertNoErrors()
-    //                      .assertValueCount(1)
-    //                      .assertValue(new File(""))
-    //                      .assertComplete();
-    //    }
+    //            RequestsVerifier.verifyRequest(pathContains(path)).invoked();
+    //
+    //            testSubscriber.assertSubscribed()
+    //                          .assertNoErrors()
+    //                          .assertValueCount(1)
+    //                          .assertValue(new File(""))
+    //                          .assertComplete();
+    //        }
 
     @Test
     public void testGetObjectOffLineFirst() throws Exception {

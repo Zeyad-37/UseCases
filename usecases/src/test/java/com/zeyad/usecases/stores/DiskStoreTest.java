@@ -177,7 +177,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     public void testDynamicUploadFile() throws Exception {
         Flowable observable =
                 mDiskStore.dynamicUploadFile(
-                        "", new File(""), "", new HashMap<>(), false, false, false, Object.class);
+                        "", new HashMap<>(), new HashMap<>(), false, false, false, Object.class);
 
         // Verify repository interactions
         verifyZeroInteractions(dbManager);
