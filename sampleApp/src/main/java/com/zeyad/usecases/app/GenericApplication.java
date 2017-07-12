@@ -14,8 +14,10 @@ import android.util.Log;
 
 import com.rollbar.android.Rollbar;
 import com.squareup.leakcanary.LeakCanary;
+import com.zeyad.rxredux.core.eventbus.RxEventBusFactory;
 import com.zeyad.usecases.api.DataServiceConfig;
 import com.zeyad.usecases.api.DataServiceFactory;
+import com.zeyad.usecases.network.ProgressInterceptor;
 
 import java.lang.reflect.InvocationTargetException;
 import java.security.MessageDigest;
@@ -33,6 +35,7 @@ import io.realm.rx.RealmObservableFactory;
 import okhttp3.CertificatePinner;
 import okhttp3.ConnectionSpec;
 import okhttp3.OkHttpClient;
+import okhttp3.Response;
 import okhttp3.logging.HttpLoggingInterceptor;
 
 import static com.zeyad.usecases.app.utils.Constants.URLS.API_BASE_URL;
@@ -126,6 +129,13 @@ public class GenericApplication extends Application {
     @NonNull
     OkHttpClient.Builder getOkHttpBuilder() {
         OkHttpClient.Builder builder = new OkHttpClient.Builder()
+                .addInterceptor(new ProgressInterceptor((bytesRead, contentLength, done)
+                        -> RxEventBusFactory.getInstance().send(null)) {
+                    @Override
+                    public boolean isUpDownload(Response originalResponse) {
+                        return false;
+                    }
+                })
                 .addInterceptor(new HttpLoggingInterceptor(message -> Log.d("NetworkInfo", message))
                         .setLevel(BuildConfig.DEBUG ?
                                 HttpLoggingInterceptor.Level.BODY : HttpLoggingInterceptor.Level.NONE))
