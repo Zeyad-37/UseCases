@@ -21,4 +21,3 @@ public class AndroidRobolectricRunner extends RobolectricTestRunner {
         return AndroidTestLifecycle.class;
     }
 }
-

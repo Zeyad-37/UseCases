@@ -27,9 +27,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.reactivex.Flowable;
 import retrofit2.HttpException;
-import rx.Observable;
 
 public class Utils {
 
@@ -141,13 +139,13 @@ public class Utils {
         return idList;
     }
 
-    public <T> Flowable<T> toFlowable(Observable<T> source) {
-        if (source == null) {
-            throw new IllegalArgumentException("Source observable is null");
-        } else {
-            return new ObservableV1ToFlowableV2<>(source);
-        }
-    }
+    //    public <T> Flowable<T> toFlowable(Observable<T> source) {
+    //        if (source == null) {
+    //            throw new IllegalArgumentException("Source observable is null");
+    //        } else {
+    //            return new ObservableV1ToFlowableV2<>(source);
+    //        }
+    //    }
 
     @NonNull
     public JSONObject getErrorJsonObject(HttpException exception) throws JSONException, IOException {

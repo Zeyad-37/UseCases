@@ -12,18 +12,17 @@ public class User extends RealmObject {
 
     static final String LOGIN = "login";
     private static final String ID = "id", AVATAR_URL = "avatar_url";
-
-    @PrimaryKey
-    @SerializedName(LOGIN)
-    String login;
-
     @SerializedName(ID)
     int id;
-
+    @PrimaryKey
+    @SerializedName(LOGIN)
+    private
+    String login;
     @SerializedName(AVATAR_URL)
+    private
     String avatarUrl;
 
-    public User() {
+    User() {
     }
 
     public String getLogin() {
@@ -51,6 +50,14 @@ public class User extends RealmObject {
     }
 
     @Override
+    public int hashCode() {
+        int result = login != null ? login.hashCode() : 0;
+        result = 31 * result + id;
+        result = 31 * result + (avatarUrl != null ? avatarUrl.hashCode() : 0);
+        return result;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
@@ -66,13 +73,5 @@ public class User extends RealmObject {
                 && (avatarUrl != null
                 ? avatarUrl.equals(user.avatarUrl)
                 : user.avatarUrl == null));
-    }
-
-    @Override
-    public int hashCode() {
-        int result = login != null ? login.hashCode() : 0;
-        result = 31 * result + id;
-        result = 31 * result + (avatarUrl != null ? avatarUrl.hashCode() : 0);
-        return result;
     }
 }

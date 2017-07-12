@@ -3,11 +3,11 @@ package com.zeyad.usecases.integration;
 /**
  * @author by ZIaDo on 7/7/17.
  */
-public class Success {
+class Success {
 
-    boolean success;
+    private boolean success;
 
-    public Success(boolean b) {
+    Success(boolean b) {
         success = b;
     }
 
@@ -22,10 +22,7 @@ public class Success {
             return true;
         if (o == null || getClass() != o.getClass())
             return false;
-
         Success success1 = (Success) o;
-
         return success == success1.success;
-
     }
 }

@@ -5,7 +5,6 @@ import android.util.Log;
 
 import com.google.gson.Gson;
 import com.zeyad.usecases.Config;
-import com.zeyad.usecases.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -38,8 +37,8 @@ public class MemoryStore {
         String key = dataClass.getSimpleName() + itemId;
         return Single.defer(() -> {
             if (isValid(key)) {
-                return Utils.getInstance().toFlowable(Storo.<M>get(key, dataClass).async())
-                        .firstElement().toSingle();
+                return Storo.<M> get(key, dataClass).async()
+                                                    .firstElement().toSingle();
             } else {
                 return Single.error(new IllegalAccessException("Cache Miss!"));
             }

@@ -15,14 +15,12 @@ import io.appflate.restmock.android.AndroidLogger;
 /**
  * @author by ZIaDo on 6/17/17.
  */
-public class AndroidTestLifecycle extends DefaultTestLifecycle {
+class AndroidTestLifecycle extends DefaultTestLifecycle {
 
     @Override
     public Application createApplication(Method method, AndroidManifest appManifest, Config config) {
         TestApplication app = (TestApplication) super.createApplication(method, appManifest, config);
-
         RESTMockServerStarter.startSync(new AndroidLocalFileParser(app), new AndroidLogger());
-
         return app;
     }
 }
