@@ -6,50 +6,48 @@ import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Update;
 
-import com.zeyad.usecases.app.screens.user_list.User;
-
 /**
- * @author by ZIaDo on 5/23/17.
+ * @author by ZIaDo on 7/12/17.
  */
 @Dao
-public interface RoomBaseDao {
+public interface RoomBaseDao<T> {
 
 //    @Query(value = ":query")
-//    Flowable<User> getItem(String query);
+    //    Flowable<T> getItem(String query);
 //
 //    @Query(value = ":query")
-//    Flowable<List> getAllItems(String query);
+    //    Flowable<List<T>> getAllItems(String query);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertItemsReplace(User... objects);
+    void insertItemsReplace(T... objects);
 
-//    @Insert(onConflict = OnConflictStrategy.ABORT)
-//    void insertItemsAbort(User... objects);
-//
-//    @Insert(onConflict = OnConflictStrategy.IGNORE)
-//    void insertItemsIgnore(User... objects);
-//
-//    @Insert(onConflict = OnConflictStrategy.FAIL)
-//    void insertItemsFail(User... objects);
-//
-//    @Insert(onConflict = OnConflictStrategy.ROLLBACK)
-//    void insertItemsRollback(User... objects);
+    //    @Insert(onConflict = OnConflictStrategy.ABORT)
+    //    void insertItemsAbort(T... objects);
+    //
+    //    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    //    void insertItemsIgnore(T... objects);
+    //
+    //    @Insert(onConflict = OnConflictStrategy.FAIL)
+    //    void insertItemsFail(T... objects);
+    //
+    //    @Insert(onConflict = OnConflictStrategy.ROLLBACK)
+    //    void insertItemsRollback(T... objects);
 
     @Update(onConflict = OnConflictStrategy.REPLACE)
-    void updateItemsReplace(User... objects);
+    void updateItemsReplace(T... objects);
 
-//    @Update(onConflict = OnConflictStrategy.ABORT)
-//    void updateItemsAbort(User... objects);
-//
-//    @Update(onConflict = OnConflictStrategy.IGNORE)
-//    void updateItemsIgnore(User... objects);
-//
-//    @Update(onConflict = OnConflictStrategy.FAIL)
-//    void updateItemsFail(User... objects);
-//
-//    @Update(onConflict = OnConflictStrategy.ROLLBACK)
-//    void updateItemsRollback(User... objects);
+    //    @Update(onConflict = OnConflictStrategy.ABORT)
+    //    void updateItemsAbort(T... objects);
+    //
+    //    @Update(onConflict = OnConflictStrategy.IGNORE)
+    //    void updateItemsIgnore(T... objects);
+    //
+    //    @Update(onConflict = OnConflictStrategy.FAIL)
+    //    void updateItemsFail(T... objects);
+    //
+    //    @Update(onConflict = OnConflictStrategy.ROLLBACK)
+    //    void updateItemsRollback(T... objects);
 
     @Delete
-    void deleteItem(User object);
+    void deleteItem(T object);
 }

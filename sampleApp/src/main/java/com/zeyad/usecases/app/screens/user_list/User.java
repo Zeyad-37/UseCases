@@ -1,19 +1,19 @@
 package com.zeyad.usecases.app.screens.user_list;
 
+import org.parceler.Parcel;
+
+import com.google.gson.annotations.SerializedName;
+
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 import android.arch.persistence.room.PrimaryKey;
 
-import com.google.gson.annotations.SerializedName;
-
-import org.parceler.Parcel;
-
 /**
  * @author zeyad on 1/10/17.
  */
 @Parcel
-@Entity(tableName = "User")
+@Entity(tableName = "Users")
 public class User {
 
     static final String LOGIN = "login";
@@ -70,21 +70,19 @@ public class User {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        User user = (User) o;
-
-        return id == user.id && (login != null ? login.equals(user.login) : user.login == null
-                && (avatarUrl != null ? avatarUrl.equals(user.avatarUrl) : user.avatarUrl == null));
-    }
-
-    @Override
     public int hashCode() {
         int result = login != null ? login.hashCode() : 0;
         result = 31 * result + id;
         result = 31 * result + (avatarUrl != null ? avatarUrl.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id == user.id && (login != null ? login.equals(user.login) : user.login == null
+                && (avatarUrl != null ? avatarUrl.equals(user.avatarUrl) : user.avatarUrl == null));
     }
 }

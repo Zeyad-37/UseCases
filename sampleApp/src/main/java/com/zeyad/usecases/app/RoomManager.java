@@ -1,11 +1,11 @@
 package com.zeyad.usecases.app;
 
-import android.support.annotation.NonNull;
+import java.util.List;
 
 import com.zeyad.usecases.app.screens.user_list.User;
 import com.zeyad.usecases.mapper.DAOMapper;
 
-import java.util.List;
+import android.support.annotation.NonNull;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -13,7 +13,7 @@ import io.reactivex.Flowable;
 /**
  * @author by ZIaDo on 5/23/17.
  */
-public class RoomManager<DB extends UserDatabase> {
+public class RoomManager<DB extends BaseDatabase> {
 
     private DB db;
     private DAOMapper entityDataMapper;

@@ -1,5 +1,12 @@
 package com.zeyad.usecases.app;
 
+import static com.zeyad.usecases.app.utils.Constants.URLS.API_BASE_URL;
+
+import java.security.MessageDigest;
+
+import com.zeyad.usecases.api.DataServiceConfig;
+import com.zeyad.usecases.api.DataServiceFactory;
+
 import android.annotation.TargetApi;
 import android.app.Application;
 import android.arch.persistence.room.Room;
@@ -12,17 +19,10 @@ import android.os.StrictMode;
 import android.util.Base64;
 import android.util.Log;
 
-import com.zeyad.usecases.api.DataServiceConfig;
-import com.zeyad.usecases.api.DataServiceFactory;
-
-import java.security.MessageDigest;
-
 import io.flowup.FlowUp;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
 import io.realm.rx.RealmObservableFactory;
-
-import static com.zeyad.usecases.app.utils.Constants.URLS.API_BASE_URL;
 
 /**
  * @author by ZIaDo on 9/24/16.
@@ -91,7 +91,7 @@ public class GenericApplication extends Application {
 //        LeakCanary.install(this);
 //        checkAppTampering(sInstance);
 //        initializeRealm();
-        UserDatabase gDb = Room.databaseBuilder(this, UserDatabase.class, "test-db").build();
+        BaseDatabase gDb = Room.databaseBuilder(this, BaseDatabase.class, "test-db").build();
         DataServiceFactory.init(new DataServiceConfig.Builder(this)
                 .baseUrl(API_BASE_URL)
 //                .withCache(3, TimeUnit.MINUTES)

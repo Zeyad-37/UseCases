@@ -107,7 +107,7 @@ ext {
     leakCanaryVersion = '1.5.1'
     androidSupportTest = '0.5'
     espressoCore = '2.2.2'
-    archCompVersion = '1.0.0alpha1'
+    archComp = '1.0.0-alpha4'
 }
 
 dependencies {
@@ -124,11 +124,11 @@ dependencies {
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
 
 
-    compile "android.arch.lifecycle:runtime:1.0.0-alpha1"
-    compile "android.arch.lifecycle:extensions:1.0.0-alpha1"
-    annotationProcessor "android.arch.lifecycle:compiler:1.0.0-alpha1"
-    compile "android.arch.persistence.room:runtime:1.0.0-alpha1"
-    annotationProcessor "android.arch.persistence.room:compiler:1.0.0-alpha1"
+    compile "android.arch.lifecycle:runtime:$archComp"
+    compile "android.arch.lifecycle:extensions:$archComp"
+    annotationProcessor "android.arch.lifecycle:compiler:$archComp"
+    compile "android.arch.persistence.room:runtime:$archComp"
+    annotationProcessor "android.arch.persistence.room:compiler:$archComp"
     // Network
     compile 'com.github.bumptech.glide:glide:3.7.0'
     // Rx
