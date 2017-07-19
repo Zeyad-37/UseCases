@@ -59,7 +59,7 @@ public final class DataServiceFactory {
         if (config.isWithCache()) {
             StoroBuilder.configure(config.getCacheSize())
                         .setCacheDirectory(config.getContext(), INTERNAL)
-                        //                        .setDefaultCacheDirectory(config.getContext())
+                        .setDefaultCacheDirectory(config.getContext())
                         .setGsonInstance(Config.getGson())
                         .initialize();
         }

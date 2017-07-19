@@ -115,9 +115,12 @@ dependencies {
     compile 'io.reactivex.rxjava2:rxjava:2.1.1'
     testCompile 'io.reactivex:rxandroid:1.2.1'
     // Cache
-    compile 'com.github.Zeyad-37:Storo:2.0.1'// {
+//    compile('com.github.lowlevel-studios:storo:1.1.0') {
 //        transitive = true
 //    }
+    compile('com.github.Zeyad-37:Storo:2.1.0') {
+        transitive = true
+    }
     compile 'com.rollbar:rollbar-android:0.2.1'
     // Testing
     testCompile 'junit:junit:4.12'
