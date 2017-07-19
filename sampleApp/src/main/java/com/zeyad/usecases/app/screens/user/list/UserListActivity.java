@@ -31,6 +31,9 @@ import com.zeyad.gadapter.GenericRecyclerViewAdapter;
 import com.zeyad.gadapter.ItemInfo;
 import com.zeyad.gadapter.OnStartDragListener;
 import com.zeyad.gadapter.SimpleItemTouchHelperCallback;
+import com.zeyad.gadapter.fastscroll.FastScroller;
+import com.zeyad.gadapter.stickyheaders.StickyLayoutManager;
+import com.zeyad.gadapter.stickyheaders.exposed.StickyHeaderListener;
 import com.zeyad.rxredux.core.redux.BaseActivity;
 import com.zeyad.rxredux.core.redux.BaseEvent;
 import com.zeyad.rxredux.core.redux.SuccessStateAccumulator;
@@ -44,6 +47,7 @@ import com.zeyad.usecases.app.screens.user.list.events.DeleteUsersEvent;
 import com.zeyad.usecases.app.screens.user.list.events.GetPaginatedUsersEvent;
 import com.zeyad.usecases.app.screens.user.list.events.SearchUsersEvent;
 import com.zeyad.usecases.app.screens.user.list.viewHolders.EmptyViewHolder;
+import com.zeyad.usecases.app.screens.user.list.viewHolders.SectionHeaderViewHolder;
 import com.zeyad.usecases.app.screens.user.list.viewHolders.UserViewHolder;
 import com.zeyad.usecases.app.utils.Utils;
 
@@ -60,6 +64,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING;
+import static com.zeyad.gadapter.ItemInfo.SECTION_HEADER;
 
 /**
  * An activity representing a list of Repos. This activity has different presentations for handset
@@ -81,6 +86,9 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
 
     @BindView(R.id.user_list)
     RecyclerView userRecycler;
+
+    @BindView(R.id.fastscroll)
+    FastScroller fastScroller;
 
     private ItemTouchHelper itemTouchHelper;
     private GenericRecyclerViewAdapter usersAdapter;
@@ -176,6 +184,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
             usersAdapter.setDataList(Observable.fromIterable(users)
                     .map(user -> new ItemInfo(user, R.layout.user_item_layout).setId(user.getId()))
                     .toList(users.size()).blockingGet());
+            //            usersAdapter.addSectionHeader(0, "1st Section");
         }
     }
 
@@ -196,6 +205,9 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
             @Override
             public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
                 switch (viewType) {
+                    case SECTION_HEADER:
+                        return new SectionHeaderViewHolder(mLayoutInflater.inflate(R.layout.section_header_layout,
+                                parent, false));
                     case R.layout.empty_view:
                         return new EmptyViewHolder(mLayoutInflater.inflate(R.layout.empty_view,
                                 parent, false));
@@ -207,6 +219,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
                 }
             }
         };
+        //        usersAdapter.setSectionTitleProvider(i -> "Section " + (i + 1));
         usersAdapter.setAreItemsClickable(true);
         usersAdapter.setOnItemClickListener((position, itemInfo, holder) -> {
             if (actionMode != null) {
@@ -262,9 +275,27 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
             rxEventBus.send(events);
         });
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        userRecycler.setLayoutManager(layoutManager);
+        StickyLayoutManager stickyLayoutManager = new TopSnappedStickyLayoutManager(this, usersAdapter);
+        stickyLayoutManager.setStickyHeaderListener(new StickyHeaderListener() {
+            @Override
+            public void headerAttached(View headerView, int adapterPosition) {
+                Log.d("Listener", "Attached with position: " + adapterPosition);
+            }
+
+            @Override
+            public void headerDetached(View headerView, int adapterPosition) {
+                Log.d("Listener", "Detached with position: " + adapterPosition);
+            }
+        });
+        userRecycler.setLayoutManager(stickyLayoutManager);
+        //        userRecycler.setLayoutManager(layoutManager);
         userRecycler.setAdapter(usersAdapter);
         usersAdapter.setAllowSelection(true);
+        fastScroller.setRecyclerView(userRecycler);
+        //        fastScroller.setViewProvider(new DefaultScrollerViewProvider());
+        //        fastScroller.setBubbleColor(0xffff0000);
+        //        fastScroller.setHandleColor(0xffff0000);
+        //        fastScroller.setBubbleTextAppearance(R.style.StyledScrollerTextAppearance);
         events = events.mergeWith(Observable.defer(() -> RxRecyclerView.scrollStateChanges(userRecycler)
                 .map(integer -> {
                     if (integer == SCROLL_STATE_SETTLING) {

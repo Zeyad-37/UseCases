@@ -13,7 +13,7 @@ import butterknife.ButterKnife;
 /**
  * @author zeyad on 1/12/17.
  */
-class RepositoryViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
+class RepositoryViewHolder extends GenericRecyclerViewAdapter.ViewHolder<Repository> {
     @BindView(R.id.textView_repo_title)
     TextView textView_repo_title;
 
@@ -23,16 +23,9 @@ class RepositoryViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     }
 
     @Override
-    public void bindData(Object data, boolean isItemSelected, int position, boolean isEnabled) {
-        if (data instanceof Repository) {
-            Repository repoModel = (Repository) data;
-            if (Utils.isNotEmpty(repoModel.getName())) {
-                textView_repo_title.setText(repoModel.getName());
-            }
+    public void bindData(Repository repository, boolean isItemSelected, int position, boolean isEnabled) {
+        if (repository != null && Utils.isNotEmpty(repository.getName())) {
+            textView_repo_title.setText(repository.getName());
         }
-    }
-
-    @Override
-    public void expand(boolean isExpanded) {
     }
 }

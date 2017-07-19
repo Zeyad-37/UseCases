@@ -17,7 +17,7 @@ import butterknife.ButterKnife;
 /**
  * @author zeyad on 12/1/16.
  */
-public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
+public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder<User> {
     @BindView(R.id.title)
     TextView textViewTitle;
 
@@ -30,9 +30,8 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
     }
 
     @Override
-    public void bindData(Object data, boolean isItemSelected, int position, boolean isEnabled) {
-        if (data != null) {
-            User userModel = (User) data;
+    public void bindData(User userModel, boolean isItemSelected, int position, boolean isEnabled) {
+        if (userModel != null) {
             if (Utils.isNotEmpty(userModel.getAvatarUrl())) {
                 Glide.with(itemView.getContext()).load(userModel.getAvatarUrl()).into(avatar);
             } else {
@@ -47,10 +46,6 @@ public class UserViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
             }
         }
         itemView.setBackgroundColor(isItemSelected ? Color.GRAY : Color.WHITE);
-    }
-
-    @Override
-    public void expand(boolean isExpanded) {
     }
 
     public TextView getTextViewTitle() {
