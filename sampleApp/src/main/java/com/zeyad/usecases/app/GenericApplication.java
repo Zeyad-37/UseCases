@@ -132,7 +132,7 @@ public class GenericApplication extends Application {
                 .addInterceptor(new ProgressInterceptor((bytesRead, contentLength, done)
                         -> RxEventBusFactory.getInstance().send(null)) {
                     @Override
-                    public boolean isUpDownload(Response originalResponse) {
+                    public boolean isFileIO(Response originalResponse) {
                         return false;
                     }
                 })

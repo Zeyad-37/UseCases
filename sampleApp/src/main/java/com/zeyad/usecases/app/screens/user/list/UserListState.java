@@ -43,6 +43,21 @@ public class UserListState {
         return lastId;
     }
 
+    @Override
+    public int hashCode() {
+        return (int) (lastId ^ (lastId >>> 32));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof UserListState))
+            return false;
+        UserListState that = (UserListState) o;
+        return lastId == that.lastId;
+    }
+
     static class Builder {
         List<User> users;
         List<User> searchList;
