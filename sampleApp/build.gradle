@@ -136,7 +136,7 @@ dependencies {
     // Bootstrap
 //    compile 'com.github.Zeyad-37:GenericRecyclerViewAdapter:master-SNAPSHOT'
     compile 'com.github.Zeyad-37:GenericRecyclerViewAdapter:1.3.0'
-    compile 'com.github.Zeyad-37:RxRedux:1.3.0'
+    compile 'com.github.Zeyad-37:RxRedux:1.4.0'
 
 //    compile "android.arch.lifecycle:runtime:$archCompVersion"
     compile "android.arch.lifecycle:extensions:$archCompVersion"

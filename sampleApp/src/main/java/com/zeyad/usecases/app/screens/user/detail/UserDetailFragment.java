@@ -27,9 +27,9 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.zeyad.gadapter.GenericRecyclerViewAdapter;
 import com.zeyad.gadapter.ItemInfo;
-import com.zeyad.rxredux.core.redux.BaseFragment;
 import com.zeyad.usecases.api.DataServiceFactory;
 import com.zeyad.usecases.app.R;
+import com.zeyad.usecases.app.screens.BaseFragment;
 import com.zeyad.usecases.app.screens.user.list.User;
 import com.zeyad.usecases.app.screens.user.list.UserListActivity;
 import com.zeyad.usecases.app.utils.Utils;
@@ -75,6 +75,18 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
     }
 
     @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        postponeEnterTransition();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            setSharedElementEnterTransition(
+                    TransitionInflater.from(getContext())
+                                      .inflateTransition(android.R.transition.move));
+        }
+        //        setSharedElementReturnTransition(null); // supply the correct element for return transition
+    }
+
+    @Override
     public void initialize() {
         Bundle arguments = getArguments();
         if (arguments != null) {
@@ -87,18 +99,6 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
                 .setIsTwoPane(currentStateBundle.isTwoPane())
                 .build(), viewState, DataServiceFactory.getInstance());
         events = Observable.just(new GetReposEvent(viewState.getUser().getLogin()));
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        postponeEnterTransition();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            setSharedElementEnterTransition(
-                    TransitionInflater.from(getContext())
-                            .inflateTransition(android.R.transition.move));
-        }
-        //        setSharedElementReturnTransition(null); // supply the correct element for return transition
     }
 
     @Override
