@@ -26,7 +26,14 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> {
                      UserDetailState initialState, Object... otherDependencies) {
         setSuccessStateAccumulator(successStateAccumulator);
         setInitialState(initialState);
-        dataUseCase = (IDataService) otherDependencies[0];
+        if (dataUseCase == null) {
+            dataUseCase = (IDataService) otherDependencies[0];
+        }
+    }
+
+    @Override
+    public Function<BaseEvent, Flowable<?>> mapEventsToExecutables() {
+        return event -> getRepositories(((GetReposEvent) event).getLogin());
     }
 
     public Flowable<List<Repository>> getRepositories(String userLogin) {
@@ -37,10 +44,5 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> {
                                 .url(String.format(REPOSITORIES, userLogin))
                                 .build())) :
                 Flowable.error(new IllegalArgumentException("User name can not be empty"));
-    }
-
-    @Override
-    public Function<BaseEvent, Flowable<?>> mapEventsToExecutables() {
-        return event -> getRepositories(((GetReposEvent) event).getLogin());
     }
 }

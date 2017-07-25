@@ -5,7 +5,7 @@ import com.zeyad.rxredux.core.redux.BaseEvent;
 import java.util.List;
 
 /** @author by ZIaDo on 3/27/17. */
-public final class DeleteUsersEvent extends BaseEvent {
+public final class DeleteUsersEvent implements BaseEvent {
 
     private final List<String> selectedItemsIds;
 

@@ -5,7 +5,7 @@ import com.zeyad.rxredux.core.redux.BaseEvent;
 /**
  * @author by ZIaDo on 4/22/17.
  */
-class GetReposEvent extends BaseEvent {
+class GetReposEvent implements BaseEvent {
     private final String login;
 
     GetReposEvent(String login) {

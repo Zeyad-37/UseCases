@@ -32,7 +32,9 @@ public class UserListVM extends BaseViewModel<UserListState> {
     @Override
     public void init(SuccessStateAccumulator<UserListState> successStateAccumulator,
                      UserListState initialState, Object... otherDependencies) {
-        dataUseCase = (IDataService) otherDependencies[0];
+        if (dataUseCase == null) {
+            dataUseCase = (IDataService) otherDependencies[0];
+        }
         setSuccessStateAccumulator(successStateAccumulator);
         setInitialState(initialState);
     }

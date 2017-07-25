@@ -3,7 +3,7 @@ package com.zeyad.usecases.app.screens.user.list.events;
 import com.zeyad.rxredux.core.redux.BaseEvent;
 
 /** @author by ZIaDo on 4/19/17. */
-public class GetPaginatedUsersEvent extends BaseEvent {
+public class GetPaginatedUsersEvent implements BaseEvent {
 
     private final long lastId;
 

@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.FragmentActivity;
@@ -27,6 +28,7 @@ import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.target.Target;
 import com.zeyad.gadapter.GenericRecyclerViewAdapter;
 import com.zeyad.gadapter.ItemInfo;
+import com.zeyad.rxredux.core.redux.ErrorMessageFactory;
 import com.zeyad.usecases.api.DataServiceFactory;
 import com.zeyad.usecases.app.R;
 import com.zeyad.usecases.app.screens.BaseFragment;
@@ -86,6 +88,12 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
         //        setSharedElementReturnTransition(null); // supply the correct element for return transition
     }
 
+    @NonNull
+    @Override
+    public ErrorMessageFactory errorMessageFactory() {
+        return Throwable::getLocalizedMessage;
+    }
+
     @Override
     public void initialize() {
         Bundle arguments = getArguments();
@@ -123,7 +131,7 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
     }
 
     @Override
-    public void renderState(UserDetailState userDetailState) {
+    public void renderSuccessState(UserDetailState userDetailState) {
         viewState = userDetailState;
         User user = viewState.getUser();
         List<Repository> repoModels = viewState.getRepos();
