@@ -178,9 +178,9 @@ class DataService implements IDataService {
                 .idColumnName(request.getIdColumnName(), request.getIdType())
                 .responseType(request.getResponseType())
                 .fullUrl(request.getUrl());
-        if (request.isQueuable()) {
-            builder.queuable(request.isOnWifi(), request.isWhileCharging());
-        }
+        //        if (request.isQueuable()) {
+        //            builder.queuable(request.isOnWifi(), request.isWhileCharging());
+        //        }
         return deleteCollectionByIds(builder.build());
     }
 

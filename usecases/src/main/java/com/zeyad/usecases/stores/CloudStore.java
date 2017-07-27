@@ -449,8 +449,7 @@ public class CloudStore implements DataStore {
         mUtils.queueFileIOCore(mDispatcher, isDownload, new FileIORequest.Builder(url)
                 .keyFileMapToUpload(keyFileMap)
                 .file(file)
-                .onWifi(onWifi)
-                .whileCharging(whileCharging)
+                //                .queuable(onWifi, whileCharging)
                 .build(), 0);
     }
 

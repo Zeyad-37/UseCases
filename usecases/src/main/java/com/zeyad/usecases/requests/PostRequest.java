@@ -229,13 +229,13 @@ public class PostRequest implements Parcelable {
             return this;
         }
 
-        @NonNull
-        public Builder queuable(boolean onWifi, boolean whileCharging) {
-            queuable = true;
-            this.onWifi = onWifi;
-            this.whileCharging = whileCharging;
-            return this;
-        }
+        //        @NonNull
+        //        public Builder queuable(boolean onWifi, boolean whileCharging) {
+        //            queuable = true;
+        //            this.onWifi = onWifi;
+        //            this.whileCharging = whileCharging;
+        //            return this;
+        //        }
 
         @NonNull
         public Builder cache() {

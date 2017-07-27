@@ -32,10 +32,8 @@ public class FileIORequestTest {
     public void setUp() throws Exception {
         mFileIORequest =
                 new FileIORequest.Builder(URL)
-                        .onWifi(ON_WIFI)
                         .file(FILE)
-                        .queuable(QUEUABLE)
-                        .whileCharging(WHILE_CHARGING)
+                        //                        .queuable(ON_WIFI, WHILE_CHARGING)
                         .responseType(DATA_CLASS)
                         .build();
     }

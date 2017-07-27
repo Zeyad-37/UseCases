@@ -125,12 +125,6 @@ public class FileIORequest implements Parcelable {
         }
 
         @NonNull
-        public Builder onWifi(boolean onWifi) {
-            this.onWifi = onWifi;
-            return this;
-        }
-
-        @NonNull
         public Builder keyFileMapToUpload(HashMap<String, File> keyFileMap) {
             this.keyFileMap = keyFileMap;
             return this;
@@ -148,17 +142,13 @@ public class FileIORequest implements Parcelable {
             return this;
         }
 
-        @NonNull
-        public Builder queuable(boolean queuable) {
-            this.queuable = queuable;
-            return this;
-        }
-
-        @NonNull
-        public Builder whileCharging(boolean whileCharging) {
-            this.whileCharging = whileCharging;
-            return this;
-        }
+        //        @NonNull
+        //        public Builder queuable(boolean onWifi, boolean whileCharging) {
+        //            queuable = true;
+        //            this.onWifi = onWifi;
+        //            this.whileCharging = whileCharging;
+        //            return this;
+        //        }
 
         @NonNull
         public FileIORequest build() {
