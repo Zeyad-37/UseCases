@@ -106,7 +106,7 @@ public class GenericApplication extends Application {
         if (LeakCanary.isInAnalyzerProcess(this)) {
             return;
         }
-        initializeStrictMode();
+        //        initializeStrictMode();
         LeakCanary.install(this);
         Completable.fromAction(() -> {
             if (!checkAppTampering(this)) {

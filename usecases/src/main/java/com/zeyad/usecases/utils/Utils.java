@@ -21,13 +21,9 @@ import com.zeyad.usecases.services.GenericJobService;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
-import retrofit2.HttpException;
 
 public class Utils {
 
@@ -46,22 +42,24 @@ public class Utils {
     public boolean isNetworkAvailable(@NonNull Context context) {
         ConnectivityManager connectivityManager =
                 (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            Network[] networks = connectivityManager.getAllNetworks();
-            for (Network network : networks) {
-                if (connectivityManager
-                        .getNetworkInfo(network)
-                        .getState()
-                        .equals(NetworkInfo.State.CONNECTED)) {
-                    return true;
-                }
-            }
-        } else if (connectivityManager != null) {
-            NetworkInfo[] info = connectivityManager.getAllNetworkInfo();
-            if (info != null) {
-                for (NetworkInfo anInfo : info) {
-                    if (anInfo.getState() == NetworkInfo.State.CONNECTED) {
+        if (connectivityManager != null) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                Network[] networks = connectivityManager.getAllNetworks();
+                for (Network network : networks) {
+                    if (connectivityManager
+                            .getNetworkInfo(network)
+                            .getState()
+                            .equals(NetworkInfo.State.CONNECTED)) {
                         return true;
+                    }
+                }
+            } else {
+                NetworkInfo[] info = connectivityManager.getAllNetworkInfo();
+                if (info != null) {
+                    for (NetworkInfo anInfo : info) {
+                        if (anInfo.getState() == NetworkInfo.State.CONNECTED) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -92,18 +90,23 @@ public class Utils {
             boolean isOnWifi, boolean whileCharging) {
         int network = isOnWifi ? Constraint.ON_UNMETERED_NETWORK : Constraint.ON_ANY_NETWORK;
         int power = whileCharging ? Constraint.DEVICE_CHARGING : Constraint.DEVICE_IDLE;
-        dispatcher.mustSchedule(dispatcher.newJobBuilder()
-                                          .setService(GenericJobService.class)
-                                          .setTag(bundle.getString("JOB_TYPE")
-                                                        .concat(String.valueOf(System.currentTimeMillis())))
-                                          .setRecurring(false)
-                                          .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
-                                          //                                          .setTrigger(Trigger.executionWindow(0, 10))
-                                          .setReplaceCurrent(true)
-                                          .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
-                                          .setExtras(bundle)
-                                          .setConstraints(network, power)
-                                          .build());
+        try {
+            dispatcher.mustSchedule(dispatcher.newJobBuilder()
+                                              .setService(GenericJobService.class)
+                                              .setTag(bundle.getString("JOB_TYPE")
+                                                            .concat(String.valueOf(System.currentTimeMillis())))
+                                              .setRecurring(false)
+                                              .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
+                                              //                                          .setTrigger(Trigger.executionWindow(0, 10))
+                                              .setReplaceCurrent(true)
+                                              .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                                              .setExtras(bundle)
+                                              .setConstraints(network, power)
+                                              .build());
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
         Log.d("FBJD", message + " request is queued successfully!");
     }
 
@@ -137,19 +140,6 @@ public class Utils {
             }
         }
         return idList;
-    }
-
-    //    public <T> Flowable<T> toFlowable(Observable<T> source) {
-    //        if (source == null) {
-    //            throw new IllegalArgumentException("Source observable is null");
-    //        } else {
-    //            return new ObservableV1ToFlowableV2<>(source);
-    //        }
-    //    }
-
-    @NonNull
-    public JSONObject getErrorJsonObject(HttpException exception) throws JSONException, IOException {
-        return new JSONObject(exception.response().errorBody().string());
     }
 
     public boolean withDisk(boolean shouldPersist) {
