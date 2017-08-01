@@ -1,5 +1,26 @@
 package com.zeyad.usecases.app.screens.user.detail;
 
+import static com.zeyad.rxredux.core.redux.BaseActivity.UI_MODEL;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.parceler.Parcels;
+
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.GlideDrawable;
+import com.bumptech.glide.request.RequestListener;
+import com.bumptech.glide.request.target.Target;
+import com.zeyad.gadapter.GenericRecyclerViewAdapter;
+import com.zeyad.gadapter.ItemInfo;
+import com.zeyad.rxredux.core.redux.ErrorMessageFactory;
+import com.zeyad.usecases.api.DataServiceFactory;
+import com.zeyad.usecases.app.R;
+import com.zeyad.usecases.app.screens.BaseFragment;
+import com.zeyad.usecases.app.screens.user.list.User;
+import com.zeyad.usecases.app.screens.user.list.UserListActivity;
+import com.zeyad.usecases.app.utils.Utils;
+
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -22,30 +43,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
-import com.zeyad.gadapter.GenericRecyclerViewAdapter;
-import com.zeyad.gadapter.ItemInfo;
-import com.zeyad.rxredux.core.redux.ErrorMessageFactory;
-import com.zeyad.usecases.api.DataServiceFactory;
-import com.zeyad.usecases.app.R;
-import com.zeyad.usecases.app.screens.BaseFragment;
-import com.zeyad.usecases.app.screens.user.list.User;
-import com.zeyad.usecases.app.screens.user.list.UserListActivity;
-import com.zeyad.usecases.app.utils.Utils;
-
-import org.parceler.Parcels;
-
-import java.util.ArrayList;
-import java.util.List;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.reactivex.Observable;
-
-import static com.zeyad.rxredux.core.redux.BaseActivity.UI_MODEL;
 
 /**
  * A fragment representing a single Repository detail screen. This fragment is either contained in a
@@ -103,10 +103,10 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
         viewModel = ViewModelProviders.of(this).get(UserDetailVM.class);
         viewModel.init((newResult, event, currentStateBundle) -> UserDetailState.builder()
                 .setRepos((List<Repository>) newResult)
-                .setUser(currentStateBundle.getUser())
+                .setUser(currentStateBundle.getUserLogin())
                 .setIsTwoPane(currentStateBundle.isTwoPane())
                 .build(), viewState, DataServiceFactory.getInstance());
-        events = Observable.just(new GetReposEvent(viewState.getUser().getLogin()));
+        events = Observable.just(new GetReposEvent(viewState.getUserLogin()));
     }
 
     @Override
@@ -133,7 +133,7 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
     @Override
     public void renderSuccessState(UserDetailState userDetailState) {
         viewState = userDetailState;
-        User user = viewState.getUser();
+        User user = viewState.getOwner();
         List<Repository> repoModels = viewState.getRepos();
         if (Utils.isNotEmpty(repoModels)) {
             repositoriesAdapter.setDataList(Observable.fromIterable(repoModels)

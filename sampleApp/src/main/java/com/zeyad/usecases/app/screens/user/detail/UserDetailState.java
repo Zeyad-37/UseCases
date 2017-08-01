@@ -1,11 +1,12 @@
 package com.zeyad.usecases.app.screens.user.detail;
 
-import com.zeyad.usecases.app.screens.user.list.User;
+import java.util.List;
 
 import org.parceler.Parcel;
 import org.parceler.Transient;
 
-import java.util.List;
+import com.zeyad.usecases.app.screens.user.list.User;
+import com.zeyad.usecases.app.utils.Utils;
 
 /**
  * @author zeyad on 1/25/17.
@@ -13,19 +14,19 @@ import java.util.List;
 @Parcel
 public class UserDetailState {
     boolean isTwoPane;
-    User user;
+    String userLogin;
     @Transient
     List<Repository> repos;
 
     UserDetailState() {
-        user = null;
+        userLogin = null;
         repos = null;
         isTwoPane = false;
     }
 
     private UserDetailState(Builder builder) {
         isTwoPane = builder.isTwoPane;
-        user = builder.user;
+        userLogin = builder.user;
         repos = builder.repos;
     }
 
@@ -37,17 +38,43 @@ public class UserDetailState {
         return isTwoPane;
     }
 
-    User getUser() {
-        return user;
+    String getUserLogin() {
+        return userLogin;
     }
 
     List<Repository> getRepos() {
         return repos;
     }
 
+    User getOwner() {
+        if (Utils.isNotEmpty(repos))
+            return repos.get(0).getOwner();
+        else
+            throw new IllegalAccessError("Repo list is empty");
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (isTwoPane ? 1 : 0);
+        result = 31 * result + (userLogin != null ? userLogin.hashCode() : 0);
+        result = 31 * result + (repos != null ? repos.hashCode() : 0);
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof UserDetailState))
+            return false;
+        UserDetailState that = (UserDetailState) o;
+        return isTwoPane == that.isTwoPane && (userLogin != null ? userLogin.equals(that.userLogin)
+                : that.userLogin == null && (repos != null ? repos.equals(that.repos) : that.repos == null));
+    }
+
     public static class Builder {
         List<Repository> repos;
-        User user;
+        String user;
         boolean isTwoPane;
 
         Builder() {
@@ -63,7 +90,7 @@ public class UserDetailState {
             return this;
         }
 
-        public Builder setUser(User value) {
+        public Builder setUser(String value) {
             user = value;
             return this;
         }
