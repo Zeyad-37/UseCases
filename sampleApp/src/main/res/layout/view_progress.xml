@@ -1,12 +1,17 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/linear_layout_loader"
+<LinearLayout android:id="@+id/linear_layout_loader"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center"
     android:visibility="visible">
 
-    <ProgressBar
-        android:layout_width="@dimen/forty_eight_dp"
-        android:layout_height="@dimen/forty_eight_dp"
-        android:indeterminate="true" />
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animation_view"
+        android:layout_width="@dimen/iv_cover_height"
+        android:layout_height="@dimen/iv_cover_height"
+        app:lottie_autoPlay="true"
+        app:lottie_colorFilter="@color/colorAccent"
+        app:lottie_fileName="loading.json"
+        app:lottie_loop="true" />
 </LinearLayout>
