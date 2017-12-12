@@ -1,36 +1,36 @@
 apply plugin: 'com.android.library'
-apply plugin: 'me.tatarka.retrolambda'
-apply plugin: 'android-apt' // remove
+//apply plugin: 'me.tatarka.retrolambda'
+//apply plugin: 'android-apt' // remove
 apply plugin: 'maven'
 apply plugin: 'realm-android'
 
 apply plugin: 'com.github.dcendents.android-maven'
 
-apply plugin: "net.ltgt.errorprone"
+//apply plugin: "net.ltgt.errorprone"
 
 version = "1.0.1"
 group = "com.github.zeyad-37"
 
-buildscript {
-    repositories {
-        maven {
-            url "https://plugins.gradle.org/m2/"
-        }
-    }
-
-    dependencies {
-        classpath 'me.tatarka:gradle-retrolambda:3.7.0'
-        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.10"
-    }
-}
-
-repositories {
-    mavenCentral()
-}
+//buildscript {
+//    repositories {
+//        maven {
+//            url "https://plugins.gradle.org/m2/"
+//        }
+//    }
+//
+//    dependencies {
+////        classpath 'me.tatarka:gradle-retrolambda:3.7.0'
+////        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.13"
+//    }
+//}
+//
+//repositories {
+//    mavenCentral()
+//}
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '25.0.3'
+    buildToolsVersion '26.0.2'
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 26
@@ -61,6 +61,7 @@ android {
 
     testOptions {
         unitTests.returnDefaultValues = true
+        unitTests.includeAndroidResources = true
         unitTests.all {
             // All the usual Gradle options.
             jvmArgs '-XX:MaxPermSize=256m'
@@ -91,17 +92,6 @@ android {
     }
 }
 
-ext {
-    supportLibrary = '25.4.0'
-    retrofit = '2.3.0'
-    okhttpVersion = '3.8.0'
-    androidSupportTest = '0.5'
-    espressoCore = '2.2.2'
-    powerMock = '1.6.6'
-    robolectric = '3.3.2'
-    okhttpIdelingResource = '1.0.0'
-}
-
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     //Job Dispatcher
@@ -115,29 +105,27 @@ dependencies {
     compile "com.android.support:support-annotations:$supportLibrary"
     // Rx
     compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.1.1'
+    compile 'io.reactivex.rxjava2:rxjava:2.1.7'
     testCompile 'io.reactivex:rxandroid:1.2.1'
     // Cache
-//    compile('com.github.lowlevel-studios:storo:1.1.0') {
-//        transitive = true
-//    }
     compile('com.github.Zeyad-37:Storo:2.1.0') {
         transitive = true
     }
     compile 'com.rollbar:rollbar-android:0.2.1'
+    compile 'nl.littlerobots.rxlint:rxlint:1.6'
     // Testing
     testCompile 'junit:junit:4.12'
     testCompile "com.android.support:support-annotations:$supportLibrary"
-    testCompile "org.mockito:mockito-core:1.10.19"
+    testCompile "org.mockito:mockito-core:$mockito"
     testCompile "org.robolectric:robolectric:$robolectric"
-    testCompile "org.robolectric:shadows-support-v4:$robolectric"
+//    testCompile "org.robolectric:shadows-support-v4:$robolectric"
 
     testCompile "org.powermock:powermock-module-junit4:$powerMock"
     testCompile "org.powermock:powermock-module-junit4-rule:$powerMock"
     testCompile "org.powermock:powermock-api-mockito:$powerMock"
     testCompile "org.powermock:powermock-classloading-xstream:$powerMock"
 
-    testCompile "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
+//    testCompile "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
     testCompile 'com.github.andrzejchm.RESTMock:android:0.2.2'
     //required to resolve robolectric test problems
     testCompile("com.jakewharton.espresso:okhttp3-idling-resource:$okhttpIdelingResource") {

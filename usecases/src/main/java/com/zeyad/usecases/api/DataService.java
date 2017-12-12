@@ -42,14 +42,14 @@ class DataService implements IDataService {
     }
 
     @Override
-    public <M> Flowable<List<M>> getList(@NonNull GetRequest getListRequest) {
+    public <M> Flowable<List<M>> getList(@NonNull final GetRequest getListRequest) {
         Flowable<List<M>> result;
         try {
-            Class dataClass = getListRequest.getDataClass();
-            String url = getListRequest.getUrl();
-            String simpleName = dataClass.getSimpleName();
-            boolean shouldCache = getListRequest.isShouldCache();
-            Flowable<List<M>> dynamicGetList = mDataStoreFactory.dynamically(url, dataClass)
+            final Class dataClass = getListRequest.getDataClass();
+            final String url = getListRequest.getUrl();
+            final String simpleName = dataClass.getSimpleName();
+            final boolean shouldCache = getListRequest.isShouldCache();
+            final Flowable<List<M>> dynamicGetList = mDataStoreFactory.dynamically(url, dataClass)
                     .dynamicGetList(url, getListRequest.getIdColumnName(), dataClass,
                             getListRequest.isPersist(), shouldCache);
             if (Utils.getInstance().withCache(shouldCache)) {
@@ -61,22 +61,22 @@ class DataService implements IDataService {
             } else {
                 result = dynamicGetList;
             }
-        } catch (IllegalAccessException e) {
+        } catch (final IllegalAccessException e) {
             result = Flowable.error(e);
         }
         return result.compose(applySchedulers());
     }
 
     @Override
-    public <M> Flowable<M> getObject(@NonNull GetRequest getRequest) {
+    public <M> Flowable<M> getObject(@NonNull final GetRequest getRequest) {
         Flowable<M> result;
         try {
-            Object itemId = getRequest.getItemId();
-            Class dataClass = getRequest.getDataClass();
-            boolean shouldCache = getRequest.isShouldCache();
-            String url = getRequest.getUrl();
-            String simpleName = dataClass.getSimpleName();
-            Flowable<M> dynamicGetObject = mDataStoreFactory.dynamically(url, dataClass)
+            final Object itemId = getRequest.getItemId();
+            final Class dataClass = getRequest.getDataClass();
+            final boolean shouldCache = getRequest.isShouldCache();
+            final String url = getRequest.getUrl();
+            final String simpleName = dataClass.getSimpleName();
+            final Flowable<M> dynamicGetObject = mDataStoreFactory.dynamically(url, dataClass)
                                                             .dynamicGetObject(url, getRequest.getIdColumnName(), itemId, getRequest.getIdType(),
                                                                     dataClass, getRequest.isPersist(), shouldCache);
             if (Utils.getInstance().withCache(shouldCache)) {

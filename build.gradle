@@ -1,16 +1,57 @@
+project.ext {
+    supportLibrary = '26.1.0'
+    butterKnife = '8.8.1'
+    rxbinding = '2.0.0'
+    okhttpVersion = '3.9.1'
+    archComp = '1.0.0'
+    rxjava = '2.1.7'
+    rxAndroid = '2.0.1'
+    genericRecyclerViewAdapter = '1.6.2'
+    rxredux = '2.0.0'
+    glide = '4.0.0'
+    lottie = '2.2.0'
+    retrofit = '2.3.0'
+
+    rxlint = '1.6'
+    leakCanary = '1.5.4'
+    androidSupportTest = '1.0.1'
+    espressoCore = '3.0.1'
+    powerMock = '1.7.3'
+    robolectric = '3.3.2'
+//    robolectric = '3.5.1'
+    okhttpIdelingResource = '1.0.0'
+    mockito = '1.10.19'
+//    mockito = '2.10.0'
+    mockitoKotlin = '1.5.0'
+    restMock = '0.2.2'
+    junit = '4.12'
+}
+
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 buildscript {
+    ext.kotlin_version = '1.2.0'
     repositories {
         jcenter()
+        google()
+        mavenCentral()
+        maven {
+            url "https://plugins.gradle.org/m2/" // error-prone
+        }
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.3.3'
+        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
 //        classpath 'com.google.gms:google-services:3.1.0'
-        classpath 'io.realm:realm-gradle-plugin:3.4.0'
+        classpath 'io.realm:realm-gradle-plugin:4.2.0'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-//        classpath "com.uber:infer-plugin:0.7.4"
+        classpath "com.uber:infer-plugin:0.7.4"
+        classpath "net.ltgt.gradle:gradle-errorprone-plugin:0.0.13"
+        classpath 'pl.droidsonroids.gradle:gradle-pitest-plugin:0.1.4'
+        classpath 'com.dicedmelon.gradle:jacoco-android:0.1.2'
+        classpath "gradle.plugin.org.jmailen.gradle:kotlinter-gradle:1.5.1"
+        classpath "gradle.plugin.io.gitlab.arturbosch.detekt:detekt-gradle-plugin:1.0.0.RC5-5"
     }
 }
 
