@@ -8,12 +8,14 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
 import android.os.StrictMode;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 
 import com.rollbar.android.Rollbar;
 import com.squareup.leakcanary.LeakCanary;
+import com.squareup.leakcanary.RefWatcher;
 import com.zeyad.rxredux.core.eventbus.RxEventBusFactory;
 import com.zeyad.usecases.api.DataServiceConfig;
 import com.zeyad.usecases.api.DataServiceFactory;
@@ -28,6 +30,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.X509TrustManager;
 
 import io.reactivex.Completable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import io.realm.Realm;
 import io.realm.RealmConfiguration;
@@ -45,6 +48,9 @@ import static com.zeyad.usecases.app.utils.Constants.URLS.API_BASE_URL;
  */
 public class GenericApplication extends Application {
     private static final int TIME_OUT = 15;
+    private Disposable disposable;
+    private RefWatcher refwatcher;
+
     @TargetApi(value = 24)
     private static boolean checkAppSignature(Context context) {
         try {
@@ -106,9 +112,9 @@ public class GenericApplication extends Application {
         if (LeakCanary.isInAnalyzerProcess(this)) {
             return;
         }
-        //        initializeStrictMode();
-        LeakCanary.install(this);
-        Completable.fromAction(() -> {
+        initializeStrictMode();
+        refwatcher = LeakCanary.install(this);
+        disposable = Completable.fromAction(() -> {
             if (!checkAppTampering(this)) {
                 throw new IllegalAccessException("App might be tampered with!");
             }
@@ -163,13 +169,10 @@ public class GenericApplication extends Application {
         return API_BASE_URL;
     }
 
-    private void initializeStrictMode() {
-        if (BuildConfig.DEBUG) {
-            StrictMode.setThreadPolicy(
-                    new StrictMode.ThreadPolicy.Builder().detectAll().penaltyLog().build());
-            StrictMode.setVmPolicy(
-                    new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().build());
-        }
+    @Override
+    public void onTerminate() {
+        disposable.dispose();
+        super.onTerminate();
     }
 
     private void initializeRealm() {
@@ -194,7 +197,21 @@ public class GenericApplication extends Application {
         return null;
     }
 
+    private void initializeStrictMode() {
+        if (BuildConfig.DEBUG
+                || "true".equals(Settings.System.getString(getContentResolver(), "firebase.test.lab"))) {
+            StrictMode.setThreadPolicy(
+                    new StrictMode.ThreadPolicy.Builder().detectAll().penaltyDeath().penaltyLog().build());
+            StrictMode
+                    .setVmPolicy(new StrictMode.VmPolicy.Builder().detectAll().penaltyLog().penaltyDeath().build());
+        }
+    }
+
     SSLSocketFactory getSSlSocketFactory() {
         return null;
+    }
+
+    public RefWatcher getRefwatcher() {
+        return refwatcher;
     }
 }

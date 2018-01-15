@@ -1,16 +1,19 @@
 package com.zeyad.usecases.app.screens;
 
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.Toast;
 
 import com.zeyad.rxredux.core.redux.BaseViewModel;
+import com.zeyad.usecases.app.GenericApplication;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
 /**
  * @author by ZIaDo on 7/21/17.
  */
 
-public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends com.zeyad.rxredux.core.redux.BaseFragment<S, VM> {
+public abstract class BaseFragment<S extends Parcelable, VM extends BaseViewModel<S>>
+        extends com.zeyad.rxredux.core.redux.prelollipop.BaseFragment<S, VM> {
 
     public void showToastMessage(String message) {
         showToastMessage(message, Toast.LENGTH_LONG);
@@ -61,5 +64,11 @@ public abstract class BaseFragment<S, VM extends BaseViewModel<S>> extends com.z
         } else {
             throw new IllegalArgumentException("View is null");
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        ((GenericApplication) getContext().getApplicationContext()).getRefwatcher().watch(this);
     }
 }

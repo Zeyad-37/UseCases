@@ -1,5 +1,6 @@
 package com.zeyad.usecases.app.screens;
 
+import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.util.Pair;
@@ -9,12 +10,11 @@ import android.widget.Toast;
 import com.zeyad.rxredux.core.redux.BaseViewModel;
 import com.zeyad.usecases.app.components.snackbar.SnackBarFactory;
 
-import java.util.List;
-
 /**
  * @author by ZIaDo on 7/21/17.
  */
-public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends com.zeyad.rxredux.core.redux.BaseActivity<S, VM> {
+public abstract class BaseActivity<S extends Parcelable, VM extends BaseViewModel<S>> extends
+        com.zeyad.rxredux.core.redux.prelollipop.BaseActivity<S, VM> {
 
     /**
      * Adds a {@link Fragment} to this activity's layout.
@@ -23,7 +23,7 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends com.z
      * @param fragment        The fragment to be added.
      */
     public void addFragment(int containerViewId, Fragment fragment, String currentFragTag,
-            List<Pair<View, String>> sharedElements) {
+                            Pair<View, String>... sharedElements) {
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
         if (sharedElements != null) {
             for (Pair<View, String> pair : sharedElements) {
@@ -67,18 +67,18 @@ public abstract class BaseActivity<S, VM extends BaseViewModel<S>> extends com.z
     }
 
     public void showSnackBarWithAction(String typeSnackBar, View view,
-            String message, String actionText, View.OnClickListener onClickListener) {
+                                       String message, String actionText, View.OnClickListener onClickListener) {
         if (view != null) {
             SnackBarFactory.getSnackBarWithAction(
                     typeSnackBar, view, message, actionText, onClickListener)
-                           .show();
+                    .show();
         } else {
             throw new IllegalArgumentException("View is null");
         }
     }
 
     public void showSnackBarWithAction(String typeSnackBar, View view,
-            String message, int actionText, View.OnClickListener onClickListener) {
+                                       String message, int actionText, View.OnClickListener onClickListener) {
         showSnackBarWithAction(typeSnackBar, view, message, getString(actionText), onClickListener);
     }
 

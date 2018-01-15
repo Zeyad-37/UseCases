@@ -74,8 +74,8 @@ public class FileIOTest {
         FileIORequest fileIOReq = mockFileIoReq(true, true, getValidFile());
         fileIO = createFileIO(fileIOReq, true);
         Mockito.doNothing()
-               .when(utils)
-               .queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class), anyInt());
+                .when(utils)
+                .queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class), anyInt());
         fileIO.queueIOFile();
         verify(utils, times(1)).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class), anyInt());
     }
@@ -110,21 +110,21 @@ public class FileIOTest {
         final CloudStore cloudStore = mock(CloudStore.class);
         Mockito.when(
                 cloudStore.dynamicDownloadFile(
-                                Mockito.anyString(),
-                                any(),
-                                anyBoolean(),
-                                anyBoolean(),
-                                anyBoolean()))
+                        Mockito.anyString(),
+                        any(),
+                        anyBoolean(),
+                        anyBoolean(),
+                        anyBoolean()))
                 .thenReturn(Flowable.empty());
         Mockito.when(
                 cloudStore.dynamicUploadFile(
-                                Mockito.anyString(),
-                        (HashMap<String, File>) anyMap(),
-                                (HashMap<String, Object>) anyMap(),
-                                anyBoolean(),
-                                anyBoolean(),
-                                anyBoolean(),
-                                any()))
+                        Mockito.anyString(),
+                        (HashMap) anyMap(),
+                        (HashMap) anyMap(),
+                        anyBoolean(),
+                        anyBoolean(),
+                        anyBoolean(),
+                        any()))
                 .thenReturn(Flowable.empty());
         return cloudStore;
     }

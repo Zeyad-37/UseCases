@@ -1,18 +1,30 @@
 package com.zeyad.usecases.app.screens.user.detail;
 
-import java.util.List;
-
-import org.parceler.Parcel;
-import org.parceler.Transient;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import com.zeyad.usecases.app.screens.user.list.User;
 import com.zeyad.usecases.app.utils.Utils;
 
+import org.parceler.Transient;
+
+import java.util.List;
+
 /**
  * @author zeyad on 1/25/17.
  */
-@Parcel
-public class UserDetailState {
+public class UserDetailState implements Parcelable {
+    public static final Creator<UserDetailState> CREATOR = new Creator<UserDetailState>() {
+        @Override
+        public UserDetailState createFromParcel(Parcel in) {
+            return new UserDetailState(in);
+        }
+
+        @Override
+        public UserDetailState[] newArray(int size) {
+            return new UserDetailState[size];
+        }
+    };
     boolean isTwoPane;
     String userLogin;
     @Transient
@@ -30,8 +42,24 @@ public class UserDetailState {
         repos = builder.repos;
     }
 
+    protected UserDetailState(Parcel in) {
+        isTwoPane = in.readByte() != 0;
+        userLogin = in.readString();
+    }
+
     public static Builder builder() {
         return new Builder();
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeByte((byte) (isTwoPane ? 1 : 0));
+        dest.writeString(userLogin);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
     }
 
     boolean isTwoPane() {

@@ -1,6 +1,5 @@
 package com.zeyad.usecases.app.screens.screens.user_list;
 
-import com.zeyad.rxredux.core.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.screens.user.list.User;
 import com.zeyad.usecases.app.screens.user.list.UserListVM;
@@ -34,7 +33,7 @@ public class UserListVMTest {
     public void setUp() throws Exception {
         mockDataUseCase = mock(IDataService.class);
         userListVM = new UserListVM();
-        userListVM.init(mock(SuccessStateAccumulator.class), null, mockDataUseCase);
+        userListVM.init(mockDataUseCase);
     }
 
     @Test
@@ -64,10 +63,9 @@ public class UserListVMTest {
         List<String> ids = new ArrayList<>();
         ids.add("1");
         ids.add("2");
-        Flowable<List<String>> observableUserRealm = Flowable.just(ids);
 
         when(mockDataUseCase.deleteCollectionByIds(any(PostRequest.class)))
-                .thenReturn(Flowable.just(true));
+                .thenReturn(Flowable.just(ids));
 
         TestSubscriber<List<String>> subscriber = new TestSubscriber<>();
         userListVM.deleteCollection(ids).subscribe(subscriber);
@@ -87,12 +85,10 @@ public class UserListVMTest {
         user.setId(1);
         userList = new ArrayList<>();
         userList.add(user);
-        Flowable<List<User>> listObservable = Flowable.just(userList);
-        Flowable<User> userObservable = Flowable.just(user);
 
-        when(mockDataUseCase.<User>getObject(any(GetRequest.class))).thenReturn(userObservable);
+        when(mockDataUseCase.<User>getObject(any(GetRequest.class))).thenReturn(Flowable.just(user));
         when(mockDataUseCase.<User>queryDisk(any(RealmQueryProvider.class)))
-                .thenReturn(listObservable);
+                .thenReturn(Flowable.just(userList));
 
         TestSubscriber<List<User>> subscriber = new TestSubscriber<>();
         userListVM.search("Zoz").subscribe(subscriber);
@@ -102,6 +98,8 @@ public class UserListVMTest {
 
         subscriber.assertComplete();
         subscriber.assertNoErrors();
-        //        subscriber.assertValue(userList);
+        List<User> expectedResult = new ArrayList<>();
+        expectedResult.add(user);
+        subscriber.assertValue(expectedResult);
     }
 }

@@ -423,8 +423,8 @@ public class DataServiceTest {
                 .cloud(Object.class)
                 .dynamicUploadFile(
                         anyString(),
-                        (HashMap<String, File>) anyMap(),
-                        (HashMap<String, Object>) anyMap(),
+                        (HashMap) anyMap(),
+                        (HashMap) anyMap(),
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean(),
@@ -437,8 +437,8 @@ public class DataServiceTest {
         verify(dataStoreFactory.cloud(Object.class), times(1))
                 .dynamicUploadFile(
                         anyString(),
-                        (HashMap<String, File>) anyMap(),
-                        (HashMap<String, Object>) anyMap(),
+                        (HashMap) anyMap(),
+                        (HashMap) anyMap(),
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean(),

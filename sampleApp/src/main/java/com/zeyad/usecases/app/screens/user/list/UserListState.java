@@ -1,20 +1,37 @@
 package com.zeyad.usecases.app.screens.user.list;
 
-import org.parceler.Parcel;
+import android.os.Parcel;
+import android.os.Parcelable;
+
+import com.zeyad.gadapter.ItemInfo;
+import com.zeyad.usecases.app.R;
+
 import org.parceler.Transient;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import io.reactivex.Observable;
+
 /**
  * @author by ZIaDo on 1/28/17.
  */
-@Parcel
-public class UserListState {
+public class UserListState implements Parcelable {
+    public static final Parcelable.Creator<UserListState> CREATOR = new Parcelable.Creator<UserListState>() {
+        @Override
+        public UserListState createFromParcel(Parcel source) {
+            return new UserListState(source);
+        }
+
+        @Override
+        public UserListState[] newArray(int size) {
+            return new UserListState[size];
+        }
+    };
     @Transient
-    List<User> users;
+    List<ItemInfo> users;
     @Transient
-    List<User> searchList;
+    List<ItemInfo> searchList;
     long lastId;
 
     UserListState() {
@@ -27,15 +44,23 @@ public class UserListState {
         lastId = builder.lastId;
     }
 
+    protected UserListState(Parcel in) {
+        this.users = new ArrayList<>();
+        //        in.readList(this.users, User.class.getClassLoader());
+        this.searchList = new ArrayList<>();
+        //        in.readList(this.searchList, User.class.getClassLoader());
+        this.lastId = in.readLong();
+    }
+
     static Builder builder() {
         return new Builder();
     }
 
-    List<User> getUsers() {
+    List<ItemInfo> getUsers() {
         return users;
     }
 
-    List<User> getSearchList() {
+    List<ItemInfo> getSearchList() {
         return searchList;
     }
 
@@ -58,21 +83,37 @@ public class UserListState {
         return lastId == that.lastId;
     }
 
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        //        dest.writeList(this.users);
+        //        dest.writeList(this.searchList);
+        dest.writeLong(this.lastId);
+    }
+
     static class Builder {
-        List<User> users;
-        List<User> searchList;
+        List<ItemInfo> users;
+        List<ItemInfo> searchList;
         long lastId;
 
         Builder() {
         }
 
         Builder users(List<User> value) {
-            users = value;
+            users = Observable.fromIterable(value)
+                    .map(user -> new ItemInfo(user, R.layout.user_item_layout).setId(user.getId()))
+                    .toList(value.size()).blockingGet();
             return this;
         }
 
         Builder searchList(List<User> value) {
-            searchList = value;
+            searchList = Observable.fromIterable(value)
+                    .map(user -> new ItemInfo(user, R.layout.user_item_layout).setId(user.getId()))
+                    .toList().blockingGet();
             return this;
         }
 
