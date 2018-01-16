@@ -47,7 +47,7 @@ class DataService implements IDataService {
     public <M> Flowable<List<M>> getList(@NonNull final GetRequest getListRequest) {
         Flowable<List<M>> result;
         try {
-            final Class dataClass = getListRequest.getDataClass();
+            final Class<M> dataClass = getListRequest.getDataClass();
             final String url = getListRequest.getUrl();
             final String simpleName = dataClass.getSimpleName();
             final boolean shouldCache = getListRequest.isShouldCache();
@@ -55,7 +55,7 @@ class DataService implements IDataService {
                     .dynamicGetList(url, getListRequest.getIdColumnName(), dataClass,
                             getListRequest.isPersist(), shouldCache);
             if (Utils.getInstance().withCache(shouldCache)) {
-                result = mDataStoreFactory.memory().<M>getAllItems(dataClass)
+                result = mDataStoreFactory.memory().getAllItems(dataClass)
                         .doOnSuccess(m -> Log.d("getList", CACHE_HIT + simpleName))
                         .doOnError(throwable -> Log.d("getList", CACHE_MISS + simpleName))
                         .toFlowable()
@@ -230,7 +230,7 @@ class DataService implements IDataService {
         Flowable<List<M>> result;
         try {
             Utils utils = Utils.getInstance();
-            Class dataClass = getRequest.getDataClass();
+            Class<M> dataClass = getRequest.getDataClass();
             String simpleName = dataClass.getSimpleName();
             String idColumnName = getRequest.getIdColumnName();
             boolean persist = getRequest.isPersist();
@@ -246,7 +246,7 @@ class DataService implements IDataService {
                             throwable))
                     .flatMap(m -> m.isEmpty() ? cloud : Flowable.just(m))
                     .onErrorResumeNext(t -> cloud);
-            Flowable<List<M>> memory = mDataStoreFactory.memory().<M>getAllItems(dataClass)
+            Flowable<List<M>> memory = mDataStoreFactory.memory().getAllItems(dataClass)
                     .doOnSuccess(m -> Log.d(GET_LIST_OFFLINE_FIRST, CACHE_HIT + simpleName))
                     .doOnError(throwable -> Log.d(GET_LIST_OFFLINE_FIRST, CACHE_MISS + simpleName))
                     .toFlowable()

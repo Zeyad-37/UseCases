@@ -112,12 +112,12 @@ public class GenericApplication extends Application {
         if (LeakCanary.isInAnalyzerProcess(this)) {
             return;
         }
-        initializeStrictMode();
+//        initializeStrictMode();
         refwatcher = LeakCanary.install(this);
         disposable = Completable.fromAction(() -> {
-            if (!checkAppTampering(this)) {
-                throw new IllegalAccessException("App might be tampered with!");
-            }
+//            if (!checkAppTampering(this)) {
+//                throw new IllegalAccessException("App might be tampered with!");
+//            }
             //            initializeFlowUp();
             Rollbar.init(this, "c8c8b4cb1d4f4650a77ae1558865ca87", BuildConfig.DEBUG ? "debug" : "production");
         }).subscribeOn(Schedulers.io())

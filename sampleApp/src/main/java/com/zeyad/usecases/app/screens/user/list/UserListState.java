@@ -52,7 +52,7 @@ public class UserListState implements Parcelable {
         this.lastId = in.readLong();
     }
 
-    static Builder builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -95,7 +95,7 @@ public class UserListState implements Parcelable {
         dest.writeLong(this.lastId);
     }
 
-    static class Builder {
+    public static class Builder {
         List<ItemInfo> users;
         List<ItemInfo> searchList;
         long lastId;
@@ -103,26 +103,26 @@ public class UserListState implements Parcelable {
         Builder() {
         }
 
-        Builder users(List<User> value) {
+        public Builder users(List<User> value) {
             users = Observable.fromIterable(value)
                     .map(user -> new ItemInfo(user, R.layout.user_item_layout).setId(user.getId()))
                     .toList(value.size()).blockingGet();
             return this;
         }
 
-        Builder searchList(List<User> value) {
+        public Builder searchList(List<User> value) {
             searchList = Observable.fromIterable(value)
                     .map(user -> new ItemInfo(user, R.layout.user_item_layout).setId(user.getId()))
                     .toList().blockingGet();
             return this;
         }
 
-        Builder lastId(long value) {
+        public Builder lastId(long value) {
             lastId = value;
             return this;
         }
 
-        UserListState build() {
+        public UserListState build() {
             return new UserListState(this);
         }
     }

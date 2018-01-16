@@ -28,7 +28,7 @@ public class GetRequest {
         return url != null ? url : "";
     }
 
-    public Class getDataClass() {
+    public <M> Class<M> getDataClass() {
         return dataClass;
     }
 
