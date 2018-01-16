@@ -191,7 +191,6 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable);
 
@@ -205,7 +204,6 @@ public class DataServiceTest {
                         any(JSONObject.class),
                         any(Class.class),
                         any(Class.class),
-                        anyBoolean(),
                         anyBoolean(),
                         anyBoolean());
     }
@@ -222,7 +220,6 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable);
 
@@ -236,7 +233,6 @@ public class DataServiceTest {
                         any(JSONObject.class),
                         any(Class.class),
                         any(Class.class),
-                        anyBoolean(),
                         anyBoolean(),
                         anyBoolean());
     }
@@ -253,7 +249,6 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable);
 
@@ -267,7 +262,6 @@ public class DataServiceTest {
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
-                        anyBoolean(),
                         anyBoolean(),
                         anyBoolean());
     }
@@ -284,7 +278,6 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable);
 
@@ -298,7 +291,6 @@ public class DataServiceTest {
                         any(JSONObject.class),
                         any(Class.class),
                         any(Class.class),
-                        anyBoolean(),
                         anyBoolean(),
                         anyBoolean());
     }
@@ -315,7 +307,6 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable);
 
@@ -329,7 +320,6 @@ public class DataServiceTest {
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
-                        anyBoolean(),
                         anyBoolean(),
                         anyBoolean());
     }
@@ -346,7 +336,6 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable);
 
@@ -360,7 +349,6 @@ public class DataServiceTest {
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
-                        anyBoolean(),
                         anyBoolean(),
                         anyBoolean());
     }
@@ -377,7 +365,6 @@ public class DataServiceTest {
                         any(Class.class),
                         any(Class.class),
                         anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable);
 
@@ -391,7 +378,6 @@ public class DataServiceTest {
                         any(JSONArray.class),
                         any(Class.class),
                         any(Class.class),
-                        anyBoolean(),
                         anyBoolean(),
                         anyBoolean());
     }
@@ -425,9 +411,6 @@ public class DataServiceTest {
                         anyString(),
                         (HashMap) anyMap(),
                         (HashMap) anyMap(),
-                        anyBoolean(),
-                        anyBoolean(),
-                        anyBoolean(),
                         any(Class.class)))
                 .thenReturn(flowable);
 
@@ -439,9 +422,6 @@ public class DataServiceTest {
                         anyString(),
                         (HashMap) anyMap(),
                         (HashMap) anyMap(),
-                        anyBoolean(),
-                        anyBoolean(),
-                        anyBoolean(),
                         any(Class.class));
     }
 
@@ -449,20 +429,14 @@ public class DataServiceTest {
     public void downloadFile() throws Exception {
         when(dataStoreFactory
                 .cloud(Object.class)
-                .dynamicDownloadFile(
-                        anyString(),
-                        any(File.class),
-                        anyBoolean(),
-                        anyBoolean(),
-                        anyBoolean()))
+                .dynamicDownloadFile(anyString(), any(File.class)))
                 .thenReturn(flowable);
 
         dataService.downloadFile(
                 new FileIORequest.Builder("").responseType(Object.class).build());
 
         verify(dataStoreFactory.cloud(Object.class), times(1))
-                .dynamicDownloadFile(
-                        anyString(), any(File.class), anyBoolean(), anyBoolean(), anyBoolean());
+                .dynamicDownloadFile(anyString(), any(File.class));
     }
 }
 

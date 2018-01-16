@@ -33,7 +33,7 @@ public class PostRequest implements Parcelable {
     private static final String DEFAULT_ID_KEY = "id";
     private final String url, idColumnName, method, payload;
     private final Class requestType, responseType, idType;
-    private final boolean onWifi, whileCharging, persist, queuable, cache;
+    private final boolean onWifi, whileCharging, persist, cache;
     private Object object;
 
     public PostRequest(@NonNull Builder builder) {
@@ -43,7 +43,6 @@ public class PostRequest implements Parcelable {
         persist = builder.persist;
         onWifi = builder.onWifi;
         whileCharging = builder.whileCharging;
-        queuable = builder.queuable;
         idColumnName = builder.idColumnName;
         idType = builder.idType;
         method = builder.method;
@@ -67,7 +66,6 @@ public class PostRequest implements Parcelable {
         this.onWifi = in.readByte() != 0;
         this.whileCharging = in.readByte() != 0;
         this.persist = in.readByte() != 0;
-        this.queuable = in.readByte() != 0;
         this.cache = in.readByte() != 0;
         this.payload = in.readString();
     }
@@ -142,10 +140,6 @@ public class PostRequest implements Parcelable {
         return cache;
     }
 
-    public boolean isQueuable() {
-        return queuable;
-    }
-
     public Object getObject() {
         return object;
     }
@@ -192,7 +186,6 @@ public class PostRequest implements Parcelable {
         dest.writeByte(this.onWifi ? (byte) 1 : (byte) 0);
         dest.writeByte(this.whileCharging ? (byte) 1 : (byte) 0);
         dest.writeByte(this.persist ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.queuable ? (byte) 1 : (byte) 0);
         dest.writeByte(this.cache ? (byte) 1 : (byte) 0);
         dest.writeString(this.payload);
     }
@@ -204,7 +197,7 @@ public class PostRequest implements Parcelable {
         HashMap<String, Object> keyValuePairs;
         String url, idColumnName, method;
         Class requestType, responseType, idType;
-        boolean persist, queuable, cache, onWifi, whileCharging;
+        boolean persist, cache, onWifi, whileCharging;
 
         public Builder(Class requestType, boolean persist) {
             this.requestType = requestType;
@@ -228,14 +221,6 @@ public class PostRequest implements Parcelable {
             this.responseType = responseType;
             return this;
         }
-
-        //        @NonNull
-        //        public Builder queuable(boolean onWifi, boolean whileCharging) {
-        //            queuable = true;
-        //            this.onWifi = onWifi;
-        //            this.whileCharging = whileCharging;
-        //            return this;
-        //        }
 
         @NonNull
         public Builder cache() {

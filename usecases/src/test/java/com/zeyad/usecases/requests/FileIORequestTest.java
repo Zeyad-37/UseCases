@@ -20,22 +20,18 @@ import static org.hamcrest.Matchers.is;
 @RunWith(JUnit4.class)
 public class FileIORequestTest {
 
-    private final boolean ON_WIFI = false;
-    private final boolean QUEUABLE = false;
-    private final boolean WHILE_CHARGING = false;
     private final String URL = "www.google.com";
     private final File FILE = Mockito.mock(File.class);
     private final Class DATA_CLASS = TestRealmModel.class;
-    @Nullable private FileIORequest mFileIORequest;
+    @Nullable
+    private FileIORequest mFileIORequest;
 
     @Before
     public void setUp() throws Exception {
-        mFileIORequest =
-                new FileIORequest.Builder(URL)
-                        .file(FILE)
-                        //                        .queuable(ON_WIFI, WHILE_CHARGING)
-                        .responseType(DATA_CLASS)
-                        .build();
+        mFileIORequest = new FileIORequest.Builder(URL)
+                .file(FILE)
+                .responseType(DATA_CLASS)
+                .build();
     }
 
     @After
@@ -49,22 +45,7 @@ public class FileIORequestTest {
     }
 
     @Test
-    public void testIsPersist() throws Exception {
-        assertThat(mFileIORequest.isQueuable(), is(equalTo(QUEUABLE)));
-    }
-
-    @Test
     public void testGetFile() throws Exception {
         assertThat(mFileIORequest.getFile(), is(equalTo(FILE)));
-    }
-
-    @Test
-    public void testOnWifi() throws Exception {
-        assertThat(mFileIORequest.isOnWifi(), is(equalTo(ON_WIFI)));
-    }
-
-    @Test
-    public void testWhileChargingGetFile() throws Exception {
-        assertThat(mFileIORequest.isWhileCharging(), is(equalTo(WHILE_CHARGING)));
     }
 }

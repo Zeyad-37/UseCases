@@ -92,7 +92,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicDeleteCollection(
-                "", "", String.class, new JSONArray(), Object.class, Object.class, false, false, false);
+                "", "", String.class, new JSONArray(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .evictCollection(anyString(), anyList(), any(Class.class), any(Class.class));
@@ -104,7 +104,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicPatchObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, false);
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class));
@@ -116,7 +116,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicPostObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, false);
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class));
@@ -128,7 +128,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicPutObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, false);
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class));
@@ -140,7 +140,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicPostList(
-                "", "", int.class, new JSONArray(), Object.class, Object.class, false, false, false);
+                "", "", int.class, new JSONArray(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .putAll(any(JSONArray.class), anyString(), any(Class.class), any(Class.class));
@@ -152,7 +152,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
                 .thenReturn(Single.just(true));
 
         mDiskStore.dynamicPutList(
-                "", "", int.class, new JSONArray(), Object.class, Object.class, false, false, false);
+                "", "", int.class, new JSONArray(), Object.class, Object.class, false, false);
 
         Mockito.verify(dbManager, times(1))
                 .putAll(any(JSONArray.class), anyString(), any(Class.class), any(Class.class));
@@ -160,8 +160,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
 
     @Test(expected = IllegalStateException.class)
     public void testDynamicDownloadFile() throws Exception {
-        Flowable observable =
-                mDiskStore.dynamicDownloadFile("", new File(""), false, false, false);
+        Flowable observable = mDiskStore.dynamicDownloadFile("", new File(""));
 
         // Verify repository interactions
         verifyZeroInteractions(dbManager);
@@ -176,8 +175,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     @Test(expected = IllegalStateException.class)
     public void testDynamicUploadFile() throws Exception {
         Flowable observable =
-                mDiskStore.dynamicUploadFile(
-                        "", new HashMap<>(), new HashMap<>(), false, false, false, Object.class);
+                mDiskStore.dynamicUploadFile("", new HashMap<>(), new HashMap<>(), Object.class);
 
         // Verify repository interactions
         verifyZeroInteractions(dbManager);

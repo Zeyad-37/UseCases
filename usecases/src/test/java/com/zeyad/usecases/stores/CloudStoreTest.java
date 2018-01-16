@@ -154,7 +154,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPatchObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, false)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -171,7 +171,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPatchObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, true, true, true)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, true, true)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -186,7 +186,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPatchObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, true)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
@@ -199,7 +199,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPatchObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, false)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
@@ -213,7 +213,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPostObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, false)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -229,7 +229,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPostObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, true, false, false)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, true, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -244,7 +244,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPostObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, true)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
@@ -257,7 +257,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPostObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, false)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
@@ -271,7 +271,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPostList("", "", int.class, new JSONArray(), Object.class, Object.class, false,
-                false, false)
+                false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -287,7 +287,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPostList("", "", int.class, new JSONArray(), Object.class, Object.class,
-                true, false, false)
+                true, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -301,8 +301,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicPostList("", "", int.class, new JSONArray(), Object.class, Object.class, false, false,
-                true)
+        cloudStore.dynamicPostList("", "", int.class, new JSONArray(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
@@ -314,8 +313,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicPostList("", "", int.class, new JSONArray(), Object.class, Object.class, false, false,
-                false)
+        cloudStore.dynamicPostList("", "", int.class, new JSONArray(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
@@ -329,7 +327,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPutObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, false)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -345,7 +343,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPutObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, true, false, false)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, true, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -360,7 +358,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPutObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, true)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
@@ -373,7 +371,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicPutObject(
-                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false, false)
+                "", "", int.class, new JSONObject(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
@@ -386,8 +384,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .thenReturn(observable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicPutList("", "", int.class, new JSONArray(), Object.class, Object.class, false, false,
-                false)
+        cloudStore.dynamicPutList("", "", int.class, new JSONArray(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -402,8 +399,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .thenReturn(observable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicPutList("", "", int.class, new JSONArray(), Object.class, Object.class, true, false,
-                false)
+        cloudStore.dynamicPutList("", "", int.class, new JSONArray(), Object.class, Object.class, true, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -417,7 +413,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicPostList("", "", int.class, new JSONArray(), Object.class, Object.class, false, false, true)
+        cloudStore.dynamicPostList("", "", int.class, new JSONArray(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
@@ -429,8 +425,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicPutList("", "", int.class, new JSONArray(), Object.class, Object.class, false, false,
-                false)
+        cloudStore.dynamicPutList("", "", int.class, new JSONArray(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
@@ -444,7 +439,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicDeleteCollection(
-                "", "", String.class, new JSONArray(), Object.class, Object.class, false, false, false)
+                "", "", String.class, new JSONArray(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -460,7 +455,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicDeleteCollection(
-                "", "", String.class, new JSONArray(), Object.class, Object.class, true, false, false)
+                "", "", String.class, new JSONArray(), Object.class, Object.class, true, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -475,7 +470,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicDeleteCollection(
-                "", "", String.class, new JSONArray(), Object.class, Object.class, false, false, true)
+                "", "", String.class, new JSONArray(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
@@ -488,7 +483,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicDeleteCollection(
-                "", "", String.class, new JSONArray(), Object.class, Object.class, false, false, false)
+                "", "", String.class, new JSONArray(), Object.class, Object.class, false, false)
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
@@ -514,7 +509,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicUploadFile(
-                "", new HashMap<>(), new HashMap<>(), false, false, false, Object.class)
+                "", new HashMap<>(), new HashMap<>(), Object.class)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoErrors();
@@ -530,7 +525,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicUploadFile(
-                "", new HashMap<>(), new HashMap<>(), false, false, true, Object.class)
+                "", new HashMap<>(), new HashMap<>(), Object.class)
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
@@ -542,8 +537,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicUploadFile(
-                "", new HashMap<>(), new HashMap<>(), false, false, false, Object.class)
+        cloudStore.dynamicUploadFile("", new HashMap<>(), new HashMap<>(), Object.class)
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
@@ -555,7 +549,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         when(mockApiConnection.dynamicDownload(anyString())).thenReturn(fileFlowable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicDownloadFile("", new File(""), false, false, false)
+        cloudStore.dynamicDownloadFile("", new File(""))
                 .subscribe(testSubscriber);
 
         //        testSubscriber.assertNoErrors();
@@ -569,7 +563,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicDownloadFile("", new File(""), false, false, true)
+        cloudStore.dynamicDownloadFile("", new File(""))
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
@@ -581,7 +575,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
-        cloudStore.dynamicDownloadFile("", new File(""), false, false, false)
+        cloudStore.dynamicDownloadFile("", new File(""))
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);

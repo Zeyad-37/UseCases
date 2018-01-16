@@ -26,7 +26,6 @@ public class FileIORequest implements Parcelable {
             };
     private File file;
     private String url;
-    private boolean onWifi, whileCharging, queuable;
     private Class dataClass;
     private HashMap<String, Object> parameters;
     private HashMap<String, File> keyFileMap;
@@ -35,9 +34,6 @@ public class FileIORequest implements Parcelable {
 
     private FileIORequest(@NonNull Builder uploadRequestBuilder) {
         url = uploadRequestBuilder.url;
-        onWifi = uploadRequestBuilder.onWifi;
-        whileCharging = uploadRequestBuilder.whileCharging;
-        queuable = uploadRequestBuilder.queuable;
         file = uploadRequestBuilder.file;
         dataClass = uploadRequestBuilder.dataClass;
         keyFileMap = uploadRequestBuilder.keyFileMap;
@@ -47,9 +43,6 @@ public class FileIORequest implements Parcelable {
     private FileIORequest(@NonNull Parcel in) {
         this.file = (File) in.readSerializable();
         this.url = in.readString();
-        this.onWifi = in.readByte() != 0;
-        this.whileCharging = in.readByte() != 0;
-        this.queuable = in.readByte() != 0;
         this.dataClass = (Class) in.readSerializable();
         this.parameters = (HashMap<String, Object>) in.readSerializable();
         this.keyFileMap = (HashMap<String, File>) in.readSerializable();
@@ -57,18 +50,6 @@ public class FileIORequest implements Parcelable {
 
     public String getUrl() {
         return url;
-    }
-
-    public boolean isOnWifi() {
-        return onWifi;
-    }
-
-    public boolean isWhileCharging() {
-        return whileCharging;
-    }
-
-    public boolean isQueuable() {
-        return queuable;
     }
 
     public Class getDataClass() {
@@ -97,9 +78,6 @@ public class FileIORequest implements Parcelable {
     public void writeToParcel(@NonNull Parcel dest, int flags) {
         dest.writeSerializable(this.file);
         dest.writeString(this.url);
-        dest.writeByte(this.onWifi ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.whileCharging ? (byte) 1 : (byte) 0);
-        dest.writeByte(this.queuable ? (byte) 1 : (byte) 0);
         dest.writeSerializable(this.dataClass);
         dest.writeSerializable(this.parameters);
         dest.writeSerializable(this.keyFileMap);
@@ -108,7 +86,6 @@ public class FileIORequest implements Parcelable {
     public static class Builder {
 
         private final String url;
-        private boolean onWifi, whileCharging, queuable;
         private Class dataClass;
         private HashMap<String, Object> parameters;
         private HashMap<String, File> keyFileMap;
@@ -141,14 +118,6 @@ public class FileIORequest implements Parcelable {
             this.parameters = parameters;
             return this;
         }
-
-        //        @NonNull
-        //        public Builder queuable(boolean onWifi, boolean whileCharging) {
-        //            queuable = true;
-        //            this.onWifi = onWifi;
-        //            this.whileCharging = whileCharging;
-        //            return this;
-        //        }
 
         @NonNull
         public FileIORequest build() {

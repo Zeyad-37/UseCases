@@ -69,7 +69,7 @@ public class DiskStore implements DataStore {
     @Override
     public Flowable dynamicPatchObject(String url, String idColumnName, Class itemIdType,
                                        @NonNull JSONObject jsonObject, @NonNull Class dataClass,
-                                       Class responseType, boolean persist, boolean cache, boolean queuable) {
+                                       Class responseType, boolean persist, boolean cache) {
         return mDataBaseManager.put(jsonObject, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(object -> {
                     if (mUtils.withCache(cache)) {
@@ -84,7 +84,7 @@ public class DiskStore implements DataStore {
     @Override
     public Flowable dynamicPostObject(String url, String idColumnName, Class itemIdType,
                                       @NonNull JSONObject jsonObject, @NonNull Class dataClass,
-                                      Class responseType, boolean persist, boolean cache, boolean queuable) {
+                                      Class responseType, boolean persist, boolean cache) {
         return mDataBaseManager.put(jsonObject, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(object -> {
                     if (mUtils.withCache(cache)) {
@@ -99,7 +99,7 @@ public class DiskStore implements DataStore {
     @Override
     public Flowable dynamicPostList(String url, String idColumnName, Class itemIdType,
                                     JSONArray jsonArray, Class dataClass, Class responseType,
-                                    boolean persist, boolean cache, boolean queuable) {
+                                    boolean persist, boolean cache) {
         return mDataBaseManager.putAll(jsonArray, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(aBoolean -> mMemoryStore.cacheList(idColumnName, jsonArray, dataClass))
                 .toFlowable();
@@ -109,7 +109,7 @@ public class DiskStore implements DataStore {
     @Override
     public Flowable dynamicPutObject(String url, String idColumnName, Class itemIdType,
                                      @NonNull JSONObject jsonObject, @NonNull Class dataClass,
-                                     Class responseType, boolean persist, boolean cache, boolean queuable) {
+                                     Class responseType, boolean persist, boolean cache) {
         return mDataBaseManager.put(jsonObject, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(object -> {
                     if (mUtils.withCache(cache)) {
@@ -124,7 +124,7 @@ public class DiskStore implements DataStore {
     @Override
     public Flowable dynamicPutList(String url, String idColumnName, Class itemIdType,
                                    JSONArray jsonArray, Class dataClass, Class responseType,
-                                   boolean persist, boolean cache, boolean queuable) {
+                                   boolean persist, boolean cache) {
         return mDataBaseManager.putAll(jsonArray, idColumnName, itemIdType, dataClass)
                 .doOnSuccess(aBoolean -> mMemoryStore.cacheList(idColumnName, jsonArray, dataClass))
                 .toFlowable();
@@ -133,9 +133,8 @@ public class DiskStore implements DataStore {
     @NonNull
     @Override
     public Flowable dynamicDeleteCollection(String url, String idColumnName, Class itemIdType,
-            JSONArray jsonArray, @NonNull Class dataClass,
-            Class responseType, boolean persist, boolean cache,
-            boolean queuable) {
+                                            JSONArray jsonArray, @NonNull Class dataClass,
+                                            Class responseType, boolean persist, boolean cache) {
         List<String> stringIds = mUtils.convertToStringListOfId(jsonArray);
         return mDataBaseManager.evictCollection(idColumnName,
                 mUtils.convertToListOfId(jsonArray, itemIdType), itemIdType, dataClass)
@@ -154,8 +153,7 @@ public class DiskStore implements DataStore {
 
     @NonNull
     @Override
-    public Flowable dynamicDownloadFile(
-            String url, File file, boolean onWifi, boolean whileCharging, boolean queuable) {
+    public Flowable dynamicDownloadFile(String url, File file) {
         return Flowable.error(new IllegalStateException(IO_DB_ERROR));
     }
 
@@ -164,9 +162,6 @@ public class DiskStore implements DataStore {
     public <M> Flowable<M> dynamicUploadFile(String url,
             @NonNull HashMap<String, File> keyFileMap,
             @Nullable HashMap<String, Object> parameters,
-            boolean onWifi,
-            boolean whileCharging,
-            boolean queuable,
             @NonNull Class responseType) {
         return Flowable.error(new IllegalStateException(IO_DB_ERROR));
     }

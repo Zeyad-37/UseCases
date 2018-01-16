@@ -27,8 +27,10 @@ import io.reactivex.Single;
  */
 class DataService implements IDataService {
 
-    private static final String CACHE_HIT = "cache Hit ", CACHE_MISS = "cache Miss ",
-            GET_LIST_OFFLINE_FIRST = "getListOffLineFirst", GET_OBJECT_OFFLINE_FIRST = "getObjectOffLineFirst";
+    private static final String CACHE_HIT = "cache Hit ";
+    private static final String CACHE_MISS = "cache Miss ";
+    private static final String GET_LIST_OFFLINE_FIRST = "getListOffLineFirst";
+    private static final String GET_OBJECT_OFFLINE_FIRST = "getObjectOffLineFirst";
     private final DataStoreFactory mDataStoreFactory;
     private final Scheduler mPostExecutionThread;
     private final Scheduler mBackgroundThread;
@@ -77,11 +79,11 @@ class DataService implements IDataService {
             final String url = getRequest.getUrl();
             final String simpleName = dataClass.getSimpleName();
             final Flowable<M> dynamicGetObject = mDataStoreFactory.dynamically(url, dataClass)
-                                                            .dynamicGetObject(url, getRequest.getIdColumnName(), itemId, getRequest.getIdType(),
-                                                                    dataClass, getRequest.isPersist(), shouldCache);
+                    .dynamicGetObject(url, getRequest.getIdColumnName(), itemId, getRequest.getIdType(),
+                            dataClass, getRequest.isPersist(), shouldCache);
             if (Utils.getInstance().withCache(shouldCache)) {
                 result = mDataStoreFactory.memory()
-                        .<M> getItem(String.valueOf(itemId), dataClass)
+                        .<M>getItem(String.valueOf(itemId), dataClass)
                         .doOnSuccess(m -> Log.d("getObject", CACHE_HIT + simpleName))
                         .doOnError(throwable -> Log.d("getObject", CACHE_MISS + simpleName))
                         .toFlowable()
@@ -103,7 +105,7 @@ class DataService implements IDataService {
                     .dynamicPatchObject(postRequest.getUrl(), postRequest.getIdColumnName(),
                             postRequest.getIdType(), postRequest.getObjectBundle(),
                             postRequest.getRequestType(), postRequest.getResponseType(),
-                            postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
+                            postRequest.isPersist(), postRequest.isCache());
         } catch (IllegalAccessException | JSONException e) {
             result = Flowable.error(e);
         }
@@ -118,7 +120,7 @@ class DataService implements IDataService {
                     .dynamicPostObject(postRequest.getUrl(), postRequest.getIdColumnName(),
                             postRequest.getIdType(), postRequest.getObjectBundle(),
                             postRequest.getRequestType(), postRequest.getResponseType(),
-                            postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
+                            postRequest.isPersist(), postRequest.isCache());
         } catch (IllegalAccessException | JSONException e) {
             result = Flowable.error(e);
         }
@@ -133,7 +135,7 @@ class DataService implements IDataService {
                     .dynamicPostList(postRequest.getUrl(), postRequest.getIdColumnName(),
                             postRequest.getIdType(), postRequest.getArrayBundle(),
                             postRequest.getRequestType(), postRequest.getResponseType(),
-                            postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
+                            postRequest.isPersist(), postRequest.isCache());
         } catch (IllegalAccessException | JSONException e) {
             result = Flowable.error(e);
         }
@@ -148,7 +150,7 @@ class DataService implements IDataService {
                     .dynamicPutObject(postRequest.getUrl(), postRequest.getIdColumnName(),
                             postRequest.getIdType(), postRequest.getObjectBundle(),
                             postRequest.getRequestType(), postRequest.getResponseType(),
-                            postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
+                            postRequest.isPersist(), postRequest.isCache());
         } catch (IllegalAccessException | JSONException e) {
             result = Flowable.error(e);
         }
@@ -163,7 +165,7 @@ class DataService implements IDataService {
                     .dynamicPutList(postRequest.getUrl(), postRequest.getIdColumnName(),
                             postRequest.getIdType(), postRequest.getArrayBundle(),
                             postRequest.getRequestType(), postRequest.getResponseType(),
-                            postRequest.isPersist(), postRequest.isCache(), postRequest.isQueuable());
+                            postRequest.isPersist(), postRequest.isCache());
         } catch (IllegalAccessException | JSONException e) {
             result = Flowable.error(e);
         }
@@ -178,9 +180,6 @@ class DataService implements IDataService {
                 .idColumnName(request.getIdColumnName(), request.getIdType())
                 .responseType(request.getResponseType())
                 .fullUrl(request.getUrl());
-        //        if (request.isQueuable()) {
-        //            builder.queuable(request.isOnWifi(), request.isWhileCharging());
-        //        }
         return deleteCollectionByIds(builder.build());
     }
 
@@ -192,7 +191,7 @@ class DataService implements IDataService {
                     .<M>dynamicDeleteCollection(deleteRequest.getUrl(), deleteRequest.getIdColumnName(),
                             deleteRequest.getIdType(), deleteRequest.getArrayBundle(),
                             deleteRequest.getRequestType(), deleteRequest.getResponseType(),
-                            deleteRequest.isPersist(), deleteRequest.isCache(), deleteRequest.isQueuable())
+                            deleteRequest.isPersist(), deleteRequest.isCache())
                     .compose(applySchedulers());
         } catch (IllegalAccessException | JSONException e) {
             result = Flowable.error(e);
@@ -218,7 +217,7 @@ class DataService implements IDataService {
     public <M> Flowable<List<M>> queryDisk(RealmQueryProvider realmQueryProvider) {
         Flowable<List<M>> result;
         try {
-            result = mDataStoreFactory.disk(Object.class).<M> queryDisk(realmQueryProvider)
+            result = mDataStoreFactory.disk(Object.class).<M>queryDisk(realmQueryProvider)
                     .compose(ReplayingShare.instance());
         } catch (IllegalAccessException e) {
             result = Flowable.error(e);
@@ -239,15 +238,15 @@ class DataService implements IDataService {
             boolean withDisk = utils.withDisk(persist);
             boolean withCache = utils.withCache(shouldCache);
             Flowable<List<M>> cloud = mDataStoreFactory.cloud(dataClass)
-                                                       .dynamicGetList(getRequest.getUrl(), idColumnName, dataClass, persist, shouldCache);
+                    .dynamicGetList(getRequest.getUrl(), idColumnName, dataClass, persist, shouldCache);
             Flowable<List<M>> disk = mDataStoreFactory.disk(dataClass)
-                    .<M> dynamicGetList("", idColumnName, dataClass, persist, shouldCache)
+                    .<M>dynamicGetList("", idColumnName, dataClass, persist, shouldCache)
                     .doOnNext(m -> Log.d(GET_LIST_OFFLINE_FIRST, "Disk Hit " + simpleName))
                     .doOnError(throwable -> Log.e(GET_LIST_OFFLINE_FIRST, "Disk Miss " + simpleName,
                             throwable))
                     .flatMap(m -> m.isEmpty() ? cloud : Flowable.just(m))
                     .onErrorResumeNext(t -> cloud);
-            Flowable<List<M>> memory = mDataStoreFactory.memory().<M> getAllItems(dataClass)
+            Flowable<List<M>> memory = mDataStoreFactory.memory().<M>getAllItems(dataClass)
                     .doOnSuccess(m -> Log.d(GET_LIST_OFFLINE_FIRST, CACHE_HIT + simpleName))
                     .doOnError(throwable -> Log.d(GET_LIST_OFFLINE_FIRST, CACHE_MISS + simpleName))
                     .toFlowable()
@@ -280,17 +279,17 @@ class DataService implements IDataService {
             boolean withDisk = utils.withDisk(persist);
             boolean withCache = utils.withCache(shouldCache);
             Flowable<M> cloud = mDataStoreFactory.cloud(dataClass)
-                    .<M> dynamicGetObject(getRequest.getUrl(), idColumnName, itemId, idType, dataClass,
+                    .<M>dynamicGetObject(getRequest.getUrl(), idColumnName, itemId, idType, dataClass,
                             persist, shouldCache)
                     .doOnNext(m -> Log.d(GET_OBJECT_OFFLINE_FIRST, "Cloud Hit " + simpleName));
             Flowable<M> disk = mDataStoreFactory.disk(dataClass)
-                    .<M> dynamicGetObject("", idColumnName, itemId, idType, dataClass, persist, shouldCache)
+                    .<M>dynamicGetObject("", idColumnName, itemId, idType, dataClass, persist, shouldCache)
                     .doOnNext(m -> Log.d(GET_OBJECT_OFFLINE_FIRST, "Disk Hit " + simpleName))
                     .doOnError(throwable -> Log.e(GET_OBJECT_OFFLINE_FIRST, "Disk Miss " + simpleName,
                             throwable))
                     .onErrorResumeNext(t -> cloud);
             Flowable<M> memory = mDataStoreFactory.memory()
-                    .<M> getItem(String.valueOf(itemId), dataClass)
+                    .<M>getItem(String.valueOf(itemId), dataClass)
                     .doOnSuccess(m -> Log.d(GET_OBJECT_OFFLINE_FIRST, CACHE_HIT + simpleName))
                     .doOnError(throwable -> Log.d(GET_OBJECT_OFFLINE_FIRST, CACHE_MISS + simpleName))
                     .toFlowable()
@@ -311,19 +310,16 @@ class DataService implements IDataService {
     @Override
     public <M> Flowable<M> uploadFile(@NonNull FileIORequest fileIORequest) {
         return mDataStoreFactory.cloud(fileIORequest.getDataClass())
-                .<M> dynamicUploadFile(fileIORequest.getUrl(), fileIORequest.getKeyFileMap(),
-                        fileIORequest.getParameters(), fileIORequest.isOnWifi(),
-                        fileIORequest.isWhileCharging(), fileIORequest.isQueuable(),
-                        fileIORequest.getDataClass())
+                .<M>dynamicUploadFile(fileIORequest.getUrl(), fileIORequest.getKeyFileMap(),
+                        fileIORequest.getParameters(), fileIORequest.getDataClass())
                 .compose(applySchedulers());
     }
 
     @Override
     public Flowable<File> downloadFile(@NonNull FileIORequest fileIORequest) {
         return mDataStoreFactory.cloud(fileIORequest.getDataClass())
-                    .dynamicDownloadFile(fileIORequest.getUrl(), fileIORequest.getFile(),
-                            fileIORequest.isOnWifi(), fileIORequest.isWhileCharging(),
-                            fileIORequest.isQueuable()).compose(applySchedulers());
+                .dynamicDownloadFile(fileIORequest.getUrl(), fileIORequest.getFile())
+                .compose(applySchedulers());
     }
 
     /**
