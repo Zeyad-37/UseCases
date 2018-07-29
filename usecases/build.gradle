@@ -3,11 +3,11 @@ apply plugin: 'realm-android'
 apply plugin: "net.ltgt.errorprone"
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 26
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "com.zeyad.usecases.integration.AndroidRobolectricRunner"
@@ -67,42 +67,42 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     //Job Dispatcher
-    compile 'com.firebase:firebase-jobdispatcher:0.7.0'
+    implementation 'com.firebase:firebase-jobdispatcher:0.7.0'
     // Network
-    compile "com.squareup.retrofit2:retrofit:$retrofit"
-    compile "com.squareup.retrofit2:converter-gson:$retrofit"
-    compile "com.squareup.retrofit2:adapter-rxjava2:$retrofit"
-    compile "com.squareup.okhttp3:okhttp:$okhttpVersion"
-    compile "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
-    compile "com.android.support:support-annotations:$supportLibrary"
+    implementation "com.squareup.retrofit2:retrofit:$retrofit"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofit"
+    implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
+    implementation "com.android.support:support-annotations:$supportLibrary"
     // Rx
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex.rxjava2:rxjava:2.1.7'
-    testCompile 'io.reactivex:rxandroid:1.2.1'
+    api 'io.reactivex.rxjava2:rxandroid:2.0.2'
+    api 'io.reactivex.rxjava2:rxjava:2.1.16'
+    testImplementation 'io.reactivex:rxandroid:1.2.1'
     // Cache
-    compile('com.github.Zeyad-37:Storo:2.1.0') {
+    implementation('com.github.Zeyad-37:Storo:2.1.0') {
         transitive = true
     }
-    compile 'com.rollbar:rollbar-android:0.2.1'
-    compile "nl.littlerobots.rxlint:rxlint:$rxlint"
+    implementation 'com.rollbar:rollbar-android:0.2.1'
+    implementation "nl.littlerobots.rxlint:rxlint:$rxlint"
     // Testing
-    testCompile 'junit:junit:4.12'
-    testCompile "com.android.support:support-annotations:$supportLibrary"
-    testCompile "org.mockito:mockito-core:$mockito"
-    testCompile "org.robolectric:robolectric:$robolectric"
-//    testCompile "org.robolectric:shadows-support-v4:$robolectric"
+    testImplementation 'junit:junit:4.12'
+    testImplementation "com.android.support:support-annotations:$supportLibrary"
+    testImplementation "org.mockito:mockito-core:$mockito"
+    testImplementation "org.robolectric:robolectric:$robolectric"
+//    testImplementation "org.robolectric:shadows-support-v4:$robolectric"
 
-    testCompile "org.powermock:powermock-module-junit4:$powerMock"
-    testCompile "org.powermock:powermock-module-junit4-rule:$powerMock"
-    testCompile "org.powermock:powermock-api-mockito:$powerMock"
-    testCompile "org.powermock:powermock-classloading-xstream:$powerMock"
+    testImplementation "org.powermock:powermock-module-junit4:$powerMock"
+    testImplementation "org.powermock:powermock-module-junit4-rule:$powerMock"
+    testImplementation "org.powermock:powermock-api-mockito:$powerMock"
+    testImplementation "org.powermock:powermock-classloading-xstream:$powerMock"
 
-//    testCompile "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
-    testCompile 'com.github.andrzejchm.RESTMock:android:0.2.2'
+//    testImplementation "com.squareup.okhttp3:mockwebserver:$okhttpVersion"
+    testImplementation 'com.github.andrzejchm.RESTMock:android:0.2.2'
     //required to resolve robolectric test problems
-    testCompile("com.jakewharton.espresso:okhttp3-idling-resource:$okhttpIdelingResource") {
+    testImplementation("com.jakewharton.espresso:okhttp3-idling-resource:$okhttpIdelingResource") {
         exclude group: 'com.android.support'
     }
 }
