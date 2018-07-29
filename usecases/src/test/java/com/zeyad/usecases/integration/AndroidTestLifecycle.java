@@ -15,7 +15,7 @@ import io.appflate.restmock.android.AndroidLogger;
 /**
  * @author by ZIaDo on 6/17/17.
  */
-class AndroidTestLifecycle extends DefaultTestLifecycle {
+public class AndroidTestLifecycle extends DefaultTestLifecycle {
 
     @Override
     public Application createApplication(Method method, AndroidManifest appManifest, Config config) {

@@ -1,8 +1,9 @@
 package com.zeyad.usecases.app.screens.user.list;
 
+import com.zeyad.gadapter.ItemInfo;
 import com.zeyad.rxredux.core.redux.BaseEvent;
 import com.zeyad.rxredux.core.redux.BaseViewModel;
-import com.zeyad.rxredux.core.redux.SuccessStateAccumulator;
+import com.zeyad.rxredux.core.redux.StateReducer;
 import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.screens.user.list.events.DeleteUsersEvent;
 import com.zeyad.usecases.app.screens.user.list.events.GetPaginatedUsersEvent;
@@ -16,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import io.reactivex.Flowable;
+import io.reactivex.Observable;
 import io.reactivex.functions.BiFunction;
 import io.reactivex.functions.Function;
 
@@ -30,25 +32,59 @@ public class UserListVM extends BaseViewModel<UserListState> {
     private IDataService dataUseCase;
 
     @Override
-    public void init(SuccessStateAccumulator<UserListState> successStateAccumulator,
-                     UserListState initialState, Object... otherDependencies) {
-        dataUseCase = (IDataService) otherDependencies[0];
-        setSuccessStateAccumulator(successStateAccumulator);
-        setInitialState(initialState);
+    public void init(Object... otherDependencies) {
+        if (dataUseCase == null) {
+            dataUseCase = (IDataService) otherDependencies[0];
+        }
     }
 
     @Override
-    public Function<BaseEvent, Flowable<?>> mapEventsToExecutables() {
-        return event -> {
-            Flowable executable = Flowable.empty();
-            if (event instanceof GetPaginatedUsersEvent) {
-                executable = getUsers(((GetPaginatedUsersEvent) event).getLastId());
-            } else if (event instanceof DeleteUsersEvent) {
-                executable = deleteCollection(((DeleteUsersEvent) event).getSelectedItemsIds());
-            } else if (event instanceof SearchUsersEvent) {
-                executable = search(((SearchUsersEvent) event).getQuery());
+    public StateReducer<UserListState> stateReducer() {
+        return (newResult, event, currentStateBundle) -> {
+            List resultList = (List) newResult;
+            List<User> users;
+            if (currentStateBundle == null || currentStateBundle.getUsers() == null)
+                users = new ArrayList<>();
+            else users = Observable.fromIterable(currentStateBundle.getUsers())
+                    .map(ItemInfo::<User>getData).toList().blockingGet();
+            List<User> searchList = new ArrayList<>();
+            switch (event) {
+                case "GetPaginatedUsersEvent":
+                    users.addAll(resultList);
+                    break;
+                case "SearchUsersEvent":
+                    searchList.addAll(resultList);
+                    break;
+                case "DeleteUsersEvent":
+                    users = Observable.fromIterable(users)
+                            .filter(user -> !resultList.contains((long) user.getId()))
+                            .distinct()
+                            .toList()
+                            .blockingGet();
+                    break;
+                default:
+                    break;
             }
-            return executable;
+            int lastId = users.get(users.size() - 1).getId();
+            users = new ArrayList<>(new HashSet<>(users));
+            Collections.sort(users, (user1, user2) ->
+                    String.valueOf(user1.getId()).compareTo(String.valueOf(user2.getId())));
+            return UserListState.builder().users(users).searchList(searchList).lastId(lastId).build();
+        };
+    }
+
+    @Override
+    protected Function<BaseEvent, Flowable<?>> mapEventsToActions() {
+        return event -> {
+            Flowable action = Flowable.empty();
+            if (event instanceof GetPaginatedUsersEvent) {
+                action = getUsers(((GetPaginatedUsersEvent) event).getPayLoad());
+            } else if (event instanceof DeleteUsersEvent) {
+                action = deleteCollection(((DeleteUsersEvent) event).getPayLoad());
+            } else if (event instanceof SearchUsersEvent) {
+                action = search(((SearchUsersEvent) event).getPayLoad());
+            }
+            return action;
         };
     }
 
@@ -88,10 +124,11 @@ public class UserListVM extends BaseViewModel<UserListState> {
 
     public Flowable<List<String>> deleteCollection(List<String> selectedItemsIds) {
         return dataUseCase.deleteCollectionByIds(new PostRequest.Builder(User.class, true)
+                //                .url(USER)
                 .payLoad(selectedItemsIds)
                 .idColumnName(User.LOGIN, String.class)
                 .cache()
-                .queuable(false, false)
+                //                .queuable(false, false)
                 .build())
                 .map(o -> selectedItemsIds);
     }

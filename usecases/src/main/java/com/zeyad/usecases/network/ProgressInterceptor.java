@@ -23,7 +23,7 @@ public abstract class ProgressInterceptor implements Interceptor {
     public Response intercept(@NonNull Chain chain) throws IOException {
         Response originalResponse = chain.proceed(chain.request());
         Response.Builder responseBuilder = originalResponse.newBuilder();
-        if (isUpDownload(originalResponse)) {
+        if (isFileIO(originalResponse)) {
             responseBuilder.body(new ProgressResponseBody(originalResponse.body(), progressListener));
         } else {
             responseBuilder.body(originalResponse.body());
@@ -31,6 +31,6 @@ public abstract class ProgressInterceptor implements Interceptor {
         return responseBuilder.build();
     }
 
-    public abstract boolean isUpDownload(Response originalResponse);
+    public abstract boolean isFileIO(Response originalResponse);
 
 }

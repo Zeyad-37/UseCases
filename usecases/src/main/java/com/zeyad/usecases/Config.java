@@ -22,15 +22,13 @@ public final class Config {
     private static Config sInstance;
     private static Gson mGson;
     private static String mBaseURL;
-    private static boolean withCache, withRealm;
-    private static int cacheAmount;
     private static TimeUnit cacheTimeUnit;
     private static Scheduler backgroundThread;
     private static ApiConnection apiConnection;
     private static CloudStore cloudStore;
-    private static boolean withSQLite;
+    private static boolean withCache, withRealm, withSQLite, mUseApiWithCache;
+    private static int cacheAmount;
     private Context mContext;
-    private boolean mUseApiWithCache;
 
     private Config(@NonNull Context context) {
         mContext = context;

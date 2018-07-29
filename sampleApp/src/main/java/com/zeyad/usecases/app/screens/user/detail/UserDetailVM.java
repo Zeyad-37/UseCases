@@ -2,7 +2,7 @@ package com.zeyad.usecases.app.screens.user.detail;
 
 import com.zeyad.rxredux.core.redux.BaseEvent;
 import com.zeyad.rxredux.core.redux.BaseViewModel;
-import com.zeyad.rxredux.core.redux.SuccessStateAccumulator;
+import com.zeyad.rxredux.core.redux.StateReducer;
 import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.utils.Utils;
 import com.zeyad.usecases.requests.GetRequest;
@@ -22,11 +22,24 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> {
     private IDataService dataUseCase;
 
     @Override
-    public void init(SuccessStateAccumulator<UserDetailState> successStateAccumulator,
-                     UserDetailState initialState, Object... otherDependencies) {
-        setSuccessStateAccumulator(successStateAccumulator);
-        setInitialState(initialState);
-        dataUseCase = (IDataService) otherDependencies[0];
+    public void init(Object... otherDependencies) {
+        if (dataUseCase == null) {
+            dataUseCase = (IDataService) otherDependencies[0];
+        }
+    }
+
+    @Override
+    public StateReducer<UserDetailState> stateReducer() {
+        return (newResult, event, currentStateBundle) -> UserDetailState.builder()
+                .setRepos((List<Repository>) newResult)
+                .setUser(currentStateBundle.getUserLogin())
+                .setIsTwoPane(currentStateBundle.isTwoPane())
+                .build();
+    }
+
+    @Override
+    protected Function<BaseEvent, Flowable<?>> mapEventsToActions() {
+        return event -> getRepositories(((GetReposEvent) event).getPayLoad());
     }
 
     public Flowable<List<Repository>> getRepositories(String userLogin) {
@@ -37,10 +50,5 @@ public class UserDetailVM extends BaseViewModel<UserDetailState> {
                                 .url(String.format(REPOSITORIES, userLogin))
                                 .build())) :
                 Flowable.error(new IllegalArgumentException("User name can not be empty"));
-    }
-
-    @Override
-    public Function<BaseEvent, Flowable<?>> mapEventsToExecutables() {
-        return event -> getRepositories(((GetReposEvent) event).getLogin());
     }
 }

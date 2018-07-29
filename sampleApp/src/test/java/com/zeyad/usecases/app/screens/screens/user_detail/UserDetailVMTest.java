@@ -1,9 +1,7 @@
 package com.zeyad.usecases.app.screens.screens.user_detail;
 
-import com.zeyad.rxredux.core.redux.SuccessStateAccumulator;
 import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.app.screens.user.detail.Repository;
-import com.zeyad.usecases.app.screens.user.detail.UserDetailState;
 import com.zeyad.usecases.app.screens.user.detail.UserDetailVM;
 import com.zeyad.usecases.db.RealmQueryProvider;
 
@@ -33,11 +31,10 @@ public class UserDetailVMTest {
     public void setUp() throws Exception {
         mockDataUseCase = mock(IDataService.class);
         userDetailVM = new UserDetailVM();
-        userDetailVM.init(
-                mock(SuccessStateAccumulator.class), mock(UserDetailState.class), mockDataUseCase);
+        userDetailVM.init(mockDataUseCase);
 
         repository = new Repository();
-        repository.setFullName("testUser");
+        repository.setName("testUser");
         repository.setId(1);
     }
 

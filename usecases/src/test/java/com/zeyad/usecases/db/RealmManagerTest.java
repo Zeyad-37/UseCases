@@ -21,7 +21,6 @@ import org.robolectric.annotation.Config;
 import java.util.ArrayList;
 
 import io.reactivex.Flowable;
-import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
@@ -46,7 +45,7 @@ public class RealmManagerTest {
         Realm mockRealm = mock(Realm.class);
         RealmQuery<TestRealmModel> realmQuery = mock(RealmQuery.class);
         RealmResults<TestRealmModel> realmResults = mock(RealmResults.class);
-        Observable observable = Observable.just(realmResults);
+//        Observable observable = Observable.just(realmResults);
         PowerMockito.when(mockRealm.where(TestRealmModel.class)).thenReturn(realmQuery);
         PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", 1L))
                 .thenReturn(realmQuery);

@@ -2,14 +2,15 @@ package com.zeyad.usecases.integration;
 
 import android.support.test.rule.BuildConfig;
 
+import com.zeyad.usecases.ImmediateSchedulersRule;
 import com.zeyad.usecases.api.DataServiceConfig;
 import com.zeyad.usecases.api.DataServiceFactory;
 import com.zeyad.usecases.api.IDataService;
 import com.zeyad.usecases.requests.GetRequest;
 import com.zeyad.usecases.requests.PostRequest;
 
-import org.assertj.core.util.Arrays;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
@@ -33,11 +34,14 @@ import static io.appflate.restmock.utils.RequestMatchers.pathContains;
 @RunWith(AndroidRobolectricRunner.class)
 @Config(constants = BuildConfig.class, sdk = 25, application = TestApplication.class)
 public class APIIntegrationTest {
+
     private final static String userResponse = "{\"login\": \"Zeyad-37\", \"id\": 5938141, \"avatar_url\": " +
             "\"https://avatars2.githubusercontent.com/u/5938141?v=3\"}",
             userListResponse = "[" + userResponse + ", " + userResponse + "]",
             SUCCESS = "{\"success\": \"true\"}";
     private final static Success success = new Success(true);
+    @Rule
+    public final ImmediateSchedulersRule testSchedulerRule = new ImmediateSchedulersRule();
     private IDataService dataService;
     private User testUser;
     private List<User> users;
@@ -62,13 +66,13 @@ public class APIIntegrationTest {
 
     @Test
     public void testValidUser() throws Exception {
-        String getUserPath = "users/Zeyad-37";
+        final String getUserPath = "users/Zeyad-37";
         RESTMockServer.whenGET(pathContains(getUserPath))
                       .thenReturn(new MockResponse()
                               .setResponseCode(HttpURLConnection.HTTP_OK)
                               .setBody(userResponse));
 
-        TestSubscriber<User> testSubscriber = new TestSubscriber<>();
+        final TestSubscriber<User> testSubscriber = new TestSubscriber<>();
         dataService.<User> getObject(new GetRequest.Builder(User.class, false)
                 .url(getUserPath)
                 .id("Zeyad-37", User.LOGIN, String.class)
@@ -284,11 +288,14 @@ public class APIIntegrationTest {
                       .thenReturn(new MockResponse()
                               .setResponseCode(HttpURLConnection.HTTP_OK)
                               .setBody(SUCCESS));
-
+        List<String> payload = new ArrayList<>(2);
+        payload.add("Zeyad-37");
+        payload.add("Zeyad-37");
         TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
         dataService.<Success> deleteCollectionByIds(new PostRequest.Builder(User.class, false)
                 .url(path)
-                .payLoad(Arrays.array("Zeyad-37", "Zeyad-37"))
+//                .payLoad(Arrays.array("Zeyad-37", "Zeyad-37"))
+                .payLoad(payload)
                 .idColumnName(User.LOGIN, String.class)
                 .responseType(Success.class)
                 .build())
