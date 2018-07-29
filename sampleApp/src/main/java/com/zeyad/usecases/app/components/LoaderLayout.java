@@ -12,7 +12,9 @@ import android.widget.TextView;
 
 import com.zeyad.usecases.app.R;
 
-/** Layout used to wrap another content layout and to show status text and progress bar. */
+/**
+ * Layout used to wrap another content layout and to show status text and progress bar.
+ */
 public class LoaderLayout extends FrameLayout implements View.OnClickListener {
 
     private ProgressBar mProgressBar;

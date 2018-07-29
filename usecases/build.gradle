@@ -54,11 +54,6 @@ android {
         exclude 'META-INF/rxjava.properties'
     }
 
-    if (project.hasProperty('devBuild')) {
-        splits.abi.enable = false
-        splits.density.enable = false
-        aaptOptions.cruncherEnabled = false
-    }
     sourceSets {
         main {
             assets.srcDirs = ['src/main/assets', 'src/main/java/com/zeyad/usecases/assets', 'src/test/java/com/zeyad/usecases/assets']

@@ -13,7 +13,9 @@ import io.reactivex.Scheduler;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 
-/** @author by ZIaDo on 12/9/16. */
+/**
+ * @author by ZIaDo on 12/9/16.
+ */
 public class DataServiceConfig {
 
     private final Context context;

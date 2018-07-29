@@ -22,7 +22,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-/** @author by ZIaDo on 2/7/17. */
+/**
+ * @author by ZIaDo on 2/7/17.
+ */
 public class UserListVMTest {
 
     private IDataService mockDataUseCase;

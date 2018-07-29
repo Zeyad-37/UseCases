@@ -10,6 +10,7 @@ import org.junit.Test;
  */
 public class MemoryStoreTest { // TODO: 6/15/17 test ids
     private MemoryStore memoryStore;
+
     @Before
     public void setUp() throws Exception {
         memoryStore = new MemoryStore(new Gson());

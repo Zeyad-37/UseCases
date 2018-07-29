@@ -46,7 +46,8 @@ import static org.mockito.Mockito.when;
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
 public class PostTest {
-    @Nullable private final ResponseBody RESPONSE_BODY = mock(ResponseBody.class);
+    @Nullable
+    private final ResponseBody RESPONSE_BODY = mock(ResponseBody.class);
     private final InputStream INPUT_STREAM = mock(InputStream.class);
     private final TestRealmModel TEST_MODEL = new TestRealmModel(1, "123");
     private Context mockedContext;

@@ -2,7 +2,9 @@ package com.zeyad.usecases.exceptions;
 
 import android.support.annotation.NonNull;
 
-/** Exception throw by the application when a there is a network connection exception. */
+/**
+ * Exception throw by the application when a there is a network connection exception.
+ */
 public class NetworkConnectionException extends Exception implements IErrorBundle {
 
     public NetworkConnectionException() {

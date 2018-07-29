@@ -7,7 +7,9 @@ import android.support.annotation.NonNull;
 import java.io.File;
 import java.util.HashMap;
 
-/** @author zeyad on 7/29/16. */
+/**
+ * @author zeyad on 7/29/16.
+ */
 public class FileIORequest implements Parcelable {
 
     public static final Parcelable.Creator<FileIORequest> CREATOR =

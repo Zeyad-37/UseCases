@@ -31,13 +31,17 @@ import io.realm.RealmResults;
 
 import static org.powermock.api.mockito.PowerMockito.mock;
 
-/** @author by ZIaDo on 2/15/17. */
+/**
+ * @author by ZIaDo on 2/15/17.
+ */
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 19)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @PrepareForTest({Realm.class, RealmQuery.class, RealmResults.class})
 public class RealmManagerTest {
-    @Rule public PowerMockRule rule = new PowerMockRule();
+
+    @Rule
+    public PowerMockRule rule = new PowerMockRule();
     private RealmManager mRealmManager;
 
     public Realm mockRealm() {
@@ -47,6 +51,7 @@ public class RealmManagerTest {
         RealmResults<TestRealmModel> realmResults = mock(RealmResults.class);
 //        Observable observable = Observable.just(realmResults);
         PowerMockito.when(mockRealm.where(TestRealmModel.class)).thenReturn(realmQuery);
+
         PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", 1L))
                 .thenReturn(realmQuery);
         TestRealmModel value = new TestRealmModel();

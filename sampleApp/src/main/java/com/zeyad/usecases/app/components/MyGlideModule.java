@@ -6,7 +6,9 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.GlideBuilder;
 import com.bumptech.glide.module.GlideModule;
 
-/** @author by ZIaDo on 4/18/17. */
+/**
+ * @author by ZIaDo on 4/18/17.
+ */
 public class MyGlideModule implements GlideModule {
     @Override
     public void applyOptions(Context context, GlideBuilder builder) {

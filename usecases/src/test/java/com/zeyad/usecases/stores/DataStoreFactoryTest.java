@@ -48,8 +48,8 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-            testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidAndNetWorkNotAvailable()
-                    throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidAndNetWorkNotAvailable()
+            throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
@@ -57,8 +57,8 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-            testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkNotAvailable()
-                    throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkNotAvailable()
+            throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
@@ -66,8 +66,8 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-            testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkIsAvailable()
-                    throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkIsAvailable()
+            throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
@@ -82,8 +82,8 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-            testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItem()
-                    throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItem()
+            throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
@@ -91,8 +91,8 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-            testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItemAndNetWorkNotAvailable()
-                    throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItemAndNetWorkNotAvailable()
+            throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
@@ -100,8 +100,8 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-            testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkNotAvailable()
-                    throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkNotAvailable()
+            throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
@@ -109,8 +109,8 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-            testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkIsAvailable()
-                    throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkIsAvailable()
+            throws Exception {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));

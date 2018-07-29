@@ -34,7 +34,6 @@ android {
 
     buildTypes {
         debug {
-            ext.alwaysUpdateBuildId = false
             minifyEnabled false
             shrinkResources false
             debuggable true
@@ -80,19 +79,8 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/rxjava.properties'
     }
-
-    if (project.hasProperty('devBuild')) {
-        splits.abi.enable = false
-        splits.density.enable = false
-        aaptOptions.cruncherEnabled = false
-    }
-
-    sourceSets {
-        main {
-            assets.srcDirs = ['src/main/assets', 'src/androidTest/java/com/zeyad/usecases/app/assets/']
-        }
-    }
 }
+
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])

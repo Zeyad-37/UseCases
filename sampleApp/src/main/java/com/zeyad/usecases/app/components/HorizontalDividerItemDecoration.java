@@ -11,7 +11,9 @@ public class HorizontalDividerItemDecoration extends RecyclerView.ItemDecoration
 
     private final Drawable mDivider;
 
-    /** Custom divider will be used */
+    /**
+     * Custom divider will be used
+     */
     public HorizontalDividerItemDecoration(Context context, int resId) {
         mDivider = ContextCompat.getDrawable(context, resId);
     }

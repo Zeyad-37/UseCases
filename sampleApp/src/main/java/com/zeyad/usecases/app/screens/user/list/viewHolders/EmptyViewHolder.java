@@ -5,7 +5,9 @@ import android.view.View;
 import com.zeyad.gadapter.GenericRecyclerViewAdapter;
 
 
-/** @author zeyad on 11/29/16. */
+/**
+ * @author zeyad on 11/29/16.
+ */
 public class EmptyViewHolder extends GenericRecyclerViewAdapter.ViewHolder {
 
     public EmptyViewHolder(View itemView) {
