@@ -247,13 +247,12 @@ class DataService implements IDataService {
                             throwable))
                     .flatMap(m -> m.isEmpty() ? cloud : Flowable.just(m))
                     .onErrorResumeNext(t -> cloud);
-            Flowable<List<M>> memory = mDataStoreFactory.memory().<M> getAllItems(dataClass)
-                    .doOnSuccess(m -> Log.d(GET_LIST_OFFLINE_FIRST, CACHE_HIT + simpleName))
-                    .doOnError(throwable -> Log.d(GET_LIST_OFFLINE_FIRST, CACHE_MISS + simpleName))
-                    .toFlowable()
-                    .onErrorResumeNext(throwable -> withDisk ? disk : cloud);
             if (withCache) {
-                result = memory;
+                result = mDataStoreFactory.memory().<M>getAllItems(dataClass)
+                        .doOnSuccess(m -> Log.d(GET_LIST_OFFLINE_FIRST, CACHE_HIT + simpleName))
+                        .doOnError(throwable -> Log.d(GET_LIST_OFFLINE_FIRST, CACHE_MISS + simpleName))
+                        .toFlowable()
+                        .onErrorResumeNext(throwable -> withDisk ? disk : cloud);
             } else if (withDisk) {
                 result = disk;
             } else {
@@ -289,14 +288,13 @@ class DataService implements IDataService {
                     .doOnError(throwable -> Log.e(GET_OBJECT_OFFLINE_FIRST, "Disk Miss " + simpleName,
                             throwable))
                     .onErrorResumeNext(t -> cloud);
-            Flowable<M> memory = mDataStoreFactory.memory()
-                    .<M> getItem(String.valueOf(itemId), dataClass)
-                    .doOnSuccess(m -> Log.d(GET_OBJECT_OFFLINE_FIRST, CACHE_HIT + simpleName))
-                    .doOnError(throwable -> Log.d(GET_OBJECT_OFFLINE_FIRST, CACHE_MISS + simpleName))
-                    .toFlowable()
-                    .onErrorResumeNext(t -> withDisk ? disk : cloud);
             if (withCache) {
-                result = memory;
+                result = mDataStoreFactory.memory()
+                        .<M>getItem(String.valueOf(itemId), dataClass)
+                        .doOnSuccess(m -> Log.d(GET_OBJECT_OFFLINE_FIRST, CACHE_HIT + simpleName))
+                        .doOnError(throwable -> Log.d(GET_OBJECT_OFFLINE_FIRST, CACHE_MISS + simpleName))
+                        .toFlowable()
+                        .onErrorResumeNext(t -> withDisk ? disk : cloud);
             } else if (withDisk) {
                 result = disk;
             } else {

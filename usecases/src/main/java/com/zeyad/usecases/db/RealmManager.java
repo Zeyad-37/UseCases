@@ -63,8 +63,10 @@ public class RealmManager implements DataBaseManager {
             return realm.where(clazz).findAll().asFlowable()
                     .filter(o -> ((RealmResults) o).isLoaded())
                     .map(o -> realm.copyFromRealm((RealmResults) o))
-                    .flatMap(o -> ((RealmResults) o).isEmpty() ? Flowable.error(new IllegalAccessException(String
-                            .format("%s(s) were not found!", clazz.getSimpleName()))) : Flowable.just(o));
+                    .flatMap(o -> ((List) o).isEmpty() ?
+                            Flowable.error(new IllegalAccessException(String
+                                    .format("%s(s) were not found!", clazz.getSimpleName())))
+                            : Flowable.just(o));
         });
     }
 
@@ -96,10 +98,9 @@ public class RealmManager implements DataBaseManager {
     @Override
     // TODO: 6/13/17 Remove ? remove : create flow
     public <M extends RealmModel> Single<Boolean> put(@NonNull M realmModel, @NonNull Class dataClass) {
-        return Single.fromCallable(() -> {
-            return RealmObject.isValid(executeWriteOperationInRealm(Realm.getDefaultInstance(),
-                    (ExecuteAndReturn<M>) realm -> realm.copyToRealmOrUpdate(realmModel)));
-        });
+        return Single.fromCallable(() ->
+                RealmObject.isValid(executeWriteOperationInRealm(Realm.getDefaultInstance(),
+                        (ExecuteAndReturn<M>) realm -> realm.copyToRealmOrUpdate(realmModel))));
     }
 
 
@@ -117,10 +118,11 @@ public class RealmManager implements DataBaseManager {
             if (jsonObject == null) {
                 throw new IllegalArgumentException("JSONObject is invalid");
             } else {
-                final JSONObject updatedJSON = updateJsonObjectWithIdValue(jsonObject, idColumnName, itemIdType, dataClass);
+                final JSONObject updatedJSON =
+                        updateJsonObjectWithIdValue(jsonObject, idColumnName, itemIdType, dataClass);
                 return RealmObject.isValid(executeWriteOperationInRealm(Realm.getDefaultInstance(),
-                        (ExecuteAndReturn<RealmModel>) realm -> realm.createOrUpdateObjectFromJson(dataClass,
-                                updatedJSON)));
+                        (ExecuteAndReturn<RealmModel>) realm ->
+                                realm.createOrUpdateObjectFromJson(dataClass, updatedJSON)));
             }
         });
     }
@@ -129,7 +131,8 @@ public class RealmManager implements DataBaseManager {
     @Override
     public <T extends RealmModel> Single<Boolean> putAll(List<T> realmObjects, Class dataClass) {
         return Single.fromCallable(() -> executeWriteOperationInRealm(Realm.getDefaultInstance(),
-                (ExecuteAndReturn<List<T>>) realm -> realm.copyToRealmOrUpdate(realmObjects)).size() == realmObjects.size());
+                (ExecuteAndReturn<List<T>>) realm ->
+                        realm.copyToRealmOrUpdate(realmObjects)).size() == realmObjects.size());
     }
 
     /**
@@ -144,8 +147,8 @@ public class RealmManager implements DataBaseManager {
     public Single<Boolean> putAll(@NonNull JSONArray jsonArray, String idColumnName, Class itemIdType,
                                   @NonNull Class dataClass) {
         return Single.fromCallable(() -> {
-            final JSONArray updatedJSONArray = updateJsonArrayWithIdValue(jsonArray, idColumnName, itemIdType,
-                    dataClass);
+            final JSONArray updatedJSONArray =
+                    updateJsonArrayWithIdValue(jsonArray, idColumnName, itemIdType, dataClass);
             executeWriteOperationInRealm(Realm.getDefaultInstance(), (Execute) realm ->
                     realm.createOrUpdateAllFromJson(dataClass, updatedJSONArray));
             return true;
