@@ -110,7 +110,7 @@ public class UserListActivity extends BaseActivity<UserListState, UserListVM> im
     public void initialize() {
         eventObservable = Observable.empty();
         viewModel = ViewModelProviders.of(this, new ViewModelFactory()).get(UserListVM.class);
-        viewModel.init(DataServiceFactory.getInstance());
+        viewModel.init(DataServiceFactory.INSTANCE.getInstance());
         if (viewState == null) {
             eventObservable = Single.<BaseEvent>just(new GetPaginatedUsersEvent(0))
                     .doOnSuccess(event -> Log.d("GetPaginatedUsersEvent", FIRED)).toObservable();

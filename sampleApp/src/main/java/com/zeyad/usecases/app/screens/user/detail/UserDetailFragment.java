@@ -11,7 +11,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.Snackbar;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.graphics.Palette;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,9 +22,6 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.load.resource.drawable.GlideDrawable;
-import com.bumptech.glide.request.RequestListener;
-import com.bumptech.glide.request.target.Target;
 import com.zeyad.gadapter.GenericRecyclerViewAdapter;
 import com.zeyad.gadapter.ItemInfo;
 import com.zeyad.rxredux.core.redux.BaseEvent;
@@ -102,7 +98,7 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
             viewState = Parcels.unwrap(arguments.getParcelable(UI_MODEL));
         }
         viewModel = ViewModelProviders.of(this).get(UserDetailVM.class);
-        viewModel.init(DataServiceFactory.getInstance());
+        viewModel.init(DataServiceFactory.INSTANCE.getInstance());
     }
 
     @Override
@@ -145,27 +141,27 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
 //                    .toList(repoModels.size()).blockingGet());
         }
         if (user != null) {
-            RequestListener<String, GlideDrawable> requestListener = new RequestListener<String, GlideDrawable>() {
-                @Override
-                public boolean onException(Exception e, String model, Target<GlideDrawable> target,
-                                           boolean isFirstResource) {
-                    FragmentActivity activity = getActivity();
-                    if (activity != null) {
-                        activity.supportStartPostponedEnterTransition();
-                    }
-                    return false;
-                }
-
-                @Override
-                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target,
-                                               boolean isFromMemoryCache, boolean isFirstResource) {
-                    FragmentActivity activity = getActivity();
-                    if (activity != null) {
-                        activity.supportStartPostponedEnterTransition();
-                    }
-                    return false;
-                }
-            };
+//            RequestListener<String, GlideDrawable> requestListener = new RequestListener<String, GlideDrawable>() {
+//                @Override
+//                public boolean onException(Exception e, String model, Target<GlideDrawable> target,
+//                                           boolean isFirstResource) {
+//                    FragmentActivity activity = getActivity();
+//                    if (activity != null) {
+//                        activity.supportStartPostponedEnterTransition();
+//                    }
+//                    return false;
+//                }
+//
+//                @Override
+//                public boolean onResourceReady(GlideDrawable resource, String model, Target<GlideDrawable> target,
+//                                               boolean isFromMemoryCache, boolean isFirstResource) {
+//                    FragmentActivity activity = getActivity();
+//                    if (activity != null) {
+//                        activity.supportStartPostponedEnterTransition();
+//                    }
+//                    return false;
+//                }
+//            };
             if (userDetailState.isTwoPane()) {
                 UserListActivity activity = (UserListActivity) getActivity();
                 if (activity != null) {
@@ -176,8 +172,8 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
                     if (Utils.isNotEmpty(user.getAvatarUrl())) {
                         Glide.with(getContext())
                                 .load(user.getAvatarUrl())
-                                .dontAnimate()
-                                .listener(requestListener)
+//                                .dontAnimate()
+//                                .listener(requestListener)
                                 .into(activity.imageViewAvatar);
                     }
                 }
@@ -191,8 +187,8 @@ public class UserDetailFragment extends BaseFragment<UserDetailState, UserDetail
                     if (Utils.isNotEmpty(user.getAvatarUrl())) {
                         Glide.with(getContext())
                                 .load(user.getAvatarUrl())
-                                .dontAnimate()
-                                .listener(requestListener)
+//                                .dontAnimate()
+//                                .listener(requestListener)
                                 .into(activity.imageViewAvatar);
                     }
                 }

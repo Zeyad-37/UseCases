@@ -13,7 +13,6 @@ import android.support.annotation.NonNull;
 import android.util.Base64;
 import android.util.Log;
 
-import com.rollbar.android.Rollbar;
 import com.squareup.leakcanary.LeakCanary;
 import com.squareup.leakcanary.RefWatcher;
 import com.zeyad.rxredux.core.eventbus.RxEventBusFactory;
@@ -119,12 +118,12 @@ public class GenericApplication extends Application {
                 throw new IllegalAccessException("App might be tampered with!");
             }
             //            initializeFlowUp();
-            Rollbar.init(this, "c8c8b4cb1d4f4650a77ae1558865ca87", BuildConfig.DEBUG ? "debug" : "production");
+//            Rollbar.init(this, "c8c8b4cb1d4f4650a77ae1558865ca87", BuildConfig.DEBUG ? "debug" : "production");
         }).subscribeOn(Schedulers.io())
                 .subscribe(() -> {
                 }, Throwable::printStackTrace);
         initializeRealm();
-        DataServiceFactory.init(new DataServiceConfig.Builder(this)
+        DataServiceFactory.INSTANCE.init(new DataServiceConfig.Builder(this)
                 .baseUrl(getApiBaseUrl())
                 .okHttpBuilder(getOkHttpBuilder())
                 .withCache(3, TimeUnit.MINUTES)

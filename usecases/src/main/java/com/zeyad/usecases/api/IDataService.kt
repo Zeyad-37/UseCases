@@ -1,17 +1,15 @@
-package com.zeyad.usecases.api;
+package com.zeyad.usecases.api
 
-import com.zeyad.usecases.db.RealmQueryProvider;
-import com.zeyad.usecases.requests.FileIORequest;
-import com.zeyad.usecases.requests.GetRequest;
-import com.zeyad.usecases.requests.PostRequest;
+import com.zeyad.usecases.db.RealmQueryProvider
+import com.zeyad.usecases.requests.FileIORequest
+import com.zeyad.usecases.requests.GetRequest
+import com.zeyad.usecases.requests.PostRequest
+import io.reactivex.Flowable
+import io.reactivex.Single
+import io.realm.RealmModel
+import java.io.File
 
-import java.io.File;
-import java.util.List;
-
-import io.reactivex.Flowable;
-import io.reactivex.Single;
-
-public interface IDataService {
+interface IDataService {
 
     /**
      * Gets list from getRequest.
@@ -19,7 +17,7 @@ public interface IDataService {
      * @param getListRequest contains the attributes of the request.
      * @return Flowable with the list.
      */
-    <M> Flowable<List<M>> getList(GetRequest getListRequest);
+    fun <M> getList(getListRequest: GetRequest<M>): Flowable<List<M>>
 
     /**
      * Gets object from getRequest.
@@ -27,7 +25,7 @@ public interface IDataService {
      * @param getRequest contains the attributes of the request.
      * @return Flowable with the Object.
      */
-    <M> Flowable<M> getObject(GetRequest getRequest);
+    fun <M> getObject(getRequest: GetRequest<M>): Flowable<M>
 
     /**
      * Gets object from getRequest.
@@ -35,7 +33,7 @@ public interface IDataService {
      * @param postRequest contains the attributes of the request.
      * @return Flowable with the Object.
      */
-    <M> Flowable<M> patchObject(PostRequest postRequest);
+    fun <M> patchObject(postRequest: PostRequest): Flowable<M>
 
     /**
      * Post Object to postRequest.
@@ -43,7 +41,7 @@ public interface IDataService {
      * @param postRequest contains the attributes of the request.
      * @return Flowable with the Object.
      */
-    <M> Flowable<M> postObject(PostRequest postRequest);
+    fun <M> postObject(postRequest: PostRequest): Flowable<M>
 
     /**
      * Post list to postRequest.
@@ -51,7 +49,7 @@ public interface IDataService {
      * @param postRequest contains the attributes of the request.
      * @return Flowable with the list.
      */
-    <M> Flowable<M> postList(PostRequest postRequest);
+    fun <M> postList(postRequest: PostRequest): Flowable<M>
 
     /**
      * Put Object to postRequest.
@@ -59,7 +57,7 @@ public interface IDataService {
      * @param postRequest contains the attributes of the request.
      * @return Flowable with the Object.
      */
-    <M> Flowable<M> putObject(PostRequest postRequest);
+    fun <M> putObject(postRequest: PostRequest): Flowable<M>
 
     /**
      * Put list to postRequest.
@@ -67,7 +65,7 @@ public interface IDataService {
      * @param postRequest contains the attributes of the request.
      * @return Flowable with the list.
      */
-    <M> Flowable<M> putList(PostRequest postRequest);
+    fun <M> putList(postRequest: PostRequest): Flowable<M>
 
     /**
      * Deletes item from postRequest.
@@ -75,7 +73,7 @@ public interface IDataService {
      * @param request contains the attributes of the request.
      * @return Flowable with the list.
      */
-    <M> Flowable<M> deleteItemById(PostRequest request);
+    fun <M> deleteItemById(request: PostRequest): Flowable<M>
 
     /**
      * Deletes list from postRequest.
@@ -83,7 +81,7 @@ public interface IDataService {
      * @param deleteRequest contains the attributes of the request.
      * @return Flowable with the list.
      */
-    <M> Flowable<M> deleteCollectionByIds(PostRequest deleteRequest);
+    fun <M> deleteCollectionByIds(deleteRequest: PostRequest): Flowable<M>
 
     /**
      * Deletes All.
@@ -91,7 +89,7 @@ public interface IDataService {
      * @param deleteRequest contains the attributes of the request.
      * @return Completable with the list.
      */
-    Single<Boolean> deleteAll(PostRequest deleteRequest);
+    fun deleteAll(deleteRequest: PostRequest): Single<Boolean>
 
     /**
      * Get list of items according to the query passed.
@@ -99,23 +97,23 @@ public interface IDataService {
      * @param realmQueryProvider query tp select list of item(s).
      * @return
      */
-    <M> Flowable<List<M>> queryDisk(RealmQueryProvider realmQueryProvider);
+    fun <M : RealmModel> queryDisk(realmQueryProvider: RealmQueryProvider<M>): Flowable<List<M>>
 
     /**
      * Creates a repository pattern with live objects
      *
      * @param getRequest contains the attributes of the request.
-     * @return {@link Flowable<List>} with the data.
+     * @return [<] with the data.
      */
-    <M> Flowable<List<M>> getListOffLineFirst(GetRequest getRequest);
+    fun <M> getListOffLineFirst(getRequest: GetRequest<M>): Flowable<List<M>>
 
     /**
      * Creates a repository pattern with live objects
      *
      * @param getRequest contains the attributes of the request.
-     * @return {@link Flowable>} with the data.
+     * @return [&gt;][Flowable] with the data.
      */
-    <M> Flowable<M> getObjectOffLineFirst(GetRequest getRequest);
+    fun <M> getObjectOffLineFirst(getRequest: GetRequest<M>): Flowable<M>
 
     /**
      * Uploads a file to a url.
@@ -123,7 +121,7 @@ public interface IDataService {
      * @param fileIORequest contains the attributes of the request,
      * @return Flowable with the Object response.
      */
-    <M> Flowable<M> uploadFile(FileIORequest fileIORequest);
+    fun <M> uploadFile(fileIORequest: FileIORequest): Flowable<M>
 
     /**
      * Downloads file from the give url.
@@ -131,5 +129,5 @@ public interface IDataService {
      * @param fileIORequest contains the attributes of the request,
      * @return Flowable with the ResponseBody
      */
-    Flowable<File> downloadFile(FileIORequest fileIORequest);
+    fun downloadFile(fileIORequest: FileIORequest): Flowable<File>
 }

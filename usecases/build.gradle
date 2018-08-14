@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
 apply plugin: 'realm-android'
 apply plugin: "net.ltgt.errorprone"
 
@@ -63,6 +65,7 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     //Job Dispatcher
     implementation 'com.firebase:firebase-jobdispatcher:0.7.0'
     // Network
@@ -74,7 +77,7 @@ dependencies {
     implementation "com.android.support:support-annotations:$supportLibrary"
     // Rx
     api 'io.reactivex.rxjava2:rxandroid:2.0.2'
-    api 'io.reactivex.rxjava2:rxjava:2.1.16'
+    api 'io.reactivex.rxjava2:rxjava:2.2.0'
     testImplementation 'io.reactivex:rxandroid:1.2.1'
     // Cache
     implementation('com.github.Zeyad-37:Storo:2.1.0') {
@@ -104,6 +107,9 @@ dependencies {
 
 //apply from: "$project.rootDir/tools/script-git-version.gradle"
 apply from: "$project.rootDir/tools/script-findbugs.gradle"
+repositories {
+    mavenCentral()
+}
 //apply from: "$project.rootDir/tools/script-pmd.gradle"
 //apply from: "$project.rootDir/tools/script-java-code-coverage.gradle"
 //apply from: "$project.rootDir/tools/script-infer.gradle"

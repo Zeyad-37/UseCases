@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'realm-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 27
@@ -98,6 +99,9 @@ dependencies {
     // Bootstrap
     implementation "com.github.Zeyad-37:GenericRecyclerViewAdapter:$genericRecyclerViewAdapter"
     implementation "com.github.Zeyad-37:RxRedux:$rxredux"
+    implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofit"
 
 //    implementation "android.arch.lifecycle:runtime:$archComp"
 //    implementation "android.arch.lifecycle:extensions:$archComp"
@@ -114,7 +118,7 @@ dependencies {
 //    implementation "com.trello.rxlifecycle2:rxlifecycle-components:$rxLifeCycle"
     // Injection
     implementation "com.jakewharton:butterknife:$butterKnife"
-    annotationProcessor "com.jakewharton:butterknife-implementationr:$butterKnife"
+    annotationProcessor "com.jakewharton:butterknife-implementation:$butterKnife"
     // Utilities
     implementation "nl.littlerobots.rxlint:rxlint:$rxlint"
     implementation 'com.airbnb.android:lottie:2.2.0'

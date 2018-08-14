@@ -16,7 +16,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,14 +46,14 @@ public class APIIntegrationTest {
     private List<User> users;
 
     @Before
-    public void setUp() throws IOException {
+    public void setUp() {
         RESTMockServer.reset();
-        DataServiceFactory.init(new DataServiceConfig.Builder(RuntimeEnvironment.application)
+        DataServiceFactory.INSTANCE.init(new DataServiceConfig.Builder(RuntimeEnvironment.application)
                 .baseUrl(RESTMockServer.getUrl())
                 //                .withCache(3, TimeUnit.MINUTES)
                 //                                .withRealm()
                 .build());
-        dataService = DataServiceFactory.getInstance();
+        dataService = DataServiceFactory.INSTANCE.getInstance();
         users = new ArrayList<>(2);
         testUser = new User();
         testUser.setAvatarUrl("https://avatars2.githubusercontent.com/u/5938141?v=3");
@@ -65,7 +64,7 @@ public class APIIntegrationTest {
     }
 
     @Test
-    public void testValidUser() throws Exception {
+    public void testValidUser() {
         final String getUserPath = "users/Zeyad-37";
         RESTMockServer.whenGET(pathContains(getUserPath))
                       .thenReturn(new MockResponse()
@@ -92,7 +91,7 @@ public class APIIntegrationTest {
     }
 
     @Test
-    public void testValidUserList() throws Exception {
+    public void testValidUserList() {
         String getUserListPath = "users?since=0";
         RESTMockServer.whenGET(pathContains(getUserListPath))
                       .thenReturn(new MockResponse()
@@ -119,7 +118,7 @@ public class APIIntegrationTest {
     }
 
     @Test
-    public void testPatchObject() throws Exception {
+    public void testPatchObject() {
         String path = "patch/user";
         RESTMockServer.whenPATCH(pathContains(path))
                       .thenReturn(new MockResponse()
@@ -146,7 +145,7 @@ public class APIIntegrationTest {
     }
 
     @Test
-    public void testPostObject() throws Exception {
+    public void testPostObject() {
         String path = "postObject/user";
         RESTMockServer.whenPOST(pathContains(path))
                       .thenReturn(new MockResponse()
@@ -173,7 +172,7 @@ public class APIIntegrationTest {
     }
 
     @Test
-    public void testPostList() throws Exception {
+    public void testPostList() {
         String path = "postList/users";
         RESTMockServer.whenPOST(pathContains(path))
                       .thenReturn(new MockResponse()
@@ -200,7 +199,7 @@ public class APIIntegrationTest {
     }
 
     @Test
-    public void testPutObject() throws Exception {
+    public void testPutObject() {
         String path = "putObject/user";
         RESTMockServer.whenPUT(pathContains(path))
                       .thenReturn(new MockResponse()
@@ -227,7 +226,7 @@ public class APIIntegrationTest {
     }
 
     @Test
-    public void testPutList() throws Exception {
+    public void testPutList() {
         String path = "putList/users";
         RESTMockServer.whenPUT(pathContains(path))
                       .thenReturn(new MockResponse()
@@ -254,7 +253,7 @@ public class APIIntegrationTest {
     }
 
     @Test
-    public void testDeleteItemById() throws Exception {
+    public void testDeleteItemById() {
         String path = "deleteObject/user";
         RESTMockServer.whenDELETE(pathContains(path))
                       .thenReturn(new MockResponse()
@@ -282,7 +281,7 @@ public class APIIntegrationTest {
     }
 
     @Test
-    public void testDeleteCollectionByIds() throws Exception {
+    public void testDeleteCollectionByIds() {
         String path = "deleteList/user";
         RESTMockServer.whenDELETE(pathContains(path))
                       .thenReturn(new MockResponse()
@@ -406,7 +405,7 @@ public class APIIntegrationTest {
     //        }
 
     @Test
-    public void testGetObjectOffLineFirst() throws Exception {
+    public void testGetObjectOffLineFirst() {
         String getUserPath = "users/Zeyad-37";
         RESTMockServer.whenGET(pathContains(getUserPath))
                       .thenReturn(new MockResponse()
@@ -433,7 +432,7 @@ public class APIIntegrationTest {
     }
 
     @Test
-    public void testGetListOffLineFirst() throws Exception {
+    public void testGetListOffLineFirst() {
         String getUserListPath = "users?since=0";
         RESTMockServer.whenGET(pathContains(getUserListPath))
                       .thenReturn(new MockResponse()
