@@ -38,7 +38,7 @@ public class DiskStore implements DataStore {
     @Override
     public <M> Flowable<List<M>> dynamicGetList(
             String url, String idColumnName, Class dataClass, boolean persist, boolean shouldCache) {
-        return mDataBaseManager.<M>getAll(dataClass)
+        return mDataBaseManager.getAll(dataClass)
                 .doOnNext(ms -> {
                     if (mUtils.withCache(shouldCache)) {
                         mMemoryStore.cacheList(idColumnName, new JSONArray(gson.toJson(ms)), dataClass);
@@ -50,7 +50,7 @@ public class DiskStore implements DataStore {
     @Override
     public <M> Flowable<M> dynamicGetObject(String url, String idColumnName, Object itemId, Class itemIdType,
                                             @NonNull Class dataClass, boolean persist, boolean shouldCache) {
-        return mDataBaseManager.<M>getById(idColumnName, itemId, itemIdType, dataClass)
+        return mDataBaseManager.getById(idColumnName, itemId, itemIdType, dataClass)
                 .doOnNext(m -> {
                     if (mUtils.withCache(shouldCache)) {
                         mMemoryStore.cacheObject(idColumnName,

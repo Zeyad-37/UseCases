@@ -35,8 +35,6 @@ import io.reactivex.Flowable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subscribers.TestSubscriber;
-import io.realm.RealmModel;
-import io.realm.RealmObject;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.ResponseBody;
@@ -69,7 +67,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
     private Flowable<ResponseBody> fileFlowable;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         com.zeyad.usecases.Config.setGson();
         observable = Flowable.just(new Object());
         fileFlowable = Flowable.just(ResponseBody.create(null, ""));
@@ -97,17 +95,17 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
     }
 
     @Test
-    public void dynamicGetObject() throws Exception {
+    public void dynamicGetObject() {
         when(mockApiConnection.dynamicGetObject(anyString(), anyBoolean())).thenReturn(observable);
 
         cloudStore.dynamicGetObject("", "", 0L, long.class, Object.class, false, false);
 
         verify(mockApiConnection, times(1)).dynamicGetObject(anyString(), anyBoolean());
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicGetObjectCanWillPersist() throws Exception {
+    public void dynamicGetObjectCanWillPersist() {
         when(mockApiConnection.dynamicGetObject(anyString(), anyBoolean())).thenReturn(observable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -117,11 +115,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicGetObject(anyString(), anyBoolean());
-        verifyDBInteractions(0, 0, 1, 0, 0, 0);
+        verifyDBInteractions(0, 0, 1, 0);
     }
 
     @Test
-    public void dynamicGetList() throws Exception {
+    public void dynamicGetList() {
         List<TestRealmModel> testRealmObjects = new ArrayList<>();
         testRealmObjects.add(new TestRealmModel());
         Flowable<List> observable = Flowable.just(testRealmObjects);
@@ -130,11 +128,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         cloudStore.dynamicGetList("", "", Object.class, false, false);
 
         verify(mockApiConnection, times(1)).dynamicGetList(anyString(), anyBoolean());
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicGetListCanWillPersist() throws Exception {
+    public void dynamicGetListCanWillPersist() {
         Flowable<List> observable = Flowable.just(Collections.singletonList(new TestRealmModel()));
         when(mockApiConnection.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
 
@@ -148,7 +146,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
     }
 
     @Test
-    public void dynamicPatchObject() throws Exception {
+    public void dynamicPatchObject() {
         when(mockApiConnection.dynamicPatch(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -160,11 +158,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicPatch(anyString(), any(RequestBody.class));
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPatchObjectCanWillPersist() throws Exception {
+    public void dynamicPatchObjectCanWillPersist() {
         com.zeyad.usecases.Config.setWithSQLite(true);
         when(mockApiConnection.dynamicPatch(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
@@ -177,11 +175,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicPatch(anyString(), any(RequestBody.class));
-        verifyDBInteractions(0, 0, 1, 0, 0, 0);
+        verifyDBInteractions(0, 0, 1, 0);
     }
 
     @Test
-    public void dynamicPatchObjectNoNetwork() throws Exception {
+    public void dynamicPatchObjectNoNetwork() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -190,11 +188,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPatchObjectNoNetworkNoQueue() throws Exception {
+    public void dynamicPatchObjectNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -203,11 +201,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPostObject() throws Exception {
+    public void dynamicPostObject() {
         when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -219,11 +217,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicPost(anyString(), any(RequestBody.class));
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPostObjectCanWillPersist() throws Exception {
+    public void dynamicPostObjectCanWillPersist() {
         when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -235,11 +233,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicPost(anyString(), any(RequestBody.class));
-        verifyDBInteractions(0, 0, 1, 0, 0, 0);
+        verifyDBInteractions(0, 0, 1, 0);
     }
 
     @Test
-    public void dynamicPostObjectNoNetwork() throws Exception {
+    public void dynamicPostObjectNoNetwork() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -248,11 +246,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPostObjectNoNetworkNoQueue() throws Exception {
+    public void dynamicPostObjectNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -261,11 +259,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPostList() throws Exception {
+    public void dynamicPostList() {
         when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -277,11 +275,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicPost(anyString(), any(RequestBody.class));
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPostListCanWillPersist() throws Exception {
+    public void dynamicPostListCanWillPersist() {
         when(mockApiConnection.dynamicPost(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -293,11 +291,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicPost(anyString(), any(RequestBody.class));
-        verifyDBInteractions(1, 0, 0, 0, 0, 0);
+        verifyDBInteractions(1, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPostListNoNetwork() throws Exception {
+    public void dynamicPostListNoNetwork() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -306,11 +304,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPostListNoNetworkNoQueue() throws Exception {
+    public void dynamicPostListNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -319,11 +317,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPutObject() throws Exception {
+    public void dynamicPutObject() {
         when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -335,11 +333,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicPut(anyString(), any(RequestBody.class));
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPutObjectCanWillPersist() throws Exception {
+    public void dynamicPutObjectCanWillPersist() {
         when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -351,11 +349,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicPut(anyString(), any(RequestBody.class));
-        verifyDBInteractions(0, 0, 1, 0, 0, 0);
+        verifyDBInteractions(0, 0, 1, 0);
     }
 
     @Test
-    public void dynamicPutObjectNoNetwork() throws Exception {
+    public void dynamicPutObjectNoNetwork() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -364,11 +362,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPutObjectNoNetworkNoQueue() throws Exception {
+    public void dynamicPutObjectNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -377,11 +375,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPutList() throws Exception {
+    public void dynamicPutList() {
         when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -393,11 +391,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicPut(anyString(), any(RequestBody.class));
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPutListCanWillPersist() throws Exception {
+    public void dynamicPutListCanWillPersist() {
         when(mockApiConnection.dynamicPut(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -409,11 +407,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicPut(anyString(), any(RequestBody.class));
-        verifyDBInteractions(1, 0, 0, 0, 0, 0);
+        verifyDBInteractions(1, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPutListNoNetwork() throws Exception {
+    public void dynamicPutListNoNetwork() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -421,11 +419,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicPutListNoNetworkNoQueue() throws Exception {
+    public void dynamicPutListNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -434,11 +432,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicDeleteCollection() throws Exception {
+    public void dynamicDeleteCollection() {
         when(mockApiConnection.dynamicDelete(anyString()))
                 .thenReturn(observable);
 
@@ -450,11 +448,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicDelete(anyString());
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicDeleteCollectionCanWillPersist() throws Exception {
+    public void dynamicDeleteCollectionCanWillPersist() {
         when(mockApiConnection.dynamicDelete(anyString()))
                 .thenReturn(observable);
 
@@ -466,11 +464,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicDelete(anyString());
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicDeleteCollectionNoNetwork() throws Exception {
+    public void dynamicDeleteCollectionNoNetwork() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -479,11 +477,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicDeleteCollectionNoNetworkNoQueue() throws Exception {
+    public void dynamicDeleteCollectionNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -492,11 +490,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void dynamicDeleteAll() throws Exception {
+    public void dynamicDeleteAll() {
         Single completable = cloudStore.dynamicDeleteAll(Object.class);
 
         // Verify repository interactions
@@ -508,7 +506,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
     }
 
     @Test
-    public void dynamicUploadFile() throws Exception {
+    public void dynamicUploadFile() {
         when(mockApiConnection.dynamicUpload(anyString(), anyMap(), anyListOf(MultipartBody.Part.class)))
                 .thenReturn(observable);
 
@@ -521,11 +519,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
         verify(mockApiConnection, times(1))
                 .dynamicUpload(anyString(), anyMap(), anyListOf(MultipartBody.Part.class));
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicUploadFileNoNetwork() throws Exception {
+    public void dynamicUploadFileNoNetwork() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -534,11 +532,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicUploadFileNoNetworkNoQueue() throws Exception {
+    public void dynamicUploadFileNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -547,11 +545,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicDownloadFile() throws Exception {
+    public void dynamicDownloadFile() {
         when(mockApiConnection.dynamicDownload(anyString())).thenReturn(fileFlowable);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -561,11 +559,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         //        testSubscriber.assertNoErrors();
 
         verify(mockApiConnection, times(1)).dynamicDownload(anyString());
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicDownloadFileNoNetwork() throws Exception {
+    public void dynamicDownloadFileNoNetwork() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -573,11 +571,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
         testSubscriber.assertNoValues();
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test
-    public void dynamicDownloadFileNoNetworkNoQueue() throws Exception {
+    public void dynamicDownloadFileNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false);
 
         TestSubscriber<Object> testSubscriber = new TestSubscriber<>();
@@ -585,11 +583,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .subscribe(testSubscriber);
 
 //        testSubscriber.assertError(NetworkConnectionException.class);
-        verifyDBInteractions(0, 0, 0, 0, 0, 0);
+        verifyDBInteractions(0, 0, 0, 0);
     }
 
     @Test(expected = RuntimeException.class)
-    public void queryDisk() throws Exception {
+    public void queryDisk() {
         Flowable observable = cloudStore.queryDisk(realm -> realm.where(TestRealmModel.class));
 
         // Verify repository interactions
@@ -602,14 +600,12 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
     }
 
     private void verifyDBInteractions(
-            int putAllJ, int putAllL, int putJ, int putO, int putM, int evict) {
+            int putAllJ, int putAllL, int putJ, int evict) {
         verify(mockDataBaseManager, times(putAllJ))
                 .putAll(any(JSONArray.class), anyString(), any(Class.class), any(Class.class));
         verify(mockDataBaseManager, times(putAllL)).putAll(anyList(), any(Class.class));
         verify(mockDataBaseManager, times(putJ))
                 .put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class));
-        verify(mockDataBaseManager, times(putO)).put(any(RealmObject.class), any(Class.class));
-        verify(mockDataBaseManager, times(putM)).put(any(RealmModel.class), any(Class.class));
         verify(mockDataBaseManager, atLeast(evict)).evictById(any(Class.class), anyString(), any(),
                 any(Class.class));
     }

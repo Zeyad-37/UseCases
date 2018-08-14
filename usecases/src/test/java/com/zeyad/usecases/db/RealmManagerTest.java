@@ -29,6 +29,7 @@ import io.realm.RealmConfiguration;
 import io.realm.RealmQuery;
 import io.realm.RealmResults;
 
+import static junit.framework.Assert.assertEquals;
 import static org.powermock.api.mockito.PowerMockito.mock;
 
 /**
@@ -75,21 +76,21 @@ public class RealmManagerTest {
     }
 
     @Test
-    public void getById() throws Exception {
-//        Flowable flowable = mRealmManager.getById("id", 1L, long.class, TestRealmModel.class);
-//
-//        applyTestSubscriber(flowable);
-//
-//        assertEquals(flowable.firstElement().blockingGet().getClass(), TestRealmModel.class);
+    public void getById() {
+        Flowable flowable = mRealmManager.getById("id", 1L, long.class, TestRealmModel.class);
+
+        applyTestSubscriber(flowable);
+
+        assertEquals(flowable.firstElement().blockingGet().getClass(), TestRealmModel.class);
     }
 
     @Test
-    public void getAll() throws Exception {
-//        Flowable flowable = mRealmManager.getAll(TestRealmModel.class);
-//
-//        applyTestSubscriber(flowable);
-//
-//        assertEquals(flowable.firstElement().blockingGet().getClass(), TestRealmModel.class);
+    public void getAll() {
+        Flowable flowable = mRealmManager.getAll(TestRealmModel.class);
+
+        applyTestSubscriber(flowable);
+
+        assertEquals(flowable.firstElement().blockingGet().getClass(), TestRealmModel.class);
     }
 
     private void applyTestSubscriber(Flowable flowable) {
@@ -98,12 +99,10 @@ public class RealmManagerTest {
         testSubscriber.assertNoErrors();
         testSubscriber.assertSubscribed();
         testSubscriber.assertComplete();
-//        testSubscriber.assertNotComplete();
-//        testSubscriber.assertNotTerminated();
     }
 
     @Test
-    public void getQuery() throws Exception {
+    public void getQuery() {
 //        Flowable flowable = mRealmManager.getQuery(realm -> realm.where(TestRealmModel.class));
 //
 //        applyTestSubscriber(flowable);
@@ -125,39 +124,33 @@ public class RealmManagerTest {
     }
 
     @Test
-    public void putRealmModel() throws Exception {
-        Single<Boolean> completable = mRealmManager.put(new TestRealmModel(), TestRealmModel.class);
-        applyTestSubscriber(completable);
-    }
-
-    @Test
-    public void putAllJSONArray() throws Exception {
+    public void putAllJSONArray() {
         Single<Boolean> completable = mRealmManager.putAll(new JSONArray(), "id", int.class,
                 TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 
     @Test
-    public void putAllRealmObject() throws Exception {
+    public void putAllRealmObject() {
         Single<Boolean> completable = mRealmManager.putAll(new ArrayList<>(), TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 
     @Test
-    public void evictAll() throws Exception {
+    public void evictAll() {
         Single<Boolean> completable = mRealmManager.evictAll(TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 
     @Test
-    public void evictCollection() throws Exception {
+    public void evictCollection() {
         Single<Boolean> completable =
                 mRealmManager.evictCollection("id", new ArrayList<>(), String.class, TestRealmModel.class);
         applyTestSubscriber(completable);
     }
 
     @Test
-    public void evictById() throws Exception {
+    public void evictById() {
 //        assertEquals(mRealmManager.evictById(TestRealmModel.class, "id", 1), true);
     }
 }
