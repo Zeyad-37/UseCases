@@ -1,7 +1,9 @@
 package com.zeyad.usecases.services.jobs;
 
 import android.content.Context;
+import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import com.firebase.jobdispatcher.FirebaseJobDispatcher;
@@ -37,6 +39,7 @@ public class FileIO {
         mUtils = utils;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.N)
     @NonNull
     public Completable execute() {
         File file = mFileIORequest.getFile();
@@ -51,7 +54,7 @@ public class FileIO {
                         mFileIORequest.isOnWifi(), mFileIORequest.isWhileCharging(),
                         mFileIORequest.isQueuable(), mFileIORequest.getDataClass())
                         .doOnSubscribe(subscription -> Log.d(TAG, "Uploading " + file.getName()))
-                        .doOnError(this::onError)
+                        .doOnError(throwable -> onError((Throwable) throwable))
                         .toObservable());
     }
 

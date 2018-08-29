@@ -51,11 +51,11 @@ class DataServiceFactoryTest {
     @Throws(Exception::class)
     fun init() {
         DataServiceFactory.init(mDataServiceConfig!!)
-        assertNotNull(com.zeyad.usecases.Config.getApiConnection())
-        assertNotNull(com.zeyad.usecases.Config.getBackgroundThread())
-        assertNotNull(com.zeyad.usecases.Config.getGson())
-        assertNotNull(com.zeyad.usecases.Config.getInstance())
+        assertNotNull(com.zeyad.usecases.Config.apiConnection)
+        assertNotNull(com.zeyad.usecases.Config.backgroundThread)
+        assertNotNull(com.zeyad.usecases.Config.gson)
+        assertNotNull(com.zeyad.usecases.Config.instance)
         assertNotNull(DataServiceFactory.instance)
-        assertEquals(com.zeyad.usecases.Config.getBaseURL(), URL)
+        assertEquals(com.zeyad.usecases.Config.baseURL, URL)
     }
 }

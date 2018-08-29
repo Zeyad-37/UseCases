@@ -175,7 +175,7 @@ public class DiskStore implements DataStore {
                                              boolean onWifi,
                                              boolean whileCharging,
                                              boolean queuable,
-                                             @NonNull Class responseType) {
+                                             @NonNull Class<M> responseType) {
         return Flowable.error(new IllegalStateException(IO_DB_ERROR));
     }
 }

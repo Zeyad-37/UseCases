@@ -68,7 +68,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Before
     public void setUp() {
-        com.zeyad.usecases.Config.setGson();
+        com.zeyad.usecases.Config.Companion.setGson();
         observable = Flowable.just(new Object());
         fileFlowable = Flowable.just(ResponseBody.create(null, ""));
         mockContext = mock(Context.class);
@@ -85,11 +85,11 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         when(utils.isNetworkAvailable(any(Context.class))).thenReturn(true);
         when(utils.withDisk(true)).thenReturn(true);
         cloudStore = new CloudStore(mockApiConnection, mockDataBaseManager, new DAOMapper(),
-                new MemoryStore(com.zeyad.usecases.Config.getGson()), utils);
+                new MemoryStore(com.zeyad.usecases.Config.Companion.getGson()), utils);
         HandlerThread backgroundThread = new HandlerThread("backgroundThread");
         backgroundThread.start();
         com.zeyad.usecases.Config.setWithCache(false);
-        com.zeyad.usecases.Config.setWithSQLite(true);
+        com.zeyad.usecases.Config.Companion.setWithSQLite(true);
         com.zeyad.usecases.Config
                 .setBackgroundThread(AndroidSchedulers.from(backgroundThread.getLooper()));
     }
@@ -163,7 +163,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicPatchObjectCanWillPersist() {
-        com.zeyad.usecases.Config.setWithSQLite(true);
+        com.zeyad.usecases.Config.Companion.setWithSQLite(true);
         when(mockApiConnection.dynamicPatch(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 

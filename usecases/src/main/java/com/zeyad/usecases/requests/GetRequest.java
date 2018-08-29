@@ -4,12 +4,15 @@ import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.Config;
 
-/** @author zeyad on 7/29/16. */
-public class GetRequest<M> {
+/**
+ * @author zeyad on 7/29/16.
+ */
+public class GetRequest {
 
     private static final String DEFAULT_ID_KEY = "id";
     private final String url, idColumnName;
-    private final Class<M> dataClass, idType;
+    private final Class dataClass;
+    private final Class idType;
     private final boolean persist, shouldCache;
     private final Object itemId;
 
@@ -28,7 +31,7 @@ public class GetRequest<M> {
         return url != null ? url : "";
     }
 
-    public Class<M> getDataClass() {
+    public <M> Class<M> getDataClass() {
         return dataClass;
     }
 
@@ -53,22 +56,22 @@ public class GetRequest<M> {
         return itemId;
     }
 
-    public static class Builder<M> {
+    public static class Builder {
         private final boolean mPersist;
-        private final Class<M> mDataClass;
+        private final Class mDataClass;
         private Object mItemId;
         private boolean mShouldCache;
         private String mIdColumnName, mUrl;
         private Class idType;
 
-        public Builder(Class<M> dataClass, boolean persist) {
+        public <M> Builder(Class<M> dataClass, boolean persist) {
             mDataClass = dataClass;
             mPersist = persist;
         }
 
         @NonNull
         public Builder url(String url) {
-            mUrl = Config.getBaseURL() + url;
+            mUrl = Config.INSTANCE.getBaseURL() + url;
             return this;
         }
 

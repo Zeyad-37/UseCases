@@ -22,7 +22,7 @@ public class DataStoreFactoryTest {
     private DataStoreFactory mDataStoreFactory; // class under test
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mDataStoreFactory =
                 new DataStoreFactory(
                         dataClass -> mock(RealmManager.class),
@@ -127,12 +127,12 @@ public class DataStoreFactoryTest {
     @Test
     public void testDiskMethod_ifExpectedDataStoreIsReturned_whenMockedEntityMapperIsPassed()
             throws IllegalAccessException {
-        Config.setHasRealm(true);
+        Config.Companion.setHasRealm(true);
         assertThat(mDataStoreFactory.disk(Object.class), is(notNullValue()));
     }
 
     @Test
-    public void testDiskMethod_ifExpectedCloudStoreIsReturned_whenMockedEntityMapperIsPassed() throws IllegalAccessException {
+    public void testDiskMethod_ifExpectedCloudStoreIsReturned_whenMockedEntityMapperIsPassed() {
         assertThat(mDataStoreFactory.cloud(Object.class), is(notNullValue()));
     }
 }

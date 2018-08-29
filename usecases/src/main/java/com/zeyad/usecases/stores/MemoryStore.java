@@ -37,7 +37,7 @@ public class MemoryStore {
         String key = dataClass.getSimpleName() + itemId;
         return Single.defer(() -> {
             if (isValid(key)) {
-                return Storo.<M> get(key, dataClass).async().firstElement().toSingle();
+                return Storo.<M>get(key, dataClass).async().firstElement().toSingle();
             } else {
                 return Single.error(new IllegalAccessException("Cache Miss!"));
             }
@@ -52,7 +52,7 @@ public class MemoryStore {
                 return Single.error(new IllegalAccessException("Cache Miss!"));
             }
             List<M> result = Observable.fromIterable(stringSet)
-                                       .filter((key) -> {
+                    .filter((key) -> {
                         if (isValid(key)) {
                             return true;
                         } else {
@@ -60,10 +60,10 @@ public class MemoryStore {
                             return false;
                         }
                     })
-                                       .filter(s -> !missed[0])
-                                       .map(key -> Storo.get(key, dataClass).execute())
-                                       .toList(missed[0] ? 0 : stringSet.size())
-                                       .blockingGet();
+                    .filter(s -> !missed[0])
+                    .map(key -> Storo.get(key, dataClass).execute())
+                    .toList(missed[0] ? 0 : stringSet.size())
+                    .blockingGet();
             return missed[0] ? Single.error(new IllegalAccessException("Cache Miss!")) : Single.just(result);
         });
     }
@@ -72,7 +72,7 @@ public class MemoryStore {
         String className = dataClass.getSimpleName();
         String key = className + jsonObject.optString(idColumnName);
         Storo.put(key, gson.fromJson(jsonObject.toString(), dataClass))
-                .setExpiry(Config.getCacheAmount(), Config.getCacheTimeUnit())
+                .setExpiry(Config.INSTANCE.getCacheDuration(), Config.INSTANCE.getCacheTimeUnit())
                 .execute();
         addKey(dataClass, key);
         Log.d(TAG, className + " cached!, id = " + key);
@@ -96,22 +96,22 @@ public class MemoryStore {
         }
         String className = dataClass.getSimpleName();
         Observable.fromIterable(ids)
-                  .map(id -> className + id)
-                  .filter((key) -> {
-                      if (isValid(key)) {
+                .map(id -> className + id)
+                .filter((key) -> {
+                    if (isValid(key)) {
                         return true;
-                      } else {
+                    } else {
                         removeKey(dataClass, key);
                         return false;
                     }
                 })
-                  .doOnEach(stringNotification -> {
+                .doOnEach(stringNotification -> {
                     String key = stringNotification.getValue();
                     removeKey(dataClass, key);
-                      Log.d(TAG, String.format("%s %s deleted!, id = %s", className,
-                              (Storo.delete(key) ? "" : "not "), key));
+                    Log.d(TAG, String.format("%s %s deleted!, id = %s", className,
+                            (Storo.delete(key) ? "" : "not "), key));
                 })
-                  .blockingSubscribe();
+                .blockingSubscribe();
     }
 
     private void addKey(Class dataType, String key) {

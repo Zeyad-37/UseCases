@@ -55,7 +55,7 @@ class DataServiceTest {
         `when`(dataStoreFactory.memory()).thenReturn(mock(MemoryStore::class.java))
         dataService = DataService(
                 dataStoreFactory, AndroidSchedulers.mainThread(), mock(Scheduler::class.java))
-        com.zeyad.usecases.Config.setWithCache(false)
+        com.zeyad.usecases.Config.isWithCache = false
         com.zeyad.usecases.Config.setWithSQLite(true)
     }
 

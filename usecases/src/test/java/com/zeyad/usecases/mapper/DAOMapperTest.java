@@ -20,18 +20,18 @@ public class DAOMapperTest {
     private DAOMapper daoMapper;
 
     @Before
-    public void setUp() throws Exception {
-        Config.setGson();
+    public void setUp() {
+        Config.INSTANCE.setGson();
         daoMapper = new DAOMapper();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         daoMapper = null;
     }
 
     @Test
-    public void mapTo() throws Exception {
+    public void mapTo() {
         Assert.assertEquals(
                 daoMapper.mapTo(new Object(), Object.class).getClass(), LinkedTreeMap.class);
         Assert.assertEquals(
@@ -40,7 +40,7 @@ public class DAOMapperTest {
     }
 
     @Test
-    public void mapAllTo() throws Exception {
+    public void mapAllTo() {
         Assert.assertEquals(
                 daoMapper.mapAllTo(Collections.EMPTY_LIST, Object.class).getClass(),
                 ArrayList.class);

@@ -21,12 +21,12 @@ public class DataStoreFactory {
 
     public DataStoreFactory(@Nullable DataBaseManagerUtil dataBaseManagerUtil, ApiConnection restApi,
                             DAOMapper daoMapper) {
-        Config.setHasRealm(dataBaseManagerUtil != null);
-        Config.setWithSQLite(dataBaseManagerUtil != null);
+//        Config.INSTANCE.setHasRealm(dataBaseManagerUtil != null);
+//        Config.INSTANCE.setWithSQLite(dataBaseManagerUtil != null);
         mDataBaseManagerUtil = dataBaseManagerUtil;
         mApiConnection = restApi;
         mDAOMapper = daoMapper;
-        withCache = Config.isWithCache();
+        withCache = Config.INSTANCE.getWithCache();
     }
 
     /**
@@ -48,7 +48,7 @@ public class DataStoreFactory {
      */
     public MemoryStore memory() {
         if (withCache && mMemoryStore == null) {
-            mMemoryStore = new MemoryStore(Config.getGson());
+            mMemoryStore = new MemoryStore(Config.INSTANCE.getGson());
         }
         return withCache ? mMemoryStore : null;
     }
@@ -58,7 +58,7 @@ public class DataStoreFactory {
      */
     @NonNull
     public DataStore disk(Class dataClass) throws IllegalAccessException {
-        if (!Config.isWithRealm() || mDataBaseManagerUtil == null) {
+        if (!Config.INSTANCE.getWithRealm() || mDataBaseManagerUtil == null) {
             throw new IllegalAccessException(DB_NOT_ENABLED);
         } else if (mDiskStore == null) {
             mDiskStore = new DiskStore(mDataBaseManagerUtil.getDataBaseManager(dataClass), memory());

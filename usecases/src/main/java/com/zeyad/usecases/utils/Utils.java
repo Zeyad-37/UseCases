@@ -76,7 +76,7 @@ public class Utils {
     }
 
     public void queueFileIOCore(@NonNull FirebaseJobDispatcher dispatcher, boolean isDownload,
-            @NonNull FileIORequest fileIORequest, int trailCount) {
+                                @NonNull FileIORequest fileIORequest, int trailCount) {
         Bundle extras = new Bundle(3);
         extras.putString(GenericJobService.JOB_TYPE, isDownload ?
                 GenericJobService.DOWNLOAD_FILE : GenericJobService.UPLOAD_FILE);
@@ -87,25 +87,24 @@ public class Utils {
     }
 
     private void queueCore(@NonNull FirebaseJobDispatcher dispatcher, @NonNull Bundle bundle, String message,
-            boolean isOnWifi, boolean whileCharging) {
+                           boolean isOnWifi, boolean whileCharging) {
         int network = isOnWifi ? Constraint.ON_UNMETERED_NETWORK : Constraint.ON_ANY_NETWORK;
         int power = whileCharging ? Constraint.DEVICE_CHARGING : Constraint.DEVICE_IDLE;
         try {
             dispatcher.mustSchedule(dispatcher.newJobBuilder()
-                                              .setService(GenericJobService.class)
-                                              .setTag(bundle.getString("JOB_TYPE")
-                                                            .concat(String.valueOf(System.currentTimeMillis())))
-                                              .setRecurring(false)
-                                              .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
-                                              //                                          .setTrigger(Trigger.executionWindow(0, 10))
-                                              .setReplaceCurrent(true)
-                                              .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
-                                              .setExtras(bundle)
-                                              .setConstraints(network, power)
-                                              .build());
-        } catch (Exception e) {
+                    .setService(GenericJobService.class)
+                    .setTag(bundle.getString("JOB_TYPE")
+                            .concat(String.valueOf(System.currentTimeMillis())))
+                    .setRecurring(false)
+                    .setLifetime(Lifetime.UNTIL_NEXT_BOOT)
+                    //                                          .setTrigger(Trigger.executionWindow(0, 10))
+                    .setReplaceCurrent(true)
+                    .setRetryStrategy(RetryStrategy.DEFAULT_EXPONENTIAL)
+                    .setExtras(bundle)
+                    .setConstraints(network, power)
+                    .build());
+        } catch (Exception ignored) {
 
-            e.printStackTrace();
         }
         Log.d("FBJD", message + " request is queued successfully!");
     }
@@ -143,10 +142,10 @@ public class Utils {
     }
 
     public boolean withDisk(boolean shouldPersist) {
-        return Config.isWithDisk() && shouldPersist;
+        return Config.INSTANCE.isWithDisk() && shouldPersist;
     }
 
     public boolean withCache(boolean shouldCache) {
-        return Config.isWithCache() && shouldCache;
+        return Config.INSTANCE.getWithCache() && shouldCache;
     }
 }

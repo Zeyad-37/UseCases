@@ -1,12 +1,12 @@
 package com.zeyad.usecases.api
 
 import android.util.Log
+import com.jakewharton.rx.ReplayingShare
 import com.zeyad.usecases.db.RealmQueryProvider
 import com.zeyad.usecases.requests.FileIORequest
 import com.zeyad.usecases.requests.GetRequest
 import com.zeyad.usecases.requests.PostRequest
 import com.zeyad.usecases.stores.DataStoreFactory
-import com.zeyad.usecases.utils.ReplayingShare
 import com.zeyad.usecases.utils.Utils
 import io.reactivex.Flowable
 import io.reactivex.FlowableTransformer
@@ -22,10 +22,10 @@ import java.io.File
 internal class DataService(private val mDataStoreFactory: DataStoreFactory, private val mPostExecutionThread: Scheduler?, private val mBackgroundThread: Scheduler) : IDataService {
     private val mPostThreadExist: Boolean = mPostExecutionThread != null
 
-    override fun <M> getList(getListRequest: GetRequest<M>): Flowable<List<M>> {
+    override fun <M> getList(getListRequest: GetRequest): Flowable<List<M>> {
         var result: Flowable<List<M>>
         try {
-            val dataClass = getListRequest.dataClass
+            val dataClass = getListRequest.getDataClass<M>()
             val url = getListRequest.url
             val simpleName = dataClass.simpleName
             val shouldCache = getListRequest.isShouldCache
@@ -48,11 +48,11 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory, priv
         return result.compose(applySchedulers())
     }
 
-    override fun <M> getObject(getRequest: GetRequest<M>): Flowable<M> {
+    override fun <M> getObject(getRequest: GetRequest): Flowable<M> {
         var result: Flowable<M>
         try {
             val itemId = getRequest.itemId
-            val dataClass = getRequest.dataClass
+            val dataClass = getRequest.getDataClass<M>()
             val shouldCache = getRequest.isShouldCache
             val url = getRequest.url
             val simpleName = dataClass.simpleName
@@ -79,9 +79,9 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory, priv
     override fun <M> patchObject(postRequest: PostRequest): Flowable<M> {
         val result: Flowable<M> = try {
             mDataStoreFactory.dynamically(postRequest.url, postRequest.requestType)
-                    .dynamicPatchObject(postRequest.url, postRequest.idColumnName,
+                    .dynamicPatchObject<M>(postRequest.url, postRequest.idColumnName,
                             postRequest.idType, postRequest.objectBundle,
-                            postRequest.requestType, postRequest.responseType,
+                            postRequest.requestType, postRequest.responseType as Class<M>,
                             postRequest.isPersist, postRequest.isCache, postRequest.isQueuable)
         } catch (e: IllegalAccessException) {
             Flowable.error(e)
@@ -95,9 +95,9 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory, priv
     override fun <M> postObject(postRequest: PostRequest): Flowable<M> {
         val result: Flowable<M> = try {
             mDataStoreFactory.dynamically(postRequest.url, postRequest.requestType)
-                    .dynamicPostObject(postRequest.url, postRequest.idColumnName,
+                    .dynamicPostObject<M>(postRequest.url, postRequest.idColumnName,
                             postRequest.idType, postRequest.objectBundle,
-                            postRequest.requestType, postRequest.responseType,
+                            postRequest.requestType, postRequest.responseType as Class<M>,
                             postRequest.isPersist, postRequest.isCache, postRequest.isQueuable)
         } catch (e: IllegalAccessException) {
             Flowable.error(e)
@@ -111,9 +111,9 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory, priv
     override fun <M> postList(postRequest: PostRequest): Flowable<M> {
         val result: Flowable<M> = try {
             mDataStoreFactory.dynamically(postRequest.url, postRequest.requestType)
-                    .dynamicPostList(postRequest.url, postRequest.idColumnName,
+                    .dynamicPostList<M>(postRequest.url, postRequest.idColumnName,
                             postRequest.idType, postRequest.arrayBundle,
-                            postRequest.requestType, postRequest.responseType,
+                            postRequest.requestType, postRequest.responseType as Class<M>,
                             postRequest.isPersist, postRequest.isCache, postRequest.isQueuable)
         } catch (e: IllegalAccessException) {
             Flowable.error(e)
@@ -126,9 +126,9 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory, priv
     override fun <M> putObject(postRequest: PostRequest): Flowable<M> {
         val result: Flowable<M> = try {
             mDataStoreFactory.dynamically(postRequest.url, postRequest.requestType)
-                    .dynamicPutObject(postRequest.url, postRequest.idColumnName,
+                    .dynamicPutObject<M>(postRequest.url, postRequest.idColumnName,
                             postRequest.idType, postRequest.objectBundle,
-                            postRequest.requestType, postRequest.responseType,
+                            postRequest.requestType, postRequest.responseType as Class<M>,
                             postRequest.isPersist, postRequest.isCache, postRequest.isQueuable)
         } catch (e: IllegalAccessException) {
             Flowable.error(e)
@@ -142,9 +142,9 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory, priv
     override fun <M> putList(postRequest: PostRequest): Flowable<M> {
         val result: Flowable<M> = try {
             mDataStoreFactory.dynamically(postRequest.url, postRequest.requestType)
-                    .dynamicPutList(postRequest.url, postRequest.idColumnName,
+                    .dynamicPutList<M>(postRequest.url, postRequest.idColumnName,
                             postRequest.idType, postRequest.arrayBundle,
-                            postRequest.requestType, postRequest.responseType,
+                            postRequest.requestType, postRequest.responseType as Class<M>,
                             postRequest.isPersist, postRequest.isCache, postRequest.isQueuable)
         } catch (e: IllegalAccessException) {
             Flowable.error(e)
@@ -171,7 +171,7 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory, priv
             mDataStoreFactory.dynamically(deleteRequest.url, deleteRequest.requestType)
                     .dynamicDeleteCollection<M>(deleteRequest.url, deleteRequest.idColumnName,
                             deleteRequest.idType, deleteRequest.arrayBundle,
-                            deleteRequest.requestType, deleteRequest.responseType,
+                            deleteRequest.requestType, deleteRequest.responseType as Class<M>,
                             deleteRequest.isPersist, deleteRequest.isCache, deleteRequest.isQueuable)
                     .compose(applySchedulers())
         } catch (e: IllegalAccessException) {
@@ -208,11 +208,11 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory, priv
         return result.compose(applySchedulers())
     }
 
-    override fun <M> getListOffLineFirst(getRequest: GetRequest<M>): Flowable<List<M>> {
+    override fun <M> getListOffLineFirst(getRequest: GetRequest): Flowable<List<M>> {
         var result: Flowable<List<M>>
         try {
             val utils = Utils.getInstance()
-            val dataClass = getRequest.dataClass
+            val dataClass = getRequest.getDataClass<M>()
             val simpleName = dataClass.simpleName
             val idColumnName = getRequest.idColumnName
             val persist = getRequest.isPersist
@@ -246,12 +246,12 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory, priv
         return result.compose(ReplayingShare.instance()).compose(applySchedulers())
     }
 
-    override fun <M> getObjectOffLineFirst(getRequest: GetRequest<M>): Flowable<M> {
+    override fun <M> getObjectOffLineFirst(getRequest: GetRequest): Flowable<M> {
         var result: Flowable<M>
         try {
             val utils = Utils.getInstance()
             val itemId = getRequest.itemId
-            val dataClass = getRequest.dataClass
+            val dataClass = getRequest.getDataClass<M>()
             val idType = getRequest.idType
             val idColumnName = getRequest.idColumnName
             val simpleName = dataClass.simpleName
@@ -293,7 +293,7 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory, priv
                 .dynamicUploadFile<M>(fileIORequest.url, fileIORequest.keyFileMap,
                         fileIORequest.parameters, fileIORequest.isOnWifi,
                         fileIORequest.isWhileCharging, fileIORequest.isQueuable,
-                        fileIORequest.dataClass)
+                        fileIORequest.dataClass as Class<M>)
                 .compose(applySchedulers())
     }
 

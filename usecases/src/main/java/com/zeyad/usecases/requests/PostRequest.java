@@ -54,7 +54,7 @@ public class PostRequest implements Parcelable {
         String objectBundle = objectString == null ? "" : objectString;
         String arrayBundle = arrayString == null ? "" : arrayString;
         payload = objectBundle.replaceAll("\\{", "").replaceAll("\\}", "").isEmpty() ?
-                  arrayBundle : objectBundle;
+                arrayBundle : objectBundle;
     }
 
     protected PostRequest(Parcel in) {
@@ -84,9 +84,8 @@ public class PostRequest implements Parcelable {
         JSONObject result = new JSONObject();
         if (object != null) {
             try {
-                return new JSONObject(Config.getGson().toJson(object));
+                return new JSONObject(Config.INSTANCE.getGson().toJson(object));
             } catch (JSONException e) {
-                //                Log.e("PostRequest", "", e);
                 return result;
             }
         } else if (jsonObject != null) {
@@ -213,7 +212,7 @@ public class PostRequest implements Parcelable {
 
         @NonNull
         public Builder url(String url) {
-            this.url = Config.getBaseURL() + url;
+            this.url = Config.INSTANCE.getBaseURL() + url;
             return this;
         }
 

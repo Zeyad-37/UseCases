@@ -24,7 +24,7 @@ class GenericJobServiceLogic {
                     Log.d(GenericJobServiceLogic.class.getSimpleName(),
                             String.format(log, GenericJobService.POST));
                     return new Post(null, extras.getParcelable(GenericJobService.PAYLOAD),
-                            Config.getApiConnection(), trailCount, utils)
+                            Config.INSTANCE.getApiConnection(), trailCount, utils)
                             .execute();
                 case GenericJobService.DOWNLOAD_FILE:
                     Log.d(GenericJobServiceLogic.class.getSimpleName(),

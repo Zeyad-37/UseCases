@@ -17,7 +17,7 @@ interface IDataService {
      * @param getListRequest contains the attributes of the request.
      * @return Flowable with the list.
      */
-    fun <M> getList(getListRequest: GetRequest<M>): Flowable<List<M>>
+    fun <M> getList(getListRequest: GetRequest): Flowable<List<M>>
 
     /**
      * Gets object from getRequest.
@@ -25,7 +25,7 @@ interface IDataService {
      * @param getRequest contains the attributes of the request.
      * @return Flowable with the Object.
      */
-    fun <M> getObject(getRequest: GetRequest<M>): Flowable<M>
+    fun <M> getObject(getRequest: GetRequest): Flowable<M>
 
     /**
      * Gets object from getRequest.
@@ -105,7 +105,7 @@ interface IDataService {
      * @param getRequest contains the attributes of the request.
      * @return [<] with the data.
      */
-    fun <M> getListOffLineFirst(getRequest: GetRequest<M>): Flowable<List<M>>
+    fun <M> getListOffLineFirst(getRequest: GetRequest): Flowable<List<M>>
 
     /**
      * Creates a repository pattern with live objects
@@ -113,7 +113,7 @@ interface IDataService {
      * @param getRequest contains the attributes of the request.
      * @return [&gt;][Flowable] with the data.
      */
-    fun <M> getObjectOffLineFirst(getRequest: GetRequest<M>): Flowable<M>
+    fun <M> getObjectOffLineFirst(getRequest: GetRequest): Flowable<M>
 
     /**
      * Uploads a file to a url.

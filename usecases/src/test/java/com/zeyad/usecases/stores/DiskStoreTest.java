@@ -37,11 +37,11 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     private DataBaseManager dbManager;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         dbManager = mock(DataBaseManager.class);
         Config.setWithCache(false);
-        Config.setGson();
-        mDiskStore = new DiskStore(dbManager, new MemoryStore(Config.getGson()));
+        Config.Companion.setGson();
+        mDiskStore = new DiskStore(dbManager, new MemoryStore(Config.Companion.getGson()));
     }
 
     @Test
@@ -99,7 +99,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     }
 
     @Test
-    public void testDynamicPatchObject() throws Exception {
+    public void testDynamicPatchObject() {
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class)))
                 .thenReturn(Single.just(true));
 
@@ -111,7 +111,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     }
 
     @Test
-    public void testDynamicPostObject() throws Exception {
+    public void testDynamicPostObject() {
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class)))
                 .thenReturn(Single.just(true));
 
@@ -123,7 +123,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     }
 
     @Test
-    public void testDynamicPutObject() throws Exception {
+    public void testDynamicPutObject() {
         when(dbManager.put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class)))
                 .thenReturn(Single.just(true));
 
@@ -135,7 +135,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     }
 
     @Test
-    public void testDynamicPostList() throws Exception {
+    public void testDynamicPostList() {
         when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class), any(Class.class)))
                 .thenReturn(Single.just(true));
 
@@ -147,7 +147,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     }
 
     @Test
-    public void testDynamicPutList() throws Exception {
+    public void testDynamicPutList() {
         when(dbManager.putAll(any(JSONArray.class), anyString(), any(Class.class), any(Class.class)))
                 .thenReturn(Single.just(true));
 
@@ -159,7 +159,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testDynamicDownloadFile() throws Exception {
+    public void testDynamicDownloadFile() {
         Flowable observable =
                 mDiskStore.dynamicDownloadFile("", new File(""), false, false, false);
 
@@ -174,7 +174,7 @@ public class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     }
 
     @Test(expected = IllegalStateException.class)
-    public void testDynamicUploadFile() throws Exception {
+    public void testDynamicUploadFile() {
         Flowable observable =
                 mDiskStore.dynamicUploadFile(
                         "", new HashMap<>(), new HashMap<>(), false, false, false, Object.class);

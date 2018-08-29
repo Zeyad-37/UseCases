@@ -88,10 +88,13 @@ class RealmManager : DataBaseManager {
     }
 
     override fun <M : RealmModel> putAll(realmObjects: List<M>, dataClass: Class<M>): Single<Boolean> {
-        return Single.fromCallable {
-            executeWriteOperationInRealm(Realm.getDefaultInstance(),
-                    { realm: Realm -> realm.copyToRealmOrUpdate(realmObjects) } as ExecuteAndReturn<List<M>>).size == realmObjects.size
-        }
+        return Single.just(executeWriteOperationInRealm(Realm.getDefaultInstance(),
+                object : ExecuteAndReturn<List<M>> {
+                    override fun runAndReturn(realm: Realm): List<M> {
+                        return realm.copyToRealmOrUpdate(realmObjects)
+                    }
+                }).size == realmObjects.size)
+//                { realm: Realm -> realm.copyToRealmOrUpdate(realmObjects) } as ExecuteAndReturn<List<M>>).size == realmObjects.size)
     }
 
     /**
@@ -197,11 +200,11 @@ class RealmManager : DataBaseManager {
     }
 
     private fun <T> executeWriteOperationInRealm(realm: Realm, executor: ExecuteAndReturn<T>): T {
-        val toReturnValue: T = executor.runAndReturn(realm)
         if (realm.isInTransaction) {
             realm.cancelTransaction()
         }
         realm.beginTransaction()
+        val toReturnValue: T = executor.runAndReturn(realm)
         realm.commitTransaction()
         return toReturnValue
     }

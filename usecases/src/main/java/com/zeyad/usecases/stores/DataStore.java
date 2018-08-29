@@ -22,7 +22,7 @@ import io.reactivex.Single;
  * Interface that represents a data store from where data is retrieved.
  */
 public interface DataStore {
-    Gson gson = Config.getGson();
+    Gson gson = Config.INSTANCE.getGson();
 
     @NonNull
     <M> Flowable<List<M>> dynamicGetList(String url, String idColumnName, Class requestType,
@@ -48,7 +48,7 @@ public interface DataStore {
     @NonNull
     <M> Flowable<M> dynamicPatchObject(String url, String idColumnName, Class itemIdType,
                                        @NonNull JSONObject jsonObject, Class requestType,
-                                       Class responseType, boolean persist, boolean cache,
+                                       Class<M> responseType, boolean persist, boolean cache,
                                        boolean queuable);
 
     /**
@@ -56,7 +56,7 @@ public interface DataStore {
      */
     @NonNull
     <M> Flowable<M> dynamicPostObject(String url, String idColumnName, Class itemIdType,
-                                      JSONObject keyValuePairs, Class requestType, Class responseType,
+                                      JSONObject keyValuePairs, Class requestType, Class<M> responseType,
                                       boolean persist, boolean cache, boolean queuable);
 
     /**
@@ -65,7 +65,7 @@ public interface DataStore {
      */
     @NonNull
     <M> Flowable<M> dynamicPostList(String url, String idColumnName, Class itemIdType,
-                                    JSONArray jsonArray, Class requestType, Class responseType,
+                                    JSONArray jsonArray, Class requestType, Class<M> responseType,
                                     boolean persist, boolean cache, boolean queuable);
 
     /**
@@ -74,7 +74,7 @@ public interface DataStore {
      */
     @NonNull
     <M> Flowable<M> dynamicPutObject(String url, String idColumnName, Class itemIdType,
-                                     JSONObject keyValuePairs, Class requestType, Class responseType,
+                                     JSONObject keyValuePairs, Class requestType, Class<M> responseType,
                                      boolean persist, boolean cache, boolean queuable);
 
     /**
@@ -83,7 +83,7 @@ public interface DataStore {
      */
     @NonNull
     <M> Flowable<M> dynamicPutList(String url, String idColumnName, Class itemIdType,
-                                   JSONArray jsonArray, Class requestType, Class responseType,
+                                   JSONArray jsonArray, Class requestType, Class<M> responseType,
                                    boolean persist, boolean cache, boolean queuable);
 
     /**
@@ -92,7 +92,7 @@ public interface DataStore {
      */
     @NonNull
     <M> Flowable<M> dynamicDeleteCollection(String url, String idColumnName, Class itemIdType,
-                                            JSONArray jsonArray, Class requestType, Class responseType,
+                                            JSONArray jsonArray, Class requestType, Class<M> responseType,
                                             boolean persist, boolean cache, boolean queuable);
 
     /**
@@ -108,6 +108,6 @@ public interface DataStore {
 
     @NonNull
     <M> Flowable<M> dynamicUploadFile(String url, @NonNull HashMap<String, File> keyFileMap,
-            @Nullable HashMap<String, Object> parameters, boolean onWifi, boolean whileCharging, boolean queuable,
-            @NonNull Class responseType);
+                                      @Nullable HashMap<String, Object> parameters, boolean onWifi,
+                                      boolean whileCharging, boolean queuable, @NonNull Class<M> responseType);
 }
