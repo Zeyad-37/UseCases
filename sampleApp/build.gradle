@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'realm-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 
 android {
     compileSdkVersion 27
@@ -80,14 +81,22 @@ android {
         exclude 'META-INF/NOTICE'
         exclude 'META-INF/rxjava.properties'
     }
+
+    androidExtensions {
+        experimental = true
+    }
 }
 
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':usecases')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation "androidx.core:core-ktx:0.3"
+    implementation "org.koin:koin-android-architecture:0.9.3"
+    implementation "android.arch.lifecycle:reactivestreams:1.1.1"
+
     // Support
-//    implementation 'com.android.support:multidex:1.0.1'
     implementation "com.android.support:appcompat-v7:$supportLibrary"
     implementation "com.android.support:support-v4:$supportLibrary"
     implementation "com.android.support:recyclerview-v7:$supportLibrary"
@@ -103,34 +112,21 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
     implementation "com.squareup.retrofit2:converter-gson:$retrofit"
 
-//    implementation "android.arch.lifecycle:runtime:$archComp"
-//    implementation "android.arch.lifecycle:extensions:$archComp"
-//    implementation "android.arch.lifecycle:reactivestreams:$archComp"
     // Network
-    implementation 'com.github.bumptech.glide:glide:4.0.0'
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
     // Rx
-//    def withoutRx = { exclude group: "io.reactivex.rxjava2" }
-    implementation "com.jakewharton.rxbinding2:rxbinding:$rxbinding"//, withoutRx
+    implementation "com.jakewharton.rxbinding2:rxbinding:$rxbinding"
     implementation "com.jakewharton.rxbinding2:rxbinding-appcompat-v7:$rxbinding"
     implementation "com.jakewharton.rxbinding2:rxbinding-design:$rxbinding"
     implementation "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7:$rxbinding"
-//    implementation "com.trello.rxlifecycle2:rxlifecycle:$rxLifeCycle"
-//    implementation "com.trello.rxlifecycle2:rxlifecycle-components:$rxLifeCycle"
-    // Injection
-    implementation "com.jakewharton:butterknife:$butterKnife"
-    annotationProcessor "com.jakewharton:butterknife-implementation:$butterKnife"
     // Utilities
     implementation "nl.littlerobots.rxlint:rxlint:$rxlint"
-    implementation 'com.airbnb.android:lottie:2.2.0'
+    implementation 'com.airbnb.android:lottie:2.5.1'
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanary"
     testImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanary"
     implementation 'org.parceler:parceler-api:1.1.9'
     annotationProcessor 'org.parceler:parceler:1.1.9'
-//    implementation("io.flowup:android-sdk:0.2.4") {
-//        exclude group: 'com.google.android.gms'
-//    }
-//    testImplementation 'io.flowup:android-sdk-no-op:0.2.4'
     // Testing
     androidTestImplementation "com.android.support.test:runner:$androidSupportTest"
     androidTestImplementation "com.android.support.test:rules:$androidSupportTest"
@@ -150,7 +146,6 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     testImplementation "org.mockito:mockito-core:$mockito"
     debugImplementation 'com.21buttons:fragment-test-rule:1.0.0'
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 //apply from: "$project.rootDir/tools/script-git-version.gradle"

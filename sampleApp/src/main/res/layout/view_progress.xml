@@ -12,6 +12,6 @@
         android:layout_height="@dimen/iv_cover_height"
         app:lottie_autoPlay="true"
         app:lottie_colorFilter="@color/colorAccent"
-        app:lottie_fileName="loading.json"
+        app:lottie_rawRes="@raw/loading"
         app:lottie_loop="true" />
 </LinearLayout>

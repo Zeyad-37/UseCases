@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.rule.ActivityTestRule;
 
-import com.zeyad.usecases.app.screens.user.list.User;
+import com.zeyad.usecases.app.screens.user.User;
 
 import org.junit.Rule;
 
@@ -22,9 +22,9 @@ public class UserDetailFragmentTest {
             UserDetailActivity.class) {
         @Override
         protected Intent getActivityIntent() {
-            return UserDetailActivity.getCallingIntent(
-                    InstrumentationRegistry.getInstrumentation().getTargetContext(), UserDetailState.builder()
-                            .setIsTwoPane(false).setRepos(mockRepos()).setUser(mockUser().getLogin()).build());
+            return UserDetailActivity.Companion.getCallingIntent(
+                    InstrumentationRegistry.getInstrumentation().getTargetContext(),
+                    new UserDetailState(false, mockUser()));
         }
     };
 
@@ -41,7 +41,7 @@ public class UserDetailFragmentTest {
         Repository repository = new Repository();
         repository.setId(1);
         repository.setName("Repo");
-        repository.setOwner(user);
+        repository.setOwner$production_sources_for_module_sampleApp(user);
         return repositories;
     }
 }

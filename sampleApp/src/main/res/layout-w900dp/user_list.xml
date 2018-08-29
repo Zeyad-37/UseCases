@@ -19,17 +19,17 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="@dimen/item_width"
         android:layout_height="match_parent"
-        app:layoutManager="LinearLayoutManager"
+        app:layoutManager="android.support.v7.widget.LinearLayoutManager"
         tools:context=".screens.screens.user_list.UserListActivity"
         tools:listitem="@layout/user_list_content" />
 
-    <com.zeyad.gadapter.fastscroll.FastScroller
-        android:id="@+id/fastscroll"
-        android:layout_width="wrap_content"
-        android:layout_height="match_parent"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:orientation="vertical" />
+    <!--<com.zeyad.gadapter.fastscroll.FastScroller-->
+    <!--android:id="@+id/fastscroll"-->
+    <!--android:layout_width="wrap_content"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:layout_alignParentEnd="true"-->
+    <!--android:layout_alignParentRight="true"-->
+    <!--android:orientation="vertical" />-->
 
     <FrameLayout
         android:id="@+id/user_detail_container"
