@@ -2,7 +2,6 @@ package com.zeyad.usecases.api
 
 import android.util.Log
 import com.jakewharton.rx.ReplayingShare
-import com.zeyad.usecases.db.RealmQueryProvider
 import com.zeyad.usecases.requests.FileIORequest
 import com.zeyad.usecases.requests.GetRequest
 import com.zeyad.usecases.requests.PostRequest
@@ -12,14 +11,15 @@ import io.reactivex.Flowable
 import io.reactivex.FlowableTransformer
 import io.reactivex.Scheduler
 import io.reactivex.Single
-import io.realm.RealmModel
 import org.json.JSONException
 import java.io.File
 
 /**
  * @author by ZIaDo on 5/9/17.
  */
-internal class DataService(private val mDataStoreFactory: DataStoreFactory, private val mPostExecutionThread: Scheduler?, private val mBackgroundThread: Scheduler) : IDataService {
+internal class DataService(private val mDataStoreFactory: DataStoreFactory,
+                           private val mPostExecutionThread: Scheduler?,
+                           private val mBackgroundThread: Scheduler) : IDataService {
     private val mPostThreadExist: Boolean = mPostExecutionThread != null
 
     override fun <M> getList(getListRequest: GetRequest): Flowable<List<M>> {
@@ -198,15 +198,15 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory, priv
         }
     }
 
-    override fun <M : RealmModel> queryDisk(realmQueryProvider: RealmQueryProvider<M>): Flowable<List<M>> {
-        val result: Flowable<List<M>> = try {
-            mDataStoreFactory.disk(Any::class.java).queryDisk<M>(realmQueryProvider)
-                    .compose(ReplayingShare.instance())
-        } catch (e: IllegalAccessException) {
-            Flowable.error(e)
-        }
-        return result.compose(applySchedulers())
-    }
+//    override fun <M : RealmModel> queryDisk(realmQueryProvider: RealmQueryProvider<M>): Flowable<List<M>> {
+//        val result: Flowable<List<M>> = try {
+//            mDataStoreFactory.disk(Any::class.java).queryDisk<M>(realmQueryProvider)
+//                    .compose(ReplayingShare.instance())
+//        } catch (e: IllegalAccessException) {
+//            Flowable.error(e)
+//        }
+//        return result.compose(applySchedulers())
+//    }
 
     override fun <M> getListOffLineFirst(getRequest: GetRequest): Flowable<List<M>> {
         var result: Flowable<List<M>>

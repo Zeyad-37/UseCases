@@ -3,6 +3,7 @@ package com.zeyad.usecases.api
 import android.app.Application
 import android.content.Context
 import com.zeyad.usecases.Config
+import com.zeyad.usecases.db.DataBaseManager
 import com.zeyad.usecases.db.RealmManager
 import com.zeyad.usecases.network.ApiConnection
 import com.zeyad.usecases.stores.DataStoreFactory
@@ -44,11 +45,13 @@ class DataServiceFactory(val config: DataServiceConfig) {
         val apiConnection = ApiConnection(ApiConnection.init(config.okHttpBuilder),
                 ApiConnection.initWithCache(config.okHttpBuilder, config.okHttpCache))
         if (!Config.withSQLite) {
-            dataBaseManagerUtil = DataBaseManagerUtil {
-                if (config.withRealm)
-                    RealmManager()
-                else
-                    null
+            dataBaseManagerUtil = object : DataBaseManagerUtil {
+                override fun getDataBaseManager(dataClass: Class<*>): DataBaseManager? {
+                    return if (config.withRealm)
+                        RealmManager()
+                    else
+                        null
+                }
             }
         }
         instance = DataService(DataStoreFactory(dataBaseManagerUtil, apiConnection,

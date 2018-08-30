@@ -1,41 +1,58 @@
-package com.zeyad.usecases.db
+package com.zeyad.usecases.db;
 
-import io.reactivex.Flowable
-import io.reactivex.Single
-import io.realm.RealmModel
-import org.json.JSONArray
-import org.json.JSONObject
+import android.support.annotation.NonNull;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.List;
+
+import io.reactivex.Flowable;
+import io.reactivex.Single;
+import io.realm.RealmModel;
 
 /**
  * Interface for the Database modules.
  */
-interface DataBaseManager {
+public interface DataBaseManager {
 
     /**
-     * Gets an [Flowable] which will emit an Object
+     * Gets an {@link Flowable} which will emit an Object
      * @param idColumnName name of ID variable
      * @param itemId ID value
      * @param itemIdType type of the ID
      * @param dataClass type of the data requested
      * @param <M> type of the data requested
-     * @return a [Flowable] containing an object of type M.
-    </M> */
-    fun <M : RealmModel> getById(idColumnName: String, itemId: Any,
-                                 itemIdType: Class<*>, dataClass: Class<M>): Flowable<M>
+     * @return a {@link Flowable} containing an object of type M.
+     */
+    @NonNull
+    <M> Flowable<M> getById(@NonNull final String idColumnName, final Object itemId,
+                            final Class itemIdType, Class dataClass);
 
     /**
-     * Gets an [Flowable] which will emit a List of Objects.
+     * Gets an {@link Flowable} which will emit a List of Objects.
      *
      * @param clazz Class type of the items to get.
      */
-    fun <M : RealmModel> getAll(clazz: Class<M>): Flowable<List<M>>
+    @NonNull
+    <M> Flowable<List<M>> getAll(Class clazz);
 
     /**
      * Get list of items according to the query passed.
      *
      * @param queryFactory The query used to look for inside the DB.
      */
-    fun <M : RealmModel> getQuery(queryFactory: RealmQueryProvider<M>): Flowable<List<M>>
+    @NonNull
+    <M extends RealmModel> Flowable<List<M>> getQuery(RealmQueryProvider<M> queryFactory);
+
+    /**
+     * Puts and element into the DB.
+     *
+     * @param realmModel Element to insert in the DB.
+     * @param dataClass  Class type of the items to be put.
+     */
+    @NonNull
+    <M extends RealmModel> Single<Boolean> put(M realmModel, Class dataClass);
 
     /**
      * Puts and element into the DB.
@@ -43,8 +60,8 @@ interface DataBaseManager {
      * @param jsonObject Element to insert in the DB.
      * @param dataClass  Class type of the items to be put.
      */
-    fun <M : RealmModel> put(jsonObject: JSONObject, idColumnName: String, itemIdType: Class<*>,
-                             dataClass: Class<M>): Single<Boolean>
+    @NonNull
+    Single<Boolean> put(JSONObject jsonObject, String idColumnName, Class itemIdType, Class dataClass);
 
     /**
      * Puts and element into the DB.
@@ -52,7 +69,8 @@ interface DataBaseManager {
      * @param realmObjects Element to insert in the DB.
      * @param dataClass    Class type of the items to be put.
      */
-    fun <M : RealmModel> putAll(realmObjects: List<M>, dataClass: Class<M>): Single<Boolean>
+    @NonNull
+    <M extends RealmModel> Single<Boolean> putAll(List<M> realmObjects, Class dataClass);
 
     /**
      * Puts and element into the DB.
@@ -61,15 +79,16 @@ interface DataBaseManager {
      * @param idColumnName Name of the id field.
      * @param dataClass    Class type of the items to be put.
      */
-    fun <M : RealmModel> putAll(jsonArray: JSONArray, idColumnName: String, itemIdType: Class<*>,
-                                dataClass: Class<M>): Single<Boolean>
+    @NonNull
+    Single<Boolean> putAll(JSONArray jsonArray, String idColumnName, Class itemIdType, Class dataClass);
 
     /**
      * Evict all elements of the DB.
      *
      * @param clazz Class type of the items to be deleted.
      */
-    fun <M : RealmModel> evictAll(clazz: Class<M>): Single<Boolean>
+    @NonNull
+    Single<Boolean> evictAll(Class clazz);
 
     /**
      * Evict a collection elements of the DB.
@@ -78,8 +97,8 @@ interface DataBaseManager {
      * @param list        List of ids to be deleted.
      * @param dataClass   Class type of the items to be deleted.
      */
-    fun <M : RealmModel> evictCollection(idFieldName: String, list: List<Any>, itemIdType: Class<*>,
-                                         dataClass: Class<M>): Single<Boolean>
+    @NonNull
+    Single<Boolean> evictCollection(String idFieldName, List<Object> list, Class itemIdType, Class dataClass);
 
     /**
      * Evict element by id of the DB.
@@ -88,7 +107,6 @@ interface DataBaseManager {
      * @param idFieldName  The id used to look for inside the DB.
      * @param idFieldValue Name of the id field.
      */
-    fun <M : RealmModel> evictById(clazz: Class<M>, idFieldName: String, idFieldValue: Any,
-                                   itemIdType: Class<*>): Boolean
+    boolean evictById(Class clazz, String idFieldName, Object idFieldValue, Class itemIdType);
 }
 

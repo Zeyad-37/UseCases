@@ -68,7 +68,6 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Before
     public void setUp() {
-        com.zeyad.usecases.Config.Companion.setGson();
         observable = Flowable.just(new Object());
         fileFlowable = Flowable.just(ResponseBody.create(null, ""));
         mockContext = mock(Context.class);
@@ -85,12 +84,12 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         when(utils.isNetworkAvailable(any(Context.class))).thenReturn(true);
         when(utils.withDisk(true)).thenReturn(true);
         cloudStore = new CloudStore(mockApiConnection, mockDataBaseManager, new DAOMapper(),
-                new MemoryStore(com.zeyad.usecases.Config.Companion.getGson()), utils);
+                new MemoryStore(com.zeyad.usecases.Config.INSTANCE.getGson()), utils);
         HandlerThread backgroundThread = new HandlerThread("backgroundThread");
         backgroundThread.start();
-        com.zeyad.usecases.Config.setWithCache(false);
-        com.zeyad.usecases.Config.Companion.setWithSQLite(true);
-        com.zeyad.usecases.Config
+        com.zeyad.usecases.Config.INSTANCE.setWithCache(false);
+        com.zeyad.usecases.Config.INSTANCE.setWithSQLite(true);
+        com.zeyad.usecases.Config.INSTANCE
                 .setBackgroundThread(AndroidSchedulers.from(backgroundThread.getLooper()));
     }
 
@@ -122,8 +121,8 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
     public void dynamicGetList() {
         List<TestRealmModel> testRealmObjects = new ArrayList<>();
         testRealmObjects.add(new TestRealmModel());
-        Flowable<List> observable = Flowable.just(testRealmObjects);
-        when(mockApiConnection.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
+        Flowable<List<TestRealmModel>> observable = Flowable.just(testRealmObjects);
+        when(mockApiConnection.<TestRealmModel>dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
 
         cloudStore.dynamicGetList("", "", Object.class, false, false);
 
@@ -133,8 +132,8 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicGetListCanWillPersist() {
-        Flowable<List> observable = Flowable.just(Collections.singletonList(new TestRealmModel()));
-        when(mockApiConnection.dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
+        Flowable<List<TestRealmModel>> observable = Flowable.just(Collections.singletonList(new TestRealmModel()));
+        when(mockApiConnection.<TestRealmModel>dynamicGetList(anyString(), anyBoolean())).thenReturn(observable);
 
         TestSubscriber<List> testSubscriber = new TestSubscriber<>();
         cloudStore.dynamicGetList("", "", Object.class, true, false).subscribe(testSubscriber);
@@ -163,7 +162,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test
     public void dynamicPatchObjectCanWillPersist() {
-        com.zeyad.usecases.Config.Companion.setWithSQLite(true);
+        com.zeyad.usecases.Config.INSTANCE.setWithSQLite(true);
         when(mockApiConnection.dynamicPatch(anyString(), any(RequestBody.class)))
                 .thenReturn(observable);
 
@@ -588,7 +587,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
 
     @Test(expected = RuntimeException.class)
     public void queryDisk() {
-        Flowable observable = cloudStore.queryDisk(realm -> realm.where(TestRealmModel.class));
+//        Flowable observable = cloudStore.queryDisk(realm -> realm.where(TestRealmModel.class));
 
         // Verify repository interactions
         verifyZeroInteractions(mockApiConnection);
