@@ -6,8 +6,8 @@ import com.zeyad.usecases.requests.FileIORequest
 import com.zeyad.usecases.requests.GetRequest
 import com.zeyad.usecases.requests.PostRequest
 import com.zeyad.usecases.stores.DataStoreFactory
-import com.zeyad.usecases.utils.Utils
 import com.zeyad.usecases.withCache
+import com.zeyad.usecases.withDisk
 import io.reactivex.Flowable
 import io.reactivex.FlowableTransformer
 import io.reactivex.Scheduler
@@ -60,7 +60,7 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory,
             val dynamicGetObject = mDataStoreFactory.dynamically(url, dataClass)
                     .dynamicGetObject(url, getRequest.idColumnName, itemId, getRequest.idType,
                             dataClass, getRequest.persist, shouldCache)
-            result = if (Utils.getInstance().withCache(shouldCache)) {
+            result = if (withCache(shouldCache)) {
                 mDataStoreFactory.memory()!!
                         .getItem<M>(itemId.toString(), dataClass)
                         .doOnSuccess { Log.d("getObject", CACHE_HIT + simpleName) }
@@ -204,14 +204,13 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory,
     override fun <M> getListOffLineFirst(getRequest: GetRequest): Flowable<List<M>> {
         var result: Flowable<List<M>>
         try {
-            val utils = Utils.getInstance()
             val dataClass = getRequest.getTypedDataClass<M>()
             val simpleName = dataClass.simpleName
             val idColumnName = getRequest.idColumnName
             val persist = getRequest.persist
             val shouldCache = getRequest.cache
-            val withDisk = utils.withDisk(persist)
-            val withCache = utils.withCache(shouldCache)
+            val withDisk = withDisk(persist)
+            val withCache = withCache(shouldCache)
             val cloud = mDataStoreFactory.cloud(dataClass)
                     .dynamicGetList(getRequest.getCorrectUrl(), idColumnName, dataClass, persist, shouldCache)
             val disk = mDataStoreFactory.disk(dataClass)
@@ -242,7 +241,6 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory,
     override fun <M> getObjectOffLineFirst(getRequest: GetRequest): Flowable<M> {
         var result: Flowable<M>
         try {
-            val utils = Utils.getInstance()
             val itemId = getRequest.itemId
             val dataClass = getRequest.getTypedDataClass<M>()
             val idType = getRequest.idType
@@ -250,8 +248,8 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory,
             val simpleName = dataClass.simpleName
             val persist = getRequest.persist
             val shouldCache = getRequest.cache
-            val withDisk = utils.withDisk(persist)
-            val withCache = utils.withCache(shouldCache)
+            val withDisk = withDisk(persist)
+            val withCache = withCache(shouldCache)
             val cloud = mDataStoreFactory.cloud(dataClass)
                     .dynamicGetObject(getRequest.getCorrectUrl(), idColumnName, itemId, idType, dataClass,
                             persist, shouldCache)

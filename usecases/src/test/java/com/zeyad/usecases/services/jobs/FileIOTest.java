@@ -8,9 +8,7 @@ import android.support.test.rule.BuildConfig;
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.requests.FileIORequest;
 import com.zeyad.usecases.stores.CloudStore;
-import com.zeyad.usecases.utils.Utils;
 
-import org.json.JSONException;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -38,19 +36,17 @@ import static org.mockito.Mockito.verify;
 public class FileIOTest {
     private CloudStore cloudStore;
     private Context mockContext;
-    private Utils utils;
     // item under test
     private FileIO fileIO;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mockContext = mock(Context.class);
-        utils = mock(Utils.class);
         cloudStore = createCloudDataStore();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         reset(cloudStore);
     }
 
@@ -62,7 +58,7 @@ public class FileIOTest {
     }
 
     @Test
-    public void testUpload() throws JSONException {
+    public void testUpload() {
         //        fileIO = createFileIO(mockFileIoReq(true, true, getValidFile()), false);
         //        fileIO.execute();
         //        verify(cloudStore).dynamicUploadFile(anyString(), any(), anyString(), (HashMap<String, Object>) anyMap(),
@@ -70,7 +66,7 @@ public class FileIOTest {
     }
 
     @Test
-    public void testReQueue() throws JSONException {
+    public void testReQueue() {
         FileIORequest fileIOReq = mockFileIoReq(true, true, getValidFile());
         fileIO = createFileIO(fileIOReq, true);
         Mockito.doNothing()
@@ -86,11 +82,11 @@ public class FileIOTest {
 
     private FileIORequest mockFileIoReq(boolean wifi, boolean isCharging, File file) {
         final FileIORequest fileIORequest = mock(FileIORequest.class);
-        Mockito.when(fileIORequest.getDataClass()).thenReturn(TestRealmModel.class);
+        Mockito.when(fileIORequest.<TestRealmModel>getDataClass()).thenReturn(TestRealmModel.class);
         Mockito.when(fileIORequest.getUrl()).thenReturn(getValidUrl());
         Mockito.when(fileIORequest.getFile()).thenReturn(file);
-        Mockito.when(fileIORequest.isWhileCharging()).thenReturn(isCharging);
-        Mockito.when(fileIORequest.isOnWifi()).thenReturn(wifi);
+        Mockito.when(fileIORequest.getWhileCharging()).thenReturn(isCharging);
+        Mockito.when(fileIORequest.getOnWifi()).thenReturn(wifi);
         return fileIORequest;
     }
 

@@ -14,7 +14,6 @@ import com.zeyad.usecases.db.DataBaseManager;
 import com.zeyad.usecases.db.RealmManager;
 import com.zeyad.usecases.mapper.DAOMapper;
 import com.zeyad.usecases.network.ApiConnection;
-import com.zeyad.usecases.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -73,7 +72,6 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         mockContext = mock(Context.class);
         mockApiConnection = mock(ApiConnection.class);
         mockDataBaseManager = mock(RealmManager.class);
-        Utils utils = mock(Utils.class);
         changeStateOfNetwork(mockContext, true);
         when(mockDataBaseManager.put(any(JSONObject.class), anyString(), any(Class.class), any(Class.class)))
                 .thenReturn(Single.just(true));
@@ -84,7 +82,7 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
         when(utils.isNetworkAvailable(any(Context.class))).thenReturn(true);
         when(utils.withDisk(true)).thenReturn(true);
         cloudStore = new CloudStore(mockApiConnection, mockDataBaseManager, new DAOMapper(),
-                new MemoryStore(com.zeyad.usecases.Config.INSTANCE.getGson()), utils);
+                new MemoryStore(com.zeyad.usecases.Config.INSTANCE.getGson()));
         HandlerThread backgroundThread = new HandlerThread("backgroundThread");
         backgroundThread.start();
         com.zeyad.usecases.Config.INSTANCE.setWithCache(false);

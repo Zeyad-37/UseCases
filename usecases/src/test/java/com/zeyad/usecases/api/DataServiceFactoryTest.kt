@@ -23,10 +23,10 @@ import java.util.concurrent.TimeUnit
 class DataServiceFactoryTest {
     private val URL = "https://api.github.com/"
     private val cacheSize = 8192
-    private var mDataServiceConfig: DataServiceConfig? = null
-    private var mockContext: Context? = null
-    private var builder: OkHttpClient.Builder? = null
-    private var cache: Cache? = null
+    private lateinit var mDataServiceConfig: DataServiceConfig
+    private lateinit var mockContext: Context
+    private lateinit var builder: OkHttpClient.Builder
+    private lateinit var cache: Cache
 
     @Before
     @Throws(Exception::class)
@@ -38,24 +38,18 @@ class DataServiceFactoryTest {
                 .writeTimeout(15, TimeUnit.SECONDS)
         cache = Cache(File("/data/data/com/zeyad/usecases/cache/", "http-cache"),
                 (10 * 1024 * 1024).toLong())
-        mDataServiceConfig = DataServiceConfig.Builder(mockContext!!)
-                .baseUrl(URL)
-                .cacheSize(cacheSize)
-                .okHttpBuilder(builder!!)
-                .okhttpCache(cache!!)
-                .withRealm()
-                .build()
+        mDataServiceConfig = DataServiceConfig(mockContext, builder, baseUrl = URL,
+                withRealm = true, cacheDuration = 3, timeUnit = TimeUnit.MINUTES, okHttpCache = cache)
     }
 
     @Test
     @Throws(Exception::class)
     fun init() {
-        DataServiceFactory.init(mDataServiceConfig!!)
+        val instance = DataServiceFactory(mDataServiceConfig).instance
         assertNotNull(com.zeyad.usecases.Config.apiConnection)
         assertNotNull(com.zeyad.usecases.Config.backgroundThread)
         assertNotNull(com.zeyad.usecases.Config.gson)
-        assertNotNull(com.zeyad.usecases.Config.instance)
-        assertNotNull(DataServiceFactory.instance)
+        assertNotNull(instance)
         assertEquals(com.zeyad.usecases.Config.baseURL, URL)
     }
 }

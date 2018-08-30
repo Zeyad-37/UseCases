@@ -8,7 +8,6 @@ import android.support.test.rule.BuildConfig;
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.network.ApiConnection;
 import com.zeyad.usecases.requests.PostRequest;
-import com.zeyad.usecases.utils.Utils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,13 +51,11 @@ public class PostTest {
     private final TestRealmModel TEST_MODEL = new TestRealmModel(1, "123");
     private Context mockedContext;
     private ApiConnection apiConnection;
-    private Utils utils;
 
     @Before
     public void setUp() {
         mockedContext = mock(Context.class);
         apiConnection = createRestApi();
-        utils = mock(Utils.class);
     }
 
     @After
