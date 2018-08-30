@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+//apply plugin: 'kotlin-android-extensions'
 apply plugin: 'realm-android'
 apply plugin: "net.ltgt.errorprone"
 
@@ -61,6 +62,10 @@ android {
             assets.srcDirs = ['src/main/assets', 'src/main/java/com/zeyad/usecases/assets', 'src/test/java/com/zeyad/usecases/assets']
         }
     }
+
+//    androidExtensions {
+//        experimental = true
+//    }
 }
 
 dependencies {

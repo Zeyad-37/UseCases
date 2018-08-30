@@ -16,7 +16,10 @@ import com.zeyad.usecases.mapper.DAOMapper
 import com.zeyad.usecases.network.ApiConnection
 import com.zeyad.usecases.requests.FileIORequest
 import com.zeyad.usecases.requests.PostRequest
-import com.zeyad.usecases.requests.PostRequest.*
+import com.zeyad.usecases.requests.PostRequest.CREATOR.DELETE
+import com.zeyad.usecases.requests.PostRequest.CREATOR.PATCH
+import com.zeyad.usecases.requests.PostRequest.CREATOR.POST
+import com.zeyad.usecases.requests.PostRequest.CREATOR.PUT
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.SingleObserver
@@ -366,31 +369,20 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
 
     private fun queueIOFile(url: String, keyFileMap: HashMap<String, File>?, file: File?, onWifi: Boolean,
                             whileCharging: Boolean, isDownload: Boolean) {
-        queueFileIOCore(mDispatcher, isDownload, FileIORequest.Builder(url)
-                .keyFileMapToUpload(keyFileMap)
-                .file(file)
-//                .queuable(onWifi, whileCharging)
-                .build(), 0)
+        queueFileIOCore(mDispatcher, isDownload,
+                FileIORequest(url, onWifi, whileCharging, true, file, Any::class.java, keyFileMap), 0)
     }
 
     private fun queuePost(method: String, url: String, idColumnName: String, idType: Class<*>,
                           jsonArray: JSONArray, persist: Boolean) {
-        queuePostCore(PostRequest.Builder(null, persist)
-                .idColumnName(idColumnName, idType)
-                .payLoad(jsonArray)
-                .url(url)
-                .method(method)
-                .build())
+        queuePostCore(PostRequest("", url, Any::class.java, Any::class.java, persist,
+                jsonArray = jsonArray, method = method, idColumnName = idColumnName, idType = idType))
     }
 
     private fun queuePost(method: String, url: String, idColumnName: String, idType: Class<*>,
                           jsonObject: JSONObject, persist: Boolean) {
-        queuePostCore(PostRequest.Builder(null, persist)
-                .idColumnName(idColumnName, idType)
-                .payLoad(jsonObject)
-                .url(url)
-                .method(method)
-                .build())
+        queuePostCore(PostRequest("", url, Any::class.java, Any::class.java, persist,
+                jsonObject = jsonObject, method = method, idColumnName = idColumnName, idType = idType))
     }
 
     private fun queuePostCore(postRequest: PostRequest) {

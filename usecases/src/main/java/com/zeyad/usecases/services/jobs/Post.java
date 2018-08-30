@@ -10,7 +10,6 @@ import com.zeyad.usecases.network.ApiConnection;
 import com.zeyad.usecases.requests.PostRequest;
 import com.zeyad.usecases.utils.Utils;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import io.reactivex.Completable;
@@ -42,34 +41,24 @@ public class Post {
 
     public Completable execute() {
         String bundle = "";
-        try {
-            if (mPostRequest.getObjectBundle().length() > 0) {
-                JSONObject jsonObject = mPostRequest.getObjectBundle();
-                if (jsonObject != null) {
-                    bundle = jsonObject.toString();
-                    isObject = true;
-                }
-            } else {
-                bundle = mPostRequest.getArrayBundle().toString();
-            }
-        } catch (JSONException e) {
-            try {
-                bundle = mPostRequest.getArrayBundle().toString();
-            } catch (JSONException e1) {
-                return Completable.error(e);
-            }
+        if (mPostRequest.getObjectBundle().length() > 0) {
+            JSONObject jsonObject = mPostRequest.getObjectBundle();
+            bundle = jsonObject.toString();
+            isObject = true;
+        } else {
+            bundle = mPostRequest.getArrayBundle().toString();
         }
         RequestBody requestBody = RequestBody.create(MediaType.parse(APPLICATION_JSON), bundle);
         switch (mPostRequest.getMethod()) {
             case PostRequest.PATCH:
-                return Completable.fromObservable(mRestApi.dynamicPatch(mPostRequest.getUrl(), requestBody)
+                return Completable.fromObservable(mRestApi.dynamicPatch(mPostRequest.getCorrectUrl(), requestBody)
                         .doOnSubscribe(subscription -> Log.d(TAG, "Patching " + mPostRequest.getRequestType()
                                 .getSimpleName()))
                         .doOnError(this::onError)
                         .doOnComplete(() -> Log.d(TAG, COMPLETED))
                         .toObservable());
             case PostRequest.POST:
-                return Completable.fromObservable(mRestApi.dynamicPost(mPostRequest.getUrl(), requestBody)
+                return Completable.fromObservable(mRestApi.dynamicPost(mPostRequest.getCorrectUrl(), requestBody)
                                                           .doOnSubscribe(subscription -> Log.d(TAG,
                                                                   "Posting " + (isObject ? "List of " : "") + mPostRequest.getRequestType()
                                                                                                                           .getSimpleName()))
@@ -77,7 +66,7 @@ public class Post {
                                                           .doOnComplete(() -> Log.d(TAG, COMPLETED))
                                                           .toObservable());
             case PostRequest.PUT:
-                return Completable.fromObservable(mRestApi.dynamicPut(mPostRequest.getUrl(), requestBody)
+                return Completable.fromObservable(mRestApi.dynamicPut(mPostRequest.getCorrectUrl(), requestBody)
                                                           .doOnSubscribe(subscription -> Log.d(TAG,
                                                                   "Putting " + (isObject ? "List of " : "") + mPostRequest.getRequestType()
                                                                                                                           .getSimpleName()))
@@ -85,7 +74,7 @@ public class Post {
                                                           .doOnComplete(() -> Log.d(TAG, COMPLETED))
                                                           .toObservable());
             case PostRequest.DELETE:
-                return Completable.fromObservable(mRestApi.dynamicDelete(mPostRequest.getUrl())
+                return Completable.fromObservable(mRestApi.dynamicDelete(mPostRequest.getCorrectUrl())
                                                           .doOnSubscribe(subscription -> Log.d(TAG,
                                                                   "Deleting " + (isObject ? "List of " : "") + mPostRequest.getRequestType()
                                                                                                                            .getSimpleName()))

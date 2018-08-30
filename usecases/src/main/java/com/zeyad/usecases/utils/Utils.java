@@ -72,7 +72,7 @@ public class Utils {
         extras.putString(GenericJobService.JOB_TYPE, GenericJobService.POST);
         extras.putParcelable(GenericJobService.PAYLOAD, postRequest);
         extras.putInt(GenericJobService.TRIAL_COUNT, trailCount);
-        queueCore(dispatcher, extras, postRequest.getMethod(), postRequest.isOnWifi(), postRequest.isWhileCharging());
+        queueCore(dispatcher, extras, postRequest.getMethod(), postRequest.getOnWifi(), postRequest.getWhileCharging());
     }
 
     public void queueFileIOCore(@NonNull FirebaseJobDispatcher dispatcher, boolean isDownload,
@@ -83,7 +83,7 @@ public class Utils {
         extras.putParcelable(GenericJobService.PAYLOAD, fileIORequest);
         extras.putInt(GenericJobService.TRIAL_COUNT, trailCount);
         queueCore(dispatcher, extras, (isDownload ? "Download" : "Upload") + " file",
-                fileIORequest.isOnWifi(), fileIORequest.isWhileCharging());
+                fileIORequest.getOnWifi(), fileIORequest.getWhileCharging());
     }
 
     private void queueCore(@NonNull FirebaseJobDispatcher dispatcher, @NonNull Bundle bundle, String message,

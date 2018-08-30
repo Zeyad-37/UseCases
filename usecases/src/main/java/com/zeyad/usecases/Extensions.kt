@@ -90,7 +90,7 @@ fun queuePostCore(dispatcher: FirebaseJobDispatcher, postRequest: PostRequest, t
     extras.putString(GenericJobService.JOB_TYPE, GenericJobService.POST)
     extras.putParcelable(GenericJobService.PAYLOAD, postRequest)
     extras.putInt(GenericJobService.TRIAL_COUNT, trailCount)
-    queueCore(dispatcher, extras, postRequest.method, postRequest.isOnWifi, postRequest.isWhileCharging)
+    queueCore(dispatcher, extras, postRequest.method, postRequest.onWifi, postRequest.whileCharging)
 }
 
 fun queueFileIOCore(dispatcher: FirebaseJobDispatcher, isDownload: Boolean,
@@ -103,7 +103,7 @@ fun queueFileIOCore(dispatcher: FirebaseJobDispatcher, isDownload: Boolean,
     extras.putParcelable(GenericJobService.PAYLOAD, fileIORequest)
     extras.putInt(GenericJobService.TRIAL_COUNT, trailCount)
     queueCore(dispatcher, extras, (if (isDownload) "Download" else "Upload") + " file",
-            fileIORequest.isOnWifi, fileIORequest.isWhileCharging)
+            fileIORequest.onWifi, fileIORequest.whileCharging)
 }
 
 private fun queueCore(dispatcher: FirebaseJobDispatcher, bundle: Bundle, message: String,

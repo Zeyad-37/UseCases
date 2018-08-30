@@ -8,7 +8,7 @@ import com.zeyad.usecases.app.screens.user.User
 import com.zeyad.usecases.app.screens.user.list.events.DeleteUsersEvent
 import com.zeyad.usecases.app.screens.user.list.events.GetPaginatedUsersEvent
 import com.zeyad.usecases.app.screens.user.list.events.SearchUsersEvent
-import com.zeyad.usecases.app.utils.Constants.URLS.USERS
+import com.zeyad.usecases.app.utils.Constants
 import com.zeyad.usecases.requests.GetRequest
 import com.zeyad.usecases.requests.PostRequest
 import io.reactivex.Flowable
@@ -62,14 +62,12 @@ class UserListVM(private var dataUseCase: IDataService) : BaseViewModel<UserList
     }
 
     private fun getUsers(lastId: Long): Flowable<List<User>> {
+        val getRequest = GetRequest(String.format(Constants.URLS.USERS, lastId), "",
+                User::class.java, Int::class.java, true, "id")
         return if (lastId == 0L)
-            dataUseCase.getListOffLineFirst(
-                    GetRequest.Builder(User::class.java, true)
-                            .url(String.format(USERS, lastId))
-                            .build())
+            dataUseCase.getListOffLineFirst(getRequest)
         else
-            dataUseCase.getList(GetRequest.Builder(User::class.java, true)
-                    .url(String.format(USERS, lastId)).build())
+            dataUseCase.getList(getRequest)
     }
 
 //    private fun search(query: String): Flowable<List<User>> {
@@ -92,7 +90,9 @@ class UserListVM(private var dataUseCase: IDataService) : BaseViewModel<UserList
 //    }
 
     private fun deleteCollection(selectedItemsIds: List<String>): Flowable<List<String>> {
-        return dataUseCase.deleteCollectionByIds<Any>(PostRequest.Builder(User::class.java, true).payLoad(selectedItemsIds)
-                .idColumnName(User.LOGIN, String::class.java).cache().build()).map { o -> selectedItemsIds }
+        return dataUseCase.deleteCollectionByIds<Boolean>(PostRequest("", "", User::class.java,
+                Boolean::class.java, true, false, false, false,
+                true, User.LOGIN, String::class.java, `object` = selectedItemsIds))
+                .map { selectedItemsIds }
     }
 }
