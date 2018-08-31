@@ -51,11 +51,11 @@ buildscript {
 }
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion '25.0.3'
+    compileSdkVersion 27
+    buildToolsVersion '27.0.3'
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 25
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
 //        multiDexEnabled true
@@ -104,40 +104,46 @@ android {
 }
 
 ext {
-    supportLibraryVersion = '25.3.1'
+    supportLibraryVersion = '27.0.1'
     retrofitVersion = '2.2.0'
     okhttpVersion = '3.7.0'
     androidSupportTest = '0.5'
     espressoCore = '2.2.2'
     powerMock = '1.6.6'
     robolectric = '3.3.2'
+    room_version = '1.1.1'
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
     //Job Dispatcher
-    compile 'com.firebase:firebase-jobdispatcher-with-gcm-dep:0.6.0'
+    implementation 'com.firebase:firebase-jobdispatcher-with-gcm-dep:0.6.0'
     // Network
-    compile "com.squareup.retrofit2:retrofit:$retrofitVersion"
-    compile "com.squareup.retrofit2:converter-gson:$retrofitVersion"
-    compile "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
-    compile "com.squareup.okhttp3:okhttp:$okhttpVersion"
-    compile "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
-    compile "com.android.support:support-annotations:$supportLibraryVersion"
+    implementation "com.squareup.retrofit2:retrofit:$retrofitVersion"
+    implementation "com.squareup.retrofit2:converter-gson:$retrofitVersion"
+    implementation "com.squareup.retrofit2:adapter-rxjava2:$retrofitVersion"
+    implementation "com.squareup.okhttp3:okhttp:$okhttpVersion"
+    implementation "com.squareup.okhttp3:logging-interceptor:$okhttpVersion"
+    implementation "com.android.support:support-annotations:$supportLibraryVersion"
+
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    annotationProcessor "android.arch.persistence.room:compiler:$room_version"
+    implementation "android.arch.persistence.room:rxjava2:$room_version"
+
     // Rx
-    compile 'io.reactivex.rxjava2:rxandroid:2.0.1'
-    compile 'io.reactivex:rxjava:1.3.0'
-    compile 'io.reactivex.rxjava2:rxjava:2.1.0'
+    implementation 'io.reactivex.rxjava2:rxandroid:2.0.1'
+    implementation 'io.reactivex:rxjava:1.3.0'
+    implementation 'io.reactivex.rxjava2:rxjava:2.1.0'
     // Cache
-    compile 'com.github.zeyad-37:storo:2.0.1'
+    implementation 'com.github.zeyad-37:storo:2.0.1'
     // Testing
-    testCompile 'junit:junit:4.12'
-    testCompile "com.android.support:support-annotations:$supportLibraryVersion"
-    testCompile "com.android.support.test.espresso:espresso-core:$espressoCore"
-//    testCompile "org.mockito:mockito-core:2.0.57-beta"
-    testCompile "org.mockito:mockito-core:1.10.19"
-    testCompile "org.robolectric:robolectric:$robolectric"
-    testCompile "org.robolectric:shadows-support-v4:$robolectric"
+    testImplementation 'junit:junit:4.12'
+    testImplementation "com.android.support:support-annotations:$supportLibraryVersion"
+    testImplementation "com.android.support.test.espresso:espresso-core:$espressoCore"
+//    testImplementation "org.mockito:mockito-core:2.0.57-beta"
+    testImplementation "org.mockito:mockito-core:1.10.19"
+    testImplementation "org.robolectric:robolectric:$robolectric"
+    testImplementation "org.robolectric:shadows-support-v4:$robolectric"
 }
 
 task createPom {
@@ -153,7 +159,7 @@ task createPom {
     }.withXml {
         def dependenciesNode = asNode().appendNode('dependencies')
 
-        configurations.compile.allDependencies.each { dependency ->
+        configurations.implementation.allDependencies.each { dependency ->
             def dependencyNode = dependenciesNode.appendNode('dependency')
             dependencyNode.appendNode('groupId', dependency.group)
             dependencyNode.appendNode('artifactId', dependency.name)
