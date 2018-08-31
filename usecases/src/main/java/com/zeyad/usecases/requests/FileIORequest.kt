@@ -4,17 +4,18 @@ import android.os.Parcel
 import android.os.Parcelable
 import java.io.File
 
+
 /**
  * @author zeyad on 7/29/16.
  */
-data class FileIORequest(val url: String = "",
-                         val onWifi: Boolean = false,
-                         val whileCharging: Boolean = false,
-                         val queuable: Boolean = false,
-                         val file: File? = File(""),
-                         val dataClass: Class<*>? = Any::class.java,
-                         val keyFileMap: HashMap<String, File>? = hashMapOf(),
-                         val parameters: HashMap<String, Any> = hashMapOf()) : Parcelable {
+data class FileIORequest private constructor(val url: String = "",
+                                             val onWifi: Boolean = false,
+                                             val whileCharging: Boolean = false,
+                                             val queuable: Boolean = false,
+                                             val file: File? = File(""),
+                                             val dataClass: Class<*>? = Any::class.java,
+                                             val keyFileMap: HashMap<String, File>? = hashMapOf(),
+                                             val parameters: HashMap<String, Any> = hashMapOf()) : Parcelable {
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
@@ -25,6 +26,17 @@ data class FileIORequest(val url: String = "",
             Any::class.java,
             hashMapOf(),
             hashMapOf())
+
+    constructor (uploadRequestBuilder: Builder) : this(
+            uploadRequestBuilder.url,
+            uploadRequestBuilder.onWifi,
+            uploadRequestBuilder.whileCharging,
+            uploadRequestBuilder.queuable,
+            uploadRequestBuilder.file,
+            uploadRequestBuilder.dataClass,
+            uploadRequestBuilder.keyFileMap,
+            uploadRequestBuilder.parameters
+    )
 
     fun <M> getTypedResponseClass(): Class<M> = dataClass as Class<M>
 
@@ -41,6 +53,47 @@ data class FileIORequest(val url: String = "",
         override fun createFromParcel(parcel: Parcel) = FileIORequest(parcel)
 
         override fun newArray(size: Int) = arrayOfNulls<FileIORequest?>(size)
+    }
+
+    class Builder(internal val url: String) {
+        internal var onWifi: Boolean = false
+        internal var whileCharging: Boolean = false
+        internal var queuable: Boolean = false
+        internal var dataClass: Class<*>? = null
+        internal var parameters: HashMap<String, Any> = hashMapOf()
+        internal var keyFileMap: HashMap<String, File>? = hashMapOf()
+        internal var file: File? = null
+
+        fun responseType(dataClass: Class<*>): Builder {
+            this.dataClass = dataClass
+            return this
+        }
+
+        fun keyFileMapToUpload(keyFileMap: HashMap<String, File>?): Builder {
+            this.keyFileMap = keyFileMap
+            return this
+        }
+
+        fun file(file: File?): Builder {
+            this.file = file
+            return this
+        }
+
+        fun payLoad(parameters: HashMap<String, Any>): Builder {
+            this.parameters = parameters
+            return this
+        }
+
+        fun queuable(onWifi: Boolean, whileCharging: Boolean): Builder {
+            this.queuable = true
+            this.onWifi = onWifi
+            this.whileCharging = whileCharging
+            return this
+        }
+
+        fun build(): FileIORequest {
+            return FileIORequest(this)
+        }
     }
 }
 

@@ -28,9 +28,12 @@ class UserDetailVM(private val dataUseCase: IDataService) : BaseViewModel<UserDe
         return Function { event -> getRepositories((event as GetReposEvent).getPayLoad()) }
     }
 
+
     private fun getRepositories(userLogin: String): Flowable<List<Repository>> {
-        return dataUseCase.getList(GetRequest(String.format(REPOSITORIES, userLogin), "",
-                Repository::class.java, Int::class.java, true, "id"))
+
+
+        return dataUseCase.getList(GetRequest.Builder(Repository::class.java, true)
+                .url(String.format(REPOSITORIES, userLogin)).build())
 //        return dataUseCase
 //                .queryDisk(object : RealmQueryProvider<Repository> {
 //                    override fun create(realm: Realm): RealmQuery<Repository> {

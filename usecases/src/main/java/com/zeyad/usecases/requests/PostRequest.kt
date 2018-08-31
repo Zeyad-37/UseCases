@@ -8,26 +8,26 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
 
+
 /**
  * @author zeyad on 7/29/16.
  */
-class PostRequest(private val url: String = "",
-                  private val fullUrl: String = "",
-                  val requestType: Class<*> = Any::class.java,
-                  val responseType: Class<*> = Any::class.java,
-                  val persist: Boolean = false,
-                  val onWifi: Boolean = false,
-                  val whileCharging: Boolean = false,
-                  val queuable: Boolean = false,
-                  val cache: Boolean = false,
-                  val idColumnName: String,
-                  val idType: Class<*> = Any::class.java,
-                  val method: String = "",
-                  keyValuePairs: HashMap<String, Any> = hashMapOf(),
-                  jsonArray: JSONArray = JSONArray(),
-                  jsonObject: JSONObject = JSONObject(),
-                  val `object`: Any = Any(),
-                  private var payload: String = "") : Parcelable {
+class PostRequest private constructor(val fullUrl: String = "",
+                                      val requestType: Class<*> = Any::class.java,
+                                      private val responseType: Class<*> = Any::class.java,
+                                      val persist: Boolean = false,
+                                      val onWifi: Boolean = false,
+                                      val whileCharging: Boolean = false,
+                                      val queuable: Boolean = false,
+                                      val cache: Boolean = false,
+                                      val idColumnName: String,
+                                      val idType: Class<*> = Any::class.java,
+                                      val method: String = "",
+                                      keyValuePairs: HashMap<String, Any> = hashMapOf(),
+                                      jsonArray: JSONArray = JSONArray(),
+                                      jsonObject: JSONObject = JSONObject(),
+                                      val `object`: Any? = Any(),
+                                      private var payload: String = "") : Parcelable {
     init {
         val objectString = getObjectBundle(jsonObject, keyValuePairs).toString()
         val arrayString = getArrayBundle(jsonArray, keyValuePairs).toString()
@@ -38,8 +38,25 @@ class PostRequest(private val url: String = "",
         }
     }
 
+    constructor(builder: Builder) : this(
+            builder.url,
+            builder.requestType,
+            builder.responseType,
+            builder.persist,
+            builder.onWifi,
+            builder.whileCharging,
+            builder.queuable,
+            builder.cache,
+            builder.idColumnName,
+            builder.idType,
+            builder.method,
+            builder.keyValuePairs,
+            builder.jsonArray,
+            builder.jsonObject,
+            builder.`object`,
+            "")
+
     constructor(parcel: Parcel) : this(
-            parcel.readString(),
             parcel.readString(),
             Any::class.java,
             Any::class.java,
@@ -58,14 +75,6 @@ class PostRequest(private val url: String = "",
             parcel.readString())
 
     fun <M> getTypedResponseClass(): Class<M> = responseType as Class<M>
-
-    fun getCorrectUrl(): String {
-        return when {
-            fullUrl.isNotBlank() -> fullUrl
-            url.isNotBlank() -> Config.baseURL + url
-            else -> ""
-        }
-    }
 
     fun getObjectBundle(): JSONObject {
         return JSONObject(payload)
@@ -117,7 +126,6 @@ class PostRequest(private val url: String = "",
     }
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeString(url)
         parcel.writeString(fullUrl)
         parcel.writeByte(if (persist) 1 else 0)
         parcel.writeByte(if (onWifi) 1 else 0)
@@ -140,5 +148,83 @@ class PostRequest(private val url: String = "",
         const val DELETE = "delete"
         const val PUT = "put"
         const val PATCH = "patch"
+    }
+
+    class Builder(internal var requestType: Class<*>, internal var persist: Boolean) {
+        internal var `object`: Any = Any()
+        internal var jsonArray: JSONArray = JSONArray()
+        internal var jsonObject: JSONObject = JSONObject()
+        internal var keyValuePairs: HashMap<String, Any> = hashMapOf()
+        internal var url: String = ""
+        internal var idColumnName: String = ""
+        internal var method: String = ""
+        internal var responseType: Class<*> = Any::class.java
+        internal var idType: Class<*> = Any::class.java
+        internal var queuable: Boolean = false
+        internal var cache: Boolean = false
+        internal var onWifi: Boolean = false
+        internal var whileCharging: Boolean = false
+
+        fun url(url: String): Builder {
+            this.url = Config.baseURL + url
+            return this
+        }
+
+        fun fullUrl(url: String): Builder {
+            this.url = url
+            return this
+        }
+
+        fun responseType(responseType: Class<*>): Builder {
+            this.responseType = responseType
+            return this
+        }
+
+        fun queuable(onWifi: Boolean, whileCharging: Boolean): Builder {
+            queuable = true
+            this.onWifi = onWifi
+            this.whileCharging = whileCharging
+            return this
+        }
+
+        fun cache(): Builder {
+            cache = true
+            return this
+        }
+
+        fun idColumnName(idColumnName: String, type: Class<*>): Builder {
+            this.idColumnName = idColumnName
+            idType = type
+            return this
+        }
+
+        fun payLoad(`object`: Any): Builder {
+            this.`object` = `object`
+            return this
+        }
+
+        fun payLoad(jsonObject: JSONObject): Builder {
+            this.jsonObject = jsonObject
+            return this
+        }
+
+        fun payLoad(jsonArray: JSONArray): Builder {
+            this.jsonArray = jsonArray
+            return this
+        }
+
+        fun payLoad(hashMap: HashMap<String, Any>): Builder {
+            keyValuePairs = hashMap
+            return this
+        }
+
+        fun method(method: String): Builder {
+            this.method = method
+            return this
+        }
+
+        fun build(): PostRequest {
+            return PostRequest(this)
+        }
     }
 }

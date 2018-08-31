@@ -8,7 +8,7 @@ import com.zeyad.usecases.app.screens.user.User
 import com.zeyad.usecases.app.screens.user.list.events.DeleteUsersEvent
 import com.zeyad.usecases.app.screens.user.list.events.GetPaginatedUsersEvent
 import com.zeyad.usecases.app.screens.user.list.events.SearchUsersEvent
-import com.zeyad.usecases.app.utils.Constants
+import com.zeyad.usecases.app.utils.Constants.URLS.USER
 import com.zeyad.usecases.requests.GetRequest
 import com.zeyad.usecases.requests.PostRequest
 import io.reactivex.Flowable
@@ -62,8 +62,9 @@ class UserListVM(private var dataUseCase: IDataService) : BaseViewModel<UserList
     }
 
     private fun getUsers(lastId: Long): Flowable<List<User>> {
-        val getRequest = GetRequest(String.format(Constants.URLS.USERS, lastId), "",
-                User::class.java, Int::class.java, true, "id")
+        val getRequest = GetRequest.Builder(User::class.java, true)
+                .url(String.format(USER, lastId))
+                .build()
         return if (lastId == 0L)
             dataUseCase.getListOffLineFirst(getRequest)
         else
@@ -90,9 +91,12 @@ class UserListVM(private var dataUseCase: IDataService) : BaseViewModel<UserList
 //    }
 
     private fun deleteCollection(selectedItemsIds: List<String>): Flowable<List<String>> {
-        return dataUseCase.deleteCollectionByIds<Boolean>(PostRequest("", "", User::class.java,
-                Boolean::class.java, true, false, false, false,
-                true, User.LOGIN, String::class.java, `object` = selectedItemsIds))
+        return dataUseCase.deleteCollectionByIds<Boolean>(PostRequest
+                .Builder(User::class.java, true)
+                .payLoad(selectedItemsIds)
+                .idColumnName(User.LOGIN, String::class.java)
+                .cache()
+                .build())
                 .map { selectedItemsIds }
     }
 }

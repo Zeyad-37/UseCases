@@ -1,6 +1,7 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-allopen'
 //apply plugin: 'kotlin-android-extensions'
 apply plugin: 'realm-android'
 apply plugin: "net.ltgt.errorprone"
@@ -66,6 +67,10 @@ android {
 //    androidExtensions {
 //        experimental = true
 //    }
+
+    allOpen {
+        annotation("com.zeyad.usecases.Mockable")
+    }
 }
 
 dependencies {

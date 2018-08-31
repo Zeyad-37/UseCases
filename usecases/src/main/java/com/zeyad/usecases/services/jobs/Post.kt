@@ -33,28 +33,28 @@ class Post(context: Context,
         }
         val requestBody = RequestBody.create(MediaType.parse(APPLICATION_JSON), bundle)
         when (mPostRequest.method) {
-            PostRequest.PATCH -> return Completable.fromObservable(mRestApi.dynamicPatch<Any>(mPostRequest.getCorrectUrl(), requestBody)
+            PostRequest.PATCH -> return Completable.fromObservable(mRestApi.dynamicPatch<Any>(mPostRequest.fullUrl, requestBody)
                     .doOnSubscribe {
                         Log.d(TAG, "Patching " + mPostRequest.requestType.simpleName)
                     }
                     .doOnError { t: Throwable -> this.onError(t) }
                     .doOnComplete { Log.d(TAG, COMPLETED) }
                     .toObservable())
-            PostRequest.POST -> return Completable.fromObservable(mRestApi.dynamicPost<Any>(mPostRequest.getCorrectUrl(), requestBody)
+            PostRequest.POST -> return Completable.fromObservable(mRestApi.dynamicPost<Any>(mPostRequest.fullUrl, requestBody)
                     .doOnSubscribe {
                         Log.d(TAG, "Posting " + (if (isObject) "List of " else "") + mPostRequest.requestType.simpleName)
                     }
                     .doOnError { t: Throwable -> this.onError(t) }
                     .doOnComplete { Log.d(TAG, COMPLETED) }
                     .toObservable())
-            PostRequest.PUT -> return Completable.fromObservable(mRestApi.dynamicPut<Any>(mPostRequest.getCorrectUrl(), requestBody)
+            PostRequest.PUT -> return Completable.fromObservable(mRestApi.dynamicPut<Any>(mPostRequest.fullUrl, requestBody)
                     .doOnSubscribe {
                         Log.d(TAG, "Putting " + (if (isObject) "List of " else "") + mPostRequest.requestType.simpleName)
                     }
                     .doOnError { t: Throwable -> this.onError(t) }
                     .doOnComplete { Log.d(TAG, COMPLETED) }
                     .toObservable())
-            PostRequest.DELETE -> return Completable.fromObservable(mRestApi.dynamicDelete<Any>(mPostRequest.getCorrectUrl())
+            PostRequest.DELETE -> return Completable.fromObservable(mRestApi.dynamicDelete<Any>(mPostRequest.fullUrl)
                     .doOnSubscribe {
                         Log.d(TAG, "Deleting " + (if (isObject) "List of " else "") + mPostRequest.requestType.simpleName)
                     }

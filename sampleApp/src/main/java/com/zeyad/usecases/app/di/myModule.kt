@@ -1,6 +1,7 @@
 package com.zeyad.usecases.app.di
 
 import android.content.Context
+import android.os.HandlerThread
 import android.util.Log
 import com.zeyad.usecases.api.DataServiceConfig
 import com.zeyad.usecases.api.DataServiceFactory
@@ -24,13 +25,11 @@ val myModule: Module = applicationContext {
 }
 
 fun createDataService(context: Context): IDataService {
-//    DataServiceFactory.init(DataServiceConfig.Builder(context)
-//            .baseUrl(API_BASE_URL)
-//            .okHttpBuilder(getOkHttpBuilder())
-//            .withRealm()
-//            .build())
-    return DataServiceFactory(DataServiceConfig(context, getOkHttpBuilder(), baseUrl = API_BASE_URL,
-            withRealm = true)).instance!!
+    return DataServiceFactory(DataServiceConfig.Builder(context)
+            .baseUrl(API_BASE_URL)
+            .okHttpBuilder(getOkHttpBuilder())
+            .withRealm(HandlerThread("BackgroundHandlerThread"))
+            .build()).instance!!
 }
 
 fun getOkHttpBuilder(): OkHttpClient.Builder {

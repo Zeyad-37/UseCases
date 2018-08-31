@@ -35,6 +35,7 @@ import java.net.ConnectException
 import java.net.UnknownHostException
 import java.util.*
 
+@Mockable
 class CloudStore(private val mApiConnection: ApiConnection, //    private static final int COUNTER_START = 1, ATTEMPTS = 3;
                  private val mDataBaseManager: DataBaseManager,
                  private val mEntityDataMapper: DAOMapper,
@@ -369,20 +370,36 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
 
     private fun queueIOFile(url: String, keyFileMap: HashMap<String, File>?, file: File?, onWifi: Boolean,
                             whileCharging: Boolean, isDownload: Boolean) {
+
         queueFileIOCore(mDispatcher, isDownload,
-                FileIORequest(url, onWifi, whileCharging, true, file, Any::class.java, keyFileMap), 0)
+                FileIORequest.Builder(url)
+                        .file(file)
+                        .keyFileMapToUpload(keyFileMap)
+                        .queuable(onWifi, whileCharging)
+                        .build(),
+                0)
     }
 
     private fun queuePost(method: String, url: String, idColumnName: String, idType: Class<*>,
                           jsonArray: JSONArray, persist: Boolean) {
-        queuePostCore(PostRequest("", url, Any::class.java, Any::class.java, persist,
-                jsonArray = jsonArray, method = method, idColumnName = idColumnName, idType = idType))
+
+
+        queuePostCore(PostRequest.Builder(Any::class.java, persist)
+                .payLoad(jsonArray)
+                .method(method)
+                .idColumnName(idColumnName, idType)
+                .fullUrl(url)
+                .build())
     }
 
     private fun queuePost(method: String, url: String, idColumnName: String, idType: Class<*>,
                           jsonObject: JSONObject, persist: Boolean) {
-        queuePostCore(PostRequest("", url, Any::class.java, Any::class.java, persist,
-                jsonObject = jsonObject, method = method, idColumnName = idColumnName, idType = idType))
+        queuePostCore(PostRequest.Builder(Any::class.java, persist)
+                .payLoad(jsonObject)
+                .method(method)
+                .idColumnName(idColumnName, idType)
+                .fullUrl(url)
+                .build())
     }
 
     private fun queuePostCore(postRequest: PostRequest) {

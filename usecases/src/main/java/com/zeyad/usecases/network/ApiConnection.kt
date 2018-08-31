@@ -3,6 +3,7 @@ package com.zeyad.usecases.network
 import android.util.Log
 import com.zeyad.usecases.BuildConfig
 import com.zeyad.usecases.Config
+import com.zeyad.usecases.Mockable
 import io.reactivex.Flowable
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
@@ -11,12 +12,12 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 import retrofit2.converter.gson.GsonConverterFactory
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
-
 /**
  * Api Connection class used to retrieve data from the cloud. Implements [Callable] so when
  * executed asynchronously can return a value.
  */
-class ApiConnection(internal val restApiWithoutCache: RestApi, internal val restApiWithCache: RestApi) {
+@Mockable
+class ApiConnection(val restApiWithoutCache: RestApi, val restApiWithCache: RestApi) {
     private val restApi: RestApi
         get() = if (Config.useApiWithCache) restApiWithCache else restApiWithoutCache
 
@@ -169,7 +170,7 @@ class ApiConnection(internal val restApiWithoutCache: RestApi, internal val rest
                     ?: builderForOkHttp, null)).create(RestApi::class.java)
         }
 
-        internal fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
+        fun provideHttpLoggingInterceptor(): HttpLoggingInterceptor {
             return HttpLoggingInterceptor { message -> Log.d("NetworkInfo", message) }
                     .setLevel(if (BuildConfig.DEBUG)
                         HttpLoggingInterceptor.Level.BODY
