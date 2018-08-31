@@ -37,7 +37,7 @@ public class ApiConnectionTest {
     private RestApi mRestApiWithoutCache;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mRestApiWithCache = mock(RestApi.class);
         mRestApiWithoutCache = mock(RestApi.class);
         mApiConnection = getApiImplementation(mRestApiWithoutCache, mRestApiWithCache);
@@ -61,9 +61,9 @@ public class ApiConnectionTest {
     }
 
     @Test
-    public void testProvideHttpLoggingInterceptor() throws Exception {
+    public void testProvideHttpLoggingInterceptor() {
         HttpLoggingInterceptor httpLoggingInterceptor =
-                ApiConnection.provideHttpLoggingInterceptor();
+                ApiConnection.Companion.provideHttpLoggingInterceptor();
         assertThat(
                 httpLoggingInterceptor.getLevel(),
                 is(
@@ -74,90 +74,86 @@ public class ApiConnectionTest {
     }
 
     @Test
-    public void testDynamicDownload() throws Exception {
+    public void testDynamicDownload() {
         mApiConnection.dynamicDownload(mValidUrl);
         Mockito.verify(mRestApiWithoutCache).dynamicDownload(eq(mValidUrl));
     }
 
     @Test
-    public void testDynamicGetObject_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsTrue()
-            throws Exception {
+    public void testDynamicGetObject_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsTrue() {
         mApiConnection.dynamicGetObject(mValidUrl, true);
         Mockito.verify(mRestApiWithoutCache).dynamicGetObject(eq(mValidUrl));
     }
 
     @Test
-    public void testDynamicGetObject_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsFalse()
-            throws Exception {
+    public void testDynamicGetObject_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsFalse() {
         mApiConnection.dynamicGetObject(mValidUrl, false);
         Mockito.verify(mRestApiWithoutCache).dynamicGetObject(eq(mValidUrl));
     }
 
     @Test
-    public void testDynamicGetObjectWithoutCacheSupport() throws Exception {
+    public void testDynamicGetObjectWithoutCacheSupport() {
         mApiConnection.dynamicGetObject(mValidUrl);
         Mockito.verify(mRestApiWithoutCache).dynamicGetObject(mValidUrl);
     }
 
     @Test
-    public void testDynamicGetListWithoutCacheSupport() throws Exception {
+    public void testDynamicGetListWithoutCacheSupport() {
         mApiConnection.dynamicGetList(mValidUrl);
         Mockito.verify(mRestApiWithoutCache).dynamicGetList(eq(mValidUrl));
     }
 
     @Test
-    public void testDynamicGetListCache_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsTrue()
-            throws Exception {
+    public void testDynamicGetListCache_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsTrue() {
         mApiConnection.dynamicGetList(mValidUrl, true);
         Mockito.verify(mRestApiWithoutCache).dynamicGetList(eq(mValidUrl));
     }
 
     @Test
-    public void testDynamicGetListCache_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsFalse()
-            throws Exception {
+    public void testDynamicGetListCache_ifCorrectMethodOfCacheRestApiIsCalled_whenToCacheIsFalse() {
         mApiConnection.dynamicGetList(mValidUrl, false);
         Mockito.verify(mRestApiWithoutCache).dynamicGetList(eq(mValidUrl));
     }
 
     @Test
-    public void testDynamicPostObject() throws Exception {
+    public void testDynamicPostObject() {
         mApiConnection.dynamicPost(mValidUrl, mMockedRequestBody);
         Mockito.verify(mRestApiWithoutCache).dynamicPost(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
     @Test
-    public void testDynamicPostList() throws Exception {
+    public void testDynamicPostList() {
         mApiConnection.dynamicPost(mValidUrl, mMockedRequestBody);
         Mockito.verify(mRestApiWithoutCache).dynamicPost(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
     @Test
-    public void testDynamicPutObject() throws Exception {
+    public void testDynamicPutObject() {
         mApiConnection.dynamicPut(mValidUrl, mMockedRequestBody);
         Mockito.verify(mRestApiWithoutCache).dynamicPut(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
     @Test
-    public void testDynamicPutList() throws Exception {
+    public void testDynamicPutList() {
         mApiConnection.dynamicPut(mValidUrl, mMockedRequestBody);
         Mockito.verify(mRestApiWithoutCache).dynamicPut(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
     @Test
-    public void testUploadPartAndRequestBody() throws Exception {
+    public void testUploadPartAndRequestBody() {
         mApiConnection.dynamicUpload(mValidUrl, mPartMap, mMultipartBodyParts);
         Mockito.verify(mRestApiWithoutCache)
                .dynamicUpload(eq(mValidUrl), eq(mPartMap), eq(mMultipartBodyParts));
     }
 
     @Test
-    public void testDynamicDeleteList() throws Exception {
+    public void testDynamicDeleteList() {
         mApiConnection.dynamicDelete(mValidUrl);
         Mockito.verify(mRestApiWithoutCache).dynamicDelete(eq(mValidUrl));
     }
 
     @Test
-    public void testDynamicDeleteObject() throws Exception {
+    public void testDynamicDeleteObject() {
         mApiConnection.dynamicDelete(mValidUrl);
         Mockito.verify(mRestApiWithoutCache).dynamicDelete(eq(mValidUrl));
     }

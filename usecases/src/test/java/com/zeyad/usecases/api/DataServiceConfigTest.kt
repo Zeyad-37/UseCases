@@ -40,9 +40,14 @@ class DataServiceConfigTest {
                 .readTimeout(15, TimeUnit.SECONDS)
                 .writeTimeout(15, TimeUnit.SECONDS)
         cache = Cache(File("", "http-cache"), (10 * 1024 * 1024).toLong())
-
-        mDataServiceConfig = DataServiceConfig(mockContext, builder, baseUrl = URL,
-                withRealm = true, cacheDuration = 3, timeUnit = TimeUnit.MINUTES, okHttpCache = cache)
+        mDataServiceConfig = DataServiceConfig.Builder(mockContext)
+                .baseUrl(URL)
+                .cacheSize(cacheSize)
+                .okHttpBuilder(builder)
+                .okhttpCache(cache)
+                .withCache(3, TimeUnit.MINUTES)
+                .withRealm()
+                .build()
     }
 
     @Test

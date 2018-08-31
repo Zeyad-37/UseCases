@@ -29,7 +29,7 @@ public class PostRequestTest {
     private PostRequest mPostRequest;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mPostRequest =
                 new PostRequest.Builder(DATA_CLASS, TO_PERSIST)
                         .payLoad(HASH_MAP)
@@ -41,27 +41,27 @@ public class PostRequestTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         mPostRequest = null;
     }
 
     @Test
-    public void testGetUrl() throws Exception {
-        assertThat(mPostRequest.getUrl(), is(equalTo(URL)));
+    public void testGetUrl() {
+        assertThat(mPostRequest.getFullUrl(), is(equalTo(URL)));
     }
 
     @Test
-    public void testGetDataClass() throws Exception {
+    public void testGetDataClass() {
         assertThat(mPostRequest.getRequestType(), is(equalTo(DATA_CLASS)));
     }
 
     @Test
-    public void testIsPersist() throws Exception {
-        assertThat(mPostRequest.isPersist(), is(equalTo(TO_PERSIST)));
+    public void testIsPersist() {
+        assertThat(mPostRequest.getPersist(), is(equalTo(TO_PERSIST)));
     }
 
     @Test
-    public void testGetIdColumnName() throws Exception {
+    public void testGetIdColumnName() {
         assertThat(mPostRequest.getIdColumnName(), is(equalTo(ID_COLUMN_NAME)));
     }
 }

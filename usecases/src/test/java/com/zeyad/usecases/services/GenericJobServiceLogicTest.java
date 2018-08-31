@@ -7,6 +7,7 @@ import com.zeyad.usecases.stores.CloudStore;
 
 import org.json.JSONArray;
 import org.junit.Test;
+import org.mockito.internal.matchers.Any;
 
 import io.reactivex.observers.TestObserver;
 
@@ -24,7 +25,7 @@ public class GenericJobServiceLogicTest {
 
         Bundle extras = new Bundle(2);
         extras.putString(GenericJobService.Companion.getJOB_TYPE(), GenericJobService.Companion.getPOST());
-        extras.putParcelable(GenericJobService.Companion.getPAYLOAD(), new PostRequest.Builder(null, true)
+        extras.putParcelable(GenericJobService.Companion.getPAYLOAD(), new PostRequest.Builder(Any.class, true)
                 .idColumnName("id", int.class)
                 .payLoad(new JSONArray())
                 .url("")

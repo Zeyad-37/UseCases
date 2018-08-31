@@ -24,7 +24,7 @@ public class GetRequestTest {
     private GetRequest mGetRequest;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         mGetRequest =
                 new GetRequest.Builder(DATA_CLASS, TO_PERSIST)
                         .fullUrl(URL)
@@ -34,37 +34,37 @@ public class GetRequestTest {
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         mGetRequest = null;
     }
 
     @Test
-    public void testGetUrl() throws Exception {
-        assertThat(mGetRequest.getUrl(), is(equalTo(URL)));
+    public void testGetUrl() {
+        assertThat(mGetRequest.getFullUrl(), is(equalTo(URL)));
     }
 
     @Test
-    public void testGetDataClass() throws Exception {
+    public void testGetDataClass() {
         assertThat(mGetRequest.getDataClass(), is(equalTo(DATA_CLASS)));
     }
 
     @Test
-    public void testIsPersist() throws Exception {
-        assertThat(mGetRequest.isPersist(), is(equalTo(TO_PERSIST)));
+    public void testIsPersist() {
+        assertThat(mGetRequest.getPersist(), is(equalTo(TO_PERSIST)));
     }
 
     @Test
-    public void testIsShouldCache() throws Exception {
-        assertThat(mGetRequest.isShouldCache(), is(equalTo(SHOULD_CACHE)));
+    public void testIsShouldCache() {
+        assertThat(mGetRequest.getCache(), is(equalTo(SHOULD_CACHE)));
     }
 
     @Test
-    public void testGetIdColumnName() throws Exception {
+    public void testGetIdColumnName() {
         assertThat(mGetRequest.getIdColumnName(), is(equalTo(ID_COLUMN_NAME)));
     }
 
     @Test
-    public void testGetItemId() throws Exception {
+    public void testGetItemId() {
         assertThat(mGetRequest.getItemId(), is(equalTo(ID)));
     }
 }

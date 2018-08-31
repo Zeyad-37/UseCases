@@ -39,8 +39,7 @@ public class DataStoreFactoryTest {
     }
 
     @Test
-    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValid()
-            throws Exception {
+    public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValid() {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
@@ -48,8 +47,7 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidAndNetWorkNotAvailable()
-            throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidAndNetWorkNotAvailable() {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
@@ -57,8 +55,7 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkNotAvailable()
-            throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkNotAvailable() {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
@@ -66,15 +63,14 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkIsAvailable()
-            throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkIsAvailable() {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
     }
 
     @Test
-    public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmpty() throws Exception {
+    public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmpty() {
         assertThat(
                 mDataStoreFactory.dynamically(getSomeValidUrl(), Object.class),
                 is(instanceOf(CloudStore.class)));
@@ -82,8 +78,7 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItem()
-            throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItem() {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
@@ -91,8 +86,7 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItemAndNetWorkNotAvailable()
-            throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItemAndNetWorkNotAvailable() {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
@@ -100,8 +94,7 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkNotAvailable()
-            throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkNotAvailable() {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
@@ -109,16 +102,14 @@ public class DataStoreFactoryTest {
 
     @Test
     public void
-    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkIsAvailable()
-            throws Exception {
+    testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkIsAvailable() {
         assertThat(
                 mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
     }
 
     @Test
-    public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmptyForSingleItem()
-            throws Exception {
+    public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmptyForSingleItem() {
         assertThat(
                 mDataStoreFactory.dynamically(getSomeValidUrl(), Object.class),
                 is(instanceOf(CloudStore.class)));
@@ -127,7 +118,7 @@ public class DataStoreFactoryTest {
     @Test
     public void testDiskMethod_ifExpectedDataStoreIsReturned_whenMockedEntityMapperIsPassed()
             throws IllegalAccessException {
-        Config.Companion.setHasRealm(true);
+        Config.INSTANCE.setWithRealm(true);
         assertThat(mDataStoreFactory.disk(Object.class), is(notNullValue()));
     }
 

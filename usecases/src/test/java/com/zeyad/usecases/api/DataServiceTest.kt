@@ -31,7 +31,7 @@ class DataServiceTest {
 
     private lateinit var dataService: DataService
     private lateinit var dataStoreFactory: DataStoreFactory
-    private lateinit var getRequest: GetRequest<Any>
+    private lateinit var getRequest: GetRequest
     private lateinit var postRequest: PostRequest
     private lateinit var flowable: Flowable<Any>
     private lateinit var fileFlowable: Flowable<File>
@@ -41,10 +41,10 @@ class DataServiceTest {
     fun setUp() {
         flowable = Flowable.just(true)
         fileFlowable = Flowable.just(File(""))
-        postRequest = PostRequest.Builder(Any::class.java, false).build()
+        postRequest = PostRequest.Builder(TestRealmModel::class.java, false).build()
         getRequest = GetRequest.Builder(TestRealmModel::class.java, false)
                 .url("")
-                .id(37, "id", Int::class.javaPrimitiveType)
+                .id(37, "id", Int::class.java)
                 .cache("id")
                 .build()
         dataStoreFactory = mock(DataStoreFactory::class.java)
@@ -64,13 +64,21 @@ class DataServiceTest {
     fun getList() {
         `when`(dataStoreFactory
                 .dynamically(anyString(), any(Class::class.java))
-                .dynamicGetList<Any>(anyString(), anyString(), any(Class::class.java), anyBoolean(), anyBoolean()))
-                .thenReturn(Flowable.just(Collections.EMPTY_LIST))
+                .dynamicGetList(anyString(),
+                        anyString(),
+                        any(Class::class.java) as Class<Any>,
+                        anyBoolean(),
+                        anyBoolean()))
+                .thenReturn(Flowable.just(mutableListOf()))
 
-        dataService.getList(getRequest)
+        dataService.getList<TestRealmModel>(getRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), any(Class::class.java)), times(1))
-                .dynamicGetList<Any>(anyString(), anyString(), any(Class::class.java), anyBoolean(), anyBoolean())
+                .dynamicGetList(anyString(),
+                        anyString(),
+                        any(Class::class.java) as Class<Any>,
+                        anyBoolean(),
+                        anyBoolean())
     }
 
     @Test
@@ -78,25 +86,25 @@ class DataServiceTest {
     fun getObject() {
         `when`(dataStoreFactory
                 .dynamically(anyString(), any(Class::class.java))
-                .dynamicGetObject<Any>(
+                .dynamicGetObject(
                         anyString(),
                         anyString(),
                         any(),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
-        dataService.getObject(getRequest)
+        dataService.getObject<TestRealmModel>(getRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), any(Class::class.java)), times(1))
-                .dynamicGetObject<Any>(
+                .dynamicGetObject(
                         anyString(),
                         anyString(),
                         any<Any>(),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean())
     }
@@ -129,50 +137,50 @@ class DataServiceTest {
     @Throws(Exception::class)
     fun getObjectOffLineFirst() {
         `when`(dataStoreFactory.cloud(Any::class.java)
-                .dynamicGetObject<Any>(
+                .dynamicGetObject(
                         anyString(),
                         anyString(),
                         any(),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
         `when`(dataStoreFactory
                 .disk(Any::class.java)
-                .dynamicGetObject<Any>(
+                .dynamicGetObject(
                         anyString(),
                         anyString(),
                         any(),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
         `when`(dataStoreFactory
                 .memory()
-                .getItem<Any>(anyString(), any(Class::class.java)))
+                ?.getItem<Any>(anyString(), any(Class::class.java)))
                 .thenReturn(Single.just(true))
 
-        dataService.getObjectOffLineFirst(getRequest)
+        dataService.getObjectOffLineFirst<TestRealmModel>(getRequest)
 
         verify<DataStore>(dataStoreFactory.cloud(Any::class.java), times(1))
-                .dynamicGetObject<Any>(
+                .dynamicGetObject(
                         anyString(),
                         anyString(),
                         any<Any>(),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean())
         verify<DataStore>(dataStoreFactory.disk(Any::class.java), times(1))
-                .dynamicGetObject<Any>(
+                .dynamicGetObject(
                         anyString(),
                         anyString(),
                         any<Any>(),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean())
     }
@@ -181,28 +189,28 @@ class DataServiceTest {
     @Throws(Exception::class)
     fun patchObject() {
         `when`(dataStoreFactory.dynamically(anyString(), any(Class::class.java))
-                .dynamicPatchObject<Any>(
+                .dynamicPatchObject(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONObject::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
-        dataService.patchObject<Any>(postRequest)
+        dataService.patchObject<TestRealmModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), any(Class::class.java)), times(1))
-                .dynamicPatchObject<Any>(
+                .dynamicPatchObject(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONObject::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean())
@@ -213,28 +221,28 @@ class DataServiceTest {
     fun postObject() {
         `when`(dataStoreFactory
                 .dynamically(anyString(), any(Class::class.java))
-                .dynamicPostObject<Any>(
+                .dynamicPostObject(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONObject::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
-        dataService.postObject<Any>(postRequest)
+        dataService.postObject<TestRealmModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), any(Class::class.java)), times(1))
-                .dynamicPostObject<Any>(
+                .dynamicPostObject(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONObject::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean())
@@ -245,28 +253,28 @@ class DataServiceTest {
     fun postList() {
         `when`(dataStoreFactory
                 .dynamically(anyString(), any(Class::class.java))
-                .dynamicPostList<Any>(
+                .dynamicPostList(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONArray::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
-        dataService.postList<Any>(postRequest)
+        dataService.postList<TestRealmModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), any(Class::class.java)), times(1))
-                .dynamicPostList<Any>(
+                .dynamicPostList(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONArray::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean())
@@ -277,28 +285,28 @@ class DataServiceTest {
     fun putObject() {
         `when`(dataStoreFactory
                 .dynamically(anyString(), any(Class::class.java))
-                .dynamicPutObject<Any>(
+                .dynamicPutObject(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONObject::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
-        dataService.putObject<Any>(postRequest)
+        dataService.putObject<TestRealmModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), any(Class::class.java)), times(1))
-                .dynamicPutObject<Any>(
+                .dynamicPutObject(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONObject::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean())
@@ -309,28 +317,28 @@ class DataServiceTest {
     fun putList() {
         `when`(dataStoreFactory
                 .dynamically(anyString(), any(Class::class.java))
-                .dynamicPutList<Any>(
+                .dynamicPutList(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONArray::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
-        dataService.putList<Any>(postRequest)
+        dataService.putList<TestRealmModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), any(Class::class.java)), times(1))
-                .dynamicPutList<Any>(
+                .dynamicPutList(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONArray::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean())
@@ -341,28 +349,28 @@ class DataServiceTest {
     fun deleteItemById() {
         `when`(dataStoreFactory
                 .dynamically(anyString(), any(Class::class.java))
-                .dynamicDeleteCollection<Any>(
+                .dynamicDeleteCollection(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONArray::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
-        dataService.deleteItemById<Any>(postRequest)
+        dataService.deleteItemById<TestRealmModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), any(Class::class.java)), times(1))
-                .dynamicDeleteCollection<Any>(
+                .dynamicDeleteCollection(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONArray::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean())
@@ -373,28 +381,28 @@ class DataServiceTest {
     fun deleteCollection() {
         `when`(dataStoreFactory
                 .dynamically(anyString(), any(Class::class.java))
-                .dynamicDeleteCollection<Any>(
+                .dynamicDeleteCollection(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONArray::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
-        dataService.deleteCollectionByIds<Any>(postRequest)
+        dataService.deleteCollectionByIds<TestRealmModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), any(Class::class.java)), times(1))
-                .dynamicDeleteCollection<Any>(
+                .dynamicDeleteCollection(
                         anyString(),
                         anyString(),
                         any(Class::class.java),
                         any(JSONArray::class.java),
                         any(Class::class.java),
-                        any(Class::class.java),
+                        any(Class::class.java) as Class<Any>,
                         anyBoolean(),
                         anyBoolean(),
                         anyBoolean())
@@ -429,7 +437,7 @@ class DataServiceTest {
     fun uploadFile() {
         `when`<Flowable<Any>>(dataStoreFactory
                 .cloud(Any::class.java)
-                .dynamicUploadFile<Any>(
+                .dynamicUploadFile(
                         anyString(),
                         anyMap() as HashMap<String, File>,
                         anyMap() as HashMap<String, Any>,

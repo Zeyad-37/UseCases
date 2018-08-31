@@ -48,12 +48,12 @@ public class APIIntegrationTest {
     @Before
     public void setUp() {
         RESTMockServer.reset();
-        DataServiceFactory.INSTANCE.init(new DataServiceConfig.Builder(RuntimeEnvironment.application)
+        dataService = new DataServiceFactory(new DataServiceConfig.Builder(RuntimeEnvironment
+                .application)
                 .baseUrl(RESTMockServer.getUrl())
                 //                .withCache(3, TimeUnit.MINUTES)
                 //                                .withRealm()
-                .build());
-        dataService = DataServiceFactory.INSTANCE.getInstance();
+                .build()).getInstance();
         users = new ArrayList<>(2);
         testUser = new User();
         testUser.setAvatarUrl("https://avatars2.githubusercontent.com/u/5938141?v=3");
@@ -67,12 +67,12 @@ public class APIIntegrationTest {
     public void testValidUser() {
         final String getUserPath = "users/Zeyad-37";
         RESTMockServer.whenGET(pathContains(getUserPath))
-                      .thenReturn(new MockResponse()
-                              .setResponseCode(HttpURLConnection.HTTP_OK)
-                              .setBody(userResponse));
+                .thenReturn(new MockResponse()
+                        .setResponseCode(HttpURLConnection.HTTP_OK)
+                        .setBody(userResponse));
 
         final TestSubscriber<User> testSubscriber = new TestSubscriber<>();
-        dataService.<User> getObject(new GetRequest.Builder(User.class, false)
+        dataService.<User>getObject(new GetRequest.Builder(User.class, false)
                 .url(getUserPath)
                 .id("Zeyad-37", User.LOGIN, String.class)
                 //                .cache(User.LOGIN)
@@ -84,22 +84,22 @@ public class APIIntegrationTest {
         RequestsVerifier.verifyGET(pathContains(getUserPath)).invoked();
 
         testSubscriber.assertSubscribed()
-                      .assertNoErrors()
-                      .assertValueCount(1)
-                      .assertValue(testUser)
-                      .assertComplete();
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertValue(testUser)
+                .assertComplete();
     }
 
     @Test
     public void testValidUserList() {
         String getUserListPath = "users?since=0";
         RESTMockServer.whenGET(pathContains(getUserListPath))
-                      .thenReturn(new MockResponse()
-                              .setResponseCode(HttpURLConnection.HTTP_OK)
-                              .setBody(userListResponse));
+                .thenReturn(new MockResponse()
+                        .setResponseCode(HttpURLConnection.HTTP_OK)
+                        .setBody(userListResponse));
 
         TestSubscriber<List<User>> testSubscriber = new TestSubscriber<>();
-        dataService.<User> getList(new GetRequest.Builder(User.class, false)
+        dataService.<User>getList(new GetRequest.Builder(User.class, false)
                 .url(getUserListPath)
                 .id("Zeyad-37", User.LOGIN, String.class)
                 //                .cache(User.LOGIN)
@@ -111,22 +111,22 @@ public class APIIntegrationTest {
         RequestsVerifier.verifyGET(pathContains(getUserListPath)).invoked();
 
         testSubscriber.assertSubscribed()
-                      .assertNoErrors()
-                      .assertValueCount(1)
-                      .assertValue(users)
-                      .assertComplete();
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertValue(users)
+                .assertComplete();
     }
 
     @Test
     public void testPatchObject() {
         String path = "patch/user";
         RESTMockServer.whenPATCH(pathContains(path))
-                      .thenReturn(new MockResponse()
-                              .setResponseCode(HttpURLConnection.HTTP_OK)
-                              .setBody(SUCCESS));
+                .thenReturn(new MockResponse()
+                        .setResponseCode(HttpURLConnection.HTTP_OK)
+                        .setBody(SUCCESS));
 
         TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
-        dataService.<Success> patchObject(new PostRequest.Builder(User.class, false)
+        dataService.<Success>patchObject(new PostRequest.Builder(User.class, false)
                 .url(path)
                 .payLoad(testUser)
                 .responseType(Success.class)
@@ -138,22 +138,22 @@ public class APIIntegrationTest {
         RequestsVerifier.verifyPATCH(pathContains(path)).invoked();
 
         testSubscriber.assertSubscribed()
-                      .assertNoErrors()
-                      .assertValueCount(1)
-                      .assertValue(success)
-                      .assertComplete();
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertValue(success)
+                .assertComplete();
     }
 
     @Test
     public void testPostObject() {
         String path = "postObject/user";
         RESTMockServer.whenPOST(pathContains(path))
-                      .thenReturn(new MockResponse()
-                              .setResponseCode(HttpURLConnection.HTTP_OK)
-                              .setBody(SUCCESS));
+                .thenReturn(new MockResponse()
+                        .setResponseCode(HttpURLConnection.HTTP_OK)
+                        .setBody(SUCCESS));
 
         TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
-        dataService.<Success> postObject(new PostRequest.Builder(User.class, false)
+        dataService.<Success>postObject(new PostRequest.Builder(User.class, false)
                 .url(path)
                 .payLoad(testUser)
                 .responseType(Success.class)
@@ -165,22 +165,22 @@ public class APIIntegrationTest {
         RequestsVerifier.verifyPOST(pathContains(path)).invoked();
 
         testSubscriber.assertSubscribed()
-                      .assertNoErrors()
-                      .assertValueCount(1)
-                      .assertValue(success)
-                      .assertComplete();
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertValue(success)
+                .assertComplete();
     }
 
     @Test
     public void testPostList() {
         String path = "postList/users";
         RESTMockServer.whenPOST(pathContains(path))
-                      .thenReturn(new MockResponse()
-                              .setResponseCode(HttpURLConnection.HTTP_OK)
-                              .setBody(SUCCESS));
+                .thenReturn(new MockResponse()
+                        .setResponseCode(HttpURLConnection.HTTP_OK)
+                        .setBody(SUCCESS));
 
         TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
-        dataService.<Success> postList(new PostRequest.Builder(User.class, false)
+        dataService.<Success>postList(new PostRequest.Builder(User.class, false)
                 .url(path)
                 .payLoad(userListResponse)
                 .responseType(Success.class)
@@ -192,22 +192,22 @@ public class APIIntegrationTest {
         RequestsVerifier.verifyPOST(pathContains(path)).invoked();
 
         testSubscriber.assertSubscribed()
-                      .assertNoErrors()
-                      .assertValueCount(1)
-                      .assertValue(success)
-                      .assertComplete();
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertValue(success)
+                .assertComplete();
     }
 
     @Test
     public void testPutObject() {
         String path = "putObject/user";
         RESTMockServer.whenPUT(pathContains(path))
-                      .thenReturn(new MockResponse()
-                              .setResponseCode(HttpURLConnection.HTTP_OK)
-                              .setBody(SUCCESS));
+                .thenReturn(new MockResponse()
+                        .setResponseCode(HttpURLConnection.HTTP_OK)
+                        .setBody(SUCCESS));
 
         TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
-        dataService.<Success> putObject(new PostRequest.Builder(User.class, false)
+        dataService.<Success>putObject(new PostRequest.Builder(User.class, false)
                 .url(path)
                 .payLoad(testUser)
                 .responseType(Success.class)
@@ -219,22 +219,22 @@ public class APIIntegrationTest {
         RequestsVerifier.verifyPUT(pathContains(path)).invoked();
 
         testSubscriber.assertSubscribed()
-                      .assertNoErrors()
-                      .assertValueCount(1)
-                      .assertValue(success)
-                      .assertComplete();
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertValue(success)
+                .assertComplete();
     }
 
     @Test
     public void testPutList() {
         String path = "putList/users";
         RESTMockServer.whenPUT(pathContains(path))
-                      .thenReturn(new MockResponse()
-                              .setResponseCode(HttpURLConnection.HTTP_OK)
-                              .setBody(SUCCESS));
+                .thenReturn(new MockResponse()
+                        .setResponseCode(HttpURLConnection.HTTP_OK)
+                        .setBody(SUCCESS));
 
         TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
-        dataService.<Success> putList(new PostRequest.Builder(User.class, false)
+        dataService.<Success>putList(new PostRequest.Builder(User.class, false)
                 .url(path)
                 .payLoad(userListResponse)
                 .responseType(Success.class)
@@ -246,22 +246,22 @@ public class APIIntegrationTest {
         RequestsVerifier.verifyPUT(pathContains(path)).invoked();
 
         testSubscriber.assertSubscribed()
-                      .assertNoErrors()
-                      .assertValueCount(1)
-                      .assertValue(success)
-                      .assertComplete();
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertValue(success)
+                .assertComplete();
     }
 
     @Test
     public void testDeleteItemById() {
         String path = "deleteObject/user";
         RESTMockServer.whenDELETE(pathContains(path))
-                      .thenReturn(new MockResponse()
-                              .setResponseCode(HttpURLConnection.HTTP_OK)
-                              .setBody(SUCCESS));
+                .thenReturn(new MockResponse()
+                        .setResponseCode(HttpURLConnection.HTTP_OK)
+                        .setBody(SUCCESS));
 
         TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
-        dataService.<Success> deleteItemById(new PostRequest.Builder(User.class, false)
+        dataService.<Success>deleteItemById(new PostRequest.Builder(User.class, false)
                 .url(path)
                 .payLoad("Zeyad-37")
                 .idColumnName(User.LOGIN, String.class)
@@ -274,24 +274,24 @@ public class APIIntegrationTest {
         RequestsVerifier.verifyDELETE(pathContains(path)).invoked();
 
         testSubscriber.assertSubscribed()
-                      .assertNoErrors()
-                      .assertValueCount(1)
-                      .assertValue(success)
-                      .assertComplete();
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertValue(success)
+                .assertComplete();
     }
 
     @Test
     public void testDeleteCollectionByIds() {
         String path = "deleteList/user";
         RESTMockServer.whenDELETE(pathContains(path))
-                      .thenReturn(new MockResponse()
-                              .setResponseCode(HttpURLConnection.HTTP_OK)
-                              .setBody(SUCCESS));
+                .thenReturn(new MockResponse()
+                        .setResponseCode(HttpURLConnection.HTTP_OK)
+                        .setBody(SUCCESS));
         List<String> payload = new ArrayList<>(2);
         payload.add("Zeyad-37");
         payload.add("Zeyad-37");
         TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
-        dataService.<Success> deleteCollectionByIds(new PostRequest.Builder(User.class, false)
+        dataService.<Success>deleteCollectionByIds(new PostRequest.Builder(User.class, false)
                 .url(path)
 //                .payLoad(Arrays.array("Zeyad-37", "Zeyad-37"))
                 .payLoad(payload)
@@ -305,10 +305,10 @@ public class APIIntegrationTest {
         RequestsVerifier.verifyDELETE(pathContains(path)).invoked();
 
         testSubscriber.assertSubscribed()
-                      .assertNoErrors()
-                      .assertValueCount(1)
-                      .assertValue(success)
-                      .assertComplete();
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertValue(success)
+                .assertComplete();
     }
 
     //    @Test
@@ -408,12 +408,12 @@ public class APIIntegrationTest {
     public void testGetObjectOffLineFirst() {
         String getUserPath = "users/Zeyad-37";
         RESTMockServer.whenGET(pathContains(getUserPath))
-                      .thenReturn(new MockResponse()
-                              .setResponseCode(HttpURLConnection.HTTP_OK)
-                              .setBody(userResponse));
+                .thenReturn(new MockResponse()
+                        .setResponseCode(HttpURLConnection.HTTP_OK)
+                        .setBody(userResponse));
 
         TestSubscriber<User> testSubscriber = new TestSubscriber<>();
-        dataService.<User> getObject(new GetRequest.Builder(User.class, false)
+        dataService.<User>getObject(new GetRequest.Builder(User.class, false)
                 .url(getUserPath)
                 .id("Zeyad-37", User.LOGIN, String.class)
                 //                .cache(User.LOGIN)
@@ -425,22 +425,22 @@ public class APIIntegrationTest {
         RequestsVerifier.verifyGET(pathContains(getUserPath)).invoked();
 
         testSubscriber.assertSubscribed()
-                      .assertNoErrors()
-                      .assertValueCount(1)
-                      .assertValue(testUser)
-                      .assertComplete();
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertValue(testUser)
+                .assertComplete();
     }
 
     @Test
     public void testGetListOffLineFirst() {
         String getUserListPath = "users?since=0";
         RESTMockServer.whenGET(pathContains(getUserListPath))
-                      .thenReturn(new MockResponse()
-                              .setResponseCode(HttpURLConnection.HTTP_OK)
-                              .setBody(userListResponse));
+                .thenReturn(new MockResponse()
+                        .setResponseCode(HttpURLConnection.HTTP_OK)
+                        .setBody(userListResponse));
 
         TestSubscriber<List<User>> testSubscriber = new TestSubscriber<>();
-        dataService.<User> getList(new GetRequest.Builder(User.class, false)
+        dataService.<User>getList(new GetRequest.Builder(User.class, false)
                 .url(getUserListPath)
                 .id("Zeyad-37", User.LOGIN, String.class)
                 //                .cache(User.LOGIN)
@@ -452,9 +452,9 @@ public class APIIntegrationTest {
         RequestsVerifier.verifyGET(pathContains(getUserListPath)).invoked();
 
         testSubscriber.assertSubscribed()
-                      .assertNoErrors()
-                      .assertValueCount(1)
-                      .assertValue(users)
-                      .assertComplete();
+                .assertNoErrors()
+                .assertValueCount(1)
+                .assertValue(users)
+                .assertComplete();
     }
 }

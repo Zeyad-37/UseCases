@@ -8,7 +8,6 @@ import org.json.JSONException
 import org.json.JSONObject
 import java.util.*
 
-
 /**
  * @author zeyad on 7/29/16.
  */
@@ -23,17 +22,17 @@ class PostRequest private constructor(val fullUrl: String = "",
                                       val idColumnName: String,
                                       val idType: Class<*> = Any::class.java,
                                       val method: String = "",
-                                      keyValuePairs: HashMap<String, Any> = hashMapOf(),
-                                      jsonArray: JSONArray = JSONArray(),
-                                      jsonObject: JSONObject = JSONObject(),
+                                      keyValuePairs: HashMap<String, Any>? = hashMapOf(),
+                                      jsonArray: JSONArray? = JSONArray(),
+                                      jsonObject: JSONObject? = JSONObject(),
                                       val `object`: Any? = Any(),
                                       private var payload: String = "") : Parcelable {
     init {
-        val objectString = getObjectBundle(jsonObject, keyValuePairs).toString()
+        val objectString = getObjectBundle(`object`, jsonObject, keyValuePairs).toString()
+                .replace("\\{".toRegex(), "").replace("}".toRegex(), "")
         val arrayString = getArrayBundle(jsonArray, keyValuePairs).toString()
         payload = when {
-            objectString.replace("\\{".toRegex(), "").replace("\\}".toRegex(), "").isEmpty()
-            -> arrayString
+            objectString.isEmpty() -> arrayString
             else -> objectString
         }
     }
@@ -84,10 +83,11 @@ class PostRequest private constructor(val fullUrl: String = "",
         return JSONArray(payload)
     }
 
-    private fun getObjectBundle(jsonObject: JSONObject?, keyValuePairs: HashMap<String, Any>?): JSONObject {
+    private fun getObjectBundle(any: Any?, jsonObject: JSONObject?,
+                                keyValuePairs: HashMap<String, Any>?): JSONObject {
         return when {
-            `object` != null -> try {
-                JSONObject(Config.gson.toJson(`object`))
+            any != null -> try {
+                JSONObject(Config.gson.toJson(any))
             } catch (e: JSONException) {
                 JSONObject()
             }
@@ -98,30 +98,30 @@ class PostRequest private constructor(val fullUrl: String = "",
     }
 
     private fun getArrayBundle(jsonArray: JSONArray?, keyValuePairs: HashMap<String, Any>?): JSONArray {
-        when {
-            jsonArray != null -> return jsonArray
+        return when {
+            jsonArray != null -> jsonArray
             keyValuePairs != null -> {
                 val result = JSONArray()
                 for (item in keyValuePairs.values) {
                     result.put(item)
                 }
-                return result
+                result
             }
             `object` is List<*> -> {
                 val result = JSONArray()
                 for (item in `object`) {
                     result.put(item)
                 }
-                return result
+                result
             }
             `object` is Array<*> -> {
                 val result = JSONArray()
                 for (item in `object`) {
                     result.put(item)
                 }
-                return result
+                result
             }
-            else -> return JSONArray()
+            else -> JSONArray()
         }
     }
 
@@ -151,10 +151,10 @@ class PostRequest private constructor(val fullUrl: String = "",
     }
 
     class Builder(internal var requestType: Class<*>, internal var persist: Boolean) {
-        internal var `object`: Any = Any()
-        internal var jsonArray: JSONArray = JSONArray()
-        internal var jsonObject: JSONObject = JSONObject()
-        internal var keyValuePairs: HashMap<String, Any> = hashMapOf()
+        internal var `object`: Any? = null
+        internal var jsonArray: JSONArray? = null
+        internal var jsonObject: JSONObject? = null
+        internal var keyValuePairs: HashMap<String, Any>? = null
         internal var url: String = ""
         internal var idColumnName: String = ""
         internal var method: String = ""

@@ -79,10 +79,10 @@ public class CloudStoreTest { // TODO: 6/5/17 add error assertions, disk and cac
                 .thenReturn(Single.just(true));
         when(mockDataBaseManager.putAll(anyList(), any(Class.class)))
                 .thenReturn(Single.just(true));
-        when(utils.isNetworkAvailable(any(Context.class))).thenReturn(true);
-        when(utils.withDisk(true)).thenReturn(true);
+//        when(utils.isNetworkAvailable(any(Context.class))).thenReturn(true);
+//        when(utils.withDisk(true)).thenReturn(true);
         cloudStore = new CloudStore(mockApiConnection, mockDataBaseManager, new DAOMapper(),
-                new MemoryStore(com.zeyad.usecases.Config.INSTANCE.getGson()));
+                new MemoryStore(com.zeyad.usecases.Config.INSTANCE.getGson(), new HashMap<>()));
         HandlerThread backgroundThread = new HandlerThread("backgroundThread");
         backgroundThread.start();
         com.zeyad.usecases.Config.INSTANCE.setWithCache(false);
