@@ -2,6 +2,7 @@ package com.zeyad.usecases.requests
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.google.gson.JsonParser
 import com.zeyad.usecases.Config
 import org.json.JSONArray
 import org.json.JSONException
@@ -29,8 +30,7 @@ class PostRequest private constructor(val fullUrl: String = "",
                                       private var payload: String = "") : Parcelable {
     init {
         val objectString = getObjectBundle(`object`, jsonObject, keyValuePairs).toString()
-                .replace("\\{".toRegex(), "").replace("}".toRegex(), "")
-        val arrayString = getArrayBundle(jsonArray, keyValuePairs).toString()
+        val arrayString = getArrayBundle(`object`, jsonArray, keyValuePairs).toString()
         payload = when {
             objectString.isEmpty() -> arrayString
             else -> objectString
@@ -52,8 +52,7 @@ class PostRequest private constructor(val fullUrl: String = "",
             builder.keyValuePairs,
             builder.jsonArray,
             builder.jsonObject,
-            builder.`object`,
-            "")
+            builder.`object`)
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
@@ -75,19 +74,15 @@ class PostRequest private constructor(val fullUrl: String = "",
 
     fun <M> getTypedResponseClass(): Class<M> = responseType as Class<M>
 
-    fun getObjectBundle(): JSONObject {
-        return JSONObject(payload)
-    }
+    fun getObjectBundle() = JSONObject(payload)
 
-    fun getArrayBundle(): JSONArray {
-        return JSONArray(payload)
-    }
+    fun getArrayBundle() = JSONArray(payload)
 
     private fun getObjectBundle(any: Any?, jsonObject: JSONObject?,
                                 keyValuePairs: HashMap<String, Any>?): JSONObject {
         return when {
             any != null -> try {
-                JSONObject(Config.gson.toJson(any))
+                JSONObject(JsonParser().parse(any.toString()).asJsonObject.toString())
             } catch (e: JSONException) {
                 JSONObject()
             }
@@ -97,7 +92,7 @@ class PostRequest private constructor(val fullUrl: String = "",
         }
     }
 
-    private fun getArrayBundle(jsonArray: JSONArray?, keyValuePairs: HashMap<String, Any>?): JSONArray {
+    private fun getArrayBundle(`object`: Any?, jsonArray: JSONArray?, keyValuePairs: HashMap<String, Any>?): JSONArray {
         return when {
             jsonArray != null -> jsonArray
             keyValuePairs != null -> {

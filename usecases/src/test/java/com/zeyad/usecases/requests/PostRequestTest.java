@@ -1,14 +1,14 @@
 package com.zeyad.usecases.requests;
 
+import com.zeyad.usecases.Config;
 import com.zeyad.usecases.TestRealmModel;
+import com.zeyad.usecases.integration.Success;
 
-import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import java.util.HashMap;
 
@@ -16,28 +16,31 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
-@RunWith(JUnit4.class)
 public class PostRequestTest {
 
     private final boolean TO_PERSIST = false;
     private final Class DATA_CLASS = TestRealmModel.class;
     private final String ID_COLUMN_NAME = "id";
     private final String URL = "www.google.com";
-    private final JSONArray JSON_ARRAY = new JSONArray();
-    private final JSONObject JSON_OBJECT = new JSONObject();
+    //    private final JSONArray JSON_ARRAY = new JSONArray();
+    private JSONObject JSON_OBJECT;
     private final HashMap<String, Object> HASH_MAP = new HashMap<>();
     private PostRequest mPostRequest;
 
     @Before
-    public void setUp() {
-        mPostRequest =
-                new PostRequest.Builder(DATA_CLASS, TO_PERSIST)
-                        .payLoad(HASH_MAP)
-                        .idColumnName(ID_COLUMN_NAME, int.class)
-                        .payLoad(JSON_ARRAY)
-                        .payLoad(JSON_OBJECT)
-                        .fullUrl(URL)
-                        .build();
+    public void setUp() throws JSONException {
+        Success success = new Success(true);
+        HASH_MAP.put("success", true);
+        JSON_OBJECT = new JSONObject(HASH_MAP);
+        JSON_OBJECT = new JSONObject("{}");
+        JSON_OBJECT.put("success", true);
+        mPostRequest = new PostRequest.Builder(DATA_CLASS, TO_PERSIST)
+//                .payLoad(HASH_MAP)
+//                .payLoad(JSON_ARRAY)
+                .idColumnName(ID_COLUMN_NAME, int.class)
+                .payLoad(Config.INSTANCE.getGson().toJson(success))
+                .fullUrl(URL)
+                .build();
     }
 
     @After

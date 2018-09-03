@@ -1,5 +1,7 @@
 package com.zeyad.usecases.stores;
 
+import android.content.Context;
+
 import com.zeyad.usecases.Config;
 import com.zeyad.usecases.db.RealmManager;
 import com.zeyad.usecases.mapper.DAOMapper;
@@ -23,8 +25,8 @@ public class DataStoreFactoryTest {
 
     @Before
     public void setUp() {
-        mDataStoreFactory =
-                new DataStoreFactory(
+        com.zeyad.usecases.Config.context = mock(Context.class);
+        mDataStoreFactory = new DataStoreFactory(
                         dataClass -> mock(RealmManager.class),
                         mock(ApiConnection.class),
                         new DAOMapper());
@@ -40,78 +42,68 @@ public class DataStoreFactoryTest {
 
     @Test
     public void testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValid() {
-        assertThat(
-                mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
     }
 
     @Test
     public void
     testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidAndNetWorkNotAvailable() {
-        assertThat(
-                mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
     }
 
     @Test
     public void
     testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkNotAvailable() {
-        assertThat(
-                mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
     }
 
     @Test
     public void
     testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidAndNetWorkIsAvailable() {
-        assertThat(
-                mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
     }
 
     @Test
     public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmpty() {
-        assertThat(
-                mDataStoreFactory.dynamically(getSomeValidUrl(), Object.class),
+        assertThat(mDataStoreFactory.dynamically(getSomeValidUrl(), Object.class),
                 is(instanceOf(CloudStore.class)));
     }
 
     @Test
     public void
     testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItem() {
-        assertThat(
-                mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
     }
 
     @Test
     public void
     testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemAreValidForSingleItemAndNetWorkNotAvailable() {
-        assertThat(
-                mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
     }
 
     @Test
     public void
     testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkNotAvailable() {
-        assertThat(
-                mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
     }
 
     @Test
     public void
     testDynamically_IfDiskDataStoreIsReturned_whenUrlIsEmptyAndItemsAreNotValidForSingleItemAndNetWorkIsAvailable() {
-        assertThat(
-                mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
+        assertThat(mDataStoreFactory.dynamically(getInvalidUrl(), Object.class),
                 is(instanceOf(DiskStore.class)));
     }
 
     @Test
     public void testDynamically_IfCloudDataStoreIsReturned_whenUrlIsNotEmptyForSingleItem() {
-        assertThat(
-                mDataStoreFactory.dynamically(getSomeValidUrl(), Object.class),
+        assertThat(mDataStoreFactory.dynamically(getSomeValidUrl(), Object.class),
                 is(instanceOf(CloudStore.class)));
     }
 

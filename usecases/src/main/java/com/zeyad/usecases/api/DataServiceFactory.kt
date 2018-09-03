@@ -44,13 +44,21 @@ class DataServiceFactory(val config: DataServiceConfig) {
         }
         val apiConnection = ApiConnection(ApiConnection.init(config.okHttpBuilder),
                 ApiConnection.initWithCache(config.okHttpBuilder, config.okHttpCache))
-        if (!Config.withSQLite) {
-            dataBaseManagerUtil = object : DataBaseManagerUtil {
+
+
+        dataBaseManagerUtil = when {
+            config.withRealm || config.withSQL ->
+                if (config.withSQL)
+                    dataBaseManagerUtil
+                else
+                    object : DataBaseManagerUtil {
+                        override fun getDataBaseManager(dataClass: Class<*>): DataBaseManager? {
+                            return RealmManager()
+                        }
+                    }
+            else -> object : DataBaseManagerUtil {
                 override fun getDataBaseManager(dataClass: Class<*>): DataBaseManager? {
-                    return if (config.withRealm)
-                        RealmManager()
-                    else
-                        null
+                    return null
                 }
             }
         }

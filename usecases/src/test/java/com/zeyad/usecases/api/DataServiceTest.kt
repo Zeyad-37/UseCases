@@ -41,7 +41,7 @@ class DataServiceTest {
     fun setUp() {
         flowable = Flowable.just(true)
         fileFlowable = Flowable.just(File(""))
-        postRequest = PostRequest.Builder(TestRealmModel::class.java, false).build()
+        postRequest = PostRequest.Builder(TestRealmModel::class.java, false).payLoad(Any()).build()
         getRequest = GetRequest.Builder(TestRealmModel::class.java, false)
                 .url("")
                 .id(37, "id", Int::class.java)

@@ -50,7 +50,7 @@ class DataStoreFactory(private val dataBaseManagerUtil: DataBaseManagerUtil?,
     fun cloud(dataClass: Class<*>): DataStore {
         if (cloudStore == null) {
             cloudStore = CloudStore(restApi,
-                    dataBaseManagerUtil?.getDataBaseManager(dataClass)!!, daoMapper, memory())
+                    dataBaseManagerUtil?.getDataBaseManager(dataClass), daoMapper, memory())
         }
         return cloudStore as CloudStore
     }

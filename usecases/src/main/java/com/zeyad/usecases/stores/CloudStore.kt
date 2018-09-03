@@ -37,7 +37,7 @@ import java.util.*
 
 @Mockable
 class CloudStore(private val mApiConnection: ApiConnection, //    private static final int COUNTER_START = 1, ATTEMPTS = 3;
-                 private val mDataBaseManager: DataBaseManager,
+                 private val mDataBaseManager: DataBaseManager?,
                  private val mEntityDataMapper: DAOMapper,
                  private val mMemoryStore: MemoryStore?) : DataStore {
 
@@ -407,9 +407,9 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
     }
 
     private fun saveAllToDisk(collection: List<*>, requestType: Class<*>) {
-        mDataBaseManager.putAll(collection as List<RealmModel>, requestType)
-                .subscribeOn(Config.backgroundThread)
-                .subscribe(SimpleSubscriber(requestType))
+        mDataBaseManager?.putAll(collection as List<RealmModel>, requestType)
+                ?.subscribeOn(Config.backgroundThread)
+                ?.subscribe(SimpleSubscriber(requestType))
     }
 
     private fun saveAllToMemory(idColumnName: String, jsonArray: JSONArray, requestType: Class<*>) {
@@ -419,9 +419,9 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
     private fun saveLocally(idColumnName: String, itemIdType: Class<*>, jsonObject: JSONObject,
                             requestType: Class<*>, persist: Boolean, cache: Boolean) {
         if (withDisk(persist)) {
-            mDataBaseManager.put(jsonObject, idColumnName, itemIdType, requestType)
-                    .subscribeOn(Config.backgroundThread)
-                    .subscribe(SimpleSubscriber(requestType))
+            mDataBaseManager?.put(jsonObject, idColumnName, itemIdType, requestType)
+                    ?.subscribeOn(Config.backgroundThread)
+                    ?.subscribe(SimpleSubscriber(requestType))
         }
         if (withCache(cache)) {
             mMemoryStore?.cacheObject(idColumnName, jsonObject, requestType)
@@ -431,9 +431,9 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
     private fun saveAllLocally(idColumnName: String, itemIdType: Class<*>, jsonArray: JSONArray,
                                requestType: Class<*>, persist: Boolean, cache: Boolean) {
         if (withDisk(persist)) {
-            mDataBaseManager.putAll(jsonArray, idColumnName, itemIdType, requestType)
-                    .subscribeOn(Config.backgroundThread)
-                    .subscribe(SimpleSubscriber(requestType))
+            mDataBaseManager?.putAll(jsonArray, idColumnName, itemIdType, requestType)
+                    ?.subscribeOn(Config.backgroundThread)
+                    ?.subscribe(SimpleSubscriber(requestType))
         }
         if (withCache(cache)) {
             mMemoryStore?.cacheList(idColumnName, jsonArray, requestType)
@@ -445,7 +445,7 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
         if (withDisk(persist)) {
             val collectionSize = ids.size
             for (i in 0 until collectionSize) {
-                mDataBaseManager.evictById(requestType, idColumnName, ids[i], itemIdType)
+                mDataBaseManager?.evictById(requestType, idColumnName, ids[i], itemIdType)
             }
         }
         if (withCache(cache)) {

@@ -55,8 +55,7 @@ class ApiConnection(val restApiWithoutCache: RestApi, val restApiWithCache: Rest
         return restApi.dynamicPut(url, requestBody) as Flowable<M>
     }
 
-    fun <M> dynamicUpload(
-            url: String, partMap: Map<String, RequestBody>, files: List<MultipartBody.Part>): Flowable<M> {
+    fun <M> dynamicUpload(url: String, partMap: Map<String, RequestBody>, files: List<MultipartBody.Part>): Flowable<M> {
         return restApi.dynamicUpload(url, partMap, files) as Flowable<M>
     }
 

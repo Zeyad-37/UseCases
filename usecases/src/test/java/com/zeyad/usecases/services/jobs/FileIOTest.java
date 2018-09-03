@@ -100,23 +100,21 @@ public class FileIOTest {
 
     private CloudStore createCloudDataStore() {
         final CloudStore cloudStore = mock(CloudStore.class);
-        Mockito.when(
-                cloudStore.dynamicDownloadFile(
-                        Mockito.anyString(),
-                        any(),
-                        anyBoolean(),
-                        anyBoolean(),
-                        anyBoolean()))
+        Mockito.when(cloudStore.dynamicDownloadFile(
+                Mockito.anyString(),
+                any(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean()))
                 .thenReturn(Flowable.empty());
-        Mockito.when(
-                cloudStore.dynamicUploadFile(
-                        Mockito.anyString(),
-                        (HashMap) anyMap(),
-                        (HashMap) anyMap(),
-                        anyBoolean(),
-                        anyBoolean(),
-                        anyBoolean(),
-                        any()))
+        Mockito.when(cloudStore.dynamicUploadFile(
+                Mockito.anyString(),
+                (HashMap) anyMap(),
+                (HashMap) anyMap(),
+                anyBoolean(),
+                anyBoolean(),
+                anyBoolean(),
+                any()))
                 .thenReturn(Flowable.empty());
         return cloudStore;
     }

@@ -48,12 +48,12 @@ public class APIIntegrationTest {
     @Before
     public void setUp() {
         RESTMockServer.reset();
-        dataService = new DataServiceFactory(new DataServiceConfig.Builder(RuntimeEnvironment
-                .application)
+        dataService = new DataServiceFactory(new DataServiceConfig.Builder(RuntimeEnvironment.application)
                 .baseUrl(RESTMockServer.getUrl())
                 //                .withCache(3, TimeUnit.MINUTES)
                 //                                .withRealm()
-                .build()).getInstance();
+                .build())
+                .getInstance();
         users = new ArrayList<>(2);
         testUser = new User();
         testUser.setAvatarUrl("https://avatars2.githubusercontent.com/u/5938141?v=3");
@@ -263,7 +263,7 @@ public class APIIntegrationTest {
         TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
         dataService.<Success>deleteItemById(new PostRequest.Builder(User.class, false)
                 .url(path)
-                .payLoad("Zeyad-37")
+                .payLoad("{\"id\": \"Zeyad-37\"}")
                 .idColumnName(User.LOGIN, String.class)
                 .responseType(Success.class)
                 .build())

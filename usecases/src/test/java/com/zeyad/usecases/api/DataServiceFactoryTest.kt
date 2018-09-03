@@ -1,5 +1,6 @@
 package com.zeyad.usecases.api
 
+import android.app.Application
 import android.content.Context
 import android.support.test.rule.BuildConfig
 import junit.framework.Assert.assertEquals
@@ -31,7 +32,7 @@ class DataServiceFactoryTest {
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        mockContext = mock(Context::class.java)
+        mockContext = mock(Application::class.java)
         builder = OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(15, TimeUnit.SECONDS)
