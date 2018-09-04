@@ -2,12 +2,14 @@ package com.zeyad.usecases.requests
 
 import android.os.Parcel
 import android.os.Parcelable
+import com.zeyad.usecases.Mockable
 import java.io.File
 
 
 /**
  * @author zeyad on 7/29/16.
  */
+@Mockable
 data class FileIORequest private constructor(val url: String = "",
                                              val onWifi: Boolean = false,
                                              val whileCharging: Boolean = false,

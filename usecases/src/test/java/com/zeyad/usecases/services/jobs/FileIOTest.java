@@ -24,8 +24,10 @@ import io.reactivex.Flowable;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyMap;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
 
 @RunWith(RobolectricTestRunner.class)
 @Config(constants = BuildConfig.class, sdk = 21)
@@ -48,28 +50,29 @@ public class FileIOTest {
 
     @Test
     public void testDownload() {
-        //        fileIO = createFileIO(mockFileIoReq(true, true, getValidFile()), true);
-        //        fileIO.execute();
-        //        verify(cloudStore).dynamicDownloadFile(anyString(), any(), anyBoolean(), anyBoolean(), anyBoolean());
+        fileIO = createFileIO(mockFileIoReq(true, true, getValidFile()), true);
+        fileIO.execute();
+        verify(cloudStore).dynamicDownloadFile(anyString(), any(), anyBoolean(), anyBoolean(), anyBoolean());
     }
 
     @Test
     public void testUpload() {
-        //        fileIO = createFileIO(mockFileIoReq(true, true, getValidFile()), false);
-        //        fileIO.execute();
-        //        verify(cloudStore).dynamicUploadFile(anyString(), any(), anyString(), (HashMap<String, Object>) anyMap(),
-        //                anyBoolean(), anyBoolean(), anyBoolean(), any());
+        fileIO = createFileIO(mockFileIoReq(true, true, getValidFile()), false);
+        fileIO.execute();
+        verify(cloudStore).dynamicUploadFile(anyString(), (HashMap<String, File>) anyMap(),
+                (HashMap<String, Object>) anyMap(), anyBoolean(), anyBoolean(), anyBoolean(), any());
     }
 
     @Test
     public void testReQueue() {
-//        FileIORequest fileIOReq = mockFileIoReq(true, true, getValidFile());
-//        fileIO = createFileIO(fileIOReq, true);
+        FileIORequest fileIOReq = mockFileIoReq(true, true, getValidFile());
+        fileIO = createFileIO(fileIOReq, true);
 //        Mockito.doNothing()
 //                .when(utils)
 //                .queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class), anyInt());
 //        fileIO.queueIOFile();
-//        verify(utils, times(1)).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class), anyInt());
+//        verify(utils,
+//                times(1)).queueFileIOCore(any(), anyBoolean(), any(FileIORequest.class), anyInt());
     }
 
     private String getValidUrl() {
@@ -101,14 +104,14 @@ public class FileIOTest {
     private CloudStore createCloudDataStore() {
         final CloudStore cloudStore = mock(CloudStore.class);
         Mockito.when(cloudStore.dynamicDownloadFile(
-                Mockito.anyString(),
+                anyString(),
                 any(),
                 anyBoolean(),
                 anyBoolean(),
                 anyBoolean()))
                 .thenReturn(Flowable.empty());
         Mockito.when(cloudStore.dynamicUploadFile(
-                Mockito.anyString(),
+                anyString(),
                 (HashMap) anyMap(),
                 (HashMap) anyMap(),
                 anyBoolean(),
