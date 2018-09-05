@@ -2,7 +2,8 @@
 [![](https://www.jitpack.io/v/zeyad-37/usecases.svg)](https://www.jitpack.io/#zeyad-37/usecases)
 # UseCases
 
-Is a library that is a generic implementation of the Domain and Data layers in a clean architecture.
+Is a library that is a generic implementation of the Data layer in Uncle Bob's clean architecture.
+Now in Kotlin
 
 # Motivation
 
@@ -29,167 +30,145 @@ Easiest way to start
 // Create Class LibraryModule to expose your realm models to the lib configuration
 
 @RealmModule(library = true, allClasses = true)
-class LibraryModule {
-}
+internal class LibraryModule
 ```
 ```
 // This should be in the application class
-
-Realm.init(this); // First initialize realm
-Realm.setDefaultConfiguration(new RealmConfiguration.Builder()
-            .name("app.realm")
-            .modules(Realm.getDefaultModule(), new LibraryModule())
-            .rxFactory(new RealmObservableFactory())
-            .deleteRealmIfMigrationNeeded()
-            .build());
+Realm.init(this)
+Realm.setDefaultConfiguration(RealmConfiguration.Builder()
+        .name("app.realm")
+        .modules(Realm.getDefaultModule(), LibraryModule())
+        .rxFactory(RealmObservableFactory())
+        .deleteRealmIfMigrationNeeded()
+        .build())
 
 // Fastest start
-DataServiceFactory.init(new DataUseCaseConfig.Builder(applicationContext).build()); // all extra features are disabled
+DataServiceFactory(DataServiceConfig.Builder(context).build()).instance!!// all extra features are disabled
                 
 // Advanced init
-DataServiceFactory.init(new DataServiceConfig.Builder(applicationContext)
-                .baseUrl(API_BASE_URL) 
-                .withRealm() // if you want a DB
-                .withCache(3, TimeUnit.MINUTES) // adds a cache layer above the server & DB if exists
-                .cacheSize(8192)  // maximum size to allocate in bytes
-                .okHttpBuilder(provideOkHttpClientBuilder()) 
-                .okhttpCache(provideCache()) // you can also provide a cache for okHttp
-                .postExecutionThread(AndroidScheduler.mainThread()) // your implementation of the post execution thread
-                .build());
-DataServiceFactory.getInstance();
+DataServiceFactory(DataServiceConfig.Builder(context)
+            .baseUrl(API_BASE_URL)
+            .okHttpBuilder(getOkHttpBuilder())
+            .withRealm() // if you want a DB
+            .withRealm(HandlerThread("BackgroundHandlerThread")) // If you want to supply your own Handler thread
+            .withCache(3, TimeUnit.MINUTES) // adds a cache layer above the server & DB if exists
+            .cacheSize(8192)  // maximum size to allocate in bytes
+            .okHttpBuilder(provideOkHttpClientBuilder()) 
+            .okhttpCache(provideCache()) // you can also provide a cache for okHttp
+            .postExecutionThread(AndroidScheduler.mainThread()) // your implementation of the post execution thread
+            .build())
+            .instance!!
+
 ```
 # Code Example
 
 Get Object From Server:
 ```
-mDataService.<Order>getObject(new GetRequest
-        .GetRequestBuilder(Order.class, true) // true to save result to db, false otherwise.
+dataService.<Order>getObject(GetRequest
+        .GetRequestBuilder(Order::class.java, true) // true to save result to db, false otherwise.
         .url(URL) // if you provided a base url in the DataServiceConfig.Builder
         .idColumnName(Order.ID)
         .id(orderId)
         .build())
-        .subscribe(new Subscriber<Order>() {
-            @Override
-            public void onCompleted() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onNext(Order order) {
-            }
-        });
+        .subscribe()
 ```
 Get Object From DB:
 ```
-mDataService.<Order>getObject(new GetRequest
-        .GetRequestBuilder(Order.class, true)
+mDataService.<Order>getObject(GetRequest
+        .GetRequestBuilder(Order::class.java, true)
         .idColumnName(Order.ID)
         .id(mItemId)
-        .build());
+        .build())
+        .subscribe()
 ```
 Get List From Server:
 ```
-mDataService.<Order>getList(new GetRequest
-        .GetRequestBuilder(Order.class, false)
+mDataService.<Order>getList(GetRequest
+        .GetRequestBuilder(Order::class.java, false)
         .fullUrl(FULL_URL) // for server access
         .build())
-        .subscribe(new Subscriber<List<Order>>() {
-            @Override
-            public void onCompleted() {
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-            }
-
-            @Override
-            public void onNext(List<Order> order){
-            }
-        });
+        .subscribe()
 ```
 Get List From DB:
 ```
-mDataService.<Order>getList(new GetRequest
-        .GetRequestBuilder(Order.class, false)
-        .build());
+mDataService.<Order>getList(GetRequest
+        .GetRequestBuilder(Order::class.java, false)
+        .build())
+        .subscribe()
 ```
 Post/Put Object:
 ```
-mDataService.<MyResponse>postObject(new PostRequest // putObject
-        .PostRequestBuilder(Payload.class, true) // Type of expected server response
+mDataService.<MyResponse>postObject(PostRequest // putObject
+        .PostRequestBuilder(Payload::class.java, true) // Type of expected server response
         .idColumnName(Order.ID) // for persistance
         .url(URL) // remove for DB access
         .payLoad(order) // or HashMap / JSONObject
-        .responseType(MyResponse.class)
-        .build());
+        .responseType(MyResponse::class.java)
+        .build())
+        .subscribe()
 ```
 Post/Put List:
 ```
-mDataService.<MyResponse>postList(new PostRequest // putList
-        .PostRequestBuilder(Payload.class, true) // Type of expected server response
+mDataService.<MyResponse>postList(PostRequest // putList
+        .PostRequestBuilder(Payload::class.java, true) // Type of expected server response
         .payLoad(orders)
         .idColumnName(Order.ID) // for persistance
         .url(URL) // remove for DB access
-        .responseType(MyResponse.class)
+        .responseType(MyResponse::class.java)
         .build())
+        .subscribe()
 ```
 Delete Collection
 ```
-mDataService().<MyResponse>deleteCollectionByIds(new PostRequest // putList
-        .PostRequestBuilder(Payload.class, true)
+mDataService().<MyResponse>deleteCollectionByIds(PostRequest // putList
+        .PostRequestBuilder(Payload::class.java, true)
         .payLoad(ids)
         .idColumnName(Order.ID) // for persistance
         .url(URL) // remove for DB access
-        .responseType(MyResponse.class)
+        .responseType(MyResponse::class.java)
         .build())
+        .subscribe()
 ```
 Delete Item:
 ```
-mDataService().<MyResponse>deleteCollectionByIds(new PostRequest // putList
-        .PostRequestBuilder(Payload.class, true)
+mDataService().<MyResponse>deleteCollectionByIds(PostRequest // putList
+        .PostRequestBuilder(Payload::class.java, true)
         .payLoad(id)
         .idColumnName(Order.ID) // for persistance
         .url(URL) // remove for DB access
-        .responseType(MyResponse.class)
+        .responseType(MyResponse::class.java)
         .build())
+        .subscribe()
 ```
 Delete All from DB:
 ```
-mDataService.deleteAll(new PostRequest
-        .PostRequestBuilder(Order.class, true)
+mDataService.deleteAll(PostRequest
+        .PostRequestBuilder(Order::class.java, true)
         .idColumnName(Order.ID)
         .build())
+        .subscribe()
 ```
 Upload File
 ```
-mDataService.<MyResponse>uploadFile(new FileIORequest
-        .FileIORequestBuilder(FULL_URL, new File()) // always full url
-        .onWifi(true)
-        .whileCharging(false)
-        .responseType(MyResponse.class)
+mDataService.<MyResponse>uploadFile(FileIORequest
+        .FileIORequestBuilder(FULL_URL, File("")) // always full url
+        .queuable(true, false) // onWifi, whileCharging
+        .responseType(MyResponse::class.java)
         .build())
+        .subscribe()
 ```
 Download File
 ```
-mDataService.downloadFile(new FileIORequest
-        .FileIORequestBuilder(FULL_URL, new File())
-        .onWifi(true)
-        .whileCharging(false)
-        .requestType(Order.class)
+mDataService.downloadFile(FileIORequest
+        .FileIORequestBuilder(FULL_URL, File(""))
+        .queuable(true, false) // onWifi, whileCharging
+        .requestType(Order::class.java)
         .build())
+        .subscribe()
 ```
-# Contributors
-
-Just make pull request. You are in!
-
 # License
 
-Licensed under the Apache License, Version 2.0 (the "License");
+Licensed under the Apache License, Version 2.0 (the "License")
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
