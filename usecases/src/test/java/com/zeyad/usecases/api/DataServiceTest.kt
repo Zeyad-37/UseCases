@@ -2,6 +2,7 @@ package com.zeyad.usecases.api
 
 import android.support.test.rule.BuildConfig
 import com.zeyad.usecases.TestRealmModel
+import com.zeyad.usecases.anyObject
 import com.zeyad.usecases.db.RealmQueryProvider
 import com.zeyad.usecases.requests.FileIORequest
 import com.zeyad.usecases.requests.GetRequest
@@ -17,7 +18,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Matchers.*
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.mockito.Mockito.mock
 import org.mockito.Mockito.times
@@ -26,7 +26,6 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.io.File
 import java.util.*
-
 /**
  * @author by ZIaDo on 5/9/17.
  */
@@ -40,10 +39,6 @@ class DataServiceTest {
     private lateinit var postRequest: PostRequest
     private lateinit var flowable: Flowable<Any>
     private lateinit var fileFlowable: Flowable<File>
-
-    private fun <T> anyObject(): T {
-        return Mockito.anyObject<T>()
-    }
 
     @Before
     @Throws(Exception::class)
