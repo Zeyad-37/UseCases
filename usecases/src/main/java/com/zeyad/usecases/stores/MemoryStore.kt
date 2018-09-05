@@ -3,6 +3,7 @@ package com.zeyad.usecases.stores
 import android.util.Log
 import com.google.gson.Gson
 import com.zeyad.usecases.Config
+import com.zeyad.usecases.Mockable
 import io.reactivex.Observable
 import io.reactivex.Single
 import org.json.JSONArray
@@ -13,6 +14,7 @@ import java.util.*
 /**
  * @author by ZIaDo on 6/5/17.
  */
+@Mockable
 class MemoryStore(private val gson: Gson,
                   private val mapOfIds: MutableMap<Class<*>, MutableSet<String>> = mutableMapOf()) {
 

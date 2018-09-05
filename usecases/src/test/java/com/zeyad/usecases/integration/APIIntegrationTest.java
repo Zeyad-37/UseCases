@@ -50,8 +50,8 @@ public class APIIntegrationTest {
         RESTMockServer.reset();
         dataService = new DataServiceFactory(new DataServiceConfig.Builder(RuntimeEnvironment.application)
                 .baseUrl(RESTMockServer.getUrl())
+//                .withRealm() Todo Fix
                 //                .withCache(3, TimeUnit.MINUTES)
-                //                                .withRealm()
                 .build())
                 .getInstance();
         users = new ArrayList<>(2);
@@ -311,98 +311,98 @@ public class APIIntegrationTest {
                 .assertComplete();
     }
 
-    //    @Test
-    //    public void testDeleteAll() throws Exception {
-    //        TestObserver<Boolean> testObserver = new TestObserver<>();
-    //        dataService.deleteAll(new PostRequest.Builder(User.class, false)
-    //                .responseType(Boolean.class)
-    //                .build())
-    //                .subscribe(testObserver);
-    //
-    //        testObserver.awaitTerminalEvent();
-    //
-    //        testObserver.assertSubscribed()
-    //                      .assertNoErrors()
-    //                      .assertValueCount(1)
-    //                      .assertValue(true)
-    //                      .assertComplete();
-    //    }
+//    @Test
+//    public void testDeleteAll() {
+//        TestObserver<Boolean> testObserver = new TestObserver<>();
+//        dataService.deleteAll(new PostRequest.Builder(User.class, false)
+//                .responseType(Boolean.class)
+//                .build())
+//                .subscribe(testObserver);
+//
+//        testObserver.awaitTerminalEvent();
+//
+//        testObserver.assertSubscribed()
+//                .assertNoErrors()
+//                .assertValueCount(1)
+//                .assertValue(true)
+//                .assertComplete();
+//    }
 
-    //    @Test
-    //    public void testQueryDisk() throws Exception {
-    //        TestSubscriber<List<User>> testSubscriber = new TestSubscriber<>();
-    //        dataService.<User> queryDisk(realm -> realm.where(User.class))
-    //                .subscribe(testSubscriber);
-    //
-    //        testSubscriber.awaitTerminalEvent();
-    //
-    //        testSubscriber.assertSubscribed()
-    //                      .assertNoErrors()
-    //                      .assertValueCount(1)
-    //                      .assertValue(users)
-    //                      .assertComplete();
-    //    }
+//    @Test
+//    public void testQueryDisk() {
+//        TestSubscriber<List<User>> testSubscriber = new TestSubscriber<>();
+//        dataService.queryDisk(realm -> realm.where(User.class))
+//                .subscribe(testSubscriber);
+//
+//        testSubscriber.awaitTerminalEvent();
+//
+//        testSubscriber.assertSubscribed()
+//                .assertNoErrors()
+//                .assertValueCount(1)
+//                .assertValue(users)
+//                .assertComplete();
+//    }
 
-    //        @Test
-    //        public void testUploadFile() throws Exception {
-    //            String path = "upload/user";
-    //            RESTMockServer.whenPOST(pathContains(path))
-    //                          .thenReturn(new MockResponse()
-    //                                  .setResponseCode(HttpURLConnection.HTTP_OK)
-    //                                  .setBody(SUCCESS));
-    //
-    //            File file = new File(RuntimeEnvironment.application.getCacheDir().getPath(), "test");
-    //            file.mkdir();
-    //            TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
-    //
-    //            HashMap<String, File> hashMap =  new HashMap<>(1);
-    //            hashMap.put("image", file);
-    //            dataService.<Success> uploadFile(new FileIORequest.Builder(path)
-    //                    .keyFileMapToUpload(hashMap)
-    //                    .payLoad(new HashMap<>())
-    //                    .responseType(Success.class)
-    //                    .build())
-    //                    .subscribe(testSubscriber);
-    //
-    //            testSubscriber.awaitTerminalEvent();
-    //
-    //            RequestsVerifier.verifyPOST(pathContains(path)).invoked();
-    //
-    //            testSubscriber.assertSubscribed()
-    //                          .assertNoErrors()
-    //                          .assertValueCount(1)
-    //                          .assertValue(success)
-    //                          .assertComplete();
-    //        }
+//    @Test
+//    public void testUploadFile() {
+//        String path = "upload/user";
+//        RESTMockServer.whenPOST(pathContains(path))
+//                .thenReturn(new MockResponse()
+//                        .setResponseCode(HttpURLConnection.HTTP_OK)
+//                        .setBody(SUCCESS));
+//
+//        File file = new File(RuntimeEnvironment.application.getCacheDir().getPath(), "test");
+//        file.mkdir();
+//        TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
+//
+//        HashMap<String, File> hashMap = new HashMap<>(1);
+//        hashMap.put("image", file);
+//        dataService.<Success>uploadFile(new FileIORequest.Builder(path, file)
+//                .keyFileMapToUpload(hashMap)
+//                .payLoad(new HashMap<>())
+//                .responseType(Success.class)
+//                .build())
+//                .subscribe(testSubscriber);
+//
+//        testSubscriber.awaitTerminalEvent();
+//
+//        RequestsVerifier.verifyPOST(pathContains(path)).invoked();
+//
+//        testSubscriber.assertSubscribed()
+//                .assertNoErrors()
+//                .assertValueCount(1)
+//                .assertValue(success)
+//                .assertComplete();
+//    }
 
-    //        @Test
-    //        public void testDownloadFile() throws Exception {
-    //            String path = "download/user";
-    //            RESTMockServer.whenRequested(pathContains(path))
-    //                          .thenReturn(new MockResponse()
-    //                                  .setResponseCode(HttpURLConnection.HTTP_OK)
-    //                                  .setBody(SUCCESS));
-    //
-    //            File file = new File(RuntimeEnvironment.application.getCacheDir().getPath(), "test");
-    //            file.mkdir();
-    //
-    //            TestSubscriber<File> testSubscriber = new TestSubscriber<>();
-    //            dataService.downloadFile(new FileIORequest.Builder(path)
-    //                    .file(file)
-    //                    .payLoad(new HashMap<>())
-    //                    .build())
-    //                       .subscribe(testSubscriber);
-    //
-    //            testSubscriber.awaitTerminalEvent();
-    //
-    //            RequestsVerifier.verifyRequest(pathContains(path)).invoked();
-    //
-    //            testSubscriber.assertSubscribed()
-    //                          .assertNoErrors()
-    //                          .assertValueCount(1)
-    //                          .assertValue(new File(""))
-    //                          .assertComplete();
-    //        }
+//    @Test
+//    public void testDownloadFile() {
+//        String path = "download/user";
+//        RESTMockServer.whenRequested(pathContains(path))
+//                .thenReturn(new MockResponse()
+//                        .setResponseCode(HttpURLConnection.HTTP_OK)
+//                        .setBody(SUCCESS));
+//
+//        File file = new File(RuntimeEnvironment.application.getCacheDir().getPath(), "test");
+//        file.mkdir();
+//
+//        TestSubscriber<File> testSubscriber = new TestSubscriber<>();
+//        dataService.downloadFile(new FileIORequest.Builder(path, file)
+//                .payLoad(new HashMap<>())
+//                .requestType(Object.class)
+//                .build())
+//                .subscribe(testSubscriber);
+//
+//        testSubscriber.awaitTerminalEvent();
+//
+//        RequestsVerifier.verifyRequest(pathContains(path)).invoked();
+//
+//        testSubscriber.assertSubscribed()
+//                .assertNoErrors()
+//                .assertValueCount(1)
+//                .assertValue(file)
+//                .assertComplete();
+//    }
 
     @Test
     public void testGetObjectOffLineFirst() {

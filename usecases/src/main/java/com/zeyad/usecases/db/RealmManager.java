@@ -214,10 +214,14 @@ public class RealmManager implements DataBaseManager {
     private Flowable<RealmModel> getItemById(Realm realm, @NonNull Class dataClass, @NonNull String idColumnName,
                                              final Object itemId, final Class itemIdType) {
         Object result;
-        if (itemIdType.equals(long.class) || itemIdType.equals(Long.class)) {
+        if (itemIdType.equals(long.class)) {
             result = realm.where(dataClass).equalTo(idColumnName, (long) itemId).findFirst();
-        } else if (itemIdType.equals(int.class) || itemIdType.equals(Integer.class)) {
+        } else if (itemIdType.equals(Long.class)) {
+            result = realm.where(dataClass).equalTo(idColumnName, (Long) itemId).findFirst();
+        } else if (itemIdType.equals(int.class)) {
             result = realm.where(dataClass).equalTo(idColumnName, (int) itemId).findFirst();
+        } else if (itemIdType.equals(Integer.class)) {
+            result = realm.where(dataClass).equalTo(idColumnName, (Integer) itemId).findFirst();
         }
         //        else if (itemIdType.equals(short.class) || itemIdType.equals(Short.class)) {
         //            result = realm.where(dataClass).equalTo(idColumnName, (short) itemId).findFirst();

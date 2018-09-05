@@ -4,6 +4,8 @@ import android.content.Context
 import android.os.HandlerThread
 import android.support.test.rule.BuildConfig
 import com.zeyad.usecases.mapper.DAOMapper
+import io.reactivex.Scheduler
+import io.reactivex.schedulers.Schedulers
 import okhttp3.Cache
 import okhttp3.OkHttpClient
 import org.hamcrest.MatcherAssert.assertThat
@@ -22,7 +24,7 @@ import java.util.concurrent.TimeUnit
  * @author by ZIaDo on 5/14/17.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, sdk = intArrayOf(21))
+@Config(constants = BuildConfig::class, sdk = [25])
 class DataServiceConfigTest {
     private val URL = "www.google.com"
     private val cacheSize = 8192
@@ -62,13 +64,12 @@ class DataServiceConfigTest {
         assertThat<Class<out DAOMapper>>(mDataServiceConfig.entityMapper.javaClass, `is`(equalTo<Class<out DAOMapper>>(DAOMapper::class.java)))
     }
 
-// Todo fix
-//    @Test
-//    @Throws(Exception::class)
-//    fun getPostExecutionThread() {
-//        assertThat<Scheduler>(mDataServiceConfig.postExecutionThread,
-//                `is`<Scheduler>(equalTo<Scheduler>(null)))
-//    }
+    @Test
+    @Throws(Exception::class)
+    fun getPostExecutionThread() {
+        assertThat<Scheduler>(mDataServiceConfig.postExecutionThread,
+                `is`<Scheduler>(equalTo<Scheduler>(Schedulers.io())))
+    }
 
     @Test
     @Throws(Exception::class)

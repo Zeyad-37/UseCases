@@ -57,27 +57,26 @@ data class FileIORequest private constructor(val url: String = "",
         override fun newArray(size: Int) = arrayOfNulls<FileIORequest?>(size)
     }
 
-    class Builder(internal val url: String) {
+    class Builder(internal val url: String, internal var file: File = File("")) {
         internal var onWifi: Boolean = false
         internal var whileCharging: Boolean = false
         internal var queuable: Boolean = false
         internal var dataClass: Class<*>? = null
         internal var parameters: HashMap<String, Any> = hashMapOf()
         internal var keyFileMap: HashMap<String, File>? = hashMapOf()
-        internal var file: File? = null
 
         fun responseType(dataClass: Class<*>): Builder {
             this.dataClass = dataClass
             return this
         }
 
-        fun keyFileMapToUpload(keyFileMap: HashMap<String, File>?): Builder {
-            this.keyFileMap = keyFileMap
+        fun requestType(dataClass: Class<*>): Builder {
+            this.dataClass = dataClass
             return this
         }
 
-        fun file(file: File?): Builder {
-            this.file = file
+        fun keyFileMapToUpload(keyFileMap: HashMap<String, File>?): Builder {
+            this.keyFileMap = keyFileMap
             return this
         }
 
@@ -98,5 +97,3 @@ data class FileIORequest private constructor(val url: String = "",
         }
     }
 }
-
-

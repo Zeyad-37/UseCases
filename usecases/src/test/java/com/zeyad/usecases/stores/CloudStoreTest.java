@@ -58,7 +58,7 @@ import static org.mockito.Mockito.when;
  * @author by ZIaDo on 2/14/17.
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 21)
+@Config(constants = BuildConfig.class, sdk = 25)
 public class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     private CloudStore cloudStore;
     private Context mockContext;
@@ -667,18 +667,18 @@ public class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         verifyDBInteractions(0, 0, 0, 0);
     }
 
-//    @Test(expected = RuntimeException.class)
-//    public void queryDisk() {
-//        Flowable observable = cloudStore.queryDisk(realm -> realm.where(TestRealmModel.class));
+    @Test(expected = RuntimeException.class)
+    public void queryDisk() {
+        Flowable observable = cloudStore.queryDisk(realm -> realm.where(TestRealmModel.class));
 
-//  // Verify repository interactions
-//        verifyZeroInteractions(mockApiConnection);
-//        verifyZeroInteractions(mockDataBaseManager);
+        // Verify repository interactions
+        verifyZeroInteractions(mockApiConnection);
+        verifyZeroInteractions(mockDataBaseManager);
 
-//  // Assert return type
-//        RuntimeException expected = new RuntimeException();
-//        assertEquals(expected.getClass(), observable.first(expected).blockingGet().getClass());
-//    }
+        // Assert return type
+        RuntimeException expected = new RuntimeException();
+        assertEquals(expected.getClass(), observable.first(expected).blockingGet().getClass());
+    }
 
     private void verifyDBInteractions(int putAllJ, int putAllL, int putJ, int evict) {
         verify(mockDataBaseManager, times(putAllJ))

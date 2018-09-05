@@ -25,8 +25,7 @@ public class GetRequestTest {
 
     @Before
     public void setUp() {
-        mGetRequest =
-                new GetRequest.Builder(DATA_CLASS, TO_PERSIST)
+        mGetRequest = new GetRequest.Builder(DATA_CLASS, TO_PERSIST)
                         .fullUrl(URL)
                         .cache(ID_COLUMN_NAME)
                         .id(ID, ID_COLUMN_NAME, long.class)

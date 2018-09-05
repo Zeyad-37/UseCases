@@ -2,6 +2,7 @@ package com.zeyad.usecases.api
 
 import android.util.Log
 import com.jakewharton.rx.ReplayingShare
+import com.zeyad.usecases.db.RealmQueryProvider
 import com.zeyad.usecases.requests.FileIORequest
 import com.zeyad.usecases.requests.GetRequest
 import com.zeyad.usecases.requests.PostRequest
@@ -12,6 +13,7 @@ import io.reactivex.Flowable
 import io.reactivex.FlowableTransformer
 import io.reactivex.Scheduler
 import io.reactivex.Single
+import io.realm.RealmModel
 import org.json.JSONException
 import java.io.File
 
@@ -191,15 +193,15 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory,
         }
     }
 
-//    override fun <M : RealmModel> queryDisk(realmQueryProvider: RealmQueryProvider<M>): Flowable<List<M>> {
-//        val result: Flowable<List<M>> = try {
-//            mDataStoreFactory.disk(Any::class.java).queryDisk<M>(realmQueryProvider)
-//                    .compose(ReplayingShare.instance())
-//        } catch (e: IllegalAccessException) {
-//            Flowable.error(e)
-//        }
-//        return result.compose(applySchedulers())
-//    }
+    override fun <M : RealmModel> queryDisk(realmQueryProvider: RealmQueryProvider<M>): Flowable<List<M>> {
+        val result: Flowable<List<M>> = try {
+            mDataStoreFactory.disk(Any::class.java).queryDisk(realmQueryProvider)
+                    .compose(ReplayingShare.instance())
+        } catch (e: IllegalAccessException) {
+            Flowable.error(e)
+        }
+        return result.compose(applySchedulers())
+    }
 
     override fun <M> getListOffLineFirst(getRequest: GetRequest): Flowable<List<M>> {
         var result: Flowable<List<M>>
@@ -283,7 +285,7 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory,
         return fileIORequest.dataClass?.let {
             fileIORequest.keyFileMap?.let { it1 ->
                 mDataStoreFactory.cloud(it)
-                        .dynamicUploadFile<M>(fileIORequest.url, it1,
+                        .dynamicUploadFile(fileIORequest.url, it1,
                                 fileIORequest.parameters, fileIORequest.onWifi,
                                 fileIORequest.whileCharging, fileIORequest.queuable,
                                 fileIORequest.getTypedResponseClass<M>())

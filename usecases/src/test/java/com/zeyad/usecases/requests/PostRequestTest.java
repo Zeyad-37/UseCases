@@ -1,6 +1,7 @@
 package com.zeyad.usecases.requests;
 
-import com.zeyad.usecases.Config;
+import android.support.test.rule.BuildConfig;
+
 import com.zeyad.usecases.TestRealmModel;
 import com.zeyad.usecases.integration.Success;
 
@@ -9,6 +10,9 @@ import org.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.annotation.Config;
 
 import java.util.HashMap;
 
@@ -16,6 +20,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 
+@RunWith(RobolectricTestRunner.class)
+@Config(constants = BuildConfig.class, sdk = 25)
 public class PostRequestTest {
 
     private final boolean TO_PERSIST = false;
@@ -38,7 +44,7 @@ public class PostRequestTest {
 //                .payLoad(HASH_MAP)
 //                .payLoad(JSON_ARRAY)
                 .idColumnName(ID_COLUMN_NAME, int.class)
-                .payLoad(Config.INSTANCE.getGson().toJson(success))
+                .payLoad(success)
                 .fullUrl(URL)
                 .build();
     }

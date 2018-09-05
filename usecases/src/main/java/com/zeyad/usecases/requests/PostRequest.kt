@@ -2,7 +2,6 @@ package com.zeyad.usecases.requests
 
 import android.os.Parcel
 import android.os.Parcelable
-import com.google.gson.JsonParser
 import com.zeyad.usecases.Config
 import org.json.JSONArray
 import org.json.JSONException
@@ -31,8 +30,8 @@ class PostRequest private constructor(val fullUrl: String = "",
     init {
         val objectString = getObjectBundle(`object`, jsonObject, keyValuePairs).toString()
         val arrayString = getArrayBundle(`object`, jsonArray, keyValuePairs).toString()
-        payload = when {
-            objectString.isEmpty() -> arrayString
+        payload = when (objectString) {
+            "{}" -> arrayString
             else -> objectString
         }
     }
@@ -74,15 +73,27 @@ class PostRequest private constructor(val fullUrl: String = "",
 
     fun <M> getTypedResponseClass(): Class<M> = responseType as Class<M>
 
-    fun getObjectBundle() = JSONObject(payload)
+    fun getObjectBundle(): JSONObject {
+        return try {
+            JSONObject(payload)
+        } catch (e: JSONException) {
+            JSONObject()
+        }
+    }
 
-    fun getArrayBundle() = JSONArray(payload)
+    fun getArrayBundle(): JSONArray {
+        return try {
+            JSONArray(payload)
+        } catch (e: JSONException) {
+            JSONArray()
+        }
+    }
 
     private fun getObjectBundle(any: Any?, jsonObject: JSONObject?,
                                 keyValuePairs: HashMap<String, Any>?): JSONObject {
         return when {
             any != null -> try {
-                JSONObject(JsonParser().parse(any.toString()).asJsonObject.toString())
+                JSONObject(Config.gson.toJson(any))
             } catch (e: JSONException) {
                 JSONObject()
             }

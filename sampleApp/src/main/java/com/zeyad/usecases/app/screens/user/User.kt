@@ -12,11 +12,11 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 open class User(@PrimaryKey
                 @SerializedName(LOGIN)
-                var login: String? = null,
+                var login: String = "",
                 @SerializedName(ID)
                 var id: Int = 0,
                 @SerializedName(AVATAR_URL)
-                var avatarUrl: String? = null) : RealmObject(), Parcelable {
+                var avatarUrl: String = "") : RealmObject(), Parcelable {
 
     companion object {
         const val LOGIN = "login"

@@ -20,6 +20,7 @@ import org.robolectric.annotation.Config;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 
 import io.reactivex.Flowable;
 import io.reactivex.Single;
@@ -37,7 +38,7 @@ import static org.powermock.api.mockito.PowerMockito.mock;
  * @author by ZIaDo on 2/15/17.
  */
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class, sdk = 19)
+@Config(constants = BuildConfig.class, sdk = 25)
 @PowerMockIgnore({"org.mockito.*", "org.robolectric.*", "android.*"})
 @PrepareForTest({Realm.class, RealmQuery.class, RealmResults.class})
 public class RealmManagerTest {
@@ -62,6 +63,13 @@ public class RealmManagerTest {
         TestRealmModel value = new TestRealmModel();
         PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", 1L).findFirst())
                 .thenReturn(value);
+
+        PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", new Long(1)))
+                .thenReturn(realmQuery);
+        PowerMockito.when(mockRealm.where(TestRealmModel.class).equalTo("id", new Long(1))
+                .findFirst())
+                .thenReturn(value);
+
         PowerMockito.when(mockRealm.where(TestRealmModel.class).findAll()).thenReturn(realmResults);
         PowerMockito.when(mockRealm.where(TestRealmModel.class).findAll().asFlowable())
                 .thenReturn(flowable);
@@ -91,9 +99,10 @@ public class RealmManagerTest {
     public void getAll() {
         Flowable flowable = mRealmManager.getAll(TestRealmModel.class);
 
-//        applyTestSubscriber(flowable);
-
-//        assertEquals(flowable.firstElement().blockingGet().getClass(), TestRealmModel.class);
+        TestSubscriber testSubscriber = new TestSubscriber<>();
+        flowable.subscribe(testSubscriber);
+        testSubscriber.assertSubscribed();
+        testSubscriber.assertErrorMessage("TestRealmModel(s) were not found!");
     }
 
     private void applyTestSubscriber(Flowable flowable) {
@@ -106,11 +115,11 @@ public class RealmManagerTest {
 
     @Test
     public void getQuery() {
-//        Flowable flowable = mRealmManager.getQuery(realm -> realm.where(TestRealmModel.class));
-//
-//        applyTestSubscriber(flowable);
-//
-//        assertEquals(flowable.firstElement().blockingGet().getClass(), TestRealmModel.class);
+        Flowable flowable = mRealmManager.getQuery(realm -> realm.where(TestRealmModel.class));
+
+        applyTestSubscriber(flowable);
+
+        assertEquals(LinkedList.class, flowable.firstElement().blockingGet().getClass());
     }
 
     @Test
@@ -152,8 +161,8 @@ public class RealmManagerTest {
         applyTestSubscriber(completable);
     }
 
-    @Test
-    public void evictById() {
-//        assertEquals(mRealmManager.evictById(TestRealmModel.class, "id", 1), true);
-    }
+//    @Test
+//    public void evictById() {
+//        assertEquals(mRealmManager.evictById(TestRealmModel.class, "id", 1, Integer.class), true);
+//    }
 }

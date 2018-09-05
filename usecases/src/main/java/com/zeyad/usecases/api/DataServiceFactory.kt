@@ -47,7 +47,7 @@ class DataServiceFactory(val config: DataServiceConfig) {
 
 
         dataBaseManagerUtil = when {
-            config.withRealm || config.withSQL ->
+            Config.isWithDisk() ->
                 if (config.withSQL)
                     dataBaseManagerUtil
                 else

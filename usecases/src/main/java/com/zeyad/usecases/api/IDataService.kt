@@ -1,10 +1,12 @@
 package com.zeyad.usecases.api
 
+import com.zeyad.usecases.db.RealmQueryProvider
 import com.zeyad.usecases.requests.FileIORequest
 import com.zeyad.usecases.requests.GetRequest
 import com.zeyad.usecases.requests.PostRequest
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.realm.RealmModel
 import java.io.File
 
 interface IDataService {
@@ -95,7 +97,7 @@ interface IDataService {
      * @param realmQueryProvider query tp select list of item(s).
      * @return
      */
-//    fun <M : RealmModel> queryDisk(realmQueryProvider: RealmQueryProvider<M>): Flowable<List<M>>
+    fun <M : RealmModel> queryDisk(realmQueryProvider: RealmQueryProvider<M>): Flowable<List<M>>
 
     /**
      * Creates a repository pattern with live objects

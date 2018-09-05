@@ -1,17 +1,21 @@
 package com.zeyad.usecases.stores
 
 import com.zeyad.usecases.Config.gson
+import com.zeyad.usecases.Mockable
 import com.zeyad.usecases.convertToListOfId
 import com.zeyad.usecases.convertToStringListOfId
 import com.zeyad.usecases.db.DataBaseManager
+import com.zeyad.usecases.db.RealmQueryProvider
 import com.zeyad.usecases.withCache
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.realm.RealmModel
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.*
 
+@Mockable
 class DiskStore(private val mDataBaseManager: DataBaseManager,
                 private val mMemoryStore: MemoryStore?) : DataStore {
 
@@ -140,10 +144,9 @@ class DiskStore(private val mDataBaseManager: DataBaseManager,
                 .toFlowable()
     }
 
-
-//    fun <M> queryDisk(queryFactory: RealmQueryProvider): Flowable<List<M>> {
-//        return mDataBaseManager.getQuery(queryFactory)
-//    }
+    override fun <M : RealmModel> queryDisk(queryFactory: RealmQueryProvider<M>): Flowable<List<M>> {
+        return mDataBaseManager.getQuery(queryFactory)
+    }
 
     override fun dynamicDeleteAll(requestType: Class<*>): Single<Boolean> {
         return mDataBaseManager.evictAll(requestType)
@@ -155,8 +158,8 @@ class DiskStore(private val mDataBaseManager: DataBaseManager,
     }
 
     override fun <M> dynamicUploadFile(url: String, keyFileMap: HashMap<String, File>,
-                                       parameters: HashMap<String, Any>?, onWifi: Boolean,
-                                       whileCharging: Boolean, queuable: Boolean, responseType: Class<*>): Flowable<M> {
+                                       parameters: HashMap<String, Any>, onWifi: Boolean,
+                                       whileCharging: Boolean, queuable: Boolean, responseType: Class<M>): Flowable<M> {
         return Flowable.error(IllegalStateException(IO_DB_ERROR))
     }
 

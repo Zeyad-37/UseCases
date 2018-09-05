@@ -11,6 +11,7 @@ import com.firebase.jobdispatcher.GooglePlayDriver
 import com.zeyad.usecases.*
 import com.zeyad.usecases.Config.gson
 import com.zeyad.usecases.db.DataBaseManager
+import com.zeyad.usecases.db.RealmQueryProvider
 import com.zeyad.usecases.exceptions.NetworkConnectionException
 import com.zeyad.usecases.mapper.DAOMapper
 import com.zeyad.usecases.network.ApiConnection
@@ -76,9 +77,9 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                 .map { entity: M -> mEntityDataMapper.mapTo<M>(entity, requestType) }
     }
 
-//    fun <M> queryDisk(queryFactory: RealmQueryProvider): Flowable<List<M>> {
-//        return Flowable.error(IllegalAccessException("Can not search disk in cloud data store!"))
-//    }
+    override fun <M : RealmModel> queryDisk(queryFactory: RealmQueryProvider<M>): Flowable<List<M>> {
+        return Flowable.error(IllegalAccessException("Can not search disk in cloud data store!"))
+    }
 
     override fun <M> dynamicPatchObject(url: String, idColumnName: String, itemIdType: Class<*>,
                                         jsonObject: JSONObject, requestType: Class<*>, responseType: Class<M>,
@@ -273,24 +274,22 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
     }
 
     override fun <M> dynamicUploadFile(url: String, keyFileMap: HashMap<String, File>,
-                                       parameters: HashMap<String, Any>?, onWifi: Boolean, whileCharging: Boolean, queuable: Boolean,
-                                       responseType: Class<*>): Flowable<M> {
+                                       parameters: HashMap<String, Any>, onWifi: Boolean, whileCharging: Boolean,
+                                       queuable: Boolean, responseType: Class<M>): Flowable<M> {
         return Flowable.defer {
             val multiPartBodyParts = ArrayList<MultipartBody.Part>()
             keyFileMap.forEach { key, file ->
                 multiPartBodyParts.add(MultipartBody.Part.createFormData(key,
                         file.name, RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file)))
             }
-            val map = HashMap<String, RequestBody>()
-            if (parameters != null && !parameters.isEmpty()) {
-                for ((key, value) in parameters) {
-                    map[key] = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA),
-                            value.toString())
-                }
+            val map = mutableMapOf<String, RequestBody>()
+            for ((key, value) in parameters) {
+                map[key] = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA),
+                        value.toString())
             }
             if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(Config.context) == onWifi
                     && isChargingReqCompatible(isCharging(Config.context), whileCharging)) {
-                queueIOFile(url, keyFileMap, null, true, whileCharging, false)
+                queueIOFile(url, keyFileMap, File(""), true, whileCharging, false)
                 Flowable.just<M>(responseType.newInstance() as M)
             } else if (!isNetworkAvailable(Config.context)) {
                 getErrorFlowableNotPersisted<M>()
@@ -298,7 +297,7 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                     .map { `object` -> daoMapHelper(responseType, `object`) }
                     .onErrorResumeNext { throwable: Throwable ->
                         if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                            queueIOFile(url, keyFileMap, null, true, whileCharging, false)
+                            queueIOFile(url, keyFileMap, File(""), true, whileCharging, false)
                             return@onErrorResumeNext Flowable.empty<M>()
                         }
                         Flowable.error(throwable)
@@ -368,12 +367,10 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                 .activeNetworkInfo.type == ConnectivityManager.TYPE_WIFI
     }
 
-    private fun queueIOFile(url: String, keyFileMap: HashMap<String, File>?, file: File?, onWifi: Boolean,
+    private fun queueIOFile(url: String, keyFileMap: HashMap<String, File>?, file: File, onWifi: Boolean,
                             whileCharging: Boolean, isDownload: Boolean) {
-
         queueFileIOCore(mDispatcher, isDownload,
-                FileIORequest.Builder(url)
-                        .file(file)
+                FileIORequest.Builder(url, file)
                         .keyFileMapToUpload(keyFileMap)
                         .queuable(onWifi, whileCharging)
                         .build(),

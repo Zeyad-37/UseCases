@@ -24,7 +24,7 @@ class Post(context: Context,
 
     fun execute(): Completable {
         val bundle: String
-        if (mPostRequest.getObjectBundle().length() > 0) {
+        if (mPostRequest.getObjectBundle().keys().hasNext()) {
             val jsonObject = mPostRequest.getObjectBundle()
             bundle = jsonObject.toString()
             isObject = true

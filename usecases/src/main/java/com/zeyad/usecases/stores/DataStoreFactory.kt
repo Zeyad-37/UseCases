@@ -1,10 +1,12 @@
 package com.zeyad.usecases.stores
 
 import com.zeyad.usecases.Config
+import com.zeyad.usecases.Mockable
 import com.zeyad.usecases.mapper.DAOMapper
 import com.zeyad.usecases.network.ApiConnection
 import com.zeyad.usecases.utils.DataBaseManagerUtil
 
+@Mockable
 class DataStoreFactory(private val dataBaseManagerUtil: DataBaseManagerUtil?,
                        private val restApi: ApiConnection,
                        private val daoMapper: DAOMapper) {

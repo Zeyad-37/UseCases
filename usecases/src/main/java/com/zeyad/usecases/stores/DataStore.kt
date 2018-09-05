@@ -1,8 +1,10 @@
 package com.zeyad.usecases.stores
 
+import com.zeyad.usecases.db.RealmQueryProvider
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
+import io.realm.RealmModel
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -26,7 +28,7 @@ interface DataStore {
      * Search disk with a RealmQuery which returns an [Flowable] that will emit a list of
      * Object.
      */
-//    fun <M> queryDisk(queryFactory: RealmQueryProvider): Flowable<List<M>>
+    fun <M : RealmModel> queryDisk(queryFactory: RealmQueryProvider<M>): Flowable<List<M>>
 
     /**
      * Patch a JSONObject which returns an [Flowable] that will emit a Object.
@@ -84,7 +86,7 @@ interface DataStore {
     fun dynamicDownloadFile(url: String, file: File, onWifi: Boolean, whileCharging: Boolean,
                             queuable: Boolean): Flowable<File>
 
-    fun <M> dynamicUploadFile(url: String, keyFileMap: HashMap<String, File>, parameters: HashMap<String, Any>?,
+    fun <M> dynamicUploadFile(url: String, keyFileMap: HashMap<String, File>, parameters: HashMap<String, Any>,
                               onWifi: Boolean, whileCharging: Boolean, queuable: Boolean,
-                              responseType: Class<*>): Flowable<M>
+                              responseType: Class<M>): Flowable<M>
 }

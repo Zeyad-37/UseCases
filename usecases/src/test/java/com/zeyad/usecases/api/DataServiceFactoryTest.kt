@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
  * @author by ZIaDo on 5/14/17.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, sdk = intArrayOf(21))
+@Config(constants = BuildConfig::class, sdk = [25])
 class DataServiceFactoryTest {
     private val URL = "https://api.github.com/"
     private val cacheSize = 8192

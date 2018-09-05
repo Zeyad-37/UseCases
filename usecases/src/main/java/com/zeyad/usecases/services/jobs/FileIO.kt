@@ -32,10 +32,10 @@ class FileIO(private val mTrailCount: Int,
                     .doOnError { t: Throwable -> this.onError(t) }
                     .toObservable())
         else
-            Completable.fromObservable(mCloudStore.dynamicUploadFile<Any>(mFileIORequest.url,
+            Completable.fromObservable(mCloudStore.dynamicUploadFile(mFileIORequest.url,
                     mFileIORequest.keyFileMap!!, mFileIORequest.parameters,
                     mFileIORequest.onWifi, mFileIORequest.whileCharging,
-                    mFileIORequest.queuable, mFileIORequest.dataClass!!)
+                    mFileIORequest.queuable, mFileIORequest.getTypedResponseClass<Any>())
                     .doOnSubscribe { Log.d(TAG, "Uploading " + file!!.name) }
                     .doOnError { throwable -> onError(throwable) }
                     .toObservable())

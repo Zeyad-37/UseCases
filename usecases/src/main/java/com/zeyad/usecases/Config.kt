@@ -1,5 +1,6 @@
 package com.zeyad.usecases
 
+import android.annotation.SuppressLint
 import android.content.Context
 import com.google.gson.Gson
 import com.zeyad.usecases.network.ApiConnection
@@ -8,6 +9,7 @@ import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
 
+@SuppressLint("StaticFieldLeak")
 object Config {
     val gson: Gson = Gson()
     var baseURL: String = ""

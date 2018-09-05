@@ -25,8 +25,7 @@ class FileIORequestTest {
 
     @Before
     fun setUp() {
-        mFileIORequest = FileIORequest.Builder(URL)
-                .file(FILE)
+        mFileIORequest = FileIORequest.Builder(URL, FILE)
                 //                        .queuable(ON_WIFI, WHILE_CHARGING)
                 .responseType(DATA_CLASS)
                 .build()
