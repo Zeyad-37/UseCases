@@ -1,8 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'realm-android'
-apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'realm-android'
 
 android {
     compileSdkVersion 27
@@ -85,6 +84,8 @@ android {
     androidExtensions {
         experimental = true
     }
+
+    android.defaultConfig.vectorDrawables.useSupportLibrary = true
 }
 
 
@@ -103,7 +104,7 @@ dependencies {
     implementation "com.android.support:design:$supportLibrary"
     implementation "com.android.support:cardview-v7:$supportLibrary"
     implementation "com.android.support:palette-v7:$supportLibrary"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.2'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 
     // Bootstrap
     implementation "com.github.Zeyad-37:GenericRecyclerViewAdapter:$genericRecyclerViewAdapter"
@@ -115,18 +116,17 @@ dependencies {
     // Network
     implementation 'com.github.bumptech.glide:glide:4.7.1'
     // Rx
-    implementation "com.jakewharton.rxbinding2:rxbinding:$rxbinding"
-    implementation "com.jakewharton.rxbinding2:rxbinding-appcompat-v7:$rxbinding"
-    implementation "com.jakewharton.rxbinding2:rxbinding-design:$rxbinding"
-    implementation "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7:$rxbinding"
+    implementation "com.jakewharton.rxbinding2:rxbinding-kotlin:$rxbinding"
+    implementation "com.jakewharton.rxbinding2:rxbinding-appcompat-v7-kotlin:$rxbinding"
+    implementation "com.jakewharton.rxbinding2:rxbinding-design-kotlin:$rxbinding"
+    implementation "com.jakewharton.rxbinding2:rxbinding-recyclerview-v7-kotlin:$rxbinding"
     // Utilities
     implementation "nl.littlerobots.rxlint:rxlint:$rxlint"
     implementation 'com.airbnb.android:lottie:2.5.1'
     debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanary"
     releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanary"
     testImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanary"
-    implementation 'org.parceler:parceler-api:1.1.9'
-    annotationProcessor 'org.parceler:parceler:1.1.9'
+
     // Testing
     androidTestImplementation "com.android.support.test:runner:$androidSupportTest"
     androidTestImplementation "com.android.support.test:rules:$androidSupportTest"

@@ -12,11 +12,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import st.lowlevel.storo.StoroBuilder
 
 class DataServiceFactory(val config: DataServiceConfig) {
-    /**
-     * @return IDataService the implementation instance of IDataService, throws NullPointerException
-     * if null.
-     */
-    var instance: IDataService?
 
     init {
         if (!doesContextBelongsToApplication(config.context)) {
@@ -62,7 +57,7 @@ class DataServiceFactory(val config: DataServiceConfig) {
                 }
             }
         }
-        instance = DataService(DataStoreFactory(dataBaseManagerUtil, apiConnection,
+        dataService = DataService(DataStoreFactory(dataBaseManagerUtil, apiConnection,
                 config.entityMapper), config.postExecutionThread, Config.backgroundThread)
         Config.apiConnection = apiConnection
     }
@@ -71,7 +66,15 @@ class DataServiceFactory(val config: DataServiceConfig) {
      * Destroys the singleton instance of DataUseCase.
      */
     fun destoryInstance() {
-        instance = null
+        dataService = null
+    }
+
+    companion object {
+        /**
+         * @return IDataService the implementation instance of IDataService, throws NullPointerException
+         * if null.
+         */
+        var dataService: IDataService? = null
     }
 
     private fun doesContextBelongsToApplication(context: Context): Boolean = context is Application

@@ -2,7 +2,6 @@ apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-allopen'
-//apply plugin: 'kotlin-android-extensions'
 apply plugin: 'realm-android'
 apply plugin: "net.ltgt.errorprone"
 
@@ -40,10 +39,6 @@ android {
     testOptions {
         unitTests.returnDefaultValues = true
         unitTests.includeAndroidResources = true
-//        unitTests.all {
-//            // All the usual Gradle options.
-//            jvmArgs '-XX:MaxPermSize=256m'
-//        }
     }
 
     compileOptions {
@@ -63,10 +58,6 @@ android {
             assets.srcDirs = ['src/main/assets', 'src/main/java/com/zeyad/usecases/assets', 'src/test/java/com/zeyad/usecases/assets']
         }
     }
-
-//    androidExtensions {
-//        experimental = true
-//    }
 
     allOpen {
         annotation("com.zeyad.usecases.Mockable")
@@ -95,7 +86,7 @@ dependencies {
     api 'io.reactivex.rxjava2:rxandroid:2.1.0'
     api 'io.reactivex.rxjava2:rxjava:2.2.0'
     implementation 'com.jakewharton.rx2:replaying-share-kotlin:2.0.1'
-//    testImplementation 'io.reactivex:rxandroid:1.2.1'
+
     // Cache
     implementation('com.github.Zeyad-37:Storo:2.1.0') {
         transitive = true

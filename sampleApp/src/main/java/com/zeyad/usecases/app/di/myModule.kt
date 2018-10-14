@@ -25,11 +25,12 @@ val myModule: Module = applicationContext {
 }
 
 fun createDataService(context: Context): IDataService {
-    return DataServiceFactory(DataServiceConfig.Builder(context)
+    DataServiceFactory(DataServiceConfig.Builder(context)
             .baseUrl(API_BASE_URL)
             .okHttpBuilder(getOkHttpBuilder())
             .withRealm(HandlerThread("BackgroundHandlerThread"))
-            .build()).instance!!
+            .build())
+    return DataServiceFactory.dataService!!
 }
 
 fun getOkHttpBuilder(): OkHttpClient.Builder {
