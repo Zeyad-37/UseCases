@@ -12,7 +12,7 @@ abstract class ProgressInterceptor(private val progressListener: ProgressListene
         val originalResponse = chain.proceed(chain.request())
         val responseBuilder = originalResponse.newBuilder()
         if (isFileIO(originalResponse)) {
-            responseBuilder.body(ProgressResponseBody(originalResponse.body(), progressListener))
+            responseBuilder.body(originalResponse.body()?.let { ProgressResponseBody(it, progressListener) })
         } else {
             responseBuilder.body(originalResponse.body())
         }
