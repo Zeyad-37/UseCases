@@ -1,13 +1,6 @@
 package com.zeyad.usecases.stores
 
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
-import android.net.ConnectivityManager
-import android.os.BatteryManager
 import android.util.Log
-import com.firebase.jobdispatcher.FirebaseJobDispatcher
-import com.firebase.jobdispatcher.GooglePlayDriver
 import com.zeyad.usecases.*
 import com.zeyad.usecases.Config.gson
 import com.zeyad.usecases.db.DataBaseManager
@@ -15,12 +8,6 @@ import com.zeyad.usecases.db.RealmQueryProvider
 import com.zeyad.usecases.exceptions.NetworkConnectionException
 import com.zeyad.usecases.mapper.DAOMapper
 import com.zeyad.usecases.network.ApiConnection
-import com.zeyad.usecases.requests.FileIORequest
-import com.zeyad.usecases.requests.PostRequest
-import com.zeyad.usecases.requests.PostRequest.CREATOR.DELETE
-import com.zeyad.usecases.requests.PostRequest.CREATOR.PATCH
-import com.zeyad.usecases.requests.PostRequest.CREATOR.POST
-import com.zeyad.usecases.requests.PostRequest.CREATOR.PUT
 import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.SingleObserver
@@ -32,8 +19,6 @@ import okhttp3.RequestBody
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.*
-import java.net.ConnectException
-import java.net.UnknownHostException
 import java.util.*
 
 @Mockable
@@ -41,9 +26,6 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                  private val mDataBaseManager: DataBaseManager?,
                  private val mEntityDataMapper: DAOMapper,
                  private val mMemoryStore: MemoryStore?) : DataStore {
-
-    private val mDispatcher: FirebaseJobDispatcher = FirebaseJobDispatcher(GooglePlayDriver(Config.context))
-
     init {
         Config.cloudStore = this
     }
@@ -86,21 +68,12 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                                         persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
         return Flowable.defer {
             saveLocally(idColumnName, itemIdType, jsonObject, requestType, persist, cache)
-            if (isQueuableIfOutOfNetwork(queuable)) {
-                queuePost(PATCH, url, idColumnName, itemIdType, jsonObject, persist)
-                Flowable.just<M>(responseType.newInstance() as M)
-            } else if (!isNetworkAvailable(Config.context)) {
+            if (!isNetworkAvailable(Config.context)) {
                 getErrorFlowableNotPersisted<M>()
             } else
                 mApiConnection.dynamicPatch<M>(url,
                         RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonObject.toString()))
                         .map { `object`: M -> daoMapHelper(responseType, `object`) }
-                        .onErrorResumeNext { throwable: Throwable ->
-                            if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                                queuePost(PATCH, url, idColumnName, itemIdType, jsonObject, persist)
-                                return@onErrorResumeNext Flowable.empty<M>()
-                            } else Flowable.error(throwable)
-                        }
         }
     }
 
@@ -109,21 +82,12 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                                        persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
         return Flowable.defer {
             saveLocally(idColumnName, itemIdType, jsonObject, requestType, persist, cache)
-            if (isQueuableIfOutOfNetwork(queuable)) {
-                queuePost(POST, url, idColumnName, itemIdType, jsonObject, persist)
-                Flowable.just<M>(responseType.newInstance() as M)
-            } else if (!isNetworkAvailable(Config.context)) {
+            if (!isNetworkAvailable(Config.context)) {
                 getErrorFlowableNotPersisted<M>()
             } else
                 mApiConnection.dynamicPost<M>(url,
                         RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonObject.toString()))
                         .map { `object`: M -> daoMapHelper(responseType, `object`) }
-                        .onErrorResumeNext { throwable: Throwable ->
-                            if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                                queuePost(POST, url, idColumnName, itemIdType, jsonObject, persist)
-                                return@onErrorResumeNext Flowable.empty<M>()
-                            } else Flowable.error(throwable)
-                        }
         }
     }
 
@@ -132,21 +96,12 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                                      persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
         return Flowable.defer {
             saveAllLocally(idColumnName, itemIdType, jsonArray, requestType, persist, cache)
-            if (isQueuableIfOutOfNetwork(queuable)) {
-                queuePost(POST, url, idColumnName, itemIdType, jsonArray, persist)
-                Flowable.just<M>(responseType.newInstance() as M)
-            } else if (!isNetworkAvailable(Config.context)) {
+            if (!isNetworkAvailable(Config.context)) {
                 getErrorFlowableNotPersisted<M>()
             } else
                 mApiConnection.dynamicPost<M>(url,
                         RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
                         .map { `object`: M -> daoMapHelper(responseType, `object`) }
-                        .onErrorResumeNext { throwable: Throwable ->
-                            if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                                queuePost(POST, url, idColumnName, itemIdType, jsonArray, persist)
-                                return@onErrorResumeNext Flowable.empty<M>()
-                            } else Flowable.error(throwable)
-                        }
         }
     }
 
@@ -155,21 +110,12 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                                       persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
         return Flowable.defer {
             saveLocally(idColumnName, itemIdType, jsonObject, requestType, persist, cache)
-            if (isQueuableIfOutOfNetwork(queuable)) {
-                queuePost(PUT, url, idColumnName, itemIdType, jsonObject, persist)
-                Flowable.just<M>(responseType.newInstance() as M)
-            } else if (!isNetworkAvailable(Config.context)) {
+            if (!isNetworkAvailable(Config.context)) {
                 getErrorFlowableNotPersisted<M>()
             } else
                 mApiConnection.dynamicPut<M>(url,
                         RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonObject.toString()))
                         .map { `object` -> daoMapHelper(responseType, `object`) }
-                        .onErrorResumeNext { throwable: Throwable ->
-                            if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                                queuePost(PUT, url, idColumnName, itemIdType, jsonObject, persist)
-                                return@onErrorResumeNext Flowable.empty<M>()
-                            } else Flowable.error(throwable)
-                        }
         }
     }
 
@@ -178,21 +124,12 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                                     persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
         return Flowable.defer {
             saveAllLocally(idColumnName, itemIdType, jsonArray, requestType, persist, cache)
-            if (isQueuableIfOutOfNetwork(queuable)) {
-                queuePost(PUT, url, idColumnName, itemIdType, jsonArray, persist)
-                Flowable.just<M>(responseType.newInstance() as M)
-            } else if (!isNetworkAvailable(Config.context)) {
+            if (!isNetworkAvailable(Config.context)) {
                 getErrorFlowableNotPersisted<M>()
             } else
                 mApiConnection.dynamicPut<M>(url,
                         RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
                         .map { `object` -> daoMapHelper(responseType, `object`) }
-                        .onErrorResumeNext { throwable: Throwable ->
-                            if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                                queuePost(PUT, url, idColumnName, itemIdType, jsonArray, persist)
-                                return@onErrorResumeNext Flowable.empty<M>()
-                            } else Flowable.error(throwable)
-                        }
         }
     }
 
@@ -202,20 +139,11 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
         return Flowable.defer {
             deleteLocally(convertToListOfId(jsonArray, itemIdType), idColumnName, itemIdType,
                     requestType, persist, cache)
-            if (isQueuableIfOutOfNetwork(queuable)) {
-                queuePost(DELETE, url, idColumnName, itemIdType, jsonArray, persist)
-                Flowable.just<M>(responseType.newInstance() as M)
-            } else if (!isNetworkAvailable(Config.context)) {
+            if (!isNetworkAvailable(Config.context)) {
                 getErrorFlowableNotPersisted<M>()
             } else
                 mApiConnection.dynamicDelete<M>(url)
                         .map { `object`: M -> daoMapHelper(responseType, `object`) }
-                        .onErrorResumeNext { throwable: Throwable ->
-                            if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                                queuePost(DELETE, url, idColumnName, itemIdType, jsonArray, persist)
-                                return@onErrorResumeNext Flowable.empty<M>()
-                            } else Flowable.error<M>(throwable)
-                        }
         }
     }
 
@@ -226,11 +154,7 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
     override fun dynamicDownloadFile(url: String, file: File, onWifi: Boolean,
                                      whileCharging: Boolean, queuable: Boolean): Flowable<File> {
         return Flowable.defer {
-            if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(Config.context) == onWifi
-                    && isChargingReqCompatible(isCharging(Config.context), whileCharging)) {
-                queueIOFile(url, null, file, onWifi, whileCharging, true)
-                Flowable.just<File>(File(""))
-            } else if (!isNetworkAvailable(Config.context)) {
+            if (!isNetworkAvailable(Config.context)) {
                 getErrorFlowableNotPersisted<File>()
             } else mApiConnection.dynamicDownload(url)
                     .map { responseBody ->
@@ -264,12 +188,6 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                         }
                         file
                     }
-                    .onErrorResumeNext { throwable: Throwable ->
-                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                            queueIOFile(url, null, file, true, whileCharging, false)
-                            return@onErrorResumeNext Flowable.just(File(""))
-                        } else Flowable.error(throwable)
-                    }
         }
     }
 
@@ -278,129 +196,28 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                                        queuable: Boolean, responseType: Class<M>): Flowable<M> {
         return Flowable.defer {
             val multiPartBodyParts = ArrayList<MultipartBody.Part>()
-            keyFileMap.forEach { key, file ->
-                multiPartBodyParts.add(MultipartBody.Part.createFormData(key,
-                        file.name, RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA), file)))
+            keyFileMap.toMap().forEach { entry ->
+                multiPartBodyParts.add(MultipartBody.Part.createFormData(entry.key,
+                        entry.value.name, RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA),
+                        entry.value)))
             }
             val map = mutableMapOf<String, RequestBody>()
             for ((key, value) in parameters) {
                 map[key] = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA),
                         value.toString())
             }
-            if (isQueuableIfOutOfNetwork(queuable) && isOnWifi(Config.context) == onWifi
-                    && isChargingReqCompatible(isCharging(Config.context), whileCharging)) {
-                queueIOFile(url, keyFileMap, File(""), true, whileCharging, false)
-                Flowable.just<M>(responseType.newInstance() as M)
-            } else if (!isNetworkAvailable(Config.context)) {
+            if (!isNetworkAvailable(Config.context)) {
                 getErrorFlowableNotPersisted<M>()
             } else mApiConnection.dynamicUpload<M>(url, map, multiPartBodyParts)
                     .map { `object` -> daoMapHelper(responseType, `object`) }
-                    .onErrorResumeNext { throwable: Throwable ->
-                        if (isQueuableIfOutOfNetwork(queuable) && isNetworkFailure(throwable)) {
-                            queueIOFile(url, keyFileMap, File(""), true, whileCharging, false)
-                            return@onErrorResumeNext Flowable.empty<M>()
-                        }
-                        Flowable.error(throwable)
-                    }
         }
     }
-
-    //    private <M> FlowableTransformer<M, M> applyExponentialBackoff() {
-    //        return observable -> observable.retryWhen(attempts -> {
-    //            return attempts.zipWith(
-    //                    Flowable.range(COUNTER_START, ATTEMPTS), (n, i) -> i)
-    //                    .flatMap(i -> {
-    //                        Log.d(TAG, "delay retry by " + i + " second(s)");
-    //                        return Flowable.timer(5 * i, TimeUnit.SECONDS);
-    //                    });
-    //        });
-    //    }
 
     private fun <M> daoMapHelper(requestType: Class<*>, `object`: M): M? {
         return if (`object` is List<*>)
             mEntityDataMapper.mapAllTo(`object` as List<*>, requestType)
         else
             mEntityDataMapper.mapTo(`object`, requestType)
-    }
-
-    private fun isNetworkFailure(throwable: Throwable): Boolean {
-        return (throwable is UnknownHostException
-                || throwable is ConnectException
-                || throwable is IOException)
-    }
-
-    private fun isQueuableIfOutOfNetwork(queuable: Boolean): Boolean {
-        return queuable && !isNetworkAvailable(Config.context)
-    }
-
-    private fun isChargingReqCompatible(isChargingCurrently: Boolean, doWhileCharging: Boolean): Boolean {
-        return !doWhileCharging || isChargingCurrently
-    }
-
-    private fun isCharging(context: Context): Boolean {
-        var charging = false
-        val batteryIntent = context.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-        if (batteryIntent != null) {
-            val status = batteryIntent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
-            val batteryCharge = status == BatteryManager.BATTERY_STATUS_CHARGING
-            val chargePlug = batteryIntent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1)
-            val usbCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_USB
-            val acCharge = chargePlug == BatteryManager.BATTERY_PLUGGED_AC
-            if (batteryCharge) {
-                charging = true
-            }
-            if (usbCharge) {
-                charging = true
-            }
-            if (acCharge) {
-                charging = true
-            }
-        }
-        return charging
-        //        Intent intent = Config.context.registerReceiver(null, new IntentFilter(Intent.ACTION_BATTERY_CHANGED));
-        //        int plugged = intent.getIntExtra(BatteryManager.EXTRA_PLUGGED, -1);
-        //        return plugged == BatteryManager.BATTERY_PLUGGED_AC || plugged == BatteryManager.BATTERY_PLUGGED_USB;
-    }
-
-    private fun isOnWifi(context: Context): Boolean {
-        return (context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager)
-                .activeNetworkInfo.type == ConnectivityManager.TYPE_WIFI
-    }
-
-    private fun queueIOFile(url: String, keyFileMap: HashMap<String, File>?, file: File, onWifi: Boolean,
-                            whileCharging: Boolean, isDownload: Boolean) {
-        queueFileIOCore(mDispatcher, isDownload,
-                FileIORequest.Builder(url, file)
-                        .keyFileMapToUpload(keyFileMap)
-                        .queuable(onWifi, whileCharging)
-                        .build(),
-                0)
-    }
-
-    private fun queuePost(method: String, url: String, idColumnName: String, idType: Class<*>,
-                          jsonArray: JSONArray, persist: Boolean) {
-
-
-        queuePostCore(PostRequest.Builder(Any::class.java, persist)
-                .payLoad(jsonArray)
-                .method(method)
-                .idColumnName(idColumnName, idType)
-                .fullUrl(url)
-                .build())
-    }
-
-    private fun queuePost(method: String, url: String, idColumnName: String, idType: Class<*>,
-                          jsonObject: JSONObject, persist: Boolean) {
-        queuePostCore(PostRequest.Builder(Any::class.java, persist)
-                .payLoad(jsonObject)
-                .method(method)
-                .idColumnName(idColumnName, idType)
-                .fullUrl(url)
-                .build())
-    }
-
-    private fun queuePostCore(postRequest: PostRequest) {
-        queuePostCore(mDispatcher, postRequest, 0)
     }
 
     private fun saveAllToDisk(collection: List<*>, requestType: Class<*>) {
