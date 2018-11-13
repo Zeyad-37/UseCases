@@ -63,7 +63,7 @@ class UserDetailFragment : BaseFragment<UserDetailState, UserDetailVM>() {
     override fun initialState(): UserDetailState = arguments?.getParcelable(UI_MODEL)!!
 
     override fun events(): Observable<BaseEvent<*>> {
-        return Observable.just(GetReposEvent(viewState?.user!!.login!!))
+        return Observable.just(GetReposEvent(viewState?.user!!.login))
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -96,7 +96,7 @@ class UserDetailFragment : BaseFragment<UserDetailState, UserDetailVM>() {
                 if (appBarLayout != null) {
                     appBarLayout.title = user!!.login
                 }
-                if (user!!.avatarUrl!!.isNotBlank()) {
+                if (user!!.avatarUrl.isNotBlank()) {
                     context?.let {
                         Glide.with(it).load(user.avatarUrl)
                                 .into(activity.getImageViewAvatar())
@@ -107,7 +107,7 @@ class UserDetailFragment : BaseFragment<UserDetailState, UserDetailVM>() {
             (activity as UserDetailActivity).let { activity ->
                 val appBarLayout = activity.getCollapsingToolbarLayout()
                 appBarLayout.title = user!!.login
-                if (user.avatarUrl!!.isNotBlank()) {
+                if (user.avatarUrl.isNotBlank()) {
                     context?.let {
                         Glide.with(it).load(user.avatarUrl)
                                 .into(activity.getImageViewAvatar())
@@ -137,17 +137,19 @@ class UserDetailFragment : BaseFragment<UserDetailState, UserDetailVM>() {
             val activity = activity as UserDetailActivity?
             val drawable = activity!!.getImageViewAvatar().drawable as BitmapDrawable
             val bitmap = drawable.bitmap
-            Palette.from(bitmap).generate { palette ->
-                activity.findViewById<View>(R.id.coordinator_detail)
-                        .setOnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
-                            if (v.height == scrollX) {
-                                activity.getToolbar().setTitleTextColor(palette.getLightVibrantColor(Color.TRANSPARENT))
-                                activity.getToolbar().background = ColorDrawable(palette.getLightVibrantColor(Color.TRANSPARENT))
-                            } else if (scrollY == 0) {
-                                activity.getToolbar().setTitleTextColor(0)
-                                activity.getToolbar().background = null
+            Palette.from(bitmap).generate {
+                it?.let { palette ->
+                    activity.findViewById<View>(R.id.coordinator_detail)
+                            .setOnScrollChangeListener { v, scrollX, scrollY, _, _ ->
+                                if (v.height == scrollX) {
+                                    activity.getToolbar().setTitleTextColor(palette.getLightVibrantColor(Color.TRANSPARENT))
+                                    activity.getToolbar().background = ColorDrawable(palette.getLightVibrantColor(Color.TRANSPARENT))
+                                } else if (scrollY == 0) {
+                                    activity.getToolbar().setTitleTextColor(0)
+                                    activity.getToolbar().background = null
+                                }
                             }
-                        }
+                }
             }
         }
     }

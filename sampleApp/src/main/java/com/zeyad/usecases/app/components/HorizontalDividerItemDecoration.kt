@@ -6,19 +6,11 @@ import android.graphics.drawable.Drawable
 import android.support.v4.content.ContextCompat
 import android.support.v7.widget.RecyclerView
 
-class HorizontalDividerItemDecoration
-/**
- * Custom divider will be used
- */
-(context: Context, resId: Int) : RecyclerView.ItemDecoration() {
+class HorizontalDividerItemDecoration(context: Context, resId: Int) : RecyclerView.ItemDecoration() {
 
-    private val mDivider: Drawable?
+    private val mDivider: Drawable? = ContextCompat.getDrawable(context, resId)
 
-    init {
-        mDivider = ContextCompat.getDrawable(context, resId)
-    }
-
-    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun onDrawOver(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         val childCount = parent.childCount
         for (i in 0 until childCount) {
             val child = parent.getChildAt(i)

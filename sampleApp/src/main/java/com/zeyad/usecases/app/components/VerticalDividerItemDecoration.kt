@@ -28,7 +28,7 @@ class VerticalDividerItemDecoration : RecyclerView.ItemDecoration {
         mDivider = ContextCompat.getDrawable(context, resId)
     }
 
-    override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun onDraw(c: Canvas, parent: RecyclerView, state: RecyclerView.State) {
         val childCount = parent.childCount
         for (i in 0 until childCount) {
             val child = parent.getChildAt(i)
@@ -41,8 +41,7 @@ class VerticalDividerItemDecoration : RecyclerView.ItemDecoration {
         }
     }
 
-    override fun getItemOffsets(
-            outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State?) {
+    override fun getItemOffsets(outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State) {
         outRect.bottom = 1
     }
 

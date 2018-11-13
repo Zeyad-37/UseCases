@@ -35,8 +35,10 @@ abstract class BaseActivity<S : Parcelable, VM : BaseViewModel<S>> : com.zeyad.r
     }
 
     fun removeFragment(tag: String) {
-        supportFragmentManager.beginTransaction().remove(supportFragmentManager.findFragmentByTag(tag))
+        supportFragmentManager.findFragmentByTag(tag)?.let {
+            supportFragmentManager.beginTransaction().remove(it)
                 .commit()
+        }
     }
 
     @JvmOverloads
