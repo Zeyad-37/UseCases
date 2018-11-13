@@ -48,12 +48,12 @@ public class APIIntegrationTest {
     @Before
     public void setUp() {
         RESTMockServer.reset();
-        dataService = new DataServiceFactory(new DataServiceConfig.Builder(RuntimeEnvironment.application)
+        new DataServiceFactory(new DataServiceConfig.Builder(RuntimeEnvironment.application)
                 .baseUrl(RESTMockServer.getUrl())
 //                .withRealm() Todo Fix
                 //                .withCache(3, TimeUnit.MINUTES)
-                .build())
-                .getInstance();
+                .build());
+        dataService = DataServiceFactory.Companion.getDataService();
         users = new ArrayList<>(2);
         testUser = new User();
         testUser.setAvatarUrl("https://avatars2.githubusercontent.com/u/5938141?v=3");

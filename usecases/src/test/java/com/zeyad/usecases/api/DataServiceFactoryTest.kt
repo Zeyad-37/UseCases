@@ -51,7 +51,8 @@ class DataServiceFactoryTest {
     @Test
     @Throws(Exception::class)
     fun init() {
-        val instance = DataServiceFactory(mDataServiceConfig).instance
+        DataServiceFactory(mDataServiceConfig)
+        val instance = DataServiceFactory.dataService
         assertNotNull(com.zeyad.usecases.Config.apiConnection)
         assertNotNull(com.zeyad.usecases.Config.backgroundThread)
         assertNotNull(com.zeyad.usecases.Config.gson)
