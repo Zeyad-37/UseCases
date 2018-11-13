@@ -44,7 +44,7 @@ import java.util.*
  * @author by ZIaDo on 2/14/17.
  */
 @RunWith(RobolectricTestRunner::class)
-@Config(constants = BuildConfig::class, sdk = intArrayOf(25))
+@Config(constants = BuildConfig::class, sdk = [25])
 class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     private lateinit var cloudStore: CloudStore
     private lateinit var mockContext: Context
@@ -52,6 +52,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     private lateinit var mockDataBaseManager: DataBaseManager
     private lateinit var observable: Flowable<Any>
     private lateinit var fileFlowable: Flowable<ResponseBody>
+    private val errorMessage = "Could not reach server!"
 
     @Before
     fun setUp() {
@@ -191,9 +192,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
                 "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, false, false, true)
                 .subscribe(testSubscriber)
 
-        testSubscriber.assertNoErrors()
-        testSubscriber.assertComplete()
-        testSubscriber.assertValueCount(1)
+        testSubscriber.assertErrorMessage(errorMessage)
 
         verify<ApiConnection>(mockApiConnection, times(0)).dynamicPatch<Any>(anyString(), anyObject())
         verifyDBInteractions(0, 0, 0, 0)
@@ -257,9 +256,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
                 "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, false, false, true)
                 .subscribe(testSubscriber)
 
-        testSubscriber.assertNoErrors()
-        testSubscriber.assertComplete()
-        testSubscriber.assertValueCount(1)
+        testSubscriber.assertErrorMessage(errorMessage)
 
         verify<ApiConnection>(mockApiConnection, times(0)).dynamicPost<Any>(anyString(), anyObject())
         verifyDBInteractions(0, 0, 0, 0)
@@ -325,9 +322,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
                 true)
                 .subscribe(testSubscriber)
 
-        testSubscriber.assertNoErrors()
-        testSubscriber.assertComplete()
-        testSubscriber.assertValueCount(1)
+        testSubscriber.assertErrorMessage(errorMessage)
 
         verify<ApiConnection>(mockApiConnection, times(0)).dynamicPost<Any>(anyString(), anyObject())
         verifyDBInteractions(0, 0, 0, 0)
@@ -393,9 +388,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
                 "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, false, false, true)
                 .subscribe(testSubscriber)
 
-        testSubscriber.assertNoErrors()
-        testSubscriber.assertComplete()
-        testSubscriber.assertValueCount(1)
+        testSubscriber.assertErrorMessage(errorMessage)
 
         verify<ApiConnection>(mockApiConnection, times(0)).dynamicPut<Any>(anyString(), anyObject())
         verifyDBInteractions(0, 0, 0, 0)
@@ -460,9 +453,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         cloudStore.dynamicPutList("", "", Int::class.java, JSONArray(), Any::class.java, Any::class.java, false, false, true)
                 .subscribe(testSubscriber)
 
-        testSubscriber.assertNoErrors()
-        testSubscriber.assertComplete()
-        testSubscriber.assertValueCount(1)
+        testSubscriber.assertErrorMessage(errorMessage)
 
         verify<ApiConnection>(mockApiConnection, times(0)).dynamicPut<Any>(anyString(), anyObject())
         verifyDBInteractions(0, 0, 0, 0)
@@ -527,9 +518,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
                 "", "", String::class.java, JSONArray(), Any::class.java, Any::class.java, false, false, true)
                 .subscribe(testSubscriber)
 
-        testSubscriber.assertNoErrors()
-        testSubscriber.assertComplete()
-        testSubscriber.assertValueCount(1)
+        testSubscriber.assertErrorMessage(errorMessage)
 
         verify<ApiConnection>(mockApiConnection, times(0)).dynamicDelete<Any>(anyString())
         verifyDBInteractions(0, 0, 0, 0)
