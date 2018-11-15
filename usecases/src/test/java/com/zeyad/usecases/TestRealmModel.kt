@@ -1,16 +1,12 @@
 package com.zeyad.usecases
 
+import android.arch.persistence.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-
-import io.realm.RealmModel
-import io.realm.annotations.PrimaryKey
-import io.realm.annotations.RealmModule
 
 /**
  * @author by ZIaDo on 2/13/17.
  */
-@RealmModule
-class TestRealmModel : RealmModel {
+class TestRealmModel {
     @SerializedName("id")
     @PrimaryKey
     var id: Int = 0

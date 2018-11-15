@@ -2,13 +2,11 @@ package com.zeyad.usecases.requests
 
 import com.zeyad.usecases.Config
 
-
 /**
  * @author zeyad on 7/29/16.
  */
 data class GetRequest private constructor(val fullUrl: String = "",
                                           val dataClass: Class<*>,
-                                          val idType: Class<*>,
                                           val persist: Boolean = false,
                                           val idColumnName: String = "id",
                                           val itemId: Any = Any(),
@@ -16,7 +14,6 @@ data class GetRequest private constructor(val fullUrl: String = "",
 
     constructor(builder: Builder) : this(builder.url,
             builder.dataClass,
-            builder.idType,
             builder.persist,
             builder.idColumnName,
             builder.itemId,
@@ -29,7 +26,6 @@ data class GetRequest private constructor(val fullUrl: String = "",
         internal var shouldCache: Boolean = false
         internal var idColumnName: String = ""
         internal var url: String = ""
-        internal var idType: Class<*> = Any::class.java
 
         fun url(url: String): Builder {
             this.url = Config.baseURL + url
@@ -47,9 +43,8 @@ data class GetRequest private constructor(val fullUrl: String = "",
             return this
         }
 
-        fun id(id: Any, idColumnName: String, type: Class<*>): Builder {
+        fun id(id: Any, idColumnName: String): Builder {
             itemId = id
-            idType = type
             this.idColumnName = idColumnName
             return this
         }

@@ -3,6 +3,8 @@ package com.zeyad.usecases.api
 import android.app.Application
 import android.content.Context
 import android.support.test.rule.BuildConfig
+import com.zeyad.usecases.db.DataBaseManager
+import com.zeyad.usecases.utils.DataBaseManagerUtil
 import junit.framework.Assert.assertEquals
 import junit.framework.Assert.assertNotNull
 import okhttp3.Cache
@@ -43,8 +45,13 @@ class DataServiceFactoryTest {
                 .baseUrl(URL)
                 .cacheSize(cacheSize)
                 .okHttpBuilder(builder)
-                .okhttpCache(cache)
-                .withRealm()
+                .okHttpCache(cache)
+                .withSQLite(object : DataBaseManagerUtil {
+                    override fun getDataBaseManager(dataClass: Class<*>): DataBaseManager? {
+//                        RoomManager()
+                        return null
+                    }
+                })
                 .build()
     }
 

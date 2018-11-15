@@ -1,7 +1,7 @@
 package com.zeyad.usecases.api
 
+import android.arch.persistence.room.RoomDatabase
 import android.content.Context
-import android.os.HandlerThread
 import com.zeyad.usecases.mapper.DAOMapper
 import com.zeyad.usecases.utils.DataBaseManagerUtil
 import io.reactivex.Scheduler
@@ -10,24 +10,22 @@ import okhttp3.Cache
 import okhttp3.OkHttpClient
 import java.util.concurrent.TimeUnit
 
-
 /**
  * @author by ZIaDo on 12/9/16.
  */
-data class DataServiceConfig private constructor(val context: Context,
-                                                 val okHttpBuilder: OkHttpClient.Builder?,
-                                                 val okHttpCache: Cache? = null,
-                                                 val baseUrl: String = "",
-                                                 val isWithCache: Boolean = false,
-                                                 val cacheSize: Int = 8192,
-                                                 val cacheDuration: Long = 3,
-                                                 val timeUnit: TimeUnit = TimeUnit.SECONDS,
-                                                 val withSQL: Boolean = false,
-                                                 val withRealm: Boolean = false,
-                                                 val postExecutionThread: Scheduler = Schedulers.io(),
-                                                 val handlerThread: HandlerThread = HandlerThread("backgroundHandler"),
-                                                 val dataBaseManagerUtil: DataBaseManagerUtil? = null,
-                                                 val entityMapper: DAOMapper = DAOMapper()) {
+data class DataServiceConfig internal constructor(val context: Context,
+                                                  val okHttpBuilder: OkHttpClient.Builder?,
+                                                  val okHttpCache: Cache? = null,
+                                                  val baseUrl: String = "",
+                                                  val isWithCache: Boolean = false,
+                                                  val cacheSize: Int = 8192,
+                                                  val cacheDuration: Long = 3,
+                                                  val timeUnit: TimeUnit = TimeUnit.SECONDS,
+                                                  val withSQL: Boolean = false,
+                                                  val postExecutionThread: Scheduler = Schedulers.io(),
+                                                  val dataBaseManagerUtil: DataBaseManagerUtil? = null,
+                                                  val db: RoomDatabase? = null,
+                                                  val entityMapper: DAOMapper = DAOMapper()) {
 
     constructor(dataUseCaseConfigBuilder: Builder) : this(
             dataUseCaseConfigBuilder.context,
@@ -38,11 +36,10 @@ data class DataServiceConfig private constructor(val context: Context,
             dataUseCaseConfigBuilder.cacheSize,
             dataUseCaseConfigBuilder.cacheDuration,
             dataUseCaseConfigBuilder.timeUnit,
-            dataUseCaseConfigBuilder.withSQL,
-            dataUseCaseConfigBuilder.withRealm,
+            dataUseCaseConfigBuilder.withSQLite,
             dataUseCaseConfigBuilder.postExecutionThread,
-            dataUseCaseConfigBuilder.handlerThread,
-            dataUseCaseConfigBuilder.dataBaseManagerUtil
+            dataUseCaseConfigBuilder.dataBaseManagerUtil,
+            dataUseCaseConfigBuilder.db
     )
 
     class Builder(internal val context: Context) {
@@ -50,14 +47,13 @@ data class DataServiceConfig private constructor(val context: Context,
         internal var okHttpCache: Cache? = null
         internal var baseUrl: String = ""
         internal var withCache: Boolean = false
-        internal var withRealm: Boolean = false
-        internal var withSQL: Boolean = false
+        internal var withSQLite: Boolean = false
         internal var cacheSize: Int = 0
         internal var cacheDuration: Long = 0
         internal var timeUnit: TimeUnit = TimeUnit.SECONDS
-        internal var handlerThread: HandlerThread = HandlerThread("backgroundHandler")
         internal var postExecutionThread: Scheduler = Schedulers.io()
         internal var dataBaseManagerUtil: DataBaseManagerUtil? = null
+        internal var db: RoomDatabase? = null
 
         fun postExecutionThread(postExecutionThread: Scheduler): Builder {
             this.postExecutionThread = postExecutionThread
@@ -74,21 +70,8 @@ data class DataServiceConfig private constructor(val context: Context,
             return this
         }
 
-        fun okhttpCache(cache: Cache): Builder {
+        fun okHttpCache(cache: Cache): Builder {
             this.okHttpCache = cache
-            return this
-        }
-
-        fun withRealm(handlerThread: HandlerThread): Builder {
-            this.withRealm = true
-            this.dataBaseManagerUtil = null
-            this.handlerThread = handlerThread
-            return this
-        }
-
-        fun withRealm(): Builder {
-            this.withRealm = true
-            this.dataBaseManagerUtil = null
             return this
         }
 
@@ -106,7 +89,7 @@ data class DataServiceConfig private constructor(val context: Context,
 
         fun withSQLite(dataBaseManagerUtil: DataBaseManagerUtil): Builder {
             this.dataBaseManagerUtil = dataBaseManagerUtil
-            this.withRealm = false
+            this.withSQLite = true
             return this
         }
 

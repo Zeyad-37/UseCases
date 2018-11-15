@@ -5,15 +5,11 @@ import android.os.Parcelable
 import com.zeyad.usecases.Mockable
 import java.io.File
 
-
 /**
  * @author zeyad on 7/29/16.
  */
 @Mockable
 data class FileIORequest private constructor(val url: String = "",
-                                             val onWifi: Boolean = false,
-                                             val whileCharging: Boolean = false,
-                                             val queuable: Boolean = false,
                                              val file: File? = File(""),
                                              val dataClass: Class<*>? = Any::class.java,
                                              val keyFileMap: HashMap<String, File>? = hashMapOf(),
@@ -21,9 +17,6 @@ data class FileIORequest private constructor(val url: String = "",
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readByte() != 0.toByte(),
             File(""),
             Any::class.java,
             hashMapOf(),
@@ -31,9 +24,6 @@ data class FileIORequest private constructor(val url: String = "",
 
     constructor (uploadRequestBuilder: Builder) : this(
             uploadRequestBuilder.url,
-            uploadRequestBuilder.onWifi,
-            uploadRequestBuilder.whileCharging,
-            uploadRequestBuilder.queuable,
             uploadRequestBuilder.file,
             uploadRequestBuilder.dataClass,
             uploadRequestBuilder.keyFileMap,
@@ -44,9 +34,6 @@ data class FileIORequest private constructor(val url: String = "",
 
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(url)
-        parcel.writeByte(if (onWifi) 1 else 0)
-        parcel.writeByte(if (whileCharging) 1 else 0)
-        parcel.writeByte(if (queuable) 1 else 0)
     }
 
     override fun describeContents() = 0
@@ -82,13 +69,6 @@ data class FileIORequest private constructor(val url: String = "",
 
         fun payLoad(parameters: HashMap<String, Any>): Builder {
             this.parameters = parameters
-            return this
-        }
-
-        fun queuable(onWifi: Boolean, whileCharging: Boolean): Builder {
-            this.queuable = true
-            this.onWifi = onWifi
-            this.whileCharging = whileCharging
             return this
         }
 

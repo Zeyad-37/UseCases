@@ -4,11 +4,9 @@ import android.app.Application
 import android.content.Context
 import com.zeyad.usecases.Config
 import com.zeyad.usecases.db.DataBaseManager
-import com.zeyad.usecases.db.RealmManager
 import com.zeyad.usecases.network.ApiConnection
 import com.zeyad.usecases.stores.DataStoreFactory
 import com.zeyad.usecases.utils.DataBaseManagerUtil
-import io.reactivex.android.schedulers.AndroidSchedulers
 import st.lowlevel.storo.StoroBuilder
 
 class DataServiceFactory(val config: DataServiceConfig) {
@@ -24,7 +22,7 @@ class DataServiceFactory(val config: DataServiceConfig) {
         Config.cacheDuration = config.cacheDuration
         Config.cacheTimeUnit = config.timeUnit
         Config.withSQLite = config.withSQL
-        Config.withRealm = config.withRealm
+
         if (config.isWithCache) {
             StoroBuilder.configure(config.cacheSize.toLong())
                     .setCacheDirectory(config.context, StoroBuilder.Storage.INTERNAL)
@@ -32,48 +30,32 @@ class DataServiceFactory(val config: DataServiceConfig) {
                     .setGsonInstance(Config.gson)
                     .initialize()
         }
-        val handlerThread = config.handlerThread
-        if (config.withRealm) {
-            handlerThread.start()
-            Config.backgroundThread = AndroidSchedulers.from(handlerThread.looper)
-        }
+
         val apiConnection = ApiConnection(ApiConnection.init(config.okHttpBuilder),
                 ApiConnection.initWithCache(config.okHttpBuilder, config.okHttpCache))
 
-
-        dataBaseManagerUtil = when {
-            Config.isWithDisk() ->
+        dataBaseManagerUtil =
                 if (config.withSQL)
                     dataBaseManagerUtil
                 else
                     object : DataBaseManagerUtil {
                         override fun getDataBaseManager(dataClass: Class<*>): DataBaseManager? {
-                            return RealmManager()
+                            return null
                         }
                     }
-            else -> object : DataBaseManagerUtil {
-                override fun getDataBaseManager(dataClass: Class<*>): DataBaseManager? {
-                    return null
-                }
-            }
-        }
+
         dataService = DataService(DataStoreFactory(dataBaseManagerUtil, apiConnection,
                 config.entityMapper), config.postExecutionThread, Config.backgroundThread)
         Config.apiConnection = apiConnection
     }
 
-    /**
-     * Destroys the singleton instance of DataUseCase.
-     */
     fun destoryInstance() {
         dataService = null
     }
 
+    fun getInstance() = dataService!!
+
     companion object {
-        /**
-         * @return IDataService the implementation instance of IDataService, throws NullPointerException
-         * if null.
-         */
         var dataService: IDataService? = null
     }
 

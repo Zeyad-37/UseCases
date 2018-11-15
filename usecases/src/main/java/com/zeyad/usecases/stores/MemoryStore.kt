@@ -19,8 +19,8 @@ class MemoryStore(private val gson: Gson,
                   private val mapOfIds: MutableMap<Class<*>, MutableSet<String>> = mutableMapOf()) {
 
     fun <M> getItem(itemId: String, dataClass: Class<*>): Single<M> {
-        val key = dataClass.simpleName + itemId
         return Single.defer<M> {
+            val key = dataClass.simpleName + itemId
             if (isValid(key)) {
                 Storo.get<M>(key, dataClass).async().firstElement().toSingle()
             } else {
@@ -43,8 +43,8 @@ class MemoryStore(private val gson: Gson,
                             false
                         }
                     }
-                    .filter { s -> !missed[0] }
-                    .map<M> { key -> Storo.get(key, dataClass).execute() }
+                    .filter { !missed[0] }
+                    .map<M> { Storo.get(it, dataClass).execute() }
                     .toList(if (missed[0]) 0 else stringSet.size)
                     .blockingGet()
                     .toList<M>()
@@ -77,7 +77,7 @@ class MemoryStore(private val gson: Gson,
         }
     }
 
-    fun deleteList(ids: List<String>, dataClass: Class<*>) {
+    fun deleteListById(ids: List<String>, dataClass: Class<*>) {
         if (ids.isEmpty()) {
             return
         }

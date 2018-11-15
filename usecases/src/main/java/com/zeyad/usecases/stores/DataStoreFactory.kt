@@ -7,6 +7,7 @@ import com.zeyad.usecases.network.ApiConnection
 import com.zeyad.usecases.utils.DataBaseManagerUtil
 
 @Mockable
+//class DataStoreFactory(private val dataBaseManagerUtil: DataBaseManagerUtil?,
 class DataStoreFactory(private val dataBaseManagerUtil: DataBaseManagerUtil?,
                        private val restApi: ApiConnection,
                        private val daoMapper: DAOMapper) {
@@ -61,6 +62,6 @@ class DataStoreFactory(private val dataBaseManagerUtil: DataBaseManagerUtil?,
         private var cloudStore: CloudStore? = null
         private var diskStore: DiskStore? = null
         private var memoryStore: MemoryStore? = null
-        private const val DB_NOT_ENABLED = "Database not enabled!"
+        private const val DB_NOT_ENABLED = "ServiceDatabase not enabled!"
     }
 }

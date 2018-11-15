@@ -22,6 +22,7 @@ import java.util.List;
 
 import io.appflate.restmock.RESTMockServer;
 import io.appflate.restmock.RequestsVerifier;
+import io.reactivex.observers.TestObserver;
 import io.reactivex.subscribers.TestSubscriber;
 import okhttp3.mockwebserver.MockResponse;
 
@@ -74,7 +75,7 @@ public class APIIntegrationTest {
         final TestSubscriber<User> testSubscriber = new TestSubscriber<>();
         dataService.<User>getObject(new GetRequest.Builder(User.class, false)
                 .url(getUserPath)
-                .id("Zeyad-37", User.LOGIN, String.class)
+                .id("Zeyad-37", User.LOGIN)
                 //                .cache(User.LOGIN)
                 .build())
                 .subscribe(testSubscriber);
@@ -101,7 +102,7 @@ public class APIIntegrationTest {
         TestSubscriber<List<User>> testSubscriber = new TestSubscriber<>();
         dataService.<User>getList(new GetRequest.Builder(User.class, false)
                 .url(getUserListPath)
-                .id("Zeyad-37", User.LOGIN, String.class)
+                .id("Zeyad-37", User.LOGIN)
                 //                .cache(User.LOGIN)
                 .build())
                 .subscribe(testSubscriber);
@@ -125,7 +126,7 @@ public class APIIntegrationTest {
                         .setResponseCode(HttpURLConnection.HTTP_OK)
                         .setBody(SUCCESS));
 
-        TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
+        TestObserver<Success> testSubscriber = new TestObserver<>();
         dataService.<Success>patchObject(new PostRequest.Builder(User.class, false)
                 .url(path)
                 .payLoad(testUser)
@@ -152,7 +153,7 @@ public class APIIntegrationTest {
                         .setResponseCode(HttpURLConnection.HTTP_OK)
                         .setBody(SUCCESS));
 
-        TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
+        TestObserver<Success> testSubscriber = new TestObserver<>();
         dataService.<Success>postObject(new PostRequest.Builder(User.class, false)
                 .url(path)
                 .payLoad(testUser)
@@ -179,7 +180,7 @@ public class APIIntegrationTest {
                         .setResponseCode(HttpURLConnection.HTTP_OK)
                         .setBody(SUCCESS));
 
-        TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
+        TestObserver<Success> testSubscriber = new TestObserver<>();
         dataService.<Success>postList(new PostRequest.Builder(User.class, false)
                 .url(path)
                 .payLoad(userListResponse)
@@ -206,7 +207,7 @@ public class APIIntegrationTest {
                         .setResponseCode(HttpURLConnection.HTTP_OK)
                         .setBody(SUCCESS));
 
-        TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
+        TestObserver<Success> testSubscriber = new TestObserver<>();
         dataService.<Success>putObject(new PostRequest.Builder(User.class, false)
                 .url(path)
                 .payLoad(testUser)
@@ -233,7 +234,7 @@ public class APIIntegrationTest {
                         .setResponseCode(HttpURLConnection.HTTP_OK)
                         .setBody(SUCCESS));
 
-        TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
+        TestObserver<Success> testSubscriber = new TestObserver<>();
         dataService.<Success>putList(new PostRequest.Builder(User.class, false)
                 .url(path)
                 .payLoad(userListResponse)
@@ -260,7 +261,7 @@ public class APIIntegrationTest {
                         .setResponseCode(HttpURLConnection.HTTP_OK)
                         .setBody(SUCCESS));
 
-        TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
+        TestObserver<Success> testSubscriber = new TestObserver<>();
         dataService.<Success>deleteItemById(new PostRequest.Builder(User.class, false)
                 .url(path)
                 .payLoad("{\"id\": \"Zeyad-37\"}")
@@ -282,7 +283,7 @@ public class APIIntegrationTest {
 
     @Test
     public void testDeleteCollectionByIds() {
-        String path = "deleteList/user";
+        String path = "deleteListById/user";
         RESTMockServer.whenDELETE(pathContains(path))
                 .thenReturn(new MockResponse()
                         .setResponseCode(HttpURLConnection.HTTP_OK)
@@ -290,7 +291,7 @@ public class APIIntegrationTest {
         List<String> payload = new ArrayList<>(2);
         payload.add("Zeyad-37");
         payload.add("Zeyad-37");
-        TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
+        TestObserver<Success> testSubscriber = new TestObserver<>();
         dataService.<Success>deleteCollectionByIds(new PostRequest.Builder(User.class, false)
                 .url(path)
 //                .payLoad(Arrays.array("Zeyad-37", "Zeyad-37"))
@@ -415,7 +416,7 @@ public class APIIntegrationTest {
         TestSubscriber<User> testSubscriber = new TestSubscriber<>();
         dataService.<User>getObject(new GetRequest.Builder(User.class, false)
                 .url(getUserPath)
-                .id("Zeyad-37", User.LOGIN, String.class)
+                .id("Zeyad-37", User.LOGIN)
                 //                .cache(User.LOGIN)
                 .build())
                 .subscribe(testSubscriber);
@@ -442,7 +443,7 @@ public class APIIntegrationTest {
         TestSubscriber<List<User>> testSubscriber = new TestSubscriber<>();
         dataService.<User>getList(new GetRequest.Builder(User.class, false)
                 .url(getUserListPath)
-                .id("Zeyad-37", User.LOGIN, String.class)
+                .id("Zeyad-37", User.LOGIN)
                 //                .cache(User.LOGIN)
                 .build())
                 .subscribe(testSubscriber);

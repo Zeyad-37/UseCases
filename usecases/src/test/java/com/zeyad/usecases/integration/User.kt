@@ -1,14 +1,13 @@
 package com.zeyad.usecases.integration
 
+import android.arch.persistence.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
-import io.realm.RealmObject
-import io.realm.annotations.PrimaryKey
 
 /**
  * @author zeyad on 1/10/17.
  */
-class User internal constructor() : RealmObject() {
+class User internal constructor() {
     @SerializedName(ID)
     var id: Int = 0
     @PrimaryKey

@@ -1,6 +1,7 @@
 package com.zeyad.usecases.network
 
 import io.reactivex.Flowable
+import io.reactivex.Single
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -24,23 +25,23 @@ interface RestApi {
     fun dynamicGetList(@Url url: String, shouldCache: Boolean): Flowable<List<Any>>
 
     @POST
-    fun dynamicPost(@Url url: String, @Body body: RequestBody): Flowable<Any>
+    fun dynamicPost(@Url url: String, @Body body: RequestBody): Single<Any>
 
     @PUT
-    fun dynamicPut(@Url url: String, @Body body: RequestBody): Flowable<Any>
+    fun dynamicPut(@Url url: String, @Body body: RequestBody): Single<Any>
 
     @PATCH
-    fun dynamicPatch(@Url url: String, @Body requestBody: RequestBody): Flowable<Any>
+    fun dynamicPatch(@Url url: String, @Body requestBody: RequestBody): Single<Any>
 
     @DELETE
-    fun dynamicDelete(@Url url: String): Flowable<Any>
+    fun dynamicDelete(@Url url: String, @Body requestBody: RequestBody): Single<Any>
 
     @Streaming
     @GET
-    fun dynamicDownload(@Url fileUrl: String): Flowable<ResponseBody>
+    fun dynamicDownload(@Url fileUrl: String): Single<ResponseBody>
 
     @Multipart
     @POST
     fun dynamicUpload(@Url url: String, @PartMap partMap: Map<String, RequestBody>,
-                      @Part file: List<MultipartBody.Part>): Flowable<Any>
+                      @Part file: List<MultipartBody.Part>): Single<Any>
 }

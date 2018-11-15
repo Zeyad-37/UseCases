@@ -53,7 +53,7 @@ class MemoryStoreTest { // TODO: 6/15/17 test ids
     }
 
     //    @Test
-    //    public void deleteList() {
-    //        memoryStore.deleteList(Collections.singletonList("1"), TestRealmModel.class);
+    //    public void deleteListById() {
+    //        memoryStore.deleteListById(Collections.singletonList("1"), TestRealmModel.class);
     //    }
 }

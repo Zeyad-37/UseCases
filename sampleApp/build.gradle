@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'realm-android'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion 28
@@ -96,6 +96,10 @@ dependencies {
     implementation "androidx.core:core-ktx:0.3"
     implementation "org.koin:koin-android-architecture:0.9.3"
     implementation "android.arch.lifecycle:reactivestreams:1.1.1"
+
+    implementation "android.arch.persistence.room:runtime:$room_version"
+    implementation "android.arch.persistence.room:rxjava2:$room_version"
+    kapt "android.arch.persistence.room:compiler:$room_version"
 
     // Support
     implementation "com.android.support:appcompat-v7:$supportLibrary"

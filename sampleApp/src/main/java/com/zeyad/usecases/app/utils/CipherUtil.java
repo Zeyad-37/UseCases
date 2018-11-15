@@ -3,7 +3,6 @@ package com.zeyad.usecases.app.utils;
 import android.content.Context;
 import android.icu.util.Calendar;
 import android.os.Build;
-import android.preference.PreferenceManager;
 import android.security.KeyPairGeneratorSpec;
 import android.support.annotation.RequiresApi;
 import android.util.Base64;
@@ -19,7 +18,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.PrivateKey;
 import java.security.PublicKey;
-import java.security.SecureRandom;
 import java.security.UnrecoverableEntryException;
 import java.security.cert.CertificateException;
 import java.util.Locale;
@@ -29,8 +27,6 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.security.auth.x500.X500Principal;
-
-import io.realm.RealmConfiguration;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -124,26 +120,26 @@ public class CipherUtil {
         return inCipher.doFinal(bytes);
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public static String createSecureRealmKey(Context context)
-            throws IOException, CertificateException, NoSuchAlgorithmException, InvalidKeyException,
-            UnrecoverableEntryException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
-            NoSuchProviderException, BadPaddingException, NoSuchPaddingException, KeyStoreException {
-        byte[] realmkey = new byte[RealmConfiguration.KEY_LENGTH];
-        new SecureRandom().nextBytes(realmkey);
-        return encrypt(context, realmkey);
-    }
-
-    // disable in manifest allowBackUp = true for encryption
-    @RequiresApi(api = Build.VERSION_CODES.N)
-    public static byte[] getRealmKey(Context context)
-            throws IOException, CertificateException, NoSuchAlgorithmException, InvalidKeyException,
-            UnrecoverableEntryException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
-            BadPaddingException, NoSuchPaddingException, KeyStoreException, NoSuchProviderException {
-        String loadedKey = PreferenceManager.getDefaultSharedPreferences(context).getString("realmKey", "");
-        if (loadedKey.isEmpty()) {
-            loadedKey = createSecureRealmKey(context);
-        }
-        return decryptToByteArray(loadedKey);
-    }
+//    @RequiresApi(api = Build.VERSION_CODES.N)
+//    public static String createSecureRealmKey(Context context)
+//            throws IOException, CertificateException, NoSuchAlgorithmException, InvalidKeyException,
+//            UnrecoverableEntryException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
+//            NoSuchProviderException, BadPaddingException, NoSuchPaddingException, KeyStoreException {
+//        byte[] realmkey = new byte[RealmConfiguration.KEY_LENGTH];
+//        new SecureRandom().nextBytes(realmkey);
+//        return encrypt(context, realmkey);
+//    }
+//
+//    // disable in manifest allowBackUp = true for encryption
+//    @RequiresApi(api = Build.VERSION_CODES.N)
+//    public static byte[] getRealmKey(Context context)
+//            throws IOException, CertificateException, NoSuchAlgorithmException, InvalidKeyException,
+//            UnrecoverableEntryException, InvalidAlgorithmParameterException, IllegalBlockSizeException,
+//            BadPaddingException, NoSuchPaddingException, KeyStoreException, NoSuchProviderException {
+//        String loadedKey = PreferenceManager.getDefaultSharedPreferences(context).getString("realmKey", "");
+//        if (loadedKey.isEmpty()) {
+//            loadedKey = createSecureRealmKey(context);
+//        }
+//        return decryptToByteArray(loadedKey);
+//    }
 }

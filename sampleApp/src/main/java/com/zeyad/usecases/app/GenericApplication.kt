@@ -21,9 +21,6 @@ import io.reactivex.disposables.Disposable
 import io.reactivex.functions.Action
 import io.reactivex.functions.Consumer
 import io.reactivex.schedulers.Schedulers
-import io.realm.Realm
-import io.realm.RealmConfiguration
-import io.realm.rx.RealmObservableFactory
 import okhttp3.CertificatePinner
 import okhttp3.ConnectionSpec
 import okhttp3.OkHttpClient
@@ -124,13 +121,13 @@ open class GenericApplication : Application() {
     }
 
     private fun initializeRealm() {
-        Realm.init(this)
-        Realm.setDefaultConfiguration(RealmConfiguration.Builder()
-                .name("app.realm")
-                .modules(Realm.getDefaultModule(), LibraryModule())
-                .rxFactory(RealmObservableFactory())
-                .deleteRealmIfMigrationNeeded()
-                .build())
+//        Realm.init(this)
+//        Realm.setDefaultConfiguration(RealmConfiguration.Builder()
+//                .name("app.realm")
+//                .modules(Realm.getDefaultModule(), LibraryModule())
+//                .rxFactory(RealmObservableFactory())
+//                .deleteRealmIfMigrationNeeded()
+//                .build())
     }
 
     private fun checkAppTampering(context: Context): Boolean {

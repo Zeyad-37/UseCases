@@ -37,7 +37,7 @@ class UserListVM(private var dataUseCase: IDataService) : BaseViewModel<UserList
             override fun reduce(newResult: Any, event: BaseEvent<*>, currentStateBundle: UserListState?): UserListState {
                 var users: MutableList<User>
                 users = if (currentStateBundle?.users == null)
-                    ArrayList<User>()
+                    ArrayList()
                 else
                     Observable.fromIterable(currentStateBundle.users)
                             .map<User> { it.getData() }
@@ -49,8 +49,6 @@ class UserListVM(private var dataUseCase: IDataService) : BaseViewModel<UserList
                     is DeleteUsersEvent -> users = Observable.fromIterable(users)
                             .filter { user -> !(newResult as List<*>).contains(user.login) }
                             .distinct().toList().blockingGet()
-                    else -> {
-                    }
                 }
                 return UserListState.builder()
                         .users(users)
@@ -98,5 +96,6 @@ class UserListVM(private var dataUseCase: IDataService) : BaseViewModel<UserList
                 .cache()
                 .build())
                 .map { selectedItemsIds }
+                .toFlowable()
     }
 }

@@ -3,7 +3,7 @@ package com.zeyad.usecases.stores
 import android.content.Context
 import com.zeyad.usecases.Config
 import com.zeyad.usecases.db.DataBaseManager
-import com.zeyad.usecases.db.RealmManager
+import com.zeyad.usecases.db.RoomManager
 import com.zeyad.usecases.mapper.DAOMapper
 import com.zeyad.usecases.network.ApiConnection
 import com.zeyad.usecases.utils.DataBaseManagerUtil
@@ -31,7 +31,7 @@ class DataStoreFactoryTest {
         com.zeyad.usecases.Config.context = mock(Context::class.java)
         mDataStoreFactory = DataStoreFactory(object : DataBaseManagerUtil {
             override fun getDataBaseManager(dataClass: Class<*>): DataBaseManager? {
-                return mock(RealmManager::class.java)
+                return mock(RoomManager::class.java)
             }
         }, mock(ApiConnection::class.java),
                 DAOMapper())
@@ -100,7 +100,7 @@ class DataStoreFactoryTest {
     @Test
     @Throws(IllegalAccessException::class)
     fun testDiskMethod_ifExpectedDataStoreIsReturned_whenMockedEntityMapperIsPassed() {
-        Config.withRealm = true
+        Config.withSQLite = true
         assertThat(mDataStoreFactory!!.disk(Any::class.java), `is`(notNullValue()))
     }
 

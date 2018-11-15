@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -61,13 +62,13 @@ public class ApiConnectionTest {
                 .thenReturn(Flowable.just(Collections.singletonList(new TestRealmModel())));
 
         when(mRestApiWithoutCache.dynamicPost(mValidUrl, mMockedRequestBody))
-                .thenReturn(Flowable.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Single.just(Collections.singletonList(new TestRealmModel())));
         when(mRestApiWithoutCache.dynamicPut(mValidUrl, mMockedRequestBody))
-                .thenReturn(Flowable.just(Collections.singletonList(new TestRealmModel())));
-        when(mRestApiWithoutCache.dynamicDelete(mValidUrl))
-                .thenReturn(Flowable.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Single.just(Collections.singletonList(new TestRealmModel())));
+        when(mRestApiWithoutCache.dynamicDelete(mValidUrl, mMockedRequestBody))
+                .thenReturn(Single.just(Collections.singletonList(new TestRealmModel())));
         when(mRestApiWithoutCache.dynamicUpload(mValidUrl, mPartMap, mMultipartBodyParts))
-                .thenReturn(Flowable.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Single.just(Collections.singletonList(new TestRealmModel())));
 
         mApiConnection = getApiImplementation(mRestApiWithoutCache, mRestApiWithCache);
     }
@@ -158,8 +159,8 @@ public class ApiConnectionTest {
 
     @Test
     public void testDynamicDeleteObject() {
-        mApiConnection.dynamicDelete(mValidUrl);
-        Mockito.verify(mRestApiWithoutCache).dynamicDelete(eq(mValidUrl));
+        mApiConnection.dynamicDelete(mValidUrl, mMockedRequestBody);
+        Mockito.verify(mRestApiWithoutCache).dynamicDelete(eq(mValidUrl), eq(mMockedRequestBody));
     }
 
     private RestApi getCurrentSetRestApiWithoutCache(@NonNull ApiConnection apiConnection) {

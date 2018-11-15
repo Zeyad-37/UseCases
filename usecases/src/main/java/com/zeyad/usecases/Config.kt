@@ -22,8 +22,4 @@ object Config {
     var useApiWithCache: Boolean = false
     var cacheDuration: Long = 0
     lateinit var context: Context
-
-    var withRealm: Boolean = false
-
-    fun isWithDisk() = withRealm || withSQLite
 }

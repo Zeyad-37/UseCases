@@ -10,8 +10,7 @@ import android.support.test.rule.BuildConfig
 import com.zeyad.usecases.TestRealmModel
 import com.zeyad.usecases.anyObject
 import com.zeyad.usecases.db.DataBaseManager
-import com.zeyad.usecases.db.RealmManager
-import com.zeyad.usecases.db.RealmQueryProvider
+import com.zeyad.usecases.db.RoomManager
 import com.zeyad.usecases.exceptions.NetworkConnectionException
 import com.zeyad.usecases.mapper.DAOMapper
 import com.zeyad.usecases.network.ApiConnection
@@ -20,9 +19,6 @@ import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.observers.TestObserver
 import io.reactivex.subscribers.TestSubscriber
-import io.realm.Realm
-import io.realm.RealmModel
-import io.realm.RealmQuery
 import junit.framework.Assert.assertEquals
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -50,24 +46,24 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     private lateinit var mockContext: Context
     private lateinit var mockApiConnection: ApiConnection
     private lateinit var mockDataBaseManager: DataBaseManager
-    private lateinit var observable: Flowable<Any>
-    private lateinit var fileFlowable: Flowable<ResponseBody>
+    private lateinit var observable: Single<Any>
+    private lateinit var fileFlowable: Single<ResponseBody>
     private val errorMessage = "Could not reach server!"
 
     @Before
     fun setUp() {
-        observable = Flowable.just(Any())
-        fileFlowable = Flowable.just(ResponseBody.create(null, ""))
+        observable = Single.just(Any())
+        fileFlowable = Single.just(ResponseBody.create(null, ""))
         mockContext = mock(Context::class.java)
         com.zeyad.usecases.Config.context = mockContext
         mockApiConnection = mock(ApiConnection::class.java)
-        mockDataBaseManager = mock(RealmManager::class.java)
+        mockDataBaseManager = mock(RoomManager::class.java)
         changeStateOfNetwork(mockContext, true)
-        `when`(mockDataBaseManager.put(any(JSONObject::class.java), anyString(), any(Class::class.java), any(Class::class.java)))
+        `when`(mockDataBaseManager.put(any(JSONObject::class.java), any(Class::class.java)))
                 .thenReturn(Single.just(true))
-        `when`(mockDataBaseManager.putAll(any(JSONArray::class.java), anyString(), any(Class::class.java), any(Class::class.java)))
+        `when`(mockDataBaseManager.putAll(any(JSONArray::class.java), any(Class::class.java)))
                 .thenReturn(Single.just(true))
-        `when`(mockDataBaseManager.putAll<RealmModel>(anyListOf(RealmModel::class.java), anyObject()))
+        `when`(mockDataBaseManager.putAll<Any>(anyListOf(Any::class.java), anyObject()))
                 .thenReturn(Single.just(true))
         cloudStore = CloudStore(mockApiConnection, mockDataBaseManager, DAOMapper(),
                 MemoryStore(com.zeyad.usecases.Config.gson, HashMap()))
@@ -81,11 +77,12 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
 
     @Test
     fun dynamicGetObject() {
-        `when`(mockApiConnection.dynamicGetObject<Any>(anyString(), anyBoolean())).thenReturn(observable)
+        `when`(mockApiConnection.dynamicGetObject<Any>(anyString(), anyBoolean()))
+                .thenReturn(Flowable.just(Any()))
 
         val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicGetObject("", "", 0L, Long::class.java, Any::class.java,
-                false, false).subscribe(testSubscriber)
+        cloudStore.dynamicGetObject("", "", 0L, Any::class.java, false, false)
+                .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
         testSubscriber.assertComplete()
@@ -97,10 +94,10 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
 
     @Test
     fun dynamicGetObjectCanWillPersist() {
-        `when`(mockApiConnection.dynamicGetObject<Any>(anyString(), anyBoolean())).thenReturn(observable)
+        `when`(mockApiConnection.dynamicGetObject<Any>(anyString(), anyBoolean())).thenReturn(Flowable.just(Any()))
 
         val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicGetObject("", "", 0L, Long::class.java, Any::class.java, true, false)
+        cloudStore.dynamicGetObject("", "", 0L, Any::class.java, true, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
@@ -151,9 +148,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         `when`(mockApiConnection.dynamicPatch<Any>(anyString(), anyObject()))
                 .thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicPatchObject(
-                "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, false, false, false)
+                "", "", JSONObject(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
@@ -170,9 +167,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         `when`(mockApiConnection.dynamicPatch<Any>(anyString(), anyObject()))
                 .thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicPatchObject(
-                "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, true, true, true)
+                "", "", JSONObject(), Any::class.java, Any::class.java, true, true)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
@@ -187,9 +184,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicPatchObjectNoNetwork() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicPatchObject(
-                "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, false, false, true)
+                "", "", JSONObject(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertErrorMessage(errorMessage)
@@ -202,9 +199,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicPatchObjectNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicPatchObject(
-                "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, false, false, false)
+                "", "", JSONObject(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertError(NetworkConnectionException::class.java)
@@ -216,9 +213,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicPostObject() {
         `when`(mockApiConnection.dynamicPost<Any>(anyString(), anyObject())).thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicPostObject(
-                "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, false, false, false)
+                "", "", JSONObject(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
@@ -234,9 +231,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         `when`(mockApiConnection.dynamicPost<Any>(anyString(), anyObject()))
                 .thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicPostObject(
-                "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, true, false, false)
+                "", "", JSONObject(), Any::class.java, Any::class.java, true, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
@@ -251,9 +248,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicPostObjectNoNetwork() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicPostObject(
-                "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, false, false, true)
+                "", "", JSONObject(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertErrorMessage(errorMessage)
@@ -266,9 +263,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicPostObjectNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicPostObject(
-                "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, false, false, false)
+                "", "", JSONObject(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertError(NetworkConnectionException::class.java)
@@ -282,8 +279,8 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         `when`(mockApiConnection.dynamicPost<Any>(anyString(), anyObject()))
                 .thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicPostList("", "", Int::class.java, JSONArray(), Any::class.java, Any::class.java, false,
+        val testSubscriber = TestObserver<Any>()
+        cloudStore.dynamicPostList("", "", JSONArray(), Any::class.java, Any::class.java,
                 false, false)
                 .subscribe(testSubscriber)
 
@@ -300,9 +297,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         `when`(mockApiConnection.dynamicPost<Any>(anyString(), anyObject()))
                 .thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicPostList("", "", Int::class.java, JSONArray(), Any::class.java, Any::class.java,
-                true, false, false)
+        val testSubscriber = TestObserver<Any>()
+        cloudStore.dynamicPostList("", "", JSONArray(), Any::class.java, Any::class.java,
+                true, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
@@ -317,9 +314,8 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicPostListNoNetwork() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicPostList("", "", Int::class.java, JSONArray(), Any::class.java, Any::class.java, false, false,
-                true)
+        val testSubscriber = TestObserver<Any>()
+        cloudStore.dynamicPostList("", "", JSONArray(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertErrorMessage(errorMessage)
@@ -332,9 +328,8 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicPostListNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicPostList("", "", Int::class.java, JSONArray(), Any::class.java, Any::class.java, false, false,
-                false)
+        val testSubscriber = TestObserver<Any>()
+        cloudStore.dynamicPostList("", "", JSONArray(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertError(NetworkConnectionException::class.java)
@@ -348,9 +343,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         `when`(mockApiConnection.dynamicPut<Any>(anyString(), anyObject()))
                 .thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicPutObject(
-                "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, false, false, false)
+                "", "", JSONObject(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
@@ -366,9 +361,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         `when`(mockApiConnection.dynamicPut<Any>(anyString(), anyObject()))
                 .thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicPutObject(
-                "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, true, false, false)
+                "", "", JSONObject(), Any::class.java, Any::class.java, true, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
@@ -383,9 +378,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicPutObjectNoNetwork() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicPutObject(
-                "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, false, false, true)
+                "", "", JSONObject(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertErrorMessage(errorMessage)
@@ -398,9 +393,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicPutObjectNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicPutObject(
-                "", "", Int::class.java, JSONObject(), Any::class.java, Any::class.java, false, false, false)
+                "", "", JSONObject(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertError(NetworkConnectionException::class.java)
@@ -414,9 +409,8 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         `when`(mockApiConnection.dynamicPut<Any>(anyString(), anyObject()))
                 .thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicPutList("", "", Int::class.java, JSONArray(), Any::class.java, Any::class.java, false, false,
-                false)
+        val testSubscriber = TestObserver<Any>()
+        cloudStore.dynamicPutList("", "", JSONArray(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
@@ -432,9 +426,8 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         `when`(mockApiConnection.dynamicPut<Any>(anyString(), anyObject()))
                 .thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicPutList("", "", Int::class.java, JSONArray(), Any::class.java, Any::class.java, true, false,
-                false)
+        val testSubscriber = TestObserver<Any>()
+        cloudStore.dynamicPutList("", "", JSONArray(), Any::class.java, Any::class.java, true, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
@@ -449,8 +442,8 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicPutListNoNetwork() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicPutList("", "", Int::class.java, JSONArray(), Any::class.java, Any::class.java, false, false, true)
+        val testSubscriber = TestObserver<Any>()
+        cloudStore.dynamicPutList("", "", JSONArray(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertErrorMessage(errorMessage)
@@ -463,9 +456,8 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicPutListNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicPutList("", "", Int::class.java, JSONArray(), Any::class.java, Any::class.java, false, false,
-                false)
+        val testSubscriber = TestObserver<Any>()
+        cloudStore.dynamicPutList("", "", JSONArray(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertError(NetworkConnectionException::class.java)
@@ -476,36 +468,36 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
 
     @Test
     fun dynamicDeleteCollection() {
-        `when`(mockApiConnection.dynamicDelete<Any>(anyString()))
+        `when`(mockApiConnection.dynamicDelete<Any>(anyString(), any()))
                 .thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicDeleteCollection(
-                "", "", String::class.java, JSONArray(), Any::class.java, Any::class.java, false, false, false)
+                "", "", String::class.java, JSONArray(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
         testSubscriber.assertComplete()
         testSubscriber.assertValueCount(1)
 
-        verify<ApiConnection>(mockApiConnection, times(1)).dynamicDelete<Any>(anyString())
+        verify<ApiConnection>(mockApiConnection, times(1)).dynamicDelete<Any>(anyString(), any())
         verifyDBInteractions(0, 0, 0, 0)
     }
 
     @Test
     fun dynamicDeleteCollectionCanWillPersist() {
-        `when`(mockApiConnection.dynamicDelete<Any>(anyString())).thenReturn(observable)
+        `when`(mockApiConnection.dynamicDelete<Any>(anyString(), any())).thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicDeleteCollection(
-                "", "", String::class.java, JSONArray(), Any::class.java, Any::class.java, true, false, false)
+                "", "", String::class.java, JSONArray(), Any::class.java, Any::class.java, true, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
         testSubscriber.assertComplete()
         testSubscriber.assertValueCount(1)
 
-        verify<ApiConnection>(mockApiConnection, times(1)).dynamicDelete<Any>(anyString())
+        verify<ApiConnection>(mockApiConnection, times(1)).dynamicDelete<Any>(anyString(), any())
         verifyDBInteractions(0, 0, 0, 0)
     }
 
@@ -513,14 +505,14 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicDeleteCollectionNoNetwork() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicDeleteCollection(
-                "", "", String::class.java, JSONArray(), Any::class.java, Any::class.java, false, false, true)
+                "", "", String::class.java, JSONArray(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertErrorMessage(errorMessage)
 
-        verify<ApiConnection>(mockApiConnection, times(0)).dynamicDelete<Any>(anyString())
+        verify<ApiConnection>(mockApiConnection, times(0)).dynamicDelete<Any>(anyString(), any())
         verifyDBInteractions(0, 0, 0, 0)
     }
 
@@ -528,14 +520,14 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicDeleteCollectionNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicDeleteCollection(
-                "", "", String::class.java, JSONArray(), Any::class.java, Any::class.java, false, false, false)
+                "", "", String::class.java, JSONArray(), Any::class.java, Any::class.java, false, false)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertError(NetworkConnectionException::class.java)
 
-        verify<ApiConnection>(mockApiConnection, times(0)).dynamicDelete<Any>(anyString())
+        verify<ApiConnection>(mockApiConnection, times(0)).dynamicDelete<Any>(anyString(), any())
         verifyDBInteractions(0, 0, 0, 0)
     }
 
@@ -562,9 +554,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
                 anyListOf<MultipartBody.Part>(MultipartBody.Part::class.java)))
                 .thenReturn(observable)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicUploadFile(
-                "", HashMap(), HashMap(), false, false, false, Any::class.java)
+                "", HashMap(), HashMap(), Any::class.java)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
@@ -581,9 +573,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicUploadFileNoNetwork() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicUploadFile(
-                "", HashMap(), HashMap(), false, false, true, Any::class.java)
+                "", HashMap(), HashMap(), Any::class.java)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoValues()
@@ -594,9 +586,9 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicUploadFileNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
+        val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicUploadFile(
-                "", HashMap(), HashMap(), false, false, false, Any::class.java)
+                "", HashMap(), HashMap(), Any::class.java)
                 .subscribe(testSubscriber)
 
         testSubscriber.assertError(NetworkConnectionException::class.java)
@@ -607,8 +599,8 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicDownloadFile() {
         `when`(mockApiConnection.dynamicDownload(anyString())).thenReturn(fileFlowable)
 
-        val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicDownloadFile("", File(""), false, false, false)
+        val testSubscriber = TestObserver<Any>()
+        cloudStore.dynamicDownloadFile("", File(""))
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoErrors()
@@ -623,8 +615,8 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicDownloadFileNoNetwork() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicDownloadFile("", File(""), false, false, true)
+        val testSubscriber = TestObserver<Any>()
+        cloudStore.dynamicDownloadFile("", File(""))
                 .subscribe(testSubscriber)
 
         testSubscriber.assertNoValues()
@@ -635,8 +627,8 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
     fun dynamicDownloadFileNoNetworkNoQueue() {
         changeStateOfNetwork(mockContext, false)
 
-        val testSubscriber = TestSubscriber<Any>()
-        cloudStore.dynamicDownloadFile("", File(""), false, false, false)
+        val testSubscriber = TestObserver<Any>()
+        cloudStore.dynamicDownloadFile("", File(""))
                 .subscribe(testSubscriber)
 
         testSubscriber.assertError(NetworkConnectionException::class.java)
@@ -645,9 +637,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
 
     @Test(expected = RuntimeException::class)
     fun queryDisk() {
-        val observable = cloudStore.queryDisk(object : RealmQueryProvider<TestRealmModel> {
-            override fun create(realm: Realm): RealmQuery<TestRealmModel> = realm.where(TestRealmModel::class.java)
-        })
+        val observable = cloudStore.queryDisk("", TestRealmModel::class.java)
 
         // Verify repository interactions
         verifyZeroInteractions(mockApiConnection)
@@ -660,13 +650,13 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
 
     private fun verifyDBInteractions(putAllJ: Int, putAllL: Int, putJ: Int, evict: Int) {
         verify<DataBaseManager>(mockDataBaseManager, times(putAllJ))
-                .putAll(any(JSONArray::class.java), anyString(), any(Class::class.java), anyObject())
-        verify<DataBaseManager>(mockDataBaseManager, times(putAllL)).putAll<RealmModel>(Matchers
-                .anyListOf(RealmModel::class.java), anyObject())
+                .putAll(any(JSONArray::class.java), any(Class::class.java))
+        verify<DataBaseManager>(mockDataBaseManager, times(putAllL)).putAll<TestRealmModel>(Matchers
+                .anyListOf(TestRealmModel::class.java), anyObject())
         verify<DataBaseManager>(mockDataBaseManager, times(putJ))
-                .put(any(JSONObject::class.java), anyString(), any(Class::class.java), anyObject())
-        verify<DataBaseManager>(mockDataBaseManager, atLeast(evict)).evictById(anyObject(), anyString(), any(),
-                anyObject())
+                .put(any(JSONObject::class.java), any(Class::class.java))
+        verify<DataBaseManager>(mockDataBaseManager, atLeast(evict)).evictById(any(Class::class.java),
+                anyString(), any())
     }
 
     private fun changeStateOfNetwork(mockedContext: Context, toEnable: Boolean): Context {

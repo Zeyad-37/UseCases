@@ -5,6 +5,7 @@ import com.zeyad.usecases.BuildConfig
 import com.zeyad.usecases.Config
 import com.zeyad.usecases.Mockable
 import io.reactivex.Flowable
+import io.reactivex.Single
 import okhttp3.*
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -21,7 +22,7 @@ class ApiConnection(val restApiWithoutCache: RestApi, val restApiWithCache: Rest
     private val restApi: RestApi
         get() = if (Config.useApiWithCache) restApiWithCache else restApiWithoutCache
 
-    fun dynamicDownload(url: String): Flowable<ResponseBody> {
+    fun dynamicDownload(url: String): Single<ResponseBody> {
         return restApi.dynamicDownload(url)
     }
 
@@ -47,30 +48,29 @@ class ApiConnection(val restApiWithoutCache: RestApi, val restApiWithCache: Rest
         return restApi.dynamicGetList(url) as Flowable<List<M>>
     }
 
-    fun <M> dynamicPost(url: String, requestBody: RequestBody): Flowable<M> {
-        return restApi.dynamicPost(url, requestBody) as Flowable<M>
+    fun <M> dynamicPost(url: String, requestBody: RequestBody): Single<M> {
+        return restApi.dynamicPost(url, requestBody) as Single<M>
     }
 
-    fun <M> dynamicPut(url: String, requestBody: RequestBody): Flowable<M> {
-        return restApi.dynamicPut(url, requestBody) as Flowable<M>
+    fun <M> dynamicPut(url: String, requestBody: RequestBody): Single<M> {
+        return restApi.dynamicPut(url, requestBody) as Single<M>
     }
 
-    fun <M> dynamicUpload(url: String, partMap: Map<String, RequestBody>, files: List<MultipartBody.Part>): Flowable<M> {
-        return restApi.dynamicUpload(url, partMap, files) as Flowable<M>
+    fun <M> dynamicUpload(url: String, partMap: Map<String, RequestBody>, files: List<MultipartBody.Part>): Single<M> {
+        return restApi.dynamicUpload(url, partMap, files) as Single<M>
     }
 
-    fun <M> dynamicDelete(url: String): Flowable<M> {
-        return restApi.dynamicDelete(url) as Flowable<M>
+    fun <M> dynamicDelete(url: String, requestBody: RequestBody): Single<M> {
+        return restApi.dynamicDelete(url, requestBody) as Single<M>
     }
 
-    fun <M> dynamicPatch(url: String, body: RequestBody): Flowable<M> {
-        return restApi.dynamicPatch(url, body) as Flowable<M>
+    fun <M> dynamicPatch(url: String, body: RequestBody): Single<M> {
+        return restApi.dynamicPatch(url, body) as Single<M>
     }
 
     private fun logNoCache() {
         Log.e(javaClass.simpleName, CACHING_DISABLED)
     }
-
 
     //    private Interceptor provideGzipRequestInterceptor() {
     //        return chain -> {
@@ -153,9 +153,9 @@ class ApiConnection(val restApiWithoutCache: RestApi, val restApiWithCache: Rest
     //    }
 
     companion object {
-        private val CACHING_DISABLED = "There would be no caching. Since caching module is disabled."//,
+        private const val CACHING_DISABLED = "There would be no caching. Since caching module is disabled."//,
         //            CACHE_CONTROL = "Cache-Control";
-        private val TIME_OUT = 15
+        private const val TIME_OUT = 15
 
         fun initWithCache(
                 okHttpBuilder: OkHttpClient.Builder?, cache: Cache?): RestApi {

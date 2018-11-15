@@ -1,10 +1,8 @@
 package com.zeyad.usecases.stores
 
-import com.zeyad.usecases.db.RealmQueryProvider
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.realm.RealmModel
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -15,67 +13,107 @@ import java.util.*
  */
 interface DataStore {
 
-    fun <M> dynamicGetList(url: String, idColumnName: String, requestType: Class<M>,
-                           persist: Boolean, shouldCache: Boolean): Flowable<List<M>>
+    fun <M> dynamicGetList(url: String,
+                           idColumnName: String,
+                           requestType: Class<M>,
+                           persist: Boolean,
+                           shouldCache: Boolean): Flowable<List<M>>
 
     /**
      * Get an [Flowable] which will emit a Object by its id.
      */
-    fun <M> dynamicGetObject(url: String, idColumnName: String, itemId: Any, itemIdType: Class<*>,
-                             requestType: Class<M>, persist: Boolean, shouldCache: Boolean): Flowable<M>
+    fun <M> dynamicGetObject(url: String,
+                             idColumnName: String,
+                             itemId: Any,
+                             requestType: Class<M>,
+                             persist: Boolean,
+                             shouldCache: Boolean): Flowable<M>
 
     /**
-     * Search disk with a RealmQuery which returns an [Flowable] that will emit a list of
+     * Search disk with a query which returns an [Flowable] that will emit a list of
      * Object.
      */
-    fun <M : RealmModel> queryDisk(queryFactory: RealmQueryProvider<M>): Flowable<List<M>>
+    fun <M> queryDisk(query: String, clazz: Class<M>): Flowable<M>
 
     /**
      * Patch a JSONObject which returns an [Flowable] that will emit a Object.
      */
-    fun <M> dynamicPatchObject(url: String, idColumnName: String, itemIdType: Class<*>,
-                               jsonObject: JSONObject, requestType: Class<*>,
-                               responseType: Class<M>, persist: Boolean, cache: Boolean,
-                               queuable: Boolean): Flowable<M>
+    fun <M> dynamicPatchObject(url: String,
+                               idColumnName: String,
+                               jsonObject: JSONObject,
+                               requestType: Class<*>,
+                               responseType: Class<M>,
+                               persist: Boolean,
+                               cache: Boolean): Single<M>
 
     /**
      * Post a JSONObject which returns an [Flowable] that will emit a Object.
      */
-    fun <M> dynamicPostObject(url: String, idColumnName: String, itemIdType: Class<*>,
-                              jsonObject: JSONObject, requestType: Class<*>, responseType: Class<M>,
-                              persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M>
+    fun <M> dynamicPostObject(url: String,
+                              idColumnName: String,
+                              jsonObject: JSONObject,
+                              requestType: Class<*>,
+                              responseType: Class<M>,
+                              persist: Boolean,
+                              cache: Boolean): Single<M>
 
     /**
      * Post a HashMap<String></String>, Object> which returns an [Flowable] that will emit a list of
      * Object.
      */
-    fun <M> dynamicPostList(url: String, idColumnName: String, itemIdType: Class<*>,
-                            jsonArray: JSONArray, requestType: Class<*>, responseType: Class<M>,
-                            persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M>
+    fun <M> dynamicPostList(url: String,
+                            idColumnName: String,
+                            jsonArray: JSONArray,
+                            requestType: Class<*>,
+                            responseType: Class<M>,
+                            persist: Boolean,
+                            cache: Boolean): Single<M>
 
     /**
      * Put a HashMap<String></String>, Object> disk with a RealmQuery which returns an [Flowable] that
      * will emit a Object.
      */
-    fun <M> dynamicPutObject(url: String, idColumnName: String, itemIdType: Class<*>,
-                             jsonObject: JSONObject, requestType: Class<*>, responseType: Class<M>,
-                             persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M>
+    fun <M> dynamicPutObject(url: String,
+                             idColumnName: String,
+                             jsonObject: JSONObject,
+                             requestType: Class<*>,
+                             responseType: Class<M>,
+                             persist: Boolean,
+                             cache: Boolean): Single<M>
 
     /**
      * Put a HashMap<String></String>, Object> disk with a RealmQuery which returns an [Flowable] that
      * will emit a list of Object.
      */
-    fun <M> dynamicPutList(url: String, idColumnName: String, itemIdType: Class<*>,
-                           jsonArray: JSONArray, requestType: Class<*>, responseType: Class<M>,
-                           persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M>
+    fun <M> dynamicPutList(url: String,
+                           idColumnName: String,
+                           jsonArray: JSONArray,
+                           requestType: Class<*>,
+                           responseType: Class<M>,
+                           persist: Boolean,
+                           cache: Boolean): Single<M>
 
     /**
      * Delete a HashMap<String></String>, Object> from cloud which returns an [Flowable] that will emit
      * a Object.
      */
-    fun <M> dynamicDeleteCollection(url: String, idColumnName: String, itemIdType: Class<*>,
-                                    jsonArray: JSONArray, requestType: Class<*>, responseType: Class<M>,
-                                    persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M>
+    fun <M> dynamicDeleteCollection(url: String,
+                                    idColumnName: String,
+                                    itemIdType: Class<*>,
+                                    jsonArray: JSONArray,
+                                    requestType: Class<*>,
+                                    responseType: Class<M>,
+                                    persist: Boolean,
+                                    cache: Boolean): Single<M>
+
+    fun <M> dynamicDeleteCollectionById(url: String,
+                                        idColumnName: String,
+                                        itemIdType: Class<*>,
+                                        jsonArray: JSONArray,
+                                        requestType: Class<*>,
+                                        responseType: Class<M>,
+                                        persist: Boolean,
+                                        cache: Boolean): Single<M>
 
     /**
      * Delete all items of the same type from cloud or disk which returns an [Completable]
@@ -83,10 +121,11 @@ interface DataStore {
      */
     fun dynamicDeleteAll(requestType: Class<*>): Single<Boolean>
 
-    fun dynamicDownloadFile(url: String, file: File, onWifi: Boolean, whileCharging: Boolean,
-                            queuable: Boolean): Flowable<File>
+    fun dynamicDownloadFile(url: String,
+                            file: File): Single<File>
 
-    fun <M> dynamicUploadFile(url: String, keyFileMap: HashMap<String, File>, parameters: HashMap<String, Any>,
-                              onWifi: Boolean, whileCharging: Boolean, queuable: Boolean,
-                              responseType: Class<M>): Flowable<M>
+    fun <M> dynamicUploadFile(url: String,
+                              keyFileMap: HashMap<String, File>,
+                              parameters: HashMap<String, Any>,
+                              responseType: Class<M>): Single<M>
 }

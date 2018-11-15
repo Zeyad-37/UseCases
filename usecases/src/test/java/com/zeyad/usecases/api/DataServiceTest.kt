@@ -3,7 +3,6 @@ package com.zeyad.usecases.api
 import android.support.test.rule.BuildConfig
 import com.zeyad.usecases.TestRealmModel
 import com.zeyad.usecases.anyObject
-import com.zeyad.usecases.db.RealmQueryProvider
 import com.zeyad.usecases.requests.FileIORequest
 import com.zeyad.usecases.requests.GetRequest
 import com.zeyad.usecases.requests.PostRequest
@@ -12,8 +11,6 @@ import io.reactivex.Flowable
 import io.reactivex.Scheduler
 import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
-import io.realm.Realm
-import io.realm.RealmQuery
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,6 +23,7 @@ import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import java.io.File
 import java.util.*
+
 /**
  * @author by ZIaDo on 5/9/17.
  */
@@ -38,17 +36,19 @@ class DataServiceTest {
     private lateinit var getRequest: GetRequest
     private lateinit var postRequest: PostRequest
     private lateinit var flowable: Flowable<Any>
-    private lateinit var fileFlowable: Flowable<File>
+    private lateinit var single: Single<Any>
+    private lateinit var fileFlowable: Single<File>
 
     @Before
     @Throws(Exception::class)
     fun setUp() {
         flowable = Flowable.just(true)
-        fileFlowable = Flowable.just(File(""))
+        single = Single.just(true)
+        fileFlowable = Single.just(File(""))
         postRequest = PostRequest.Builder(TestRealmModel::class.java, false).payLoad(Any()).build()
         getRequest = GetRequest.Builder(TestRealmModel::class.java, false)
                 .url("")
-                .id(37, "id", Int::class.java)
+                .id(37, "id")
                 .cache("id")
                 .build()
         dataStoreFactory = mock(DataStoreFactory::class.java)
@@ -96,7 +96,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
@@ -109,7 +108,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -146,7 +144,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
         `when`(dataStoreFactory
@@ -157,7 +154,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
@@ -175,7 +171,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
                         anyBoolean())
         verify<DataStore>(dataStoreFactory.disk(Any::class.java), times(1))
                 .dynamicGetObject<Any>(
@@ -184,7 +179,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -199,10 +193,8 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
-                .thenReturn(flowable)
+                .thenReturn(single)
 
         dataService.patchObject<TestRealmModel>(postRequest)
 
@@ -214,8 +206,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
-                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -231,10 +221,8 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
-                .thenReturn(flowable)
+                .thenReturn(single)
 
         dataService.postObject<TestRealmModel>(postRequest)
 
@@ -246,8 +234,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
-                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -263,10 +249,8 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
-                .thenReturn(flowable)
+                .thenReturn(single)
 
         dataService.postList<TestRealmModel>(postRequest)
 
@@ -278,8 +262,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
-                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -295,10 +277,8 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
-                .thenReturn(flowable)
+                .thenReturn(single)
 
         dataService.putObject<TestRealmModel>(postRequest)
 
@@ -310,8 +290,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
-                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -327,10 +305,8 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
-                .thenReturn(flowable)
+                .thenReturn(single)
 
         dataService.putList<TestRealmModel>(postRequest)
 
@@ -342,8 +318,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
-                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -360,9 +334,8 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
-                .thenReturn(flowable)
+                .thenReturn(single)
 
         dataService.deleteItemById<TestRealmModel>(postRequest)
 
@@ -374,7 +347,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
                         anyBoolean(),
                         anyBoolean())
     }
@@ -392,9 +364,8 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyBoolean(),
-                        anyBoolean(),
                         anyBoolean()))
-                .thenReturn(flowable)
+                .thenReturn(single)
 
         dataService.deleteCollectionByIds<TestRealmModel>(postRequest)
 
@@ -406,7 +377,6 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyBoolean(),
                         anyBoolean(),
                         anyBoolean())
     }
@@ -426,32 +396,26 @@ class DataServiceTest {
     @Throws(Exception::class)
     fun queryDisk() {
         `when`(dataStoreFactory.disk(Any::class.java)
-                .queryDisk(anyObject<RealmQueryProvider<TestRealmModel>>()))
+                .queryDisk(anyString(), any(Class::class.java)))
                 .thenReturn(Flowable.just(listOf(TestRealmModel())))
 
-        dataService.queryDisk(object : RealmQueryProvider<TestRealmModel> {
-            override fun create(realm: Realm): RealmQuery<TestRealmModel> =
-                    realm.where(TestRealmModel::class.java)
-        })
+        dataService.queryDisk("", TestRealmModel::class.java)
 
         verify<DataStore>(dataStoreFactory.disk(Any::class.java), times(1))
-                .queryDisk(anyObject<RealmQueryProvider<TestRealmModel>>())
+                .queryDisk(anyString(), any(Class::class.java))
     }
 
     @Test
     @Throws(Exception::class)
     fun uploadFile() {
-        `when`<Flowable<Any>>(dataStoreFactory
+        `when`<Single<File>>(dataStoreFactory
                 .cloud(Any::class.java)
                 .dynamicUploadFile(
                         anyString(),
                         anyMap() as HashMap<String, File>,
                         anyMap() as HashMap<String, Any>,
-                        anyBoolean(),
-                        anyBoolean(),
-                        anyBoolean(),
-                        anyObject()))
-                .thenReturn(flowable)
+                        any(Class::class.java) as Class<File>))
+                .thenReturn(fileFlowable)
 
         dataService.uploadFile<Any>(
                 FileIORequest.Builder("", File("")).responseType(Any::class.java).build())
@@ -461,31 +425,23 @@ class DataServiceTest {
                         anyString(),
                         anyMap() as HashMap<String, File>,
                         anyMap() as HashMap<String, Any>,
-                        anyBoolean(),
-                        anyBoolean(),
-                        anyBoolean(),
                         anyObject())
     }
 
     @Test
     @Throws(Exception::class)
     fun downloadFile() {
-        `when`<Flowable<File>>(dataStoreFactory
+        `when`<Single<File>>(dataStoreFactory
                 .cloud(Any::class.java)
                 .dynamicDownloadFile(
                         anyString(),
-                        anyObject(),
-                        anyBoolean(),
-                        anyBoolean(),
-                        anyBoolean()))
+                        any(File::class.java)))
                 .thenReturn(fileFlowable)
 
         dataService.downloadFile(
                 FileIORequest.Builder("", File("")).responseType(Any::class.java).build())
 
         verify<DataStore>(dataStoreFactory.cloud(Any::class.java), times(1))
-                .dynamicDownloadFile(
-                        anyString(), anyObject(), anyBoolean(), anyBoolean(), anyBoolean())
+                .dynamicDownloadFile(anyString(), any(File::class.java))
     }
 }
-

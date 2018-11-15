@@ -2,14 +2,11 @@ package com.zeyad.usecases.stores
 
 import com.zeyad.usecases.Config.gson
 import com.zeyad.usecases.Mockable
-import com.zeyad.usecases.convertToListOfId
 import com.zeyad.usecases.convertToStringListOfId
 import com.zeyad.usecases.db.DataBaseManager
-import com.zeyad.usecases.db.RealmQueryProvider
 import com.zeyad.usecases.withCache
 import io.reactivex.Flowable
 import io.reactivex.Single
-import io.realm.RealmModel
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
@@ -19,21 +16,27 @@ import java.util.*
 class DiskStore(private val mDataBaseManager: DataBaseManager,
                 private val mMemoryStore: MemoryStore?) : DataStore {
 
+    private inline fun onNext(shouldCache: Boolean, block: () -> Unit) {
+        if (withCache(shouldCache)) {
+            block.invoke()
+        }
+    }
+
     override fun <M> dynamicGetList(url: String, idColumnName: String, requestType: Class<M>,
                                     persist: Boolean, shouldCache: Boolean): Flowable<List<M>> {
-        return mDataBaseManager.getAll<M>(requestType)
+        return mDataBaseManager.getAll(requestType)
                 .doOnNext { ms: List<M> ->
-                    if (withCache(shouldCache)) {
+                    onNext(shouldCache) {
                         mMemoryStore?.cacheList(idColumnName, JSONArray(gson.toJson(ms)), requestType)
                     }
                 }
     }
 
-    override fun <M> dynamicGetObject(url: String, idColumnName: String, itemId: Any, itemIdType: Class<*>,
+    override fun <M> dynamicGetObject(url: String, idColumnName: String, itemId: Any,
                                       requestType: Class<M>, persist: Boolean, shouldCache: Boolean): Flowable<M> {
-        return mDataBaseManager.getById<M>(idColumnName, itemId, itemIdType, requestType)
+        return mDataBaseManager.getById(idColumnName, itemId, requestType)
                 .doOnNext { m: M ->
-                    if (withCache(shouldCache)) {
+                    onNext(shouldCache) {
                         mMemoryStore?.cacheObject(idColumnName, JSONObject(gson.toJson(m)), requestType)
                     }
                 }
@@ -42,125 +45,141 @@ class DiskStore(private val mDataBaseManager: DataBaseManager,
     /**
      * Patch a JSONObject which returns an [Flowable] that will emit a Object.
      */
-    override fun <M> dynamicPatchObject(url: String, idColumnName: String, itemIdType: Class<*>,
+    override fun <M> dynamicPatchObject(url: String, idColumnName: String,
                                         jsonObject: JSONObject, requestType: Class<*>, responseType: Class<M>,
-                                        persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
-        return mDataBaseManager.put(jsonObject, idColumnName, itemIdType, requestType)
+                                        persist: Boolean, cache: Boolean): Single<M> {
+        return mDataBaseManager.put(jsonObject, requestType)
                 .doOnSuccess {
-                    if (withCache(cache)) {
+                    onNext(cache) {
                         mMemoryStore?.cacheObject(idColumnName, JSONObject(gson.toJson(jsonObject)), requestType)
                     }
                 }
                 .map { it as M }
-                .toFlowable()
     }
 
     /**
-     * Post a JSONObject which returns an [Flowable] that will emit a Object.
+     * Post a JSONObject which returns an [Single] that will emit a Object.
      */
-    override fun <M> dynamicPostObject(url: String, idColumnName: String, itemIdType: Class<*>,
-                                       jsonObject: JSONObject, requestType: Class<*>,
-                                       responseType: Class<M>, persist: Boolean, cache: Boolean,
-                                       queuable: Boolean): Flowable<M> {
-        return mDataBaseManager.put(jsonObject, idColumnName, itemIdType, requestType)
+    override fun <M> dynamicPostObject(url: String, idColumnName: String, jsonObject: JSONObject,
+                                       requestType: Class<*>, responseType: Class<M>, persist: Boolean,
+                                       cache: Boolean): Single<M> {
+        return mDataBaseManager.put(jsonObject, requestType)
                 .doOnSuccess {
-                    if (withCache(cache)) {
+                    onNext(cache) {
                         mMemoryStore?.cacheObject(idColumnName,
                                 JSONObject(gson.toJson(jsonObject)), requestType)
                     }
                 }
                 .map { it as M }
-                .toFlowable()
     }
 
     /**
-     * Post a HashMap<String></String>, Object> which returns an [Flowable] that will emit a list of
+     * Post a HashMap<String></String>, Object> which returns an [Single] that will emit a list of
      * Object.
      */
-    override fun <M> dynamicPostList(url: String, idColumnName: String, itemIdType: Class<*>,
+    override fun <M> dynamicPostList(url: String, idColumnName: String,
                                      jsonArray: JSONArray, requestType: Class<*>, responseType: Class<M>,
-                                     persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, itemIdType, requestType)
+                                     persist: Boolean, cache: Boolean): Single<M> {
+        return mDataBaseManager.putAll(jsonArray, requestType)
                 .doOnSuccess {
-                    if (withCache(cache)) {
+                    onNext(cache) {
                         mMemoryStore?.cacheList(idColumnName, jsonArray, requestType)
                     }
                 }
                 .map { it as M }
-                .toFlowable()
     }
 
     /**
-     * Put a HashMap<String></String>, Object> disk with a RealmQuery which returns an [Flowable] that
+     * Put a HashMap<String></String>, Object> disk with a RealmQuery which returns an [Single] that
      * will emit a Object.
      */
-    override fun <M> dynamicPutObject(url: String, idColumnName: String, itemIdType: Class<*>,
+    override fun <M> dynamicPutObject(url: String, idColumnName: String,
                                       jsonObject: JSONObject, requestType: Class<*>, responseType: Class<M>,
-                                      persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
-        return mDataBaseManager.put(jsonObject, idColumnName, itemIdType, requestType)
+                                      persist: Boolean, cache: Boolean): Single<M> {
+        return mDataBaseManager.put(jsonObject, requestType)
                 .doOnSuccess {
-                    if (withCache(cache)) {
+                    onNext(cache) {
                         mMemoryStore?.cacheObject(idColumnName,
                                 JSONObject(gson.toJson(jsonObject)), requestType)
                     }
                 }
                 .map { it as M }
-                .toFlowable()
     }
 
     /**
-     * Put a HashMap<String></String>, Object> disk with a RealmQuery which returns an [Flowable] that
+     * Put a HashMap<String></String>, Object> disk with a RealmQuery which returns an [Single] that
      * will emit a list of Object.
      */
-    override fun <M> dynamicPutList(url: String, idColumnName: String, itemIdType: Class<*>,
+    override fun <M> dynamicPutList(url: String, idColumnName: String,
                                     jsonArray: JSONArray, requestType: Class<*>, responseType: Class<M>,
-                                    persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
-        return mDataBaseManager.putAll(jsonArray, idColumnName, itemIdType, requestType)
+                                    persist: Boolean, cache: Boolean): Single<M> {
+        return mDataBaseManager.putAll(jsonArray, requestType)
                 .doOnSuccess {
-                    if (withCache(cache)) {
+                    onNext(cache) {
                         mMemoryStore?.cacheList(idColumnName, jsonArray, requestType)
                     }
                 }
                 .map { it as M }
-                .toFlowable()
     }
 
     /**
-     * Delete a HashMap<String></String>, Object> from cloud which returns an [Flowable] that will emit
+     * Delete a HashMap<String></String>, Object> from cloud which returns an [Single] that will emit
      * a Object.
      */
-    override fun <M> dynamicDeleteCollection(url: String, idColumnName: String, itemIdType: Class<*>,
-                                             jsonArray: JSONArray, requestType: Class<*>, responseType: Class<M>,
-                                             persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
+    override fun <M> dynamicDeleteCollection(url: String,
+                                             idColumnName: String,
+                                             itemIdType: Class<*>,
+                                             jsonArray: JSONArray,
+                                             requestType: Class<*>,
+                                             responseType: Class<M>,
+                                             persist: Boolean,
+                                             cache: Boolean): Single<M> {
+        throw NotImplementedError("Not Implemented Yet")
+//        val stringIds = convertToStringListOfId(jsonArray)
+//        return mDataBaseManager.evictCollection(idColumnName, convertToListOfId(jsonArray, itemIdType),
+//                itemIdType, requestType)
+//                .doOnSuccess {
+//                    onNext(cache) {
+//                        mMemoryStore?.deleteListById(stringIds, requestType)
+//                    }
+//                }
+//                .map { it as M }
+//                .toSingle()
+    }
+
+    override fun <M> dynamicDeleteCollectionById(url: String,
+                                                 idColumnName: String,
+                                                 itemIdType: Class<*>,
+                                                 jsonArray: JSONArray,
+                                                 requestType: Class<*>,
+                                                 responseType: Class<M>,
+                                                 persist: Boolean,
+                                                 cache: Boolean): Single<M> {
         val stringIds = convertToStringListOfId(jsonArray)
-        return mDataBaseManager.evictCollection(idColumnName, convertToListOfId(jsonArray, itemIdType),
-                itemIdType, requestType)
+        return mDataBaseManager.evictCollectionById(stringIds, requestType, idColumnName)
                 .doOnSuccess {
-                    if (withCache(cache)) {
-                        mMemoryStore?.deleteList(stringIds, requestType)
+                    onNext(cache) {
+                        mMemoryStore?.deleteListById(stringIds.map { toString() }, requestType)
                     }
                 }
                 .map { it as M }
-                .toFlowable()
     }
 
-    override fun <M : RealmModel> queryDisk(queryFactory: RealmQueryProvider<M>): Flowable<List<M>> {
-        return mDataBaseManager.getQuery(queryFactory)
+    override fun <M> queryDisk(query: String, clazz: Class<M>): Flowable<M> {
+        return mDataBaseManager.getQuery(query, clazz)
     }
 
     override fun dynamicDeleteAll(requestType: Class<*>): Single<Boolean> {
-        return mDataBaseManager.evictAll(requestType)
+        return mDataBaseManager.evictAll(requestType).map { it as Boolean }
     }
 
-    override fun dynamicDownloadFile(url: String, file: File, onWifi: Boolean, whileCharging: Boolean,
-                                     queuable: Boolean): Flowable<File> {
-        return Flowable.error<File>(IllegalStateException(IO_DB_ERROR))
+    override fun dynamicDownloadFile(url: String, file: File): Single<File> {
+        return Single.error<File>(IllegalStateException(IO_DB_ERROR))
     }
 
     override fun <M> dynamicUploadFile(url: String, keyFileMap: HashMap<String, File>,
-                                       parameters: HashMap<String, Any>, onWifi: Boolean,
-                                       whileCharging: Boolean, queuable: Boolean, responseType: Class<M>): Flowable<M> {
-        return Flowable.error(IllegalStateException(IO_DB_ERROR))
+                                       parameters: HashMap<String, Any>, responseType: Class<M>): Single<M> {
+        return Single.error(IllegalStateException(IO_DB_ERROR))
     }
 
     companion object {

@@ -26,7 +26,7 @@ class GetRequestTest {
         mGetRequest = GetRequest.Builder(DATA_CLASS, TO_PERSIST)
                 .fullUrl(URL)
                 .cache(ID_COLUMN_NAME)
-                .id(ID, ID_COLUMN_NAME, Long::class.javaPrimitiveType!!)
+                .id(ID, ID_COLUMN_NAME)
                 .build()
     }
 

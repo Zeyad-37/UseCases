@@ -15,9 +15,6 @@ import java.io.File
 @RunWith(JUnit4::class)
 class FileIORequestTest {
 
-    private val ON_WIFI = false
-    private val QUEUABLE = false
-    private val WHILE_CHARGING = false
     private val URL = "www.google.com"
     private val FILE = Mockito.mock(File::class.java)
     private val DATA_CLASS = TestRealmModel::class.java
@@ -42,22 +39,7 @@ class FileIORequestTest {
     }
 
     @Test
-    fun testIsPersist() {
-        assertThat(mFileIORequest!!.queuable, `is`(equalTo(QUEUABLE)))
-    }
-
-    @Test
     fun testGetFile() {
         assertThat<File>(mFileIORequest!!.file, `is`(equalTo(FILE)))
-    }
-
-    @Test
-    fun testOnWifi() {
-        assertThat(mFileIORequest!!.onWifi, `is`(equalTo(ON_WIFI)))
-    }
-
-    @Test
-    fun testWhileChargingGetFile() {
-        assertThat(mFileIORequest!!.whileCharging, `is`(equalTo(WHILE_CHARGING)))
     }
 }

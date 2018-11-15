@@ -4,7 +4,6 @@ import android.util.Log
 import com.zeyad.usecases.*
 import com.zeyad.usecases.Config.gson
 import com.zeyad.usecases.db.DataBaseManager
-import com.zeyad.usecases.db.RealmQueryProvider
 import com.zeyad.usecases.exceptions.NetworkConnectionException
 import com.zeyad.usecases.mapper.DAOMapper
 import com.zeyad.usecases.network.ApiConnection
@@ -12,7 +11,6 @@ import io.reactivex.Flowable
 import io.reactivex.Single
 import io.reactivex.SingleObserver
 import io.reactivex.disposables.Disposable
-import io.realm.RealmModel
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -22,7 +20,7 @@ import java.io.*
 import java.util.*
 
 @Mockable
-class CloudStore(private val mApiConnection: ApiConnection, //    private static final int COUNTER_START = 1, ATTEMPTS = 3;
+class CloudStore(private val mApiConnection: ApiConnection,
                  private val mDataBaseManager: DataBaseManager?,
                  private val mEntityDataMapper: DAOMapper,
                  private val mMemoryStore: MemoryStore?) : DataStore {
@@ -30,132 +28,149 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
         Config.cloudStore = this
     }
 
-    private fun <M> getErrorFlowableNotPersisted(): Flowable<M> {
-        return Flowable.error(NetworkConnectionException("Could not reach server and could not persist to queue!"))
+    private fun <M> getErrorSingleNotPersisted(): Single<M> {
+        return Single.error(NetworkConnectionException("Could not reach server and could not persist to queue!"))
+    }
+
+    private inline fun <M> persistErrorExecute(disk: () -> Unit, network: () -> Single<M>): Single<M> {
+        disk.invoke()
+        return if (isNetworkNotAvailable(Config.context)) {
+            getErrorSingleNotPersisted()
+        } else network.invoke()
     }
 
     override fun <M> dynamicGetList(url: String, idColumnName: String,
                                     requestType: Class<M>, persist: Boolean,
                                     shouldCache: Boolean): Flowable<List<M>> {
         return mApiConnection.dynamicGetList<M>(url, shouldCache)
-                .map { entities: List<M> -> mEntityDataMapper.mapAllTo<List<M>>(entities, requestType) }
-                .doOnNext { list: List<M> ->
-                    if (withDisk(persist)) {
-                        saveAllToDisk(list, requestType)
-                    }
-                    if (withCache(shouldCache)) {
-                        saveAllToMemory(idColumnName, JSONArray(gson.toJson(list)), requestType)
-                    }
-                }
+                .map { mEntityDataMapper.mapAllTo<List<M>>(it, requestType) }
+                .doOnNext { saveAllLocally(idColumnName, it, requestType, persist, shouldCache) }
     }
 
-    override fun <M> dynamicGetObject(url: String, idColumnName: String, itemId: Any, itemIdType: Class<*>,
+    override fun <M> dynamicGetObject(url: String, idColumnName: String, itemId: Any,
                                       requestType: Class<M>, persist: Boolean, shouldCache: Boolean): Flowable<M> {
         return mApiConnection.dynamicGetObject<M>(url, shouldCache)
-                .doOnNext { m: M ->
-                    saveLocally(idColumnName, itemIdType,
-                            JSONObject(gson.toJson(m)), requestType, persist, shouldCache)
+                .doOnNext {
+                    saveLocally(idColumnName, JSONObject(gson.toJson(it)), requestType, persist, shouldCache)
                 }
-                .map { entity: M -> mEntityDataMapper.mapTo<M>(entity, requestType) }
+                .map { mEntityDataMapper.mapTo<M>(it, requestType) }
     }
 
-    override fun <M : RealmModel> queryDisk(queryFactory: RealmQueryProvider<M>): Flowable<List<M>> {
+    override fun <M> queryDisk(query: String, clazz: Class<M>): Flowable<M> {
         return Flowable.error(IllegalAccessException("Can not search disk in cloud data store!"))
     }
 
-    override fun <M> dynamicPatchObject(url: String, idColumnName: String, itemIdType: Class<*>,
+    override fun <M> dynamicPatchObject(url: String, idColumnName: String,
                                         jsonObject: JSONObject, requestType: Class<*>, responseType: Class<M>,
-                                        persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
-        return Flowable.defer {
-            saveLocally(idColumnName, itemIdType, jsonObject, requestType, persist, cache)
-            if (!isNetworkAvailable(Config.context)) {
-                getErrorFlowableNotPersisted<M>()
-            } else
+                                        persist: Boolean, cache: Boolean): Single<M> {
+        return Single.defer {
+            persistErrorExecute({
+                saveLocally(idColumnName, jsonObject, requestType, persist, cache)
+            }, {
                 mApiConnection.dynamicPatch<M>(url,
                         RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonObject.toString()))
-                        .map { `object`: M -> daoMapHelper(responseType, `object`) }
+                        .map { daoMapHelper(responseType, it) }
+            })
         }
     }
 
-    override fun <M> dynamicPostObject(url: String, idColumnName: String, itemIdType: Class<*>,
+    override fun <M> dynamicPostObject(url: String, idColumnName: String,
                                        jsonObject: JSONObject, requestType: Class<*>, responseType: Class<M>,
-                                       persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
-        return Flowable.defer {
-            saveLocally(idColumnName, itemIdType, jsonObject, requestType, persist, cache)
-            if (!isNetworkAvailable(Config.context)) {
-                getErrorFlowableNotPersisted<M>()
-            } else
+                                       persist: Boolean, cache: Boolean): Single<M> {
+        return Single.defer {
+            persistErrorExecute({
+                saveLocally(idColumnName, jsonObject, requestType, persist, cache)
+            }, {
                 mApiConnection.dynamicPost<M>(url,
                         RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonObject.toString()))
-                        .map { `object`: M -> daoMapHelper(responseType, `object`) }
+                        .map { daoMapHelper(responseType, it) }
+            })
         }
     }
 
-    override fun <M> dynamicPostList(url: String, idColumnName: String, itemIdType: Class<*>,
+    override fun <M> dynamicPostList(url: String, idColumnName: String,
                                      jsonArray: JSONArray, requestType: Class<*>, responseType: Class<M>,
-                                     persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
-        return Flowable.defer {
-            saveAllLocally(idColumnName, itemIdType, jsonArray, requestType, persist, cache)
-            if (!isNetworkAvailable(Config.context)) {
-                getErrorFlowableNotPersisted<M>()
-            } else
+                                     persist: Boolean, cache: Boolean): Single<M> {
+        return Single.defer {
+            persistErrorExecute({
+                saveAllLocally(idColumnName, jsonArray, requestType, persist, cache)
+            }, {
                 mApiConnection.dynamicPost<M>(url,
                         RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
-                        .map { `object`: M -> daoMapHelper(responseType, `object`) }
+                        .map { daoMapHelper(responseType, it) }
+            })
         }
     }
 
-    override fun <M> dynamicPutObject(url: String, idColumnName: String, itemIdType: Class<*>,
+    override fun <M> dynamicPutObject(url: String, idColumnName: String,
                                       jsonObject: JSONObject, requestType: Class<*>, responseType: Class<M>,
-                                      persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
-        return Flowable.defer {
-            saveLocally(idColumnName, itemIdType, jsonObject, requestType, persist, cache)
-            if (!isNetworkAvailable(Config.context)) {
-                getErrorFlowableNotPersisted<M>()
-            } else
+                                      persist: Boolean, cache: Boolean): Single<M> {
+        return Single.defer {
+            persistErrorExecute({
+                saveLocally(idColumnName, jsonObject, requestType, persist, cache)
+            }, {
                 mApiConnection.dynamicPut<M>(url,
                         RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonObject.toString()))
-                        .map { `object` -> daoMapHelper(responseType, `object`) }
+                        .map { daoMapHelper(responseType, it) }
+            })
         }
     }
 
-    override fun <M> dynamicPutList(url: String, idColumnName: String, itemIdType: Class<*>,
+    override fun <M> dynamicPutList(url: String, idColumnName: String,
                                     jsonArray: JSONArray, requestType: Class<*>, responseType: Class<M>,
-                                    persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
-        return Flowable.defer {
-            saveAllLocally(idColumnName, itemIdType, jsonArray, requestType, persist, cache)
-            if (!isNetworkAvailable(Config.context)) {
-                getErrorFlowableNotPersisted<M>()
-            } else
+                                    persist: Boolean, cache: Boolean): Single<M> {
+        return Single.defer {
+            persistErrorExecute({
+                saveAllLocally(idColumnName, jsonArray, requestType, persist, cache)
+            }, {
                 mApiConnection.dynamicPut<M>(url,
                         RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
-                        .map { `object` -> daoMapHelper(responseType, `object`) }
+                        .map { daoMapHelper(responseType, it) }
+            })
         }
     }
 
+    // TODO("Finish and Fix")
     override fun <M> dynamicDeleteCollection(url: String, idColumnName: String, itemIdType: Class<*>,
                                              jsonArray: JSONArray, requestType: Class<*>, responseType: Class<M>,
-                                             persist: Boolean, cache: Boolean, queuable: Boolean): Flowable<M> {
-        return Flowable.defer {
-            deleteLocally(convertToListOfId(jsonArray, itemIdType), idColumnName, itemIdType,
-                    requestType, persist, cache)
-            if (!isNetworkAvailable(Config.context)) {
-                getErrorFlowableNotPersisted<M>()
-            } else
-                mApiConnection.dynamicDelete<M>(url)
-                        .map { `object`: M -> daoMapHelper(responseType, `object`) }
+                                             persist: Boolean, cache: Boolean): Single<M> {
+        return Single.defer {
+            persistErrorExecute({
+                val list = mutableListOf<Any>()
+                for (i in 0..(jsonArray.length() - 1)) {
+                    list.add(gson.fromJson(jsonArray.getJSONObject(i).toString(), requestType))
+                }
+                deleteLocally(list, idColumnName, requestType, persist, cache)
+            }, {
+                mApiConnection.dynamicDelete<M>(url,
+                        RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
+                        .map { daoMapHelper(responseType, it) }
+            })
         }
     }
+
+    override fun <M> dynamicDeleteCollectionById(url: String, idColumnName: String, itemIdType: Class<*>, jsonArray: JSONArray, requestType: Class<*>, responseType: Class<M>, persist: Boolean, cache: Boolean): Single<M> {
+        return Single.defer {
+            persistErrorExecute({
+                deleteLocallyById(convertToListOfId(jsonArray, itemIdType), idColumnName, requestType,
+                        persist, cache)
+            }, {
+                mApiConnection.dynamicDelete<M>(url,
+                        RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
+                        .map { daoMapHelper(responseType, it) }
+            })
+        }
+    }
+
 
     override fun dynamicDeleteAll(requestType: Class<*>): Single<Boolean> {
         return Single.error(IllegalStateException("Can not delete all from cloud data store!"))
     }
 
-    override fun dynamicDownloadFile(url: String, file: File, onWifi: Boolean,
-                                     whileCharging: Boolean, queuable: Boolean): Flowable<File> {
-        return Flowable.defer {
-            if (!isNetworkAvailable(Config.context)) {
-                getErrorFlowableNotPersisted<File>()
+    override fun dynamicDownloadFile(url: String, file: File): Single<File> {
+        return Single.defer {
+            if (isNetworkNotAvailable(Config.context)) {
+                getErrorSingleNotPersisted<File>()
             } else mApiConnection.dynamicDownload(url)
                     .map { responseBody ->
                         try {
@@ -192,9 +207,8 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
     }
 
     override fun <M> dynamicUploadFile(url: String, keyFileMap: HashMap<String, File>,
-                                       parameters: HashMap<String, Any>, onWifi: Boolean, whileCharging: Boolean,
-                                       queuable: Boolean, responseType: Class<M>): Flowable<M> {
-        return Flowable.defer {
+                                       parameters: HashMap<String, Any>, responseType: Class<M>): Single<M> {
+        return Single.defer {
             val multiPartBodyParts = ArrayList<MultipartBody.Part>()
             keyFileMap.toMap().forEach { entry ->
                 multiPartBodyParts.add(MultipartBody.Part.createFormData(entry.key,
@@ -206,60 +220,88 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                 map[key] = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA),
                         value.toString())
             }
-            if (!isNetworkAvailable(Config.context)) {
-                getErrorFlowableNotPersisted<M>()
+            if (isNetworkNotAvailable(Config.context)) {
+                getErrorSingleNotPersisted<M>()
             } else mApiConnection.dynamicUpload<M>(url, map, multiPartBodyParts)
-                    .map { `object` -> daoMapHelper(responseType, `object`) }
+                    .map { daoMapHelper(responseType, it) }
         }
     }
 
-    private fun <M> daoMapHelper(requestType: Class<*>, `object`: M): M? {
-        return if (`object` is List<*>)
-            mEntityDataMapper.mapAllTo(`object` as List<*>, requestType)
+    private fun <M> daoMapHelper(requestType: Class<*>, model: M): M? {
+        return if (model is List<*>)
+            mEntityDataMapper.mapAllTo(model as List<*>, requestType)
         else
-            mEntityDataMapper.mapTo(`object`, requestType)
+            mEntityDataMapper.mapTo(model, requestType)
     }
 
-    private fun saveAllToDisk(collection: List<*>, requestType: Class<*>) {
-        mDataBaseManager?.putAll(collection as List<RealmModel>, requestType)
+    private fun <M> saveAllToDisk(collection: List<M>, requestType: Class<M>) {
+        mDataBaseManager?.putAll(collection, requestType)
                 ?.subscribeOn(Config.backgroundThread)
-                ?.subscribe(SimpleSubscriber(requestType))
+                ?.subscribe(SimpleSingleObserver())
     }
 
     private fun saveAllToMemory(idColumnName: String, jsonArray: JSONArray, requestType: Class<*>) {
         mMemoryStore?.cacheList(idColumnName, jsonArray, requestType)
     }
 
-    private fun saveLocally(idColumnName: String, itemIdType: Class<*>, jsonObject: JSONObject,
+    private fun <M> saveAllLocally(idColumnName: String, collection: List<M>,
+                                   requestType: Class<M>, persist: Boolean, cache: Boolean) {
+        if (withDisk(persist)) {
+            saveAllToDisk(collection, requestType)
+        }
+        if (withCache(cache)) {
+            saveAllToMemory(idColumnName, JSONArray(gson.toJson(collection)), requestType)
+        }
+    }
+
+    private fun saveLocally(idColumnName: String, jsonObject: JSONObject,
                             requestType: Class<*>, persist: Boolean, cache: Boolean) {
         if (withDisk(persist)) {
-            mDataBaseManager?.put(jsonObject, idColumnName, itemIdType, requestType)
+            mDataBaseManager?.put(jsonObject, requestType)
                     ?.subscribeOn(Config.backgroundThread)
-                    ?.subscribe(SimpleSubscriber(requestType))
+                    ?.subscribe(SimpleSingleObserver())
         }
         if (withCache(cache)) {
             mMemoryStore?.cacheObject(idColumnName, jsonObject, requestType)
         }
     }
 
-    private fun saveAllLocally(idColumnName: String, itemIdType: Class<*>, jsonArray: JSONArray,
-                               requestType: Class<*>, persist: Boolean, cache: Boolean) {
+    private fun saveAllLocally(idColumnName: String, jsonArray: JSONArray, requestType: Class<*>,
+                               persist: Boolean, cache: Boolean) {
         if (withDisk(persist)) {
-            mDataBaseManager?.putAll(jsonArray, idColumnName, itemIdType, requestType)
+            mDataBaseManager?.putAll(jsonArray, requestType)
                     ?.subscribeOn(Config.backgroundThread)
-                    ?.subscribe(SimpleSubscriber(requestType))
+                    ?.subscribe(SimpleSingleObserver())
         }
         if (withCache(cache)) {
             mMemoryStore?.cacheList(idColumnName, jsonArray, requestType)
         }
     }
 
-    private fun deleteLocally(ids: List<Any>, idColumnName: String, itemIdType: Class<*>, requestType: Class<*>,
+    private fun deleteLocally(list: List<Any>, idColumnName: String, requestType: Class<*>,
                               persist: Boolean, cache: Boolean) {
+        if (withDisk(persist)) {
+            val collectionSize = list.size
+            for (i in 0 until collectionSize) {
+//                mDataBaseManager?.evictCollection(list, requestType)
+            }
+        }
+        if (withCache(cache)) {
+            val stringIds = Flowable.fromIterable(list)
+                    .map { JSONObject(gson.toJson(it)).opt(idColumnName) }
+                    .map { it.toString() }
+                    .toList(list.size)
+                    .blockingGet()
+            mMemoryStore?.deleteListById(stringIds, requestType)
+        }
+    }
+
+    private fun deleteLocallyById(ids: List<Any>, idColumnName: String, requestType: Class<*>,
+                                  persist: Boolean, cache: Boolean) {
         if (withDisk(persist)) {
             val collectionSize = ids.size
             for (i in 0 until collectionSize) {
-                mDataBaseManager?.evictById(requestType, idColumnName, ids[i], itemIdType)
+                mDataBaseManager?.evictById(requestType, idColumnName, ids[i])
             }
         }
         if (withCache(cache)) {
@@ -267,17 +309,16 @@ class CloudStore(private val mApiConnection: ApiConnection, //    private static
                     .map { it.toString() }
                     .toList(ids.size)
                     .blockingGet()
-            mMemoryStore?.deleteList(stringIds, requestType)
+            mMemoryStore?.deleteListById(stringIds, requestType)
         }
     }
 
-    private class SimpleSubscriber internal constructor(private val mClass: Class<*>) : SingleObserver<Any> {
+    private class SimpleSingleObserver : SingleObserver<Any> {
+        private var subscription: Disposable? = null
+
         override fun onSuccess(t: Any) {
             subscription!!.dispose()
-            Log.d(TAG, mClass.simpleName + " persisted!")
         }
-
-        private var subscription: Disposable? = null
 
         override fun onSubscribe(d: Disposable) {
             subscription = d

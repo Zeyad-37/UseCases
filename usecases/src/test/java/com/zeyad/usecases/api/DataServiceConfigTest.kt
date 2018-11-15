@@ -1,9 +1,10 @@
 package com.zeyad.usecases.api
 
 import android.content.Context
-import android.os.HandlerThread
 import android.support.test.rule.BuildConfig
+import com.zeyad.usecases.db.DataBaseManager
 import com.zeyad.usecases.mapper.DAOMapper
+import com.zeyad.usecases.utils.DataBaseManagerUtil
 import io.reactivex.Scheduler
 import io.reactivex.schedulers.Schedulers
 import okhttp3.Cache
@@ -14,8 +15,8 @@ import org.hamcrest.Matchers.equalTo
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -36,7 +37,7 @@ class DataServiceConfigTest {
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        mockContext = mock(Context::class.java)
+        mockContext = RuntimeEnvironment.application // mock(Context::class.java)
         builder = OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(15, TimeUnit.SECONDS)
@@ -46,9 +47,13 @@ class DataServiceConfigTest {
                 .baseUrl(URL)
                 .cacheSize(cacheSize)
                 .okHttpBuilder(builder)
-                .okhttpCache(cache)
+                .okHttpCache(cache)
                 .withCache(3, TimeUnit.MINUTES)
-                .withRealm()
+                .withSQLite(object : DataBaseManagerUtil {
+                    override fun getDataBaseManager(dataClass: Class<*>): DataBaseManager? {
+                        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                    }
+                })
                 .build()
     }
 
@@ -117,12 +122,5 @@ class DataServiceConfigTest {
     @Throws(Exception::class)
     fun getTimeUnit() {
         assertThat(mDataServiceConfig.timeUnit, `is`(equalTo(TimeUnit.MINUTES)))
-    }
-
-    @Test
-    @Throws(Exception::class)
-    fun getHandlerThread() {
-        assertThat(
-                mDataServiceConfig.handlerThread.javaClass, `is`(equalTo(HandlerThread::class.java)))
     }
 }

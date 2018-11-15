@@ -15,9 +15,6 @@ class PostRequest private constructor(val fullUrl: String = "",
                                       val requestType: Class<*> = Any::class.java,
                                       private val responseType: Class<*> = Any::class.java,
                                       val persist: Boolean = false,
-                                      val onWifi: Boolean = false,
-                                      val whileCharging: Boolean = false,
-                                      val queuable: Boolean = false,
                                       val cache: Boolean = false,
                                       val idColumnName: String,
                                       val idType: Class<*> = Any::class.java,
@@ -41,9 +38,6 @@ class PostRequest private constructor(val fullUrl: String = "",
             builder.requestType,
             builder.responseType,
             builder.persist,
-            builder.onWifi,
-            builder.whileCharging,
-            builder.queuable,
             builder.cache,
             builder.idColumnName,
             builder.idType,
@@ -51,15 +45,12 @@ class PostRequest private constructor(val fullUrl: String = "",
             builder.keyValuePairs,
             builder.jsonArray,
             builder.jsonObject,
-            builder.`object`)
+            builder.any)
 
     constructor(parcel: Parcel) : this(
             parcel.readString(),
             Any::class.java,
             Any::class.java,
-            parcel.readByte() != 0.toByte(),
-            parcel.readByte() != 0.toByte(),
-            parcel.readByte() != 0.toByte(),
             parcel.readByte() != 0.toByte(),
             parcel.readByte() != 0.toByte(),
             parcel.readString(),
@@ -134,9 +125,6 @@ class PostRequest private constructor(val fullUrl: String = "",
     override fun writeToParcel(parcel: Parcel, flags: Int) {
         parcel.writeString(fullUrl)
         parcel.writeByte(if (persist) 1 else 0)
-        parcel.writeByte(if (onWifi) 1 else 0)
-        parcel.writeByte(if (whileCharging) 1 else 0)
-        parcel.writeByte(if (queuable) 1 else 0)
         parcel.writeByte(if (cache) 1 else 0)
         parcel.writeString(idColumnName)
         parcel.writeString(method)
@@ -157,7 +145,7 @@ class PostRequest private constructor(val fullUrl: String = "",
     }
 
     class Builder(internal var requestType: Class<*>, internal var persist: Boolean) {
-        internal var `object`: Any? = null
+        internal var any: Any? = null
         internal var jsonArray: JSONArray? = null
         internal var jsonObject: JSONObject? = null
         internal var keyValuePairs: HashMap<String, Any>? = null
@@ -186,13 +174,6 @@ class PostRequest private constructor(val fullUrl: String = "",
             return this
         }
 
-        fun queuable(onWifi: Boolean, whileCharging: Boolean): Builder {
-            queuable = true
-            this.onWifi = onWifi
-            this.whileCharging = whileCharging
-            return this
-        }
-
         fun cache(): Builder {
             cache = true
             return this
@@ -204,8 +185,8 @@ class PostRequest private constructor(val fullUrl: String = "",
             return this
         }
 
-        fun payLoad(`object`: Any): Builder {
-            this.`object` = `object`
+        fun payLoad(any: Any): Builder {
+            this.any = any
             return this
         }
 
