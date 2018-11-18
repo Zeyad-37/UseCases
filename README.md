@@ -2,7 +2,8 @@
 [![](https://www.jitpack.io/v/zeyad-37/usecases.svg)](https://www.jitpack.io/#zeyad-37/usecases)
 # UseCases
 
-Is a library that is a generic implementation of the Data layer in Uncle Bob's clean architecture.
+Is a library that is a generic implementation of the Repository pattern applied in the Data layer
+ in Uncle Bob's clean architecture.
 Now in Kotlin
 
 # Motivation
@@ -10,7 +11,7 @@ Now in Kotlin
 As developers, we always need to deliver high quality software on time,
  which is not an easy task.
 In most tasks, we need to make either a IO operation, whether from the server,
- db or file, which is a lot of boiler plate. And getting it functioning and effiecient every time
+ db or file, which is a lot of boiler plate. And getting it functioning and efficient every time
  is a bit challenging due to the many things that you need to take care of. 
  Like separation of concerns, error handling and writing robust code that 
  would not crash on you.
@@ -21,26 +22,26 @@ In most tasks, we need to make either a IO operation, whether from the server,
 
 # Requirements
 
-UseCases Library can be included in any Android application that supports Android 2.3 (Gingerbread) and later. 
+UseCases Library can be included in any Android application that supports Android 4.2 (Gingerbread) and later. 
 
 # Installation
 
 Easiest way to start
 ```
-// Create Class LibraryModule to expose your realm models to the lib configuration
+// Create Class Dao to expose your models to the lib configuration
+// Standard Room init
+@Dao
+interface UserDao : BaseDao<User>
 
-@RealmModule(library = true, allClasses = true)
-internal class LibraryModule
-```
-```
-// This should be in the application class
-Realm.init(this)
-Realm.setDefaultConfiguration(RealmConfiguration.Builder()
-        .name("app.realm")
-        .modules(Realm.getDefaultModule(), LibraryModule())
-        .rxFactory(RealmObservableFactory())
-        .deleteRealmIfMigrationNeeded()
-        .build())
+@Dao
+interface RepoDao : BaseDao<Repository>
+
+@Database(entities = [User::class, Repository::class], version = 1)
+abstract class AppDatabase : RoomDatabase() {
+
+    abstract fun userDao(): UserDao
+    abstract fun repoDao(): RepoDao
+}
 
 // Fastest start
 DataServiceFactory(DataServiceConfig.Builder(context).build()).instance!!// all extra features are disabled
@@ -49,10 +50,20 @@ DataServiceFactory(DataServiceConfig.Builder(context).build()).instance!!// all 
 DataServiceFactory(DataServiceConfig.Builder(context)
             .baseUrl(API_BASE_URL)
             .okHttpBuilder(getOkHttpBuilder())
-            .withRealm() // if you want a DB
-            .withRealm(HandlerThread("BackgroundHandlerThread")) // If you want to supply your own Handler thread
-            .withCache(3, TimeUnit.MINUTES) // adds a cache layer above the server & DB if exists
-            .cacheSize(8192)  // maximum size to allocate in bytes
+            .withRoom(object : DataBaseManagerUtil {
+                                      override fun getDataBaseManager(dataClass: Class<*>): DataBaseManager? {
+                                          return RoomManager(db, object : DaoResolver {
+                                              override fun <E> getDao(dataClass: Class<E>): BaseDao<E> {
+                                                  return when (dataClass) {
+                                                      User::class.java -> db.userDao() as BaseDao<E>
+                                                      Repository::class.java -> db.repoDao() as BaseDao<E>
+                                                      else -> throw IllegalArgumentException("")
+                                                  }
+                                              }
+                                          })
+                                      }
+                                  })
+            .withCache(3, TimeUnit.MINUTES, 8192) // adds a cache layer with maximum size to allocate in bytes
             .okHttpBuilder(provideOkHttpClientBuilder()) 
             .okhttpCache(provideCache()) // you can also provide a cache for okHttp
             .postExecutionThread(AndroidScheduler.mainThread()) // your implementation of the post execution thread
