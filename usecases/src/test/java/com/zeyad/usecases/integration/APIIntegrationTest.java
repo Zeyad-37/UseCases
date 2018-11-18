@@ -253,64 +253,64 @@ public class APIIntegrationTest {
                 .assertComplete();
     }
 
-    @Test
-    public void testDeleteItemById() {
-        String path = "deleteObject/user";
-        RESTMockServer.whenDELETE(pathContains(path))
-                .thenReturn(new MockResponse()
-                        .setResponseCode(HttpURLConnection.HTTP_OK)
-                        .setBody(SUCCESS));
-
-        TestObserver<Success> testSubscriber = new TestObserver<>();
-        dataService.<Success>deleteItemById(new PostRequest.Builder(User.class, false)
-                .url(path)
-                .payLoad("{\"id\": \"Zeyad-37\"}")
-                .idColumnName(User.LOGIN, String.class)
-                .responseType(Success.class)
-                .build())
-                .subscribe(testSubscriber);
-
-        testSubscriber.awaitTerminalEvent();
-
-        RequestsVerifier.verifyDELETE(pathContains(path)).invoked();
-
-        testSubscriber.assertSubscribed()
-                .assertNoErrors()
-                .assertValueCount(1)
-                .assertValue(success)
-                .assertComplete();
-    }
-
-    @Test
-    public void testDeleteCollectionByIds() {
-        String path = "deleteListById/user";
-        RESTMockServer.whenDELETE(pathContains(path))
-                .thenReturn(new MockResponse()
-                        .setResponseCode(HttpURLConnection.HTTP_OK)
-                        .setBody(SUCCESS));
-        List<String> payload = new ArrayList<>(2);
-        payload.add("Zeyad-37");
-        payload.add("Zeyad-37");
-        TestObserver<Success> testSubscriber = new TestObserver<>();
-        dataService.<Success>deleteCollectionByIds(new PostRequest.Builder(User.class, false)
-                .url(path)
-//                .payLoad(Arrays.array("Zeyad-37", "Zeyad-37"))
-                .payLoad(payload)
-                .idColumnName(User.LOGIN, String.class)
-                .responseType(Success.class)
-                .build())
-                .subscribe(testSubscriber);
-
-        testSubscriber.awaitTerminalEvent();
-
-        RequestsVerifier.verifyDELETE(pathContains(path)).invoked();
-
-        testSubscriber.assertSubscribed()
-                .assertNoErrors()
-                .assertValueCount(1)
-                .assertValue(success)
-                .assertComplete();
-    }
+//    @Test
+//    public void testDeleteItemById() {
+//        String path = "deleteObject/user";
+//        RESTMockServer.whenDELETE(pathContains(path))
+//                .thenReturn(new MockResponse()
+//                        .setResponseCode(HttpURLConnection.HTTP_OK)
+//                        .setBody(SUCCESS));
+//
+//        TestObserver<Success> testSubscriber = new TestObserver<>();
+//        dataService.<Success>deleteItemById(new PostRequest.Builder(User.class, false)
+//                .url(path)
+//                .payLoad("{\"id\": \"Zeyad-37\"}")
+//                .idColumnName(User.LOGIN, String.class)
+//                .responseType(Success.class)
+//                .build())
+//                .subscribe(testSubscriber);
+//
+//        testSubscriber.awaitTerminalEvent();
+//
+//        RequestsVerifier.verifyDELETE(pathContains(path)).invoked();
+//
+//        testSubscriber.assertSubscribed()
+//                .assertNoErrors()
+//                .assertValueCount(1)
+//                .assertValue(success)
+//                .assertComplete();
+//    }
+//
+//    @Test
+//    public void testDeleteCollectionByIds() {
+//        String path = "deleteListById/user";
+//        RESTMockServer.whenDELETE(pathContains(path))
+//                .thenReturn(new MockResponse()
+//                        .setResponseCode(HttpURLConnection.HTTP_OK)
+//                        .setBody(SUCCESS));
+//        List<String> payload = new ArrayList<>(2);
+//        payload.add("Zeyad-37");
+//        payload.add("Zeyad-37");
+//        TestObserver<Success> testSubscriber = new TestObserver<>();
+//        dataService.<Success>deleteCollectionByIds(new PostRequest.Builder(User.class, false)
+//                .url(path)
+////                .payLoad(Arrays.array("Zeyad-37", "Zeyad-37"))
+//                .payLoad(payload)
+//                .idColumnName(User.LOGIN, String.class)
+//                .responseType(Success.class)
+//                .build())
+//                .subscribe(testSubscriber);
+//
+//        testSubscriber.awaitTerminalEvent();
+//
+//        RequestsVerifier.verifyDELETE(pathContains(path)).invoked();
+//
+//        testSubscriber.assertSubscribed()
+//                .assertNoErrors()
+//                .assertValueCount(1)
+//                .assertValue(success)
+//                .assertComplete();
+//    }
 
 //    @Test
 //    public void testDeleteAll() {
@@ -354,7 +354,7 @@ public class APIIntegrationTest {
 //
 //        File file = new File(RuntimeEnvironment.application.getCacheDir().getPath(), "test");
 //        file.mkdir();
-//        TestSubscriber<Success> testSubscriber = new TestSubscriber<>();
+//        TestObserver<Success> testSubscriber = new TestObserver<>();
 //
 //        HashMap<String, File> hashMap = new HashMap<>(1);
 //        hashMap.put("image", file);
@@ -375,7 +375,7 @@ public class APIIntegrationTest {
 //                .assertValue(success)
 //                .assertComplete();
 //    }
-
+//
 //    @Test
 //    public void testDownloadFile() {
 //        String path = "download/user";
@@ -387,7 +387,7 @@ public class APIIntegrationTest {
 //        File file = new File(RuntimeEnvironment.application.getCacheDir().getPath(), "test");
 //        file.mkdir();
 //
-//        TestSubscriber<File> testSubscriber = new TestSubscriber<>();
+//        TestObserver<File> testSubscriber = new TestObserver<>();
 //        dataService.downloadFile(new FileIORequest.Builder(path, file)
 //                .payLoad(new HashMap<>())
 //                .requestType(Object.class)

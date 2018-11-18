@@ -3,7 +3,7 @@ package com.zeyad.usecases.network;
 import android.support.annotation.NonNull;
 
 import com.zeyad.usecases.BuildConfig;
-import com.zeyad.usecases.TestRealmModel;
+import com.zeyad.usecases.TestModel;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -46,29 +46,29 @@ public class ApiConnectionTest {
         mRestApiWithoutCache = mock(RestApi.class);
 
         when(mRestApiWithoutCache.dynamicGetList(mValidUrl))
-                .thenReturn(Flowable.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Flowable.just(Collections.singletonList(new TestModel())));
 
         when(mRestApiWithoutCache.dynamicGetList(mValidUrl, true))
-                .thenReturn(Flowable.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Flowable.just(Collections.singletonList(new TestModel())));
         when(mRestApiWithoutCache.dynamicGetList(mValidUrl, false))
-                .thenReturn(Flowable.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Flowable.just(Collections.singletonList(new TestModel())));
 
         when(mRestApiWithoutCache.dynamicGetObject(mValidUrl))
-                .thenReturn(Flowable.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Flowable.just(Collections.singletonList(new TestModel())));
 
         when(mRestApiWithoutCache.dynamicGetObject(mValidUrl, true))
-                .thenReturn(Flowable.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Flowable.just(Collections.singletonList(new TestModel())));
         when(mRestApiWithoutCache.dynamicGetObject(mValidUrl, false))
-                .thenReturn(Flowable.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Flowable.just(Collections.singletonList(new TestModel())));
 
         when(mRestApiWithoutCache.dynamicPost(mValidUrl, mMockedRequestBody))
-                .thenReturn(Single.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Single.just(Collections.singletonList(new TestModel())));
         when(mRestApiWithoutCache.dynamicPut(mValidUrl, mMockedRequestBody))
-                .thenReturn(Single.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Single.just(Collections.singletonList(new TestModel())));
         when(mRestApiWithoutCache.dynamicDelete(mValidUrl, mMockedRequestBody))
-                .thenReturn(Single.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Single.just(Collections.singletonList(new TestModel())));
         when(mRestApiWithoutCache.dynamicUpload(mValidUrl, mPartMap, mMultipartBodyParts))
-                .thenReturn(Single.just(Collections.singletonList(new TestRealmModel())));
+                .thenReturn(Single.just(Collections.singletonList(new TestModel())));
 
         mApiConnection = getApiImplementation(mRestApiWithoutCache, mRestApiWithCache);
     }
