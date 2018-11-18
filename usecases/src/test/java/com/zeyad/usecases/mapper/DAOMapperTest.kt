@@ -1,7 +1,7 @@
 package com.zeyad.usecases.mapper
 
 import com.google.gson.internal.LinkedTreeMap
-import com.zeyad.usecases.TestRealmModel
+import com.zeyad.usecases.TestModel
 import junit.framework.Assert
 import org.junit.After
 import org.junit.Before
@@ -29,8 +29,8 @@ class DAOMapperTest {
         Assert.assertEquals(
                 daoMapper!!.mapTo<Any>(Any(), Any::class.java).javaClass, LinkedTreeMap::class.java)
         Assert.assertEquals(
-                daoMapper!!.mapTo<Any>(Any(), TestRealmModel::class.java).javaClass,
-                TestRealmModel::class.java)
+                daoMapper!!.mapTo<Any>(Any(), TestModel::class.java).javaClass,
+                TestModel::class.java)
     }
 
     @Test
@@ -45,8 +45,8 @@ class DAOMapperTest {
         Assert.assertEquals(
                 daoMapper!!
                         .mapAllTo<Any>(
-                                listOf(TestRealmModel()),
-                                TestRealmModel::class.java).javaClass,
+                                listOf(TestModel()),
+                                TestModel::class.java).javaClass,
                 ArrayList::class.java)
     }
 }

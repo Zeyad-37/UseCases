@@ -1,6 +1,6 @@
 package com.zeyad.usecases.requests
 
-import com.zeyad.usecases.TestRealmModel
+import com.zeyad.usecases.TestModel
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.equalTo
@@ -17,7 +17,7 @@ class FileIORequestTest {
 
     private val URL = "www.google.com"
     private val FILE = Mockito.mock(File::class.java)
-    private val DATA_CLASS = TestRealmModel::class.java
+    private val DATA_CLASS = TestModel::class.java
     private var mFileIORequest: FileIORequest? = null
 
     @Before

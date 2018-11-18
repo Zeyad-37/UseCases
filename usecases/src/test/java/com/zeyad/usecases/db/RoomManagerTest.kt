@@ -24,7 +24,7 @@ import org.robolectric.annotation.Config
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(constants = BuildConfig::class, sdk = [25])
-class RealmManagerTest {
+class RoomManagerTest {
 
     private lateinit var roomManager: RoomManager
 

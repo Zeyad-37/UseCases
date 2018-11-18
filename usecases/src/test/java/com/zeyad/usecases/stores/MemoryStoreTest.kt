@@ -2,7 +2,7 @@ package com.zeyad.usecases.stores
 
 import android.support.test.rule.BuildConfig
 import com.zeyad.usecases.Config
-import com.zeyad.usecases.TestRealmModel
+import com.zeyad.usecases.TestModel
 import org.json.JSONObject
 import org.junit.Before
 import org.junit.Test
@@ -35,17 +35,17 @@ class MemoryStoreTest { // TODO: 6/15/17 test ids
 
     @Test
     fun getAllItems() {
-        memoryStore!!.getAllItems(TestRealmModel::class.java)
+        memoryStore!!.getAllItems(TestModel::class.java)
     }
 
     @Test
     fun getObject() {
-        memoryStore!!.getItem<Any>("", TestRealmModel::class.java)
+        memoryStore!!.getItem<Any>("", TestModel::class.java)
     }
 
     @Test
     fun cacheObject() {
-        memoryStore!!.cacheObject("", JSONObject(), TestRealmModel::class.java)
+        memoryStore!!.cacheObject("", JSONObject(), TestModel::class.java)
     }
 
     companion object {
@@ -54,6 +54,6 @@ class MemoryStoreTest { // TODO: 6/15/17 test ids
 
     //    @Test
     //    public void deleteListById() {
-    //        memoryStore.deleteListById(Collections.singletonList("1"), TestRealmModel.class);
+    //        memoryStore.deleteListById(Collections.singletonList("1"), TestModel.class);
     //    }
 }

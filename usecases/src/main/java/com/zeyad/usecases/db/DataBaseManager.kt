@@ -95,6 +95,6 @@ interface DataBaseManager {
      * @param idFieldName  The id used to look for inside the DB.
      * @param idFieldValue Name of the id field.
      */
-    fun <E> evictById(clazz: Class<E>, idFieldName: String, idFieldValue: Any): Single<Any>
+    fun <E> evictById(clazz: Class<E>, idFieldName: String, idFieldValue: Any): Single<Boolean>
 }
 

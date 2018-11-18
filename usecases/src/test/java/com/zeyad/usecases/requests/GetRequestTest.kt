@@ -1,6 +1,6 @@
 package com.zeyad.usecases.requests
 
-import com.zeyad.usecases.TestRealmModel
+import com.zeyad.usecases.TestModel
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.hamcrest.Matchers.equalTo
@@ -13,7 +13,7 @@ import org.junit.runners.JUnit4
 @RunWith(JUnit4::class)
 class GetRequestTest {
 
-    private val DATA_CLASS = TestRealmModel::class.java
+    private val DATA_CLASS = TestModel::class.java
     private val TO_PERSIST = false
     private val ID_COLUMN_NAME = "id"
     private val URL = "www.google.com"

@@ -1,6 +1,5 @@
 package com.zeyad.usecases.api
 
-import android.app.Application
 import android.content.Context
 import android.support.test.rule.BuildConfig
 import com.zeyad.usecases.db.DataBaseManager
@@ -12,8 +11,8 @@ import okhttp3.OkHttpClient
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito.mock
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.RuntimeEnvironment
 import org.robolectric.annotation.Config
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -34,7 +33,8 @@ class DataServiceFactoryTest {
     @Before
     @Throws(Exception::class)
     fun setUp() {
-        mockContext = mock(Application::class.java)
+//        mockContext = mock(Application::class.java)
+        mockContext = RuntimeEnvironment.application
         builder = OkHttpClient.Builder()
                 .connectTimeout(15, TimeUnit.SECONDS)
                 .readTimeout(15, TimeUnit.SECONDS)

@@ -29,7 +29,7 @@ class CloudStore(private val mApiConnection: ApiConnection,
     }
 
     private fun <M> getErrorSingleNotPersisted(): Single<M> {
-        return Single.error(NetworkConnectionException("Could not reach server and could not persist to queue!"))
+        return Single.error(NetworkConnectionException("Could not reach server!"))
     }
 
     private inline fun <M> persistErrorExecute(disk: () -> Unit, network: () -> Single<M>): Single<M> {
@@ -301,7 +301,7 @@ class CloudStore(private val mApiConnection: ApiConnection,
         if (withDisk(persist)) {
             val collectionSize = ids.size
             for (i in 0 until collectionSize) {
-                mDataBaseManager?.evictById(requestType, idColumnName, ids[i])
+                mDataBaseManager?.evictById(requestType, idColumnName, ids[i])?.blockingGet()
             }
         }
         if (withCache(cache)) {

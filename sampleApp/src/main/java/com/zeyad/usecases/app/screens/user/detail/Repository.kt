@@ -21,5 +21,6 @@ open class Repository(@SerializedName("id")
                       var fullName: String = ""
 //        ,
 //                      @SerializedName("owner")
+//                      @IgnoredOnParcel
 //                      var owner: User = User()) : Parcelable
 ) : Parcelable

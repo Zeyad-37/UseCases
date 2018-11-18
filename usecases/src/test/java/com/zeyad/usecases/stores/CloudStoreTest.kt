@@ -7,7 +7,8 @@ import android.net.NetworkInfo
 import android.os.Build
 import android.os.HandlerThread
 import android.support.test.rule.BuildConfig
-import com.zeyad.usecases.TestRealmModel
+import com.zeyad.usecases.Config.gson
+import com.zeyad.usecases.TestModel
 import com.zeyad.usecases.anyObject
 import com.zeyad.usecases.db.DataBaseManager
 import com.zeyad.usecases.db.RoomManager
@@ -59,14 +60,14 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         mockApiConnection = mock(ApiConnection::class.java)
         mockDataBaseManager = mock(RoomManager::class.java)
         changeStateOfNetwork(mockContext, true)
-        `when`(mockDataBaseManager.put(any(JSONObject::class.java), any(Class::class.java)))
+        `when`(mockDataBaseManager.put(anyObject<JSONObject>(), anyObject<Class<TestModel>>()))
                 .thenReturn(Single.just(true))
-        `when`(mockDataBaseManager.putAll(any(JSONArray::class.java), any(Class::class.java)))
+        `when`(mockDataBaseManager.putAll(anyObject<JSONArray>(), anyObject<Class<TestModel>>()))
                 .thenReturn(Single.just(true))
         `when`(mockDataBaseManager.putAll<Any>(anyListOf(Any::class.java), anyObject()))
                 .thenReturn(Single.just(true))
         cloudStore = CloudStore(mockApiConnection, mockDataBaseManager, DAOMapper(),
-                MemoryStore(com.zeyad.usecases.Config.gson, HashMap()))
+                MemoryStore(gson, HashMap()))
         val backgroundThread = HandlerThread("backgroundThread")
         backgroundThread.start()
         com.zeyad.usecases.Config.withCache = false
@@ -110,10 +111,10 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
 
     @Test
     fun dynamicGetList() {
-        val testRealmObjects = ArrayList<TestRealmModel>()
-        testRealmObjects.add(TestRealmModel())
-        val observable = Flowable.just<List<TestRealmModel>>(testRealmObjects)
-        `when`(mockApiConnection.dynamicGetList<TestRealmModel>(anyString(), anyBoolean())).thenReturn(observable)
+        val testRealmObjects = ArrayList<TestModel>()
+        testRealmObjects.add(TestModel())
+        val observable = Flowable.just<List<TestModel>>(testRealmObjects)
+        `when`(mockApiConnection.dynamicGetList<TestModel>(anyString(), anyBoolean())).thenReturn(observable)
 
         val testSubscriber = TestSubscriber<Any>()
         cloudStore.dynamicGetList("", "", Any::class.java, false, false)
@@ -129,8 +130,8 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
 
     @Test
     fun dynamicGetListCanWillPersist() {
-        val observable = Flowable.just(listOf(TestRealmModel()))
-        `when`(mockApiConnection.dynamicGetList<TestRealmModel>(anyString(), anyBoolean())).thenReturn(observable)
+        val observable = Flowable.just(listOf(TestModel()))
+        `when`(mockApiConnection.dynamicGetList<TestModel>(anyString(), anyBoolean())).thenReturn(observable)
 
         val testSubscriber = TestSubscriber<List<*>>()
         cloudStore.dynamicGetList("", "", Any::class.java, true, false).subscribe(testSubscriber)
@@ -468,7 +469,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
 
     @Test
     fun dynamicDeleteCollection() {
-        `when`(mockApiConnection.dynamicDelete<Any>(anyString(), any()))
+        `when`(mockApiConnection.dynamicDelete<Any>(anyString(), anyObject()))
                 .thenReturn(observable)
 
         val testSubscriber = TestObserver<Any>()
@@ -480,13 +481,13 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         testSubscriber.assertComplete()
         testSubscriber.assertValueCount(1)
 
-        verify<ApiConnection>(mockApiConnection, times(1)).dynamicDelete<Any>(anyString(), any())
+        verify<ApiConnection>(mockApiConnection, times(1)).dynamicDelete<Any>(anyString(), anyObject())
         verifyDBInteractions(0, 0, 0, 0)
     }
 
     @Test
     fun dynamicDeleteCollectionCanWillPersist() {
-        `when`(mockApiConnection.dynamicDelete<Any>(anyString(), any())).thenReturn(observable)
+        `when`(mockApiConnection.dynamicDelete<Any>(anyString(), anyObject())).thenReturn(observable)
 
         val testSubscriber = TestObserver<Any>()
         cloudStore.dynamicDeleteCollection(
@@ -497,7 +498,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
         testSubscriber.assertComplete()
         testSubscriber.assertValueCount(1)
 
-        verify<ApiConnection>(mockApiConnection, times(1)).dynamicDelete<Any>(anyString(), any())
+        verify<ApiConnection>(mockApiConnection, times(1)).dynamicDelete<Any>(anyString(), anyObject())
         verifyDBInteractions(0, 0, 0, 0)
     }
 
@@ -512,7 +513,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
 
         testSubscriber.assertErrorMessage(errorMessage)
 
-        verify<ApiConnection>(mockApiConnection, times(0)).dynamicDelete<Any>(anyString(), any())
+        verify<ApiConnection>(mockApiConnection, times(0)).dynamicDelete<Any>(anyString(), anyObject())
         verifyDBInteractions(0, 0, 0, 0)
     }
 
@@ -527,7 +528,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
 
         testSubscriber.assertError(NetworkConnectionException::class.java)
 
-        verify<ApiConnection>(mockApiConnection, times(0)).dynamicDelete<Any>(anyString(), any())
+        verify<ApiConnection>(mockApiConnection, times(0)).dynamicDelete<Any>(anyString(), anyObject())
         verifyDBInteractions(0, 0, 0, 0)
     }
 
@@ -637,7 +638,7 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
 
     @Test(expected = RuntimeException::class)
     fun queryDisk() {
-        val observable = cloudStore.queryDisk("", TestRealmModel::class.java)
+        val observable = cloudStore.queryDisk("", TestModel::class.java)
 
         // Verify repository interactions
         verifyZeroInteractions(mockApiConnection)
@@ -650,13 +651,13 @@ class CloudStoreTest { // TODO: 6/5/17 add disk and cache verifications
 
     private fun verifyDBInteractions(putAllJ: Int, putAllL: Int, putJ: Int, evict: Int) {
         verify<DataBaseManager>(mockDataBaseManager, times(putAllJ))
-                .putAll(any(JSONArray::class.java), any(Class::class.java))
-        verify<DataBaseManager>(mockDataBaseManager, times(putAllL)).putAll<TestRealmModel>(Matchers
-                .anyListOf(TestRealmModel::class.java), anyObject())
+                .putAll(anyObject<JSONArray>(), anyObject<Class<TestModel>>())
+        verify<DataBaseManager>(mockDataBaseManager, times(putAllL)).putAll<TestModel>(Matchers
+                .anyListOf(TestModel::class.java), anyObject())
         verify<DataBaseManager>(mockDataBaseManager, times(putJ))
-                .put(any(JSONObject::class.java), any(Class::class.java))
-        verify<DataBaseManager>(mockDataBaseManager, atLeast(evict)).evictById(any(Class::class.java),
-                anyString(), any())
+                .put(anyObject<JSONObject>(), anyObject<Class<TestModel>>())
+        verify<DataBaseManager>(mockDataBaseManager, atLeast(evict)).evictById(anyObject<Class<TestModel>>(),
+                anyString(), anyObject())
     }
 
     private fun changeStateOfNetwork(mockedContext: Context, toEnable: Boolean): Context {

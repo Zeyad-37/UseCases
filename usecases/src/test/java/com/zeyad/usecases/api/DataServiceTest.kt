@@ -1,7 +1,7 @@
 package com.zeyad.usecases.api
 
 import android.support.test.rule.BuildConfig
-import com.zeyad.usecases.TestRealmModel
+import com.zeyad.usecases.TestModel
 import com.zeyad.usecases.anyObject
 import com.zeyad.usecases.requests.FileIORequest
 import com.zeyad.usecases.requests.GetRequest
@@ -45,8 +45,8 @@ class DataServiceTest {
         flowable = Flowable.just(true)
         single = Single.just(true)
         fileFlowable = Single.just(File(""))
-        postRequest = PostRequest.Builder(TestRealmModel::class.java, false).payLoad(Any()).build()
-        getRequest = GetRequest.Builder(TestRealmModel::class.java, false)
+        postRequest = PostRequest.Builder(TestModel::class.java, false).payLoad(Any()).build()
+        getRequest = GetRequest.Builder(TestModel::class.java, false)
                 .url("")
                 .id(37, "id")
                 .cache("id")
@@ -75,7 +75,7 @@ class DataServiceTest {
                         anyBoolean()))
                 .thenReturn(Flowable.just(mutableListOf()))
 
-        dataService.getList<TestRealmModel>(getRequest)
+        dataService.getList<TestModel>(getRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), anyObject()), times(1))
                 .dynamicGetList<Any>(anyString(),
@@ -95,11 +95,11 @@ class DataServiceTest {
                         anyString(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
-        dataService.getObject<TestRealmModel>(getRequest)
+        dataService.getObject<TestModel>(getRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), anyObject()), times(1))
                 .dynamicGetObject<Any>(
@@ -107,7 +107,7 @@ class DataServiceTest {
                         anyString(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -143,7 +143,7 @@ class DataServiceTest {
                         anyString(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
         `when`(dataStoreFactory
@@ -153,7 +153,7 @@ class DataServiceTest {
                         anyString(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(flowable)
 
@@ -162,7 +162,7 @@ class DataServiceTest {
                 ?.getItem<Any>(anyString(), anyObject()))
                 .thenReturn(Single.just(true))
 
-        dataService.getObjectOffLineFirst<TestRealmModel>(getRequest)
+        dataService.getObjectOffLineFirst<TestModel>(getRequest)
 
         verify<DataStore>(dataStoreFactory.cloud(Any::class.java), times(1))
                 .dynamicGetObject<Any>(
@@ -170,7 +170,7 @@ class DataServiceTest {
                         anyString(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean())
         verify<DataStore>(dataStoreFactory.disk(Any::class.java), times(1))
                 .dynamicGetObject<Any>(
@@ -178,7 +178,7 @@ class DataServiceTest {
                         anyString(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -192,11 +192,11 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(single)
 
-        dataService.patchObject<TestRealmModel>(postRequest)
+        dataService.patchObject<TestModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), anyObject()), times(1))
                 .dynamicPatchObject<Any>(
@@ -205,7 +205,7 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -220,11 +220,11 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(single)
 
-        dataService.postObject<TestRealmModel>(postRequest)
+        dataService.postObject<TestModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), anyObject()), times(1))
                 .dynamicPostObject<Any>(
@@ -233,7 +233,7 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -248,11 +248,11 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(single)
 
-        dataService.postList<TestRealmModel>(postRequest)
+        dataService.postList<TestModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), anyObject()), times(1))
                 .dynamicPostList<Any>(
@@ -261,7 +261,7 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -276,11 +276,11 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(single)
 
-        dataService.putObject<TestRealmModel>(postRequest)
+        dataService.putObject<TestModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), anyObject()), times(1))
                 .dynamicPutObject<Any>(
@@ -289,7 +289,7 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -304,11 +304,11 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean()))
                 .thenReturn(single)
 
-        dataService.putList<TestRealmModel>(postRequest)
+        dataService.putList<TestModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), anyObject()), times(1))
                 .dynamicPutList<Any>(
@@ -317,7 +317,7 @@ class DataServiceTest {
                         anyObject(),
                         anyObject(),
                         anyObject(),
-                        anyObject(),
+                        anyBoolean(),
                         anyBoolean())
     }
 
@@ -337,7 +337,7 @@ class DataServiceTest {
                         anyBoolean()))
                 .thenReturn(single)
 
-        dataService.deleteItemById<TestRealmModel>(postRequest)
+        dataService.deleteItemById<TestModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), anyObject()), times(1))
                 .dynamicDeleteCollection<Any>(
@@ -367,7 +367,7 @@ class DataServiceTest {
                         anyBoolean()))
                 .thenReturn(single)
 
-        dataService.deleteCollectionByIds<TestRealmModel>(postRequest)
+        dataService.deleteCollectionByIds<TestModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), anyObject()), times(1))
                 .dynamicDeleteCollection<Any>(
@@ -396,13 +396,13 @@ class DataServiceTest {
     @Throws(Exception::class)
     fun queryDisk() {
         `when`(dataStoreFactory.disk(Any::class.java)
-                .queryDisk(anyString(), any(Class::class.java)))
-                .thenReturn(Flowable.just(listOf(TestRealmModel())))
+                .queryDisk(anyString(), anyObject<Class<TestModel>>()))
+                .thenReturn(Flowable.just(TestModel()))
 
-        dataService.queryDisk("", TestRealmModel::class.java)
+        dataService.queryDisk("", TestModel::class.java)
 
         verify<DataStore>(dataStoreFactory.disk(Any::class.java), times(1))
-                .queryDisk(anyString(), any(Class::class.java))
+                .queryDisk(anyString(), anyObject<Class<TestModel>>())
     }
 
     @Test
@@ -414,7 +414,7 @@ class DataServiceTest {
                         anyString(),
                         anyMap() as HashMap<String, File>,
                         anyMap() as HashMap<String, Any>,
-                        any(Class::class.java) as Class<File>))
+                        anyObject()))
                 .thenReturn(fileFlowable)
 
         dataService.uploadFile<Any>(
@@ -435,13 +435,13 @@ class DataServiceTest {
                 .cloud(Any::class.java)
                 .dynamicDownloadFile(
                         anyString(),
-                        any(File::class.java)))
+                        anyObject()))
                 .thenReturn(fileFlowable)
 
         dataService.downloadFile(
                 FileIORequest.Builder("", File("")).responseType(Any::class.java).build())
 
         verify<DataStore>(dataStoreFactory.cloud(Any::class.java), times(1))
-                .dynamicDownloadFile(anyString(), any(File::class.java))
+                .dynamicDownloadFile(anyString(), anyObject())
     }
 }
