@@ -45,11 +45,10 @@ class DataServiceConfigTest {
         cache = Cache(File("", "http-cache"), (10 * 1024 * 1024).toLong())
         mDataServiceConfig = DataServiceConfig.Builder(mockContext)
                 .baseUrl(URL)
-                .cacheSize(cacheSize)
                 .okHttpBuilder(builder)
                 .okHttpCache(cache)
-                .withCache(3, TimeUnit.MINUTES)
-                .withSQLite(object : DataBaseManagerUtil {
+                .withCache(3, TimeUnit.MINUTES, cacheSize)
+                .withRoom(object : DataBaseManagerUtil {
                     override fun getDataBaseManager(dataClass: Class<*>): DataBaseManager? {
                         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
                     }

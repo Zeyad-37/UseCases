@@ -4,10 +4,10 @@ import android.content.Context
 import android.support.test.rule.BuildConfig
 import com.zeyad.usecases.db.DataBaseManager
 import com.zeyad.usecases.utils.DataBaseManagerUtil
-import junit.framework.Assert.assertEquals
-import junit.framework.Assert.assertNotNull
 import okhttp3.Cache
 import okhttp3.OkHttpClient
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -24,7 +24,6 @@ import java.util.concurrent.TimeUnit
 @Config(constants = BuildConfig::class, sdk = [25])
 class DataServiceFactoryTest {
     private val URL = "https://api.github.com/"
-    private val cacheSize = 8192
     private lateinit var mDataServiceConfig: DataServiceConfig
     private lateinit var mockContext: Context
     private lateinit var builder: OkHttpClient.Builder
@@ -43,10 +42,9 @@ class DataServiceFactoryTest {
                 (10 * 1024 * 1024).toLong())
         mDataServiceConfig = DataServiceConfig.Builder(mockContext)
                 .baseUrl(URL)
-                .cacheSize(cacheSize)
                 .okHttpBuilder(builder)
                 .okHttpCache(cache)
-                .withSQLite(object : DataBaseManagerUtil {
+                .withRoom(object : DataBaseManagerUtil {
                     override fun getDataBaseManager(dataClass: Class<*>): DataBaseManager? {
 //                        RoomManager()
                         return null

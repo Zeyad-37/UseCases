@@ -39,7 +39,7 @@ fun createDataService(context: Context, db: AppDatabase): IDataService {
     return DataServiceFactory(DataServiceConfig.Builder(context)
             .baseUrl(API_BASE_URL)
             .okHttpBuilder(getOkHttpBuilder())
-            .withSQLite(object : DataBaseManagerUtil {
+            .withRoom(object : DataBaseManagerUtil {
                 override fun getDataBaseManager(dataClass: Class<*>): DataBaseManager? {
                     return RoomManager(db, object : DaoResolver {
                         override fun <E> getDao(dataClass: Class<E>): BaseDao<E> {

@@ -75,19 +75,15 @@ data class DataServiceConfig internal constructor(val context: Context,
             return this
         }
 
-        fun withCache(expiryAmount: Long, timeUnit: TimeUnit): Builder {
+        fun withCache(expiryAmount: Long, timeUnit: TimeUnit, cacheSize: Int = 0): Builder {
             this.withCache = true
             this.cacheDuration = expiryAmount
             this.timeUnit = timeUnit
-            return this
-        }
-
-        fun cacheSize(cacheSize: Int): Builder {
             this.cacheSize = cacheSize
             return this
         }
 
-        fun withSQLite(dataBaseManagerUtil: DataBaseManagerUtil): Builder {
+        fun withRoom(dataBaseManagerUtil: DataBaseManagerUtil): Builder {
             this.dataBaseManagerUtil = dataBaseManagerUtil
             this.withSQLite = true
             return this
