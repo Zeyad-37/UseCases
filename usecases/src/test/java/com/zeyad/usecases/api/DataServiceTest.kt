@@ -326,7 +326,7 @@ class DataServiceTest {
     fun deleteItemById() {
         `when`(dataStoreFactory
                 .dynamically(anyString(), anyObject())
-                .dynamicDeleteCollection<Any>(
+                .dynamicDeleteCollection<Any, Any>(
                         anyString(),
                         anyString(),
                         anyObject(),
@@ -340,7 +340,7 @@ class DataServiceTest {
         dataService.deleteItemById<TestModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), anyObject()), times(1))
-                .dynamicDeleteCollection<Any>(
+                .dynamicDeleteCollection<Any, Any>(
                         anyString(),
                         anyString(),
                         anyObject(),
@@ -356,7 +356,7 @@ class DataServiceTest {
     fun deleteCollection() {
         `when`(dataStoreFactory
                 .dynamically(anyString(), anyObject())
-                .dynamicDeleteCollection<Any>(
+                .dynamicDeleteCollection<Any, Any>(
                         anyString(),
                         anyString(),
                         anyObject(),
@@ -370,7 +370,7 @@ class DataServiceTest {
         dataService.deleteCollectionByIds<TestModel>(postRequest)
 
         verify<DataStore>(dataStoreFactory.dynamically(anyString(), anyObject()), times(1))
-                .dynamicDeleteCollection<Any>(
+                .dynamicDeleteCollection<Any, Any>(
                         anyString(),
                         anyString(),
                         anyObject(),
@@ -397,7 +397,7 @@ class DataServiceTest {
     fun queryDisk() {
         `when`(dataStoreFactory.disk(Any::class.java)
                 .queryDisk(anyString(), anyObject<Class<TestModel>>()))
-                .thenReturn(Flowable.just(TestModel()))
+                .thenReturn(Flowable.just(listOf(TestModel())))
 
         dataService.queryDisk("", TestModel::class.java)
 

@@ -13,7 +13,7 @@ interface BaseDao<E> {
     fun getAllItems(query: SupportSQLiteQuery): Single<List<E>>
 
     @RawQuery
-    fun getQuery(query: SupportSQLiteQuery): Single<E>
+    fun getQuery(query: SupportSQLiteQuery): Single<List<E>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertItemsReplace(vararg objects: E): List<Long>

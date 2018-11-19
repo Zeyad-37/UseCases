@@ -33,7 +33,7 @@ interface DataStore {
      * Search disk with a query which returns an [Flowable] that will emit a list of
      * Object.
      */
-    fun <M> queryDisk(query: String, clazz: Class<M>): Flowable<M>
+    fun <M> queryDisk(query: String, clazz: Class<M>): Flowable<List<M>>
 
     /**
      * Patch a JSONObject which returns an [Flowable] that will emit a Object.
@@ -97,14 +97,14 @@ interface DataStore {
      * Delete a HashMap<String></String>, Object> from cloud which returns an [Flowable] that will emit
      * a Object.
      */
-    fun <M> dynamicDeleteCollection(url: String,
-                                    idColumnName: String,
-                                    itemIdType: Class<*>,
-                                    jsonArray: JSONArray,
-                                    requestType: Class<*>,
-                                    responseType: Class<M>,
-                                    persist: Boolean,
-                                    cache: Boolean): Single<M>
+    fun <T, M> dynamicDeleteCollection(url: String,
+                                       idColumnName: String,
+                                       itemIdType: Class<*>,
+                                       jsonArray: JSONArray,
+                                       requestType: Class<T>,
+                                       responseType: Class<M>,
+                                       persist: Boolean,
+                                       cache: Boolean): Single<M>
 
     fun <M> dynamicDeleteCollectionById(url: String,
                                         idColumnName: String,

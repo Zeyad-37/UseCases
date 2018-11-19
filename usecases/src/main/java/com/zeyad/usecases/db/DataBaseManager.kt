@@ -32,7 +32,7 @@ interface DataBaseManager {
      *
      * @param query The query used to look for inside the DB.
      */
-    fun <E> getQuery(query: String, clazz: Class<E>): Flowable<E>
+    fun <E> getQuery(query: String, clazz: Class<E>): Flowable<List<E>>
 
     /**
      * Puts and element into the DB.
@@ -70,7 +70,7 @@ interface DataBaseManager {
      *
      * @param clazz Class type of the items to be deleted.
      */
-    fun <E> evictAll(clazz: Class<E>): Single<Any>
+    fun <E> evictAll(clazz: Class<E>): Single<Boolean>
 
     /**
      * Evict a collection elements of the DB.
@@ -78,7 +78,7 @@ interface DataBaseManager {
      * @param list        List to be deleted.
      * @param clazz   Class type of the items to be deleted.
      */
-    fun <E> evictCollection(list: List<E>, clazz: Class<E>): Single<Any>
+    fun <E> evictCollection(list: List<E>, clazz: Class<E>): Single<Boolean>
 
     /**
      * Evict a collection elements of the DB.
@@ -86,7 +86,7 @@ interface DataBaseManager {
      * @param list        List of ids to be deleted.
      * @param clazz   Class type of the items to be deleted.
      */
-    fun <E> evictCollectionById(list: List<Any>, clazz: Class<E>, idFieldName: String): Single<Any>
+    fun <E> evictCollectionById(list: List<Any>, clazz: Class<E>, idFieldName: String): Single<Boolean>
 
     /**
      * Evict element by id of the DB.

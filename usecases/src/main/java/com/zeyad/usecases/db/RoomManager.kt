@@ -11,8 +11,8 @@ import org.json.JSONObject
 
 @Mockable
 class RoomManager(private val db: RoomDatabase, private val daoResolver: DaoResolver) : DataBaseManager {
-    //    typealias Predicate<T> = (T) -> Boolean
-    override fun <E> getQuery(query: String, clazz: Class<E>): Flowable<E> {
+
+    override fun <E> getQuery(query: String, clazz: Class<E>): Flowable<List<E>> {
         return db.singleTypedTransactionBlock {
             daoResolver.getDao(clazz).getQuery(SimpleSQLiteQuery(query))
         }.toFlowable()
@@ -59,22 +59,23 @@ class RoomManager(private val db: RoomDatabase, private val daoResolver: DaoReso
             list.add(Config.gson.fromJson(jsonArray.get(i).toString(), clazz))
         }
         return putAll(list, clazz)
-
     }
 
-    override fun <E> evictAll(clazz: Class<E>): Single<Any> {
-        return db.singleTransactionBlock {
+    override fun <E> evictAll(clazz: Class<E>): Single<Boolean> {
+        return db.singleTypedTransactionBlock {
             Single.just(daoResolver.getDao(clazz)
                     .deleteAllItems(SimpleSQLiteQuery("DELETE FROM ${clazz.simpleName}")) > 0)
         }
     }
 
-    override fun <E> evictCollection(list: List<E>, clazz: Class<E>): Single<Any> {
-        return db.singleTransactionBlock { Single.just(daoResolver.getDao(clazz).deleteItems(list) > 0) }
+    override fun <E> evictCollection(list: List<E>, clazz: Class<E>): Single<Boolean> {
+        return db.singleTypedTransactionBlock {
+            Single.just(daoResolver.getDao(clazz).deleteItems(list) > 0)
+        }
     }
 
-    override fun <E> evictCollectionById(list: List<Any>, clazz: Class<E>, idFieldName: String): Single<Any> {
-        return db.singleTransactionBlock {
+    override fun <E> evictCollectionById(list: List<Any>, clazz: Class<E>, idFieldName: String): Single<Boolean> {
+        return db.singleTypedTransactionBlock {
             Single.just(list).flatMap { evictById(clazz, idFieldName, it) }
         }
     }

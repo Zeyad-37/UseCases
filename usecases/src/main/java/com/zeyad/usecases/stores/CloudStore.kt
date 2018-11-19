@@ -14,6 +14,7 @@ import io.reactivex.disposables.Disposable
 import okhttp3.MediaType
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import okhttp3.RequestBody.create
 import org.json.JSONArray
 import org.json.JSONObject
 import java.io.*
@@ -56,7 +57,7 @@ class CloudStore(private val mApiConnection: ApiConnection,
                 .map { mEntityDataMapper.mapTo<M>(it, requestType) }
     }
 
-    override fun <M> queryDisk(query: String, clazz: Class<M>): Flowable<M> {
+    override fun <M> queryDisk(query: String, clazz: Class<M>): Flowable<List<M>> {
         return Flowable.error(IllegalAccessException("Can not search disk in cloud data store!"))
     }
 
@@ -68,7 +69,7 @@ class CloudStore(private val mApiConnection: ApiConnection,
                 saveLocally(idColumnName, jsonObject, requestType, persist, cache)
             }, {
                 mApiConnection.dynamicPatch<M>(url,
-                        RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonObject.toString()))
+                        create(MediaType.parse(APPLICATION_JSON), jsonObject.toString()))
                         .map { daoMapHelper(responseType, it) }
             })
         }
@@ -82,7 +83,7 @@ class CloudStore(private val mApiConnection: ApiConnection,
                 saveLocally(idColumnName, jsonObject, requestType, persist, cache)
             }, {
                 mApiConnection.dynamicPost<M>(url,
-                        RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonObject.toString()))
+                        create(MediaType.parse(APPLICATION_JSON), jsonObject.toString()))
                         .map { daoMapHelper(responseType, it) }
             })
         }
@@ -96,7 +97,7 @@ class CloudStore(private val mApiConnection: ApiConnection,
                 saveAllLocally(idColumnName, jsonArray, requestType, persist, cache)
             }, {
                 mApiConnection.dynamicPost<M>(url,
-                        RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
+                        create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
                         .map { daoMapHelper(responseType, it) }
             })
         }
@@ -110,7 +111,7 @@ class CloudStore(private val mApiConnection: ApiConnection,
                 saveLocally(idColumnName, jsonObject, requestType, persist, cache)
             }, {
                 mApiConnection.dynamicPut<M>(url,
-                        RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonObject.toString()))
+                        create(MediaType.parse(APPLICATION_JSON), jsonObject.toString()))
                         .map { daoMapHelper(responseType, it) }
             })
         }
@@ -124,39 +125,39 @@ class CloudStore(private val mApiConnection: ApiConnection,
                 saveAllLocally(idColumnName, jsonArray, requestType, persist, cache)
             }, {
                 mApiConnection.dynamicPut<M>(url,
-                        RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
+                        create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
                         .map { daoMapHelper(responseType, it) }
             })
         }
     }
 
-    // TODO("Finish and Fix")
-    override fun <M> dynamicDeleteCollection(url: String, idColumnName: String, itemIdType: Class<*>,
-                                             jsonArray: JSONArray, requestType: Class<*>, responseType: Class<M>,
-                                             persist: Boolean, cache: Boolean): Single<M> {
+    override fun <T, M> dynamicDeleteCollection(url: String, idColumnName: String, itemIdType: Class<*>,
+                                                jsonArray: JSONArray, requestType: Class<T>,
+                                                responseType: Class<M>, persist: Boolean, cache: Boolean): Single<M> {
         return Single.defer {
             persistErrorExecute({
-                val list = mutableListOf<Any>()
+                val list = mutableListOf<T>()
                 for (i in 0..(jsonArray.length() - 1)) {
                     list.add(gson.fromJson(jsonArray.getJSONObject(i).toString(), requestType))
                 }
                 deleteLocally(list, idColumnName, requestType, persist, cache)
             }, {
                 mApiConnection.dynamicDelete<M>(url,
-                        RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
+                        create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
                         .map { daoMapHelper(responseType, it) }
             })
         }
     }
 
-    override fun <M> dynamicDeleteCollectionById(url: String, idColumnName: String, itemIdType: Class<*>, jsonArray: JSONArray, requestType: Class<*>, responseType: Class<M>, persist: Boolean, cache: Boolean): Single<M> {
+    override fun <M> dynamicDeleteCollectionById(url: String, idColumnName: String, itemIdType: Class<*>,
+                                                 jsonArray: JSONArray, requestType: Class<*>,
+                                                 responseType: Class<M>, persist: Boolean, cache: Boolean): Single<M> {
         return Single.defer {
             persistErrorExecute({
                 deleteLocallyById(convertToListOfId(jsonArray, itemIdType), idColumnName, requestType,
                         persist, cache)
             }, {
-                mApiConnection.dynamicDelete<M>(url,
-                        RequestBody.create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
+                mApiConnection.dynamicDelete<M>(url, create(MediaType.parse(APPLICATION_JSON), jsonArray.toString()))
                         .map { daoMapHelper(responseType, it) }
             })
         }
@@ -212,12 +213,12 @@ class CloudStore(private val mApiConnection: ApiConnection,
             val multiPartBodyParts = ArrayList<MultipartBody.Part>()
             keyFileMap.toMap().forEach { entry ->
                 multiPartBodyParts.add(MultipartBody.Part.createFormData(entry.key,
-                        entry.value.name, RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA),
+                        entry.value.name, create(MediaType.parse(MULTIPART_FORM_DATA),
                         entry.value)))
             }
             val map = mutableMapOf<String, RequestBody>()
             for ((key, value) in parameters) {
-                map[key] = RequestBody.create(MediaType.parse(MULTIPART_FORM_DATA),
+                map[key] = create(MediaType.parse(MULTIPART_FORM_DATA),
                         value.toString())
             }
             if (isNetworkNotAvailable(Config.context)) {
@@ -278,12 +279,12 @@ class CloudStore(private val mApiConnection: ApiConnection,
         }
     }
 
-    private fun deleteLocally(list: List<Any>, idColumnName: String, requestType: Class<*>,
-                              persist: Boolean, cache: Boolean) {
+    private fun <T> deleteLocally(list: List<T>, idColumnName: String, requestType: Class<T>,
+                                  persist: Boolean, cache: Boolean) {
         if (withDisk(persist)) {
             val collectionSize = list.size
             for (i in 0 until collectionSize) {
-//                mDataBaseManager?.evictCollection(list, requestType)
+                mDataBaseManager?.evictCollection(list, requestType)
             }
         }
         if (withCache(cache)) {

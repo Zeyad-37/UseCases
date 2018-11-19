@@ -95,7 +95,7 @@ interface IDataService {
      * @param realmQueryProvider query tp select list of item(s).
      * @return
      */
-    fun <M> queryDisk(query: String, clazz: Class<M>): Single<M>
+    fun <M> queryDisk(query: String, clazz: Class<M>): Single<List<M>>
 
     /**
      * Creates a repository pattern with live objects

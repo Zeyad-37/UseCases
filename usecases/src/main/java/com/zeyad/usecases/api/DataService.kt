@@ -184,8 +184,8 @@ internal class DataService(private val mDataStoreFactory: DataStoreFactory,
         }
     }
 
-    override fun <M> queryDisk(query: String, clazz: Class<M>): Single<M> {
-        val result: Single<M> = try {
+    override fun <M> queryDisk(query: String, clazz: Class<M>): Single<List<M>> {
+        val result: Single<List<M>> = try {
             mDataStoreFactory.disk(Any::class.java).queryDisk(query, clazz)
                     .compose(ReplayingShare.instance()).singleOrError()
         } catch (e: IllegalAccessException) {

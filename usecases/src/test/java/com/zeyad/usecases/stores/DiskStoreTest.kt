@@ -61,7 +61,7 @@ class DiskStoreTest { // TODO: 6/5/17 add cache verifications
     @Test
     fun testSearchDiskQuery() {
         `when`(dbManager.getQuery(anyString(), anyObject<Class<TestModel>>()))
-                .thenReturn(Flowable.just(TestModel()))
+                .thenReturn(Flowable.just(listOf(TestModel())))
 
         mDiskStore.queryDisk("", TestModel::class.java)
 

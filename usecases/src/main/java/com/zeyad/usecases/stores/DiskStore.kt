@@ -2,6 +2,7 @@ package com.zeyad.usecases.stores
 
 import com.zeyad.usecases.Config.gson
 import com.zeyad.usecases.Mockable
+import com.zeyad.usecases.convertToListOfId
 import com.zeyad.usecases.convertToStringListOfId
 import com.zeyad.usecases.db.DataBaseManager
 import com.zeyad.usecases.withCache
@@ -126,25 +127,26 @@ class DiskStore(private val mDataBaseManager: DataBaseManager,
      * Delete a HashMap<String></String>, Object> from cloud which returns an [Single] that will emit
      * a Object.
      */
-    override fun <M> dynamicDeleteCollection(url: String,
-                                             idColumnName: String,
-                                             itemIdType: Class<*>,
-                                             jsonArray: JSONArray,
-                                             requestType: Class<*>,
-                                             responseType: Class<M>,
-                                             persist: Boolean,
-                                             cache: Boolean): Single<M> {
-        throw NotImplementedError("Not Implemented Yet")
-//        val stringIds = convertToStringListOfId(jsonArray)
-//        return mDataBaseManager.evictCollection(idColumnName, convertToListOfId(jsonArray, itemIdType),
-//                itemIdType, requestType)
-//                .doOnSuccess {
-//                    onNext(cache) {
-//                        mMemoryStore?.deleteListById(stringIds, requestType)
-//                    }
-//                }
-//                .map { it as M }
-//                .toSingle()
+    override fun <T, M> dynamicDeleteCollection(url: String,
+                                                idColumnName: String,
+                                                itemIdType: Class<*>,
+                                                jsonArray: JSONArray,
+                                                requestType: Class<T>,
+                                                responseType: Class<M>,
+                                                persist: Boolean,
+                                                cache: Boolean): Single<M> {
+        val list = mutableListOf<T>()
+        for (i in 0..(jsonArray.length() - 1)) {
+            list.add(gson.fromJson(jsonArray.getJSONObject(i).toString(), requestType))
+        }
+        return mDataBaseManager.evictCollection(list, requestType)
+                .doOnSuccess {
+                    onNext(cache) {
+                        mMemoryStore?.deleteListById(convertToListOfId(jsonArray, String::class.java),
+                                requestType)
+                    }
+                }
+                .map { it as M }
     }
 
     override fun <M> dynamicDeleteCollectionById(url: String,
@@ -165,12 +167,12 @@ class DiskStore(private val mDataBaseManager: DataBaseManager,
                 .map { it as M }
     }
 
-    override fun <M> queryDisk(query: String, clazz: Class<M>): Flowable<M> {
+    override fun <M> queryDisk(query: String, clazz: Class<M>): Flowable<List<M>> {
         return mDataBaseManager.getQuery(query, clazz)
     }
 
     override fun dynamicDeleteAll(requestType: Class<*>): Single<Boolean> {
-        return mDataBaseManager.evictAll(requestType).map { it as Boolean }
+        return mDataBaseManager.evictAll(requestType).map { it }
     }
 
     override fun dynamicDownloadFile(url: String, file: File): Single<File> {

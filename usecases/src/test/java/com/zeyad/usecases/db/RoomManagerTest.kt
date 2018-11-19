@@ -33,7 +33,7 @@ class RoomManagerTest {
         val testDao = mock(TestDao::class.java)
         `when`(testDao.getAllItems(anyObject())).thenReturn(Single.just(listOf(TestModel())))
         `when`(testDao.getItem(anyObject())).thenReturn(Single.just(TestModel()))
-        `when`(testDao.getQuery(anyObject())).thenReturn(Single.just(TestModel()))
+        `when`(testDao.getQuery(anyObject())).thenReturn(Single.just(listOf(TestModel())))
         `when`(testDao.insertItemsReplace(anyObject<TestModel>())).thenReturn(listOf(1))
         `when`(testDao.updateItemsReplace(anyObject())).thenReturn(1)
         `when`(testDao.deleteItems(anyObject<TestModel>())).thenReturn(1)
@@ -47,7 +47,7 @@ class RoomManagerTest {
         })
     }
 
-    private fun applyTestSingleSubscriber(single: Single<Any>) {
+    private fun applyTestSingleSubscriber(single: Single<*>) {
         val testSubscriber = TestObserver<Any>()
         single.subscribe(testSubscriber)
         testSubscriber.assertComplete()
@@ -81,7 +81,7 @@ class RoomManagerTest {
 
         applyTestFlowableSubscriber(flowable)
 
-        assertEquals(TestModel::class.java, flowable.firstElement().blockingGet().javaClass)
+        assertEquals(TestModel::class.java, flowable.firstElement().blockingGet()[0].javaClass)
     }
 
     @Test
